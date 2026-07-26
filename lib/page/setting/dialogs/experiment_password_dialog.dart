@@ -5,9 +5,9 @@
 // Experiment password dialog.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as user_perference;
+import 'package:watermeter/generated/l10n.dart';
 
 class ExperimentPasswordDialog extends StatefulWidget {
   const ExperimentPasswordDialog({super.key});
@@ -42,17 +42,14 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        FlutterI18n.translate(context, "setting.change_experiment_title"),
+        I18n.of(context)!.settingChangeExperimentTitle,
       ),
       content: TextField(
         autofocus: true,
         controller: _experimentPasswordController,
         obscureText: _couldView,
         decoration: InputDecoration(
-          hintText: FlutterI18n.translate(
-            context,
-            "setting.change_password_dialog.input_hint",
-          ),
+          hintText: I18n.of(context)!.settingChangePasswordDialogInputHint,
           suffixIcon: IconButton(
             icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
             onPressed: () {
@@ -65,13 +62,13 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(I18n.of(context)!.cancel),
           onPressed: () {
             Navigator.pop<bool>(context, false);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(I18n.of(context)!.confirm),
           onPressed: () async {
             if (_experimentPasswordController.text.isNotEmpty) {
               user_perference.setString(
@@ -82,10 +79,7 @@ class _ExperimentPasswordDialogState extends State<ExperimentPasswordDialog> {
             } else {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "setting.change_password_dialog.blank_input",
-                ),
+                msg: I18n.of(context)!.settingChangePasswordDialogBlankInput,
               );
             }
           },

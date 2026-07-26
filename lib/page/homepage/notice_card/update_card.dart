@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class UpdateCard extends StatelessWidget {
   const UpdateCard({super.key});
@@ -18,11 +18,11 @@ class UpdateCard extends StatelessWidget {
       builder: (context) {
         final state = UpdateNoticeController.i.updateMessageStateSignal.value;
         if (state.isLoading || state.isRefreshing) {
-          return Text(FlutterI18n.translate(context, "setting.fetching_update"))
+          return Text(I18n.of(context)!.settingFetchingUpdate)
               .paddingDirectional(horizontal: 16, vertical: 14)
               .withHomeCardStyle(context);
         } else if (state.hasError) {
-          return Text(FlutterI18n.translate(context, "setting.fetch_failed"))
+          return Text(I18n.of(context)!.settingFetchFailed)
               .paddingDirectional(horizontal: 16, vertical: 14)
               .withHomeCardStyle(context);
         } else {
@@ -32,12 +32,12 @@ class UpdateCard extends StatelessWidget {
               .value) {
             case null:
               return Text(
-                    FlutterI18n.translate(context, "setting.current_testing"),
+                    I18n.of(context)!.settingCurrentTesting,
                   )
                   .paddingDirectional(horizontal: 16, vertical: 14)
                   .withHomeCardStyle(context);
             case true:
-              return Text(FlutterI18n.translate(context, "setting.new_version"))
+              return Text(I18n.of(context)!.settingNewVersion)
                   .paddingDirectional(horizontal: 16, vertical: 14)
                   .withHomeCardStyle(
                     context,

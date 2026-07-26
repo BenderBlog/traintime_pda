@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 /// The index row of the class table, shows the index of the day and the week.
 class ClassTableDateRow extends StatelessWidget {
@@ -27,11 +27,7 @@ class ClassTableDateRow extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            FlutterI18n.translate(
-              context,
-              "classtable.month",
-              translationParams: {"month": dateList.first.month.toString()},
-            ),
+            I18n.of(context)!.classtableMonth(dateList.first.month.toString()),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

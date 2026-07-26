@@ -5,7 +5,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
@@ -14,6 +13,7 @@ import 'package:watermeter/page/setting/about_page/easter_egg_page.dart';
 import 'package:watermeter/page/setting/about_page/developer_widget.dart';
 import 'package:watermeter/page/setting/about_page/link_widget.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/l10n.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -33,254 +33,254 @@ class _AboutPageState extends State<AboutPage> {
     Developer(
       "BenderBlog Rodriguez",
       "https://avatars.githubusercontent.com/u/14026321",
-      FlutterI18n.translate(context, "setting.about_page.benderblog"),
+      I18n.of(context)!.settingAboutPageBenderblog,
       "https://space.bilibili.com/284290692",
     ),
     Developer(
       "A1nair",
       "https://avatars.githubusercontent.com/u/36269472",
-      FlutterI18n.translate(context, "setting.about_page.alnair"),
+      I18n.of(context)!.settingAboutPageAlnair,
       "https://github.com/A1nair",
     ),
     Developer(
       "aqqkad (Kevin)",
       "https://avatars.githubusercontent.com/u/97880629",
-      FlutterI18n.translate(context, "setting.about_page.aqqkad"),
+      I18n.of(context)!.settingAboutPageAqqkad,
       "https://github.com/aqqkad",
     ),
     Developer(
       "BellssGit",
       "https://avatars.githubusercontent.com/u/107785251",
-      FlutterI18n.translate(context, "setting.about_page.bellssgit"),
+      I18n.of(context)!.settingAboutPageBellssgit,
       "https://space.bilibili.com/17772726",
     ),
     Developer(
       "BrackRat",
       "https://avatars.githubusercontent.com/u/35328547",
-      FlutterI18n.translate(context, "setting.about_page.brackrat"),
+      I18n.of(context)!.settingAboutPageBrackrat,
       "https://github.com/BrackRat",
     ),
     Developer(
       "Breezeline",
       "https://avatars.githubusercontent.com/u/74224286",
-      FlutterI18n.translate(context, "setting.about_page.breezeline"),
+      I18n.of(context)!.settingAboutPageBreezeline,
       "mailto:ydzhang.ruc@gmail.com",
     ),
     Developer(
       "0xCAFEBABE",
       "https://blog.hxzzz.asia/usr/uploads/2024/05/1717631110.jpg",
-      FlutterI18n.translate(context, "setting.about_page.cafebabe"),
+      I18n.of(context)!.settingAboutPageCafebabe,
       "https://blog.hxzzz.asia/",
     ),
     Developer(
       "chitao1234",
       "https://avatars.githubusercontent.com/u/25598632",
-      FlutterI18n.translate(context, "setting.about_page.chitao1234"),
+      I18n.of(context)!.settingAboutPageChitao1234,
       "https://github.com/chitao1234",
     ),
     Developer(
       "CopperKoi",
       "https://avatars.githubusercontent.com/u/91732947",
-      FlutterI18n.translate(context, "setting.about_page.copperkoi"),
+      I18n.of(context)!.settingAboutPageCopperkoi,
       "https://copperkoi.cn/about",
     ),
     Developer(
       "Dimole",
       "https://avatars.githubusercontent.com/u/24828354",
-      FlutterI18n.translate(context, "setting.about_page.dimole"),
+      I18n.of(context)!.settingAboutPageDimole,
       "https://github.com/Dimole",
     ),
     Developer(
       "EliteWars",
       "https://avatars.githubusercontent.com/u/44139545",
-      FlutterI18n.translate(context, "setting.about_page.elitewars"),
+      I18n.of(context)!.settingAboutPageElitewars,
       "https://space.bilibili.com/49892391/",
     ),
     Developer(
       "Mother Elliot Flores",
       "https://legacy.superbart.top/picture/Random/hirasawa.jpg",
-      FlutterI18n.translate(context, "setting.about_page.elliot"),
+      I18n.of(context)!.settingAboutPageElliot,
       "https://mp.weixin.qq.com/s/_egmj3rjwOTAB-KHzKsYGw",
     ),
     Developer(
       "FlyingPig278",
       "https://avatars.githubusercontent.com/u/88129602",
-      FlutterI18n.translate(context, "setting.about_page.flyingpig"),
+      I18n.of(context)!.settingAboutPageFlyingpig,
       "https://github.com/FlyingPig278",
     ),
     Developer(
       "GodHu777777",
       "https://avatars.githubusercontent.com/u/111997394",
-      FlutterI18n.translate(context, "setting.about_page.godhu777777"),
+      I18n.of(context)!.settingAboutPageGodhu777777,
       "https://github.com/GodHu777777",
     ),
     Developer(
       "Hancl777",
       "https://avatars.githubusercontent.com/u/74408609",
-      FlutterI18n.translate(context, "setting.about_page.hancl777"),
+      I18n.of(context)!.settingAboutPageHancl777,
       "https://github.com/Hancl777",
     ),
     Developer(
       "Hazuki Keatsu (叶月枫)",
       "https://avatars.githubusercontent.com/u/111259147",
-      FlutterI18n.translate(context, "setting.about_page.hazuki-keatsu"),
+      I18n.of(context)!.settingAboutPageHazukiKeatsu,
       "https://keatsu.top",
     ),
     Developer(
       "hawa130",
       "https://avatars.githubusercontent.com/u/26119430",
-      FlutterI18n.translate(context, "setting.about_page.hawa130"),
+      I18n.of(context)!.settingAboutPageHawa130,
       "https://hawa130.com/",
     ),
     Developer(
       "hhzm (闪电豹猫)",
       "https://avatars.githubusercontent.com/u/19224718",
-      FlutterI18n.translate(context, "setting.about_page.hhzm"),
+      I18n.of(context)!.settingAboutPageHhzm,
       "https://hhzm.win/",
     ),
     Developer(
       "imaginary_17",
       "https://avatars.githubusercontent.com/u/70046513",
-      FlutterI18n.translate(context, "setting.about_page.imaginary_17"),
+      I18n.of(context)!.settingAboutPageImaginary17,
       "https://github.com/clever-max",
     ),
 
     Developer(
       "imoscarz",
       "https://avatars.githubusercontent.com/u/52318095",
-      FlutterI18n.translate(context, "setting.about_page.imoscarz"),
+      I18n.of(context)!.settingAboutPageImoscarz,
       "https://imoscarz.me/",
     ),
     Developer(
       "Ka-mate-ka-ora",
       "https://avatars.githubusercontent.com/u/187651078",
-      FlutterI18n.translate(context, "setting.about_page.ka-mate-ka-ora"),
+      I18n.of(context)!.settingAboutPageKaMateKaOra,
       "https://github.com/Ka-mate-ka-ora/",
     ),
     Developer(
       "Lagrange-X",
       "https://avatars.githubusercontent.com/u/110022915",
-      FlutterI18n.translate(context, "setting.about_page.lagrange-x"),
+      I18n.of(context)!.settingAboutPageLagrangeX,
       "https://github.com/Lagrange-X/",
     ),
     Developer(
       "lhx-666-cool",
       "https://avatars.githubusercontent.com/u/63273792",
-      FlutterI18n.translate(context, "setting.about_page.lhx-666-cool"),
+      I18n.of(context)!.settingAboutPageLhx666Cool,
       "https://github.com/lhx-666-cool/",
     ),
     Developer(
       "LichtYy",
       "https://avatars.githubusercontent.com/u/105974550",
-      FlutterI18n.translate(context, "setting.about_page.lichtyy"),
+      I18n.of(context)!.settingAboutPageLichtyy,
       "https://github.com/lichtYy",
     ),
     Developer(
       "LQSY-H",
       "https://avatars.githubusercontent.com/u/142521812",
-      FlutterI18n.translate(context, "setting.about_page.lqsy-h"),
+      I18n.of(context)!.settingAboutPageLqsyH,
       "https://github.com/LQSY-H",
     ),
     Developer(
       "lsy223622 (木生睡不着)",
       "https://avatars.githubusercontent.com/u/57913213",
-      FlutterI18n.translate(context, "setting.about_page.lsy223622"),
+      I18n.of(context)!.settingAboutPageLsy223622,
       "https://lsy223622.com/",
     ),
     Developer(
       "MrBrilliant2046",
       "https://avatars.githubusercontent.com/u/94728421?v=4",
-      FlutterI18n.translate(context, "setting.about_page.mrbrilliant2046"),
+      I18n.of(context)!.settingAboutPageMrbrilliant2046,
       "https://github.com/MrBrilliant2046",
     ),
     Developer(
       "NanCunChild",
       "https://avatars.githubusercontent.com/u/85873278?v=4",
-      FlutterI18n.translate(context, "setting.about_page.nancunchild"),
+      I18n.of(context)!.settingAboutPageNancunchild,
       "https://github.com/NanCunChild",
     ),
     Developer(
       "nkAnF",
       "https://avatars.githubusercontent.com/u/172456830",
-      FlutterI18n.translate(context, "setting.about_page.nkanf"),
+      I18n.of(context)!.settingAboutPageNkanf,
       "https://github.com/nkanf-dev",
     ),
     Developer(
       "Pairman",
       "https://avatars.githubusercontent.com/u/18365163",
-      FlutterI18n.translate(context, "setting.about_page.pairman"),
+      I18n.of(context)!.settingAboutPagePairman,
       "https://github.com/Pairman",
     ),
     Developer(
       "ReverierXu",
       "https://avatars.githubusercontent.com/u/41937333",
-      FlutterI18n.translate(context, "setting.about_page.reverierxu"),
+      I18n.of(context)!.settingAboutPageReverierxu,
       "https://blog.woooo.tech/",
     ),
     Developer(
       "Rrrilac",
       "https://avatars.githubusercontent.com/u/128341096",
-      FlutterI18n.translate(context, "setting.about_page.rrrilac"),
+      I18n.of(context)!.settingAboutPageRrrilac,
       "https://github.com/Rrrilac",
     ),
     Developer(
       "Ray Flores",
       "https://sns-avatar-qc.xhscdn.com/avatar/65fb96e24f8a7c5709c421f2.jpg",
-      FlutterI18n.translate(context, "setting.about_page.ray"),
+      I18n.of(context)!.settingAboutPageRay,
       "https://www.xiaohongshu.com/user/profile/63d293990000000026010075",
     ),
     Developer(
       "shadowyingyi",
       "https://avatars.githubusercontent.com/u/42831635",
-      FlutterI18n.translate(context, "setting.about_page.shadowyingyi"),
+      I18n.of(context)!.settingAboutPageShadowyingyi,
       "https://github.com/shadowyingyi",
     ),
     Developer(
       "stalomeow",
       "https://avatars.githubusercontent.com/u/47203031",
-      FlutterI18n.translate(context, "setting.about_page.stalomeow"),
+      I18n.of(context)!.settingAboutPageStalomeow,
       "https://stalomeow.com",
     ),
     Developer(
       "xeonds",
       "https://avatars.githubusercontent.com/u/68117734",
-      FlutterI18n.translate(context, "setting.about_page.xeonds"),
+      I18n.of(context)!.settingAboutPageXeonds,
       "https://mxts.jiujiuer.xyz",
     ),
     Developer(
       "XingShuyu",
       "https://avatars.githubusercontent.com/u/82715884",
-      FlutterI18n.translate(context, "setting.about_page.xingshuyu"),
+      I18n.of(context)!.settingAboutPageXingshuyu,
       "https://xingshuyu.github.io",
     ),
     Developer(
       "Xiue233",
       "https://avatars.githubusercontent.com/u/30972246",
-      FlutterI18n.translate(context, "setting.about_page.xiue233"),
+      I18n.of(context)!.settingAboutPageXiue233,
       "https://xiue233.github.io/",
     ),
     Developer(
       "xizi",
       "https://static.wikia.nocookie.net/chiikawa/images/c/c3/Hachi_main.png/revision/latest?cb=20231016011752&path-prefix=zh",
-      FlutterI18n.translate(context, "setting.about_page.xizi"),
+      I18n.of(context)!.settingAboutPageXizi,
       "https://www.bilibili.com/video/BV1Rg4y1x7su/",
     ),
     Developer(
       "wirsbf",
       "https://avatars.githubusercontent.com/u/144008530",
-      FlutterI18n.translate(context, "setting.about_page.wirsbf"),
+      I18n.of(context)!.settingAboutPageWirsbf,
       "https://xiue233.github.io/",
     ),
     Developer(
       "ZCWzy",
       "https://avatars.githubusercontent.com/u/87163986",
-      FlutterI18n.translate(context, "setting.about_page.zcwzy"),
+      I18n.of(context)!.settingAboutPageZcwzy,
       "https://github.com/ZCWzy",
     ),
     Developer(
       "ZYar-er",
       "https://avatars.githubusercontent.com/u/95170599?v=4",
-      FlutterI18n.translate(context, "setting.about_page.zyar-er"),
+      I18n.of(context)!.settingAboutPageZyarEr,
       "https://github.com/ZYar-er",
     ),
   ];
@@ -288,12 +288,12 @@ class _AboutPageState extends State<AboutPage> {
   List<Link> linkData() => [
     Link(
       icon: const Icon(Icons.home),
-      name: FlutterI18n.translate(context, "setting.about_page.homepage"),
+      name: I18n.of(context)!.settingAboutPageHomepage,
       url: "https://xdyou.superbart.top",
     ),
     Link(
       icon: const Icon(Icons.code),
-      name: FlutterI18n.translate(context, "setting.about_page.code"),
+      name: I18n.of(context)!.settingAboutPageCode,
       url: "https://github.com/BenderBlog/traintime_pda",
     ),
   ];
@@ -337,11 +337,7 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget get _developerList => ReXCard(
     title: Text(
-      FlutterI18n.translate(
-        context,
-        "setting.acknowledgement",
-        translationParams: {"developers": getDevelopers().length.toString()},
-      ),
+      I18n.of(context)!.settingAcknowledgement(getDevelopers().length.toString()),
     ).padding(bottom: 8).center(),
     remaining: const [],
     bottomRow: Wrap(
@@ -356,7 +352,7 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget _moreList(BuildContext context) => ReXCard(
     title: Text(
-      FlutterI18n.translate(context, "setting.about_page.title"),
+      I18n.of(context)!.settingAboutPageTitle,
     ).padding(bottom: 8).center(),
     remaining: const [],
     bottomRow: [
@@ -368,7 +364,7 @@ class _AboutPageState extends State<AboutPage> {
         contentPadding: EdgeInsets.zero,
         leading: const Icon(Icons.balance),
         title: Text(
-          FlutterI18n.translate(context, "setting.about_page.know_more"),
+          I18n.of(context)!.settingAboutPageKnowMore,
         ),
         onTap: () => showLicensePage(
           context: context,
@@ -380,10 +376,7 @@ class _AboutPageState extends State<AboutPage> {
               "v${preference.packageInfo.version}+"
               "${preference.packageInfo.buildNumber}",
           applicationIcon: const AppIconWidget().padding(vertical: 16),
-          applicationLegalese: FlutterI18n.translate(
-            context,
-            "setting.about_page.copyright_notice",
-          ),
+          applicationLegalese: I18n.of(context)!.settingAboutPageCopyrightNotice,
         ),
       ),
       if (Platform.isIOS || Platform.isMacOS)
@@ -392,7 +385,7 @@ class _AboutPageState extends State<AboutPage> {
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.code),
           title: Text(
-            FlutterI18n.translate(context, "setting.about_page.beian"),
+            I18n.of(context)!.settingAboutPageBeian,
           ),
           subtitle: const Text("陕ICP备2024026116号-1A"),
         ),
@@ -402,7 +395,7 @@ class _AboutPageState extends State<AboutPage> {
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.code),
           title: Text(
-            FlutterI18n.translate(context, "setting.about_page.sign_android"),
+            I18n.of(context)!.settingAboutPageSignAndroid,
           ),
           subtitle: Text(preference.packageInfo.buildSignature),
         ),
@@ -411,7 +404,7 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget _versionHint(BuildContext context) => ReXCard(
     title: Text(
-      FlutterI18n.translate(context, "setting.easter_egg_page"),
+      I18n.of(context)!.settingEasterEggPage,
     ).padding(bottom: 8).center(),
     remaining: const [],
     bottomRow: [
@@ -445,12 +438,9 @@ class _AboutPageState extends State<AboutPage> {
         ),
       ].toRow(mainAxisAlignment: MainAxisAlignment.center).padding(bottom: 8),
       Text(
-        FlutterI18n.translate(
-          context,
-          Platform.isIOS || Platform.isMacOS
-              ? "easter_egg_apple"
-              : "easter_egg_others",
-        ),
+        Platform.isIOS || Platform.isMacOS
+            ? I18n.of(context)!.easterEggApple
+            : I18n.of(context)!.easterEggOthers,
         textAlign: TextAlign.center,
       ),
     ].toColumn(),
@@ -460,7 +450,7 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "setting.about_page.title")),
+        title: Text(I18n.of(context)!.settingAboutPageTitle),
       ),
       body: Builder(
         builder: (context) {

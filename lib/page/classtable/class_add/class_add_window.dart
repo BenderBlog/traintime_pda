@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_add/date_selector_free.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ClassAddWindow extends StatefulWidget {
   final CustomClass? customToChange;
@@ -77,10 +77,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
     if (classNameController.text.isEmpty) {
       showToast(
         context: context,
-        msg: FlutterI18n.translate(
-          context,
-          "classtable.class_add.class_name_empty_message",
-        ),
+        msg: I18n.of(context)!.classtableClassAddClassNameEmptyMessage,
       );
       return;
     }
@@ -88,10 +85,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
     if (chosenDates.isEmpty) {
       showToast(
         context: context,
-        msg: FlutterI18n.translate(
-          context,
-          "classtable.class_add.choose_at_least_one",
-        ),
+        msg: I18n.of(context)!.classtableClassAddChooseAtLeastOne,
       );
       return;
     }
@@ -146,23 +140,14 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
       appBar: AppBar(
         title: Text(
           widget.customToChange == null
-              ? FlutterI18n.translate(
-                  context,
-                  "classtable.class_add.add_class_title",
-                )
-              : FlutterI18n.translate(
-                  context,
-                  "classtable.class_add.change_class_title",
-                ),
+              ? I18n.of(context)!.classtableClassAddAddClassTitle
+              : I18n.of(context)!.classtableClassAddChangeClassTitle,
         ),
         actions: [
           TextButton(
             onPressed: _save,
             child: Text(
-              FlutterI18n.translate(
-                context,
-                "classtable.class_add.save_button",
-              ),
+              I18n.of(context)!.classtableClassAddSaveButton,
             ),
           ),
         ],
@@ -185,10 +170,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                       ),
-                      hintText: FlutterI18n.translate(
-                        context,
-                        "classtable.class_add.input_classname_hint",
-                      ),
+                      hintText: I18n.of(context)!.classtableClassAddInputClassnameHint,
                     ),
                   ).padding(vertical: inputFieldVerticalPadding),
                   TextField(
@@ -200,10 +182,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                       ),
-                      hintText: FlutterI18n.translate(
-                        context,
-                        "classtable.class_add.input_teacher_hint",
-                      ),
+                      hintText: I18n.of(context)!.classtableClassAddInputTeacherHint,
                     ),
                   ).padding(vertical: inputFieldVerticalPadding),
                   TextField(
@@ -215,10 +194,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                       ),
-                      hintText: FlutterI18n.translate(
-                        context,
-                        "classtable.class_add.input_classroom_hint",
-                      ),
+                      hintText: I18n.of(context)!.classtableClassAddInputClassroomHint,
                     ),
                   ).padding(vertical: inputFieldVerticalPadding),
                 ],

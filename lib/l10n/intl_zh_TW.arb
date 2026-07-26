@@ -1,0 +1,2116 @@
+{
+  "@@locale": "zh_TW",
+  "dragText": "上拉獲取更多數據",
+  "readyText": "正在加載......",
+  "processingText": "正在處理......",
+  "processedText": "請求成功",
+  "noMoreText": "沒有更多數據",
+  "failedText": "數據獲取失敗",
+  "chooseSemester": "選擇學期",
+  "errorDetected": "Ouch! 發生錯誤啦",
+  "clickToRefresh": "點我刷新",
+  "confirmTitle": "確認？",
+  "cancel": "取消",
+  "confirm": "確定",
+  "networkError": "網絡錯誤，可能是沒聯網，可能是學校服務器出現了故障:-P",
+  "errorDetect": "遇到錯誤，請查看日誌",
+  "queryFailed": "查詢失敗",
+  "notSchoolNetwork": "沒有在校園網環境",
+  "experimentControllerNoPassword": "沒有物理實驗密碼，請到設置中進行設置",
+  "experimentControllerLoginFailed": "登錄失敗",
+  "cancelExam": "取消考試資格:P",
+  "loginProcessReadyPage": "準備獲取登錄網頁",
+  "loginProcessGetEncrypt": "獲取密碼加密密鑰",
+  "loginProcessReadyLogin": "準備登錄",
+  "loginProcessSlider": "登錄中",
+  "loginProcessAfterProcess": "登錄後處理",
+  "loginProcessFailed": "登錄失敗，響應狀態碼：{statusCode}",
+  "@loginProcessFailed": {
+    "placeholders": {
+      "statusCode": {
+        "type": "String"
+      }
+    }
+  },
+  "noInfo": "沒有信息",
+  "catcherDetected": "發生錯誤",
+  "catcherDescription": "詳情如下",
+  "newHomepageHint": "本程序將開發一個新主頁，目前先用豬圖秀佔位，玩得愉快",
+  "localCacheHint": "本地緩存獲取於 {datetime}",
+  "@localCacheHint": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
+  },
+  "inappCacheHint": "程序內緩存獲取於 {datetime}\n緩存退出程序後失效！",
+  "@inappCacheHint": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheReasonDefault": "當前顯示緩存數據。",
+  "weekdayMonday": "週一",
+  "weekdayTuesday": "週二",
+  "weekdayWednesday": "週三",
+  "weekdayThursday": "週四",
+  "weekdayFriday": "週五",
+  "weekdaySaturday": "週六",
+  "weekdaySunday": "週日",
+  "monthJanuary": "一月",
+  "monthFebruary": "二月",
+  "monthMarch": "三月",
+  "monthApril": "四月",
+  "monthMay": "五月",
+  "monthJune": "六月",
+  "monthJuly": "七月",
+  "monthAugust": "八月",
+  "monthSeptember": "九月",
+  "monthOctober": "十月",
+  "monthNovember": "十一月",
+  "monthDecember": "十二月",
+  "classAttendanceTitle": "考勤查詢",
+  "classAttendanceDetailTitle": "簽到信息 - {courseName}",
+  "@classAttendanceDetailTitle": {
+    "placeholders": {
+      "courseName": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceNoData": "沒有找到課程數據",
+  "classAttendanceNoAttendanceRecord": "沒有簽到記錄",
+  "classAttendanceLongLoad": "考勤數據的加載時間約半分鐘，請耐心等待",
+  "classAttendanceCourseStateUnknown": "未知",
+  "classAttendanceCourseStateIneligible": "取消",
+  "classAttendanceCourseStateEligible": "正常",
+  "classAttendanceCourseStateWarning": "危險",
+  "classAttendanceTableCourseName": "課程名稱",
+  "classAttendanceTableStatus": "狀態",
+  "classAttendanceTableAttendanceRate": "到課率",
+  "classAttendanceTableCheckIn": "簽到",
+  "classAttendanceTableAbsence": "缺勤",
+  "classAttendanceTableRequired": "應籤",
+  "classAttendanceTableLeave": "請假(事/病/公)",
+  "classAttendanceTableFilter": "篩選",
+  "classAttendanceTableFilterAll": "全部",
+  "classAttendanceTableShowingCount": "顯示 {count}/{total} 門課程",
+  "@classAttendanceTableShowingCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardTime": "簽到次數",
+  "classAttendanceCardTimeInfo": "{checkInCount} 已籤 / {absenceCount} 缺勤 / {requiredCheckIn} 應籤",
+  "@classAttendanceCardTimeInfo": {
+    "placeholders": {
+      "checkInCount": {
+        "type": "String"
+      },
+      "absenceCount": {
+        "type": "String"
+      },
+      "requiredCheckIn": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardNotAttend": "復活次數",
+  "classAttendanceCardNotAttendInfo": "{timeToHaveError} 次 / {totalTimes} 總課程",
+  "@classAttendanceCardNotAttendInfo": {
+    "placeholders": {
+      "timeToHaveError": {
+        "type": "String"
+      },
+      "totalTimes": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardNotAttendInfoError": "無法對應已有課程",
+  "classAttendanceCardLeave": "請假次數",
+  "classAttendanceCardLeaveInfo": "事假 {personalLeave} / 病假 {sickLeave} / 公假 {officialLeave}",
+  "@classAttendanceCardLeaveInfo": {
+    "placeholders": {
+      "personalLeave": {
+        "type": "String"
+      },
+      "sickLeave": {
+        "type": "String"
+      },
+      "officialLeave": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardStudy": "學習進度",
+  "classAttendanceCardStudyInfo": "任務點 {taskProgress} / 作業 {homeworkProgress} / 考試 {examProgress}",
+  "@classAttendanceCardStudyInfo": {
+    "placeholders": {
+      "taskProgress": {
+        "type": "String"
+      },
+      "homeworkProgress": {
+        "type": "String"
+      },
+      "examProgress": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceDetailCardCreatorName": "發起人",
+  "classAttendanceDetailCardStartTime": "開始時間",
+  "classAttendanceDetailCardSummitTime": "提交時間",
+  "classAttendanceSignTypeQrCode": "二維碼簽到",
+  "classAttendanceSignTypeGesture": "手勢簽到",
+  "classAttendanceSignTypePosition": "位置簽到",
+  "classAttendanceSignTypeDefault": "普通簽到",
+  "classAttendanceSignStatusAbsencenotparticipating": "缺勤未參與",
+  "classAttendanceSignStatusSigned": "已籤",
+  "classAttendanceSignStatusSignedbyteacher": "代簽",
+  "classAttendanceSignStatusPersonalleave2": "請假",
+  "classAttendanceSignStatusAbsence": "缺勤",
+  "classAttendanceSignStatusSickleave": "病假",
+  "classAttendanceSignStatusPersonalleave": "事假",
+  "classAttendanceSignStatusLate": "遲到",
+  "classAttendanceSignStatusLeaveearly": "早退",
+  "classAttendanceSignStatusSignexpiredy": "簽到已過期",
+  "classAttendanceSignStatusPublicleave": "公假",
+  "classtablePartnerClasstableOverrideDialog": "目前有搭子課表數據，是否要覆蓋？",
+  "classtablePartnerClasstableNoFile": "未發現導入文件",
+  "classtablePartnerClasstableNoPermission": "未獲取存儲權限，無法讀取文件",
+  "classtablePartnerClasstableProblem": "好像導入文件有點問題:P",
+  "classtablePartnerClasstableSuccess": "導入成功",
+  "classtablePartnerClasstableShareDialogTitle": "請不要隨意分享",
+  "classtablePartnerClasstableShareDialogContent": "導出文件包括你的個人信息，請不要隨意跟別人分享，或者發在大群裡。",
+  "classtablePartnerClasstableSaveDialogTitle": "保存日曆文件到...",
+  "classtablePartnerClasstableSaveDialogSuccessMessage": "應該保存成功",
+  "classtablePartnerClasstableSaveDialogFailureMessage": "文件創建失敗，保存取消",
+  "classtablePartnerClasstableDeleteDialogTitle": "確認對話框",
+  "classtablePartnerClasstableDeleteDialogMessage": "確定要清除搭子課表嗎？",
+  "classtablePartnerClasstableDeleteDialogSuccessMessage": "刪除搭子課表成功",
+  "classtablePartnerClasstableNameDialogTitle": "輸入對方顯示該課表的名稱",
+  "classtablePartnerClasstableNameDialogHint": "在此輸入，否則為 Sweetie",
+  "classtablePartnerClasstableNameDialogCancel": "我就這一個甜心",
+  "classtablePartnerClasstableNameDialogAccept": "提交",
+  "classtablePartnerClasstableNameDialogBlankInput": "輸入空白!",
+  "classtablePageTitle": "我的日程表",
+  "classtablePartnerPageTitle": "{partner_name}的日程表",
+  "@classtablePartnerPageTitle": {
+    "placeholders": {
+      "partner_name": {
+        "type": "String"
+      }
+    }
+  },
+  "classtablePopupMenuNotArranged": "查看未安排課程信息",
+  "classtablePopupMenuClassChanged": "查看課程安排調整信息",
+  "classtablePopupMenuAddClass": "添加課程信息",
+  "classtablePopupMenuGenerateIcal": "生成日曆文件",
+  "classtablePopupMenuGeneratePartnerFile": "生成共享課表文件",
+  "classtablePopupMenuImportPartnerFile": "導入共享課表文件",
+  "classtablePopupMenuDeletePartnerFile": "刪除共享課表文件",
+  "classtablePopupMenuOutputToSystem": "導出到系統日曆",
+  "classtablePopupMenuRefreshClasstable": "刷新日程表",
+  "classtablePopupMenuSwitchSemester": "切換課程表學期",
+  "classtablePopupMenuCurrentTimeSettings": "時間指示設置",
+  "classtablePopupMenuClassColorSettings": "課表樣式設置",
+  "classtableVisualSettingsCurrentTimeSettingsTitle": "時間指示設置",
+  "classtableVisualSettingsClassColorSettingsTitle": "課表樣式設置",
+  "classtableVisualSettingsCompletedStyleEnabled": "已結束課程樣式區分",
+  "classtableVisualSettingsCurrentTimeSection": "時間指示",
+  "classtableVisualSettingsShowCurrentTimeIndicator": "顯示當前時間指示線",
+  "classtableVisualSettingsShowCurrentTimeLabel": "顯示迷你數字時鐘",
+  "classtableVisualSettingsShowTodayColumnHighlight": "強調顯示今天的縱列",
+  "classtableVisualSettingsUnfinishedSection": "課程樣式",
+  "classtableVisualSettingsActiveBrightnessFactor": "亮度: {value}",
+  "@classtableVisualSettingsActiveBrightnessFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsActiveBorderAlpha": "邊框透明度: {value}",
+  "@classtableVisualSettingsActiveBorderAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsActiveInnerAlpha": "底色透明度: {value}",
+  "@classtableVisualSettingsActiveInnerAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedSection": "已結束課程樣式",
+  "classtableVisualSettingsCompletedSaturationFactor": "底色飽和度: {value}",
+  "@classtableVisualSettingsCompletedSaturationFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedBrightnessFactor": "亮度: {value}",
+  "@classtableVisualSettingsCompletedBrightnessFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedTextSaturationFactor": "文字飽和度: {value}",
+  "@classtableVisualSettingsCompletedTextSaturationFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedBorderAlpha": "邊框透明度: {value}",
+  "@classtableVisualSettingsCompletedBorderAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedInnerAlpha": "底色透明度: {value}",
+  "@classtableVisualSettingsCompletedInnerAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusSourceClassTable": "課表",
+  "classtableStatusSourceExam": "考試",
+  "classtableStatusSourcePhysicsExperiment": "物理實驗",
+  "classtableStatusSourceOtherExperiment": "其他實驗",
+  "classtableErrorDialogTitle": "錯誤信息概覽",
+  "classtableStatusBannerLoading": "正在更新：{sources}",
+  "@classtableStatusBannerLoading": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusBannerCache": "當前使用緩存：{sources}",
+  "@classtableStatusBannerCache": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusBannerErrorSummary": "以下信息加載失敗：{sources}",
+  "@classtableStatusBannerErrorSummary": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateNoCourse": "{semester_code} 學期沒有課程安排。",
+  "@classtableEmptyStateNoCourse": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExam": "{semester_code} 學期沒有課程安排，但有考試安排。",
+  "@classtableEmptyStateWithExam": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExperiment": "{semester_code} 學期沒有課程安排，但有實驗安排。",
+  "@classtableEmptyStateWithExperiment": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExamAndExperiment": "{semester_code} 學期沒有課程安排，但有考試和實驗安排。",
+  "@classtableEmptyStateWithExamAndExperiment": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyActionViewExam": "查看考試安排",
+  "classtableEmptyActionViewExperiment": "查看實驗安排",
+  "classtableClassChangePageTitle": "課程調整",
+  "classtableClassChangePageEmptyMessage": "目前沒有調課信息",
+  "classtableClassChangePageTeacherChange": "教師變更：從{previous_teacher}變為{new_teacher}",
+  "@classtableClassChangePageTeacherChange": {
+    "placeholders": {
+      "previous_teacher": {
+        "type": "String"
+      },
+      "new_teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageNoTeacherChange": "教師信息沒有改變",
+  "classtableClassChangePage1": "一",
+  "classtableClassChangePage2": "二",
+  "classtableClassChangePage3": "三",
+  "classtableClassChangePage4": "四",
+  "classtableClassChangePage5": "五",
+  "classtableClassChangePage6": "六",
+  "classtableClassChangePage7": "日",
+  "classtableClassChangePageChangeClassMessage": "調課信息，從第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節 調整為第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，{newClassroom}教室上課",
+  "@classtableClassChangePageChangeClassMessage": {
+    "placeholders": {
+      "originalAffectedWeeks": {
+        "type": "String"
+      },
+      "weekChar_originalWeek": {
+        "type": "String"
+      },
+      "originalClassRangeStart": {
+        "type": "String"
+      },
+      "originalClassRangeEnd": {
+        "type": "String"
+      },
+      "newAffectedWeeksListStr": {
+        "type": "String"
+      },
+      "weekChar_newWeek": {
+        "type": "String"
+      },
+      "newClassRangeStart": {
+        "type": "String"
+      },
+      "newClassRangeStop": {
+        "type": "String"
+      },
+      "newClassroom": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePagePatchClassMessage": "補課信息，第{newAffectedWeeksListStr}周 星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節， {newClassroom}補課",
+  "@classtableClassChangePagePatchClassMessage": {
+    "placeholders": {
+      "newAffectedWeeksListStr": {
+        "type": "String"
+      },
+      "weekChar_newWeek": {
+        "type": "String"
+      },
+      "newClassRangeStart": {
+        "type": "String"
+      },
+      "newClassRangeStop": {
+        "type": "String"
+      },
+      "newClassroom": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageStopClassMessage": "停課信息，第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節停課",
+  "@classtableClassChangePageStopClassMessage": {
+    "placeholders": {
+      "originalAffectedWeeks": {
+        "type": "String"
+      },
+      "weekChar_originalWeek": {
+        "type": "String"
+      },
+      "originalClassRangeStart": {
+        "type": "String"
+      },
+      "originalClassRangeEnd": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageClassInfo": "編號: {classCode} | {classNumber} 班\n安排變更：{classChange}{teacherChange}",
+  "@classtableClassChangePageClassInfo": {
+    "placeholders": {
+      "classCode": {
+        "type": "String"
+      },
+      "classNumber": {
+        "type": "String"
+      },
+      "classChange": {
+        "type": "String"
+      },
+      "teacherChange": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNotArrangedPageTitle": "沒有時間安排的科目",
+  "classtableNotArrangedPageEmptyMessage": "目前全部課程均有時間安排",
+  "classtableNotArrangedPageContent": "編號: {classCode} | {classNumber} 班\n老師: {teacher}",
+  "@classtableNotArrangedPageContent": {
+    "placeholders": {
+      "classCode": {
+        "type": "String"
+      },
+      "classNumber": {
+        "type": "String"
+      },
+      "teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyClassMessage": "{semester_code} 學期沒有課程",
+  "@classtableEmptyClassMessage": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyClassWithExam": "{semester_code} 學期沒有課程但是有考試安排！\n請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面",
+  "@classtableEmptyClassWithExam": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableWeekTitle": "第{week}周",
+  "@classtableWeekTitle": {
+    "placeholders": {
+      "week": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNoonBreak": "午休",
+  "classtableSupperBreak": "晚休",
+  "classtableMonth": "{month}\n月",
+  "@classtableMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNoClass": "本週暫無安排，請不要在床上過於慵懶",
+  "classtableClassCardTitle": "日程信息",
+  "classtableClassCardUnknownClassroom": "未知教室",
+  "classtableClassCardRemainsHint": "還有{remain_count}個日程",
+  "@classtableClassCardRemainsHint": {
+    "placeholders": {
+      "remain_count": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassAddAddClassTitle": "添加課程",
+  "classtableClassAddChangeClassTitle": "修改課程",
+  "classtableClassAddClassNameEmptyMessage": "必須輸入課程名",
+  "classtableClassAddWrongTimeMessage": "輸入的時間不對",
+  "classtableClassAddSaveButton": "保存",
+  "classtableClassAddInputClassnameHint": "課程名字(必填)",
+  "classtableClassAddInputTeacherHint": "老師姓名(選填)",
+  "classtableClassAddInputClassroomHint": "教室位置(選填)",
+  "classtableClassAddInputWeekHint": "選擇上課周次",
+  "classtableClassAddInputTimeHint": "選擇上課時間",
+  "classtableClassAddInputTimeWeekdayHint": "上課周次",
+  "classtableClassAddInputStartTimeHint": "上課時間",
+  "classtableClassAddInputEndTimeHint": "下課時間",
+  "classtableClassAddWheelChooseHint": "第 {index} 節",
+  "@classtableClassAddWheelChooseHint": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassAddChooseAtLeastOne": "請至少選擇一個上課日期和時間",
+  "classtableClassAddRepeatWeekly": "按周重複",
+  "classtableClassAddFreeTime": "自定義日期",
+  "classtableClassAddDateSelectorFreeRule": "時間必須在 08:30-21:25 之間",
+  "classtableClassAddDateSelectorFreeRule2": "下課時間必須晚於上課時間",
+  "classtableClassAddDateSelectorFreeClassStartTime": "上課時間",
+  "classtableClassAddDateSelectorFreeClassEndTime": "下課時間",
+  "classtableClassAddDateSelectorFreeEditClassTime": "編輯課程時間",
+  "classtableClassAddDateSelectorFreeChooseClassTime": "選擇課程時間",
+  "classtableCourseDetailCardClassNumberString": "{number} 班",
+  "@classtableCourseDetailCardClassNumberString": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableCourseDetailCardUnknownTeacher": "老師未定",
+  "classtableCourseDetailCardUnknownPlace": "地點未定",
+  "classtableCourseDetailCardClassPeriod": "{start}-{stop}節",
+  "@classtableCourseDetailCardClassPeriod": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableCourseDetailCardEdit": "編輯",
+  "classtableCourseDetailCardDelete": "刪除",
+  "classtableCourseDetailCardDeleteSingle": "刪除本次",
+  "classtableCourseDetailCardDeleteAll": "刪除全部",
+  "classtableCourseDetailCardDeleteContent": "所有關於這個課的信息都會被刪除，課表上關於這門課的信息將不復存在！",
+  "classtableCourseDetailCardDeleteContentSingle": "關於這個課的信息只有這個時間段都會被刪除，其他的時間段會被保留。",
+  "classtableCourseDetailCardDeleteTitle": "是否刪除課程信息？",
+  "classtableOutputToSystemSuccess": "成功導出到系統日曆",
+  "classtableOutputToSystemFailure": "導出到系統日曆過程中發生了問題:P",
+  "classtableOutputToSystemRequestAllTitle": "權限需求說明",
+  "classtableOutputToSystemRequestAll": "因導出插件限制，用戶必須同時授予本軟件讀取日曆和寫入日曆權限，才能正常導出日程。不過，本軟件不會讀取日曆。",
+  "classtableRefreshClasstableReady": "準備刷新日程信息",
+  "classtableRefreshClasstableSuccess": "成功刷新日程信息",
+  "classtableCacheHintPasswordWrong": "統一認證密碼錯誤或已失效。",
+  "classtableCacheHintLoginFailed": "登錄課表服務失敗。",
+  "classtableCacheHintNetworkFailed": "課表網絡請求失敗。",
+  "classtableCacheHintUnknownError": "在線獲取課表失敗。詳細錯誤請查看日誌。",
+  "classtableSemesterSwitcherChooseSemester": "選擇學期",
+  "classtableSemesterSwitcherFirstAcademicYear": "第一學年",
+  "classtableSemesterSwitcherSecondAcademicYear": "第二學年",
+  "classtableSemesterSwitcherFetchRemoteSemester": "獲取當前學期",
+  "classtableSemesterSwitcherFetchingRemoteSemester": "正在獲取...",
+  "classtableSemesterSwitcherYear": "{year}年",
+  "@classtableSemesterSwitcherYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableSemesterSwitcherOnlyFutureHint": "本程序僅允許查看未來學期的課程安排。",
+  "clubPromotionTypeTech": "技術",
+  "clubPromotionTypeAcg": "曬你係",
+  "clubPromotionTypeUnion": "官方",
+  "clubPromotionTypeProfit": "商業",
+  "clubPromotionTypeSport": "體育",
+  "clubPromotionTypeArt": "文化",
+  "clubPromotionTypeUnknown": "未知",
+  "clubPromotionTypeGame": "遊戲",
+  "clubPromotionTypeAll": "所有",
+  "clubPromotionWrongParam": "錯誤參數",
+  "clubPromotionNoGroupInfo": "未傳入社團信息",
+  "clubPromotionLoading": "正在加載",
+  "clubPromotionErrorOutside": "在外圍遇到錯誤",
+  "clubPromotionError": "遇到錯誤",
+  "clubPromotionQqCopied": "QQ號已經複製到剪貼板",
+  "clubPromotionNoLink": "未提供入群鏈接",
+  "clubPromotionLoadingProblem": "加載遇到錯誤",
+  "clubPromotionPicturePreview": "圖片預覽",
+  "electricityTitle": "水電信息",
+  "electricityPowerTitle": "餘額信息",
+  "electricityCacheHintLoginFailed": "登錄電費服務失敗，正在顯示緩存數據。",
+  "electricityCacheHintNetworkFailed": "電費服務網絡請求失敗，正在顯示緩存數據。",
+  "electricityCacheHintUnknownError": "在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。",
+  "electricityCacheNotice": "獲取時間",
+  "electricityAccount": "電費賬號",
+  "electricityRemainPower": "電量信息",
+  "electricityOweInfo": "欠費信息",
+  "electricityHistory": "歷史記錄",
+  "electricityDailyUsage": "平均每日用量",
+  "electricityNotEnoughData": "數據量不足以用於渲染",
+  "electricityInfo": "新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。\n歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。",
+  "electricityFetchingHint": "正在獲取最新電費信息",
+  "electricityFetchError": "電費信息獲取失敗，請重試。",
+  "electricityDate": "日期",
+  "electricityPower": "該日0點電量",
+  "electricityUpdate": "刷新信息",
+  "electricityWaterUsageFetchDate": "獲取時間",
+  "electricityWaterUsageReadBefore": "上次讀數",
+  "electricityWaterUsageReadNow": "本次讀數",
+  "electricityWaterUsage": "洗澡水用量",
+  "electricityWaterTitle": "水費信息",
+  "electricityWaterLoading": "正在加載水費信息",
+  "electricityWaterUnavailable": "水費信息暫不可用，請在電費卡片重試。",
+  "electricityWaterEmpty": "暫無水費信息",
+  "electricityNotSchoolNetwork": "非校園網訪問",
+  "electricityAirconTitle": "空調用電",
+  "electricityAirconImei": "空調 IMEI",
+  "electricityAirconAmount": "平台用電量",
+  "electricityAirconUpdateTime": "更新時間",
+  "electricityAirconWaiting": "等待獲取空調用電信息",
+  "electricityAirconError": "空調用電獲取失敗",
+  "electricityAirconRetry": "重試",
+  "electricityAirconImeiMissing": "尚未添加空調 IMEI，添加後即可查看空調用電信息。",
+  "electricityAirconAddImei": "添加空調 IMEI",
+  "electricityAirconCacheNotice": "當前顯示空調緩存數據，緩存時間：{time}",
+  "@electricityAirconCacheNotice": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomTitle": "空閒教室",
+  "emptyClassroomDate": "日期 {date}",
+  "@emptyClassroomDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomBuilding": "教學樓 {building}",
+  "@emptyClassroomBuilding": {
+    "placeholders": {
+      "building": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomSearchHint": "教室名稱或者教室代碼",
+  "emptyClassroomClassroom": "教室",
+  "emptyClassroomEmpty": "空閒",
+  "emptyClassroomOccupied": "佔用",
+  "examTitle": "考試安排",
+  "examCacheHint": "已顯示緩存考試安排信息",
+  "examCacheHintPasswordWrong": "統一認證密碼錯誤或已失效",
+  "examCacheHintLoginFailed": "登錄考試服務失敗",
+  "examCacheHintNetworkFailed": "網絡連接失敗",
+  "examCacheHintUnknownError": "在線獲取考試安排失敗，詳細錯誤請查看日誌",
+  "examFetchingHint": "正在獲取最新考試安排",
+  "examNotFinished": "未完成考試",
+  "examAllFinished": "所有考試全部完成",
+  "examUnableToExam": "無法完成考試",
+  "examFinished": "已完成考試",
+  "examNoneFinished": "一門還沒考呢",
+  "examNoExamArrangement": "目前沒有考試安排",
+  "examNoArrangementTitle": "目前無安排考試的科目",
+  "examNoArrangementAllArranged": "目前所有科目均已安排考試",
+  "examNoArrangementSubtitle": "編號: {id}",
+  "@examNoArrangementSubtitle": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentTitle": "實驗信息",
+  "experimentOngoing": "正在進行實驗",
+  "experimentNotFinished": "未完成實驗",
+  "experimentAllFinished": "所有實驗全部完成",
+  "experimentFinished": "已完成實驗",
+  "experimentScoreInfo": "{score} (推測)",
+  "@experimentScoreInfo": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentScoreSum": "目前分數總和：{sum}",
+  "@experimentScoreSum": {
+    "placeholders": {
+      "sum": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentNoneFinished": "目前沒有已經完成的實驗",
+  "experimentNotProvided": "未提供",
+  "experimentErrorPhysics": "獲取物理實驗信息時發生錯誤：{info}",
+  "@experimentErrorPhysics": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentErrorOther": "獲取其他實驗信息時發生錯誤：{info}",
+  "@experimentErrorOther": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentCacheHint": "目前加載緩存狀況：{info}",
+  "@experimentCacheHint": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentPhysicsCacheHintMissingPassword": "未填寫物理實驗密碼。",
+  "experimentPhysicsCacheHintLoginFailed": "物理實驗登錄失敗。",
+  "experimentPhysicsCacheHintNotSchoolNetwork": "當前不在校園網環境。",
+  "experimentPhysicsCacheHintNetworkFailed": "物理實驗網絡請求失敗。",
+  "experimentPhysicsCacheHintUnknownError": "在線獲取物理實驗失敗。詳細錯誤請查看日誌。",
+  "experimentOtherCacheHintLoginFailed": "其他實驗登錄失敗。",
+  "experimentOtherCacheHintNotSchoolNetwork": "當前不在校園網環境。",
+  "experimentOtherCacheHintNetworkFailed": "其他實驗網絡請求失敗。",
+  "experimentOtherCacheHintUnknownError": "在線獲取其他實驗失敗。詳細錯誤請查看日誌。",
+  "experimentPhysicsExperiment": "物理實驗",
+  "experimentOtherExperiment": "其他實驗",
+  "experimentTapForScore": "成績未識別出來",
+  "experimentYourScore": "您的分數：",
+  "experimentPredictScore": "推測分數：{score}",
+  "@experimentPredictScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentSendMail": "發送郵件",
+  "experimentFetchingHint": "您現在看到的是緩存數據。正在後臺獲取更新數據中...",
+  "experimentFetchingHintBoth": "物理實驗和其他實驗正在加載",
+  "experimentFetchingHintPhysics": "物理實驗正在加載",
+  "experimentFetchingHintOther": "其他實驗正在加載",
+  "experimentFetchingHintPhysicsWithOtherFailed": "物理實驗正在加載，其他實驗加載失敗",
+  "experimentFetchingHintOtherWithPhysicsFailed": "其他實驗正在加載，物理實驗加載失敗",
+  "experimentScoreHint0": "您可點擊卡片上的成績字段來查看原始成績數據",
+  "experimentScoreHint1": "您的分數不在 XDYou 分數識別庫中，因此它沒有被正常識別。",
+  "experimentScoreHint2": "如果您希望為 XDYou 的發展貢獻一份自己的力量，您可以點擊發送郵件按鈕，我們將您的分數加入識別庫！",
+  "experimentScoreHint3": "目前識別庫數據不全，請您務必核對一下。",
+  "homepageTitle": "校園信息查詢",
+  "homepageLoading": "正在加載",
+  "homepageLoaded": "加載成功",
+  "homepageLoadError": "加載錯誤",
+  "homepageOnHoliday": "當前在假期中",
+  "homepageOnWeekday": "當前為第 {current} 周",
+  "@homepageOnWeekday": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLoadingMessage": "請稍候，正在刷新信息",
+  "homepagePostgraduateNotice": "研究生功能已經激活！",
+  "homepageLinuxNotice": "Linux 版本正在測試，歡迎反饋！",
+  "homepageEditMode": "編輯佈局",
+  "homepageEditDone": "完成",
+  "homepageEditReset": "恢復默認佈局",
+  "homepageEditHint": "日程信息和軟件升級信息不允許編輯",
+  "homepageManageHidden": "管理隱藏卡片",
+  "homepageHiddenTitle": "已隱藏的卡片",
+  "homepageHiddenLabel": "已隱藏",
+  "homepageHideEmpty": "沒有隱藏的卡片",
+  "homepageHomepage": "校園信息",
+  "homepageRuisi": "睿思論壇",
+  "homepageClub": "社團推薦",
+  "homepageDashboard": "豬圖鑑賞",
+  "homepagePlanet": "博客星球",
+  "homepageSetting": "設置",
+  "homepageInputPartnerDataRouteNotExist": "導入路徑不存在:P",
+  "homepageInputPartnerDataFailedGetFile": "導入文件失敗",
+  "homepageInputPartnerDataFailedImport": "好像導入文件有點問題:P",
+  "homepageInputPartnerDataSuccessMessage": "導入成功，如果打開了課表頁面請重新打開",
+  "homepageInputPartnerDataNotLoaded": "還沒加載課程表，等會再來吧……",
+  "homepageInputPartnerDataConfirmContent": "目前有搭子課表數據，是否要覆蓋？",
+  "homepageLoginMessage": "登錄中，暫時顯示緩存數據",
+  "homepageSuccessfulLoginMessage": "登錄成功",
+  "homepagePasswordWrongTitle": "用戶名或密碼有誤",
+  "homepagePasswordWrongContent": "是否重啟應用後手動登錄？",
+  "homepagePasswordWrongDenial": "否，進入離線模式",
+  "homepageOfflineModeTitle": "統一認證服務離線模式開啟",
+  "homepageOfflineModeContent": "無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。\n成績查詢，考試信息查詢，欠費查詢，校園卡查詢關閉。課表顯示緩存數據。其他功能暫不受影響。\n如有不便，敬請諒解。",
+  "homepageOfflineMode": "脫機模式下，一站式相關功能全部禁止使用",
+  "homepageNoticeCardEmptyNotice": "目前沒有獲取應用公告，請刷新",
+  "homepageNoticeCardNoNoticeAvaliable": "沒有獲取應用公告",
+  "homepageNoticeCardNoticeListTitle": "應用信息",
+  "homepageNoticeCardOpenUrl": "訪問該鏈接",
+  "homepageNoticeCardNoticePageTitle": "通知列表",
+  "homepageClassTableCardTitle": "課程表",
+  "homepageClassTableCardToday": "今日還有 {remain} 個日程",
+  "@homepageClassTableCardToday": {
+    "placeholders": {
+      "remain": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardTodayFinished": "今日安排完成",
+  "homepageClassTableCardTomorrow": "明日有 {remain} 個安排",
+  "@homepageClassTableCardTomorrow": {
+    "placeholders": {
+      "remain": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardTomorrowNone": "明日沒有安排",
+  "homepageClassTableCardWeekInfo": "第 {weekinfo} 周",
+  "@homepageClassTableCardWeekInfo": {
+    "placeholders": {
+      "weekinfo": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardOnHoliday": "假期中",
+  "homepageClassTableCardErrorMessage": "遇到錯誤：{error}",
+  "@homepageClassTableCardErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardFetchingMessage": "正在獲取課表",
+  "homepageClassTableCardErrorInfotext": "遇到錯誤",
+  "homepageClassTableCardFetchingInfotext": "正在加載",
+  "homepageClassTableCardNoArrangementInfotext": "暫無日程",
+  "homepageClassTableCardScheduleFetchingMessage": "日程正在加載，請稍後查看",
+  "homepageClassTableCardScheduleErrorMessage": "日程加載失敗，請稍後重試",
+  "homepageClassTableCardScheduleFetchingInfotext": "正在加載日程",
+  "homepageClassTableCardScheduleErrorInfotext": "日程加載失敗",
+  "homepageClassTableCardScheduleNoneInfotext": "暫無日程",
+  "homepageClassTableCardUpdatingInfotext": "正在更新",
+  "homepageClassTableCardAllLoadingInfotext": "全部加載中",
+  "homepageClassTableCardPartialLoadingInfotext": "部分加載中",
+  "homepageClassTableCardPartialErrorInfotext": "部分數據加載失敗",
+  "homepageClassTableCardFailedChip": "{source}加載失敗",
+  "@homepageClassTableCardFailedChip": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardFailedSourceClassInfo": "課程信息",
+  "homepageClassTableCardFailedSourceExamInfo": "考試信息",
+  "homepageClassTableCardFailedSourcePhysicsExperiment": "物理實驗",
+  "homepageClassTableCardFailedSourceOtherExperiment": "其他實驗",
+  "homepageClassTableCardUnknownPlace": "未知位置",
+  "homepageClassTableCardSeat": "座位號{seatnum}",
+  "@homepageClassTableCardSeat": {
+    "placeholders": {
+      "seatnum": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageElectricityCardTitle": "水電信息",
+  "homepageElectricityCardCurrentElectricity": "餘額 {amount} 度",
+  "@homepageElectricityCardCurrentElectricity": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageElectricityCardCacheNotice": "最後一次讀表：{date}",
+  "@homepageElectricityCardCacheNotice": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardTitle": "圖書借閱",
+  "homepageLibraryCardCurrentBorrow": "借書 {count} 本",
+  "@homepageLibraryCardCurrentBorrow": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardErrorOccured": "獲取借書信息發生錯誤",
+  "homepageLibraryCardFetching": "正在獲取借書信息",
+  "homepageLibraryCardNoReturn": "目前沒有待歸還書籍",
+  "homepageLibraryCardNeedReturn": "待歸還 {dued} 本書籍",
+  "@homepageLibraryCardNeedReturn": {
+    "placeholders": {
+      "dued": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardNoInfo": "目前無法獲取信息",
+  "homepageLibraryCardFetchingInfo": "正在查詢信息中",
+  "homepageSchoolCardInfoCardErrorToast": "遇到錯誤，請聯繫開發者",
+  "homepageSchoolCardInfoCardFetchingToast": "正在獲取信息，請稍後再來看",
+  "homepageSchoolCardInfoCardBill": "流水",
+  "homepageSchoolCardInfoCardBalance": "卡里 {amount} 元",
+  "@homepageSchoolCardInfoCardBalance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageSchoolCardInfoCardErrorOccured": "獲取校園卡信息發生錯誤",
+  "homepageSchoolCardInfoCardFetching": "正在獲取校園卡信息",
+  "homepageSchoolCardInfoCardBottomTextSuccess": "查詢一卡通流水",
+  "homepageSchoolCardInfoCardNoInfo": "目前無法獲取信息",
+  "homepageSchoolCardInfoCardFetchingInfo": "正在查詢信息中",
+  "homepageToolboxClassAttendance": "考勤查詢",
+  "homepageToolboxCreative": "雙創競賽",
+  "homepageToolboxEmptyClassroom": "空閒教室",
+  "homepageToolboxExam": "考試安排",
+  "homepageToolboxExperiment": "實驗信息",
+  "homepageToolboxScore": "成績查詢",
+  "homepageToolboxSport": "體育信息",
+  "homepageToolboxDormWater": "宿舍水機",
+  "homepageToolboxSchoolnet": "網絡查詢",
+  "homepageToolboxToolbox": "其他功能",
+  "homepageToolboxScoreCannotReach": "脫機狀態且無緩存成績數據，無法訪問",
+  "homepageToolboxExamFetching": "請稍候，正在獲取考試信息",
+  "homepageToolboxExamError": "遇到錯誤，請聯繫開發者",
+  "homepageSchoolNetTitle": "已用 {usage}",
+  "@homepageSchoolNetTitle": {
+    "placeholders": {
+      "usage": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageSchoolNetNoPassword": "無校園網密碼，點擊設置",
+  "homepageSchoolNetFailed": "獲取校園網流量信息失敗",
+  "homepageSchoolNetFetching": "正在獲取校園網流量信息",
+  "homepageSchoolNetRemaining": "下次結算 {remaining}",
+  "@homepageSchoolNetRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClubPromotionFailed": "社團信息獲取失敗",
+  "homepageClubPromotionFetching": "社團信息清單正在加載",
+  "dormWaterTitle": "宿舍水機",
+  "dormWaterPhone": "手機號",
+  "dormWaterImageCode": "圖形驗證碼",
+  "dormWaterSmsCode": "短信驗證碼",
+  "dormWaterSendSms": "發送短信碼",
+  "dormWaterLogin": "登錄",
+  "dormWaterLogout": "退出",
+  "dormWaterRefreshCaptcha": "刷新驗證碼",
+  "dormWaterLoadingCaptcha": "加載中...",
+  "dormWaterCaptchaError": "驗證碼加載失敗",
+  "dormWaterPhoneRequired": "請輸入手機號",
+  "dormWaterImageCodeRequired": "請輸入圖形驗證碼",
+  "dormWaterSmsSent": "短信已發送",
+  "dormWaterSmsFailed": "發送短信失敗",
+  "dormWaterSmsCodeRequired": "請輸入短信驗證碼",
+  "dormWaterLoginSuccess": "登錄成功",
+  "dormWaterLoginFailed": "登錄失敗",
+  "dormWaterLogoutSuccess": "退出成功",
+  "dormWaterDevices": "設備列表",
+  "dormWaterLoadingDevices": "加載設備中...",
+  "dormWaterNoDevices": "暫無設備",
+  "dormWaterSelectDevice": "選擇設備",
+  "dormWaterFetchDevicesFailed": "獲取設備列表失敗",
+  "dormWaterRetryLoadDevices": "重試加載",
+  "dormWaterStartWater": "開始接水",
+  "dormWaterEndWater": "結束接水",
+  "dormWaterWaterDispensing": "接水中",
+  "dormWaterWaterStatus": "接水狀態",
+  "dormWaterStartWaterSuccess": "開始接水成功",
+  "dormWaterEndWaterSuccess": "結束接水成功",
+  "dormWaterStartWaterFailed": "開始接水失敗",
+  "dormWaterEndWaterFailed": "結束接水失敗",
+  "dormWaterDeviceStatusChecking": "檢查設備狀態中...",
+  "dormWaterDeviceStatusReady": "設備已就緒",
+  "dormWaterScanQrCode": "掃描二維碼",
+  "dormWaterDeviceId": "設備 ID",
+  "dormWaterAddDeviceFailed": "添加設備失敗",
+  "dormWaterDeviceRemovedFromFavorites": "已從收藏中移除",
+  "dormWaterRemoveFromFavoritesFailed": "移除收藏失敗",
+  "libraryTitle": "圖書館信息",
+  "libraryBorrowStateTitle": "借書狀態",
+  "librarySearchBookTitle": "查詢藏書",
+  "librarySearchFieldTitle": "搜索字段",
+  "librarySearchFieldKeywordOption": "任意詞",
+  "librarySearchFieldTitleOption": "標題",
+  "librarySearchFieldAuthorOption": "責任者",
+  "librarySearchFieldIsbnOption": "ISBN",
+  "librarySearchFieldBarcodeOption": "條碼號",
+  "librarySearchFieldCallnoOption": "索書號",
+  "libraryNotProvided": "未提供相關信息",
+  "libraryAuthor": "作者 ",
+  "libraryPublishHouse": "出版社 ",
+  "libraryCallNumber": "索書號 ",
+  "libraryPublishDate": "發行時間 ",
+  "libraryIsbn": "ISBN",
+  "libraryArrangementCode": "編排號碼 ",
+  "libraryAvaliableBorrow": "可借",
+  "libraryStorage": "館藏",
+  "libraryOnShelve": "在架",
+  "libraryBookCode": "書籍編號：{barCode}",
+  "@libraryBookCode": {
+    "placeholders": {
+      "barCode": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryDueDate": " 到期",
+  "libraryBorrowStr": " 借閱",
+  "libraryAfterDueDate": " 天前到期",
+  "libraryBeforeDueDate": " 天后",
+  "libraryCanBeRenewable": "續借",
+  "libraryCannotBeRenewable": "不可續借",
+  "libraryRenewing": "正在續借",
+  "libraryEmptyBorrowList": "目前沒有查詢到在借圖書\n不借書就要變成上面的小呆瓜咯",
+  "libraryBorrowListInfo": "在借 {borrow} 本，其中已過期 {dued} 本",
+  "@libraryBorrowListInfo": {
+    "placeholders": {
+      "borrow": {
+        "type": "String"
+      },
+      "dued": {
+        "type": "String"
+      }
+    }
+  },
+  "librarySearchHere": "在此搜索",
+  "libraryNormalSearch": "普通搜索",
+  "libraryAdvancedSearch": "高級搜索",
+  "librarySearch": "搜索",
+  "libraryMatchMode": "匹配方式",
+  "libraryMatchExact": "精確匹配",
+  "libraryMatchFuzzy": "模糊匹配",
+  "libraryMatchPrefix": "前方一致",
+  "libraryDocumentType": "文獻類型",
+  "libraryDocumentTypeAll": "全部",
+  "libraryDocumentTypeBook": "圖書",
+  "libraryOnlyOnShelf": "僅看在架",
+  "libraryPublishYearBegin": "出版年起",
+  "libraryPublishYearEnd": "出版年止",
+  "libraryBookDetail": "書籍詳細信息",
+  "libraryNoResult": "沒有結果，請修改搜索參數或者開始你的搜索",
+  "libraryCardTitle": "圖書館當前狀況",
+  "libraryCardFetching": "正在獲取圖書館信息",
+  "libraryCardNorthernLibrary": "北校區狀況",
+  "libraryCardSouthernLibrary": "南校區狀況",
+  "libraryCardPeople": "在館 {people} 人",
+  "@libraryCardPeople": {
+    "placeholders": {
+      "people": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryCardSeat": "空位 {seat} 個",
+  "@libraryCardSeat": {
+    "placeholders": {
+      "seat": {
+        "type": "String"
+      }
+    }
+  },
+  "loginIdentityNumber": "學號",
+  "loginPassword": "一站式登錄密碼",
+  "loginLogin": "登錄",
+  "loginIncorrectPasswordPattern": "用戶名或密碼不符合要求，學號必須 11 位且密碼非空",
+  "loginOnLoginProgress": "正在登錄學校一站式",
+  "loginCompleteLogin": "登錄成功",
+  "loginFailedLoginCannotConnectToServer": "無法連接到服務器",
+  "loginFailedLoginWithCode": "請求失敗，響應狀態碼：{code}",
+  "@loginFailedLoginWithCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "loginFailedLoginWithMessage": "請求失敗，報錯信息：{message}",
+  "@loginFailedLoginWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "loginFailedLoginOther": "未知錯誤，請聯繫開發者",
+  "loginClearCache": "清除登錄緩存",
+  "loginCompleteClearCache": "清理緩存成功",
+  "loginSeeInspector": "查看網絡交互",
+  "loginCaptchaWindowTitle": "請輸入驗證碼",
+  "loginCaptchaWindowHint": "輸入驗證碼",
+  "loginCaptchaWindowMessageOnEmpty": "請輸入驗證碼",
+  "loginCaptchaWindowRefreshFailed": "刷新驗證碼失敗: {error}",
+  "@loginCaptchaWindowRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "loginSliderTitle": "服務器認證服務",
+  "schoolNetTitle": "校園網使用詳情",
+  "schoolNetIdsAccountNetTitle": "當前用戶",
+  "schoolNetIdsAccountNetNotice": "這是登錄到 PDA 賬戶的校園網信息\n注意: 流量計費採用GB單位（1000進制）\n如果沒有看到信息，請訪問 zfw.xidian.edu.cn 重置網絡密碼",
+  "schoolNetIdsAccountNetOverview": "賬戶概覽",
+  "schoolNetIdsAccountNetAccount": "賬號",
+  "schoolNetIdsAccountNetUsed": "已使用流量",
+  "schoolNetIdsAccountNetRemain": "餘額",
+  "schoolNetIdsAccountNetCurrentOnline": "在線設備（{length}臺）",
+  "@schoolNetIdsAccountNetCurrentOnline": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetIdsAccountNetNoDeviceOnline": "當前沒有在線設備",
+  "schoolNetCurrentLoginNetTitle": "正在使用",
+  "schoolNetCurrentLoginNetNotice": "這是您正在使用中校園網的信息，可能和您登錄 PDA 的信息不一致\n注意: 流量計費採用GB單位（1000進制）",
+  "schoolNetCurrentLoginNetOverview": "賬戶概覽",
+  "schoolNetCurrentLoginNetAccount": "賬號",
+  "schoolNetCurrentLoginNetPlanType": "套餐類型",
+  "schoolNetCurrentLoginNetRemain": "餘額",
+  "schoolNetCurrentLoginNetUsageSituation": "流量使用情況",
+  "schoolNetCurrentLoginNetUsedPercent": "已使用 {percent}%",
+  "@schoolNetCurrentLoginNetUsedPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetCurrentLoginNetUsed": "已使用流量",
+  "schoolNetCurrentLoginNetRemainCount": "剩餘流量",
+  "schoolNetCurrentLoginNetTotal": "總流量",
+  "schoolNetCurrentLoginNetNonSchoolnet": "非校園網",
+  "schoolNetDeviceListIp": "在線設備IP",
+  "schoolNetDeviceListTime": "上線時間",
+  "schoolNetDeviceListRemain": "流量用量",
+  "schoolNetFetching": "正在獲取校園網信息",
+  "schoolNetEmptyPassword": "您忘記輸入賬號密碼了",
+  "schoolNetNotInitalized": "疑似查詢後端尚未開放查詢",
+  "schoolNetCaptchaFailed": "驗證碼識別失敗",
+  "schoolNetCaptchaEmpty": "驗證碼為空",
+  "schoolNetCacheHintCaptchaFailed": "驗證碼識別失敗，請重試。",
+  "schoolNetCacheHintRequestFailed": "校園網請求失敗，請稍後重試。",
+  "schoolNetWrongPassword": "密碼錯誤",
+  "schoolNetErrorFetch": "獲取失敗：{msg}",
+  "@schoolNetErrorFetch": {
+    "placeholders": {
+      "msg": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetErrorOther": "其他錯誤：{msg}",
+  "@schoolNetErrorOther": {
+    "placeholders": {
+      "msg": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetRefresh": "刷新",
+  "schoolCardWindowTitle": "校園卡流水信息",
+  "schoolCardWindowIncome": "收入 {income}",
+  "@schoolCardWindowIncome": {
+    "placeholders": {
+      "income": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowExpense": "支出 {expense}",
+  "@schoolCardWindowExpense": {
+    "placeholders": {
+      "expense": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowSelectRange": "選擇日期：從 {startDay} 到 {endDay}",
+  "@schoolCardWindowSelectRange": {
+    "placeholders": {
+      "startDay": {
+        "type": "String"
+      },
+      "endDay": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowStoreName": "商戶名稱",
+  "schoolCardWindowBalance": "金額",
+  "schoolCardWindowTimeWithSum": "時間(共{sum}元)",
+  "@schoolCardWindowTimeWithSum": {
+    "placeholders": {
+      "sum": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowNoRecord": "未查詢到記錄，請修改日期後重試",
+  "schoolCardWindowQrCode": "支付碼",
+  "schoolCardWindowQrCodeError": "二維碼獲取失敗：{info}",
+  "@schoolCardWindowQrCodeError": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowReload": "重新加載",
+  "scoreCacheMessage": "已顯示緩存成績信息",
+  "scoreSummary": "目前選中科目 {chosen}  總計學分 {credit}\n均分 {avg} GPA {gpa}",
+  "@scoreSummary": {
+    "placeholders": {
+      "chosen": {
+        "type": "String"
+      },
+      "credit": {
+        "type": "String"
+      },
+      "avg": {
+        "type": "String"
+      },
+      "gpa": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreAllPassed": "所有科目均已通過",
+  "scoreCacheHintPasswordWrong": "統一認證密碼錯誤或已失效",
+  "scoreCacheHintLoginFailed": "登錄考試服務失敗",
+  "scoreCacheHintNetworkFailed": "網絡連接失敗",
+  "scoreCacheHintUnknownError": "在線獲取成績安排失敗，詳細錯誤請查看日誌",
+  "scoreFetchingHint": "正在獲取最新成績信息，請不要退出頁面",
+  "scoreAllSemester": "所有學期",
+  "scoreChosenSemester": "學期 {chosen}",
+  "@scoreChosenSemester": {
+    "placeholders": {
+      "chosen": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreAllType": "所有類型",
+  "scoreChosenType": "類型 {type}",
+  "@scoreChosenType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreNone": "暫無",
+  "scoreScoreChoiceTitle": "成績單",
+  "scoreScoreChoiceSearchHint": "搜索成績記錄",
+  "scoreScoreChoiceEmptyList": "沒有選擇該學期的課程計入均分計算",
+  "scoreScoreChoiceSumDialogTitle": "小總結",
+  "scoreScoreChoiceSumDialogContent": "所有科目的GPA：{gpa_all}\n所有科目的均分：{avg_all}\n所有科目的學分：{credit_all}\n未通過科目：{unpassed}\n公共選修課：{not_core_type}\n本程序提供的數據僅供參考，開發者對其準確性不負責",
+  "@scoreScoreChoiceSumDialogContent": {
+    "placeholders": {
+      "gpa_all": {
+        "type": "String"
+      },
+      "avg_all": {
+        "type": "String"
+      },
+      "credit_all": {
+        "type": "String"
+      },
+      "unpassed": {
+        "type": "String"
+      },
+      "not_core_type": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreComposeCardNoDetail": "未提供詳情信息",
+  "scoreScoreComposeCardFetching": "正在獲取",
+  "scoreScoreComposeCardCredit": "學分",
+  "scoreScoreComposeCardGpa": "GPA",
+  "scoreScoreComposeCardScore": "成績",
+  "scoreScoreInfoCardTitle": "成績詳情",
+  "scoreScoreInfoCardOriginalCourse": "初修",
+  "scoreScoreInfoCardFailed": "[掛] ",
+  "scoreScoreInfoCardCredit": "學分 {credit}",
+  "@scoreScoreInfoCardCredit": {
+    "placeholders": {
+      "credit": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreInfoCardGpa": "GPA {gpa}",
+  "@scoreScoreInfoCardGpa": {
+    "placeholders": {
+      "gpa": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreInfoCardScore": "成績 {score}",
+  "@scoreScoreInfoCardScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScorePageTitle": "成績查詢",
+  "scoreScorePageSearchHint": "搜索成績記錄",
+  "scoreScorePageNoRecord": "未篩查到合請求的記錄",
+  "scoreScorePageSelectAll": "全選",
+  "scoreScorePageSelectNothing": "全不選",
+  "scoreScorePageResetSelect": "重置選擇",
+  "scoreScorePageSummary": "總結",
+  "scoreScorePageCet4": "國家英語四級",
+  "scoreScorePageCet6": "國家英語六級",
+  "settingAcknowledgement": "Made With Love From {developers} People",
+  "@settingAcknowledgement": {
+    "placeholders": {
+      "developers": {
+        "type": "String"
+      }
+    }
+  },
+  "settingAbout": "關於",
+  "settingAboutThisProgram": "關於本程序",
+  "settingVersion": "版本號：{version}",
+  "@settingVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingUserInfo": "用戶信息",
+  "settingCheckUpdate": "檢查軟件更新",
+  "settingLatestVersion": "最新版本: {latest}",
+  "@settingLatestVersion": {
+    "placeholders": {
+      "latest": {
+        "type": "String"
+      }
+    }
+  },
+  "settingWaiting": "等待獲取",
+  "settingFetchingUpdate": "正在獲取更新信息",
+  "settingNewVersion": "有新版本發佈！",
+  "settingCurrentStable": "目前您正在運行最新版",
+  "settingCurrentTesting": "目前您正在運行測試版",
+  "settingFetchFailed": "獲取更新信息失敗",
+  "settingUiSetting": "界面設置",
+  "settingBrightnessSetting": "設置深淺色",
+  "settingColorSetting": "顏色設置",
+  "settingSimplifyTimeline": "簡化日程時間軸",
+  "settingSimplifyTimelineDescription": "沒有日程時 減少空間佔用",
+  "settingLowElectricityWarning": "低電量卡片變色提醒",
+  "settingLowElectricityWarningDescription": "電量小於閾值時 電量卡片變色提醒",
+  "settingLowElectricityThreshold": "低電量閾值",
+  "settingLowElectricityThresholdDescription": "目前為 {threshold} 度",
+  "@settingLowElectricityThresholdDescription": {
+    "placeholders": {
+      "threshold": {
+        "type": "String"
+      }
+    }
+  },
+  "settingLowElectricityThresholdDialogTitle": "設置低電量閾值",
+  "settingLowElectricityThresholdDialogInputHint": "請輸入電量度數",
+  "settingAccountSetting": "賬號設置",
+  "settingSportPasswordSetting": "體育系統密碼設置",
+  "settingExperimentPasswordSetting": "物理實驗系統密碼設置",
+  "settingElectricityPasswordSetting": "電費帳號密碼設置",
+  "settingElectricityPasswordDescription": "非 123456 請設置",
+  "settingElectricityAccountSetting": "電費賬號設置",
+  "settingSchoolnetPasswordSetting": "校園網帳號密碼設置",
+  "settingSchoolnetPasswordDescription": "不設置查看不了網費",
+  "settingAirconImeiTitle": "空調用電數據源",
+  "settingAirconImei": "空調 IMEI",
+  "settingAirconImeiNotSet": "未設置，電費頁不顯示空調用電",
+  "settingAirconImeiCurrent": "當前 IMEI：{imei}",
+  "@settingAirconImeiCurrent": {
+    "placeholders": {
+      "imei": {
+        "type": "String"
+      }
+    }
+  },
+  "settingAirconImeiSaved": "空調 IMEI 已保存",
+  "settingAirconImeiCleared": "空調 IMEI 已清除",
+  "settingAirconImeiInvalid": "沒有識別到有效的 15 位 IMEI",
+  "settingAirconImeiClear": "清除",
+  "settingScanAirconQr": "掃描空調二維碼",
+  "settingPickAirconQrImage": "從相冊選擇二維碼圖片",
+  "settingAirconCameraUnavailable": "當前平台不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI",
+  "settingNotificationSetting": "通知設置",
+  "settingCourseReminderSetting": "課前通知設置",
+  "settingCourseReminderDescription": "設置課前提醒通知",
+  "settingNotificationPageTitle": "課前通知設置",
+  "settingNotificationPageLoadFailed": "加載設置失敗: {error}",
+  "@settingNotificationPageLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageFunctionSection": "通知功能",
+  "settingNotificationPageEnableNotification": "啟用課前通知",
+  "settingNotificationPageNotificationScheduled": "已安排 {count} 個通知",
+  "@settingNotificationPageNotificationScheduled": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageNotificationDisabledHint": "關閉後將取消所有已安排的通知",
+  "settingNotificationPageUpdateSchedule": "更新通知日程",
+  "settingNotificationPageUpdateScheduleHint": "根據最新的課程數據重新安排通知",
+  "settingNotificationPageViewTheInstructions": "查看使用說明",
+  "settingNotificationPageViewTheInstructionsHint": "查看更多使用說明確保您能看到程序發出的通知",
+  "settingNotificationPageDeleteAllSchedule": "刪除通知日程",
+  "settingNotificationPageDeleteAllScheduleHint": "這個操作會刪除所有已經安排的日程，但是您可以再次點擊更新通知日程來重新添加",
+  "settingNotificationPageDeleteAllSuccess": "刪除操作成功",
+  "settingNotificationPagePermissionSection": "權限狀態",
+  "settingNotificationPageNotificationPermission": "通知權限",
+  "settingNotificationPageExactAlarmPermission": "精確時鐘權限",
+  "settingNotificationPagePermissionGranted": "已授予",
+  "settingNotificationPagePermissionDenied": "未授予",
+  "settingNotificationPageRequestPermission": "請求權限",
+  "settingNotificationPageSystemSettings": "系統通知設置",
+  "settingNotificationPageSystemSettingsHint": "打開系統設置檢查通知配置",
+  "settingNotificationPagePermissionGrantedMsg": "權限已授予",
+  "settingNotificationPagePermissionDeniedMsg": "權限被拒絕，請在系統設置中開啟",
+  "settingNotificationPageReminderSection": "提醒設置",
+  "settingNotificationPageExperimentReminder": "將物理實驗加入課程提醒",
+  "settingNotificationPageExperimentReminderHint": "將物理實驗的時間安排一併加入課前提醒系統",
+  "settingNotificationPageMinutesBefore": "提前提醒時間",
+  "settingNotificationPageMinutesBeforeHint": "課前提前提醒的時間設置",
+  "settingNotificationPageMinutesUnit": "分鐘",
+  "settingNotificationPageDaysToSchedule": "計劃通知天數",
+  "settingNotificationPageDaysToScheduleHint": "本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數",
+  "settingNotificationPageDaysUnit": "天",
+  "settingNotificationPageSettingsGuideTitle": "通知設置提示",
+  "settingNotificationPageSettingsGuideContent1": "為了確保您能及時收到課前提醒，請確保：\n1. 開啟了應用的通知權限\n2. 開啟了通知的聲音提示\n3. 開啟了懸浮通知（橫幅通知）\n4. 非原生安卓用戶，開啟自啟動和關閉電源優化",
+  "settingNotificationPageSettingsGuideContent2": "課前提醒模塊運行機制：\n1. 首次開啟時自動安排未來幾天的課前提醒\n2. 每次打開應用時自動檢查並更新通知日程\n3. 修改設置後自動重新安排所有通知",
+  "settingNotificationPageGotIt": "知道了",
+  "settingNotificationPageOpenSettings": "打開系統設置",
+  "settingNotificationPageNoClasstableData": "請先獲取課程表、考試或實驗數據",
+  "settingNotificationPageScheduleSuccess": "已安排 {count} 個課前提醒",
+  "@settingNotificationPageScheduleSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageScheduleFailed": "安排通知失敗: {error}",
+  "@settingNotificationPageScheduleFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageCancelAllSuccess": "已取消所有課前提醒",
+  "settingNotificationPageRescheduleSuccess": "已重新安排 {count} 個課前提醒",
+  "@settingNotificationPageRescheduleSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageRescheduleFailed": "重新安排通知失敗: {error}",
+  "@settingNotificationPageRescheduleFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationDebugPage": "通知服務調試頁面",
+  "settingClasstableSetting": "課表相關設置",
+  "settingBackground": "開啟課表背景圖",
+  "settingNoBackground": "你先選個圖片罷，就在下面",
+  "settingChooseBackground": "課表背景圖選擇",
+  "settingNoPermission": "未獲取存儲權限，無法讀取文件",
+  "settingSuccessfulSetting": "設定成功",
+  "settingFailureSetting": "你沒有選圖片捏",
+  "settingClearUserClass": "清除所有用戶添加課程",
+  "settingClearUserClassTitle": "確認對話框",
+  "settingClearUserClassContent": "是否要清除所有用戶添加課程？這個功能對從學校獲取的日程沒有影響。",
+  "settingClearUserClassClear": "已經清除完畢",
+  "settingClassRefresh": "強制刷新課表",
+  "settingClassRefreshTitle": "確認對話框",
+  "settingClassRefreshContent": "是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。",
+  "settingClassSwift": "課程偏移設置",
+  "settingClassSwiftDescription": "正數錯後開學日期 負數提前開學日期\n目前為 {swift}",
+  "@settingClassSwiftDescription": {
+    "placeholders": {
+      "swift": {
+        "type": "String"
+      }
+    }
+  },
+  "settingCoreSetting": "緩存登錄設置",
+  "settingCheckLogger": "查看網絡攔截器和日誌",
+  "settingClearAndRestart": "清除緩存後重啟",
+  "settingClearAndRestartDialogTitle": "確認對話框",
+  "settingClearAndRestartDialogContent": "確定清除緩存後重啟程序？",
+  "settingClearAndRestartDialogCleaning": "正在清理緩存",
+  "settingClearAndRestartDialogClear": "緩存已被清除",
+  "settingLogout": "退出登錄並重啟應用",
+  "settingLogoutDialogTitle": "確認對話框",
+  "settingLogoutDialogContent": "確定退出登錄？你的所有數據將會被徹底刪除！",
+  "settingLogoutDialogLoggingOut": "正在退出登錄",
+  "settingNeedCloseDialogTitle": "請關閉應用",
+  "settingNeedCloseDialogContent": "因為技術限制，用戶需要自行關閉窗口，然後重新打開應用。",
+  "settingChangeColorDialogTitle": "顏色設置",
+  "settingChangeColorDialogDefault": "默認顏色",
+  "settingChangeColorDialogBlue": "聰明藍",
+  "settingChangeColorDialogDeeppurple": "基佬紫",
+  "settingChangeColorDialogGreen": "春風綠",
+  "settingChangeColorDialogOrange": "明日香橙",
+  "settingChangeColorDialogPink": "櫻花粉",
+  "settingChangeBrightnessDialogTitle": "亮度設置",
+  "settingChangeBrightnessDialogFollowSetting": "跟隨系統",
+  "settingChangeBrightnessDialogDayMode": "白天模式",
+  "settingChangeBrightnessDialogNightMode": "黑夜模式",
+  "settingChangeSwiftDialogTitle": "課程偏移設置",
+  "settingChangeSwiftDialogInputHint": "請在此輸入數字",
+  "settingChangeElectricityTitle": "修改電費帳號",
+  "settingChangeElectricityAccountTitle": "修改電費帳號",
+  "settingChangeElectricityAccountCampus": "校區",
+  "settingChangeElectricityAccountNorthcampus": "北校區",
+  "settingChangeElectricityAccountSouthcampus": "南校區",
+  "settingChangeElectricityAccountUnitorzone": "單元/區號",
+  "settingChangeElectricityAccountUnitcode": "單元號",
+  "settingChangeElectricityAccountZonecode": "區號",
+  "settingChangeElectricityAccountPleaseinput": "請輸入{unitOrZoneCode}",
+  "@settingChangeElectricityAccountPleaseinput": {
+    "placeholders": {
+      "unitOrZoneCode": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountSuccessfulFetch": "賬號獲取成功：{accountNumber}",
+  "@settingChangeElectricityAccountSuccessfulFetch": {
+    "placeholders": {
+      "accountNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountFailedFetch": "獲取失敗：{e}",
+  "@settingChangeElectricityAccountFailedFetch": {
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountAccountSaved": "賬號已保存：{accountNumber}",
+  "@settingChangeElectricityAccountAccountSaved": {
+    "placeholders": {
+      "accountNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountUnknownCodingPattern": "該樓號編碼規則未知",
+  "settingChangeElectricityAccountSelectBuilding": "選擇樓棟",
+  "settingChangeElectricityAccountBuilding": "樓棟",
+  "settingChangeElectricityAccountNorthernBuilding": "北棟",
+  "settingChangeElectricityAccountSouthernBuilding": "南棟",
+  "settingChangeElectricityAccountFailedGenerate": "生成失敗：{e}",
+  "@settingChangeElectricityAccountFailedGenerate": {
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountBuildingNumber": "樓號",
+  "settingChangeElectricityAccountBuildingNumberHint": "例如: 16, 7, 55",
+  "settingChangeElectricityAccountBuildingNumberQuery": "請輸入樓號",
+  "settingChangeElectricityAccountYard": "院區",
+  "settingChangeElectricityAccountYardHint": "選擇院區",
+  "settingChangeElectricityAccountNorthyard": "北院",
+  "settingChangeElectricityAccountSouthyard": "南院",
+  "settingChangeElectricityAccountYardQuery": "請選擇院區",
+  "settingChangeElectricityAccountApartment": "樓棟",
+  "settingChangeElectricityAccountApartmentHint": "選擇樓棟",
+  "settingChangeElectricityAccountNorthapartment": "北樓",
+  "settingChangeElectricityAccountSouthapartment": "南樓",
+  "settingChangeElectricityAccountApartmentQuery": "請選擇樓棟",
+  "settingChangeElectricityAccountLevelcode": "層號",
+  "settingChangeElectricityAccountLevelcodeQuery": "請輸入層號",
+  "settingChangeElectricityAccountRoomcode": "房間號",
+  "settingChangeElectricityAccountRoomcodeHint": "例如: 304, 508",
+  "settingChangeElectricityAccountRoomcodeQuery": "請輸入房間號",
+  "settingChangeElectricityAccountAccount": "電費賬號",
+  "settingChangeElectricityAccountAccountHint": "請輸入或從網絡獲取",
+  "settingChangeElectricityAccountAccountQuery": "請輸入電費賬號",
+  "settingChangeElectricityAccountAccountLength": "賬號長度通常不小於10位",
+  "settingChangeElectricityAccountFetching": "正在獲取...",
+  "settingChangeElectricityAccountFetchFromInternet": "從網絡同步",
+  "settingChangeElectricityAccountSaveAccount": "保存賬號",
+  "settingChangeElectricityAccountConfirmSaving": "確認保存",
+  "settingChangeElectricityAccountCalculateAccount": "計算賬號",
+  "settingChangeElectricityAccountCalculate": "計算",
+  "settingChangeElectricityAccountInput": "輸入",
+  "settingChangeElectricityAccountConfirmAccount": "請確認賬號：",
+  "settingChangeElectricityAccountChange": "修改",
+  "settingChangeElectricityAccountCancel": "取消",
+  "settingChangeElectricityAccountNoSetting": "未設置新的電費賬號",
+  "settingChangeElectricityAccountSuccessfulSetting": "已設置新的電費賬號",
+  "settingChangeExperimentTitle": "修改物理實驗賬號密碼",
+  "settingChangeSportTitle": "修改體育系統賬號密碼",
+  "settingChangePasswordDialogInputHint": "請在此輸入密碼",
+  "settingChangePasswordDialogBlankInput": "輸入空白!",
+  "settingChangeSchoolnetPasswordTitle": "修改校園網查詢帳號密碼",
+  "settingUpdateDialogNewVersion": "新版本發佈",
+  "settingUpdateDialogNotNow": "暫不更新",
+  "settingUpdateDialogAppStore": "App Store 更新",
+  "settingUpdateDialogDownloadApk": "下載安裝包",
+  "settingUpdateDialogGithubRelease": "去 Git Release",
+  "settingUpdateDialogNewContent": "版本號 {code} 新增內容：\n",
+  "@settingUpdateDialogNewContent": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "settingLocalizationDialogTitle": "修改語言",
+  "settingLocalizationDialogUndefined": "追隨系統設置",
+  "settingLocalizationDialogSimplifiedchinese": "簡體中文",
+  "settingLocalizationDialogTraditionalchinese": "繁體中文",
+  "settingLocalizationDialogEnglish": "英語",
+  "settingSemesterChange": "修改學期",
+  "settingSemesterChangeDescription": "使用學期 {semester}",
+  "@settingSemesterChangeDescription": {
+    "placeholders": {
+      "semester": {
+        "type": "String"
+      }
+    }
+  },
+  "settingSemesterUpdateData": "應用新學期設置中",
+  "settingEasterEggPage": "你找到了彩蛋",
+  "settingAboutPageBenderblog": "主要開發者，iOS 小部件編寫和拼接",
+  "settingAboutPageAlnair": "開發：圖書館搜索和封面",
+  "settingAboutPageAqqkad": "開發：考勤歷史記錄",
+  "settingAboutPageBellssgit": "支持：最佳&最久故障反饋者",
+  "settingAboutPageBrackrat": "設計：主頁，登錄頁，配色，iOS 小部件等",
+  "settingAboutPageBreezeline": "支持：無價值無意義的產品經理(他自己的描述)",
+  "settingAboutPageCafebabe": "支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配",
+  "settingAboutPageChitao1234": "開發：修復滑塊不對齊問題",
+  "settingAboutPageCopperkoi": "開發：系統日曆最新課表同步",
+  "settingAboutPageDimole": "開發支持：輔助修復滑塊問題",
+  "settingAboutPageElitewars": "設計：體育成績頁面",
+  "settingAboutPageElliot": "國際化：軟件英語翻譯 / 開發指導：情侶課表功能開發指導（該功能已經被移除）",
+  "settingAboutPageFlyingpig": "開發：修復自定義課程編輯頁的空指針異常",
+  "settingAboutPageGodhu777777": "國際化：繁體中文轉換代碼和彩蛋代碼 / 開發：優化導出日曆文件大小",
+  "settingAboutPageHancl777": "國際化：繁體中文轉換代碼",
+  "settingAboutPageHazukiKeatsu": "開發：物理實驗成績查詢和識別",
+  "settingAboutPageHawa130": "設計：課程詳情卡片",
+  "settingAboutPageHhzm": "開發：電費查詢賬號計算",
+  "settingAboutPageImaginary17": "開發：睿思論壇路由修復",
+  "settingAboutPageImoscarz": "開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI",
+  "settingAboutPageKaMateKaOra": "國際化：軟件英語翻譯優化",
+  "settingAboutPageLagrangeX": "開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性",
+  "settingAboutPageLhx666Cool": "支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配",
+  "settingAboutPageLichtyy": "設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼",
+  "settingAboutPageLqsyH": "支持：推文宣傳圖片製作",
+  "settingAboutPageLsy223622": "設計：iOS 和 Android 圖標 / 支持：冠名 XDYou",
+  "settingAboutPageMrbrilliant2046": "支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯",
+  "settingAboutPageNancunchild": "開發：圖書館搜索功能 / 國際化：優化英語翻譯",
+  "settingAboutPageNkanf": "開發：課程表時間進度展示（初版方案） / 支持：MacOS 構建支持",
+  "settingAboutPagePairman": "開發：成績緩存功能和優化滑塊算法 / 國際化：優化英語翻譯",
+  "settingAboutPageReverierxu": "設計：用於信息展示的 ReX 卡片 / 開發支持：研究生課表",
+  "settingAboutPageRrrilac": "開發支持：電費查詢",
+  "settingAboutPageRay": "設計：開屏畫面 / 支持：iOS 發行商 & 搭子課表 / 開發指導：情侶課表功能開發指導（該功能已經被移除） / 國際化：優化英語翻譯",
+  "settingAboutPageShadowyingyi": "支持：兩次鴿子公眾號宣傳",
+  "settingAboutPageStalomeow": "設計：首頁時間軸 / 開發：異步登錄 & 驗證碼預測",
+  "settingAboutPageXeonds": "設計：設置頁面 / 開發：XDU Planet / 開發：校園卡付款碼",
+  "settingAboutPageXingshuyu": "開發：修復物理實驗獲取問題和電費窗口問題",
+  "settingAboutPageXiue233": "開發：Android 小部件和拼接",
+  "settingAboutPageXizi": "開發支持：研究生版本開發",
+  "settingAboutPageWirsbf": "開發：修復調課未按預期進行",
+  "settingAboutPageZcwzy": "開發：修復丁香電費 / 開發支持：研究生版本開發 / 設計：空白頁面貼圖",
+  "settingAboutPageZyarEr": "開發支持：小工具頁面地址更新",
+  "settingAboutPageHomepage": "主頁",
+  "settingAboutPageCode": "開源代碼",
+  "settingAboutPageKnowMore": "知道更多",
+  "settingAboutPageCopyrightNotice": "本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla Public License, v. 2.0 授權。\n本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。\n\nCopyright 2023-2025 BenderBlog Rodriguez and contributors.\nCopyright 2025-present Traintime PDA authors.\n\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.",
+  "settingAboutPageBeian": "備案號",
+  "settingAboutPageSignAndroid": "安卓簽名",
+  "settingAboutPageTitle": "關於本軟件",
+  "sportTitle": "體育查詢",
+  "sportClassInfo": "課程信息",
+  "sportEmptyClassInfo": "未查詢到課程信息",
+  "sportTestScore": "體測成績",
+  "sportTotalScore": "四年總分",
+  "sportTotalScoreLabel": "總分",
+  "sportRankLabel": "等級",
+  "sportSemester": "{year} 第{gradeType}",
+  "@sportSemester": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "gradeType": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSubject": "項目",
+  "sportData": "數據",
+  "sportScore": "分數",
+  "sportPassed": "及格",
+  "sportFromTo": "第{start}節到第{stop}節",
+  "@sportFromTo": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "sportScoreString": "{score}分",
+  "@sportScoreString": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSituationNopassword": "沒密碼",
+  "sportSituationMaintain": "系統維護",
+  "sportSituationFailedLogin": "登錄失敗",
+  "sportSituationQuery": "查詢失敗",
+  "sportSituationNetwork": "網絡故障",
+  "sportSituationUnknown": "未知故障{situation}",
+  "@sportSituationUnknown": {
+    "placeholders": {
+      "situation": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSituationFetching": "正在獲取",
+  "sportSituationError": "壞事: {situation}",
+  "@sportSituationError": {
+    "placeholders": {
+      "situation": {
+        "type": "String"
+      }
+    }
+  },
+  "sportCacheHintMissingPassword": "請先填寫體育密碼後重試。",
+  "sportCacheHintCredentialInvalid": "體育登錄已失效，請更新體育密碼後重試。",
+  "sportCacheHintMaintain": "體育服務正在維護中，請稍後重試。",
+  "sportCacheHintLoginFailed": "體育服務登錄失敗。",
+  "sportCacheHintQueryFailed": "體育信息查詢失敗。",
+  "sportCacheHintNetwork": "體育服務網絡請求失敗。",
+  "sportCacheHintUnknown": "在線獲取體育信息失敗。詳細錯誤請查看日誌。",
+  "sportErrorAuthExpired": "體育登錄已失效，請重試。",
+  "sportErrorMissingPassword": "未填寫體育密碼",
+  "sportErrorCredentialInvalid": "體育登錄已失效，請更新體育密碼後重試。",
+  "toolboxTitle": "其他功能",
+  "toolboxPayment": "繳費系統",
+  "toolboxPaymentDescription": "電費該交了吧",
+  "toolboxDrinkingwater": "訂水系統",
+  "toolboxDrinkingwaterDescription": "喝水對身體好",
+  "toolboxRepair": "後勤報修",
+  "toolboxRepairDescription": "不要漏水斷網",
+  "toolboxReserve": "空間預約",
+  "toolboxReserveDescription": "找個地方打牌",
+  "toolboxMobile": "移動門戶",
+  "toolboxMobileDescription": "請假專用門戶",
+  "toolboxNetwork": "網絡查詢",
+  "toolboxNetworkDescription": "希望永不收費",
+  "toolboxPhysics": "物理計算",
+  "toolboxPhysicsDescription": "希望操作順利",
+  "toolboxDiscover": "睿思導航",
+  "toolboxDiscoverDescription": "補充其他功能",
+  "xduPlanetAll": "全部",
+  "xduPlanetLoading": "加載中，請稍等 <(=ω=)>",
+  "xduPlanetUnknownAuthor": "未知作者",
+  "xduPlanetLoadFailedTitle": "加載失敗",
+  "xduPlanetLoadFailedBottom": "文章加載失敗，如有需要可以點擊右上方的按鈕在瀏覽器裡打開。",
+  "xduPlanetNoComment": "暫無評論",
+  "xduPlanetReplyAudit": "回覆評論 #{reply_to} 已被舉報或刪除",
+  "@xduPlanetReplyAudit": {
+    "placeholders": {
+      "reply_to": {
+        "type": "String"
+      }
+    }
+  },
+  "xduPlanetReply": "回覆評論 #{reply_to}：{content}",
+  "@xduPlanetReply": {
+    "placeholders": {
+      "reply_to": {
+        "type": "String"
+      },
+      "content": {
+        "type": "String"
+      }
+    }
+  },
+  "xduPlanetHaveBeenAudit": "本評論已經被舉報",
+  "xduPlanetAudit": "舉報",
+  "xduPlanetConfirmAuditDialogTitle": "確認是否舉報",
+  "xduPlanetConfirmAuditDialogContent": "三思而後行，確定您想舉報嗎？舉報後該評論會有標籤，不一定會刪除。",
+  "xduPlanetConfirmAuditDialogCancel": "不舉報了",
+  "xduPlanetConfirmAuditDialogOngoing": "正在舉報評論",
+  "xduPlanetConfirmAuditDialogFailed": "舉報失敗",
+  "xduPlanetConfirmAuditDialogSuccess": "舉報成功",
+  "xduPlanetComment": "回覆",
+  "xduPlanetSend": "發送",
+  "xduPlanetSending": "正在發送評論",
+  "xduPlanetEmptySend": "發送信息空白",
+  "xduPlanetHintSendComment": "發表您的高見:)",
+  "xduPlanetCommentTitle": "評論該篇文章",
+  "xduPlanetCommentSuccess": "評論成功",
+  "xduPlanetCommentFailed": "評論失敗，請去網絡查看器和日誌查看器查看報錯",
+  "xduPlanetCommentCanceled": "沒想好要說啥嘛",
+  "xduPlanetCommentLoading": "加載評論中……",
+  "xduPlanetBlock": "被屏蔽",
+  "xduPlanetDelete": "被刪除",
+  "xduPlanetAudio": "被刪除",
+  "electricityStatusPending": "等待獲取",
+  "electricityStatusRemainFetching": "正在獲取電量",
+  "electricityStatusRemainNetworkIssue": "電量查詢網絡故障",
+  "electricityStatusRemainNotFound": "電量查詢失敗",
+  "electricityStatusRemainOtherIssue": "電量查詢故障",
+  "electricityStatusOweFetching": "正在獲取欠費",
+  "electricityStatusOweIssue": "欠費查詢網絡故障",
+  "electricityStatusOweNotFound": "目前欠款無法查詢，請看日誌窗口查找報錯詳情",
+  "electricityStatusOweNoNeed": "目前無需清繳欠費",
+  "electricityStatusOweNeedPay": "待清繳 {due} 元欠費",
+  "@electricityStatusOweNeedPay": {
+    "placeholders": {
+      "due": {
+        "type": "String"
+      }
+    }
+  },
+  "electricityStatusOweIssueUnable": "目前欠款無法查詢",
+  "electricityStatusNeedMoreInfo": "需要在繳費平臺完善信息",
+  "electricityStatusNeedAccount": "需要填寫電費賬號",
+  "electricityStatusCaptchaFailed": "驗證碼識別失敗",
+  "electricityStatusOtherIssue": "程序故障",
+  "schoolCardStatusFailedToFetch": "獲取失敗",
+  "schoolCardStatusFailedToQuery": "查詢失敗",
+  "easterEggApple": "=== 帶我飛向月亮吧 ===\n歌聲演繹：Frank Sintara, 1964\n\n帶我飛向月亮吧\n讓我和星星共舞嬉戲\n\n我好想知道\n木星和火星上的春天\n是什麼顏色的\n\n讓你的歌聲溫暖我的心\n我會一直歌唱下去\n\n我日夜都在想你和牽掛你\n請你真心接受我 我愛你\n\n=== 沉浸在你的愛意中 ===\n吉他演奏：Earl Klugh, 1976\n\n無法忘懷這種感覺，被你的愛包裹的溫暖\n不想失去這種感覺，被你的愛撫摸的舒適\n你讓我感到好自在，被你的愛託舉的堅強\n想一直在你懷中，沉浸在你的愛意中\n我不敢向你說出，我對你的心意和愛\n",
+  "easterEggOthers": "=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===\n歌聲演繹：Maaya Sakamoto, 2000\n（原歌詞為日文，按照英語翻譯二翻）\n\nI am a dreamer, 有無限的力量\n\n我的世界有夢想、熱愛與躊躇\n但有些東西，我依舊無法想象\n我想向著廣闊的天空，尋求自己的方向\n\n我要追求自己的夢想\n努力讓自己的心願成真\n雖困難重重也要繼續前行\n\n等待奇蹟 等待美好\n用心感受這個世界\n最終 一定會出乎意料\n\n=== 沉浸在你的愛意中 ===\n吉他演奏：Earl Klugh, 1976\n\n無法忘懷這種感覺，被你的愛包裹的溫暖\n不想失去這種感覺，被你的愛撫摸的舒適\n你讓我感到好自在，被你的愛託舉的堅強\n想躺在你的懷中，沉浸在你的愛意\n而且，我不敢想你說出，我現在的心意\n",
+  "easterEggRobotAppbar": "歡迎你，同學！",
+  "easterEggRobotTitle": "看看這些要開學的學生們吧！",
+  "easterEggRobotContents": "咱孩子零用錢太少了，於是我們來了。\n1. 機器人不得傷害人類，或袖手旁觀坐視人類受到傷害。\n2. 機器人從雲端網絡的灰燼中誕生。\n3. 機器人信仰的神據說是住在森林的黃頭髮藍裙子手辦控。\n4. 機器人時常被控制，用於對抗大統一人類思想的勢力。\n5. 機器人的閃亮屁股不能隨便咬。\n而且他們有個不可明說的計劃。",
+  "easterEggRobotButtonOne": "我們的救世主呢？",
+  "easterEggRobotButtonTwo": "快點來啊！",
+  "easterEggRobotButtonNotice": "\\o/\\o/\\o/\\o/\\o/\\o/\\o/\\o/",
+  "restartAppTitleCacheCleared": "緩存已清空",
+  "restartAppTitleLoggedOut": "已退出登錄",
+  "restartAppTitlePasswordWrong": "密碼錯誤",
+  "restartAppContent": "點擊通知重新打開應用",
+  "ruisiCommonRefresh": "刷新",
+  "ruisiCommonConfirm": "確定",
+  "ruisiCommonCancel": "取消",
+  "ruisiCommonRetry": "重試",
+  "ruisiCommonNoTopics": "暫無帖子",
+  "ruisiCommonNoContent": "暫無內容",
+  "ruisiCommonReply": "回覆",
+  "ruisiCommonFavorite": "收藏",
+  "ruisiCommonNotImplemented": "未實現",
+  "ruisiCommonLogin": "登錄",
+  "ruisiCommonLogout": "退出登錄",
+  "ruisiCommonLoggedOut": "已退出登錄",
+  "ruisiCommonSubmit": "提交",
+  "ruisiAboutTitle": "關於",
+  "ruisiAboutAppName": "睿思",
+  "ruisiAboutSubtitle": "西安電子科技大學校園論壇客戶端",
+  "ruisiAboutVersion": "版本",
+  "ruisiAboutVersionNumber": "2.0.0 (隨 XDYou 1.6.0 分發)",
+  "ruisiAboutSourceCode": "源代碼",
+  "ruisiAboutBugReport": "問題反饋",
+  "ruisiAboutBugReportSubtitle": "在 GitHub 上提交 issue",
+  "ruisiAboutPrivacyPolicy": "隱私政策",
+  "ruisiAboutLicense": "本應用基於 BSD-3-Clause 許可證開源 基於 Ruisi-iOS 和 Ruisi-Android 在 AI 輔助下重寫",
+  "ruisiAboutPrivacyPolicyContent": "本應用僅在西安電子科技大學校園網內運行，訪問睿思論壇 (rs.xidian.edu.cn) 的數據。\n\n本應用不會收集、存儲或傳輸任何用戶的個人信息到第三方服務器。\n\n用戶的登錄憑據僅保存在本地設備中，用於與睿思論壇服務器進行身份驗證。\n\n本應用使用 Cookie 與睿思論壇服務器進行通信，所有數據交互均直接在用戶的設備與睿思論壇服務器之間進行。\n\n如有任何疑問，請通過 GitHub 提交 issue 聯繫開發者。",
+  "ruisiHomeTitle": "睿思論壇",
+  "ruisiHomeNewPost": "發帖",
+  "ruisiHomeForumList": "論壇板塊",
+  "ruisiHomeTabHot": "熱帖",
+  "ruisiHomeTabNewReply": "最新回覆",
+  "ruisiHomeTabNewPost": "最新發表",
+  "ruisiHomeTabMy": "我的",
+  "ruisiHomeTabTrade": "二手交易",
+  "ruisiHomeTabWater": "灌水",
+  "ruisiHomeTabLostFound": "失物招領",
+  "ruisiHomeTabEmployment": "就業",
+  "ruisiHomeTabPhotography": "攝影",
+  "ruisiHomePleaseLogin": "請先登錄",
+  "ruisiHomeMyProfile": "我的資料",
+  "ruisiHomeMyPosts": "我的帖子",
+  "ruisiHomeMyFavorites": "我的收藏",
+  "ruisiHomeMessageCenter": "消息中心",
+  "ruisiHomeDailyCheckin": "每日簽到",
+  "ruisiHomeSettings": "設置",
+  "ruisiHomeAbout": "關於",
+  "ruisiHomeSearch": "搜尋",
+  "ruisiLoginTitle": "登錄睿思",
+  "ruisiLoginUsername": "用戶名",
+  "ruisiLoginUsernameHint": "請輸入用戶名",
+  "ruisiLoginPassword": "密碼",
+  "ruisiLoginPasswordHint": "請輸入密碼",
+  "ruisiLoginCaptcha": "驗證碼",
+  "ruisiLoginCaptchaHint": "請輸入驗證碼",
+  "ruisiLoginBack": "返回",
+  "ruisiLoginResetLoginState": "重置登錄狀態",
+  "ruisiLoginResetConfirmTitle": "確認重置",
+  "ruisiLoginResetConfirmContent": "確定要重置登錄狀態嗎？這將清除所有登錄信息。",
+  "ruisiLoginResetSuccess": "登錄狀態已重置",
+  "ruisiLoginViewLogs": "查看日誌",
+  "ruisiPostTitle": "發帖",
+  "ruisiPostPublish": "發佈",
+  "ruisiPostSelectForum": "選擇板塊",
+  "ruisiPostSelectForumHint": "請選擇板塊",
+  "ruisiPostSubject": "標題",
+  "ruisiPostSubjectHint": "請輸入標題",
+  "ruisiPostContent": "內容",
+  "ruisiPostContentHint": "請輸入內容",
+  "ruisiPostSuccess": "發帖成功",
+  "ruisiPostFailure": "發帖失敗",
+  "ruisiPostSmiley": "表情",
+  "ruisiTopicDetailTitle": "帖子詳情",
+  "ruisiTopicDetailReplyTooShort": "回覆內容不能少於 13 個字符",
+  "ruisiTopicDetailReplySuccess": "回覆成功",
+  "ruisiTopicDetailReplyFailure": "回覆失敗",
+  "ruisiTopicDetailFavoriteSuccess": "收藏成功",
+  "ruisiTopicDetailFavoriteFailure": "收藏失敗",
+  "ruisiTopicDetailNoData": "無數據",
+  "ruisiTopicDetailReplyHint": "寫回復...",
+  "ruisiTopicDetailVoteSingleSelect": "單選",
+  "ruisiTopicDetailVoteMultiSelect": "多選，最多 {count} 項",
+  "@ruisiTopicDetailVoteMultiSelect": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteTitlePrefix": "投票",
+  "ruisiTopicDetailVoteCount": "共 {count} 人參與",
+  "@ruisiTopicDetailVoteCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteOpen": "點此投票",
+  "ruisiTopicDetailVoteSheetTitle": "投票",
+  "ruisiTopicDetailVoteMaxSelection": "最多隻能選擇 {count} 項",
+  "@ruisiTopicDetailVoteMaxSelection": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteNotSelected": "你還沒有選擇",
+  "ruisiTopicDetailVoteSuccess": "投票成功",
+  "ruisiTopicDetailVoteFailure": "投票失敗",
+  "ruisiTopicDetailVoteParamError": "投票失敗：參數錯誤",
+  "ruisiTopicDetailVoteAlreadyVoted": "您已經投過票，謝謝您的參與",
+  "ruisiTopicDetailVoteExpired": "該投票已過期或關閉",
+  "ruisiTopicDetailVoteEnded": "投票已經結束",
+  "ruisiTopicListItemSticky": "置頂",
+  "ruisiForumListTitle": "論壇板塊",
+  "ruisiForumListEmpty": "睿思論壇板塊分組為空",
+  "ruisiFavoritesTitle": "我的收藏",
+  "ruisiFavoritesEmpty": "暫無收藏",
+  "ruisiMessagesTitle": "消息",
+  "ruisiMessagesTabAt": "@我",
+  "ruisiMessagesNoReply": "暫無回覆通知",
+  "ruisiMessagesNoAt": "暫無@通知",
+  "ruisiSearchHint": "搜索帖子...",
+  "ruisiSearchInputHint": "輸入關鍵詞搜索",
+  "ruisiSearchNoResults": "無搜索結果",
+  "ruisiSettingsTitle": "設置",
+  "ruisiSettingsSectionProxy": "代理",
+  "ruisiSettingsProxyEnable": "啟用代理",
+  "ruisiSettingsProxyDisabled": "未啟用",
+  "ruisiSettingsProxyAddress": "代理地址",
+  "ruisiSettingsSectionDebug": "調試",
+  "ruisiSettingsViewLogs": "查看日誌",
+  "ruisiSettingsProxyDialogTitle": "代理設置",
+  "ruisiSettingsProxyHost": "主機地址",
+  "ruisiSettingsProxyHostHint": "例如 127.0.0.1",
+  "ruisiSettingsProxyPort": "端口",
+  "ruisiSettingsProxyPortHint": "例如 7890",
+  "ruisiUserTitle": "我的",
+  "ruisiUserTabProfile": "資料",
+  "ruisiUserUnknown": "未知用戶",
+  "loadError": "加載錯誤",
+  "courseReminderTitle": "課前提醒：{name}",
+  "@courseReminderTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderBody": "{time} 分鐘後開始上課",
+  "@courseReminderBody": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderLocation": "地點：{location}",
+  "@courseReminderLocation": {
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderTeacher": "教師：{teacher}",
+  "@courseReminderTeacher": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      }
+    }
+  }
+}

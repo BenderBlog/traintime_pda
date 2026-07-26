@@ -2,7 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -13,6 +12,7 @@ import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class EnergyCard extends StatelessWidget {
   const EnergyCard({super.key});
@@ -39,63 +39,36 @@ class EnergyCard extends StatelessWidget {
           type: lowElectricityWarning
               ? HomeCardType.warning
               : HomeCardType.plain,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.electricity_card.title",
-          ),
+          text: I18n.of(context)!.homepageElectricityCardTitle,
           infoText: DefaultTextStyle.merge(
             style: const TextStyle(fontSize: 20),
             child: displayInfo != null
                 ? Text(
-                    FlutterI18n.translate(
-                      context,
-                      "homepage.electricity_card.current_electricity",
-                      translationParams: {
-                        "amount": displayInfo.electricityRemain.toString(),
-                      },
-                    ),
+                    I18n.of(context)!.homepageElectricityCardCurrentElectricity(displayInfo.electricityRemain.toString()),
                   )
                 : state.map(
                     data: (_) => const Text(""),
                     error: () => Text(
-                      FlutterI18n.translate(
-                        context,
-                        "electricity_status.remain_not_found",
-                      ),
+                      I18n.of(context)!.electricityStatusRemainNotFound,
                     ),
                     loading: () => Text(
-                      FlutterI18n.translate(
-                        context,
-                        "electricity_status.remain_fetching",
-                      ),
+                      I18n.of(context)!.electricityStatusRemainFetching,
                     ),
                   ),
           ),
           bottomText: displayInfo != null
               ? Text(
-                  FlutterI18n.translate(
-                    context,
-                    "homepage.electricity_card.cache_notice",
-                    translationParams: {
-                      "date": DateFormat(
+                  I18n.of(context)!.homepageElectricityCardCacheNotice(DateFormat(
                         "yyyy-MM-dd",
-                      ).format(displayInfo.electricityMeterList.first.ReadTime),
-                    },
-                  ).replaceAll("\n", ""),
+                      ).format(displayInfo.electricityMeterList.first.ReadTime)),
                 )
               : state.map(
                   data: (_) => const Text(""),
                   error: () => Text(
-                    FlutterI18n.translate(
-                      context,
-                      "electricity_status.owe_issue",
-                    ),
+                    I18n.of(context)!.electricityStatusOweIssue,
                   ),
                   loading: () => Text(
-                    FlutterI18n.translate(
-                      context,
-                      "electricity_status.owe_fetching",
-                    ),
+                    I18n.of(context)!.electricityStatusOweFetching,
                   ),
                 ),
         );

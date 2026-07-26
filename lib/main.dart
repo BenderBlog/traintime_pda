@@ -13,9 +13,9 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:shared_preferences/util/legacy_to_async_migration_util.dart';
+import 'package:watermeter/generated/l10n.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -139,20 +139,12 @@ class _MyAppState extends State<MyApp> {
       builder: (context) {
         final color = appTheme.colorSignal.value;
         final themeMode = appTheme.colorStateSignal.value;
-        final i18nDelegate = appTheme.i18nDelegateSignal.value;
+        final locale = appTheme.localeSignal.value;
 
         return MaterialApp(
-          localizationsDelegates: [
-            i18nDelegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('zh', 'CN'),
-            Locale('zh', 'TW'),
-            Locale('en', 'US'),
-          ],
+          locale: locale,
+          localizationsDelegates: I18n.localizationsDelegates,
+          supportedLocales: I18n.supportedLocales,
           debugShowCheckedModeBanner: false,
           scrollBehavior: MyCustomScrollBehavior(),
           navigatorKey: preference.debuggerKey,

@@ -5,11 +5,11 @@
 // Course reminder notification settings page
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
@@ -84,11 +84,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       if (mounted) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.load_failed',
-            translationParams: {'error': e.toString()},
-          ),
+          msg: I18n.of(context)!.settingNotificationPageLoadFailed(e.toString()),
         );
       }
     } finally {
@@ -114,18 +110,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       if (notificationPermissionGranted && exactAlarmGranted) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.permission_granted_msg',
-          ),
+          msg: I18n.of(context)!.settingNotificationPagePermissionGrantedMsg,
         );
       } else {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.permission_denied_msg',
-          ),
+          msg: I18n.of(context)!.settingNotificationPagePermissionDeniedMsg,
         );
       }
     }
@@ -136,27 +126,18 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          FlutterI18n.translate(
-            context,
-            'setting.notification_page.settings_guide_title',
-          ),
+          I18n.of(context)!.settingNotificationPageSettingsGuideTitle,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.settings_guide_content_1',
-              ),
+              I18n.of(context)!.settingNotificationPageSettingsGuideContent1,
             ),
             Divider(),
             Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.settings_guide_content_2',
-              ),
+              I18n.of(context)!.settingNotificationPageSettingsGuideContent2,
             ),
           ],
         ),
@@ -164,10 +145,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.got_it',
-              ),
+              I18n.of(context)!.settingNotificationPageGotIt,
             ),
           ),
           TextButton(
@@ -176,10 +154,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               _courseReminder.openNotificationSettings();
             },
             child: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.open_settings',
-              ),
+              I18n.of(context)!.settingNotificationPageOpenSettings,
             ),
           ),
         ],
@@ -205,10 +180,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           if (mounted) {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                'setting.notification_page.no_classtable_data',
-              ),
+              msg: I18n.of(context)!.settingNotificationPageNoClasstableData,
             );
           }
           return;
@@ -226,22 +198,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           });
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              'setting.notification_page.schedule_success',
-              translationParams: {'count': _pendingCount.toString()},
-            ),
+            msg: I18n.of(context)!.settingNotificationPageScheduleSuccess(_pendingCount.toString()),
           );
         }
       } catch (e) {
         if (mounted) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              'setting.notification_page.schedule_failed',
-              translationParams: {'error': e.toString()},
-            ),
+            msg: I18n.of(context)!.settingNotificationPageScheduleFailed(e.toString()),
           );
         }
       } finally {
@@ -262,10 +226,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         });
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.cancel_all_success',
-          ),
+          msg: I18n.of(context)!.settingNotificationPageCancelAllSuccess,
         );
       }
     }
@@ -278,11 +239,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       setState(() {});
       showToast(
         context: context,
-        msg: FlutterI18n.translate(
-          context,
-          'setting.notification_page.reschedule_success',
-          translationParams: {'count': _pendingCount.toString()},
-        ),
+        msg: I18n.of(context)!.settingNotificationPageRescheduleSuccess(_pendingCount.toString()),
       );
     }
   }
@@ -351,22 +308,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       if (mounted) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.reschedule_success',
-            translationParams: {'count': _pendingCount.toString()},
-          ),
+          msg: I18n.of(context)!.settingNotificationPageRescheduleSuccess(_pendingCount.toString()),
         );
       }
     } catch (e) {
       if (mounted) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.reschedule_failed',
-            translationParams: {'error': e.toString()},
-          ),
+          msg: I18n.of(context)!.settingNotificationPageRescheduleFailed(e.toString()),
         );
       }
     } finally {
@@ -387,10 +336,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       });
       showToast(
         context: context,
-        msg: FlutterI18n.translate(
-          context,
-          'setting.notification_page.delete_all_success',
-        ),
+        msg: I18n.of(context)!.settingNotificationPageDeleteAllSuccess,
       );
     }
   }
@@ -405,7 +351,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          FlutterI18n.translate(context, 'setting.notification_page.title'),
+          I18n.of(context)!.settingNotificationPageTitle,
         ),
         actions: [
           if (_isLoading)
@@ -427,34 +373,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           // Function switch
           ReXCard(
             title: _buildListSubtitle(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.function_section',
-              ),
+              I18n.of(context)!.settingNotificationPageFunctionSection,
             ),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.enable_notification',
-                    ),
+                    I18n.of(context)!.settingNotificationPageEnableNotification,
                   ),
                   subtitle: Text(
                     _isEnabled
-                        ? FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.notification_scheduled',
-                            translationParams: {
-                              'count': _pendingCount.toString(),
-                            },
-                          )
-                        : FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.notification_disabled_hint',
-                          ),
+                        ? I18n.of(context)!.settingNotificationPageNotificationScheduled(_pendingCount.toString())
+                        : I18n.of(context)!.settingNotificationPageNotificationDisabledHint,
                   ),
                   trailing: Switch(
                     value: _isEnabled,
@@ -463,16 +394,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 ),
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.view_the_instructions',
-                    ),
+                    I18n.of(context)!.settingNotificationPageViewTheInstructions,
                   ),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.view_the_instructions_hint',
-                    ),
+                    I18n.of(context)!.settingNotificationPageViewTheInstructionsHint,
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => _showNotificationSettingsGuide(),
@@ -480,16 +405,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 if (_isEnabled)
                   ListTile(
                     title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.notification_page.update_schedule',
-                      ),
+                      I18n.of(context)!.settingNotificationPageUpdateSchedule,
                     ),
                     subtitle: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.notification_page.update_schedule_hint',
-                      ),
+                      I18n.of(context)!.settingNotificationPageUpdateScheduleHint,
                     ),
                     trailing: const Icon(Icons.refresh),
                     onTap: _rescheduleNotifications,
@@ -497,16 +416,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 if (_isEnabled && _pendingCount > 0)
                   ListTile(
                     title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.notification_page.delete_all_schedule',
-                      ),
+                      I18n.of(context)!.settingNotificationPageDeleteAllSchedule,
                     ),
                     subtitle: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.notification_page.delete_all_schedule_hint',
-                      ),
+                      I18n.of(context)!.settingNotificationPageDeleteAllScheduleHint,
                     ),
                     trailing: Icon(
                       Icons.delete,
@@ -521,26 +434,17 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           // Reminder setting
           ReXCard(
             title: _buildListSubtitle(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.reminder_section',
-              ),
+              I18n.of(context)!.settingNotificationPageReminderSection,
             ),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.experiment_reminder',
-                    ),
+                    I18n.of(context)!.settingNotificationPageExperimentReminder,
                   ),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.experiment_reminder_hint',
-                    ),
+                    I18n.of(context)!.settingNotificationPageExperimentReminderHint,
                   ),
                   trailing: Switch(
                     value: _enableExperimentNotifications,
@@ -573,16 +477,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 const Divider(),
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.minutes_before',
-                    ),
+                    I18n.of(context)!.settingNotificationPageMinutesBefore,
                   ),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.minutes_before_hint',
-                    ),
+                    I18n.of(context)!.settingNotificationPageMinutesBeforeHint,
                   ),
                   trailing: DropdownButton<int>(
                     value: _minutesBefore,
@@ -591,7 +489,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                           (value) => DropdownMenuItem(
                             value: value,
                             child: Text(
-                              '$value ${FlutterI18n.translate(context, "setting.notification_page.minutes_unit")}',
+                              '$value ${I18n.of(context)!.settingNotificationPageMinutesUnit}',
                             ),
                           ),
                         )
@@ -606,16 +504,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 const Divider(),
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.days_to_schedule',
-                    ),
+                    I18n.of(context)!.settingNotificationPageDaysToSchedule,
                   ),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.days_to_schedule_hint',
-                    ),
+                    I18n.of(context)!.settingNotificationPageDaysToScheduleHint,
                   ),
                   trailing: DropdownButton<int>(
                     value: _daysToSchedule,
@@ -624,7 +516,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                           (value) => DropdownMenuItem(
                             value: value,
                             child: Text(
-                              '$value ${FlutterI18n.translate(context, "setting.notification_page.days_unit")}',
+                              '$value ${I18n.of(context)!.settingNotificationPageDaysUnit}',
                             ),
                           ),
                         )
@@ -643,31 +535,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           // Permission state
           ReXCard(
             title: _buildListSubtitle(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.permission_section',
-              ),
+              I18n.of(context)!.settingNotificationPagePermissionSection,
             ),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.notification_permission',
-                    ),
+                    I18n.of(context)!.settingNotificationPageNotificationPermission,
                   ),
                   subtitle: Text(
                     _hasNotificationPermission
-                        ? FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.permission_granted',
-                          )
-                        : FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.permission_denied',
-                          ),
+                        ? I18n.of(context)!.settingNotificationPagePermissionGranted
+                        : I18n.of(context)!.settingNotificationPagePermissionDenied,
                   ),
                   trailing: _hasNotificationPermission
                       ? Icon(
@@ -677,31 +557,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       : TextButton(
                           onPressed: _requestPermission,
                           child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'setting.notification_page.request_permission',
-                            ),
+                            I18n.of(context)!.settingNotificationPageRequestPermission,
                           ),
                         ),
                 ),
                 const Divider(),
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.exact_alarm_permission',
-                    ),
+                    I18n.of(context)!.settingNotificationPageExactAlarmPermission,
                   ),
                   subtitle: Text(
                     _hasExactAlarmPermission
-                        ? FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.permission_granted',
-                          )
-                        : FlutterI18n.translate(
-                            context,
-                            'setting.notification_page.permission_denied',
-                          ),
+                        ? I18n.of(context)!.settingNotificationPagePermissionGranted
+                        : I18n.of(context)!.settingNotificationPagePermissionDenied,
                   ),
                   trailing: _hasExactAlarmPermission
                       ? Icon(
@@ -711,26 +579,17 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       : TextButton(
                           onPressed: _requestPermission,
                           child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              'setting.notification_page.request_permission',
-                            ),
+                            I18n.of(context)!.settingNotificationPageRequestPermission,
                           ),
                         ),
                 ),
                 const Divider(),
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.system_settings',
-                    ),
+                    I18n.of(context)!.settingNotificationPageSystemSettings,
                   ),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.system_settings_hint',
-                    ),
+                    I18n.of(context)!.settingNotificationPageSystemSettingsHint,
                   ),
                   trailing: const Icon(Icons.settings),
                   onTap: () => _courseReminder.openNotificationSettings(),

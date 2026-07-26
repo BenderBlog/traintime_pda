@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/energy/aircon_energy_card.dart';
 import 'package:watermeter/page/energy/electricity_energy_card.dart';
 import 'package:watermeter/page/energy/water_energy_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ElectricityReadyView extends StatelessWidget {
   const ElectricityReadyView({super.key});
@@ -16,7 +16,7 @@ class ElectricityReadyView extends StatelessWidget {
   Widget build(BuildContext context) {
     return [
           Text(
-                FlutterI18n.translate(context, "electricity.info"),
+                I18n.of(context)!.electricityInfo,
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.orange[800],

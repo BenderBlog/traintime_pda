@@ -5,12 +5,12 @@
 // Score Window
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_page.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ScoreWindow extends StatelessWidget {
   const ScoreWindow({super.key});
@@ -24,7 +24,7 @@ class ScoreWindow extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                FlutterI18n.translate(context, "score.score_page.title"),
+                I18n.of(context)!.scoreScorePageTitle,
               ),
               actions: [
                 if (state.state == ScoreFetchState.readyCache ||

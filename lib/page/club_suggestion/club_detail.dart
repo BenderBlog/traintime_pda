@@ -6,7 +6,6 @@
 /*
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:result_dart/result_dart.dart';
@@ -17,6 +16,7 @@ import 'package:watermeter/page/club_suggestion/club_image_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/pda_service_session.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ClubDetail extends StatefulWidget {
   final String code;
@@ -43,11 +43,11 @@ class _ClubDetailState extends State<ClubDetail> {
         ? Scaffold(
             appBar: AppBar(
               title: Text(
-                FlutterI18n.translate(context, "club_promotion.wrong_param"),
+                I18n.of(context)!.clubPromotionWrongParam,
               ),
             ),
             body: Text(
-              FlutterI18n.translate(context, "club_promotion.no_group_info"),
+              I18n.of(context)!.clubPromotionNoGroupInfo,
             ).center(),
           )
         : FutureBuilder<ResultDart<ClubInfo, Exception>>(
@@ -57,7 +57,7 @@ class _ClubDetailState extends State<ClubDetail> {
                 return Scaffold(
                   appBar: AppBar(
                     title: Text(
-                      FlutterI18n.translate(context, "club_promotion.loading"),
+                      I18n.of(context)!.clubPromotionLoading,
                     ),
                   ),
                   body: CircularProgressIndicator().center(),
@@ -68,10 +68,7 @@ class _ClubDetailState extends State<ClubDetail> {
                 return Scaffold(
                   appBar: AppBar(
                     title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "club_promotion.error_outside",
-                      ),
+                      I18n.of(context)!.clubPromotionErrorOutside,
                     ),
                   ),
                   body: ReloadWidget(
@@ -88,7 +85,7 @@ class _ClubDetailState extends State<ClubDetail> {
                 (failure) => Scaffold(
                   appBar: AppBar(
                     title: Text(
-                      FlutterI18n.translate(context, "club_promotion.error"),
+                      I18n.of(context)!.clubPromotionError,
                     ),
                   ),
                   body: ReloadWidget(
@@ -155,7 +152,7 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
     if (mounted) {
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "club_promotion.qq_copied"),
+        msg: I18n.of(context)!.clubPromotionQqCopied,
       );
     }
   }
@@ -334,7 +331,7 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
                                 ),
                                 child: HtmlWidget(
                                   snapshot.data ??
-                                      '''<p>${FlutterI18n.translate(context, "club_promotion.loading_problem")}</p>''',
+                                      '''<p>${I18n.of(context)!.clubPromotionLoadingProblem}</p>''',
                                 ),
                               ),
                             );

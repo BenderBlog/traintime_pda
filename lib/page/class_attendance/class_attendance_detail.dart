@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
@@ -11,6 +10,7 @@ import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_ids/learning_session.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ClassAttendanceDetailView extends StatefulWidget {
   final ClassAttendance classAttendance;
@@ -25,6 +25,39 @@ class ClassAttendanceDetailView extends StatefulWidget {
   @override
   State<ClassAttendanceDetailView> createState() =>
       _ClassAttendanceDetailViewState();
+}
+
+String attendanceSignName(BuildContext context, SignInType type, {String? customName}) {
+  if (customName != null) return customName;
+  return switch (type) {
+    SignInType.qrCode => I18n.of(context)!.classAttendanceSignTypeQrCode,
+    SignInType.gesture => I18n.of(context)!.classAttendanceSignTypeGesture,
+    SignInType.position => I18n.of(context)!.classAttendanceSignTypePosition,
+    SignInType.unknown => I18n.of(context)!.classAttendanceSignTypeDefault,
+    SignInType.customName => I18n.of(context)!.classAttendanceSignTypeDefault,
+  };
+}
+
+String attendanceSignStatus(BuildContext context, SignStatus type) {
+  return switch (type) {
+    SignStatus.absenceNotParticipating =>
+      I18n.of(context)!.classAttendanceSignStatusAbsencenotparticipating,
+    SignStatus.signed => I18n.of(context)!.classAttendanceSignStatusSigned,
+    SignStatus.signedByTeacher =>
+      I18n.of(context)!.classAttendanceSignStatusSignedbyteacher,
+    SignStatus.personalLeave2 =>
+      I18n.of(context)!.classAttendanceSignStatusPersonalleave2,
+    SignStatus.absence => I18n.of(context)!.classAttendanceSignStatusAbsence,
+    SignStatus.sickLeave => I18n.of(context)!.classAttendanceSignStatusSickleave,
+    SignStatus.personalLeave =>
+      I18n.of(context)!.classAttendanceSignStatusPersonalleave,
+    SignStatus.later => I18n.of(context)!.classAttendanceSignStatusLate,
+    SignStatus.leaveEarly => I18n.of(context)!.classAttendanceSignStatusLeaveearly,
+    SignStatus.signExpiredy =>
+      I18n.of(context)!.classAttendanceSignStatusSignexpiredy,
+    SignStatus.publicLeave =>
+      I18n.of(context)!.classAttendanceSignStatusPublicleave,
+  };
 }
 
 class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
@@ -108,10 +141,7 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
                   );
                 },
                 noItemsFoundIndicatorBuilder: (context) => EmptyListView(
-                  text: FlutterI18n.translate(
-                    context,
-                    "class_attndance.no_attendance_record",
-                  ),
+                  text: I18n.of(context)!.classAttendanceNoAttendanceRecord,
                   type: EmptyListViewType.rolling,
                 ),
                 noMoreItemsIndicatorBuilder: (context) =>
@@ -129,38 +159,31 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
 
                 itemBuilder: (context, item, index) => ReXCard(
                   title: Text(
-                    item.signName.contains("class_attendance.sign_type")
-                        ? FlutterI18n.translate(context, item.signName)
-                        : item.signName,
+                    attendanceSignName(
+                      context,
+                      item.signType,
+                      customName: item.name,
+                    ),
                   ),
                   remaining: [
                     ReXCardRemaining(
-                      FlutterI18n.translate(context, item.signStatus),
+                      attendanceSignStatus(context, item.signStatusType),
                     ),
                   ],
                   bottomRow: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildInfoRow(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.detail_card.creator_name",
-                        ),
+                        I18n.of(context)!.classAttendanceDetailCardCreatorName,
                         item.creatorName,
                       ),
                       _buildInfoRow(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.detail_card.start_time",
-                        ),
+                        I18n.of(context)!.classAttendanceDetailCardStartTime,
                         item.starttime,
                       ),
                       if (item.submittime != null)
                         _buildInfoRow(
-                          FlutterI18n.translate(
-                            context,
-                            "class_attendance.detail_card.summit_time",
-                          ),
+                          I18n.of(context)!.classAttendanceDetailCardSummitTime,
                           item.submittime!,
                         ),
                     ],
@@ -188,13 +211,7 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          FlutterI18n.translate(
-            context,
-            "class_attendance.detail_title",
-            translationParams: {
-              "courseName": widget.classAttendance.courseName,
-            },
-          ),
+          I18n.of(context)!.classAttendanceDetailTitle(widget.classAttendance.courseName),
         ),
       ),
       body: body,

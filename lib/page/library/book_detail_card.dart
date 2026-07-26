@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
 import 'package:watermeter/page/library/book_place_card.dart';
 import 'package:watermeter/page/library/ebook_place_card.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class BookDetailCard extends StatefulWidget {
   final BookInfo toUse;
@@ -55,10 +55,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: FlutterI18n.translate(
-                            context,
-                            "library.author",
-                          ),
+                          text: I18n.of(context)!.libraryAuthor,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -68,10 +65,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                         TextSpan(
                           text:
                               widget.toUse.author ??
-                              FlutterI18n.translate(
-                                context,
-                                "library.not_provided",
-                              ),
+                              I18n.of(context)!.libraryNotProvided,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -84,10 +78,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: FlutterI18n.translate(
-                            context,
-                            "library.publish_house",
-                          ),
+                          text: I18n.of(context)!.libraryPublishHouse,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -97,10 +88,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                         TextSpan(
                           text:
                               widget.toUse.publisherHouse ??
-                              FlutterI18n.translate(
-                                context,
-                                "library.not_provided",
-                              ),
+                              I18n.of(context)!.libraryNotProvided,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -113,10 +101,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: FlutterI18n.translate(
-                            context,
-                            "library.call_number",
-                          ),
+                          text: I18n.of(context)!.libraryCallNumber,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -137,10 +122,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: FlutterI18n.translate(
-                            context,
-                            "library.publish_date",
-                          ),
+                          text: I18n.of(context)!.libraryPublishDate,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -150,10 +132,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                         TextSpan(
                           text:
                               widget.toUse.publishYear ??
-                              FlutterI18n.translate(
-                                context,
-                                "library.not_provided",
-                              ),
+                              I18n.of(context)!.libraryNotProvided,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -166,7 +145,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: FlutterI18n.translate(context, "library.isbn"),
+                          text: I18n.of(context)!.libraryIsbn,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -176,10 +155,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                         TextSpan(
                           text:
                               widget.toUse.isbn ??
-                              FlutterI18n.translate(
-                                context,
-                                "library.not_provided",
-                              ),
+                              I18n.of(context)!.libraryNotProvided,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -193,10 +169,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: FlutterI18n.translate(
-                              context,
-                              "library.arrangement_code",
-                            ),
+                            text: I18n.of(context)!.libraryArrangementCode,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,

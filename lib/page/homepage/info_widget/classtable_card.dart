@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -16,6 +15,7 @@ import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ClassTableCard extends StatefulWidget {
   const ClassTableCard({super.key});
@@ -38,25 +38,13 @@ class _ClassTableCardState extends State<ClassTableCard> {
   String _getEmptyInfoText(home.ArrangementState state) {
     switch (state) {
       case home.ArrangementState.fetching:
-        return FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.schedule_fetching_infoText",
-        );
+        return I18n.of(context)!.homepageClassTableCardScheduleFetchingInfotext;
       case home.ArrangementState.error:
-        return FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.schedule_error_infoText",
-        );
+        return I18n.of(context)!.homepageClassTableCardScheduleErrorInfotext;
       case home.ArrangementState.none:
-        return FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.schedule_none_infoText",
-        );
+        return I18n.of(context)!.homepageClassTableCardScheduleNoneInfotext;
       case home.ArrangementState.fetched:
-        return FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.no_arrangement_infoText",
-        );
+        return I18n.of(context)!.homepageClassTableCardNoArrangementInfotext;
     }
   }
 
@@ -158,38 +146,20 @@ class _ClassArrangementListView extends StatelessWidget {
                 if (isTomorrow) {
                   if (arrangements.isEmpty) {
                     return Text(
-                      FlutterI18n.translate(
-                        context,
-                        "homepage.class_table_card.tomorrow_none",
-                      ),
+                      I18n.of(context)!.homepageClassTableCardTomorrowNone,
                     );
                   }
                   return Text(
-                    FlutterI18n.translate(
-                      context,
-                      "homepage.class_table_card.tomorrow",
-                      translationParams: {
-                        "remain": arrangements.length.toString(),
-                      },
-                    ),
+                    I18n.of(context)!.homepageClassTableCardTomorrow(arrangements.length.toString()),
                   );
                 }
                 if (arrangements.isEmpty) {
                   return Text(
-                    FlutterI18n.translate(
-                      context,
-                      "homepage.class_table_card.today_finished",
-                    ),
+                    I18n.of(context)!.homepageClassTableCardTodayFinished,
                   );
                 }
                 return Text(
-                  FlutterI18n.translate(
-                    context,
-                    "homepage.class_table_card.today",
-                    translationParams: {
-                      "remain": arrangements.length.toString(),
-                    },
-                  ),
+                  I18n.of(context)!.homepageClassTableCardToday(arrangements.length.toString()),
                 );
               },
             ),
@@ -203,34 +173,24 @@ class _ClassArrangementListView extends StatelessWidget {
               builder: (context) {
                 String timeString = DateFormat(
                   "MMMd",
-                  FlutterI18n.currentLocale(context).toString(),
+                  Localizations.localeOf(context).toString(),
                 ).format(displayTime);
 
                 String weekString = DateFormat(
                   "E",
-                  FlutterI18n.currentLocale(context).toString(),
+                  Localizations.localeOf(context).toString(),
                 ).format(displayTime);
 
                 String weekInfo =
                     currentWeek >= 0 && currentWeek < semesterLength
-                    ? FlutterI18n.translate(
-                        context,
-                        "homepage.class_table_card.week_info",
-                        translationParams: {"weekinfo": "${currentWeek + 1}"},
-                      )
-                    : FlutterI18n.translate(
-                        context,
-                        "homepage.class_table_card.on_holiday",
-                      );
+                    ? I18n.of(context)!.homepageClassTableCardWeekInfo("${currentWeek + 1}")
+                    : I18n.of(context)!.homepageClassTableCardOnHoliday;
 
                 String toShow = switch (arrangementState) {
                   home.ArrangementState.fetched =>
                     "$timeString $weekString $weekInfo",
-                  home.ArrangementState.error => FlutterI18n.translate(
-                    context,
-                    "homepage.load_error",
-                  ),
-                  _ => FlutterI18n.translate(context, "homepage.loading"),
+                  home.ArrangementState.error => I18n.of(context)!.homepageLoadError,
+                  _ => I18n.of(context)!.homepageLoading,
                 };
                 return Text(toShow);
               },
@@ -302,17 +262,10 @@ class _ClassArrangementListTile extends StatelessWidget {
                   builder: (context) {
                     String place =
                         arrangement.place ??
-                        FlutterI18n.translate(
-                          context,
-                          "homepage.class_table_card.unknown_place",
-                        );
+                        I18n.of(context)!.homepageClassTableCardUnknownPlace;
                     if (arrangement.seat != null) {
                       place += " ";
-                      place += FlutterI18n.translate(
-                        context,
-                        "homepage.class_table_card.seat",
-                        translationParams: {"seatnum": arrangement.seat!},
-                      );
+                      place += I18n.of(context)!.homepageClassTableCardSeat(arrangement.seat!);
                     }
                     return Text(
                       place,
@@ -386,25 +339,13 @@ class _StateList extends StatelessWidget {
   ) {
     switch (source) {
       case home.HomepageFailedSource.classInfo:
-        return FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.failed_source_class_info",
-        );
+        return I18n.of(context)!.homepageClassTableCardFailedSourceClassInfo;
       case home.HomepageFailedSource.examInfo:
-        return FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.failed_source_exam_info",
-        );
+        return I18n.of(context)!.homepageClassTableCardFailedSourceExamInfo;
       case home.HomepageFailedSource.physicsExperiment:
-        return FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.failed_source_physics_experiment",
-        );
+        return I18n.of(context)!.homepageClassTableCardFailedSourcePhysicsExperiment;
       case home.HomepageFailedSource.otherExperiment:
-        return FlutterI18n.translate(
-          context,
-          "homepage.class_table_card.failed_source_other_experiment",
-        );
+        return I18n.of(context)!.homepageClassTableCardFailedSourceOtherExperiment;
     }
   }
 
@@ -432,10 +373,7 @@ class _StateList extends StatelessWidget {
       hints.add(
         _buildStateHintChip(
           context,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.class_table_card.all_loading_infoText",
-          ),
+          text: I18n.of(context)!.homepageClassTableCardAllLoadingInfotext,
           backgroundColor: theme.primary,
           foregroundColor: theme.primaryContainer,
         ),
@@ -444,10 +382,7 @@ class _StateList extends StatelessWidget {
       hints.add(
         _buildStateHintChip(
           context,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.class_table_card.partial_loading_infoText",
-          ),
+          text: I18n.of(context)!.homepageClassTableCardPartialLoadingInfotext,
           backgroundColor: theme.primary,
           foregroundColor: theme.primaryContainer,
         ),
@@ -469,13 +404,7 @@ class _StateList extends StatelessWidget {
       hints.add(
         _buildStateHintChip(
           context,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.class_table_card.failed_chip",
-            translationParams: {
-              "source": _getFailedSourceLabel(context, source),
-            },
-          ),
+          text: I18n.of(context)!.homepageClassTableCardFailedChip(_getFailedSourceLabel(context, source)),
           backgroundColor: theme.error,
           foregroundColor: theme.errorContainer,
         ),

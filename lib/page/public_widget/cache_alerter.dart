@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 // inapp: cache in the memory, will be cleared once program restart
 // device: cache in device, read from a file
@@ -25,13 +25,9 @@ class CacheAlerter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cachePlaceHint = FlutterI18n.translate(
-      context,
-      placeOfCache == PlaceOfCache.inapp
-          ? "inapp_cache_hint"
-          : "local_cache_hint",
-      translationParams: {"datetime": fetchTime.toString()},
-    );
+    final cachePlaceHint = placeOfCache == PlaceOfCache.inapp
+        ? I18n.of(context)!.inappCacheHint(fetchTime.toString())
+        : I18n.of(context)!.localCacheHint(fetchTime.toString());
 
     return Container(
       decoration: DecoratedBox(

@@ -4,9 +4,9 @@
 
 // Library Window.
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/library/borrow_list_window.dart';
 import 'package:watermeter/page/library/search_book_window.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class LibraryWindow extends StatelessWidget {
   const LibraryWindow({super.key});
@@ -17,20 +17,14 @@ class LibraryWindow extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, "library.title")),
+          title: Text(I18n.of(context)!.libraryTitle),
           bottom: TabBar(
             tabs: [
               Tab(
-                text: FlutterI18n.translate(
-                  context,
-                  "library.borrow_state_title",
-                ),
+                text: I18n.of(context)!.libraryBorrowStateTitle,
               ),
               Tab(
-                text: FlutterI18n.translate(
-                  context,
-                  "library.search_book_title",
-                ),
+                text: I18n.of(context)!.librarySearchBookTitle,
               ),
             ],
           ),

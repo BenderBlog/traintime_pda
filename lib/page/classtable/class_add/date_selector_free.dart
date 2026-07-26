@@ -4,11 +4,11 @@
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class DateSelectorFree extends StatefulWidget {
   final List<DateTimeRange> initialDates;
@@ -132,7 +132,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                       TextButton(
                         onPressed: () => Navigator.of(builderContext).pop(),
                         child: Text(
-                          FlutterI18n.translate(context, 'cancel'),
+                          I18n.of(context)!.cancel,
                           style: const TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -148,27 +148,21 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                           if (!_isInRange(start) || !_isInRange(end)) {
                             showToast(
                               context: context,
-                              msg: FlutterI18n.translate(
-                                context,
-                                "classtable.class_add.date_selector_free.rule",
-                              ),
+                              msg: I18n.of(context)!.classtableClassAddDateSelectorFreeRule,
                             );
                             return;
                           }
                           if (_minutesOf(end) <= _minutesOf(start)) {
                             showToast(
                               context: context,
-                              msg: FlutterI18n.translate(
-                                context,
-                                "classtable.class_add.date_selector_free.rule_2",
-                              ),
+                              msg: I18n.of(context)!.classtableClassAddDateSelectorFreeRule2,
                             );
                             return;
                           }
                           Navigator.of(builderContext).pop((start, end));
                         },
                         child: Text(
-                          FlutterI18n.translate(context, "confirm"),
+                          I18n.of(context)!.confirm,
                           style: TextStyle(color: widget.color),
                         ),
                       ),
@@ -186,10 +180,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                       _buildTimeEditor(
                         keyPrefix: 'start',
                         isStart: true,
-                        title: FlutterI18n.translate(
-                          context,
-                          "classtable.class_add.date_selector_free.class_start_time",
-                        ),
+                        title: I18n.of(context)!.classtableClassAddDateSelectorFreeClassStartTime,
                         color: widget.color,
                         current: start,
                         onHourChanged: (hour) {
@@ -212,10 +203,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                       _buildTimeEditor(
                         keyPrefix: 'end',
                         isStart: false,
-                        title: FlutterI18n.translate(
-                          context,
-                          "classtable.class_add.date_selector_free.class_end_time",
-                        ),
+                        title: I18n.of(context)!.classtableClassAddDateSelectorFreeClassEndTime,
                         color: widget.color,
                         current: end,
                         onHourChanged: (hour) {
@@ -323,10 +311,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
       context,
       initialStart: TimeOfDay.fromDateTime(old.start),
       initialEnd: TimeOfDay.fromDateTime(old.end),
-      helpText: FlutterI18n.translate(
-        context,
-        "classtable.class_add.date_selector_free.edit_class_time",
-      ),
+      helpText: I18n.of(context)!.classtableClassAddDateSelectorFreeEditClassTime,
     );
 
     if (!mounted || result == null) return;
@@ -367,10 +352,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                 Icon(Icons.calendar_month, color: widget.color),
                 SizedBox(width: 16,),
                 Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.class_add.input_week_hint",
-                  ),
+                  I18n.of(context)!.classtableClassAddInputWeekHint,
                 ).textStyle(TextStyle(color: widget.color)),
               ],
             ),
@@ -389,29 +371,35 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                 disableMonthPicker: true,
                 selectableYearPredicate: (_) => false,
                 weekdayLabels: [
-                  FlutterI18n.translate(context, 'weekday.sunday'),
-                  FlutterI18n.translate(context, 'weekday.monday'),
-                  FlutterI18n.translate(context, 'weekday.tuesday'),
-                  FlutterI18n.translate(context, 'weekday.wednesday'),
-                  FlutterI18n.translate(context, 'weekday.thursday'),
-                  FlutterI18n.translate(context, 'weekday.friday'),
-                  FlutterI18n.translate(context, 'weekday.saturday'),
+                  I18n.of(context)!.weekdaySunday,
+                  I18n.of(context)!.weekdayMonday,
+                  I18n.of(context)!.weekdayTuesday,
+                  I18n.of(context)!.weekdayWednesday,
+                  I18n.of(context)!.weekdayThursday,
+                  I18n.of(context)!.weekdayFriday,
+                  I18n.of(context)!.weekdaySaturday,
                 ],
                 modePickerTextHandler:
                     ({required DateTime monthDate, bool? isMonthPicker}) {
-                      final monthKey =
-                          'month.${DateFormat('MMMM', "en_US").format(monthDate).toLowerCase()}';
-                      final monthName = FlutterI18n.translate(
-                        context,
-                        monthKey,
-                      );
-                      final year = monthDate.year.toString();
-                      final yearName = FlutterI18n.translate(
-                        context,
-                        "classtable.semester_switcher.year",
-                        translationParams: {"year": year},
-                      );
-                      return "$yearName $monthName";
+                      final monthIndex = monthDate.month - 1;
+                      final i18n = I18n.of(context)!;
+                      final monthNameList = [
+                        i18n.monthJanuary,
+                        i18n.monthFebruary,
+                        i18n.monthMarch,
+                        i18n.monthApril,
+                        i18n.monthMay,
+                        i18n.monthJune,
+                        i18n.monthJuly,
+                        i18n.monthAugust,
+                        i18n.monthSeptember,
+                        i18n.monthOctober,
+                        i18n.monthNovember,
+                        i18n.monthDecember
+                      ];
+                      final year = monthDate.year;
+                      final yearName = I18n.of(context)!.classtableSemesterSwitcherYear('$year');
+                      return "$yearName ${monthNameList[monthIndex]}";
                     },
               ),
               value: chosenDatesRanges.map((e) => e.start).toList(),
@@ -434,10 +422,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                     context,
                     initialStart: const TimeOfDay(hour: 8, minute: 30),
                     initialEnd: const TimeOfDay(hour: 9, minute: 15),
-                    helpText: FlutterI18n.translate(
-                      context,
-                      "classtable.class_add.date_selector_free.choose_class_time",
-                    ),
+                    helpText: I18n.of(context)!.classtableClassAddDateSelectorFreeChooseClassTime,
                   );
 
                   if (pickedRange != null) {

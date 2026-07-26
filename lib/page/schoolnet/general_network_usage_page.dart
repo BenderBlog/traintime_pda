@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/password_exceptions.dart';
@@ -16,6 +15,7 @@ import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/schoolnet_session.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class GeneralNetworkUsagePage extends StatefulWidget {
   const GeneralNetworkUsagePage({super.key});
@@ -61,21 +61,15 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
       [
         if (result.isCache)
           CacheAlerter(
-            dataType: FlutterI18n.translate(context, "school_net.title"),
-            hint: FlutterI18n.translate(
-              context,
-              result.hintKey ?? "cache_reason_default",
-            ),
+            dataType: I18n.of(context)!.schoolNetTitle,
+            hint: _schoolnetCacheHint(context, result.cacheHint),
             placeOfCache: PlaceOfCache.inapp,
             fetchTime: result.fetchTime,
           ).center(),
         [
               // 注意事项
               Text(
-                    FlutterI18n.translate(
-                      context,
-                      "school_net.ids_account_net.notice",
-                    ),
+                    I18n.of(context)!.schoolNetIdsAccountNetNotice,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.orange[800],
@@ -96,34 +90,22 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
               // 用户信息卡片
               InfoCard(
                     iconData: Icons.info,
-                    title: FlutterI18n.translate(
-                      context,
-                      "school_net.ids_account_net.overview",
-                    ),
+                    title: I18n.of(context)!.schoolNetIdsAccountNetOverview,
                     children: [
                       InfoItem(
                         icon: Icons.person,
-                        label: FlutterI18n.translate(
-                          context,
-                          "school_net.ids_account_net.account",
-                        ),
+                        label: I18n.of(context)!.schoolNetIdsAccountNetAccount,
                         value: pref.getString(pref.Preference.idsAccount),
                       ),
                       InfoItem(
                         icon: Icons.data_usage,
-                        label: FlutterI18n.translate(
-                          context,
-                          "school_net.ids_account_net.used",
-                        ),
+                        label: I18n.of(context)!.schoolNetIdsAccountNetUsed,
                         value: result.data.used,
                         valueColor: Colors.green,
                       ),
                       InfoItem(
                         icon: Icons.account_balance_wallet,
-                        label: FlutterI18n.translate(
-                          context,
-                          "school_net.ids_account_net.remain",
-                        ),
+                        label: I18n.of(context)!.schoolNetIdsAccountNetRemain,
                         value: result.data.rest,
                         valueColor: Colors.green,
                       ),
@@ -144,7 +126,7 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
                       _reload(context);
                     }),
                     child: Text(
-                      FlutterI18n.translate(context, "school_net.refresh"),
+                      I18n.of(context)!.schoolNetRefresh,
                     ),
                   )
                   .padding(horizontal: 4, vertical: 8)
@@ -183,7 +165,7 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
               _buildUsageBody(context, snapshot.data!),
               LoadingAlerter(
                 isLoading: true,
-                hint: FlutterI18n.translate(context, "school_net.fetching"),
+                hint: I18n.of(context)!.schoolNetFetching,
                 opacity: 0.15,
               ),
             ],
@@ -198,14 +180,8 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
               (snapshot.error as NoPasswordException).type ==
                   PasswordType.schoolnet) {
             return ReloadWidget(
-              errorStatus: FlutterI18n.translate(
-                context,
-                "school_net.empty_password",
-              ),
-              buttonName: FlutterI18n.translate(
-                context,
-                "setting.change_schoolnet_password_title",
-              ),
+              errorStatus: I18n.of(context)!.schoolNetEmptyPassword,
+              buttonName: I18n.of(context)!.settingChangeSchoolnetPasswordTitle,
               function: () async {
                 await showDialog(
                   context: context,
@@ -227,14 +203,8 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
               (snapshot.error as WrongPasswordException).type ==
                   PasswordType.schoolnet) {
             return ReloadWidget(
-              errorStatus: FlutterI18n.translate(
-                context,
-                "school_net.wrong_password",
-              ),
-              buttonName: FlutterI18n.translate(
-                context,
-                "setting.change_schoolnet_password_title",
-              ),
+              errorStatus: I18n.of(context)!.schoolNetWrongPassword,
+              buttonName: I18n.of(context)!.settingChangeSchoolnetPasswordTitle,
               function: () async {
                 await showDialog(
                   context: context,
@@ -254,7 +224,7 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
 
           return ReloadWidget(
             errorStatus: snapshot.error is String
-                ? FlutterI18n.translate(context, snapshot.error as String)
+                ? (snapshot.error as String)
                 : snapshot.error,
             stackTrace: snapshot.stackTrace,
             function: () => setState(() {
@@ -285,19 +255,19 @@ class _DeviceListLite extends StatelessWidget {
     return [
       [
             Text(
-              FlutterI18n.translate(context, "school_net.device_list.ip"),
+              I18n.of(context)!.schoolNetDeviceListIp,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 3),
 
             Text(
-              FlutterI18n.translate(context, "school_net.device_list.time"),
+              I18n.of(context)!.schoolNetDeviceListTime,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 4),
 
             Text(
-              FlutterI18n.translate(context, "school_net.device_list.remain"),
+              I18n.of(context)!.schoolNetDeviceListRemain,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 3),
@@ -331,4 +301,17 @@ class _DeviceListLite extends StatelessWidget {
       }),
     ].toColumn().card(elevation: 0);
   }
+}
+
+String _schoolnetCacheHint(BuildContext context, Object? hint) {
+  if (hint == null) {
+    return I18n.of(context)!.cacheReasonDefault;
+  }
+  return switch (hint) {
+    SchoolnetCacheHint.captchaFailed =>
+      I18n.of(context)!.schoolNetCacheHintCaptchaFailed,
+    SchoolnetCacheHint.requestFailed =>
+      I18n.of(context)!.schoolNetCacheHintRequestFailed,
+    _ => I18n.of(context)!.cacheReasonDefault,
+  };
 }

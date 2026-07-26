@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // School card log list.
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +12,7 @@ import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class SchoolCardWindow extends StatefulWidget {
   const SchoolCardWindow({super.key});
@@ -32,17 +32,9 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
       sumUp += double.parse(element.money);
     }
     if (sumUp < 0) {
-      return FlutterI18n.translate(
-        context,
-        "school_card_window.expense",
-        translationParams: {"expense": (sumUp * -1).toStringAsFixed(2)},
-      );
+      return I18n.of(context)!.schoolCardWindowExpense((sumUp * -1).toStringAsFixed(2));
     } else {
-      return FlutterI18n.translate(
-        context,
-        "school_card_window.income",
-        translationParams: {"income": sumUp.toStringAsFixed(2)},
-      );
+      return I18n.of(context)!.schoolCardWindowIncome(sumUp.toStringAsFixed(2));
     }
   }
 
@@ -65,20 +57,13 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "school_card_window.title")),
+        title: Text(I18n.of(context)!.schoolCardWindowTitle),
       ),
       body: Column(
         children: [
           FilledButton(
             child: Text(
-              FlutterI18n.translate(
-                context,
-                "school_card_window.select_range",
-                translationParams: {
-                  "startDay": formatter.format(timeRange[0]!),
-                  "endDay": formatter.format(timeRange[1]!),
-                },
-              ),
+              I18n.of(context)!.schoolCardWindowSelectRange(formatter.format(timeRange[0]!), formatter.format(timeRange[1]!)),
             ),
             onPressed: () async {
               await showCalendarDatePicker2Dialog(
@@ -115,10 +100,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                 } else if (snapshot.data!.isEmpty) {
                   return EmptyListView(
                     type: EmptyListViewType.singing,
-                    text: FlutterI18n.translate(
-                      context,
-                      "school_card_window.no_record",
-                    ),
+                    text: I18n.of(context)!.schoolCardWindowNoRecord,
                   );
                 } else {
                   final theme = Theme.of(context);
@@ -129,27 +111,17 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
 
                   final headerRow = [
                     Text(
-                      FlutterI18n.translate(
-                        context,
-                        "school_card_window.store_name",
-                      ),
+                      I18n.of(context)!.schoolCardWindowStoreName,
                       style: headerStyle,
                       textAlign: TextAlign.center,
                     ).expanded(flex: 3),
                     Text(
-                      FlutterI18n.translate(
-                        context,
-                        "school_card_window.balance",
-                      ),
+                      I18n.of(context)!.schoolCardWindowBalance,
                       style: headerStyle,
                       textAlign: TextAlign.center,
                     ).expanded(flex: 2),
                     Text(
-                      FlutterI18n.translate(
-                        context,
-                        "school_card_window.time_with_sum",
-                        translationParams: {"sum": moneySunUp(snapshot.data!)},
-                      ),
+                      I18n.of(context)!.schoolCardWindowTimeWithSum(moneySunUp(snapshot.data!)),
                       style: headerStyle,
                       textAlign: TextAlign.center,
                     ).expanded(flex: 4),

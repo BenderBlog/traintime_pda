@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Change app brightness.
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/l10n.dart';
 
 class ChangeLanguageDialog extends StatefulWidget {
   const ChangeLanguageDialog({super.key});
@@ -23,7 +23,7 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        FlutterI18n.translate(context, "setting.localization_dialog.title"),
+        I18n.of(context)!.settingLocalizationDialogTitle,
       ),
       titleTextStyle: TextStyle(
         fontSize: 20,
@@ -62,12 +62,7 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
             children: List<Widget>.generate(
               Localization.values.length,
               (index) => RadioListTile<int>(
-                title: Text(
-                  FlutterI18n.translate(
-                    context,
-                    Localization.values[index].toShow,
-                  ),
-                ),
+                title: Text(Localization.values[index].displayName(I18n.of(context)!)),
                 value: index,
               ),
             ),
@@ -76,7 +71,7 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(I18n.of(context)!.confirm),
           onPressed: () => Navigator.pop(context),
         ),
       ],
@@ -84,3 +79,5 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
     );
   }
 }
+
+

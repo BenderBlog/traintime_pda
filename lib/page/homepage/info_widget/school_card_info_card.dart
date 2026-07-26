@@ -4,7 +4,6 @@
 
 import 'dart:math';
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
@@ -14,6 +13,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/schoolcard/qr_code_view.dart';
 import 'package:watermeter/routing/routes.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 
@@ -30,7 +30,7 @@ class SchoolCardInfoCard extends StatelessWidget {
             if (offline) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(context, "homepage.offline_mode"),
+                msg: I18n.of(context)!.homepageOfflineMode,
               );
             } else {
               state.map(
@@ -51,37 +51,31 @@ class SchoolCardInfoCard extends StatelessWidget {
 
                   showToast(
                     context: context,
-                    msg: FlutterI18n.translate(
-                      context,
-                      "homepage.school_card_info_card.error_toast",
-                    ),
+                    msg: I18n.of(context)!.homepageSchoolCardInfoCardErrorToast,
                   );
                 },
                 loading: () {
                   showToast(
                     context: context,
-                    msg: FlutterI18n.translate(
+                    msg: I18n.of(
                       context,
-                      "homepage.school_card_info_card.fetching_toast",
-                    ),
+                    )!.homepageSchoolCardInfoCardFetchingToast,
                   );
                 },
                 refreshing: () {
                   showToast(
                     context: context,
-                    msg: FlutterI18n.translate(
+                    msg: I18n.of(
                       context,
-                      "homepage.school_card_info_card.fetching_toast",
-                    ),
+                    )!.homepageSchoolCardInfoCardFetchingToast,
                   );
                 },
                 reloading: () {
                   showToast(
                     context: context,
-                    msg: FlutterI18n.translate(
+                    msg: I18n.of(
                       context,
-                      "homepage.school_card_info_card.fetching_toast",
-                    ),
+                    )!.homepageSchoolCardInfoCardFetchingToast,
                   );
                 },
               );
@@ -89,10 +83,7 @@ class SchoolCardInfoCard extends StatelessWidget {
           },
           isLoad: state.isLoading,
           icon: MingCuteIcons.mgc_wallet_4_line,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.school_card_info_card.bill",
-          ),
+          text: I18n.of(context)!.homepageSchoolCardInfoCardBill,
           infoText: Text.rich(
             TextSpan(
               style: const TextStyle(fontSize: 20),
@@ -101,34 +92,25 @@ class SchoolCardInfoCard extends StatelessWidget {
                   text: state.map(
                     data: (money) {
                       if (money.contains(RegExp(r'[0-9]'))) {
-                        return FlutterI18n.translate(
+                        return I18n.of(
                           context,
-                          "homepage.school_card_info_card.balance",
-                          translationParams: {
-                            "amount": double.parse(money) >= 10
-                                ? double.parse(money).truncate().toString()
-                                : money,
-                          },
+                        )!.homepageSchoolCardInfoCardBalance(
+                          double.parse(money) >= 10
+                              ? double.parse(money).truncate().toString()
+                              : money,
                         );
                       }
-                      return FlutterI18n.translate(context, money);
+                      return I18n.of(context)!.schoolCardStatusFailedToQuery;
                     },
-                    loading: () => FlutterI18n.translate(
+                    loading: () =>
+                        I18n.of(context)!.homepageSchoolCardInfoCardFetching,
+                    refreshing: () =>
+                        I18n.of(context)!.homepageSchoolCardInfoCardFetching,
+                    reloading: () =>
+                        I18n.of(context)!.homepageSchoolCardInfoCardFetching,
+                    error: (_, stackTrace) => I18n.of(
                       context,
-                      "homepage.school_card_info_card.fetching",
-                    ),
-                    refreshing: () => FlutterI18n.translate(
-                      context,
-                      "homepage.school_card_info_card.fetching",
-                    ),
-                    reloading: () => FlutterI18n.translate(
-                      context,
-                      "homepage.school_card_info_card.fetching",
-                    ),
-                    error: (_, stackTrace) => FlutterI18n.translate(
-                      context,
-                      "homepage.school_card_info_card.error_occured",
-                    ),
+                    )!.homepageSchoolCardInfoCardErrorOccured,
                   ),
                 ),
               ],
@@ -136,26 +118,16 @@ class SchoolCardInfoCard extends StatelessWidget {
           ),
           bottomText: Text(
             state.map(
-              data: (_) => FlutterI18n.translate(
-                context,
-                "homepage.school_card_info_card.bottom_text_success",
-              ),
-              loading: () => FlutterI18n.translate(
-                context,
-                "homepage.school_card_info_card.fetching_info",
-              ),
-              refreshing: () => FlutterI18n.translate(
-                context,
-                "homepage.school_card_info_card.fetching_info",
-              ),
-              reloading: () => FlutterI18n.translate(
-                context,
-                "homepage.school_card_info_card.fetching_info",
-              ),
-              error: (_, stackTrace) => FlutterI18n.translate(
-                context,
-                "homepage.school_card_info_card.no_info",
-              ),
+              data: (_) =>
+                  I18n.of(context)!.homepageSchoolCardInfoCardBottomTextSuccess,
+              loading: () =>
+                  I18n.of(context)!.homepageSchoolCardInfoCardFetchingInfo,
+              refreshing: () =>
+                  I18n.of(context)!.homepageSchoolCardInfoCardFetchingInfo,
+              reloading: () =>
+                  I18n.of(context)!.homepageSchoolCardInfoCardFetchingInfo,
+              error: (_, stackTrace) =>
+                  I18n.of(context)!.homepageSchoolCardInfoCardNoInfo,
             ),
             overflow: TextOverflow.ellipsis,
           ),

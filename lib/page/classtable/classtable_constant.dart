@@ -1,3 +1,4 @@
+import 'package:watermeter/generated/l10n.dart';
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
@@ -5,7 +6,6 @@
 // These are some constant used in the class table.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 
 /// The width of the button.
 const weekButtonWidth = 74.0;
@@ -27,14 +27,14 @@ const changePageTime = 200;
 const midRowHeight = 54.0;
 
 String getWeekString(BuildContext context, int index) {
-  List<String> weekList = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
+  List weekList = [
+    I18n.of(context)!.weekdayMonday,
+    I18n.of(context)!.weekdayTuesday,
+    I18n.of(context)!.weekdayWednesday,
+    I18n.of(context)!.weekdayThursday,
+    I18n.of(context)!.weekdayFriday,
+    I18n.of(context)!.weekdaySaturday,
+    I18n.of(context)!.weekdaySunday,
   ];
-  return FlutterI18n.translate(context, "weekday.${weekList[index]}");
+  return weekList[index];
 }

@@ -5,9 +5,9 @@
 // Intro of the sport data.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/sport/sport_class_window.dart';
 import 'package:watermeter/page/sport/sport_score_window.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class SportWindow extends StatelessWidget {
   const SportWindow({super.key});
@@ -18,11 +18,11 @@ class SportWindow extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, "sport.title")),
+          title: Text(I18n.of(context)!.sportTitle),
           bottom: TabBar(
             tabs: [
-              Tab(text: FlutterI18n.translate(context, "sport.test_score")),
-              Tab(text: FlutterI18n.translate(context, "sport.class_info")),
+              Tab(text: I18n.of(context)!.sportTestScore),
+              Tab(text: I18n.of(context)!.sportClassInfo),
             ],
           ),
         ),

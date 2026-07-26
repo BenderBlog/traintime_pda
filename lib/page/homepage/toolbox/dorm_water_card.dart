@@ -6,6 +6,7 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class DormWaterCard extends StatelessWidget {
   const DormWaterCard({super.key});
@@ -17,7 +18,7 @@ class DormWaterCard extends StatelessWidget {
         context.pushReplacementNamed(Routes.dormWater);
       },
       icon: MingCuteIcons.mgc_teacup_line,
-      nameKey: "homepage.toolbox.dorm_water",
+      name: I18n.of(context)!.homepageToolboxDormWater,
     );
   }
 }

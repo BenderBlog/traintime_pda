@@ -123,7 +123,7 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get isClassTableFromCache =>
       classTableController.isClassTableFromCacheComputedSignal.value;
 
-  String? get classTableCacheHintKey =>
+  Object? get classTableCacheHintKey =>
       classTableController.classTableCacheHintKeyComputedSignal.value;
 
   DateTime? get classTableFetchTime =>
@@ -136,7 +136,7 @@ class ClassTableWidgetState with ChangeNotifier {
 
   bool get isExamFromCache => examController.isExamFromCache.value;
 
-  String? get examCacheHintKey => examController.examCacheHintKey.value;
+  Object? get examCacheHintKey => examController.examCacheHintKey.value;
 
   bool get isPhysicsExperimentLoading =>
       physicsExperimentController.physicsExperimentStateSignal.value.isLoading;
@@ -148,7 +148,7 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get isPhysicsExperimentFromCache =>
       physicsExperimentController.isPhysicsExperimentFromCache.value;
 
-  String? get physicsExperimentCacheHintKey =>
+  Object? get physicsExperimentCacheHintKey =>
       physicsExperimentController.physicsExperimentCacheHintKey.value;
 
   bool get isOtherExperimentLoading =>
@@ -160,7 +160,7 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get isOtherExperimentFromCache =>
       otherExperimentController.isOtherExperimentFromCache.value;
 
-  String? get otherExperimentCacheHintKey =>
+  Object? get otherExperimentCacheHintKey =>
       otherExperimentController.otherExperimentCacheHintKey.value;
 
   bool get hasExamArrangement => examController.hasExamArrangement.value;

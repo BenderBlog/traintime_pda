@@ -21,17 +21,24 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-String _cacheHintFromError(Object error) {
+enum ClasstableCacheHint {
+  passwordWrong,
+  loginFailed,
+  networkFailed,
+  unknownError,
+}
+
+ClasstableCacheHint _cacheHintFromError(Object error) {
   if (error is PasswordWrongException) {
-    return "classtable.cache_hint_password_wrong";
+    return ClasstableCacheHint.passwordWrong;
   }
   if (error is LoginFailedException) {
-    return "classtable.cache_hint_login_failed";
+    return ClasstableCacheHint.loginFailed;
   }
   if (error is DioException) {
-    return "classtable.cache_hint_network_failed";
+    return ClasstableCacheHint.networkFailed;
   }
-  return "classtable.cache_hint_unknown_error";
+  return ClasstableCacheHint.unknownError;
 }
 
 Future<FetchResult<ClassTableData>> getClassTable(String semesterCode) async {
@@ -49,7 +56,7 @@ Future<FetchResult<ClassTableData>> getClassTable(String semesterCode) async {
       return FetchResult.cache(
         fetchTime: cache.$1,
         data: cache.$2,
-        hintKey: _cacheHintFromError(e),
+        cacheHint: _cacheHintFromError(e),
       );
     }
     rethrow;

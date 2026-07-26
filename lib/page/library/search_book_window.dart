@@ -2,7 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +12,7 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart'
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 const double _searchPanelMaxWidth = 760;
 const double _resultCardMaxWidth = 360;
@@ -199,7 +199,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                       Icon(Icons.search, size: 96.0),
                       const SizedBox(height: 16),
                       Text(
-                        FlutterI18n.translate(context, "library.no_result"),
+                        I18n.of(context)!.libraryNoResult,
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -229,7 +229,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
     FocusManager.instance.primaryFocus?.unfocus();
     await BothSideSheet.show(
       context: context,
-      title: FlutterI18n.translate(context, "library.book_detail"),
+      title: I18n.of(context)!.libraryBookDetail,
       child: BookDetailCard(toUse: item),
     );
   }
@@ -269,17 +269,17 @@ class _SearchBookWindowState extends State<SearchBookWindow>
   List<_SearchOption> _matchModeOptions(BuildContext context) => [
     search_book.LibrarySearchOption(
       "1",
-      FlutterI18n.translate(context, "library.match_exact"),
+      I18n.of(context)!.libraryMatchExact,
       "精确",
     ),
     search_book.LibrarySearchOption(
       "2",
-      FlutterI18n.translate(context, "library.match_fuzzy"),
+      I18n.of(context)!.libraryMatchFuzzy,
       "模糊",
     ),
     search_book.LibrarySearchOption(
       "3",
-      FlutterI18n.translate(context, "library.match_prefix"),
+      I18n.of(context)!.libraryMatchPrefix,
       "前方",
     ),
   ];
@@ -293,7 +293,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
   }) {
     return _buildOptionDropdown(
       context,
-      label: FlutterI18n.translate(context, "library.search_field_title"),
+      label: I18n.of(context)!.librarySearchFieldTitle,
       value: value,
       options: options,
       selectedMaxLines: selectedMaxLines,
@@ -323,8 +323,8 @@ class _SearchBookWindowState extends State<SearchBookWindow>
             });
           },
           children: [
-            Text(FlutterI18n.translate(context, "library.normal_search")),
-            Text(FlutterI18n.translate(context, "library.advanced_search")),
+            Text(I18n.of(context)!.libraryNormalSearch),
+            Text(I18n.of(context)!.libraryAdvancedSearch),
           ],
         ),
         const Spacer(),
@@ -353,7 +353,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
             controller: _advancedTextController,
             decoration: _inputDecoration(
               context,
-              FlutterI18n.translate(context, "library.search_here"),
+              I18n.of(context)!.librarySearchHere,
               prefixIcon: Icons.manage_search,
             ),
             onFieldSubmitted: (_) => _submitAdvancedSearch(),
@@ -363,7 +363,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
         IconButton.filled(
           onPressed: _submitAdvancedSearch,
           icon: const Icon(Icons.manage_search),
-          tooltip: FlutterI18n.translate(context, "library.search"),
+          tooltip: I18n.of(context)!.librarySearch,
         ),
       ],
     );
@@ -392,7 +392,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
             controller: _normalTextController,
             decoration: _inputDecoration(
               context,
-              FlutterI18n.translate(context, "library.search_here"),
+              I18n.of(context)!.librarySearchHere,
               prefixIcon: Icons.search,
             ),
             onFieldSubmitted: (_) => _submitNormalSearch(),
@@ -402,7 +402,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
         IconButton.filled(
           onPressed: _submitNormalSearch,
           icon: const Icon(Icons.search),
-          tooltip: FlutterI18n.translate(context, "library.search"),
+          tooltip: I18n.of(context)!.librarySearch,
         ),
       ],
     );
@@ -426,7 +426,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
           ),
           _buildOptionDropdown(
             context,
-            label: FlutterI18n.translate(context, "library.match_mode"),
+            label: I18n.of(context)!.libraryMatchMode,
             value: _advancedMatchMode,
             options: _matchModeOptions(context),
             onChanged: (value) => setState(() => _advancedMatchMode = value),

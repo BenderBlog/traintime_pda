@@ -160,7 +160,7 @@ class EnergyController {
     () => _lastValidEnergyInfo.value?.fetchTime,
   );
 
-  late final energyInfoCacheHintKey = computed<String?>(
-    () => _lastValidEnergyInfo.value?.hintKey,
+  late final energyInfoCacheHintKey = computed<Object?>(
+    () => _lastValidEnergyInfo.value?.cacheHint,
   );
 }

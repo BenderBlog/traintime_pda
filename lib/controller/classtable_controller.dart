@@ -125,8 +125,8 @@ class ClassTableController {
         classTableComputedSignal.value.timeArrangement.isNotEmpty,
   );
 
-  late final classTableCacheHintKeyComputedSignal = computed<String?>(
-    () => _lastValidSchoolClassTable.value?.hintKey,
+  late final classTableCacheHintKeyComputedSignal = computed<Object?>(
+    () => _lastValidSchoolClassTable.value?.cacheHint,
   );
 
   late final startDayComputedSignal = computed<DateTime?>(() {

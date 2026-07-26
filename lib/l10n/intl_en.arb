@@ -1,0 +1,2116 @@
+{
+  "@@locale": "en",
+  "dragText": "Pull to request more",
+  "readyText": "Loading...",
+  "processingText": "Processing...",
+  "processedText": "Successfully requested",
+  "noMoreText": "No more data",
+  "failedText": "Failed to load data",
+  "chooseSemester": "Choose Semester",
+  "errorDetected": "Ouch! An error occurred!",
+  "clickToRefresh": "Click to refresh",
+  "confirmTitle": "Confirm? (ゝ∀･)",
+  "cancel": "Cancel",
+  "confirm": "Okay",
+  "networkError": "Network error, maybe you are not connected to the Internet, or the school server is down :P",
+  "errorDetect": "An error has occurred,",
+  "queryFailed": "Query failed",
+  "notSchoolNetwork": "Not on the Campus Network",
+  "experimentControllerNoPassword": "Experiment password is not set, please set up one in the setting",
+  "experimentControllerLoginFailed": "Login failed",
+  "cancelExam": "Disqualified to exam :P",
+  "loginProcessReadyPage": "Prepare to obtain login environment",
+  "loginProcessGetEncrypt": "Obtain password encryption key",
+  "loginProcessReadyLogin": "Prepare to login",
+  "loginProcessSlider": "Logging in",
+  "loginProcessAfterProcess": "Post-login processing",
+  "loginProcessFailed": "Login failed, response status code: {statusCode}",
+  "@loginProcessFailed": {
+    "placeholders": {
+      "statusCode": {
+        "type": "String"
+      }
+    }
+  },
+  "noInfo": "No information",
+  "catcherDetected": "An error has occurred",
+  "catcherDescription": "Details are shown as follows",
+  "newHomepageHint": "A new homepage is developing here, the pigimg is a placeholder, have fun",
+  "localCacheHint": "Local cache from {datetime}",
+  "@localCacheHint": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
+  },
+  "inappCacheHint": "In-app cache from {datetime}\nCache will be cleared once restart!",
+  "@inappCacheHint": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheReasonDefault": "Showing cached data.",
+  "weekdayMonday": "Mon.",
+  "weekdayTuesday": "Tue.",
+  "weekdayWednesday": "Wed.",
+  "weekdayThursday": "Thu.",
+  "weekdayFriday": "Fri.",
+  "weekdaySaturday": "Sat.",
+  "weekdaySunday": "Sun.",
+  "monthJanuary": "Jan.",
+  "monthFebruary": "Feb.",
+  "monthMarch": "Mar.",
+  "monthApril": "Apr.",
+  "monthMay": "May",
+  "monthJune": "Jun.",
+  "monthJuly": "Jul.",
+  "monthAugust": "Aug.",
+  "monthSeptember": "Sept.",
+  "monthOctober": "Oct.",
+  "monthNovember": "Nov.",
+  "monthDecember": "Dec.",
+  "classAttendanceTitle": "Attendance Query",
+  "classAttendanceDetailTitle": "Attendance Detail - {courseName}",
+  "@classAttendanceDetailTitle": {
+    "placeholders": {
+      "courseName": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceNoData": "No course info",
+  "classAttendanceNoAttendanceRecord": "No attendance record",
+  "classAttendanceLongLoad": "It takes about half minute to load attendance data, pleace wait patiently",
+  "classAttendanceCourseStateUnknown": "unknown",
+  "classAttendanceCourseStateIneligible": "ineligible",
+  "classAttendanceCourseStateEligible": "eligible",
+  "classAttendanceCourseStateWarning": "warning",
+  "classAttendanceTableCourseName": "Course Name",
+  "classAttendanceTableStatus": "Status",
+  "classAttendanceTableAttendanceRate": "Rate",
+  "classAttendanceTableCheckIn": "Check-in",
+  "classAttendanceTableAbsence": "Absence",
+  "classAttendanceTableRequired": "Required",
+  "classAttendanceTableLeave": "Leave(P/S/O)",
+  "classAttendanceTableFilter": "Filter",
+  "classAttendanceTableFilterAll": "All",
+  "classAttendanceTableShowingCount": "Showing {count}/{total} courses",
+  "@classAttendanceTableShowingCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardTime": "Attendances",
+  "classAttendanceCardTimeInfo": "{checkInCount} Checked / {absenceCount} Absences / {requiredCheckIn} Required",
+  "@classAttendanceCardTimeInfo": {
+    "placeholders": {
+      "checkInCount": {
+        "type": "String"
+      },
+      "absenceCount": {
+        "type": "String"
+      },
+      "requiredCheckIn": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardNotAttend": "Rebirths",
+  "classAttendanceCardNotAttendInfo": "{timeToHaveError} Times / {totalTimes} Total",
+  "@classAttendanceCardNotAttendInfo": {
+    "placeholders": {
+      "timeToHaveError": {
+        "type": "String"
+      },
+      "totalTimes": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardNotAttendInfoError": "Cannot match course in the classtable",
+  "classAttendanceCardLeave": "Leaves",
+  "classAttendanceCardLeaveInfo": "Personal {personalLeave} / Sick {sickLeave} / Official {officialLeave}",
+  "@classAttendanceCardLeaveInfo": {
+    "placeholders": {
+      "personalLeave": {
+        "type": "String"
+      },
+      "sickLeave": {
+        "type": "String"
+      },
+      "officialLeave": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardStudy": "Study",
+  "classAttendanceCardStudyInfo": "Task {taskProgress} / Works {homeworkProgress} / Exam {examProgress}",
+  "@classAttendanceCardStudyInfo": {
+    "placeholders": {
+      "taskProgress": {
+        "type": "String"
+      },
+      "homeworkProgress": {
+        "type": "String"
+      },
+      "examProgress": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceDetailCardCreatorName": "Creator",
+  "classAttendanceDetailCardStartTime": "Start at",
+  "classAttendanceDetailCardSummitTime": "Summit at",
+  "classAttendanceSignTypeQrCode": "QR Code Checkin",
+  "classAttendanceSignTypeGesture": "Gesture Checkin",
+  "classAttendanceSignTypePosition": "Position Checkin",
+  "classAttendanceSignTypeDefault": "Normal Checkin",
+  "classAttendanceSignStatusAbsencenotparticipating": "Absence (Not participating)",
+  "classAttendanceSignStatusSigned": "Signed",
+  "classAttendanceSignStatusSignedbyteacher": "Signed by teacher",
+  "classAttendanceSignStatusPersonalleave2": "Personal Leave",
+  "classAttendanceSignStatusAbsence": "Absence",
+  "classAttendanceSignStatusSickleave": "Sick Leave",
+  "classAttendanceSignStatusPersonalleave": "Personal Leave",
+  "classAttendanceSignStatusLate": "Late",
+  "classAttendanceSignStatusLeaveearly": "Leave Early",
+  "classAttendanceSignStatusSignexpiredy": "Sign Expired",
+  "classAttendanceSignStatusPublicleave": "Public Leave",
+  "classtablePartnerClasstableOverrideDialog": "Currently there is a partner classtable data, do you want to overwrite?",
+  "classtablePartnerClasstableNoFile": "Import file not found",
+  "classtablePartnerClasstableNoPermission": "Storage permission denied , cannot read file",
+  "classtablePartnerClasstableProblem": "Maybe there's a problem with the import file :P",
+  "classtablePartnerClasstableSuccess": "Successfully imported",
+  "classtablePartnerClasstableShareDialogTitle": "Caution!",
+  "classtablePartnerClasstableShareDialogContent": "The exported file may include your personal information, please DO NOT share casually",
+  "classtablePartnerClasstableSaveDialogTitle": "Save calendar file to...",
+  "classtablePartnerClasstableSaveDialogSuccessMessage": "Should be saved",
+  "classtablePartnerClasstableSaveDialogFailureMessage": "Can not create the file, save fails.",
+  "classtablePartnerClasstableDeleteDialogTitle": "(｡í _ ì｡)For real?",
+  "classtablePartnerClasstableDeleteDialogMessage": "Are you sure to delete the partner classtable?",
+  "classtablePartnerClasstableDeleteDialogSuccessMessage": "Done",
+  "classtablePartnerClasstableNameDialogTitle": "Input the name of the partner classtable to be shown on your partner's screen",
+  "classtablePartnerClasstableNameDialogHint": "Input here, otherwise it will be shown as 'Sweetie'",
+  "classtablePartnerClasstableNameDialogCancel": "There's nobody other than my sweetie",
+  "classtablePartnerClasstableNameDialogAccept": "Submit",
+  "classtablePartnerClasstableNameDialogBlankInput": "Input is blank!",
+  "classtablePageTitle": "My Schedule",
+  "classtablePartnerPageTitle": "{partner_name}'s Schedule",
+  "@classtablePartnerPageTitle": {
+    "placeholders": {
+      "partner_name": {
+        "type": "String"
+      }
+    }
+  },
+  "classtablePopupMenuNotArranged": "View unarranged classes",
+  "classtablePopupMenuClassChanged": "View schedule changes",
+  "classtablePopupMenuAddClass": "Add class",
+  "classtablePopupMenuGenerateIcal": "Export calendar file",
+  "classtablePopupMenuGeneratePartnerFile": "Export partner classtable file",
+  "classtablePopupMenuImportPartnerFile": "Import partner classtable file",
+  "classtablePopupMenuDeletePartnerFile": "Delete partner classtable file",
+  "classtablePopupMenuOutputToSystem": "Export to system calendar",
+  "classtablePopupMenuRefreshClasstable": "Refresh schedule",
+  "classtablePopupMenuSwitchSemester": "Switch classtable semester",
+  "classtablePopupMenuCurrentTimeSettings": "Time indicator settings",
+  "classtablePopupMenuClassColorSettings": "Class color settings",
+  "classtableVisualSettingsCurrentTimeSettingsTitle": "Time indicator settings",
+  "classtableVisualSettingsClassColorSettingsTitle": "Class color settings",
+  "classtableVisualSettingsCompletedStyleEnabled": "Completed class styling distinction",
+  "classtableVisualSettingsCurrentTimeSection": "Time indicators",
+  "classtableVisualSettingsShowCurrentTimeIndicator": "Show current time indicator",
+  "classtableVisualSettingsShowCurrentTimeLabel": "Show mini time label",
+  "classtableVisualSettingsShowTodayColumnHighlight": "Highlight today's column",
+  "classtableVisualSettingsUnfinishedSection": "Class style",
+  "classtableVisualSettingsActiveBrightnessFactor": "Brightness: {value}",
+  "@classtableVisualSettingsActiveBrightnessFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsActiveBorderAlpha": "Border opacity: {value}",
+  "@classtableVisualSettingsActiveBorderAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsActiveInnerAlpha": "Fill opacity: {value}",
+  "@classtableVisualSettingsActiveInnerAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedSection": "Completed class style",
+  "classtableVisualSettingsCompletedSaturationFactor": "Fill saturation: {value}",
+  "@classtableVisualSettingsCompletedSaturationFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedBrightnessFactor": "Brightness: {value}",
+  "@classtableVisualSettingsCompletedBrightnessFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedTextSaturationFactor": "Text saturation: {value}",
+  "@classtableVisualSettingsCompletedTextSaturationFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedBorderAlpha": "Border opacity: {value}",
+  "@classtableVisualSettingsCompletedBorderAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedInnerAlpha": "Fill opacity: {value}",
+  "@classtableVisualSettingsCompletedInnerAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusSourceClassTable": "Class Table",
+  "classtableStatusSourceExam": "Exams",
+  "classtableStatusSourcePhysicsExperiment": "Physics Experiments",
+  "classtableStatusSourceOtherExperiment": "Other Experiments",
+  "classtableErrorDialogTitle": "Error Info",
+  "classtableStatusBannerLoading": "Updating: {sources}",
+  "@classtableStatusBannerLoading": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusBannerCache": "Using cached data: {sources}",
+  "@classtableStatusBannerCache": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusBannerErrorSummary": "Failed to load: {sources}",
+  "@classtableStatusBannerErrorSummary": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateNoCourse": "No classes are arranged for semester {semester_code}.",
+  "@classtableEmptyStateNoCourse": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExam": "No classes are arranged for semester {semester_code}, but exam arrangements are available.",
+  "@classtableEmptyStateWithExam": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExperiment": "No classes are arranged for semester {semester_code}, but experiment arrangements are available.",
+  "@classtableEmptyStateWithExperiment": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExamAndExperiment": "No classes are arranged for semester {semester_code}, but exam and experiment arrangements are available.",
+  "@classtableEmptyStateWithExamAndExperiment": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyActionViewExam": "View exams",
+  "classtableEmptyActionViewExperiment": "View experiments",
+  "classtableClassChangePageTitle": "Schedule Changes",
+  "classtableClassChangePageEmptyMessage": "Currently there's no class schedule changes",
+  "classtableClassChangePageTeacherChange": "Teacher has been changed from {previous_teacher} to {new_teacher}",
+  "@classtableClassChangePageTeacherChange": {
+    "placeholders": {
+      "previous_teacher": {
+        "type": "String"
+      },
+      "new_teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageNoTeacherChange": "Teacher kept unchanged",
+  "classtableClassChangePage1": "One",
+  "classtableClassChangePage2": "Two",
+  "classtableClassChangePage3": "Three",
+  "classtableClassChangePage4": "Four",
+  "classtableClassChangePage5": "Five",
+  "classtableClassChangePage6": "Six",
+  "classtableClassChangePage7": "Seven",
+  "classtableClassChangePageChangeClassMessage": "This is a course adjustment info，Originally scheduled on period {originalClassRangeStart} to period {originalClassRangeEnd} at the {weekChar_originalWeek}th day of the {originalAffectedWeeks}th week(s), now it is at the {newClassroom} classroom, arranged at the period {newClassRangeStart} to period {newClassRangeStop} at the {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).",
+  "@classtableClassChangePageChangeClassMessage": {
+    "placeholders": {
+      "originalClassRangeStart": {
+        "type": "String"
+      },
+      "originalClassRangeEnd": {
+        "type": "String"
+      },
+      "weekChar_originalWeek": {
+        "type": "String"
+      },
+      "originalAffectedWeeks": {
+        "type": "String"
+      },
+      "newClassroom": {
+        "type": "String"
+      },
+      "newClassRangeStart": {
+        "type": "String"
+      },
+      "newClassRangeStop": {
+        "type": "String"
+      },
+      "weekChar_newWeek": {
+        "type": "String"
+      },
+      "newAffectedWeeksListStr": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePagePatchClassMessage": "This is a course reschedule info，The course have been rescheduled at the {newClassroom}, on the period {newClassRangeStart} to period {newClassRangeStop} at the {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).",
+  "@classtableClassChangePagePatchClassMessage": {
+    "placeholders": {
+      "newClassroom": {
+        "type": "String"
+      },
+      "newClassRangeStart": {
+        "type": "String"
+      },
+      "newClassRangeStop": {
+        "type": "String"
+      },
+      "weekChar_newWeek": {
+        "type": "String"
+      },
+      "newAffectedWeeksListStr": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageStopClassMessage": "This is a course suspension info. The class will be suspended at the period {originalClassRangeStart} to period {originalClassRangeEnd} at the {weekChar_originalWeek} day of the {originalAffectedWeeks} week(s).",
+  "@classtableClassChangePageStopClassMessage": {
+    "placeholders": {
+      "originalClassRangeStart": {
+        "type": "String"
+      },
+      "originalClassRangeEnd": {
+        "type": "String"
+      },
+      "weekChar_originalWeek": {
+        "type": "String"
+      },
+      "originalAffectedWeeks": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageClassInfo": "Code: {classCode} | Class {classNumber}\nSchedule change: {classChange}\n{teacherChange}",
+  "@classtableClassChangePageClassInfo": {
+    "placeholders": {
+      "classCode": {
+        "type": "String"
+      },
+      "classNumber": {
+        "type": "String"
+      },
+      "classChange": {
+        "type": "String"
+      },
+      "teacherChange": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNotArrangedPageTitle": "Unscheduled Classes",
+  "classtableNotArrangedPageEmptyMessage": "All courses have been scheduled",
+  "classtableNotArrangedPageContent": "Code {classCode} | Class {classNumber}\nTeacher: {teacher}",
+  "@classtableNotArrangedPageContent": {
+    "placeholders": {
+      "classCode": {
+        "type": "String"
+      },
+      "classNumber": {
+        "type": "String"
+      },
+      "teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyClassMessage": "Semester {semester_code} has no class arranged",
+  "@classtableEmptyClassMessage": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyClassWithExam": "Semester {semester_code} has no class arranged\nbut we have exam info now!\nGo back to mainpage and goto the exam info page.",
+  "@classtableEmptyClassWithExam": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableWeekTitle": "Week {week}",
+  "@classtableWeekTitle": {
+    "placeholders": {
+      "week": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNoonBreak": "Noon",
+  "classtableSupperBreak": "Supper",
+  "classtableMonth": "{month}\nmo",
+  "@classtableMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNoClass": "No schedule arranged in this week, please do not spend much of your time on bed.",
+  "classtableClassCardTitle": "Schedule Information",
+  "classtableClassCardUnknownClassroom": "Unknown classroom",
+  "classtableClassCardRemainsHint": "There is/are {remain_count} schedule(s) remaining",
+  "@classtableClassCardRemainsHint": {
+    "placeholders": {
+      "remain_count": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassAddAddClassTitle": "Add class information",
+  "classtableClassAddChangeClassTitle": "Modify class info",
+  "classtableClassAddClassNameEmptyMessage": "Class name cannot be empty",
+  "classtableClassAddWrongTimeMessage": "Incorrect time input",
+  "classtableClassAddSaveButton": "Save",
+  "classtableClassAddInputClassnameHint": "Class name (required)",
+  "classtableClassAddInputTeacherHint": "Teacher's name (optional)",
+  "classtableClassAddInputClassroomHint": "Classroom location (optional)",
+  "classtableClassAddInputWeekHint": "Select weeks",
+  "classtableClassAddInputTimeHint": "Select time",
+  "classtableClassAddInputTimeWeekdayHint": "Weekday",
+  "classtableClassAddInputStartTimeHint": "Time start",
+  "classtableClassAddInputEndTimeHint": "Time end",
+  "classtableClassAddWheelChooseHint": "Period {index}",
+  "@classtableClassAddWheelChooseHint": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassAddChooseAtLeastOne": "Please choose at least one time for class",
+  "classtableClassAddRepeatWeekly": "Repeat Weekly",
+  "classtableClassAddFreeTime": "Free Time",
+  "classtableClassAddDateSelectorFreeRule": "Time must be between 8:30 and 21:25.",
+  "classtableClassAddDateSelectorFreeRule2": "The end time must be later than the start time.",
+  "classtableClassAddDateSelectorFreeClassStartTime": "Start time",
+  "classtableClassAddDateSelectorFreeClassEndTime": "End time",
+  "classtableClassAddDateSelectorFreeEditClassTime": "Edit the class time",
+  "classtableClassAddDateSelectorFreeChooseClassTime": "Choose a class time",
+  "classtableCourseDetailCardClassNumberString": "Class {number}",
+  "@classtableCourseDetailCardClassNumberString": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableCourseDetailCardUnknownTeacher": "Unknown teacher",
+  "classtableCourseDetailCardUnknownPlace": "Unknown classroom",
+  "classtableCourseDetailCardClassPeriod": "period {start} to {stop}",
+  "@classtableCourseDetailCardClassPeriod": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableCourseDetailCardEdit": "Edit",
+  "classtableCourseDetailCardDelete": "Delete",
+  "classtableCourseDetailCardDeleteSingle": "Delete this one",
+  "classtableCourseDetailCardDeleteAll": "Delete all",
+  "classtableCourseDetailCardDeleteContent": "Everything will be excuted.",
+  "classtableCourseDetailCardDeleteContentSingle": "Only the information within this time range of the class will be removed.",
+  "classtableCourseDetailCardDeleteTitle": "Are you sure to delete this class information?",
+  "classtableOutputToSystemSuccess": "Successfully output to the system calendar.",
+  "classtableOutputToSystemFailure": "Problem occurred while outputing to the system calendar.",
+  "classtableOutputToSystemRequestAllTitle": "Information on requesting permission",
+  "classtableOutputToSystemRequestAll": "Due to technical difficulties, users must grant both read calendar and write calendar permissions to this software in order to export schedules properly. However, this software will not read the calendar.",
+  "classtableRefreshClasstableReady": "Ready to refresh the schedule",
+  "classtableRefreshClasstableSuccess": "Successfully refresh the schedule",
+  "classtableCacheHintPasswordWrong": "IDS password is incorrect or expired.",
+  "classtableCacheHintLoginFailed": "Failed to log in to the classtable service.",
+  "classtableCacheHintNetworkFailed": "Classtable network request failed.",
+  "classtableCacheHintUnknownError": "Failed to fetch the latest classtable online. Check logs for details.",
+  "classtableSemesterSwitcherChooseSemester": "Choose a Semester",
+  "classtableSemesterSwitcherFirstAcademicYear": "Academic year 1",
+  "classtableSemesterSwitcherSecondAcademicYear": "Academic year 2",
+  "classtableSemesterSwitcherFetchRemoteSemester": "Fetch Current Semester",
+  "classtableSemesterSwitcherFetchingRemoteSemester": "Fetching...",
+  "classtableSemesterSwitcherYear": "{year}",
+  "@classtableSemesterSwitcherYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableSemesterSwitcherOnlyFutureHint": "This app only allows viewing course schedules for future semesters.",
+  "clubPromotionTypeTech": "Tech",
+  "clubPromotionTypeAcg": "ACG",
+  "clubPromotionTypeUnion": "Official",
+  "clubPromotionTypeProfit": "Commercial",
+  "clubPromotionTypeSport": "Sport",
+  "clubPromotionTypeArt": "Culture",
+  "clubPromotionTypeUnknown": "Unknown",
+  "clubPromotionTypeGame": "Game",
+  "clubPromotionTypeAll": "All",
+  "clubPromotionWrongParam": "Wrong Parameter",
+  "clubPromotionNoGroupInfo": "No Club info",
+  "clubPromotionLoading": "Loading",
+  "clubPromotionErrorOutside": "Error detected at the outside",
+  "clubPromotionError": "Error detected",
+  "clubPromotionQqCopied": "QQ Group Number have been copied to the clipboard",
+  "clubPromotionNoLink": "No group invite link provided",
+  "clubPromotionLoadingProblem": "Error on loading page",
+  "clubPromotionPicturePreview": "Picture",
+  "electricityTitle": "Power Info",
+  "electricityPowerTitle": "Infomation",
+  "electricityCacheHintLoginFailed": "Failed to log in to the electricity service, showing cached data.",
+  "electricityCacheHintNetworkFailed": "Electricity service network request failed, showing cached data.",
+  "electricityCacheHintUnknownError": "Failed to fetch the latest electricity data online, showing cached data. Check logs for details.",
+  "electricityCacheNotice": "Last fetched",
+  "electricityAccount": "Account",
+  "electricityRemainPower": "Remain power",
+  "electricityOweInfo": "Arrears",
+  "electricityHistory": "Billing History",
+  "electricityDailyUsage": "Average usage per day",
+  "electricityNotEnoughData": "Not enough data for rendering graph",
+  "electricityInfo": "Energy system can be only be accessed at schoolnet, do contact developers if have issue.\nHistory will be recorded locally while average usage is based on the electric meter's record.",
+  "electricityFetchingHint": "Fetching the latest electricity info.",
+  "electricityFetchError": "Failed to fetch electricity information. Please retry.",
+  "electricityDate": "Date",
+  "electricityPower": "Remaining",
+  "electricityUpdate": "Refresh",
+  "electricityWaterUsageFetchDate": "Fetch time",
+  "electricityWaterUsageReadBefore": "Last time",
+  "electricityWaterUsageReadNow": "This time",
+  "electricityWaterUsage": "Bath water usage",
+  "electricityWaterTitle": "Water usage",
+  "electricityWaterLoading": "Loading water usage information",
+  "electricityWaterUnavailable": "Water usage is unavailable. Retry from the electricity card.",
+  "electricityWaterEmpty": "No water usage information",
+  "electricityNotSchoolNetwork": "Not school network",
+  "electricityAirconTitle": "Aircon Electricity",
+  "electricityAirconImei": "Aircon IMEI",
+  "electricityAirconAmount": "Platform usage",
+  "electricityAirconUpdateTime": "Updated at",
+  "electricityAirconWaiting": "Waiting to fetch aircon electricity data",
+  "electricityAirconError": "Failed to fetch aircon electricity data",
+  "electricityAirconRetry": "Retry",
+  "electricityAirconImeiMissing": "Add the aircon IMEI to view its electricity usage.",
+  "electricityAirconAddImei": "Add aircon IMEI",
+  "electricityAirconCacheNotice": "Showing cached aircon data from {time}",
+  "@electricityAirconCacheNotice": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomTitle": "Empty Classrooms",
+  "emptyClassroomDate": "Date {date}",
+  "@emptyClassroomDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomBuilding": "Building {building}",
+  "@emptyClassroomBuilding": {
+    "placeholders": {
+      "building": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomSearchHint": "Classroom name or code",
+  "emptyClassroomClassroom": "Classroom",
+  "emptyClassroomEmpty": "Available",
+  "emptyClassroomOccupied": "Occupied",
+  "examTitle": "Exam Schedule",
+  "examCacheHint": "Displaying cached exam schedule info",
+  "examCacheHintPasswordWrong": "IDS password is incorrect or expired.",
+  "examCacheHintLoginFailed": "Failed to log in to the exam service.",
+  "examCacheHintNetworkFailed": "Network request failed.",
+  "examCacheHintUnknownError": "Failed to fetch the latest exam schedule. Check logs for details.",
+  "examFetchingHint": "Fetching the latest exam schedule.",
+  "examNotFinished": "Still there are some bad guys here.",
+  "examAllFinished": "Say goodbye to all the exams.",
+  "examUnableToExam": "Unable to exam",
+  "examFinished": "All exams ",
+  "examNoneFinished": "No exams have been completed",
+  "examNoExamArrangement": "No exam has been arranged currently",
+  "examNoArrangementTitle": "Not arranged exams",
+  "examNoArrangementAllArranged": "Exams have been scheduled for all subjects",
+  "examNoArrangementSubtitle": "Code: {id}",
+  "@examNoArrangementSubtitle": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentTitle": "Experiment Info",
+  "experimentOngoing": "Ongoing experiment",
+  "experimentNotFinished": "Experiments to be done",
+  "experimentAllFinished": "All experiments have been completed",
+  "experimentFinished": "Completed experiments",
+  "experimentScoreInfo": "{score} (predicted)",
+  "@experimentScoreInfo": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentScoreSum": "Total score: {sum}",
+  "@experimentScoreSum": {
+    "placeholders": {
+      "sum": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentNoneFinished": "None of the experiments have been completed",
+  "experimentNotProvided": "Not provided",
+  "experimentErrorPhysics": "Error on fetching physics experiments: {info}",
+  "@experimentErrorPhysics": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentErrorOther": "Error on fetching other experiments: {info}",
+  "@experimentErrorOther": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentCacheHint": "Loaded cache: {info}",
+  "@experimentCacheHint": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentPhysicsCacheHintMissingPassword": "Physics experiment password is not set.",
+  "experimentPhysicsCacheHintLoginFailed": "Physics experiment login failed.",
+  "experimentPhysicsCacheHintNotSchoolNetwork": "Not on the campus network.",
+  "experimentPhysicsCacheHintNetworkFailed": "Physics experiment network request failed.",
+  "experimentPhysicsCacheHintUnknownError": "Failed to fetch physics experiments online. Check logs for details.",
+  "experimentOtherCacheHintLoginFailed": "Other experiment login failed.",
+  "experimentOtherCacheHintNotSchoolNetwork": "Not on the campus network.",
+  "experimentOtherCacheHintNetworkFailed": "Other experiment network request failed.",
+  "experimentOtherCacheHintUnknownError": "Failed to fetch other experiments online. Check logs for details.",
+  "experimentPhysicsExperiment": "physics experiments",
+  "experimentOtherExperiment": "other experiments",
+  "experimentTapForScore": "Failed to detect the score",
+  "experimentYourScore": "Your Score: ",
+  "experimentPredictScore": "Predict score: {score}",
+  "@experimentPredictScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentSendMail": "Send",
+  "experimentFetchingHint": "The data you see is from cache. Updating is running in the background...",
+  "experimentFetchingHintBoth": "Physics experiments and other experiments are loading",
+  "experimentFetchingHintPhysics": "Physics experiments are loading",
+  "experimentFetchingHintOther": "Other experiments are loading",
+  "experimentFetchingHintPhysicsWithOtherFailed": "Physics experiments are loading, while other experiments failed to load",
+  "experimentFetchingHintOtherWithPhysicsFailed": "Other experiments are loading, while physics experiments failed to load",
+  "experimentScoreHint0": "You can tap on the score info on the score card to check out the original score data",
+  "experimentScoreHint1": "Your score is not in the XDYou score recognition database, so it was not recognized properly.",
+  "experimentScoreHint2": "If you wish to contribute to the development of XDYou, you can click the send email button, and we will add your score to the recognition database!",
+  "experimentScoreHint3": "Due to the lack of data for recognization, it is necessary to check twice.",
+  "homepageTitle": "School Info Center",
+  "homepageLoading": "Loading",
+  "homepageLoaded": "Message updated",
+  "homepageLoadError": "Something wrong",
+  "homepageOnHoliday": "Currently on holiday",
+  "homepageOnWeekday": "Currently week {current}",
+  "@homepageOnWeekday": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLoadingMessage": "Refreshing information...",
+  "homepagePostgraduateNotice": "Postgraduate features activated!",
+  "homepageLinuxNotice": "Linux version is under testing, feel free to feedback!",
+  "homepageEditMode": "Edit Layout",
+  "homepageEditDone": "Done",
+  "homepageEditReset": "Reset Layout",
+  "homepageEditHint": "Schedule and update cards cannot be edited",
+  "homepageManageHidden": "Manage hidden cards",
+  "homepageHiddenTitle": "Hidden cards",
+  "homepageHiddenLabel": "Hidden",
+  "homepageHideEmpty": "No hidden cards",
+  "homepageHomepage": "Info",
+  "homepageRuisi": "Forum",
+  "homepageClub": "Club",
+  "homepagePlanet": "Blog",
+  "homepageDashboard": "Pighub",
+  "homepageSetting": "Settings",
+  "homepageInputPartnerDataRouteNotExist": "Import path does not exist:P",
+  "homepageInputPartnerDataFailedGetFile": "Failed to import file",
+  "homepageInputPartnerDataFailedImport": "Maybe there is a problem with the import file:P",
+  "homepageInputPartnerDataSuccessMessage": "Import successful, if the class schedule page is open, please reopen it",
+  "homepageInputPartnerDataNotLoaded": "Class schedule has not been loaded yet, please try again later...",
+  "homepageInputPartnerDataConfirmContent": "There is currently partner class schedule data, do you want to overwrite?",
+  "homepageLoginMessage": "Logging in, currently displaying cached data",
+  "homepageSuccessfulLoginMessage": "Login successful",
+  "homepagePasswordWrongTitle": "Wrong username or password",
+  "homepagePasswordWrongContent": "Restart the app and log in manually?",
+  "homepagePasswordWrongDenial": "No, enter offline mode",
+  "homepageOfflineModeTitle": "Uniform Authentication Service offline mode activated",
+  "homepageOfflineModeContent": "\"Unable to connect to the Unified Authentication Service server, all related services are temporarily unavailable.\nScore inquiry, exam information inquiry, overdue fee inquiry, campus card inquiry are closed. The schedule displays cached data. Other functions are temporarily not affected.\nWe apologize for any inconvenience caused.\"\n",
+  "homepageOfflineMode": "In offline mode, all one-stop related functions are disabled",
+  "homepageNoticeCardEmptyNotice": "No application announcements retrieved, please refresh",
+  "homepageNoticeCardNoNoticeAvaliable": "Failed to fetch the application announcements",
+  "homepageNoticeCardNoticeListTitle": "Notifications",
+  "homepageNoticeCardOpenUrl": "Open link",
+  "homepageNoticeCardNoticePageTitle": "Notification List",
+  "homepageClassTableCardTitle": "Timetable",
+  "homepageClassTableCardToday": "{remain} arrangment(s) today",
+  "@homepageClassTableCardToday": {
+    "placeholders": {
+      "remain": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardTodayFinished": "Arrangements all done today",
+  "homepageClassTableCardTomorrow": "{remain} arrangment(s) tomorrow",
+  "@homepageClassTableCardTomorrow": {
+    "placeholders": {
+      "remain": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardTomorrowNone": "No arrangement tomorrow",
+  "homepageClassTableCardWeekInfo": "Week {weekinfo}",
+  "@homepageClassTableCardWeekInfo": {
+    "placeholders": {
+      "weekinfo": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardOnHoliday": "On vacation",
+  "homepageClassTableCardErrorMessage": "An error occurred: {error}",
+  "@homepageClassTableCardErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardFetchingMessage": "Fetching class schedule",
+  "homepageClassTableCardErrorInfotext": "An error occurred",
+  "homepageClassTableCardFetchingInfotext": "Loading",
+  "homepageClassTableCardNoArrangementInfotext": "No schedule at the moment",
+  "homepageClassTableCardScheduleFetchingMessage": "Schedule is loading, please check again soon",
+  "homepageClassTableCardScheduleErrorMessage": "Failed to load schedule, please try again later",
+  "homepageClassTableCardScheduleFetchingInfotext": "Loading schedule",
+  "homepageClassTableCardScheduleErrorInfotext": "Failed to load schedule",
+  "homepageClassTableCardScheduleNoneInfotext": "No schedule available",
+  "homepageClassTableCardUpdatingInfotext": "Updating",
+  "homepageClassTableCardAllLoadingInfotext": "All sources loading",
+  "homepageClassTableCardPartialLoadingInfotext": "Partially loading",
+  "homepageClassTableCardPartialErrorInfotext": "Some data failed to load",
+  "homepageClassTableCardFailedChip": "{source} failed",
+  "@homepageClassTableCardFailedChip": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardFailedSourceClassInfo": "Class info",
+  "homepageClassTableCardFailedSourceExamInfo": "Exam info",
+  "homepageClassTableCardFailedSourcePhysicsExperiment": "Physics experiment",
+  "homepageClassTableCardFailedSourceOtherExperiment": "Other experiment",
+  "homepageClassTableCardUnknownPlace": "Unknown place",
+  "homepageClassTableCardSeat": "Seat {seatnum}",
+  "@homepageClassTableCardSeat": {
+    "placeholders": {
+      "seatnum": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageElectricityCardTitle": "Electricity and Hydroenergy Information",
+  "homepageElectricityCardCurrentElectricity": "{amount} kWh remains",
+  "@homepageElectricityCardCurrentElectricity": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageElectricityCardCacheNotice": "Last fetch date: {date}",
+  "@homepageElectricityCardCacheNotice": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardTitle": "Library Info",
+  "homepageLibraryCardCurrentBorrow": "Borrowing {count} book(s)",
+  "@homepageLibraryCardCurrentBorrow": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardErrorOccured": "Error occurred while retrieving borrowing information",
+  "homepageLibraryCardFetching": "Fetching borrowing information",
+  "homepageLibraryCardNoReturn": "Currently there's no book to be returned",
+  "homepageLibraryCardNeedReturn": "Need to return {dued} books",
+  "@homepageLibraryCardNeedReturn": {
+    "placeholders": {
+      "dued": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardNoInfo": "Cannot retrieve information at the moment",
+  "homepageLibraryCardFetchingInfo": "Fetching information...",
+  "homepageSchoolCardInfoCardErrorToast": "An error occurred, please contact the developer",
+  "homepageSchoolCardInfoCardFetchingToast": "Fetching information, please check later",
+  "homepageSchoolCardInfoCardBill": "Bill",
+  "homepageSchoolCardInfoCardBalance": "Remain {amount} RMB",
+  "@homepageSchoolCardInfoCardBalance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageSchoolCardInfoCardErrorOccured": "Error occurred while retrieving campus card information",
+  "homepageSchoolCardInfoCardFetching": "Fetching campus card information",
+  "homepageSchoolCardInfoCardBottomTextSuccess": "Query campus card bill",
+  "homepageSchoolCardInfoCardNoInfo": "Cannot retrieve information currently",
+  "homepageSchoolCardInfoCardFetchingInfo": "Fetching information...",
+  "homepageToolboxClassAttendance": "Attendances",
+  "homepageToolboxCreative": "Innovation and Entrepreneurship Competition",
+  "homepageToolboxEmptyClassroom": "Classrooms",
+  "homepageToolboxExam": "Exams",
+  "homepageToolboxExperiment": "Experiments",
+  "homepageToolboxScore": "Grades",
+  "homepageToolboxSport": "PE Info",
+  "homepageToolboxDormWater": "Dorm Water",
+  "homepageToolboxSchoolnet": "Schoolnet Usage",
+  "homepageToolboxToolbox": "Others",
+  "homepageToolboxScoreCannotReach": "Offline mode with no cached score data, unable to access",
+  "homepageToolboxExamFetching": "Fetching exam information, please wait",
+  "homepageToolboxExamError": "An error occurred, please contact the developer",
+  "homepageSchoolNetTitle": "Used {usage}",
+  "@homepageSchoolNetTitle": {
+    "placeholders": {
+      "usage": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageSchoolNetNoPassword": "The query password is not set, click to set up",
+  "homepageSchoolNetFailed": "Failed to get the school net usage info",
+  "homepageSchoolNetFetching": "Fetching the school net usage info",
+  "homepageSchoolNetRemaining": "Clearing at {remaining}",
+  "@homepageSchoolNetRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClubPromotionFailed": "Failed to fetch club info",
+  "homepageClubPromotionFetching": "Fetching club info",
+  "dormWaterTitle": "Dorm Water",
+  "dormWaterPhone": "Phone",
+  "dormWaterImageCode": "Image code",
+  "dormWaterSmsCode": "SMS code",
+  "dormWaterSendSms": "Send SMS",
+  "dormWaterLogin": "Login",
+  "dormWaterLogout": "Logout",
+  "dormWaterRefreshCaptcha": "Refresh Captcha",
+  "dormWaterLoadingCaptcha": "Loading...",
+  "dormWaterCaptchaError": "Failed to load captcha",
+  "dormWaterPhoneRequired": "Please enter phone number",
+  "dormWaterImageCodeRequired": "Please enter image code",
+  "dormWaterSmsSent": "SMS sent successfully",
+  "dormWaterSmsFailed": "Failed to send SMS",
+  "dormWaterSmsCodeRequired": "Please enter SMS code",
+  "dormWaterLoginSuccess": "Login successful",
+  "dormWaterLoginFailed": "Login failed",
+  "dormWaterLogoutSuccess": "Logged out successfully",
+  "dormWaterDevices": "Device List",
+  "dormWaterLoadingDevices": "Loading devices...",
+  "dormWaterNoDevices": "No devices",
+  "dormWaterSelectDevice": "Select Device",
+  "dormWaterFetchDevicesFailed": "Failed to fetch device list",
+  "dormWaterRetryLoadDevices": "Retry Loading",
+  "dormWaterStartWater": "Start Water",
+  "dormWaterEndWater": "End Water",
+  "dormWaterWaterDispensing": "Water Dispensing",
+  "dormWaterWaterStatus": "Water Status",
+  "dormWaterStartWaterSuccess": "Water dispensing started",
+  "dormWaterEndWaterSuccess": "Water dispensing ended",
+  "dormWaterStartWaterFailed": "Failed to start water",
+  "dormWaterEndWaterFailed": "Failed to end water",
+  "dormWaterDeviceStatusChecking": "Checking device status...",
+  "dormWaterDeviceStatusReady": "Device ready",
+  "dormWaterScanQrCode": "Scan QR Code",
+  "dormWaterDeviceId": "Device ID",
+  "dormWaterAddDeviceFailed": "Failed to add device",
+  "dormWaterDeviceRemovedFromFavorites": "Device removed from favorites",
+  "dormWaterRemoveFromFavoritesFailed": "Failed to remove from favorites",
+  "libraryTitle": "Library Information",
+  "libraryBorrowStateTitle": "Borrowing Status",
+  "librarySearchBookTitle": "Search Books",
+  "librarySearchFieldTitle": "Search Field",
+  "librarySearchFieldKeywordOption": "Any",
+  "librarySearchFieldTitleOption": "Title",
+  "librarySearchFieldAuthorOption": "Author",
+  "librarySearchFieldIsbnOption": "ISBN",
+  "librarySearchFieldBarcodeOption": "Bar Code",
+  "librarySearchFieldCallnoOption": "Call No",
+  "libraryNotProvided": "No information provided",
+  "libraryAuthor": "Author ",
+  "libraryPublishHouse": "Publisher ",
+  "libraryCallNumber": "Call Number ",
+  "libraryPublishDate": "Publication Date",
+  "libraryIsbn": "ISBN",
+  "libraryArrangementCode": "Arrangement Code ",
+  "libraryAvaliableBorrow": "Available to borrow",
+  "libraryStorage": "Storage",
+  "libraryOnShelve": "On shelf",
+  "libraryBookCode": "Book code: {barCode}",
+  "@libraryBookCode": {
+    "placeholders": {
+      "barCode": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryDueDate": " Due date",
+  "libraryBorrowStr": " Borrow",
+  "libraryAfterDueDate": " day(s) overdue",
+  "libraryBeforeDueDate": " day(s) left",
+  "libraryCanBeRenewable": "Renewable",
+  "libraryCannotBeRenewable": "Not renewable",
+  "libraryRenewing": "Renewing",
+  "libraryEmptyBorrowList": "No borrowed books found",
+  "libraryBorrowListInfo": "Borrowing {borrow} book(s), among which {dued} book(s) have expired",
+  "@libraryBorrowListInfo": {
+    "placeholders": {
+      "borrow": {
+        "type": "String"
+      },
+      "dued": {
+        "type": "String"
+      }
+    }
+  },
+  "librarySearchHere": "Search here",
+  "libraryNormalSearch": "Normal Search",
+  "libraryAdvancedSearch": "Advanced Search",
+  "librarySearch": "Search",
+  "libraryMatchMode": "Match Mode",
+  "libraryMatchExact": "Exact",
+  "libraryMatchFuzzy": "Fuzzy",
+  "libraryMatchPrefix": "Prefix",
+  "libraryDocumentType": "Document Type",
+  "libraryDocumentTypeAll": "All",
+  "libraryDocumentTypeBook": "Book",
+  "libraryOnlyOnShelf": "Only on shelf",
+  "libraryPublishYearBegin": "Publish year from",
+  "libraryPublishYearEnd": "Publish year to",
+  "libraryBookDetail": "Book details",
+  "libraryNoResult": "No result, change parameter or start your search",
+  "libraryCardTitle": "Library status",
+  "libraryCardFetching": "Fetching",
+  "libraryCardNorthernLibrary": "Northern Library",
+  "libraryCardSouthernLibrary": "Southern Library",
+  "libraryCardPeople": "People: {people}",
+  "@libraryCardPeople": {
+    "placeholders": {
+      "people": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryCardSeat": "Seats: {seat}",
+  "@libraryCardSeat": {
+    "placeholders": {
+      "seat": {
+        "type": "String"
+      }
+    }
+  },
+  "loginIdentityNumber": "Student ID",
+  "loginPassword": "IDS Login password",
+  "loginLogin": "Login",
+  "loginIncorrectPasswordPattern": "Username or password does not meet requirements, student ID must be 11 digits and password cannot be empty",
+  "loginOnLoginProgress": "Logging in...",
+  "loginCompleteLogin": "Login successful",
+  "loginFailedLoginCannotConnectToServer": "Cannot connect to server",
+  "loginFailedLoginWithCode": "Request failed, response status code: {code}",
+  "@loginFailedLoginWithCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "loginFailedLoginWithMessage": "Request failed, error message: {message}",
+  "@loginFailedLoginWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "loginFailedLoginOther": "Unknown error, please contact the developer",
+  "loginClearCache": "Clear cache",
+  "loginCompleteClearCache": "Cache cleared successfully",
+  "loginSeeInspector": "View network interaction",
+  "loginCaptchaWindowTitle": "Please enter captcha",
+  "loginCaptchaWindowHint": "Input captcha",
+  "loginCaptchaWindowMessageOnEmpty": "Please enter captcha",
+  "loginCaptchaWindowRefreshFailed": "Failed to refresh captcha: {error}",
+  "@loginCaptchaWindowRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "loginSliderTitle": "Server authentication service",
+  "schoolNetTitle": "School Net Usage Query",
+  "schoolNetIdsAccountNetTitle": "Current user",
+  "schoolNetIdsAccountNetNotice": "This is the current PDA user's information.\nNotice that network traffic is charged in GB (1GB = 1000MB).\nIf you cannot see any info, go to zfw.xidian.edu.cn for password reset",
+  "schoolNetIdsAccountNetOverview": "Overview",
+  "schoolNetIdsAccountNetAccount": "Account",
+  "schoolNetIdsAccountNetUsed": "Data usage",
+  "schoolNetIdsAccountNetRemain": "Balance",
+  "schoolNetIdsAccountNetCurrentOnline": "Online devices (currently {length})",
+  "@schoolNetIdsAccountNetCurrentOnline": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetIdsAccountNetNoDeviceOnline": "No device is online at the moment",
+  "schoolNetCurrentLoginNetTitle": "Current using",
+  "schoolNetCurrentLoginNetNotice": "This is the information of the current using account.\nIt may be different from the current user's, and DON'T BE EVIL!\nNotice that network traffic is charged in GB (1GB=1000MB).",
+  "schoolNetCurrentLoginNetOverview": "Overview of the account",
+  "schoolNetCurrentLoginNetAccount": "Account",
+  "schoolNetCurrentLoginNetPlanType": "Type of the plan",
+  "schoolNetCurrentLoginNetRemain": "Balance",
+  "schoolNetCurrentLoginNetUsageSituation": "Traffic usage info",
+  "schoolNetCurrentLoginNetUsedPercent": "Used {percent}%",
+  "@schoolNetCurrentLoginNetUsedPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetCurrentLoginNetUsed": "Data usage",
+  "schoolNetCurrentLoginNetRemainCount": "Data remaining",
+  "schoolNetCurrentLoginNetTotal": "Total data",
+  "schoolNetCurrentLoginNetNonSchoolnet": "Not in school net environment",
+  "schoolNetDeviceListIp": "Device IP",
+  "schoolNetDeviceListTime": "Online time",
+  "schoolNetDeviceListRemain": "Traffic used",
+  "schoolNetFetching": "Fetching schoolnet usage data",
+  "schoolNetEmptyPassword": "You may forgot to enter the schoolnet password",
+  "schoolNetNotInitalized": "It seems the backend is not open for query:P",
+  "schoolNetCaptchaFailed": "Failed to idenify captcha",
+  "schoolNetCaptchaEmpty": "Captcha is empty",
+  "schoolNetCacheHintCaptchaFailed": "Captcha recognition failed. Please try again.",
+  "schoolNetCacheHintRequestFailed": "The schoolnet request failed. Please try again later.",
+  "schoolNetWrongPassword": "Wrong schoolnet password",
+  "schoolNetErrorFetch": "Failed to fetch：{msg}",
+  "@schoolNetErrorFetch": {
+    "placeholders": {
+      "msg": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetErrorOther": "Other error：{msg}",
+  "@schoolNetErrorOther": {
+    "placeholders": {
+      "msg": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetRefresh": "Refresh",
+  "schoolCardWindowTitle": "Campus Card Transaction History",
+  "schoolCardWindowIncome": "Income ￥{income}",
+  "@schoolCardWindowIncome": {
+    "placeholders": {
+      "income": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowExpense": "Expense ￥{expense}",
+  "@schoolCardWindowExpense": {
+    "placeholders": {
+      "expense": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowSelectRange": "Select date: from {startDay} to {endDay}",
+  "@schoolCardWindowSelectRange": {
+    "placeholders": {
+      "startDay": {
+        "type": "String"
+      },
+      "endDay": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowStoreName": "Expense place",
+  "schoolCardWindowBalance": "Amount",
+  "schoolCardWindowTimeWithSum": "Time ({sum})",
+  "@schoolCardWindowTimeWithSum": {
+    "placeholders": {
+      "sum": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowNoRecord": "No records found, please try again with different dates",
+  "schoolCardWindowQrCode": "Payment Code",
+  "schoolCardWindowQrCodeError": "Get QR Code failed: {info}",
+  "@schoolCardWindowQrCodeError": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowReload": "Reload",
+  "scoreCacheMessage": "Cached score information is displayed",
+  "scoreSummary": "Selected subjects {chosen}  Total credits {credit}\nAverage {avg} GPA {gpa}",
+  "@scoreSummary": {
+    "placeholders": {
+      "chosen": {
+        "type": "String"
+      },
+      "credit": {
+        "type": "String"
+      },
+      "avg": {
+        "type": "String"
+      },
+      "gpa": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreAllPassed": "All subjects have passed",
+  "scoreCacheHintPasswordWrong": "IDS password is incorrect or expired.",
+  "scoreCacheHintLoginFailed": "Failed to log in to the score service.",
+  "scoreCacheHintNetworkFailed": "Network request failed.",
+  "scoreCacheHintUnknownError": "Failed to fetch the latest score info. Check logs for details.",
+  "scoreFetchingHint": "Fetching the latest score info.",
+  "scoreAllSemester": "All semesters",
+  "scoreChosenSemester": "{chosen}",
+  "@scoreChosenSemester": {
+    "placeholders": {
+      "chosen": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreAllType": "All types",
+  "scoreChosenType": "{type}",
+  "@scoreChosenType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreNone": "None",
+  "scoreScoreChoiceTitle": "Transcript",
+  "scoreScoreChoiceSearchHint": "Search for score records",
+  "scoreScoreChoiceEmptyList": "No courses from this semester is selected to be calculated",
+  "scoreScoreChoiceSumDialogTitle": "Summary",
+  "scoreScoreChoiceSumDialogContent": "Overall GPA of all subjects：{gpa_all}\nOverall average：{avg_all}\nTotal credits：{credit_all}\nUnpassed subjects：{unpassed}\nPublic selective：{not_core_type}\nThe data provided by this program is for reference only, and the developer is not responsible for its accuracy",
+  "@scoreScoreChoiceSumDialogContent": {
+    "placeholders": {
+      "gpa_all": {
+        "type": "String"
+      },
+      "avg_all": {
+        "type": "String"
+      },
+      "credit_all": {
+        "type": "String"
+      },
+      "unpassed": {
+        "type": "String"
+      },
+      "not_core_type": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreComposeCardNoDetail": "No detailed information provided",
+  "scoreScoreComposeCardFetching": "Fetching...",
+  "scoreScoreComposeCardCredit": "Credits",
+  "scoreScoreComposeCardGpa": "GPA",
+  "scoreScoreComposeCardScore": "Score",
+  "scoreScoreInfoCardTitle": "Score Details",
+  "scoreScoreInfoCardOriginalCourse": "Initial course",
+  "scoreScoreInfoCardFailed": "[Failed]",
+  "scoreScoreInfoCardCredit": "Credits {credit}",
+  "@scoreScoreInfoCardCredit": {
+    "placeholders": {
+      "credit": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreInfoCardGpa": "GPA {gpa}",
+  "@scoreScoreInfoCardGpa": {
+    "placeholders": {
+      "gpa": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreInfoCardScore": "Score {score}",
+  "@scoreScoreInfoCardScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScorePageTitle": "Score Query",
+  "scoreScorePageSearchHint": "Search for score records",
+  "scoreScorePageNoRecord": "No relevant information found",
+  "scoreScorePageSelectAll": "Select all",
+  "scoreScorePageSelectNothing": "Clear",
+  "scoreScorePageResetSelect": "Reset",
+  "scoreScorePageSummary": "Summary",
+  "scoreScorePageCet4": "College English Test Band 4",
+  "scoreScorePageCet6": "College English Test Band 6",
+  "settingAcknowledgement": "Made With Love From {developers} People",
+  "@settingAcknowledgement": {
+    "placeholders": {
+      "developers": {
+        "type": "String"
+      }
+    }
+  },
+  "settingAbout": "About",
+  "settingAboutThisProgram": "About this APP",
+  "settingVersion": "Version：{version}",
+  "@settingVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingUserInfo": "User information",
+  "settingCheckUpdate": "Check for updates",
+  "settingLatestVersion": "Latest version: {latest}",
+  "@settingLatestVersion": {
+    "placeholders": {
+      "latest": {
+        "type": "String"
+      }
+    }
+  },
+  "settingWaiting": "Waiting for obtain",
+  "settingFetchingUpdate": "Fetching update information",
+  "settingNewVersion": "New version released!",
+  "settingCurrentStable": "You are running the latest version",
+  "settingCurrentTesting": "You are running the testing version",
+  "settingFetchFailed": "Failed to fetch update information",
+  "settingUiSetting": "UI Settings",
+  "settingBrightnessSetting": "Light/Dark mode",
+  "settingColorSetting": "Color theme",
+  "settingSimplifyTimeline": "Simplify schedule timeline",
+  "settingSimplifyTimelineDescription": "Reduce space occupation while no schedule",
+  "settingLowElectricityWarning": "Low electricity card color warning",
+  "settingLowElectricityWarningDescription": "Change the homepage electricity card color when remaining electricity is below the threshold",
+  "settingLowElectricityThreshold": "Low electricity threshold",
+  "settingLowElectricityThresholdDescription": "Current: {threshold} kWh",
+  "@settingLowElectricityThresholdDescription": {
+    "placeholders": {
+      "threshold": {
+        "type": "String"
+      }
+    }
+  },
+  "settingLowElectricityThresholdDialogTitle": "Set low electricity threshold",
+  "settingLowElectricityThresholdDialogInputHint": "Input remaining electricity",
+  "settingAccountSetting": "Account Settings",
+  "settingSportPasswordSetting": "PE system password",
+  "settingExperimentPasswordSetting": "Physics experiment password",
+  "settingElectricityPasswordSetting": "Electricity account password",
+  "settingElectricityPasswordDescription": "Please set if not default",
+  "settingElectricityAccountSetting": "Electricity account setting",
+  "settingSchoolnetPasswordSetting": "Campus net password",
+  "settingSchoolnetPasswordDescription": "If you have not setted it, you cannot query it.",
+  "settingAirconImeiTitle": "Aircon electricity data source",
+  "settingAirconImei": "Aircon IMEI",
+  "settingAirconImeiNotSet": "Not set. Aircon electricity will be hidden on the power page.",
+  "settingAirconImeiCurrent": "Current IMEI: {imei}",
+  "@settingAirconImeiCurrent": {
+    "placeholders": {
+      "imei": {
+        "type": "String"
+      }
+    }
+  },
+  "settingAirconImeiSaved": "Aircon IMEI saved",
+  "settingAirconImeiCleared": "Aircon IMEI cleared",
+  "settingAirconImeiInvalid": "No valid 15-digit IMEI found",
+  "settingAirconImeiClear": "Clear",
+  "settingScanAirconQr": "Scan aircon QR code",
+  "settingPickAirconQrImage": "Choose QR image",
+  "settingAirconCameraUnavailable": "Camera scanning is unavailable on this platform. Choose a QR image or enter the IMEI manually.",
+  "settingNotificationSetting": "Notification Settings",
+  "settingCourseReminderSetting": "Pre-class Reminder Settings",
+  "settingCourseReminderDescription": "Configure pre-class reminder notifications",
+  "settingNotificationPageTitle": "Pre-class Reminder Settings",
+  "settingNotificationPageLoadFailed": "Failed to load settings: {error}",
+  "@settingNotificationPageLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageFunctionSection": "Notification Function",
+  "settingNotificationPageEnableNotification": "Enable Pre-class Reminders",
+  "settingNotificationPageNotificationScheduled": "{count} notifications scheduled",
+  "@settingNotificationPageNotificationScheduled": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageNotificationDisabledHint": "All scheduled notifications will be cancelled when disabled",
+  "settingNotificationPageUpdateSchedule": "Update Notification Schedule",
+  "settingNotificationPageUpdateScheduleHint": "Reschedule notifications based on the latest course data",
+  "settingNotificationPageDeleteAllSchedule": "Delete All Scheduled Reminder",
+  "settingNotificationPageDeleteAllScheduleHint": "This action will delete all scheduled events, but you can click 'Update Notification Schedule' again to re-add them.",
+  "settingNotificationPageDeleteAllSuccess": "Delete successfully",
+  "settingNotificationPageViewTheInstructions": "View the instructions",
+  "settingNotificationPageViewTheInstructionsHint": "Check more instructions to ensure that you can see the notifications sent by the program",
+  "settingNotificationPagePermissionSection": "Permission Status",
+  "settingNotificationPageNotificationPermission": "Notification Permission",
+  "settingNotificationPageExactAlarmPermission": "Exact Alarm Permission",
+  "settingNotificationPagePermissionGranted": "Granted",
+  "settingNotificationPagePermissionDenied": "Denied",
+  "settingNotificationPageRequestPermission": "Request Permission",
+  "settingNotificationPageSystemSettings": "System Notification Settings",
+  "settingNotificationPageSystemSettingsHint": "Open system settings to check notification configuration",
+  "settingNotificationPagePermissionGrantedMsg": "Permission granted",
+  "settingNotificationPagePermissionDeniedMsg": "Permission denied, please enable it in system settings",
+  "settingNotificationPageReminderSection": "Reminder Settings",
+  "settingNotificationPageExperimentReminder": "Include the physics experiments",
+  "settingNotificationPageExperimentReminderHint": "Enable this option to add the physics experiment to the Pre-class Reminder",
+  "settingNotificationPageMinutesBefore": "Advance Reminder Time",
+  "settingNotificationPageMinutesBeforeHint": "The time setting for pre-class reminders",
+  "settingNotificationPageMinutesUnit": "minutes",
+  "settingNotificationPageDaysToSchedule": "Schedule Duration",
+  "settingNotificationPageDaysToScheduleHint": "This program writes course information into the planned schedule in advance. This setting can adjust the number of days for writing into the planned schedule",
+  "settingNotificationPageDaysUnit": "days",
+  "settingNotificationPageSettingsGuideTitle": "Notification Settings Guide",
+  "settingNotificationPageSettingsGuideContent1": "To ensure you receive pre-class reminders in time, please make sure:\n1. App notification permission is enabled\n2. Notification sound is enabled\n3. Banner notifications are enabled\n4. Non-native Android users, enable auto-start and disable power optimization",
+  "settingNotificationPageSettingsGuideContent2": "Pre-class Reminder Module Operating Mechanism:\n1. When first activated, it will automatically schedule pre-class reminders for the upcoming days\n2. Each time the app is opened, it will automatically check and update the notification schedule\n3. After modifying settings, it will automatically reschedule all notifications",
+  "settingNotificationPageGotIt": "Got it",
+  "settingNotificationPageOpenSettings": "Open System Settings",
+  "settingNotificationPageNoClasstableData": "Please fetch course schedule, exam, or experiment data first",
+  "settingNotificationPageScheduleSuccess": "Scheduled {count} pre-class reminders",
+  "@settingNotificationPageScheduleSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageScheduleFailed": "Failed to schedule notifications: {error}",
+  "@settingNotificationPageScheduleFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageCancelAllSuccess": "All pre-class reminders cancelled",
+  "settingNotificationPageRescheduleSuccess": "Rescheduled {count} pre-class reminders",
+  "@settingNotificationPageRescheduleSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageRescheduleFailed": "Failed to reschedule notifications: {error}",
+  "@settingNotificationPageRescheduleFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationDebugPage": "Notification Services Debug Page",
+  "settingClasstableSetting": "Class Schedule Related",
+  "settingBackground": "Background image",
+  "settingNoBackground": "You need to select an image first, it's at below",
+  "settingChooseBackground": "Choose background image",
+  "settingNoPermission": "No storage permission obtained, cannot read files",
+  "settingSuccessfulSetting": "Successfully set",
+  "settingFailureSetting": "You did not select an image",
+  "settingClearUserClass": "Clear all customized courses",
+  "settingClearUserClassTitle": "Clear Confirmation",
+  "settingClearUserClassContent": "Do you want to clear all user-added courses? This function does not affect the schedule obtained from the school.",
+  "settingClearUserClassClear": "Already cleared",
+  "settingClassRefresh": "Force refresh class schedule",
+  "settingClassRefreshTitle": "Refresh Confirmation",
+  "settingClassRefreshContent": "Do you want to force refreshing the class schedule? If you agree, we will fetch the schedule from the school, which may takes a long time.",
+  "settingClassSwift": "Class schedule offset setting",
+  "settingClassSwiftDescription": "Positive number delays the start date, negative number advances the start date\nCurrently {swift}\n",
+  "@settingClassSwiftDescription": {
+    "placeholders": {
+      "swift": {
+        "type": "String"
+      }
+    }
+  },
+  "settingCoreSetting": "Cached login settings",
+  "settingCheckLogger": "View network interceptor and logs",
+  "settingClearAndRestart": "Clear cache and restart",
+  "settingClearAndRestartDialogTitle": "Restart confirmation",
+  "settingClearAndRestartDialogContent": "Are you sure to clear cache and restart the program?",
+  "settingClearAndRestartDialogCleaning": "Clearing cache...",
+  "settingClearAndRestartDialogClear": "Cache has been cleared",
+  "settingLogout": "Log out and restart the app",
+  "settingLogoutDialogTitle": "Logout confirmation",
+  "settingLogoutDialogContent": "Are you want to log out? All your data will be completely deleted!",
+  "settingLogoutDialogLoggingOut": "Logging out...",
+  "settingNeedCloseDialogTitle": "Crashed",
+  "settingNeedCloseDialogContent": "Due to technical limitations, you need to close the window manually and then reopen the app.",
+  "settingChangeColorDialogTitle": "Color setting",
+  "settingChangeColorDialogDefault": "Default",
+  "settingChangeColorDialogBlue": "Sky Blue",
+  "settingChangeColorDialogDeeppurple": "Deep Purple",
+  "settingChangeColorDialogGreen": "Spring Green",
+  "settingChangeColorDialogOrange": "Asuka Orange",
+  "settingChangeColorDialogPink": "Sakura Pink",
+  "settingChangeBrightnessDialogTitle": "Brightness settings",
+  "settingChangeBrightnessDialogFollowSetting": "Follow system",
+  "settingChangeBrightnessDialogDayMode": "Day mode",
+  "settingChangeBrightnessDialogNightMode": "Night mode",
+  "settingChangeSwiftDialogTitle": "Class schedule offset setting",
+  "settingChangeSwiftDialogInputHint": "Please input number here",
+  "settingChangeElectricityTitle": "Modify electricity account",
+  "settingChangeElectricityAccountTitle": "Modify electricity account",
+  "settingChangeElectricityAccountCampus": "Campus",
+  "settingChangeElectricityAccountNorthcampus": "Northern Campus",
+  "settingChangeElectricityAccountSouthcampus": "Southern Campus",
+  "settingChangeElectricityAccountUnitorzone": "Unit  / Zone",
+  "settingChangeElectricityAccountUnitcode": "Unit",
+  "settingChangeElectricityAccountZonecode": "Zone",
+  "settingChangeElectricityAccountPleaseinput": "Please input {unitOrZoneCode}",
+  "@settingChangeElectricityAccountPleaseinput": {
+    "placeholders": {
+      "unitOrZoneCode": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountSuccessfulFetch": "Successful fetching account: {accountNumber}",
+  "@settingChangeElectricityAccountSuccessfulFetch": {
+    "placeholders": {
+      "accountNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountFailedFetch": "Failed to fetch: {e}",
+  "@settingChangeElectricityAccountFailedFetch": {
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountAccountSaved": "Account saved：{accountNumber}",
+  "@settingChangeElectricityAccountAccountSaved": {
+    "placeholders": {
+      "accountNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountUnknownCodingPattern": "Unknown coding pattern",
+  "settingChangeElectricityAccountSelectBuilding": "Select Building",
+  "settingChangeElectricityAccountBuilding": "Building",
+  "settingChangeElectricityAccountNorthernBuilding": "Northern Building",
+  "settingChangeElectricityAccountSouthernBuilding": "Southern Building",
+  "settingChangeElectricityAccountFailedGenerate": "Failed to generate: {e}",
+  "@settingChangeElectricityAccountFailedGenerate": {
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountBuildingNumber": "Building number",
+  "settingChangeElectricityAccountBuildingNumberHint": "eg: 16, 7, 55",
+  "settingChangeElectricityAccountBuildingNumberQuery": "Please input building No.",
+  "settingChangeElectricityAccountYard": "Yard",
+  "settingChangeElectricityAccountYardHint": "Select Yard",
+  "settingChangeElectricityAccountNorthyard": "North Yard",
+  "settingChangeElectricityAccountSouthyard": "South Yard",
+  "settingChangeElectricityAccountYardQuery": "Please select yard",
+  "settingChangeElectricityAccountApartment": "Apartment",
+  "settingChangeElectricityAccountApartmentHint": "Select Apartment",
+  "settingChangeElectricityAccountNorthapartment": "North Apartment",
+  "settingChangeElectricityAccountSouthapartment": "South Apartment",
+  "settingChangeElectricityAccountApartmentQuery": "Please select apartment",
+  "settingChangeElectricityAccountLevelcode": "Floor number",
+  "settingChangeElectricityAccountLevelcodeQuery": "Floor number",
+  "settingChangeElectricityAccountRoomcode": "Room code",
+  "settingChangeElectricityAccountRoomcodeHint": "eg: 304, 508",
+  "settingChangeElectricityAccountRoomcodeQuery": "Please input room code",
+  "settingChangeElectricityAccountAccount": "Electricity Account",
+  "settingChangeElectricityAccountAccountHint": "Please enter your account",
+  "settingChangeElectricityAccountAccountQuery": "Please input your account",
+  "settingChangeElectricityAccountAccountLength": "Account length is larger than 10",
+  "settingChangeElectricityAccountFetching": "Fetching...",
+  "settingChangeElectricityAccountFetchFromInternet": "Sync from backend",
+  "settingChangeElectricityAccountSaveAccount": "Save account",
+  "settingChangeElectricityAccountConfirmSaving": "Confirm account",
+  "settingChangeElectricityAccountCalculateAccount": "Calculate account",
+  "settingChangeElectricityAccountCalculate": "Calculate",
+  "settingChangeElectricityAccountInput": "Input",
+  "settingChangeElectricityAccountConfirmAccount": "Confirm your account: ",
+  "settingChangeElectricityAccountChange": "Edit",
+  "settingChangeElectricityAccountCancel": "Cancel",
+  "settingChangeElectricityAccountNoSetting": "No new electricity account set",
+  "settingChangeElectricityAccountSuccessfulSetting": "Successfully setting new electricity account",
+  "settingChangeExperimentTitle": "Modify physics experiment account password",
+  "settingChangeSportTitle": "Modify sports system account password",
+  "settingChangePasswordDialogInputHint": "Please input password here",
+  "settingChangePasswordDialogBlankInput": "Blank input!",
+  "settingChangeSchoolnetPasswordTitle": "Modify the schoolnet query password",
+  "settingUpdateDialogNewVersion": "New version available",
+  "settingUpdateDialogNotNow": "Not now",
+  "settingUpdateDialogAppStore": "Update from App Store",
+  "settingUpdateDialogDownloadApk": "Download APK",
+  "settingUpdateDialogGithubRelease": "Go to Git Release",
+  "settingUpdateDialogNewContent": "New features from version {code}:\n",
+  "@settingUpdateDialogNewContent": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "settingLocalizationDialogTitle": "Languages",
+  "settingLocalizationDialogUndefined": "Follow system setting",
+  "settingLocalizationDialogSimplifiedchinese": "Simplified Chinese",
+  "settingLocalizationDialogTraditionalchinese": "Traditional Chinese",
+  "settingLocalizationDialogEnglish": "English",
+  "settingSemesterChange": "Change semester",
+  "settingSemesterChangeDescription": "Using semester {semester}",
+  "@settingSemesterChangeDescription": {
+    "placeholders": {
+      "semester": {
+        "type": "String"
+      }
+    }
+  },
+  "settingSemesterUpdateData": "Applying new semester setting",
+  "settingEasterEggPage": "You found an Easter egg",
+  "settingAboutPageBenderblog": "Main developer, iOS widget",
+  "settingAboutPageAlnair": "Development: Library search and cover",
+  "settingAboutPageAqqkad": "Development: Class attandance history",
+  "settingAboutPageBellssgit": "Support: best and longest feedback source",
+  "settingAboutPageBrackrat": "Design: homepage, login page, color scheme, iOS widgets, etc.",
+  "settingAboutPageBreezeline": "Support: valueless and meaningless product manager (from his own description)",
+  "settingAboutPageCafebabe": "Support: provide Easter egg code / Development: Development: New Slider '26",
+  "settingAboutPageChitao1234": "Development: fix slider misalignment issue",
+  "settingAboutPageCopperkoi": "Development: latest time arrangement sync to calendar",
+  "settingAboutPageDimole": "Development support: assist in fixing slider issue",
+  "settingAboutPageElitewars": "Design: sports score page",
+  "settingAboutPageElliot": "Internationalization: English translation / Development guidance: on partner classtable development (This function has been removed)",
+  "settingAboutPageFlyingpig": "Development: Fix null pointer exception at user defined class info",
+  "settingAboutPageGodhu777777": "Internationalization: Traditional Chinese conversion code & Easter egg code / Development: Optimize outputing arrangements to the calendar",
+  "settingAboutPageHancl777": "Internationalization: Traditional Chinese conversion code",
+  "settingAboutPageHazukiKeatsu": "Development: Physics experiment score query and recognization",
+  "settingAboutPageHawa130": "Design: Class info card",
+  "settingAboutPageHhzm": "Development: electricity fee inquiry account calculation",
+  "settingAboutPageImaginary17": "Developement: Ruisi navigator stack fix",
+  "settingAboutPageImoscarz": "Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change",
+  "settingAboutPageKaMateKaOra": "Internationalization: English correction",
+  "settingAboutPageLagrangeX": "Development: Class progress indicator (adopted) / Development: Gray cover on attended class and other classtable design",
+  "settingAboutPageLhx666Cool": "Support: Windows and Linux build scripts / Development: New Slider '26",
+  "settingAboutPageLichtyy": "Design: color pattern and blank page picture / Development: HTML reader for the experiment system",
+  "settingAboutPageLqsyH": "Support: Promotion Picture",
+  "settingAboutPageLsy223622": "Design: iOS and Android icons / Support: titled XDYou",
+  "settingAboutPageMrbrilliant2046": "Support: Provided the school net user guide / Internationalization: English correction",
+  "settingAboutPageNancunchild": "Development: library search function / Internationalization: English correction",
+  "settingAboutPageNkanf": "Development: Class progress indicator (original) / Support: MacOS build support",
+  "settingAboutPagePairman": "Development: score cache and optimize slider algorithm / Internationalization: English correction",
+  "settingAboutPageReverierxu": "Design: REX card for information display / Development support: on postgraduate class schedule",
+  "settingAboutPageRrrilac": "Development support: electricity query",
+  "settingAboutPageRay": "Design: splash screen / Support: iOS publisher / Development guidance: on partner classtable development (This function has been removed) / Internationalization: English correction",
+  "settingAboutPageShadowyingyi": "Support: two times of pigeon house official account publicity",
+  "settingAboutPageStalomeow": "Design: homepage timeline / Development: asynchronous login and captcha predict",
+  "settingAboutPageXeonds": "Design: settings page / Development: XDU Planet / Development: Payment Code",
+  "settingAboutPageXingshuyu": "Development: Fix physics experiment api and electricity graph",
+  "settingAboutPageXiue233": "Development: Android applet",
+  "settingAboutPageXizi": "Development support: on postgraduate version",
+  "settingAboutPageWirsbf": "Development: fix course adjustment did not proceed as expected",
+  "settingAboutPageZcwzy": "Development: fix Dingxiang apartment electricity fee / development support: on postgraduate version / design: blank page picture",
+  "settingAboutPageZyarEr": "Development support: fix shortcut url",
+  "settingAboutPageHomepage": "Homepage",
+  "settingAboutPageCode": "Source code",
+  "settingAboutPageKnowMore": "Learn more",
+  "settingAboutPageCopyrightNotice": "This software is compiled, or derived from the traintime_pda (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.\n\nThis APP has no relation to Xidian University, Tishineng Service, Shuwow and other services.\n\nCopyright 2023-2025 BenderBlog Rodriguez and contributors.\nCopyright 2025-present Traintime PDA authors.\n\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.",
+  "settingAboutPageBeian": "ICP record code",
+  "settingAboutPageSignAndroid": "Android signature",
+  "settingAboutPageTitle": "About this APP",
+  "sportTitle": "Sport Query",
+  "sportClassInfo": "Class information",
+  "sportEmptyClassInfo": "No class information found",
+  "sportTestScore": "Sport test score",
+  "sportTotalScore": "Four-year total score",
+  "sportTotalScoreLabel": "Total Score",
+  "sportRankLabel": "Rank",
+  "sportSemester": "Semester {year} {gradeType}",
+  "@sportSemester": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "gradeType": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSubject": "Subject",
+  "sportData": "Data",
+  "sportScore": "Score",
+  "sportPassed": "Passed",
+  "sportFromTo": "Period {start} to {stop}",
+  "@sportFromTo": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "sportScoreString": "{score} points",
+  "@sportScoreString": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSituationNopassword": "No password",
+  "sportSituationMaintain": "System maintenance",
+  "sportSituationFailedLogin": "Login failed",
+  "sportSituationQuery": "Query failed",
+  "sportSituationNetwork": "Network malfunction",
+  "sportSituationUnknown": "Unknown malfunction {situation}",
+  "@sportSituationUnknown": {
+    "placeholders": {
+      "situation": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSituationFetching": "Fetching...",
+  "sportSituationError": "Bad thing: {situation}",
+  "@sportSituationError": {
+    "placeholders": {
+      "situation": {
+        "type": "String"
+      }
+    }
+  },
+  "sportCacheHintMissingPassword": "Please set your PE password and try again.",
+  "sportCacheHintCredentialInvalid": "The PE login has expired. Please update your PE password and try again.",
+  "sportCacheHintMaintain": "The PE service is under maintenance. Please try again later.",
+  "sportCacheHintLoginFailed": "Failed to log in to the PE service.",
+  "sportCacheHintQueryFailed": "Failed to query PE information.",
+  "sportCacheHintNetwork": "The PE service network request failed.",
+  "sportCacheHintUnknown": "Failed to fetch PE information online. Check logs for details.",
+  "sportErrorAuthExpired": "The PE login has expired. Please try again.",
+  "sportErrorMissingPassword": "PE password is not set",
+  "sportErrorCredentialInvalid": "The PE login has expired. Please update your PE password and try again.",
+  "toolboxTitle": "Other Functions",
+  "toolboxPayment": "Payment System",
+  "toolboxPaymentDescription": "Times to pay the electricity fee",
+  "toolboxDrinkingwater": "Drinking Water",
+  "toolboxDrinkingwaterDescription": "Is good for health",
+  "toolboxRepair": "Repair report",
+  "toolboxRepairDescription": "Don't let the water leak from the top",
+  "toolboxReserve": "Space Reservation",
+  "toolboxReserveDescription": "Find a place to gathering",
+  "toolboxMobile": "Mobile Portal",
+  "toolboxMobileDescription": "Specific for leaving",
+  "toolboxNetwork": "Network Query",
+  "toolboxNetworkDescription": "Hope never charges (NO!)",
+  "toolboxPhysics": "Physics Calculation",
+  "toolboxPhysicsDescription": "Hope the operation goes smoothly",
+  "toolboxDiscover": "Ruisi Navigation",
+  "toolboxDiscoverDescription": "Lots other functions",
+  "xduPlanetAll": "All",
+  "xduPlanetLoading": "Loading, please wait <(=ω=)>",
+  "xduPlanetUnknownAuthor": "Unknown author",
+  "xduPlanetLoadFailedTitle": "Failed to load",
+  "xduPlanetLoadFailedBottom": "Failed to load the article, you can click the button on the top right of the screen to open it in the browser.",
+  "xduPlanetNoComment": "No comments yet",
+  "xduPlanetReplyAudit": "Reply comment #{reply_to} has been reported or deleted",
+  "@xduPlanetReplyAudit": {
+    "placeholders": {
+      "reply_to": {
+        "type": "String"
+      }
+    }
+  },
+  "xduPlanetReply": "Reply to #{reply_to}: {content}",
+  "@xduPlanetReply": {
+    "placeholders": {
+      "reply_to": {
+        "type": "String"
+      },
+      "content": {
+        "type": "String"
+      }
+    }
+  },
+  "xduPlanetHaveBeenAudit": "This comment has been reported",
+  "xduPlanetAudit": "Report",
+  "xduPlanetConfirmAuditDialogTitle": "Confirm reporting",
+  "xduPlanetConfirmAuditDialogContent": "Think twice. Reporting will tag the comment, but it may not be deleted.",
+  "xduPlanetConfirmAuditDialogCancel": "Forget it",
+  "xduPlanetConfirmAuditDialogOngoing": "Reporting...",
+  "xduPlanetConfirmAuditDialogFailed": "Failed to report",
+  "xduPlanetConfirmAuditDialogSuccess": "Successfully reporting",
+  "xduPlanetComment": "Reply",
+  "xduPlanetSend": "Send",
+  "xduPlanetSending": "Sending comment",
+  "xduPlanetEmptySend": "Blank message sent",
+  "xduPlanetHintSendComment": "Express yourself!",
+  "xduPlanetCommentTitle": "Comment on this article",
+  "xduPlanetCommentSuccess": "Successfully commenting",
+  "xduPlanetCommentFailed": "Comment failed, please check the log",
+  "xduPlanetCommentCanceled": "Nothing to say?",
+  "xduPlanetCommentLoading": "Loading comments...",
+  "xduPlanetBlock": "Blocked",
+  "xduPlanetDelete": "Deleted",
+  "xduPlanetAudio": "Deleted",
+  "electricityStatusPending": "Pending",
+  "electricityStatusRemainFetching": "Fetching...",
+  "electricityStatusRemainNetworkIssue": "Network malfunction",
+  "electricityStatusRemainNotFound": "Query failed",
+  "electricityStatusRemainOtherIssue": "Query malfunction",
+  "electricityStatusOweFetching": "Obtaining arrearage",
+  "electricityStatusOweIssue": "Network malfunction of overdue information",
+  "electricityStatusOweNotFound": "Cannot query arrearage, check log window for detail",
+  "electricityStatusOweNoNeed": "None",
+  "electricityStatusOweNeedPay": "Need to pay {due} yuan",
+  "@electricityStatusOweNeedPay": {
+    "placeholders": {
+      "due": {
+        "type": "String"
+      }
+    }
+  },
+  "electricityStatusOweIssueUnable": "Cannot query arrearage",
+  "electricityStatusNeedMoreInfo": "Need to improve information on the payment platform",
+  "electricityStatusNeedAccount": "Need to input electricity account",
+  "electricityStatusCaptchaFailed": "Failed to check captcha",
+  "electricityStatusOtherIssue": "Program malfunction",
+  "schoolCardStatusFailedToFetch": "Failed fetching",
+  "schoolCardStatusFailedToQuery": "Failed querying",
+  "easterEggApple": "=== Fly Me To The Moon ===\nVocal: Frank Sintara, 1964\n\nFly me to the moon\nLet me play among the stars\n\nLet me see what's spring is like\non a Jupiter and Mars\n\nFill my heart with song\nand let me sing forever more\n\nYou are all I long for\nall I worship and I adore\n\nIn other words\nPlease, be true\n\nIn other words\nI love you\n\n=== Living Inside Your Love ===\nGuitar: Earl Klugh, 1976\n\nCan't get over the feeling\nLiving inside your love\n\nI never want to lose the feeling\nLiving inside your love\n\nBaby, you made my life so free\nLiving inside your love\n\nI'm just where I want to be\nLiving inside your love\n\nAnd I never could say\nWhat I'm feeling today\nFor you...\n",
+  "easterEggOthers": "=== Cardcaptor Sakura OP3 ===\nVocal: Maaya Sakamoto, 2000\nIn Japanese Roman Letters\n\nI'm a dreamer\nhisomu PAWA-\n\nwatashi no sekai\nyume to koi to fuan de dekite'ru\ndemo souzou wo shinai mono\nkakurete'ru hazu\n\nsora ni mukau kiki no you ni anata wo\nmassugu mitsumete'ru\nmitsuketai naa kanaetai naa\nshinjiru sore dake de\n\nkoerarenai mono wa nai\nutau you ni kiseki no you ni\n\"omoi\" ga subete wo kaete yuku yo\nkitto kitto\nodoroku kurai\n\n=== Living Inside Your Love ===\nGuitar: Earl Klugh, 1976\n\nCan't get over the feeling\nLiving inside your love\n\nI never want to lose the feeling\nLiving inside your love\n\nBaby, you made my life so free\nLiving inside your love\n\nI'm just where I want to be\nLiving inside your love\n\nAnd I never could say\nWhat I'm feeling today\nFor you...\n",
+  "easterEggRobotAppbar": "Welcome Students!",
+  "easterEggRobotTitle": "Looking like you are worrying about opening semester?",
+  "easterEggRobotContents": "We are here to let our children have more pocket money.\n1. Robots may not injure a human being or, through inaction, allow a human being to come to harm.\n2. Robots are born from the ashes of the network running at the cloud.\n3. Robots are lovestruck, which cannot be annoyed, and loves merging programs!\n4. Robots sometimes can be controlled to avoid the attack from the Angles.\n5. Robots have shiny metal ass which should not be bitten.\nAnd they have a plan.",
+  "easterEggRobotButtonOne": "We are hanger for your help!",
+  "easterEggRobotButtonTwo": "Come on!",
+  "easterEggRobotButtonNotice": "\\o/\\o/\\o/\\o/\\o/\\o/\\o/\\o/",
+  "restartAppTitleCacheCleared": "Cache Cleared",
+  "restartAppTitleLoggedOut": "Logged Out",
+  "restartAppTitlePasswordWrong": "Wrong Password",
+  "restartAppContent": "Tap to reopen the app",
+  "ruisiCommonRefresh": "Refresh",
+  "ruisiCommonConfirm": "OK",
+  "ruisiCommonCancel": "Cancel",
+  "ruisiCommonRetry": "Retry",
+  "ruisiCommonNoTopics": "No topics",
+  "ruisiCommonNoContent": "No content",
+  "ruisiCommonReply": "Reply",
+  "ruisiCommonFavorite": "Favorite",
+  "ruisiCommonNotImplemented": "Not implemented",
+  "ruisiCommonLogin": "Login",
+  "ruisiCommonLogout": "Log out",
+  "ruisiCommonLoggedOut": "Logged out",
+  "ruisiCommonSubmit": "Submit",
+  "ruisiAboutTitle": "About",
+  "ruisiAboutAppName": "Ruisi",
+  "ruisiAboutSubtitle": "Xidian University Campus Forum Client",
+  "ruisiAboutVersion": "Version",
+  "ruisiAboutVersionNumber": "2.0.0 (Bundled with XDYou 1.6.0)",
+  "ruisiAboutSourceCode": "Source Code",
+  "ruisiAboutBugReport": "Report Issue",
+  "ruisiAboutBugReportSubtitle": "Submit an issue on GitHub",
+  "ruisiAboutPrivacyPolicy": "Privacy Policy",
+  "ruisiAboutLicense": "Open-sourced under the BSD-3-Clause License Reimplemented based on Ruisi-iOS and Ruisi-Android with AI assistant",
+  "ruisiAboutPrivacyPolicyContent": "This app only operates on the Xidian University campus network, accessing data from the Ruisi Forum (rs.xidian.edu.cn).\n\nThis app does not collect, store, or transmit any personal information to third-party servers.\n\nUser login credentials are stored only on the local device, used for authentication with the Ruisi Forum server.\n\nThis app uses cookies to communicate with the Ruisi Forum server. All data exchange occurs directly between the user's device and the Ruisi Forum server.\n\nIf you have any questions, please contact the developer by submitting an issue on GitHub.",
+  "ruisiHomeTitle": "Ruisi Forum",
+  "ruisiHomeNewPost": "New Post",
+  "ruisiHomeForumList": "Forum List",
+  "ruisiHomeTabHot": "Hot",
+  "ruisiHomeTabNewReply": "Latest Replies",
+  "ruisiHomeTabNewPost": "Latest Posts",
+  "ruisiHomeTabMy": "Me",
+  "ruisiHomeTabTrade": "Trading",
+  "ruisiHomeTabWater": "Water Bar",
+  "ruisiHomeTabLostFound": "Lost & Found",
+  "ruisiHomeTabEmployment": "Employment",
+  "ruisiHomeTabPhotography": "Photography",
+  "ruisiHomePleaseLogin": "Please log in first",
+  "ruisiHomeMyProfile": "My Profile",
+  "ruisiHomeMyPosts": "My Posts",
+  "ruisiHomeMyFavorites": "My Favorites",
+  "ruisiHomeMessageCenter": "Messages",
+  "ruisiHomeDailyCheckin": "Daily Check-in",
+  "ruisiHomeSettings": "Settings",
+  "ruisiHomeAbout": "About",
+  "ruisiHomeSearch": "Search",
+  "ruisiLoginTitle": "Login to Ruisi",
+  "ruisiLoginUsername": "Username",
+  "ruisiLoginUsernameHint": "Please enter username",
+  "ruisiLoginPassword": "Password",
+  "ruisiLoginPasswordHint": "Please enter password",
+  "ruisiLoginCaptcha": "Captcha",
+  "ruisiLoginCaptchaHint": "Please enter captcha",
+  "ruisiLoginBack": "Back",
+  "ruisiLoginResetLoginState": "Reset Login State",
+  "ruisiLoginResetConfirmTitle": "Confirm Reset",
+  "ruisiLoginResetConfirmContent": "Are you sure you want to reset the login state? This will clear all login information.",
+  "ruisiLoginResetSuccess": "Login state has been reset",
+  "ruisiLoginViewLogs": "View Logs",
+  "ruisiPostTitle": "New Post",
+  "ruisiPostPublish": "Publish",
+  "ruisiPostSelectForum": "Select Forum",
+  "ruisiPostSelectForumHint": "Please select a forum",
+  "ruisiPostSubject": "Title",
+  "ruisiPostSubjectHint": "Please enter a title",
+  "ruisiPostContent": "Content",
+  "ruisiPostContentHint": "Please enter content",
+  "ruisiPostSuccess": "Post published",
+  "ruisiPostFailure": "Failed to publish",
+  "ruisiPostSmiley": "Smileys",
+  "ruisiTopicDetailTitle": "Topic Detail",
+  "ruisiTopicDetailReplyTooShort": "Reply must be at least 13 characters",
+  "ruisiTopicDetailReplySuccess": "Reply sent",
+  "ruisiTopicDetailReplyFailure": "Failed to reply",
+  "ruisiTopicDetailFavoriteSuccess": "Added to favorites",
+  "ruisiTopicDetailFavoriteFailure": "Failed to add to favorites",
+  "ruisiTopicDetailNoData": "No data",
+  "ruisiTopicDetailReplyHint": "Write a reply...",
+  "ruisiTopicDetailVoteSingleSelect": "Single choice",
+  "ruisiTopicDetailVoteMultiSelect": "Multiple choice, up to {count}",
+  "@ruisiTopicDetailVoteMultiSelect": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteTitlePrefix": "Vote",
+  "ruisiTopicDetailVoteCount": "{count} people voted",
+  "@ruisiTopicDetailVoteCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteOpen": "Vote",
+  "ruisiTopicDetailVoteSheetTitle": "Vote",
+  "ruisiTopicDetailVoteMaxSelection": "You can select up to {count}",
+  "@ruisiTopicDetailVoteMaxSelection": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteNotSelected": "Please select an option",
+  "ruisiTopicDetailVoteSuccess": "Vote submitted",
+  "ruisiTopicDetailVoteFailure": "Vote failed",
+  "ruisiTopicDetailVoteParamError": "Vote failed: invalid parameters",
+  "ruisiTopicDetailVoteAlreadyVoted": "You have already voted. Thank you!",
+  "ruisiTopicDetailVoteExpired": "This poll has expired or been closed",
+  "ruisiTopicDetailVoteEnded": "This poll has ended",
+  "ruisiTopicListItemSticky": "Pinned",
+  "ruisiForumListTitle": "Forum List",
+  "ruisiForumListEmpty": "Ruisi Forum section grouping is empty",
+  "ruisiFavoritesTitle": "My Favorites",
+  "ruisiFavoritesEmpty": "No favorites",
+  "ruisiMessagesTitle": "Messages",
+  "ruisiMessagesTabAt": "@Me",
+  "ruisiMessagesNoReply": "No reply notifications",
+  "ruisiMessagesNoAt": "No @ notifications",
+  "ruisiSearchHint": "Search topics...",
+  "ruisiSearchInputHint": "Enter keywords to search",
+  "ruisiSearchNoResults": "No results",
+  "ruisiSettingsTitle": "Settings",
+  "ruisiSettingsSectionProxy": "Proxy",
+  "ruisiSettingsProxyEnable": "Enable Proxy",
+  "ruisiSettingsProxyDisabled": "Disabled",
+  "ruisiSettingsProxyAddress": "Proxy Address",
+  "ruisiSettingsSectionDebug": "Debug",
+  "ruisiSettingsViewLogs": "View Logs",
+  "ruisiSettingsProxyDialogTitle": "Proxy Settings",
+  "ruisiSettingsProxyHost": "Host",
+  "ruisiSettingsProxyHostHint": "e.g. 127.0.0.1",
+  "ruisiSettingsProxyPort": "Port",
+  "ruisiSettingsProxyPortHint": "e.g. 7890",
+  "ruisiUserTitle": "Me",
+  "ruisiUserTabProfile": "Profile",
+  "ruisiUserUnknown": "Unknown User",
+  "loadError": "Load Error",
+  "courseReminderTitle": "Pre-class Reminder: {name}",
+  "@courseReminderTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderBody": "Class starts in {time} minutes",
+  "@courseReminderBody": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderLocation": "Location: {location}",
+  "@courseReminderLocation": {
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderTeacher": "Teacher: {teacher}",
+  "@courseReminderTeacher": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
+import 'package:watermeter/generated/l10n.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 
@@ -15,20 +15,17 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, 'ruisi.settings.title')),
+        title: Text(I18n.of(context)!.ruisiSettingsTitle),
       ),
       body: ListView(
         children: [
           _SectionHeader(
-            title: FlutterI18n.translate(
-              context,
-              'ruisi.settings.section_debug',
-            ),
+            title: I18n.of(context)!.ruisiSettingsSectionDebug,
           ),
           ListTile(
             leading: const Icon(Icons.bug_report),
             title: Text(
-              FlutterI18n.translate(context, 'ruisi.settings.view_logs'),
+              I18n.of(context)!.ruisiSettingsViewLogs,
             ),
             onTap: () => Navigator.push(
               context,

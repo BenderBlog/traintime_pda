@@ -6,12 +6,12 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/l10n.dart';
 
 bool get _canUseCameraScanner => Platform.isAndroid || Platform.isIOS;
 
@@ -56,10 +56,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
     if (!_canUseCameraScanner) {
       showToast(
         context: context,
-        msg: FlutterI18n.translate(
-          context,
-          "setting.aircon_camera_unavailable",
-        ),
+        msg: I18n.of(context)!.settingAirconCameraUnavailable,
       );
       return;
     }
@@ -96,7 +93,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
       if (imei == null) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(context, "setting.aircon_imei_invalid"),
+          msg: I18n.of(context)!.settingAirconImeiInvalid,
         );
         return;
       }
@@ -106,7 +103,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "setting.aircon_imei_invalid"),
+        msg: I18n.of(context)!.settingAirconImeiInvalid,
       );
     }
   }
@@ -117,14 +114,14 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "setting.aircon_imei_saved"),
+        msg: I18n.of(context)!.settingAirconImeiSaved,
       );
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "setting.aircon_imei_invalid"),
+        msg: I18n.of(context)!.settingAirconImeiInvalid,
       );
     }
   }
@@ -134,7 +131,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
     if (!mounted) return;
     showToast(
       context: context,
-      msg: FlutterI18n.translate(context, "setting.aircon_imei_cleared"),
+      msg: I18n.of(context)!.settingAirconImeiCleared,
     );
     Navigator.pop(context);
   }
@@ -142,7 +139,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(context, "setting.aircon_imei_title")),
+      title: Text(I18n.of(context)!.settingAirconImeiTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -154,7 +151,7 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
               LengthLimitingTextInputFormatter(15),
             ],
             decoration: InputDecoration(
-              labelText: FlutterI18n.translate(context, "setting.aircon_imei"),
+              labelText: I18n.of(context)!.settingAirconImei,
             ),
           ),
           const SizedBox(height: 8),
@@ -169,17 +166,14 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
                     onPressed: _scanQrCode,
                     icon: const Icon(Icons.qr_code_scanner),
                     label: Text(
-                      FlutterI18n.translate(context, "setting.scan_aircon_qr"),
+                      I18n.of(context)!.settingScanAirconQr,
                     ),
                   ),
                 TextButton.icon(
                   onPressed: _pickQrCodeImage,
                   icon: const Icon(Icons.photo_library),
                   label: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.pick_aircon_qr_image",
-                    ),
+                    I18n.of(context)!.settingPickAirconQrImage,
                   ),
                 ),
               ],
@@ -191,16 +185,16 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
         TextButton(
           onPressed: _clear,
           child: Text(
-            FlutterI18n.translate(context, "setting.aircon_imei_clear"),
+            I18n.of(context)!.settingAirconImeiClear,
           ),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(I18n.of(context)!.cancel),
         ),
         TextButton(
           onPressed: _save,
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(I18n.of(context)!.confirm),
         ),
       ],
     );
@@ -221,7 +215,7 @@ class _AirconImeiScannerPageState extends State<_AirconImeiScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "setting.scan_aircon_qr")),
+        title: Text(I18n.of(context)!.settingScanAirconQr),
       ),
       body: ReaderWidget(
         isMultiScan: true,
@@ -237,10 +231,7 @@ class _AirconImeiScannerPageState extends State<_AirconImeiScannerPage> {
           if (imei == null) {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "setting.aircon_imei_invalid",
-              ),
+              msg: I18n.of(context)!.settingAirconImeiInvalid,
             );
             return;
           }

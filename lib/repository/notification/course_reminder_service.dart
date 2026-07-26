@@ -21,7 +21,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/routing/routes.dart';
-import 'package:watermeter/generated/non_ui_i18n.g.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 /// Course Reminder Service implementation
 class CourseReminderService extends NotificationService
@@ -405,26 +405,18 @@ class CourseReminderService extends NotificationService
             '${classStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
           );
 
-          String title = NonUII18n.translate(
-            locale,
-            'course_reminder.title',
-            translateParams: {'name': customClass.name},
-          );
+          String title = lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderTitle(customClass.name);
 
-          String body = NonUII18n.translate(
-            locale,
-            'course_reminder.body',
-            translateParams: {'time': minutesBefore.toString()},
-          );
+          String body = lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderBody(minutesBefore.toString());
 
           if (customClass.classroom != null &&
               customClass.classroom!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": customClass.classroom!})}';
+                '\n${lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderLocation(customClass.classroom!)}';
           }
           if (customClass.teacher != null && customClass.teacher!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": customClass.teacher!})}';
+                '\n${lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderTeacher(customClass.teacher!)}';
           }
 
           final Map<String, dynamic> payload = {
@@ -528,27 +520,19 @@ class CourseReminderService extends NotificationService
 
           String locale = _getCurrentLocale();
 
-          String title = NonUII18n.translate(
-            locale,
-            'course_reminder.title',
-            translateParams: {'name': classDetail.name},
-          );
+          String title = lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderTitle(classDetail.name);
 
-          String body = NonUII18n.translate(
-            locale,
-            'course_reminder.body',
-            translateParams: {'time': minutesBefore.toString()},
-          );
+          String body = lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderBody(minutesBefore.toString());
 
           if (timeArrangement.classroom != null &&
               timeArrangement.classroom!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": timeArrangement.classroom!})}';
+                '\n${lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderLocation(timeArrangement.classroom!)}';
           }
           if (timeArrangement.teacher != null &&
               timeArrangement.teacher!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": timeArrangement.teacher!})}';
+                '\n${lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderTeacher(timeArrangement.teacher!)}';
           }
 
           Map<String, dynamic> payload = {
@@ -660,25 +644,17 @@ class CourseReminderService extends NotificationService
           String locale = _getCurrentLocale();
 
           // Use course_reminder translation keys to treat experiments as courses
-          String title = NonUII18n.translate(
-            locale,
-            'course_reminder.title',
-            translateParams: {'name': experiment.name},
-          );
+          String title = lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderTitle(experiment.name);
 
-          String body = NonUII18n.translate(
-            locale,
-            'course_reminder.body',
-            translateParams: {'time': minutesBefore.toString()},
-          );
+          String body = lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderBody(minutesBefore.toString());
 
           if (experiment.classroom.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": experiment.classroom})}';
+                '\n${lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderLocation(experiment.classroom)}';
           }
           if (experiment.teacher.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": experiment.teacher})}';
+                '\n${lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderTeacher(experiment.teacher)}';
           }
 
           Map<String, dynamic> payload = {
@@ -761,21 +737,13 @@ class CourseReminderService extends NotificationService
         );
         final locale = _getCurrentLocale();
 
-        String title = NonUII18n.translate(
-          locale,
-          'course_reminder.title',
-          translateParams: {'name': '${exam.subject}考试'},
-        );
+        String title = lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderTitle('${exam.subject}考试');
 
-        String body = NonUII18n.translate(
-          locale,
-          'course_reminder.body',
-          translateParams: {'time': minutesBefore.toString()},
-        );
+        String body = lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderBody(minutesBefore.toString());
 
         if (exam.place.isNotEmpty) {
           body +=
-              '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": exam.place})}';
+              '\n${lookupI18n(Locale.fromSubtags(languageCode: locale.substring(0, 2), countryCode: locale.length > 4 ? locale.substring(3) : null)).courseReminderLocation(exam.place)}';
         }
 
         final payload = <String, dynamic>{

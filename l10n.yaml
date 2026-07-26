@@ -1,0 +1,6 @@
+arb-dir: lib/l10n
+template-arb-file: intl_en.arb 
+output-localization-file: l10n.dart
+output-class: I18n
+output-dir: lib/generated/
+use-deferred-loading: false

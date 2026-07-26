@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ClassTableInlineBanner extends StatelessWidget {
   final List<ClassTableStatusSource> loadingSources;
@@ -17,40 +17,37 @@ class ClassTableInlineBanner extends StatelessWidget {
   });
 
   String _sourceLabel(BuildContext context, ClassTableStatusSource source) =>
-      FlutterI18n.translate(context, switch (source) {
-        ClassTableStatusSource.classTable =>
-          "classtable.status_source.class_table",
-        ClassTableStatusSource.exam => "classtable.status_source.exam",
-        ClassTableStatusSource.physicsExperiment =>
-          "classtable.status_source.physics_experiment",
-        ClassTableStatusSource.otherExperiment =>
-          "classtable.status_source.other_experiment",
-      });
+      switch (source) {
+        ClassTableStatusSource.classTable => I18n.of(
+          context,
+        )!.classtableStatusSourceClassTable,
+        ClassTableStatusSource.exam => I18n.of(
+          context,
+        )!.classtableStatusSourceExam,
+        ClassTableStatusSource.physicsExperiment => I18n.of(
+          context,
+        )!.classtableStatusSourcePhysicsExperiment,
+        ClassTableStatusSource.otherExperiment => I18n.of(
+          context,
+        )!.classtableStatusSourceOtherExperiment,
+      };
 
   @override
   Widget build(BuildContext context) {
     final isVisible = loadingSources.isNotEmpty || cacheSources.isNotEmpty;
     final loadingText = loadingSources.isEmpty
         ? null
-        : FlutterI18n.translate(
-            context,
-            "classtable.status_banner.loading",
-            translationParams: {
-              "sources": loadingSources
-                  .map((source) => _sourceLabel(context, source))
-                  .join("; "),
-            },
+        : I18n.of(context)!.classtableStatusBannerLoading(
+            loadingSources
+                .map((source) => _sourceLabel(context, source))
+                .join("; "),
           );
     final cacheText = cacheSources.isEmpty
         ? null
-        : FlutterI18n.translate(
-            context,
-            "classtable.status_banner.cache",
-            translationParams: {
-              "sources": cacheSources
-                  .map((source) => _sourceLabel(context, source))
-                  .join("; "),
-            },
+        : I18n.of(context)!.classtableStatusBannerCache(
+            cacheSources
+                .map((source) => _sourceLabel(context, source))
+                .join("; "),
           );
 
     return !isVisible

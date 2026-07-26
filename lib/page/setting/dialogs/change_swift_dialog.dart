@@ -6,9 +6,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/l10n.dart';
 
 class ChangeSwiftDialog extends StatelessWidget {
   final TextEditingController _getNumberController =
@@ -33,7 +33,7 @@ class ChangeSwiftDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        FlutterI18n.translate(context, "setting.change_swift_dialog.title"),
+        I18n.of(context)!.settingChangeSwiftDialogTitle,
       ),
       content: TextField(
         autofocus: true,
@@ -44,19 +44,16 @@ class ChangeSwiftDialog extends StatelessWidget {
         ],
         maxLines: 1,
         decoration: InputDecoration(
-          hintText: FlutterI18n.translate(
-            context,
-            "setting.change_swift_dialog.input_hint",
-          ),
+          hintText: I18n.of(context)!.settingChangeSwiftDialogInputHint,
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(I18n.of(context)!.cancel),
           onPressed: () => Navigator.pop(context),
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(I18n.of(context)!.confirm),
           onPressed: () async {
             final value = _getNumberController.text.isEmpty
                 ? 0

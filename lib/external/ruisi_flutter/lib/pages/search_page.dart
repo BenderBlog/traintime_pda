@@ -4,8 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/utils/branch_navigation.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 import '../models/topic.dart';
 import '../controller/ruisi_controller.dart';
@@ -47,7 +47,7 @@ class _SearchPageState extends State<SearchPage> {
           controller: _textEditingController,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: FlutterI18n.translate(context, 'ruisi.search.hint'),
+            hintText: I18n.of(context)!.ruisiSearchHint,
             border: InputBorder.none,
           ),
           onChanged: (String textFieldValue) => search = textFieldValue,

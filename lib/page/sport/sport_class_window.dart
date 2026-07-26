@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
@@ -12,6 +11,7 @@ import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class SportClassWindow extends StatefulWidget {
   const SportClassWindow({super.key});
@@ -28,12 +28,11 @@ class _SportClassWindowState extends State<SportClassWindow>
   Future<FetchResult<SportClass>> _future = SportSession().getClass();
 
   Object? _translateError(BuildContext context, Object? error) {
-    if (error is SportCredentialMissingException ||
-        error is SportCredentialInvalidException) {
-      return FlutterI18n.translate(context, error.toString());
+    if (error is SportCredentialMissingException) {
+      return I18n.of(context)!.sportErrorMissingPassword;
     }
-    if (error is String) {
-      return FlutterI18n.translate(context, error);
+    if (error is SportCredentialInvalidException) {
+      return I18n.of(context)!.sportErrorCredentialInvalid;
     }
     return error;
   }
@@ -61,21 +60,15 @@ class _SportClassWindowState extends State<SportClassWindow>
               children: [
                 if (result.isCache)
                   CacheAlerter(
-                    dataType: FlutterI18n.translate(context, "sport.title"),
-                    hint: FlutterI18n.translate(
-                      context,
-                      result.hintKey ?? "cache_reason_default",
-                    ),
+                    dataType: I18n.of(context)!.sportTitle,
+                    hint: _sportCacheHint(context, result.cacheHint),
                     placeOfCache: PlaceOfCache.inapp,
                     fetchTime: result.fetchTime,
                   ),
                 if (toShow.isEmpty)
                   EmptyListView(
                     type: EmptyListViewType.singing,
-                    text: FlutterI18n.translate(
-                      context,
-                      "sport.empty_class_info",
-                    ),
+                    text: I18n.of(context)!.sportEmptyClassInfo,
                   )
                 else
                   Expanded(
@@ -125,29 +118,18 @@ class SportClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> weekList = [
-      'monday',
-      'tuesday',
-      'wednesday',
-      'thursday',
-      'friday',
-      'saturday',
-      'sunday',
-    ];
+    String timeWeek = switch (data.week) {
+      1 => I18n.of(context)!.weekdayMonday,
+      2 => I18n.of(context)!.weekdayTuesday,
+      3 => I18n.of(context)!.weekdayWednesday,
+      4 => I18n.of(context)!.weekdayThursday,
+      5 => I18n.of(context)!.weekdayFriday,
+      6 => I18n.of(context)!.weekdaySaturday,
+      7 => I18n.of(context)!.weekdaySunday,
+      _ => I18n.of(context)!.weekdayMonday,
+    };
 
-    String timeWeek = FlutterI18n.translate(
-      context,
-      "weekday.${weekList[data.week - 1]}",
-    );
-
-    String timePlace = FlutterI18n.translate(
-      context,
-      "sport.from_to",
-      translationParams: {
-        "start": data.start.toString(),
-        "stop": data.stop.toString(),
-      },
-    );
+    String timePlace = I18n.of(context)!.sportFromTo(data.start.toString(), data.stop.toString());
 
     return ReXCard(
       title: Text(data.termToShow),
@@ -169,4 +151,27 @@ class SportClassCard extends StatelessWidget {
       ].toColumn(),
     );
   }
+}
+
+String _sportCacheHint(BuildContext context, Object? hint) {
+  if (hint == null) {
+    return I18n.of(context)!.cacheReasonDefault;
+  }
+  return switch (hint) {
+    SportCacheHint.missingPassword =>
+      I18n.of(context)!.sportCacheHintMissingPassword,
+    SportCacheHint.credentialInvalid =>
+      I18n.of(context)!.sportCacheHintCredentialInvalid,
+    SportCacheHint.maintain =>
+      I18n.of(context)!.sportCacheHintMaintain,
+    SportCacheHint.loginFailed =>
+      I18n.of(context)!.sportCacheHintLoginFailed,
+    SportCacheHint.queryFailed =>
+      I18n.of(context)!.sportCacheHintQueryFailed,
+    SportCacheHint.networkFailed =>
+      I18n.of(context)!.sportCacheHintNetwork,
+    SportCacheHint.unknownError =>
+      I18n.of(context)!.sportCacheHintUnknown,
+    _ => I18n.of(context)!.cacheReasonDefault,
+  };
 }

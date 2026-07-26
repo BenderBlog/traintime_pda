@@ -1,8 +1,8 @@
+import 'package:watermeter/generated/l10n.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/urls.dart';
@@ -21,7 +21,7 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, 'ruisi.about.title')),
+        title: Text(I18n.of(context)!.ruisiAboutTitle),
       ),
       body: ListView(
         children: [
@@ -42,14 +42,14 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 16),
           Center(
             child: Text(
-              FlutterI18n.translate(context, 'ruisi.about.app_name'),
+              I18n.of(context)!.ruisiAboutAppName,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 8),
           Center(
             child: Text(
-              FlutterI18n.translate(context, 'ruisi.about.subtitle'),
+              I18n.of(context)!.ruisiAboutSubtitle,
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
           ),
@@ -59,9 +59,9 @@ class AboutPage extends StatelessWidget {
           // 版本
           ListTile(
             leading: const Icon(Icons.info_outline),
-            title: Text(FlutterI18n.translate(context, 'ruisi.about.version')),
+            title: Text(I18n.of(context)!.ruisiAboutVersion),
             subtitle: Text(
-              FlutterI18n.translate(context, 'ruisi.about.version_number'),
+              I18n.of(context)!.ruisiAboutVersionNumber,
             ),
           ),
 
@@ -69,7 +69,7 @@ class AboutPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.code),
             title: Text(
-              FlutterI18n.translate(context, 'ruisi.about.source_code'),
+              I18n.of(context)!.ruisiAboutSourceCode,
             ),
             subtitle: Text(Urls.homePage),
             onTap: () => _openUrl(Urls.homePage),
@@ -79,10 +79,10 @@ class AboutPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.bug_report),
             title: Text(
-              FlutterI18n.translate(context, 'ruisi.about.bug_report'),
+              I18n.of(context)!.ruisiAboutBugReport,
             ),
             subtitle: Text(
-              FlutterI18n.translate(context, 'ruisi.about.bug_report_subtitle'),
+              I18n.of(context)!.ruisiAboutBugReportSubtitle,
             ),
             onTap: () => _openUrl('${Urls.homePage}/issues'),
           ),
@@ -93,7 +93,7 @@ class AboutPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(
-              FlutterI18n.translate(context, 'ruisi.about.privacy_policy'),
+              I18n.of(context)!.ruisiAboutPrivacyPolicy,
             ),
             onTap: () => _showPrivacyPolicy(context),
           ),
@@ -104,7 +104,7 @@ class AboutPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              FlutterI18n.translate(context, 'ruisi.about.license'),
+              I18n.of(context)!.ruisiAboutLicense,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
@@ -119,20 +119,17 @@ class AboutPage extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-          FlutterI18n.translate(context, 'ruisi.about.privacy_policy'),
+          I18n.of(context)!.ruisiAboutPrivacyPolicy,
         ),
         content: SingleChildScrollView(
           child: Text(
-            FlutterI18n.translate(
-              context,
-              'ruisi.about.privacy_policy_content',
-            ),
+            I18n.of(context)!.ruisiAboutPrivacyPolicyContent,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(FlutterI18n.translate(context, 'ruisi.common.confirm')),
+            child: Text(I18n.of(context)!.ruisiCommonConfirm),
           ),
         ],
       ),

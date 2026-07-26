@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/empty_classroom/empty_classroom_search_window.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/xidian_ids/empty_classroom_session.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class EmptyClassroomWindow extends StatefulWidget {
   const EmptyClassroomWindow({super.key});
@@ -30,7 +30,7 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "empty_classroom.title")),
+        title: Text(I18n.of(context)!.emptyClassroomTitle),
       ),
       body: FutureBuilder(
         future: places,

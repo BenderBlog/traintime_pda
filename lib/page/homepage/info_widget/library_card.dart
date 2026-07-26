@@ -2,7 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class LibraryCard extends StatelessWidget {
   const LibraryCard({super.key});
@@ -26,42 +26,26 @@ class LibraryCard extends StatelessWidget {
           isLoad: state.isLoading,
           icon: MingCuteIcons.mgc_book_2_line,
           text:
-              FlutterI18n.translate(context, "homepage.library_card.title"),
+              I18n.of(context)!.homepageLibraryCardTitle,
           infoText: Text.rich(
             TextSpan(
               style: const TextStyle(fontSize: 20),
               children: [
                 state.map(
                   data: (list) => TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.current_borrow",
-                      translationParams: {"count": list.length.toString()},
-                    ),
+                    text: I18n.of(context)!.homepageLibraryCardCurrentBorrow(list.length.toString()),
                   ),
                   loading: () => TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.fetching",
-                    ),
+                    text: I18n.of(context)!.homepageLibraryCardFetching,
                   ),
                   refreshing: () => TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.fetching",
-                    ),
+                    text: I18n.of(context)!.homepageLibraryCardFetching,
                   ),
                   reloading: () => TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.fetching",
-                    ),
+                    text: I18n.of(context)!.homepageLibraryCardFetching,
                   ),
                   error: (_, _) => TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.error_occured",
-                    ),
+                    text: I18n.of(context)!.homepageLibraryCardErrorOccured,
                   ),
                 ),
               ],
@@ -75,43 +59,24 @@ class LibraryCard extends StatelessWidget {
                     data.where((element) => element.lendDay < 0).length;
                 if (duedNum == 0) {
                   return Text(
-                    FlutterI18n.translate(
-                      context,
-                      "homepage.library_card.no_return",
-                    ),
+                    I18n.of(context)!.homepageLibraryCardNoReturn,
                   );
                 }
                 return Text(
-                  FlutterI18n.translate(
-                    context,
-                    "homepage.library_card.need_return",
-                    translationParams: {"dued": duedNum.toString()},
-                  ),
+                  I18n.of(context)!.homepageLibraryCardNeedReturn(duedNum.toString()),
                 );
               },
               loading: () => Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.fetching_info",
-                ),
+                I18n.of(context)!.homepageLibraryCardFetchingInfo,
               ),
               refreshing: () => Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.fetching_info",
-                ),
+                I18n.of(context)!.homepageLibraryCardFetchingInfo,
               ),
               reloading: () => Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.fetching_info",
-                ),
+                I18n.of(context)!.homepageLibraryCardFetchingInfo,
               ),
               error: (_, _) => Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.library_card.no_info",
-                ),
+                I18n.of(context)!.homepageLibraryCardNoInfo,
               ),
             ),
           ),

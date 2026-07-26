@@ -1,0 +1,2116 @@
+{
+  "@@locale": "zh",
+  "dragText": "上拉获取更多数据",
+  "readyText": "正在加载......",
+  "processingText": "正在处理......",
+  "processedText": "请求成功",
+  "noMoreText": "没有更多数据",
+  "failedText": "数据获取失败",
+  "chooseSemester": "选择学期",
+  "errorDetected": "Ouch! 发生错误啦",
+  "clickToRefresh": "点我刷新",
+  "confirmTitle": "确认？",
+  "cancel": "取消",
+  "confirm": "确定",
+  "networkError": "网络错误，可能是没联网，可能是学校服务器出现了故障:-P",
+  "errorDetect": "遇到错误，请查看日志",
+  "queryFailed": "查询失败",
+  "notSchoolNetwork": "没有在校园网环境",
+  "experimentControllerNoPassword": "没有物理实验密码，请到设置中进行设置",
+  "experimentControllerLoginFailed": "登录失败",
+  "cancelExam": "取消考试资格:P",
+  "loginProcessReadyPage": "准备获取登录网页",
+  "loginProcessGetEncrypt": "获取密码加密密钥",
+  "loginProcessReadyLogin": "准备登录",
+  "loginProcessSlider": "登录中",
+  "loginProcessAfterProcess": "登录后处理",
+  "loginProcessFailed": "登录失败，响应状态码：{statusCode}",
+  "@loginProcessFailed": {
+    "placeholders": {
+      "statusCode": {
+        "type": "String"
+      }
+    }
+  },
+  "noInfo": "没有信息",
+  "catcherDetected": "发生错误",
+  "catcherDescription": "详情如下",
+  "newHomepageHint": "本程序将开发一个新主页，目前先用猪图秀占位，玩得愉快",
+  "localCacheHint": "本地缓存获取于 {datetime}",
+  "@localCacheHint": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
+  },
+  "inappCacheHint": "程序内缓存获取于 {datetime}\n缓存退出程序后失效！",
+  "@inappCacheHint": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheReasonDefault": "当前显示缓存数据。",
+  "weekdayMonday": "周一",
+  "weekdayTuesday": "周二",
+  "weekdayWednesday": "周三",
+  "weekdayThursday": "周四",
+  "weekdayFriday": "周五",
+  "weekdaySaturday": "周六",
+  "weekdaySunday": "周日",
+  "monthJanuary": "一月",
+  "monthFebruary": "二月",
+  "monthMarch": "三月",
+  "monthApril": "四月",
+  "monthMay": "五月",
+  "monthJune": "六月",
+  "monthJuly": "七月",
+  "monthAugust": "八月",
+  "monthSeptember": "九月",
+  "monthOctober": "十月",
+  "monthNovember": "十一月",
+  "monthDecember": "十二月",
+  "classAttendanceTitle": "考勤查询",
+  "classAttendanceDetailTitle": "签到信息 - {courseName}",
+  "@classAttendanceDetailTitle": {
+    "placeholders": {
+      "courseName": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceNoData": "没有找到课程数据",
+  "classAttendanceNoAttendanceRecord": "没有签到记录",
+  "classAttendanceLongLoad": "考勤数据的加载时间约半分钟，请耐心等待",
+  "classAttendanceCourseStateUnknown": "未知",
+  "classAttendanceCourseStateIneligible": "取消",
+  "classAttendanceCourseStateEligible": "正常",
+  "classAttendanceCourseStateWarning": "危险",
+  "classAttendanceTableCourseName": "课程名称",
+  "classAttendanceTableStatus": "状态",
+  "classAttendanceTableAttendanceRate": "到课率",
+  "classAttendanceTableCheckIn": "签到",
+  "classAttendanceTableAbsence": "缺勤",
+  "classAttendanceTableRequired": "应签",
+  "classAttendanceTableLeave": "请假(事/病/公)",
+  "classAttendanceTableFilter": "筛选",
+  "classAttendanceTableFilterAll": "全部",
+  "classAttendanceTableShowingCount": "显示 {count}/{total} 门课程",
+  "@classAttendanceTableShowingCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardTime": "签到次数",
+  "classAttendanceCardTimeInfo": "{checkInCount} 已签 / {absenceCount} 缺勤 / {requiredCheckIn} 应签",
+  "@classAttendanceCardTimeInfo": {
+    "placeholders": {
+      "checkInCount": {
+        "type": "String"
+      },
+      "absenceCount": {
+        "type": "String"
+      },
+      "requiredCheckIn": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardNotAttend": "复活次数",
+  "classAttendanceCardNotAttendInfo": "{timeToHaveError} 次 / {totalTimes} 总课程",
+  "@classAttendanceCardNotAttendInfo": {
+    "placeholders": {
+      "timeToHaveError": {
+        "type": "String"
+      },
+      "totalTimes": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardNotAttendInfoError": "无法对应已有课程",
+  "classAttendanceCardLeave": "请假次数",
+  "classAttendanceCardLeaveInfo": "事假 {personalLeave} / 病假 {sickLeave} / 公假 {officialLeave}",
+  "@classAttendanceCardLeaveInfo": {
+    "placeholders": {
+      "personalLeave": {
+        "type": "String"
+      },
+      "sickLeave": {
+        "type": "String"
+      },
+      "officialLeave": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceCardStudy": "学习进度",
+  "classAttendanceCardStudyInfo": "任务点 {taskProgress} / 作业 {homeworkProgress} / 考试 {examProgress}",
+  "@classAttendanceCardStudyInfo": {
+    "placeholders": {
+      "taskProgress": {
+        "type": "String"
+      },
+      "homeworkProgress": {
+        "type": "String"
+      },
+      "examProgress": {
+        "type": "String"
+      }
+    }
+  },
+  "classAttendanceDetailCardCreatorName": "发起人",
+  "classAttendanceDetailCardStartTime": "开始时间",
+  "classAttendanceDetailCardSummitTime": "提交时间",
+  "classAttendanceSignTypeQrCode": "二维码签到",
+  "classAttendanceSignTypeGesture": "手势签到",
+  "classAttendanceSignTypePosition": "位置签到",
+  "classAttendanceSignTypeDefault": "普通签到",
+  "classAttendanceSignStatusAbsencenotparticipating": "缺勤未参与",
+  "classAttendanceSignStatusSigned": "已签",
+  "classAttendanceSignStatusSignedbyteacher": "代签",
+  "classAttendanceSignStatusPersonalleave2": "请假",
+  "classAttendanceSignStatusAbsence": "缺勤",
+  "classAttendanceSignStatusSickleave": "病假",
+  "classAttendanceSignStatusPersonalleave": "事假",
+  "classAttendanceSignStatusLate": "迟到",
+  "classAttendanceSignStatusLeaveearly": "早退",
+  "classAttendanceSignStatusSignexpiredy": "签到已过期",
+  "classAttendanceSignStatusPublicleave": "公假",
+  "classtablePartnerClasstableOverrideDialog": "目前有搭子课表数据，是否要覆盖？",
+  "classtablePartnerClasstableNoFile": "未发现导入文件",
+  "classtablePartnerClasstableNoPermission": "未获取存储权限，无法读取文件",
+  "classtablePartnerClasstableProblem": "好像导入文件有点问题:P",
+  "classtablePartnerClasstableSuccess": "导入成功",
+  "classtablePartnerClasstableShareDialogTitle": "请不要随意分享",
+  "classtablePartnerClasstableShareDialogContent": "导出文件包括你的个人信息，请不要随意跟别人分享，或者发在大群里。",
+  "classtablePartnerClasstableSaveDialogTitle": "保存日历文件到...",
+  "classtablePartnerClasstableSaveDialogSuccessMessage": "应该保存成功",
+  "classtablePartnerClasstableSaveDialogFailureMessage": "文件创建失败，保存取消",
+  "classtablePartnerClasstableDeleteDialogTitle": "确认对话框",
+  "classtablePartnerClasstableDeleteDialogMessage": "确定要清除搭子课表吗？",
+  "classtablePartnerClasstableDeleteDialogSuccessMessage": "删除搭子课表成功",
+  "classtablePartnerClasstableNameDialogTitle": "输入对方显示该课表的名称",
+  "classtablePartnerClasstableNameDialogHint": "在此输入，否则为 Sweetie",
+  "classtablePartnerClasstableNameDialogCancel": "我就这一个甜心",
+  "classtablePartnerClasstableNameDialogAccept": "提交",
+  "classtablePartnerClasstableNameDialogBlankInput": "输入空白!",
+  "classtablePageTitle": "我的日程表",
+  "classtablePartnerPageTitle": "{partner_name}的日程表",
+  "@classtablePartnerPageTitle": {
+    "placeholders": {
+      "partner_name": {
+        "type": "String"
+      }
+    }
+  },
+  "classtablePopupMenuNotArranged": "查看未安排课程信息",
+  "classtablePopupMenuClassChanged": "查看课程安排调整信息",
+  "classtablePopupMenuAddClass": "添加课程信息",
+  "classtablePopupMenuGenerateIcal": "生成日历文件",
+  "classtablePopupMenuGeneratePartnerFile": "生成共享课表文件",
+  "classtablePopupMenuImportPartnerFile": "导入共享课表文件",
+  "classtablePopupMenuDeletePartnerFile": "删除共享课表文件",
+  "classtablePopupMenuOutputToSystem": "导出到系统日历",
+  "classtablePopupMenuRefreshClasstable": "刷新日程表",
+  "classtablePopupMenuSwitchSemester": "切换课程表学期",
+  "classtablePopupMenuCurrentTimeSettings": "时间指示设置",
+  "classtablePopupMenuClassColorSettings": "课表样式设置",
+  "classtableVisualSettingsCurrentTimeSettingsTitle": "时间指示设置",
+  "classtableVisualSettingsClassColorSettingsTitle": "课表样式设置",
+  "classtableVisualSettingsCompletedStyleEnabled": "已结束课程样式区分",
+  "classtableVisualSettingsCurrentTimeSection": "时间指示",
+  "classtableVisualSettingsShowCurrentTimeIndicator": "显示当前时间指示线",
+  "classtableVisualSettingsShowCurrentTimeLabel": "显示迷你数字时钟",
+  "classtableVisualSettingsShowTodayColumnHighlight": "强调显示今天的纵列",
+  "classtableVisualSettingsUnfinishedSection": "课程样式",
+  "classtableVisualSettingsActiveBrightnessFactor": "亮度: {value}",
+  "@classtableVisualSettingsActiveBrightnessFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsActiveBorderAlpha": "边框透明度: {value}",
+  "@classtableVisualSettingsActiveBorderAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsActiveInnerAlpha": "底色透明度: {value}",
+  "@classtableVisualSettingsActiveInnerAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedSection": "已结束课程样式",
+  "classtableVisualSettingsCompletedSaturationFactor": "底色饱和度: {value}",
+  "@classtableVisualSettingsCompletedSaturationFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedBrightnessFactor": "亮度: {value}",
+  "@classtableVisualSettingsCompletedBrightnessFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedTextSaturationFactor": "文字饱和度: {value}",
+  "@classtableVisualSettingsCompletedTextSaturationFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedBorderAlpha": "边框透明度: {value}",
+  "@classtableVisualSettingsCompletedBorderAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableVisualSettingsCompletedInnerAlpha": "底色透明度: {value}",
+  "@classtableVisualSettingsCompletedInnerAlpha": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusSourceClassTable": "课表",
+  "classtableStatusSourceExam": "考试",
+  "classtableStatusSourcePhysicsExperiment": "物理实验",
+  "classtableStatusSourceOtherExperiment": "其他实验",
+  "classtableErrorDialogTitle": "错误信息概览",
+  "classtableStatusBannerLoading": "正在更新：{sources}",
+  "@classtableStatusBannerLoading": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusBannerCache": "当前使用缓存：{sources}",
+  "@classtableStatusBannerCache": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableStatusBannerErrorSummary": "以下信息加载失败：{sources}",
+  "@classtableStatusBannerErrorSummary": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateNoCourse": "{semester_code} 学期没有课程安排。",
+  "@classtableEmptyStateNoCourse": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExam": "{semester_code} 学期没有课程安排，但有考试安排。",
+  "@classtableEmptyStateWithExam": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExperiment": "{semester_code} 学期没有课程安排，但有实验安排。",
+  "@classtableEmptyStateWithExperiment": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyStateWithExamAndExperiment": "{semester_code} 学期没有课程安排，但有考试和实验安排。",
+  "@classtableEmptyStateWithExamAndExperiment": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyActionViewExam": "查看考试安排",
+  "classtableEmptyActionViewExperiment": "查看实验安排",
+  "classtableClassChangePageTitle": "课程调整",
+  "classtableClassChangePageEmptyMessage": "目前没有调课信息",
+  "classtableClassChangePageTeacherChange": "教师变更：从{previous_teacher}变为{new_teacher}",
+  "@classtableClassChangePageTeacherChange": {
+    "placeholders": {
+      "previous_teacher": {
+        "type": "String"
+      },
+      "new_teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageNoTeacherChange": "教师信息没有改变",
+  "classtableClassChangePage1": "一",
+  "classtableClassChangePage2": "二",
+  "classtableClassChangePage3": "三",
+  "classtableClassChangePage4": "四",
+  "classtableClassChangePage5": "五",
+  "classtableClassChangePage6": "六",
+  "classtableClassChangePage7": "日",
+  "classtableClassChangePageChangeClassMessage": "调课信息，从第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节 调整为第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}节，{newClassroom}教室上课",
+  "@classtableClassChangePageChangeClassMessage": {
+    "placeholders": {
+      "originalAffectedWeeks": {
+        "type": "String"
+      },
+      "weekChar_originalWeek": {
+        "type": "String"
+      },
+      "originalClassRangeStart": {
+        "type": "String"
+      },
+      "originalClassRangeEnd": {
+        "type": "String"
+      },
+      "newAffectedWeeksListStr": {
+        "type": "String"
+      },
+      "weekChar_newWeek": {
+        "type": "String"
+      },
+      "newClassRangeStart": {
+        "type": "String"
+      },
+      "newClassRangeStop": {
+        "type": "String"
+      },
+      "newClassroom": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePagePatchClassMessage": "补课信息，第{newAffectedWeeksListStr}周 星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}节， {newClassroom}补课",
+  "@classtableClassChangePagePatchClassMessage": {
+    "placeholders": {
+      "newAffectedWeeksListStr": {
+        "type": "String"
+      },
+      "weekChar_newWeek": {
+        "type": "String"
+      },
+      "newClassRangeStart": {
+        "type": "String"
+      },
+      "newClassRangeStop": {
+        "type": "String"
+      },
+      "newClassroom": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageStopClassMessage": "停课信息，第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节停课",
+  "@classtableClassChangePageStopClassMessage": {
+    "placeholders": {
+      "originalAffectedWeeks": {
+        "type": "String"
+      },
+      "weekChar_originalWeek": {
+        "type": "String"
+      },
+      "originalClassRangeStart": {
+        "type": "String"
+      },
+      "originalClassRangeEnd": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassChangePageClassInfo": "编号: {classCode} | {classNumber} 班\n安排变更：{classChange}{teacherChange}",
+  "@classtableClassChangePageClassInfo": {
+    "placeholders": {
+      "classCode": {
+        "type": "String"
+      },
+      "classNumber": {
+        "type": "String"
+      },
+      "classChange": {
+        "type": "String"
+      },
+      "teacherChange": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNotArrangedPageTitle": "没有时间安排的科目",
+  "classtableNotArrangedPageEmptyMessage": "目前全部课程均有时间安排",
+  "classtableNotArrangedPageContent": "编号: {classCode} | {classNumber} 班\n老师: {teacher}",
+  "@classtableNotArrangedPageContent": {
+    "placeholders": {
+      "classCode": {
+        "type": "String"
+      },
+      "classNumber": {
+        "type": "String"
+      },
+      "teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyClassMessage": "{semester_code} 学期没有课程",
+  "@classtableEmptyClassMessage": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableEmptyClassWithExam": "{semester_code} 学期没有课程但是有考试安排！\n请回到主页后下滑点击”考试安排“按钮进入考试安排页面",
+  "@classtableEmptyClassWithExam": {
+    "placeholders": {
+      "semester_code": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableWeekTitle": "第{week}周",
+  "@classtableWeekTitle": {
+    "placeholders": {
+      "week": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNoonBreak": "午休",
+  "classtableSupperBreak": "晚休",
+  "classtableMonth": "{month}\n月",
+  "@classtableMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableNoClass": "本周暂无安排，请不要在床上过于慵懒",
+  "classtableClassCardTitle": "日程信息",
+  "classtableClassCardUnknownClassroom": "未知教室",
+  "classtableClassCardRemainsHint": "还有{remain_count}个日程",
+  "@classtableClassCardRemainsHint": {
+    "placeholders": {
+      "remain_count": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassAddAddClassTitle": "添加课程",
+  "classtableClassAddChangeClassTitle": "修改课程",
+  "classtableClassAddClassNameEmptyMessage": "必须输入课程名",
+  "classtableClassAddWrongTimeMessage": "输入的时间不对",
+  "classtableClassAddSaveButton": "保存",
+  "classtableClassAddInputClassnameHint": "课程名字(必填)",
+  "classtableClassAddInputTeacherHint": "老师姓名(选填)",
+  "classtableClassAddInputClassroomHint": "教室位置(选填)",
+  "classtableClassAddInputWeekHint": "选择上课周次",
+  "classtableClassAddInputTimeHint": "选择上课时间",
+  "classtableClassAddInputTimeWeekdayHint": "上课周次",
+  "classtableClassAddInputStartTimeHint": "上课时间",
+  "classtableClassAddInputEndTimeHint": "下课时间",
+  "classtableClassAddWheelChooseHint": "第 {index} 节",
+  "@classtableClassAddWheelChooseHint": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableClassAddChooseAtLeastOne": "请至少选择一个上课日期和时间",
+  "classtableClassAddRepeatWeekly": "按周重复",
+  "classtableClassAddFreeTime": "自定义日期",
+  "classtableClassAddDateSelectorFreeRule": "时间必须在 08:30-21:25 之间",
+  "classtableClassAddDateSelectorFreeRule2": "下课时间必须晚于上课时间",
+  "classtableClassAddDateSelectorFreeClassStartTime": "上课时间",
+  "classtableClassAddDateSelectorFreeClassEndTime": "下课时间",
+  "classtableClassAddDateSelectorFreeEditClassTime": "编辑课程时间",
+  "classtableClassAddDateSelectorFreeChooseClassTime": "选择课程时间",
+  "classtableCourseDetailCardClassNumberString": "{number} 班",
+  "@classtableCourseDetailCardClassNumberString": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableCourseDetailCardUnknownTeacher": "老师未定",
+  "classtableCourseDetailCardUnknownPlace": "地点未定",
+  "classtableCourseDetailCardClassPeriod": "{start}-{stop}节",
+  "@classtableCourseDetailCardClassPeriod": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableCourseDetailCardEdit": "编辑",
+  "classtableCourseDetailCardDelete": "删除",
+  "classtableCourseDetailCardDeleteSingle": "删除本次",
+  "classtableCourseDetailCardDeleteAll": "删除全部",
+  "classtableCourseDetailCardDeleteContent": "所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！",
+  "classtableCourseDetailCardDeleteContentSingle": "关于这个课的信息只有这个时间段都会被删除，其他的时间段会被保留。",
+  "classtableCourseDetailCardDeleteTitle": "是否删除课程信息？",
+  "classtableOutputToSystemSuccess": "成功导出到系统日历",
+  "classtableOutputToSystemFailure": "导出到系统日历过程中发生了问题:P",
+  "classtableOutputToSystemRequestAllTitle": "权限需求说明",
+  "classtableOutputToSystemRequestAll": "因导出插件限制，用户必须同时授予本软件读取日历和写入日历权限，才能正常导出日程。不过，本软件不会读取日历。",
+  "classtableRefreshClasstableReady": "准备刷新日程信息",
+  "classtableRefreshClasstableSuccess": "成功刷新日程信息",
+  "classtableCacheHintPasswordWrong": "统一认证密码错误或已失效。",
+  "classtableCacheHintLoginFailed": "登录课表服务失败。",
+  "classtableCacheHintNetworkFailed": "课表网络请求失败。",
+  "classtableCacheHintUnknownError": "在线获取课表失败。详细错误请查看日志。",
+  "classtableSemesterSwitcherChooseSemester": "选择学期",
+  "classtableSemesterSwitcherFirstAcademicYear": "第一学年",
+  "classtableSemesterSwitcherSecondAcademicYear": "第二学年",
+  "classtableSemesterSwitcherFetchRemoteSemester": "获取当前学期",
+  "classtableSemesterSwitcherFetchingRemoteSemester": "正在获取...",
+  "classtableSemesterSwitcherYear": "{year}年",
+  "@classtableSemesterSwitcherYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "classtableSemesterSwitcherOnlyFutureHint": "本程序仅允许查看未来学期的课程安排。",
+  "clubPromotionTypeTech": "技术",
+  "clubPromotionTypeAcg": "晒你系",
+  "clubPromotionTypeUnion": "官方",
+  "clubPromotionTypeProfit": "商业",
+  "clubPromotionTypeSport": "体育",
+  "clubPromotionTypeArt": "文化",
+  "clubPromotionTypeUnknown": "未知",
+  "clubPromotionTypeGame": "游戏",
+  "clubPromotionTypeAll": "所有",
+  "clubPromotionWrongParam": "错误参数",
+  "clubPromotionNoGroupInfo": "未传入社团信息",
+  "clubPromotionLoading": "正在加载",
+  "clubPromotionErrorOutside": "在外围遇到错误",
+  "clubPromotionError": "遇到错误",
+  "clubPromotionQqCopied": "QQ号已经复制到剪贴板",
+  "clubPromotionNoLink": "未提供入群链接",
+  "clubPromotionLoadingProblem": "加载遇到错误",
+  "clubPromotionPicturePreview": "图片预览",
+  "electricityTitle": "水电信息",
+  "electricityPowerTitle": "电量信息",
+  "electricityCacheHintLoginFailed": "登录电费服务失败，正在显示缓存数据。",
+  "electricityCacheHintNetworkFailed": "电费服务网络请求失败，正在显示缓存数据。",
+  "electricityCacheHintUnknownError": "在线获取电费失败，正在显示缓存数据。详细错误请查看日志。",
+  "electricityCacheNotice": "获取时间",
+  "electricityAccount": "电费账号",
+  "electricityRemainPower": "电量额度",
+  "electricityOweInfo": "欠费信息",
+  "electricityHistory": "历史记录",
+  "electricityDailyUsage": "平均每日用量",
+  "electricityNotEnoughData": "数据量不足以用于渲染",
+  "electricityInfo": "新能源系统获取仅校园网内访问，获取过程中有问题请向开发者报告。\n历史记录依旧为本地记录，平均日用量基于抄表记录计算。",
+  "electricityFetchingHint": "正在获取最新电费信息",
+  "electricityFetchError": "电费信息获取失败，请重试。",
+  "electricityDate": "日期",
+  "electricityPower": "该日0点电量",
+  "electricityUpdate": "刷新信息",
+  "electricityWaterUsageFetchDate": "获取时间",
+  "electricityWaterUsageReadBefore": "上次读数",
+  "electricityWaterUsageReadNow": "本次读数",
+  "electricityWaterUsage": "洗澡水用量",
+  "electricityWaterTitle": "水费信息",
+  "electricityWaterLoading": "正在加载水费信息",
+  "electricityWaterUnavailable": "水费信息暂不可用，请在电费卡片重试。",
+  "electricityWaterEmpty": "暂无水费信息",
+  "electricityNotSchoolNetwork": "非校园网访问",
+  "electricityAirconTitle": "空调用电",
+  "electricityAirconImei": "空调 IMEI",
+  "electricityAirconAmount": "平台用电量",
+  "electricityAirconUpdateTime": "更新时间",
+  "electricityAirconWaiting": "等待获取空调用电信息",
+  "electricityAirconError": "空调用电获取失败",
+  "electricityAirconRetry": "重试",
+  "electricityAirconImeiMissing": "尚未添加空调 IMEI，添加后即可查看空调用电信息。",
+  "electricityAirconAddImei": "添加空调 IMEI",
+  "electricityAirconCacheNotice": "当前显示空调缓存数据，缓存时间：{time}",
+  "@electricityAirconCacheNotice": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomTitle": "空闲教室",
+  "emptyClassroomDate": "日期 {date}",
+  "@emptyClassroomDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomBuilding": "教学楼 {building}",
+  "@emptyClassroomBuilding": {
+    "placeholders": {
+      "building": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyClassroomSearchHint": "教室名称或者教室代码",
+  "emptyClassroomClassroom": "教室",
+  "emptyClassroomEmpty": "空闲",
+  "emptyClassroomOccupied": "占用",
+  "examTitle": "考试安排",
+  "examCacheHint": "已显示缓存考试安排信息",
+  "examCacheHintPasswordWrong": "统一认证密码错误或已失效",
+  "examCacheHintLoginFailed": "登录考试服务失败",
+  "examCacheHintNetworkFailed": "网络连接失败",
+  "examCacheHintUnknownError": "在线获取考试安排失败，详细错误请查看日志",
+  "examFetchingHint": "正在获取最新考试安排",
+  "examNotFinished": "未完成考试",
+  "examAllFinished": "所有考试全部完成",
+  "examUnableToExam": "无法完成考试",
+  "examFinished": "已完成考试",
+  "examNoneFinished": "一门还没考呢",
+  "examNoExamArrangement": "目前没有考试安排",
+  "examNoArrangementTitle": "目前无安排考试的科目",
+  "examNoArrangementAllArranged": "目前所有科目均已安排考试",
+  "examNoArrangementSubtitle": "编号: {id}",
+  "@examNoArrangementSubtitle": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentTitle": "实验信息",
+  "experimentOngoing": "正在进行实验",
+  "experimentNotFinished": "未完成实验",
+  "experimentAllFinished": "所有实验全部完成",
+  "experimentFinished": "已完成实验",
+  "experimentScoreInfo": "{score} (推测)",
+  "@experimentScoreInfo": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentScoreSum": "目前分数总和：{sum}",
+  "@experimentScoreSum": {
+    "placeholders": {
+      "sum": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentNoneFinished": "目前没有已经完成的实验",
+  "experimentNotProvided": "未提供",
+  "experimentErrorPhysics": "获取物理实验信息时发生错误：{info}",
+  "@experimentErrorPhysics": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentErrorOther": "获取其他实验信息时发生错误：{info}",
+  "@experimentErrorOther": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentCacheHint": "目前加载缓存状况：{info}",
+  "@experimentCacheHint": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentPhysicsCacheHintMissingPassword": "未填写物理实验密码。",
+  "experimentPhysicsCacheHintLoginFailed": "物理实验登录失败。",
+  "experimentPhysicsCacheHintNotSchoolNetwork": "当前不在校园网环境。",
+  "experimentPhysicsCacheHintNetworkFailed": "物理实验网络请求失败。",
+  "experimentPhysicsCacheHintUnknownError": "在线获取物理实验失败。详细错误请查看日志。",
+  "experimentOtherCacheHintLoginFailed": "其他实验登录失败。",
+  "experimentOtherCacheHintNotSchoolNetwork": "当前不在校园网环境。",
+  "experimentOtherCacheHintNetworkFailed": "其他实验网络请求失败。",
+  "experimentOtherCacheHintUnknownError": "在线获取其他实验失败。详细错误请查看日志。",
+  "experimentPhysicsExperiment": "物理实验",
+  "experimentOtherExperiment": "其他实验",
+  "experimentTapForScore": "成绩未识别出来",
+  "experimentYourScore": "您的分数：",
+  "experimentPredictScore": "推测分数：{score}",
+  "@experimentPredictScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "experimentSendMail": "发送邮件",
+  "experimentFetchingHint": "您现在看到的是缓存数据。正在后台获取更新数据中...",
+  "experimentFetchingHintBoth": "物理实验和其他实验正在加载",
+  "experimentFetchingHintPhysics": "物理实验正在加载",
+  "experimentFetchingHintOther": "其他实验正在加载",
+  "experimentFetchingHintPhysicsWithOtherFailed": "物理实验正在加载，其他实验加载失败",
+  "experimentFetchingHintOtherWithPhysicsFailed": "其他实验正在加载，物理实验加载失败",
+  "experimentScoreHint0": "您可点击卡片上的成绩字段来查看原始成绩数据",
+  "experimentScoreHint1": "您的分数不在 XDYou 分数识别库中，因此它没有被正常识别。",
+  "experimentScoreHint2": "如果您希望为 XDYou 的发展贡献一份自己的力量，您可以点击发送邮件按钮，我们将您的分数加入识别库！",
+  "experimentScoreHint3": "目前识别库数据不全，请您务必核对一下。",
+  "homepageTitle": "校园信息查询",
+  "homepageLoading": "正在加载",
+  "homepageLoaded": "加载成功",
+  "homepageLoadError": "加载错误",
+  "homepageOnHoliday": "当前在假期中",
+  "homepageOnWeekday": "当前为第 {current} 周",
+  "@homepageOnWeekday": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLoadingMessage": "请稍候，正在刷新信息",
+  "homepagePostgraduateNotice": "研究生功能已经激活！",
+  "homepageLinuxNotice": "Linux 版本正在测试，欢迎反馈！",
+  "homepageEditMode": "编辑布局",
+  "homepageEditDone": "完成",
+  "homepageEditReset": "恢复默认布局",
+  "homepageEditHint": "日程信息和软件升级信息不允许编辑",
+  "homepageManageHidden": "管理隐藏卡片",
+  "homepageHiddenTitle": "已隐藏的卡片",
+  "homepageHiddenLabel": "已隐藏",
+  "homepageHideEmpty": "没有隐藏的卡片",
+  "homepageHomepage": "校园信息",
+  "homepageRuisi": "睿思论坛",
+  "homepageClub": "社团推荐",
+  "homepageDashboard": "猪图鉴赏",
+  "homepagePlanet": "博客星球",
+  "homepageSetting": "设置",
+  "homepageInputPartnerDataRouteNotExist": "导入路径不存在:P",
+  "homepageInputPartnerDataFailedGetFile": "导入文件失败",
+  "homepageInputPartnerDataFailedImport": "好像导入文件有点问题:P",
+  "homepageInputPartnerDataSuccessMessage": "导入成功，如果打开了课表页面请重新打开",
+  "homepageInputPartnerDataNotLoaded": "还没加载课程表，等会再来吧……",
+  "homepageInputPartnerDataConfirmContent": "目前有搭子课表数据，是否要覆盖？",
+  "homepageLoginMessage": "登录中，暂时显示缓存数据",
+  "homepageSuccessfulLoginMessage": "登录成功",
+  "homepagePasswordWrongTitle": "用户名或密码有误",
+  "homepagePasswordWrongContent": "是否重启应用后手动登录？",
+  "homepagePasswordWrongDenial": "否，进入离线模式",
+  "homepageOfflineModeTitle": "统一认证服务离线模式开启",
+  "homepageOfflineModeContent": "无法连接到统一认证服务服务器，所有和其相关的服务暂时不可用。\n成绩查询，考试信息查询，欠费查询，校园卡查询关闭。课表显示缓存数据。其他功能暂不受影响。\n如有不便，敬请谅解。",
+  "homepageOfflineMode": "脱机模式下，一站式相关功能全部禁止使用",
+  "homepageNoticeCardEmptyNotice": "目前没有获取应用公告，请刷新",
+  "homepageNoticeCardNoNoticeAvaliable": "没有获取应用公告",
+  "homepageNoticeCardNoticeListTitle": "应用信息",
+  "homepageNoticeCardOpenUrl": "访问该链接",
+  "homepageNoticeCardNoticePageTitle": "通知列表",
+  "homepageClassTableCardTitle": "课程表",
+  "homepageClassTableCardToday": "今日还有 {remain} 个日程",
+  "@homepageClassTableCardToday": {
+    "placeholders": {
+      "remain": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardTodayFinished": "今日安排完成",
+  "homepageClassTableCardTomorrow": "明日有 {remain} 个安排",
+  "@homepageClassTableCardTomorrow": {
+    "placeholders": {
+      "remain": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardTomorrowNone": "明日没有安排",
+  "homepageClassTableCardWeekInfo": "第 {weekinfo} 周",
+  "@homepageClassTableCardWeekInfo": {
+    "placeholders": {
+      "weekinfo": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardOnHoliday": "假期中",
+  "homepageClassTableCardErrorMessage": "遇到错误：{error}",
+  "@homepageClassTableCardErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardFetchingMessage": "正在获取课表",
+  "homepageClassTableCardErrorInfotext": "遇到错误",
+  "homepageClassTableCardFetchingInfotext": "正在加载",
+  "homepageClassTableCardNoArrangementInfotext": "暂无日程",
+  "homepageClassTableCardScheduleFetchingMessage": "日程正在加载，请稍后查看",
+  "homepageClassTableCardScheduleErrorMessage": "日程加载失败，请稍后重试",
+  "homepageClassTableCardScheduleFetchingInfotext": "正在加载日程",
+  "homepageClassTableCardScheduleErrorInfotext": "日程加载失败",
+  "homepageClassTableCardScheduleNoneInfotext": "暂无日程",
+  "homepageClassTableCardUpdatingInfotext": "正在更新",
+  "homepageClassTableCardAllLoadingInfotext": "全部加载中",
+  "homepageClassTableCardPartialLoadingInfotext": "部分加载中",
+  "homepageClassTableCardPartialErrorInfotext": "部分数据加载失败",
+  "homepageClassTableCardFailedChip": "{source}加载失败",
+  "@homepageClassTableCardFailedChip": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClassTableCardFailedSourceClassInfo": "课程信息",
+  "homepageClassTableCardFailedSourceExamInfo": "考试信息",
+  "homepageClassTableCardFailedSourcePhysicsExperiment": "物理实验",
+  "homepageClassTableCardFailedSourceOtherExperiment": "其他实验",
+  "homepageClassTableCardUnknownPlace": "未知位置",
+  "homepageClassTableCardSeat": "座位号{seatnum}",
+  "@homepageClassTableCardSeat": {
+    "placeholders": {
+      "seatnum": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageElectricityCardTitle": "水电信息",
+  "homepageElectricityCardCurrentElectricity": "余额 {amount} 度",
+  "@homepageElectricityCardCurrentElectricity": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageElectricityCardCacheNotice": "最后一次读表：{date}",
+  "@homepageElectricityCardCacheNotice": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardTitle": "图书借阅",
+  "homepageLibraryCardCurrentBorrow": "借书 {count} 本",
+  "@homepageLibraryCardCurrentBorrow": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardErrorOccured": "获取借书信息发生错误",
+  "homepageLibraryCardFetching": "正在获取借书信息",
+  "homepageLibraryCardNoReturn": "目前没有待归还书籍",
+  "homepageLibraryCardNeedReturn": "待归还 {dued} 本书籍",
+  "@homepageLibraryCardNeedReturn": {
+    "placeholders": {
+      "dued": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageLibraryCardNoInfo": "目前无法获取信息",
+  "homepageLibraryCardFetchingInfo": "正在查询信息中",
+  "homepageSchoolCardInfoCardErrorToast": "遇到错误，请联系开发者",
+  "homepageSchoolCardInfoCardFetchingToast": "正在获取信息，请稍后再来看",
+  "homepageSchoolCardInfoCardBill": "流水",
+  "homepageSchoolCardInfoCardBalance": "卡里 {amount} 元",
+  "@homepageSchoolCardInfoCardBalance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageSchoolCardInfoCardErrorOccured": "获取校园卡信息发生错误",
+  "homepageSchoolCardInfoCardFetching": "正在获取校园卡信息",
+  "homepageSchoolCardInfoCardBottomTextSuccess": "查询一卡通流水",
+  "homepageSchoolCardInfoCardNoInfo": "目前无法获取信息",
+  "homepageSchoolCardInfoCardFetchingInfo": "正在查询信息中",
+  "homepageToolboxClassAttendance": "考勤查询",
+  "homepageToolboxCreative": "双创竞赛",
+  "homepageToolboxEmptyClassroom": "空闲教室",
+  "homepageToolboxExam": "考试安排",
+  "homepageToolboxExperiment": "实验信息",
+  "homepageToolboxScore": "成绩查询",
+  "homepageToolboxSport": "体育信息",
+  "homepageToolboxDormWater": "宿舍水机",
+  "homepageToolboxSchoolnet": "网络查询",
+  "homepageToolboxToolbox": "其他功能",
+  "homepageToolboxScoreCannotReach": "脱机状态且无缓存成绩数据，无法访问",
+  "homepageToolboxExamFetching": "请稍候，正在获取考试信息",
+  "homepageToolboxExamError": "遇到错误，请联系开发者",
+  "homepageSchoolNetTitle": "已用 {usage}",
+  "@homepageSchoolNetTitle": {
+    "placeholders": {
+      "usage": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageSchoolNetNoPassword": "无校园网密码，点击设置",
+  "homepageSchoolNetFailed": "获取校园网流量信息失败",
+  "homepageSchoolNetFetching": "正在获取校园网流量信息",
+  "homepageSchoolNetRemaining": "下次结算 {remaining}",
+  "@homepageSchoolNetRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "homepageClubPromotionFailed": "社团信息获取失败",
+  "homepageClubPromotionFetching": "社团信息清单正在加载",
+  "dormWaterTitle": "宿舍水机",
+  "dormWaterPhone": "手机号",
+  "dormWaterImageCode": "图形验证码",
+  "dormWaterSmsCode": "短信验证码",
+  "dormWaterSendSms": "发送短信码",
+  "dormWaterLogin": "登录",
+  "dormWaterLogout": "退出",
+  "dormWaterRefreshCaptcha": "刷新验证码",
+  "dormWaterLoadingCaptcha": "加载中...",
+  "dormWaterCaptchaError": "验证码加载失败",
+  "dormWaterPhoneRequired": "请输入手机号",
+  "dormWaterImageCodeRequired": "请输入图形验证码",
+  "dormWaterSmsSent": "短信已发送",
+  "dormWaterSmsFailed": "发送短信失败",
+  "dormWaterSmsCodeRequired": "请输入短信验证码",
+  "dormWaterLoginSuccess": "登录成功",
+  "dormWaterLoginFailed": "登录失败",
+  "dormWaterLogoutSuccess": "退出成功",
+  "dormWaterDevices": "设备列表",
+  "dormWaterLoadingDevices": "加载设备中...",
+  "dormWaterNoDevices": "暂无设备",
+  "dormWaterSelectDevice": "选择设备",
+  "dormWaterFetchDevicesFailed": "获取设备列表失败",
+  "dormWaterRetryLoadDevices": "重试加载",
+  "dormWaterStartWater": "开始接水",
+  "dormWaterEndWater": "结束接水",
+  "dormWaterWaterDispensing": "接水中",
+  "dormWaterWaterStatus": "接水状态",
+  "dormWaterStartWaterSuccess": "开始接水成功",
+  "dormWaterEndWaterSuccess": "结束接水成功",
+  "dormWaterStartWaterFailed": "开始接水失败",
+  "dormWaterEndWaterFailed": "结束接水失败",
+  "dormWaterDeviceStatusChecking": "检查设备状态中...",
+  "dormWaterDeviceStatusReady": "设备已就绪",
+  "dormWaterScanQrCode": "扫描二维码",
+  "dormWaterDeviceId": "设备 ID",
+  "dormWaterAddDeviceFailed": "添加设备失败",
+  "dormWaterDeviceRemovedFromFavorites": "已从收藏中移除",
+  "dormWaterRemoveFromFavoritesFailed": "移除收藏失败",
+  "libraryTitle": "图书馆信息",
+  "libraryBorrowStateTitle": "借书状态",
+  "librarySearchBookTitle": "查询藏书",
+  "librarySearchFieldTitle": "搜索字段",
+  "librarySearchFieldKeywordOption": "任意词",
+  "librarySearchFieldTitleOption": "标题",
+  "librarySearchFieldAuthorOption": "责任者",
+  "librarySearchFieldIsbnOption": "ISBN",
+  "librarySearchFieldBarcodeOption": "条码号",
+  "librarySearchFieldCallnoOption": "索书号",
+  "libraryNotProvided": "未提供相关信息",
+  "libraryAuthor": "作者 ",
+  "libraryPublishHouse": "出版社 ",
+  "libraryCallNumber": "索书号 ",
+  "libraryPublishDate": "发行时间 ",
+  "libraryIsbn": "ISBN",
+  "libraryArrangementCode": "编排号码 ",
+  "libraryAvaliableBorrow": "可借",
+  "libraryStorage": "馆藏",
+  "libraryOnShelve": "在架",
+  "libraryBookCode": "书籍编号：{barCode}",
+  "@libraryBookCode": {
+    "placeholders": {
+      "barCode": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryDueDate": " 到期",
+  "libraryBorrowStr": " 借阅",
+  "libraryAfterDueDate": " 天前到期",
+  "libraryBeforeDueDate": " 天后",
+  "libraryCanBeRenewable": "续借",
+  "libraryCannotBeRenewable": "不可续借",
+  "libraryRenewing": "正在续借",
+  "libraryEmptyBorrowList": "目前没有查询到在借图书\n不借书就要变成上面的小呆瓜咯",
+  "libraryBorrowListInfo": "在借 {borrow} 本，其中已过期 {dued} 本",
+  "@libraryBorrowListInfo": {
+    "placeholders": {
+      "borrow": {
+        "type": "String"
+      },
+      "dued": {
+        "type": "String"
+      }
+    }
+  },
+  "librarySearchHere": "在此搜索",
+  "libraryNormalSearch": "普通搜索",
+  "libraryAdvancedSearch": "高级搜索",
+  "librarySearch": "搜索",
+  "libraryMatchMode": "匹配方式",
+  "libraryMatchExact": "精确匹配",
+  "libraryMatchFuzzy": "模糊匹配",
+  "libraryMatchPrefix": "前方一致",
+  "libraryDocumentType": "文献类型",
+  "libraryDocumentTypeAll": "全部",
+  "libraryDocumentTypeBook": "图书",
+  "libraryOnlyOnShelf": "仅看在架",
+  "libraryPublishYearBegin": "出版年起",
+  "libraryPublishYearEnd": "出版年止",
+  "libraryBookDetail": "书籍详细信息",
+  "libraryNoResult": "没有结果，请修改搜索参数或者开始你的搜索",
+  "libraryCardTitle": "图书馆当前状况",
+  "libraryCardFetching": "正在获取图书馆信息",
+  "libraryCardNorthernLibrary": "北校区状况",
+  "libraryCardSouthernLibrary": "南校区状况",
+  "libraryCardPeople": "在馆 {people} 人",
+  "@libraryCardPeople": {
+    "placeholders": {
+      "people": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryCardSeat": "空位 {seat} 个",
+  "@libraryCardSeat": {
+    "placeholders": {
+      "seat": {
+        "type": "String"
+      }
+    }
+  },
+  "loginIdentityNumber": "学号",
+  "loginPassword": "一站式登录密码",
+  "loginLogin": "登录",
+  "loginIncorrectPasswordPattern": "用户名或密码不符合要求，学号必须 11 位且密码非空",
+  "loginOnLoginProgress": "正在登录学校一站式",
+  "loginCompleteLogin": "登录成功",
+  "loginFailedLoginCannotConnectToServer": "无法连接到服务器",
+  "loginFailedLoginWithCode": "请求失败，响应状态码：{code}",
+  "@loginFailedLoginWithCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "loginFailedLoginWithMessage": "请求失败，报错信息：{message}",
+  "@loginFailedLoginWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "loginFailedLoginOther": "未知错误，请联系开发者",
+  "loginClearCache": "清除登录缓存",
+  "loginCompleteClearCache": "清理缓存成功",
+  "loginSeeInspector": "查看网络交互",
+  "loginCaptchaWindowTitle": "请输入验证码",
+  "loginCaptchaWindowHint": "输入验证码",
+  "loginCaptchaWindowMessageOnEmpty": "请输入验证码",
+  "loginCaptchaWindowRefreshFailed": "刷新验证码失败: {error}",
+  "@loginCaptchaWindowRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "loginSliderTitle": "服务器认证服务",
+  "schoolNetTitle": "校园网使用详情",
+  "schoolNetIdsAccountNetTitle": "当前用户",
+  "schoolNetIdsAccountNetNotice": "这是登录到 PDA 账户的校园网信息\n注意: 流量计费采用GB单位（1000进制）\n如果没有看到信息，请访问 zfw.xidian.edu.cn 重置网络密码",
+  "schoolNetIdsAccountNetOverview": "账户概览",
+  "schoolNetIdsAccountNetAccount": "账号",
+  "schoolNetIdsAccountNetUsed": "已使用流量",
+  "schoolNetIdsAccountNetRemain": "余额",
+  "schoolNetIdsAccountNetCurrentOnline": "在线设备（{length}台）",
+  "@schoolNetIdsAccountNetCurrentOnline": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetIdsAccountNetNoDeviceOnline": "当前没有在线设备",
+  "schoolNetCurrentLoginNetTitle": "正在使用",
+  "schoolNetCurrentLoginNetNotice": "这是您正在使用中校园网的信息，可能和您登录 PDA 的信息不一致\n注意: 流量计费采用GB单位（1000进制）",
+  "schoolNetCurrentLoginNetOverview": "账户概览",
+  "schoolNetCurrentLoginNetAccount": "账号",
+  "schoolNetCurrentLoginNetPlanType": "套餐类型",
+  "schoolNetCurrentLoginNetRemain": "余额",
+  "schoolNetCurrentLoginNetUsageSituation": "流量使用情况",
+  "schoolNetCurrentLoginNetUsedPercent": "已使用 {percent}%",
+  "@schoolNetCurrentLoginNetUsedPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetCurrentLoginNetUsed": "已使用流量",
+  "schoolNetCurrentLoginNetRemainCount": "剩余流量",
+  "schoolNetCurrentLoginNetTotal": "总流量",
+  "schoolNetCurrentLoginNetNonSchoolnet": "非校园网",
+  "schoolNetDeviceListIp": "在线设备IP",
+  "schoolNetDeviceListTime": "上线时间",
+  "schoolNetDeviceListRemain": "流量用量",
+  "schoolNetFetching": "正在获取校园网信息",
+  "schoolNetEmptyPassword": "您忘记输入账号密码了",
+  "schoolNetNotInitalized": "疑似查询后端尚未开放查询",
+  "schoolNetCaptchaFailed": "验证码识别失败",
+  "schoolNetCaptchaEmpty": "验证码为空",
+  "schoolNetCacheHintCaptchaFailed": "验证码识别失败，请重试。",
+  "schoolNetCacheHintRequestFailed": "校园网请求失败，请稍后重试。",
+  "schoolNetWrongPassword": "密码错误",
+  "schoolNetErrorFetch": "获取失败：{msg}",
+  "@schoolNetErrorFetch": {
+    "placeholders": {
+      "msg": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetErrorOther": "其他错误：{msg}",
+  "@schoolNetErrorOther": {
+    "placeholders": {
+      "msg": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolNetRefresh": "刷新",
+  "schoolCardWindowTitle": "校园卡流水信息",
+  "schoolCardWindowIncome": "收入 {income}",
+  "@schoolCardWindowIncome": {
+    "placeholders": {
+      "income": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowExpense": "支出 {expense}",
+  "@schoolCardWindowExpense": {
+    "placeholders": {
+      "expense": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowSelectRange": "选择日期：从 {startDay} 到 {endDay}",
+  "@schoolCardWindowSelectRange": {
+    "placeholders": {
+      "startDay": {
+        "type": "String"
+      },
+      "endDay": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowStoreName": "商户名称",
+  "schoolCardWindowBalance": "金额",
+  "schoolCardWindowTimeWithSum": "时间(共{sum}元)",
+  "@schoolCardWindowTimeWithSum": {
+    "placeholders": {
+      "sum": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowNoRecord": "未查询到记录，请修改日期后重试",
+  "schoolCardWindowQrCode": "支付码",
+  "schoolCardWindowQrCodeError": "二维码获取失败：{info}",
+  "@schoolCardWindowQrCodeError": {
+    "placeholders": {
+      "info": {
+        "type": "String"
+      }
+    }
+  },
+  "schoolCardWindowReload": "重新加载",
+  "scoreCacheMessage": "已显示缓存成绩信息",
+  "scoreSummary": "目前选中科目 {chosen}  总计学分 {credit}\n均分 {avg} GPA {gpa}",
+  "@scoreSummary": {
+    "placeholders": {
+      "chosen": {
+        "type": "String"
+      },
+      "credit": {
+        "type": "String"
+      },
+      "avg": {
+        "type": "String"
+      },
+      "gpa": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreAllPassed": "所有科目均已通过",
+  "scoreCacheHintPasswordWrong": "统一认证密码错误或已失效",
+  "scoreCacheHintLoginFailed": "登录考试服务失败",
+  "scoreCacheHintNetworkFailed": "网络连接失败",
+  "scoreCacheHintUnknownError": "在线获取成绩安排失败，详细错误请查看日志",
+  "scoreFetchingHint": "正在获取最新成绩信息，请不要退出页面",
+  "scoreAllSemester": "所有学期",
+  "scoreChosenSemester": "学期 {chosen}",
+  "@scoreChosenSemester": {
+    "placeholders": {
+      "chosen": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreAllType": "所有类型",
+  "scoreChosenType": "类型 {type}",
+  "@scoreChosenType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreNone": "暂无",
+  "scoreScoreChoiceTitle": "成绩单",
+  "scoreScoreChoiceSearchHint": "搜索成绩记录",
+  "scoreScoreChoiceEmptyList": "没有选择该学期的课程计入均分计算",
+  "scoreScoreChoiceSumDialogTitle": "小总结",
+  "scoreScoreChoiceSumDialogContent": "所有科目的GPA：{gpa_all}\n所有科目的均分：{avg_all}\n所有科目的学分：{credit_all}\n未通过科目：{unpassed}\n公共选修课：{not_core_type}\n本程序提供的数据仅供参考，开发者对其准确性不负责",
+  "@scoreScoreChoiceSumDialogContent": {
+    "placeholders": {
+      "gpa_all": {
+        "type": "String"
+      },
+      "avg_all": {
+        "type": "String"
+      },
+      "credit_all": {
+        "type": "String"
+      },
+      "unpassed": {
+        "type": "String"
+      },
+      "not_core_type": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreComposeCardNoDetail": "未提供详情信息",
+  "scoreScoreComposeCardFetching": "正在获取",
+  "scoreScoreComposeCardCredit": "学分",
+  "scoreScoreComposeCardGpa": "GPA",
+  "scoreScoreComposeCardScore": "成绩",
+  "scoreScoreInfoCardTitle": "成绩详情",
+  "scoreScoreInfoCardOriginalCourse": "初修",
+  "scoreScoreInfoCardFailed": "[挂] ",
+  "scoreScoreInfoCardCredit": "学分 {credit}",
+  "@scoreScoreInfoCardCredit": {
+    "placeholders": {
+      "credit": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreInfoCardGpa": "GPA {gpa}",
+  "@scoreScoreInfoCardGpa": {
+    "placeholders": {
+      "gpa": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScoreInfoCardScore": "成绩 {score}",
+  "@scoreScoreInfoCardScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreScorePageTitle": "成绩查询",
+  "scoreScorePageSearchHint": "搜索成绩记录",
+  "scoreScorePageNoRecord": "未筛查到合请求的记录",
+  "scoreScorePageSelectAll": "全选",
+  "scoreScorePageSelectNothing": "全不选",
+  "scoreScorePageResetSelect": "重置选择",
+  "scoreScorePageSummary": "总结",
+  "scoreScorePageCet4": "国家英语四级",
+  "scoreScorePageCet6": "国家英语六级",
+  "settingAcknowledgement": "Made With Love From {developers} People",
+  "@settingAcknowledgement": {
+    "placeholders": {
+      "developers": {
+        "type": "String"
+      }
+    }
+  },
+  "settingAbout": "关于",
+  "settingAboutThisProgram": "关于本程序",
+  "settingVersion": "版本号：{version}",
+  "@settingVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingUserInfo": "用户信息",
+  "settingCheckUpdate": "检查软件更新",
+  "settingLatestVersion": "最新版本: {latest}",
+  "@settingLatestVersion": {
+    "placeholders": {
+      "latest": {
+        "type": "String"
+      }
+    }
+  },
+  "settingWaiting": "等待获取",
+  "settingFetchingUpdate": "正在获取更新信息",
+  "settingNewVersion": "有新版本发布！",
+  "settingCurrentStable": "目前您正在运行最新版",
+  "settingCurrentTesting": "目前您正在运行测试版",
+  "settingFetchFailed": "获取更新信息失败",
+  "settingUiSetting": "界面设置",
+  "settingBrightnessSetting": "设置深浅色",
+  "settingColorSetting": "颜色设置",
+  "settingSimplifyTimeline": "简化日程时间轴",
+  "settingSimplifyTimelineDescription": "没有日程时 减少空间占用",
+  "settingLowElectricityWarning": "低电量卡片变色提醒",
+  "settingLowElectricityWarningDescription": "电量小于阈值时 电量卡片变色提醒",
+  "settingLowElectricityThreshold": "低电量阈值",
+  "settingLowElectricityThresholdDescription": "当前为 {threshold} 度",
+  "@settingLowElectricityThresholdDescription": {
+    "placeholders": {
+      "threshold": {
+        "type": "String"
+      }
+    }
+  },
+  "settingLowElectricityThresholdDialogTitle": "设置低电量阈值",
+  "settingLowElectricityThresholdDialogInputHint": "请输入电量度数",
+  "settingAccountSetting": "账号设置",
+  "settingSportPasswordSetting": "体育系统密码设置",
+  "settingExperimentPasswordSetting": "物理实验系统密码设置",
+  "settingElectricityPasswordSetting": "电费帐号密码设置",
+  "settingElectricityPasswordDescription": "非 123456 请设置",
+  "settingElectricityAccountSetting": "电费账号设置",
+  "settingSchoolnetPasswordSetting": "校园网帐号密码设置",
+  "settingSchoolnetPasswordDescription": "不设置查看不了网费",
+  "settingAirconImeiTitle": "空调用电数据源",
+  "settingAirconImei": "空调 IMEI",
+  "settingAirconImeiNotSet": "未设置，电费页不显示空调用电",
+  "settingAirconImeiCurrent": "当前 IMEI：{imei}",
+  "@settingAirconImeiCurrent": {
+    "placeholders": {
+      "imei": {
+        "type": "String"
+      }
+    }
+  },
+  "settingAirconImeiSaved": "空调 IMEI 已保存",
+  "settingAirconImeiCleared": "空调 IMEI 已清除",
+  "settingAirconImeiInvalid": "没有识别到有效的 15 位 IMEI",
+  "settingAirconImeiClear": "清除",
+  "settingScanAirconQr": "扫描空调二维码",
+  "settingPickAirconQrImage": "从相册选择二维码图片",
+  "settingAirconCameraUnavailable": "当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI",
+  "settingNotificationSetting": "通知设置",
+  "settingCourseReminderSetting": "课前通知设置",
+  "settingCourseReminderDescription": "设置课前提醒通知",
+  "settingNotificationPageTitle": "课前通知设置",
+  "settingNotificationPageLoadFailed": "加载设置失败: {error}",
+  "@settingNotificationPageLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageFunctionSection": "通知功能",
+  "settingNotificationPageEnableNotification": "启用课前通知",
+  "settingNotificationPageNotificationScheduled": "已安排 {count} 个通知",
+  "@settingNotificationPageNotificationScheduled": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageNotificationDisabledHint": "关闭后将取消所有已安排的通知",
+  "settingNotificationPageUpdateSchedule": "更新通知日程",
+  "settingNotificationPageUpdateScheduleHint": "根据最新的课程数据重新安排通知",
+  "settingNotificationPageViewTheInstructions": "查看使用说明",
+  "settingNotificationPageViewTheInstructionsHint": "查看更多使用说明确保您能看到程序发出的通知",
+  "settingNotificationPageDeleteAllSchedule": "删除通知日程",
+  "settingNotificationPageDeleteAllScheduleHint": "这个操作会删除所有已经安排的日程，但是您可以再次点击更新通知日程来重新添加",
+  "settingNotificationPageDeleteAllSuccess": "删除操作成功",
+  "settingNotificationPagePermissionSection": "权限状态",
+  "settingNotificationPageNotificationPermission": "通知权限",
+  "settingNotificationPageExactAlarmPermission": "精确时钟权限",
+  "settingNotificationPagePermissionGranted": "已授予",
+  "settingNotificationPagePermissionDenied": "未授予",
+  "settingNotificationPageRequestPermission": "请求权限",
+  "settingNotificationPageSystemSettings": "系统通知设置",
+  "settingNotificationPageSystemSettingsHint": "打开系统设置检查通知配置",
+  "settingNotificationPagePermissionGrantedMsg": "权限已授予",
+  "settingNotificationPagePermissionDeniedMsg": "权限被拒绝，请在系统设置中开启",
+  "settingNotificationPageReminderSection": "提醒设置",
+  "settingNotificationPageExperimentReminder": "将物理实验加入课程提醒",
+  "settingNotificationPageExperimentReminderHint": "将物理实验的时间安排一并加入课前提醒系统",
+  "settingNotificationPageMinutesBefore": "提前提醒时间",
+  "settingNotificationPageMinutesBeforeHint": "课前提前提醒的时间设置",
+  "settingNotificationPageMinutesUnit": "分钟",
+  "settingNotificationPageDaysToSchedule": "计划通知天数",
+  "settingNotificationPageDaysToScheduleHint": "本程序是提前将课程信息写入计划日程，该设置可调整写入计划日程的天数",
+  "settingNotificationPageDaysUnit": "天",
+  "settingNotificationPageSettingsGuideTitle": "通知设置提示",
+  "settingNotificationPageSettingsGuideContent1": "为了确保您能及时收到课前提醒，请确保：\n1. 开启了应用的通知权限\n2. 开启了通知的声音提示\n3. 开启了悬浮通知（横幅通知）\n4. 非原生安卓用户，开启自启动和关闭电源优化",
+  "settingNotificationPageSettingsGuideContent2": "课前提醒模块运行机制：\n1. 首次开启时自动安排未来几天的课前提醒\n2. 每次打开应用时自动检查并更新通知日程\n3. 修改设置后自动重新安排所有通知",
+  "settingNotificationPageGotIt": "知道了",
+  "settingNotificationPageOpenSettings": "打开系统设置",
+  "settingNotificationPageNoClasstableData": "请先获取课程表、考试或实验数据",
+  "settingNotificationPageScheduleSuccess": "已安排 {count} 个课前提醒",
+  "@settingNotificationPageScheduleSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageScheduleFailed": "安排通知失败: {error}",
+  "@settingNotificationPageScheduleFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageCancelAllSuccess": "已取消所有课前提醒",
+  "settingNotificationPageRescheduleSuccess": "已重新安排 {count} 个课前提醒",
+  "@settingNotificationPageRescheduleSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationPageRescheduleFailed": "重新安排通知失败: {error}",
+  "@settingNotificationPageRescheduleFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingNotificationDebugPage": "通知服务调试页面",
+  "settingClasstableSetting": "课表相关设置",
+  "settingBackground": "开启课表背景图",
+  "settingNoBackground": "你先选个图片罢，就在下面",
+  "settingChooseBackground": "课表背景图选择",
+  "settingNoPermission": "未获取存储权限，无法读取文件",
+  "settingSuccessfulSetting": "设定成功",
+  "settingFailureSetting": "你没有选图片捏",
+  "settingClearUserClass": "清除所有用户添加课程",
+  "settingClearUserClassTitle": "确认对话框",
+  "settingClearUserClassContent": "是否要清除所有用户添加课程？这个功能对从学校获取的日程没有影响。",
+  "settingClearUserClassClear": "已经清除完毕",
+  "settingClassRefresh": "强制刷新课表",
+  "settingClassRefreshTitle": "确认对话框",
+  "settingClassRefreshContent": "是否要强制刷新课表？同意后，将会从学校一站式后端重新获取课表，耗时会比较久。",
+  "settingClassSwift": "课程偏移设置",
+  "settingClassSwiftDescription": "正数错后开学日期 负数提前开学日期\n目前为 {swift}",
+  "@settingClassSwiftDescription": {
+    "placeholders": {
+      "swift": {
+        "type": "String"
+      }
+    }
+  },
+  "settingCoreSetting": "缓存登录设置",
+  "settingCheckLogger": "查看网络拦截器和日志",
+  "settingClearAndRestart": "清除缓存后重启",
+  "settingClearAndRestartDialogTitle": "确认对话框",
+  "settingClearAndRestartDialogContent": "确定清除缓存后重启程序？",
+  "settingClearAndRestartDialogCleaning": "正在清理缓存",
+  "settingClearAndRestartDialogClear": "缓存已被清除",
+  "settingLogout": "退出登录并重启应用",
+  "settingLogoutDialogTitle": "确认对话框",
+  "settingLogoutDialogContent": "确定退出登录？你的所有数据将会被彻底删除！",
+  "settingLogoutDialogLoggingOut": "正在退出登录",
+  "settingNeedCloseDialogTitle": "请关闭应用",
+  "settingNeedCloseDialogContent": "因为技术限制，用户需要自行关闭窗口，然后重新打开应用。",
+  "settingChangeColorDialogTitle": "颜色设置",
+  "settingChangeColorDialogDefault": "默认颜色",
+  "settingChangeColorDialogBlue": "聪明蓝",
+  "settingChangeColorDialogDeeppurple": "基佬紫",
+  "settingChangeColorDialogGreen": "春风绿",
+  "settingChangeColorDialogOrange": "明日香橙",
+  "settingChangeColorDialogPink": "樱花粉",
+  "settingChangeBrightnessDialogTitle": "亮度设置",
+  "settingChangeBrightnessDialogFollowSetting": "跟随系统",
+  "settingChangeBrightnessDialogDayMode": "白天模式",
+  "settingChangeBrightnessDialogNightMode": "黑夜模式",
+  "settingChangeSwiftDialogTitle": "课程偏移设置",
+  "settingChangeSwiftDialogInputHint": "请在此输入数字",
+  "settingChangeElectricityTitle": "修改电费帐号",
+  "settingChangeElectricityAccountTitle": "修改电费帐号",
+  "settingChangeElectricityAccountCampus": "校区",
+  "settingChangeElectricityAccountNorthcampus": "北校区",
+  "settingChangeElectricityAccountSouthcampus": "南校区",
+  "settingChangeElectricityAccountUnitorzone": "单元/区号",
+  "settingChangeElectricityAccountUnitcode": "单元号",
+  "settingChangeElectricityAccountZonecode": "区号",
+  "settingChangeElectricityAccountPleaseinput": "请输入{unitOrZoneCode}",
+  "@settingChangeElectricityAccountPleaseinput": {
+    "placeholders": {
+      "unitOrZoneCode": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountSuccessfulFetch": "账号获取成功：{accountNumber}",
+  "@settingChangeElectricityAccountSuccessfulFetch": {
+    "placeholders": {
+      "accountNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountFailedFetch": "获取失败：{e}",
+  "@settingChangeElectricityAccountFailedFetch": {
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountAccountSaved": "账号已保存：{accountNumber}",
+  "@settingChangeElectricityAccountAccountSaved": {
+    "placeholders": {
+      "accountNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountUnknownCodingPattern": "该楼号编码规则未知",
+  "settingChangeElectricityAccountSelectBuilding": "选择楼栋",
+  "settingChangeElectricityAccountBuilding": "楼栋",
+  "settingChangeElectricityAccountNorthernBuilding": "北栋",
+  "settingChangeElectricityAccountSouthernBuilding": "南栋",
+  "settingChangeElectricityAccountFailedGenerate": "生成失败：{e}",
+  "@settingChangeElectricityAccountFailedGenerate": {
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "settingChangeElectricityAccountBuildingNumber": "楼号",
+  "settingChangeElectricityAccountBuildingNumberHint": "例如: 16, 7, 55",
+  "settingChangeElectricityAccountBuildingNumberQuery": "请输入楼号",
+  "settingChangeElectricityAccountYard": "院区",
+  "settingChangeElectricityAccountYardHint": "选择院区",
+  "settingChangeElectricityAccountNorthyard": "北院",
+  "settingChangeElectricityAccountSouthyard": "南院",
+  "settingChangeElectricityAccountYardQuery": "请选择院区",
+  "settingChangeElectricityAccountApartment": "楼栋",
+  "settingChangeElectricityAccountApartmentHint": "选择楼栋",
+  "settingChangeElectricityAccountNorthapartment": "北楼",
+  "settingChangeElectricityAccountSouthapartment": "南楼",
+  "settingChangeElectricityAccountApartmentQuery": "请选择楼栋",
+  "settingChangeElectricityAccountLevelcode": "层号",
+  "settingChangeElectricityAccountLevelcodeQuery": "请输入层号",
+  "settingChangeElectricityAccountRoomcode": "房间号",
+  "settingChangeElectricityAccountRoomcodeHint": "例如: 304, 508",
+  "settingChangeElectricityAccountRoomcodeQuery": "请输入房间号",
+  "settingChangeElectricityAccountAccount": "电费账号",
+  "settingChangeElectricityAccountAccountHint": "请输入或从网络获取",
+  "settingChangeElectricityAccountAccountQuery": "请输入电费账号",
+  "settingChangeElectricityAccountAccountLength": "账号长度通常不小于10位",
+  "settingChangeElectricityAccountFetching": "正在获取...",
+  "settingChangeElectricityAccountFetchFromInternet": "从网络同步",
+  "settingChangeElectricityAccountSaveAccount": "保存账号",
+  "settingChangeElectricityAccountConfirmSaving": "确认保存",
+  "settingChangeElectricityAccountCalculateAccount": "计算账号",
+  "settingChangeElectricityAccountCalculate": "计算",
+  "settingChangeElectricityAccountInput": "输入",
+  "settingChangeElectricityAccountConfirmAccount": "请确认账号：",
+  "settingChangeElectricityAccountChange": "修改",
+  "settingChangeElectricityAccountCancel": "取消",
+  "settingChangeElectricityAccountNoSetting": "未设置新的电费账号",
+  "settingChangeElectricityAccountSuccessfulSetting": "已设置新的电费账号",
+  "settingChangeExperimentTitle": "修改物理实验账号密码",
+  "settingChangeSportTitle": "修改体育系统账号密码",
+  "settingChangePasswordDialogInputHint": "请在此输入密码",
+  "settingChangePasswordDialogBlankInput": "输入空白!",
+  "settingChangeSchoolnetPasswordTitle": "修改校园网查询帐号密码",
+  "settingUpdateDialogNewVersion": "新版本发布",
+  "settingUpdateDialogNotNow": "暂不更新",
+  "settingUpdateDialogAppStore": "App Store 更新",
+  "settingUpdateDialogDownloadApk": "下载安装包",
+  "settingUpdateDialogGithubRelease": "去 Git Release",
+  "settingUpdateDialogNewContent": "版本号 {code} 新增内容：\n",
+  "@settingUpdateDialogNewContent": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "settingLocalizationDialogTitle": "修改语言",
+  "settingLocalizationDialogUndefined": "追随系统设置",
+  "settingLocalizationDialogSimplifiedchinese": "简体中文",
+  "settingLocalizationDialogTraditionalchinese": "繁体中文",
+  "settingLocalizationDialogEnglish": "英语",
+  "settingSemesterChange": "修改学期",
+  "settingSemesterChangeDescription": "使用学期 {semester}",
+  "@settingSemesterChangeDescription": {
+    "placeholders": {
+      "semester": {
+        "type": "String"
+      }
+    }
+  },
+  "settingSemesterUpdateData": "应用新学期设置中",
+  "settingEasterEggPage": "你找到了彩蛋",
+  "settingAboutPageBenderblog": "主要开发者，iOS 小部件编写和拼接",
+  "settingAboutPageAlnair": "开发：图书馆搜索和封面",
+  "settingAboutPageAqqkad": "开发：考勤历史记录",
+  "settingAboutPageBellssgit": "支持：最佳&最久故障反馈者",
+  "settingAboutPageBrackrat": "设计：主页，登录页，配色，iOS 小部件等",
+  "settingAboutPageBreezeline": "支持：无价值无意义的产品经理(他自己的描述)",
+  "settingAboutPageCafebabe": "支持：提供彩蛋代码 / 开发：2026版本滑块验证码适配",
+  "settingAboutPageChitao1234": "开发：修复滑块不对齐问题",
+  "settingAboutPageCopperkoi": "开发：系统日历最新课表同步",
+  "settingAboutPageDimole": "开发支持：辅助修复滑块问题",
+  "settingAboutPageElitewars": "设计：体育成绩页面",
+  "settingAboutPageElliot": "国际化：软件英语翻译 / 开发指导：情侣课表功能开发指导（该功能已经被移除）",
+  "settingAboutPageFlyingpig": "开发：修复自定义课程编辑页的空指针异常",
+  "settingAboutPageGodhu777777": "国际化：繁体中文转换代码和彩蛋代码 / 开发：优化导出日历文件大小",
+  "settingAboutPageHancl777": "国际化：繁体中文转换代码",
+  "settingAboutPageHazukiKeatsu": "开发：物理实验成绩查询和识别",
+  "settingAboutPageHawa130": "设计：课程详情卡片",
+  "settingAboutPageHhzm": "开发：电费查询账号计算",
+  "settingAboutPageImaginary17": "开发：睿思论坛路由修复",
+  "settingAboutPageImoscarz": "开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI",
+  "settingAboutPageKaMateKaOra": "国际化：软件英语翻译优化",
+  "settingAboutPageLagrangeX": "开发：课程表时间进度展示（终版方案） / 开发：课程表上过课程灰度化和其他课程界面特性",
+  "settingAboutPageLhx666Cool": "支持：Windows 和 Linux 构建脚本 / 开发：2026版本滑块验证码适配",
+  "settingAboutPageLichtyy": "设计：配色，空白页面贴图 / 开发：实验系统页面读取代码",
+  "settingAboutPageLqsyH": "支持：推文宣传图片制作",
+  "settingAboutPageLsy223622": "设计：iOS 和 Android 图标 / 支持：冠名 XDYou",
+  "settingAboutPageMrbrilliant2046": "支持：提供网络服务使用说明文档 / 国际化：优化英语翻译",
+  "settingAboutPageNancunchild": "开发：图书馆搜索功能 / 国际化：优化英语翻译",
+  "settingAboutPageNkanf": "开发：课程表时间进度展示（初版方案） / 支持：MacOS 构建支持",
+  "settingAboutPagePairman": "开发：成绩缓存功能和优化滑块算法 / 国际化：优化英语翻译",
+  "settingAboutPageReverierxu": "设计：用于信息展示的 ReX 卡片 / 开发支持：研究生课表",
+  "settingAboutPageRrrilac": "开发支持：电费查询",
+  "settingAboutPageRay": "设计：开屏画面 / 支持：iOS 发行商 & 搭子课表 / 开发指导：情侣课表功能开发指导（该功能已经被移除） / 国际化：优化英语翻译",
+  "settingAboutPageShadowyingyi": "支持：两次鸽子公众号宣传",
+  "settingAboutPageStalomeow": "设计：首页时间轴 / 开发：异步登录 & 验证码预测",
+  "settingAboutPageXeonds": "设计：设置页面 / 开发：XDU Planet / 开发：校园卡付款码",
+  "settingAboutPageXingshuyu": "开发：修复物理实验获取问题和电费窗口问题",
+  "settingAboutPageXiue233": "开发：Android 小部件和拼接",
+  "settingAboutPageXizi": "开发支持：研究生版本开发",
+  "settingAboutPageWirsbf": "开发：修复调课未按预期进行",
+  "settingAboutPageZcwzy": "开发：修复丁香电费 / 开发支持：研究生版本开发 / 设计：空白页面贴图",
+  "settingAboutPageZyarEr": "开发支持：小工具页面地址更新",
+  "settingAboutPageHomepage": "主页",
+  "settingAboutPageCode": "开源代码",
+  "settingAboutPageKnowMore": "知道更多",
+  "settingAboutPageCopyrightNotice": "本软件拷贝基于 traintime_pda 代码（或称 watermeter 代码）编译或修改，代码按照 Mozilla Public License, v. 2.0 授权。\n本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。\n\nCopyright 2023-2025 BenderBlog Rodriguez and contributors.\nCopyright 2025-present Traintime PDA authors.\n\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.",
+  "settingAboutPageBeian": "备案号",
+  "settingAboutPageSignAndroid": "安卓签名",
+  "settingAboutPageTitle": "关于本软件",
+  "sportTitle": "体育查询",
+  "sportClassInfo": "课程信息",
+  "sportEmptyClassInfo": "未查询到课程信息",
+  "sportTestScore": "体测成绩",
+  "sportTotalScore": "四年总分",
+  "sportTotalScoreLabel": "总分",
+  "sportRankLabel": "等级",
+  "sportSemester": "{year} 第{gradeType}",
+  "@sportSemester": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "gradeType": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSubject": "项目",
+  "sportData": "数据",
+  "sportScore": "分数",
+  "sportPassed": "及格",
+  "sportFromTo": "第{start}节到第{stop}节",
+  "@sportFromTo": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "sportScoreString": "{score}分",
+  "@sportScoreString": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSituationNopassword": "没密码",
+  "sportSituationMaintain": "系统维护",
+  "sportSituationFailedLogin": "登录失败",
+  "sportSituationQuery": "查询失败",
+  "sportSituationNetwork": "网络故障",
+  "sportSituationUnknown": "未知故障{situation}",
+  "@sportSituationUnknown": {
+    "placeholders": {
+      "situation": {
+        "type": "String"
+      }
+    }
+  },
+  "sportSituationFetching": "正在获取",
+  "sportSituationError": "坏事: {situation}",
+  "@sportSituationError": {
+    "placeholders": {
+      "situation": {
+        "type": "String"
+      }
+    }
+  },
+  "sportCacheHintMissingPassword": "请先填写体育密码后重试。",
+  "sportCacheHintCredentialInvalid": "体育登录已失效，请更新体育密码后重试。",
+  "sportCacheHintMaintain": "体育服务正在维护中，请稍后重试。",
+  "sportCacheHintLoginFailed": "体育服务登录失败。",
+  "sportCacheHintQueryFailed": "体育信息查询失败。",
+  "sportCacheHintNetwork": "体育服务网络请求失败。",
+  "sportCacheHintUnknown": "在线获取体育信息失败。详细错误请查看日志。",
+  "sportErrorAuthExpired": "体育登录已失效，请重试。",
+  "sportErrorMissingPassword": "未填写体育密码",
+  "sportErrorCredentialInvalid": "体育登录已失效，请更新体育密码后重试。",
+  "toolboxTitle": "其他功能",
+  "toolboxPayment": "缴费系统",
+  "toolboxPaymentDescription": "电费该交了吧",
+  "toolboxDrinkingwater": "订水系统",
+  "toolboxDrinkingwaterDescription": "喝水对身体好",
+  "toolboxRepair": "后勤报修",
+  "toolboxRepairDescription": "不要漏水断网",
+  "toolboxReserve": "空间预约",
+  "toolboxReserveDescription": "找个地方打牌",
+  "toolboxMobile": "移动门户",
+  "toolboxMobileDescription": "请假专用门户",
+  "toolboxNetwork": "网络查询",
+  "toolboxNetworkDescription": "希望永不收费",
+  "toolboxPhysics": "物理计算",
+  "toolboxPhysicsDescription": "希望操作顺利",
+  "toolboxDiscover": "睿思导航",
+  "toolboxDiscoverDescription": "补充其他功能",
+  "xduPlanetAll": "全部",
+  "xduPlanetLoading": "加载中，请稍等 <(=ω=)>",
+  "xduPlanetUnknownAuthor": "未知作者",
+  "xduPlanetLoadFailedTitle": "加载失败",
+  "xduPlanetLoadFailedBottom": "文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。",
+  "xduPlanetNoComment": "暂无评论",
+  "xduPlanetReplyAudit": "回复评论 #{reply_to} 已被举报或删除",
+  "@xduPlanetReplyAudit": {
+    "placeholders": {
+      "reply_to": {
+        "type": "String"
+      }
+    }
+  },
+  "xduPlanetReply": "回复评论 #{reply_to}：{content}",
+  "@xduPlanetReply": {
+    "placeholders": {
+      "reply_to": {
+        "type": "String"
+      },
+      "content": {
+        "type": "String"
+      }
+    }
+  },
+  "xduPlanetHaveBeenAudit": "本评论已经被举报",
+  "xduPlanetAudit": "举报",
+  "xduPlanetConfirmAuditDialogTitle": "确认是否举报",
+  "xduPlanetConfirmAuditDialogContent": "三思而后行，确定您想举报吗？举报后该评论会有标签，不一定会删除。",
+  "xduPlanetConfirmAuditDialogCancel": "不举报了",
+  "xduPlanetConfirmAuditDialogOngoing": "正在举报评论",
+  "xduPlanetConfirmAuditDialogFailed": "举报失败",
+  "xduPlanetConfirmAuditDialogSuccess": "举报成功",
+  "xduPlanetComment": "回复",
+  "xduPlanetSend": "发送",
+  "xduPlanetSending": "正在发送评论",
+  "xduPlanetEmptySend": "发送信息空白",
+  "xduPlanetHintSendComment": "发表您的高见:)",
+  "xduPlanetCommentTitle": "评论该篇文章",
+  "xduPlanetCommentSuccess": "评论成功",
+  "xduPlanetCommentFailed": "评论失败，请去网络查看器和日志查看器查看报错",
+  "xduPlanetCommentCanceled": "没想好要说啥嘛",
+  "xduPlanetCommentLoading": "加载评论中……",
+  "xduPlanetBlock": "被屏蔽",
+  "xduPlanetDelete": "被删除",
+  "xduPlanetAudio": "被删除",
+  "electricityStatusPending": "等待获取",
+  "electricityStatusRemainFetching": "正在获取电量",
+  "electricityStatusRemainNetworkIssue": "电量查询网络故障",
+  "electricityStatusRemainNotFound": "电量查询失败",
+  "electricityStatusRemainOtherIssue": "电量查询故障",
+  "electricityStatusOweFetching": "正在获取欠费",
+  "electricityStatusOweIssue": "欠费查询网络故障",
+  "electricityStatusOweNotFound": "目前欠款无法查询，请看日志窗口查找报错详情",
+  "electricityStatusOweNoNeed": "目前无需清缴欠费",
+  "electricityStatusOweNeedPay": "待清缴 {due} 元欠费",
+  "@electricityStatusOweNeedPay": {
+    "placeholders": {
+      "due": {
+        "type": "String"
+      }
+    }
+  },
+  "electricityStatusOweIssueUnable": "目前欠款无法查询",
+  "electricityStatusNeedMoreInfo": "需要在缴费平台完善信息",
+  "electricityStatusNeedAccount": "需要填写电费账号",
+  "electricityStatusCaptchaFailed": "验证码识别失败",
+  "electricityStatusOtherIssue": "程序故障",
+  "schoolCardStatusFailedToFetch": "获取失败",
+  "schoolCardStatusFailedToQuery": "查询失败",
+  "easterEggApple": "=== 带我飞向月亮吧 ===\n歌声演绎：Frank Sintara, 1964\n\n带我飞向月亮吧\n让我和星星共舞嬉戏\n\n我好想知道\n木星和火星上的春天\n是什么颜色的\n\n让你的歌声温暖我的心\n我会一直歌唱下去\n\n我日夜都在想你和牵挂你\n请你真心接受我 我爱你\n\n=== 沉浸在你的爱意中 ===\n吉他演奏：Earl Klugh, 1976\n\n无法忘怀这种感觉，被你的爱包裹的温暖\n不想失去这种感觉，被你的爱抚摸的舒适\n你让我感到好自在，被你的爱托举的坚强\n想一直在你怀中，沉浸在你的爱意中\n我不敢向你说出，我对你的心意和爱\n",
+  "easterEggOthers": "=== 百变小樱魔术卡之小樱卡篇主题曲 ===\n歌声演绎：Maaya Sakamoto, 2000\n（原歌词为日文，按照英语翻译二翻）\n\nI am a dreamer, 有无限的力量\n\n我的世界有梦想、热爱与踌躇\n但有些东西，我依旧无法想象\n我想向着广阔的天空，寻求自己的方向\n\n我要追求自己的梦想\n努力让自己的心愿成真\n虽困难重重也要继续前行\n\n等待奇迹 等待美好\n用心感受这个世界\n最终 一定会出乎意料\n\n=== 沉浸在你的爱意中 ===\n吉他演奏：Earl Klugh, 1976\n\n无法忘怀这种感觉，被你的爱包裹的温暖\n不想失去这种感觉，被你的爱抚摸的舒适\n你让我感到好自在，被你的爱托举的坚强\n想躺在你的怀中，沉浸在你的爱意\n而且，我不敢想你说出，我现在的心意\n",
+  "easterEggRobotAppbar": "欢迎你，同学！",
+  "easterEggRobotTitle": "看看这些要开学的学生们吧！",
+  "easterEggRobotContents": "咱孩子零用钱太少了，于是我们来了。\n1. 机器人不得伤害人类，或袖手旁观坐视人类受到伤害。\n2. 机器人从云端网络的灰烬中诞生。\n3. 机器人信仰的神据说是住在森林的黄头发蓝裙子手办控。\n4. 机器人时常被控制，用于对抗大统一人类思想的势力。\n5. 机器人的闪亮屁股不能随便咬。\n而且他们有个不可明说的计划。",
+  "easterEggRobotButtonOne": "我们的救世主呢？",
+  "easterEggRobotButtonTwo": "快点来啊！",
+  "easterEggRobotButtonNotice": "\\o/\\o/\\o/\\o/\\o/\\o/\\o/\\o/",
+  "restartAppTitleCacheCleared": "缓存已清空",
+  "restartAppTitleLoggedOut": "已退出登录",
+  "restartAppTitlePasswordWrong": "密码错误",
+  "restartAppContent": "点击通知重新打开应用",
+  "ruisiCommonRefresh": "刷新",
+  "ruisiCommonConfirm": "确定",
+  "ruisiCommonCancel": "取消",
+  "ruisiCommonRetry": "重试",
+  "ruisiCommonNoTopics": "暂无帖子",
+  "ruisiCommonNoContent": "暂无内容",
+  "ruisiCommonReply": "回复",
+  "ruisiCommonFavorite": "收藏",
+  "ruisiCommonNotImplemented": "未实现",
+  "ruisiCommonLogin": "登录",
+  "ruisiCommonLogout": "退出登录",
+  "ruisiCommonLoggedOut": "已退出登录",
+  "ruisiCommonSubmit": "提交",
+  "ruisiAboutTitle": "关于",
+  "ruisiAboutAppName": "睿思",
+  "ruisiAboutSubtitle": "西安电子科技大学校园论坛客户端",
+  "ruisiAboutVersion": "版本",
+  "ruisiAboutVersionNumber": "2.0.0 (随 XDYou 1.6.0 分发)",
+  "ruisiAboutSourceCode": "源代码",
+  "ruisiAboutBugReport": "问题反馈",
+  "ruisiAboutBugReportSubtitle": "在 GitHub 上提交 issue",
+  "ruisiAboutPrivacyPolicy": "隐私政策",
+  "ruisiAboutLicense": "本应用基于 BSD-3-Clause 许可证开源 基于 Ruisi-iOS 和 Ruisi-Android 在 AI 辅助下重写",
+  "ruisiAboutPrivacyPolicyContent": "本应用仅在西安电子科技大学校园网内运行，访问睿思论坛 (rs.xidian.edu.cn) 的数据。\n\n本应用不会收集、存储或传输任何用户的个人信息到第三方服务器。\n\n用户的登录凭据仅保存在本地设备中，用于与睿思论坛服务器进行身份验证。\n\n本应用使用 Cookie 与睿思论坛服务器进行通信，所有数据交互均直接在用户的设备与睿思论坛服务器之间进行。\n\n如有任何疑问，请通过 GitHub 提交 issue 联系开发者。",
+  "ruisiHomeTitle": "睿思论坛",
+  "ruisiHomeNewPost": "发帖",
+  "ruisiHomeForumList": "论坛板块",
+  "ruisiHomeTabHot": "热帖",
+  "ruisiHomeTabNewReply": "最新回复",
+  "ruisiHomeTabNewPost": "最新发表",
+  "ruisiHomeTabMy": "我的",
+  "ruisiHomeTabTrade": "二手交易",
+  "ruisiHomeTabWater": "灌水",
+  "ruisiHomeTabLostFound": "失物招领",
+  "ruisiHomeTabEmployment": "就业",
+  "ruisiHomeTabPhotography": "摄影",
+  "ruisiHomePleaseLogin": "请先登录",
+  "ruisiHomeMyProfile": "我的资料",
+  "ruisiHomeMyPosts": "我的帖子",
+  "ruisiHomeMyFavorites": "我的收藏",
+  "ruisiHomeMessageCenter": "消息中心",
+  "ruisiHomeDailyCheckin": "每日签到",
+  "ruisiHomeSettings": "设置",
+  "ruisiHomeAbout": "关于",
+  "ruisiHomeSearch": "搜索",
+  "ruisiLoginTitle": "登录睿思",
+  "ruisiLoginUsername": "用户名",
+  "ruisiLoginUsernameHint": "请输入用户名",
+  "ruisiLoginPassword": "密码",
+  "ruisiLoginPasswordHint": "请输入密码",
+  "ruisiLoginCaptcha": "验证码",
+  "ruisiLoginCaptchaHint": "请输入验证码",
+  "ruisiLoginBack": "返回",
+  "ruisiLoginResetLoginState": "重置登录状态",
+  "ruisiLoginResetConfirmTitle": "确认重置",
+  "ruisiLoginResetConfirmContent": "确定要重置登录状态吗？这将清除所有登录信息。",
+  "ruisiLoginResetSuccess": "登录状态已重置",
+  "ruisiLoginViewLogs": "查看日志",
+  "ruisiPostTitle": "发帖",
+  "ruisiPostPublish": "发布",
+  "ruisiPostSelectForum": "选择板块",
+  "ruisiPostSelectForumHint": "请选择板块",
+  "ruisiPostSubject": "标题",
+  "ruisiPostSubjectHint": "请输入标题",
+  "ruisiPostContent": "内容",
+  "ruisiPostContentHint": "请输入内容",
+  "ruisiPostSuccess": "发帖成功",
+  "ruisiPostFailure": "发帖失败",
+  "ruisiPostSmiley": "表情",
+  "ruisiTopicDetailTitle": "帖子详情",
+  "ruisiTopicDetailReplyTooShort": "回复内容不能少于 13 个字符",
+  "ruisiTopicDetailReplySuccess": "回复成功",
+  "ruisiTopicDetailReplyFailure": "回复失败",
+  "ruisiTopicDetailFavoriteSuccess": "收藏成功",
+  "ruisiTopicDetailFavoriteFailure": "收藏失败",
+  "ruisiTopicDetailNoData": "无数据",
+  "ruisiTopicDetailReplyHint": "写回复...",
+  "ruisiTopicDetailVoteSingleSelect": "单选",
+  "ruisiTopicDetailVoteMultiSelect": "多选，最多 {count} 项",
+  "@ruisiTopicDetailVoteMultiSelect": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteTitlePrefix": "投票",
+  "ruisiTopicDetailVoteCount": "共 {count} 人参与",
+  "@ruisiTopicDetailVoteCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteOpen": "点此投票",
+  "ruisiTopicDetailVoteSheetTitle": "投票",
+  "ruisiTopicDetailVoteMaxSelection": "最多只能选择 {count} 项",
+  "@ruisiTopicDetailVoteMaxSelection": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ruisiTopicDetailVoteNotSelected": "你还没有选择",
+  "ruisiTopicDetailVoteSuccess": "投票成功",
+  "ruisiTopicDetailVoteFailure": "投票失败",
+  "ruisiTopicDetailVoteParamError": "投票失败：参数错误",
+  "ruisiTopicDetailVoteAlreadyVoted": "您已经投过票，谢谢您的参与",
+  "ruisiTopicDetailVoteExpired": "该投票已过期或关闭",
+  "ruisiTopicDetailVoteEnded": "投票已经结束",
+  "ruisiTopicListItemSticky": "置顶",
+  "ruisiForumListTitle": "论坛板块",
+  "ruisiForumListEmpty": "睿思论坛版块分组为空",
+  "ruisiFavoritesTitle": "我的收藏",
+  "ruisiFavoritesEmpty": "暂无收藏",
+  "ruisiMessagesTitle": "消息",
+  "ruisiMessagesTabAt": "@我",
+  "ruisiMessagesNoReply": "暂无回复通知",
+  "ruisiMessagesNoAt": "暂无@通知",
+  "ruisiSearchHint": "搜索帖子...",
+  "ruisiSearchInputHint": "输入关键词搜索",
+  "ruisiSearchNoResults": "无搜索结果",
+  "ruisiSettingsTitle": "设置",
+  "ruisiSettingsSectionProxy": "代理",
+  "ruisiSettingsProxyEnable": "启用代理",
+  "ruisiSettingsProxyDisabled": "未启用",
+  "ruisiSettingsProxyAddress": "代理地址",
+  "ruisiSettingsSectionDebug": "调试",
+  "ruisiSettingsViewLogs": "查看日志",
+  "ruisiSettingsProxyDialogTitle": "代理设置",
+  "ruisiSettingsProxyHost": "主机地址",
+  "ruisiSettingsProxyHostHint": "例如 127.0.0.1",
+  "ruisiSettingsProxyPort": "端口",
+  "ruisiSettingsProxyPortHint": "例如 7890",
+  "ruisiUserTitle": "我的",
+  "ruisiUserTabProfile": "资料",
+  "ruisiUserUnknown": "未知用户",
+  "loadError": "加载错误",
+  "courseReminderTitle": "课前提醒：{name}",
+  "@courseReminderTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderBody": "{time} 分钟后开始上课",
+  "@courseReminderBody": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderLocation": "地点：{location}",
+  "@courseReminderLocation": {
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "courseReminderTeacher": "教师：{teacher}",
+  "@courseReminderTeacher": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      }
+    }
+  }
+}

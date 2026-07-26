@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/constants/forum_id.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/pages/search_page.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 import '../controller/ruisi_controller.dart';
 import '../utils/branch_navigation.dart';
@@ -44,21 +44,21 @@ class _HomePageState extends State<HomePage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, 'ruisi.home.title')),
+        title: Text(I18n.of(context)!.ruisiHomeTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            tooltip: FlutterI18n.translate(context, 'ruisi.home.search'),
+            tooltip: I18n.of(context)!.ruisiHomeSearch,
             onPressed: () => context.pushRuisiBranch(const SearchPage()),
           ),
           IconButton(
             icon: const Icon(Icons.edit_note),
-            tooltip: FlutterI18n.translate(context, 'ruisi.home.new_post'),
+            tooltip: I18n.of(context)!.ruisiHomeNewPost,
             onPressed: () => context.pushRuisiBranch(const NewPostPage()),
           ),
           IconButton(
             icon: const Icon(Icons.forum),
-            tooltip: FlutterI18n.translate(context, 'ruisi.home.forum_list'),
+            tooltip: I18n.of(context)!.ruisiHomeForumList,
             onPressed: () => context.pushRuisiBranch(const ForumListPage()),
           ),
           IconButton(
@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage>
                 errorBuilder: (_, _, _) => const Icon(Icons.person, size: 24),
               ),
             ),
-            tooltip: FlutterI18n.translate(context, 'ruisi.home.my_profile'),
+            tooltip: I18n.of(context)!.ruisiHomeMyProfile,
             onPressed: () => context.pushRuisiBranch(const UserPage()),
           ),
         ],
@@ -80,24 +80,21 @@ class _HomePageState extends State<HomePage>
           controller: _tabCtrl,
           tabs: [
             Tab(
-              text: FlutterI18n.translate(context, 'ruisi.home.tab_new_post'),
+              text: I18n.of(context)!.ruisiHomeTabNewPost,
             ),
             Tab(
-              text: FlutterI18n.translate(context, 'ruisi.home.tab_new_reply'),
+              text: I18n.of(context)!.ruisiHomeTabNewReply,
             ),
-            Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_water')),
+            Tab(text: I18n.of(context)!.ruisiHomeTabWater),
             Tab(
-              text: FlutterI18n.translate(
-                context,
-                'ruisi.home.tab_photography',
-              ),
+              text: I18n.of(context)!.ruisiHomeTabPhotography,
             ),
-            Tab(text: FlutterI18n.translate(context, 'ruisi.home.tab_trade')),
+            Tab(text: I18n.of(context)!.ruisiHomeTabTrade),
             Tab(
-              text: FlutterI18n.translate(context, 'ruisi.home.tab_employment'),
+              text: I18n.of(context)!.ruisiHomeTabEmployment,
             ),
             Tab(
-              text: FlutterI18n.translate(context, 'ruisi.home.tab_lost_found'),
+              text: I18n.of(context)!.ruisiHomeTabLostFound,
             ),
           ],
         ),

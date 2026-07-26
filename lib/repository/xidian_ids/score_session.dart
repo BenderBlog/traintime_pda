@@ -20,17 +20,24 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-String _cacheHintFromError(Object error) {
+enum ScoreCacheHint {
+  passwordWrong,
+  loginFailed,
+  networkFailed,
+  unknownError,
+}
+
+ScoreCacheHint _cacheHintFromError(Object error) {
   if (error is PasswordWrongException) {
-    return "score.cache_hint_password_wrong";
+    return ScoreCacheHint.passwordWrong;
   }
   if (error is LoginFailedException) {
-    return "score.cache_hint_login_failed";
+    return ScoreCacheHint.loginFailed;
   }
   if (error is DioException) {
-    return "score.cache_hint_network_failed";
+    return ScoreCacheHint.networkFailed;
   }
-  return "score.cache_hint_unknown_error";
+  return ScoreCacheHint.unknownError;
 }
 
 /// 考试成绩 4768574631264620
@@ -289,7 +296,7 @@ class ScoreSession extends EhallSession {
         return FetchResult.cache(
           fetchTime: file.lastModifiedSync(),
           data: cache,
-          hintKey: _cacheHintFromError(e),
+          cacheHint: _cacheHintFromError(e),
         );
       } else {
         rethrow;

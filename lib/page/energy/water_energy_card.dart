@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class WaterEnergyCard extends StatelessWidget {
   const WaterEnergyCard({super.key});
@@ -24,13 +24,13 @@ class WaterEnergyCard extends StatelessWidget {
 
         return InfoCard(
           iconData: Icons.water_drop,
-          title: FlutterI18n.translate(context, "electricity.water_title"),
+          title: I18n.of(context)!.electricityWaterTitle,
           children: [
             if (displayInfo == null)
               _buildUnavailableState(context, hasError: state is AsyncError)
             else if (usages == null || usages.isEmpty)
               Text(
-                FlutterI18n.translate(context, "electricity.water_empty"),
+                I18n.of(context)!.electricityWaterEmpty,
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
               ).padding(vertical: 8, horizontal: 12)
             else
@@ -47,7 +47,7 @@ class WaterEnergyCard extends StatelessWidget {
   }) {
     if (hasError) {
       return Text(
-        FlutterI18n.translate(context, "electricity.water_unavailable"),
+        I18n.of(context)!.electricityWaterUnavailable,
         style: TextStyle(color: Theme.of(context).colorScheme.error),
       ).padding(vertical: 8, horizontal: 12);
     }
@@ -62,7 +62,7 @@ class WaterEnergyCard extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            FlutterI18n.translate(context, "electricity.water_loading"),
+            I18n.of(context)!.electricityWaterLoading,
           ),
         ),
       ],
@@ -80,31 +80,22 @@ class WaterEnergyCard extends StatelessWidget {
     return [
       [
             Text(
-              FlutterI18n.translate(
-                context,
-                "electricity.water_usage_fetch_date",
-              ),
+              I18n.of(context)!.electricityWaterUsageFetchDate,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 4),
             Text(
-              FlutterI18n.translate(context, "electricity.water_usage"),
+              I18n.of(context)!.electricityWaterUsage,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 3),
             Text(
-              FlutterI18n.translate(
-                context,
-                "electricity.water_usage_read_now",
-              ),
+              I18n.of(context)!.electricityWaterUsageReadNow,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 3),
             Text(
-              FlutterI18n.translate(
-                context,
-                "electricity.water_usage_read_before",
-              ),
+              I18n.of(context)!.electricityWaterUsageReadBefore,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 3),

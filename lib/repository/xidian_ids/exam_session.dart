@@ -19,17 +19,24 @@ import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-String _cacheHintFromError(Object error) {
+enum ExamCacheHint {
+  passwordWrong,
+  loginFailed,
+  networkFailed,
+  unknownError,
+}
+
+ExamCacheHint _cacheHintFromError(Object error) {
   if (error is PasswordWrongException) {
-    return "exam.cache_hint_password_wrong";
+    return ExamCacheHint.passwordWrong;
   }
   if (error is LoginFailedException) {
-    return "exam.cache_hint_login_failed";
+    return ExamCacheHint.loginFailed;
   }
   if (error is DioException) {
-    return "exam.cache_hint_network_failed";
+    return ExamCacheHint.networkFailed;
   }
-  return "exam.cache_hint_unknown_error";
+  return ExamCacheHint.unknownError;
 }
 
 Future<FetchResult<ExamData>> getScoreInfo(String semester) async {
@@ -47,7 +54,7 @@ Future<FetchResult<ExamData>> getScoreInfo(String semester) async {
       return FetchResult.cache(
         fetchTime: cache.$1,
         data: cache.$2,
-        hintKey: _cacheHintFromError(e),
+        cacheHint: _cacheHintFromError(e),
       );
     }
     rethrow;

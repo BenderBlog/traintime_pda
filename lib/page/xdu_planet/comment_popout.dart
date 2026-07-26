@@ -6,13 +6,13 @@
 /*
 //import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xdu_planet_session.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class CommentPopout extends StatelessWidget {
   final String id;
@@ -60,42 +60,35 @@ class CommentPopout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(context, "xdu_planet.comment_title")),
+      title: Text(I18n.of(context)!.xduPlanetCommentTitle),
       content: TextField(
         controller: _controller,
         maxLines: 5,
         decoration: InputDecoration(
           hintText: replyTo == null
-              ? FlutterI18n.translate(context, "xdu_planet.hint_send_comment")
-              : FlutterI18n.translate(
-                  context,
-                  "xdu_planet.reply",
-                  translationParams: {
-                    "reply_to": replyTo!.ID.toString(),
-                    "content": replyTo!.content,
-                  },
-                ),
+              ? I18n.of(context)!.xduPlanetHintSendComment
+              : I18n.of(context)!.xduPlanetReply(replyTo!.ID.toString(), replyTo!.content),
         ),
       ),
       actions: [
         TextButton(
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(I18n.of(context)!.cancel),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(context, "xdu_planet.send")),
+          child: Text(I18n.of(context)!.xduPlanetSend),
           onPressed: () async {
             if (_controller.text.isEmpty) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(context, "xdu_planet.empty_send"),
+                msg: I18n.of(context)!.xduPlanetEmptySend,
               );
               return;
             }
             var pd = ProgressDialog(context: context);
-            pd.show(msg: FlutterI18n.translate(context, "xdu_planet.sending"));
+            pd.show(msg: I18n.of(context)!.xduPlanetSending);
             //var hashedUid = md5.convert(utf8.encode(
             //    "${pref.getString(pref.Preference.idsAccount)}#${pref.getString(pref.Preference.name)}"));
             await PlanetSession()

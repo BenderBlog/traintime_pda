@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
 import 'dart:convert' show base64Decode;
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/dorm_water_session.dart';
 import 'package:watermeter/repository/preference.dart';
+import 'package:watermeter/generated/l10n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 
 class DormWaterWindow extends StatefulWidget {
@@ -112,7 +112,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "dorm_water.phone_required"),
+        msg: I18n.of(context)!.dormWaterPhoneRequired,
       );
       return;
     }
@@ -121,7 +121,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "dorm_water.image_code_required"),
+        msg: I18n.of(context)!.dormWaterImageCodeRequired,
       );
       return;
     }
@@ -131,7 +131,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "dorm_water.sms_sent"),
+        msg: I18n.of(context)!.dormWaterSmsSent,
       );
     } on Exception catch (e) {
       if (!mounted) return;
@@ -141,7 +141,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: "${FlutterI18n.translate(context, "dorm_water.sms_failed")}: $e",
+        msg: "${I18n.of(context)!.dormWaterSmsFailed}: $e",
       );
       _loadCaptcha();
     }
@@ -156,7 +156,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "dorm_water.phone_required"),
+        msg: I18n.of(context)!.dormWaterPhoneRequired,
       );
       return;
     }
@@ -165,7 +165,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "dorm_water.sms_code_required"),
+        msg: I18n.of(context)!.dormWaterSmsCodeRequired,
       );
       return;
     }
@@ -179,7 +179,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "dorm_water.login_success"),
+        msg: I18n.of(context)!.dormWaterLoginSuccess,
       );
       setState(() {
         _isLoggedIn = true;
@@ -189,7 +189,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: "${FlutterI18n.translate(context, "dorm_water.login_failed")}: $e",
+        msg: "${I18n.of(context)!.dormWaterLoginFailed}: $e",
       );
     } finally {
       if (mounted) {
@@ -219,7 +219,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     if (!mounted) return;
     showToast(
       context: context,
-      msg: FlutterI18n.translate(context, "dorm_water.logout_success"),
+      msg: I18n.of(context)!.dormWaterLogoutSuccess,
     );
   }
 
@@ -246,7 +246,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       showToast(
         context: context,
         msg:
-            "${FlutterI18n.translate(context, "dorm_water.fetch_devices_failed")}: $e",
+            "${I18n.of(context)!.dormWaterFetchDevicesFailed}: $e",
       );
     }
   }
@@ -264,7 +264,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "dorm_water.start_water_success"),
+        msg: I18n.of(context)!.dormWaterStartWaterSuccess,
       );
       // Start polling device status
       _pollDeviceStatus(device.id);
@@ -277,7 +277,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       showToast(
         context: context,
         msg:
-            "${FlutterI18n.translate(context, "dorm_water.start_water_failed")}: $e",
+            "${I18n.of(context)!.dormWaterStartWaterFailed}: $e",
       );
     }
   }
@@ -289,7 +289,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg: FlutterI18n.translate(context, "dorm_water.end_water_success"),
+        msg: I18n.of(context)!.dormWaterEndWaterSuccess,
       );
       setState(() {
         _isWaterRunning = false;
@@ -301,7 +301,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       showToast(
         context: context,
         msg:
-            "${FlutterI18n.translate(context, "dorm_water.end_water_failed")}: $e",
+            "${I18n.of(context)!.dormWaterEndWaterFailed}: $e",
       );
     }
   }
@@ -338,10 +338,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
             if (mounted) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "dorm_water.device_status_ready",
-                ),
+                msg: I18n.of(context)!.dormWaterDeviceStatusReady,
               );
             }
             return;
@@ -384,7 +381,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   Widget _buildLoginPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "dorm_water.title")),
+        title: Text(I18n.of(context)!.dormWaterTitle),
       ),
       body: _buildLoginTab(context),
     );
@@ -418,7 +415,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       showToast(
         context: context,
         msg:
-            "${FlutterI18n.translate(context, "dorm_water.add_device_failed")}: $e",
+            "${I18n.of(context)!.dormWaterAddDeviceFailed}: $e",
       );
     }
   }
@@ -427,17 +424,17 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   Widget _buildDeviceListPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "dorm_water.title")),
+        title: Text(I18n.of(context)!.dormWaterTitle),
         actions: [
           IconButton(
             icon: const Icon(MingCuteIcons.mgc_qrcode_line),
             onPressed: _scanQrCode,
-            tooltip: FlutterI18n.translate(context, "dorm_water.scan_qr_code"),
+            tooltip: I18n.of(context)!.dormWaterScanQrCode,
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _logout,
-            tooltip: FlutterI18n.translate(context, "dorm_water.logout"),
+            tooltip: I18n.of(context)!.dormWaterLogout,
           ),
         ],
       ),
@@ -455,7 +452,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
           controller: _phoneController,
           keyboardType: TextInputType.phone,
           decoration: InputDecoration(
-            labelText: FlutterI18n.translate(context, "dorm_water.phone"),
+            labelText: I18n.of(context)!.dormWaterPhone,
           ),
         ),
         const SizedBox(height: 12),
@@ -467,10 +464,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
               child: TextField(
                 controller: _imageCodeController,
                 decoration: InputDecoration(
-                  labelText: FlutterI18n.translate(
-                    context,
-                    "dorm_water.image_code",
-                  ),
+                  labelText: I18n.of(context)!.dormWaterImageCode,
                 ),
               ),
             ),
@@ -483,7 +477,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
         TextField(
           controller: _smsCodeController,
           decoration: InputDecoration(
-            labelText: FlutterI18n.translate(context, "dorm_water.sms_code"),
+            labelText: I18n.of(context)!.dormWaterSmsCode,
           ),
         ),
         const SizedBox(height: 16),
@@ -493,7 +487,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
               child: FilledButton.tonal(
                 onPressed: _sendSmsCode,
                 child: Text(
-                  FlutterI18n.translate(context, "dorm_water.send_sms"),
+                  I18n.of(context)!.dormWaterSendSms,
                 ),
               ),
             ),
@@ -501,7 +495,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
             Expanded(
               child: FilledButton(
                 onPressed: _isLoggingIn ? null : _login,
-                child: Text(FlutterI18n.translate(context, "dorm_water.login")),
+                child: Text(I18n.of(context)!.dormWaterLogin),
               ),
             ),
           ],
@@ -519,7 +513,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            Text(FlutterI18n.translate(context, "dorm_water.loading_devices")),
+            Text(I18n.of(context)!.dormWaterLoadingDevices),
           ],
         ),
       );
@@ -531,14 +525,14 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              FlutterI18n.translate(context, "dorm_water.fetch_devices_failed"),
+              I18n.of(context)!.dormWaterFetchDevicesFailed,
               style: const TextStyle(color: Colors.red),
             ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _loadDevices,
               child: Text(
-                FlutterI18n.translate(context, "dorm_water.retry_load_devices"),
+                I18n.of(context)!.dormWaterRetryLoadDevices,
               ),
             ),
           ],
@@ -551,12 +545,12 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(FlutterI18n.translate(context, "dorm_water.no_devices")),
+            Text(I18n.of(context)!.dormWaterNoDevices),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _loadDevices,
               child: Text(
-                FlutterI18n.translate(context, "dorm_water.select_device"),
+                I18n.of(context)!.dormWaterSelectDevice,
               ),
             ),
           ],
@@ -589,10 +583,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
                         if (!context.mounted) return;
                         showToast(
                           context: context,
-                          msg: FlutterI18n.translate(
-                            context,
-                            "dorm_water.device_removed_from_favorites",
-                          ),
+                          msg: I18n.of(context)!.dormWaterDeviceRemovedFromFavorites,
                         );
                         // Remove device from list without full refresh
                         setState(() {
@@ -603,7 +594,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
                         showToast(
                           context: context,
                           msg:
-                              "${FlutterI18n.translate(context, "dorm_water.remove_from_favorites_failed")}: $e",
+                              "${I18n.of(context)!.dormWaterRemoveFromFavoritesFailed}: $e",
                         );
                       }
                     },
@@ -665,7 +656,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
           ),
           child: Center(
             child: Text(
-              FlutterI18n.translate(context, "dorm_water.captcha_error"),
+              I18n.of(context)!.dormWaterCaptchaError,
               style: const TextStyle(color: Colors.red, fontSize: 10),
               textAlign: TextAlign.center,
             ),

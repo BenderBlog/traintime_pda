@@ -64,7 +64,6 @@ dependencies:
   share_plus: ^13.1.0
   # internationalized
   device_info_plus: ^13.1.0
-  flutter_i18n: ^0.37.1
   flutter_localizations:
     sdk: flutter
   intl:
@@ -96,6 +95,7 @@ flutter_native_splash:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     - assets/icon.png
     - assets/Icon-App-iTunes-Background.png
@@ -110,9 +110,6 @@ flutter:
     # - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
     # - assets/art/anan_christmas.png
     # - assets/art/Sakura_and_Tomoyo_Kimono.jpg
-    - assets/flutter_i18n/zh_CN.yaml
-    - assets/flutter_i18n/zh_TW.yaml
-    - assets/flutter_i18n/en_US.yaml
     # - assets/captcha-solver-payment.tflite
     # - assets/captcha-solver-zfw.tflite
     - assets/ruisi_flutter/

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -16,6 +15,7 @@ import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 /// The card in [classSubRow], mentioned in [ClassTableView].
 class ClassCard extends StatelessWidget {
@@ -97,10 +97,7 @@ class ClassCard extends StatelessWidget {
                     /// The way to show the class info of the period.
                     /// The last one indicate whether to delete this stuff.
                     final action = await BothSideSheet.show(
-                      title: FlutterI18n.translate(
-                        context,
-                        "classtable.class_card.title",
-                      ),
+                      title: I18n.of(context)!.classtableClassCardTitle,
                       child: ArrangementDetail(
                         information: List.generate(data.length, (index) {
                           if (data.elementAt(index) is Subject ||
@@ -196,7 +193,7 @@ class ClassCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
+                            "@${place ?? I18n.of(context)!.classtableClassCardUnknownClassroom}",
                             style: TextStyle(
                               color: textStyle.textColor,
                               fontSize: isPhone(context) ? 10 : 12,
@@ -204,13 +201,7 @@ class ClassCard extends StatelessWidget {
                           ),
                           if (data.length > 1)
                             Text(
-                              FlutterI18n.translate(
-                                context,
-                                "classtable.class_card.remains_hint",
-                                translationParams: {
-                                  "remain_count": (data.length - 1).toString(),
-                                },
-                              ),
+                              I18n.of(context)!.classtableClassCardRemainsHint((data.length - 1).toString()),
                               style: TextStyle(
                                 color: textStyle.textColor,
                                 fontSize: isPhone(context) ? 10 : 12,

@@ -550,14 +550,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  flutter_i18n:
-    dependency: "direct main"
-    description:
-      name: flutter_i18n
-      sha256: af7d625e4bfd04764d1554a6411d349dd62d4dc204105cc819a81a35a77bd9b6
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.37.1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -1594,14 +1586,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.0"
-  toml:
-    dependency: transitive
-    description:
-      name: toml
-      sha256: "35cd2a1351c14bd213f130f8efcbd3e0c18181bff0c8ca7a08f6822a2bede786"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.17.0"
   typed_data:
     dependency: transitive
     description:
@@ -1778,14 +1762,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.6.1"
-  xml2json:
-    dependency: transitive
-    description:
-      name: xml2json
-      sha256: "8a7ae63b76676f083d81287b61f03222952609c0507893bc62e60a4a588a9702"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.2.7"
   yaml:
     dependency: "direct dev"
     description:

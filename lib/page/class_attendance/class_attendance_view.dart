@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
@@ -14,6 +13,7 @@ import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ClassAttendanceView extends StatelessWidget {
   const ClassAttendanceView({super.key});
@@ -29,7 +29,7 @@ class ClassAttendanceView extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                FlutterI18n.translate(context, "class_attendance.title"),
+                I18n.of(context)!.classAttendanceTitle,
               ),
               actions: [
                 if (state.state == ClassAttendanceFetchState.ok ||
@@ -51,10 +51,7 @@ class ClassAttendanceView extends StatelessWidget {
                           const CircularProgressIndicator(),
                           const SizedBox(height: 16),
                           Text(
-                            FlutterI18n.translate(
-                              context,
-                              "class_attendance.long_load",
-                            ),
+                            I18n.of(context)!.classAttendanceLongLoad,
                           ),
                         ],
                       ),
@@ -67,10 +64,7 @@ class ClassAttendanceView extends StatelessWidget {
                     );
                   case ClassAttendanceFetchState.empty:
                     return EmptyListView(
-                      text: FlutterI18n.translate(
-                        context,
-                        "class_attendance.no_data",
-                      ),
+                      text: I18n.of(context)!.classAttendanceNoData,
                       type: EmptyListViewType.rolling,
                     );
                   case ClassAttendanceFetchState.ok:
@@ -137,37 +131,25 @@ class ClassAttendanceView extends StatelessWidget {
         children: [
           if (ineligibleCourses.isNotEmpty) ...[
             TimelineTitle(
-              title: FlutterI18n.translate(
-                context,
-                "class_attendance.course_state.ineligible",
-              ),
+              title: I18n.of(context)!.classAttendanceCourseStateIneligible,
             ),
             ineligibleCourses.toColumn(),
           ],
           if (warningCourses.isNotEmpty) ...[
             TimelineTitle(
-              title: FlutterI18n.translate(
-                context,
-                "class_attendance.course_state.warning",
-              ),
+              title: I18n.of(context)!.classAttendanceCourseStateWarning,
             ),
             warningCourses.toColumn(),
           ],
           if (eligibleCourses.isNotEmpty) ...[
             TimelineTitle(
-              title: FlutterI18n.translate(
-                context,
-                "class_attendance.course_state.eligible",
-              ),
+              title: I18n.of(context)!.classAttendanceCourseStateEligible,
             ),
             eligibleCourses.toColumn(),
           ],
           if (unknownCourses.isNotEmpty) ...[
             TimelineTitle(
-              title: FlutterI18n.translate(
-                context,
-                "class_attendance.course_state.unknown",
-              ),
+              title: I18n.of(context)!.classAttendanceCourseStateUnknown,
             ),
             unknownCourses.toColumn(),
           ],

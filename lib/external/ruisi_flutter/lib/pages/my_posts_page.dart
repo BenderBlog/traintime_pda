@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/pages/topic_list_page.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 import '../controller/ruisi_controller.dart';
 
@@ -15,7 +15,7 @@ class MyPostsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, 'ruisi.favorites.title')),
+        title: Text(I18n.of(context)!.ruisiFavoritesTitle),
       ),
       body: TopicListPage(
         getTopicList: (int page) =>

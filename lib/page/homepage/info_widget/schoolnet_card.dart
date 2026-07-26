@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 /*
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/schoolnet_controller.dart';
 import 'package:watermeter/page/schoolnet/network_card_window.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/l10n.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:signals/signals_flutter.dart';
@@ -32,40 +32,19 @@ class SchoolnetCard extends StatelessWidget {
           preference
               .getString(preference.Preference.schoolNetQueryPassword)
               .isEmpty
-          ? FlutterI18n.translate(
-              context,
-              "homepage.school_card_info_card.bill",
-            )
-          : FlutterI18n.translate(context, "homepage.school_net.no_password"),
+          ? I18n.of(context)!.homepageSchoolCardInfoCardBill
+          : I18n.of(context)!.homepageSchoolNetNoPassword,
       infoText: Text.rich(
         TextSpan(
           style: const TextStyle(fontSize: 20),
           children: [
             TextSpan(
               text: state.map(
-                data: (result) => FlutterI18n.translate(
-                  context,
-                  "homepage.school_net.title",
-                  translationParams: {
-                    "usage": result.data.used.replaceAll("G", " GB"),
-                  },
-                ),
-                loading: () => FlutterI18n.translate(
-                  context,
-                  "homepage.school_net.fetching",
-                ),
-                refreshing: () => FlutterI18n.translate(
-                  context,
-                  "homepage.school_net.fetching",
-                ),
-                reloading: () => FlutterI18n.translate(
-                  context,
-                  "homepage.school_net.fetching",
-                ),
-                error: (_, _) => FlutterI18n.translate(
-                  context,
-                  "homepage.school_net.failed",
-                ),
+                data: (result) => I18n.of(context)!.homepageSchoolNetTitle(result.data.used.replaceAll("G", " GB")),
+                loading: () => I18n.of(context)!.homepageSchoolNetFetching,
+                refreshing: () => I18n.of(context)!.homepageSchoolNetFetching,
+                reloading: () => I18n.of(context)!.homepageSchoolNetFetching,
+                error: (_, _) => I18n.of(context)!.homepageSchoolNetFailed,
               ),
             ),
           ],
@@ -73,20 +52,16 @@ class SchoolnetCard extends StatelessWidget {
       ),
       bottomText: Text(
         state.map(
-          data: (result) => FlutterI18n.translate(
-            context,
-            "homepage.school_net.remaining",
-            translationParams: {"remaining": result.data.charged},
-          ),
+          data: (result) => I18n.of(context)!.homepageSchoolNetRemaining(result.data.charged),
           loading: () =>
-              FlutterI18n.translate(context, "homepage.school_net.fetching"),
+              I18n.of(context)!.homepageSchoolNetFetching,
           refreshing: () =>
-              FlutterI18n.translate(context, "homepage.school_net.fetching"),
+              I18n.of(context)!.homepageSchoolNetFetching,
           reloading: () =>
-              FlutterI18n.translate(context, "homepage.school_net.fetching"),
+              I18n.of(context)!.homepageSchoolNetFetching,
           error: (errorStatus, _) => errorStatus is String
               ? FlutterI18n.translate(context, errorStatus)
-              : FlutterI18n.translate(context, "homepage.school_net.failed"),
+              : I18n.of(context)!.homepageSchoolNetFailed,
         ),
         overflow: TextOverflow.ellipsis,
       ),

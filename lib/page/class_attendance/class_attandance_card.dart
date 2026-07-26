@@ -1,12 +1,13 @@
 // Copyright 2025 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_detail.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/generated/l10n.dart';
+import './class_attendance_table.dart' show attendanceStatusName;
 
 class CourseCard extends StatelessWidget {
   final ClassAttendance course;
@@ -32,66 +33,42 @@ class CourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReXCard(
       title: Text(course.courseName),
-      remaining: [
-        ReXCardRemaining(
-          FlutterI18n.translate(context, course.attendanceStatus.i18nString),
-        ),
-      ],
+      remaining: [ReXCardRemaining(attendanceStatusName(context, course.attendanceStatus))],
       bottomRow: Column(
         children: [
           _buildInfoRow(
-            FlutterI18n.translate(context, "class_attendance.card.time"),
-            FlutterI18n.translate(
-              context,
-              "class_attendance.card.time_info",
-              translationParams: {
-                "checkInCount": course.checkInCount,
-                "absenceCount": course.absenceCount,
-                "requiredCheckIn": course.requiredCheckIn,
-              },
+            I18n.of(context)!.classAttendanceCardTime,
+            I18n.of(context)!.classAttendanceCardTimeInfo(
+              course.checkInCount,
+              course.absenceCount,
+              course.requiredCheckIn,
             ),
           ),
           _buildInfoRow(
-            FlutterI18n.translate(context, "class_attendance.card.not_attend"),
+            I18n.of(context)!.classAttendanceCardNotAttend,
             (totalTimes == null)
-                ? FlutterI18n.translate(
-                    context,
-                    "class_attendance.card.not_attend_info_error",
-                  )
-                : FlutterI18n.translate(
-                    context,
-                    "class_attendance.card.not_attend_info",
-                    translationParams: {
-                      "timeToHaveError":
-                          ((totalTimes! / 4).floor() -
-                                  (int.tryParse(course.absenceCount) ?? 0))
-                              .toString(),
-                      "totalTimes": totalTimes.toString(),
-                    },
+                ? I18n.of(context)!.classAttendanceCardNotAttendInfoError
+                : I18n.of(context)!.classAttendanceCardNotAttendInfo(
+                    ((totalTimes! / 4).floor() -
+                            (int.tryParse(course.absenceCount) ?? 0))
+                        .toString(),
+                    totalTimes.toString(),
                   ),
           ),
           _buildInfoRow(
-            FlutterI18n.translate(context, "class_attendance.card.leave"),
-            FlutterI18n.translate(
-              context,
-              "class_attendance.card.leave_info",
-              translationParams: {
-                "personalLeave": course.personalLeave,
-                "sickLeave": course.sickLeave,
-                "officialLeave": course.officialLeave,
-              },
+            I18n.of(context)!.classAttendanceCardLeave,
+            I18n.of(context)!.classAttendanceCardLeaveInfo(
+              course.personalLeave,
+              course.sickLeave,
+              course.officialLeave,
             ),
           ),
           _buildInfoRow(
-            FlutterI18n.translate(context, "class_attendance.card.study"),
-            FlutterI18n.translate(
-              context,
-              "class_attendance.card.study_info",
-              translationParams: {
-                "taskProgress": course.taskProgress,
-                "homeworkProgress": course.homeworkProgress,
-                "examProgress": course.examProgress,
-              },
+            I18n.of(context)!.classAttendanceCardStudy,
+            I18n.of(context)!.classAttendanceCardStudyInfo(
+              course.taskProgress,
+              course.homeworkProgress,
+              course.examProgress,
             ),
           ),
         ],
@@ -101,11 +78,9 @@ class CourseCard extends StatelessWidget {
         if (course.attendanceStatus != AttendanceStatus.unknown) {
           await BothSideSheet.show(
             context: context,
-            title: FlutterI18n.translate(
+            title: I18n.of(
               context,
-              "class_attendance.detail_title",
-              translationParams: {"courseName": course.courseName},
-            ),
+            )!.classAttendanceDetailTitle(course.courseName),
             child: ClassAttendanceDetailView(
               classAttendance: course,
               showAppBar: false,

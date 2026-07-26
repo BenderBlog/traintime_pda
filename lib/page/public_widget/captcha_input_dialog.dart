@@ -9,8 +9,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class CaptchaInputDialog extends StatefulWidget {
   final List<int> image;
@@ -53,11 +53,7 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
       if (mounted) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            "login.captcha_window.refresh_failed",
-            translationParams: {"error": e.toString()},
-          ),
+          msg: I18n.of(context)!.loginCaptchaWindowRefreshFailed(e.toString()),
         );
       }
     } finally {
@@ -72,7 +68,7 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(context, "login.captcha_window.title")),
+      title: Text(I18n.of(context)!.loginCaptchaWindowTitle),
       titleTextStyle: const TextStyle(fontSize: 20, color: Colors.black),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -95,31 +91,25 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
             style: const TextStyle(fontSize: 20),
             controller: _captchaController,
             decoration: InputDecoration(
-              hintText: FlutterI18n.translate(
-                context,
-                "login.captcha_window.hint",
-              ),
+              hintText: I18n.of(context)!.loginCaptchaWindowHint,
             ),
           ),
         ],
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(I18n.of(context)!.cancel),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(I18n.of(context)!.confirm),
           onPressed: () async {
             if (_captchaController.text.isEmpty) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "login.captcha_window.message_on_empty",
-                ),
+                msg: I18n.of(context)!.loginCaptchaWindowMessageOnEmpty,
               );
             } else {
               Navigator.of(context).pop(_captchaController.text);

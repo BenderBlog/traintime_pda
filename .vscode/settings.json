@@ -12,6 +12,7 @@
   "files.watcherExclude": {
     "**/.fvm": true
   },
+  "flutter-intl.generator": "flutter_gen_l10n",
   "files.associations": {
     "*.arb": "json"
   },

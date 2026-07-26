@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/schoolnet/current_net_info_page.dart';
 import 'package:watermeter/page/schoolnet/general_network_usage_page.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class NetworkCardWindow extends StatefulWidget {
   const NetworkCardWindow({super.key});
@@ -22,20 +22,14 @@ class _NetworkCardWindowState extends State<NetworkCardWindow> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, "school_net.title")),
+          title: Text(I18n.of(context)!.schoolNetTitle),
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
-                text: FlutterI18n.translate(
-                  context,
-                  "school_net.ids_account_net.title",
-                ),
+                text: I18n.of(context)!.schoolNetIdsAccountNetTitle,
               ),
               Tab(
-                text: FlutterI18n.translate(
-                  context,
-                  "school_net.current_login_net.title",
-                ),
+                text: I18n.of(context)!.schoolNetCurrentLoginNetTitle,
               ),
             ],
           ),

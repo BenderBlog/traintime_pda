@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 /// A dialog/card shows the class detail / time arrangement.
 class ClassDetailCard extends StatelessWidget {
@@ -68,7 +68,7 @@ class ClassDetailCard extends StatelessWidget {
             children: [
               Text(
                 "${classDetail.name}"
-                "${classDetail.code != null && classDetail.number != null ? "\n${classDetail.code} | ${FlutterI18n.translate(context, "classtable.course_detail_card.class_number_string", translationParams: {"number": classDetail.number.toString()})}" : ""}",
+                "${classDetail.code != null && classDetail.number != null ? "\n${classDetail.code} | ${I18n.of(context)!.classtableCourseDetailCardClassNumberString('${classDetail.number}')}" : ""}",
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,
@@ -83,10 +83,7 @@ class ClassDetailCard extends StatelessWidget {
                       icon: Icons.person,
                       str:
                           timeArrangement.teacher ??
-                          FlutterI18n.translate(
-                            context,
-                            "classtable.course_detail_card.unknown_teacher",
-                          ),
+                          I18n.of(context)!.classtableCourseDetailCardUnknownTeacher,
                       infoColor: infoColor,
                     ),
                   ),
@@ -95,10 +92,7 @@ class ClassDetailCard extends StatelessWidget {
                       icon: Icons.room,
                       str:
                           timeArrangement.classroom ??
-                          FlutterI18n.translate(
-                            context,
-                            "classtable.course_detail_card.unknown_place",
-                          ),
+                          I18n.of(context)!.classtableCourseDetailCardUnknownPlace,
                       infoColor: infoColor,
                     ),
                   ),
@@ -108,7 +102,7 @@ class ClassDetailCard extends StatelessWidget {
                 icon: Icons.access_time_filled_outlined,
                 str:
                     "${getWeekString(context, timeArrangement.day - 1)}"
-                    "${FlutterI18n.translate(context, "classtable.course_detail_card.class_period", translationParams: {"start": timeArrangement.start.toString(), "stop": timeArrangement.stop.toString()})} "
+                    "${I18n.of(context)!.classtableCourseDetailCardClassPeriod('${timeArrangement.start}', '${timeArrangement.stop}')} "
                     "${timeList[(timeArrangement.start - 1) * 2]}-${timeList[(timeArrangement.stop - 1) * 2 + 1]}",
                 infoColor: infoColor,
               ),

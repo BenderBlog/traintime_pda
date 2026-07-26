@@ -7,6 +7,7 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ExperimentCard extends StatelessWidget {
   const ExperimentCard({super.key});
@@ -18,7 +19,7 @@ class ExperimentCard extends StatelessWidget {
         context.pushReplacementNamed(Routes.experiment);
       },
       icon: MingCuteIcons.mgc_science_line,
-      nameKey: "homepage.toolbox.experiment",
+      name: I18n.of(context)!.homepageToolboxExperiment,
     );
   }
 }

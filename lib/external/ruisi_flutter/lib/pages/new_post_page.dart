@@ -1,8 +1,8 @@
+import 'package:watermeter/generated/l10n.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 
 import '../controller/ruisi_controller.dart';
@@ -155,7 +155,7 @@ class _NewPostPageState extends State<NewPostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, 'ruisi.post.title')),
+        title: Text(I18n.of(context)!.ruisiPostTitle),
         actions: [
           TextButton(
             onPressed: _submitting || _uploading || _metaLoading
@@ -167,7 +167,7 @@ class _NewPostPageState extends State<NewPostPage> {
                     width: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(FlutterI18n.translate(context, 'ruisi.post.publish')),
+                : Text(I18n.of(context)!.ruisiPostPublish),
           ),
         ],
       ),
@@ -190,10 +190,7 @@ class _NewPostPageState extends State<NewPostPage> {
                   value:
                       _selectedFid, // 注意：Flutter 新版本推荐使用 value 代替 initialValue
                   decoration: InputDecoration(
-                    labelText: FlutterI18n.translate(
-                      context,
-                      'ruisi.post.select_forum',
-                    ),
+                    labelText: I18n.of(context)!.ruisiPostSelectForum,
                     // 如果正在加载，提示用户稍等；如果加载失败且无数据，提示刷新
                     hintText: isLoading
                         ? "正在加载板块..."
@@ -218,10 +215,7 @@ class _NewPostPageState extends State<NewPostPage> {
                     if (v != null) _loadMeta(v);
                   },
                   validator: (v) => v == null
-                      ? FlutterI18n.translate(
-                          context,
-                          'ruisi.post.select_forum_hint',
-                        )
+                      ? I18n.of(context)!.ruisiPostSelectForumHint
                       : null,
                 );
               },
@@ -250,11 +244,11 @@ class _NewPostPageState extends State<NewPostPage> {
             TextFormField(
               controller: _subjectCtrl,
               decoration: InputDecoration(
-                labelText: FlutterI18n.translate(context, 'ruisi.post.subject'),
+                labelText: I18n.of(context)!.ruisiPostSubject,
                 border: const OutlineInputBorder(),
               ),
               validator: (v) => (v == null || v.isEmpty)
-                  ? FlutterI18n.translate(context, 'ruisi.post.subject_hint')
+                  ? I18n.of(context)!.ruisiPostSubjectHint
                   : null,
             ),
             const SizedBox(height: 16),
@@ -263,13 +257,13 @@ class _NewPostPageState extends State<NewPostPage> {
             TextFormField(
               controller: _contentCtrl,
               decoration: InputDecoration(
-                labelText: FlutterI18n.translate(context, 'ruisi.post.content'),
+                labelText: I18n.of(context)!.ruisiPostContent,
                 border: const OutlineInputBorder(),
                 alignLabelWithHint: true,
               ),
               maxLines: 12,
               validator: (v) => (v == null || v.isEmpty)
-                  ? FlutterI18n.translate(context, 'ruisi.post.content_hint')
+                  ? I18n.of(context)!.ruisiPostContentHint
                   : null,
             ),
             const SizedBox(height: 8),
@@ -283,7 +277,7 @@ class _NewPostPageState extends State<NewPostPage> {
                         ? Icons.keyboard
                         : Icons.emoji_emotions_outlined,
                   ),
-                  tooltip: FlutterI18n.translate(context, 'ruisi.post.smiley'),
+                  tooltip: I18n.of(context)!.ruisiPostSmiley,
                   onPressed: () => setState(() => _showSmiley = !_showSmiley),
                 ),
                 IconButton(
@@ -395,7 +389,7 @@ class _NewPostPageState extends State<NewPostPage> {
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(FlutterI18n.translate(context, 'ruisi.post.success')),
+          content: Text(I18n.of(context)!.ruisiPostSuccess),
         ),
       );
       Navigator.pop(context);
@@ -403,7 +397,7 @@ class _NewPostPageState extends State<NewPostPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error ?? FlutterI18n.translate(context, 'ruisi.post.failure'),
+            error ?? I18n.of(context)!.ruisiPostFailure,
           ),
         ),
       );

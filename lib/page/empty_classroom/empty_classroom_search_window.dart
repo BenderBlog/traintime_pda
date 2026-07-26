@@ -4,7 +4,6 @@
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/session_state.dart';
@@ -13,6 +12,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/empty_classroom_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/l10n.dart';
 
 class EmptyClassroomSearchWindow extends StatefulWidget {
   final List<EmptyClassroomPlace> places;
@@ -251,10 +251,7 @@ class _EmptyClassroomSearchWindowState
                 autofocus: false,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: FlutterI18n.translate(
-                    context,
-                    "empty_classroom.search_hint",
-                  ),
+                  hintText: I18n.of(context)!.emptyClassroomSearchHint,
                   isDense: false,
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
                   prefixIcon: const Icon(Icons.search),
@@ -285,11 +282,7 @@ class _EmptyClassroomSearchWindowState
                           });
                         },
                         child: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "empty_classroom.date",
-                            translationParams: {"date": formatter.format(time)},
-                          ),
+                          I18n.of(context)!.emptyClassroomDate(formatter.format(time)),
                         ),
                       ).padding(right: 8),
                       FilledButton(
@@ -300,11 +293,7 @@ class _EmptyClassroomSearchWindowState
                           chooseBuilding();
                         },
                         child: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "empty_classroom.building",
-                            translationParams: {"building": chosen.name},
-                          ),
+                          I18n.of(context)!.emptyClassroomBuilding(chosen.name),
                         ),
                       ),
                     ].toRow(),
@@ -316,13 +305,13 @@ class _EmptyClassroomSearchWindowState
                   getIcon(true),
                   const SizedBox(width: 4.0),
                   Text(
-                    FlutterI18n.translate(context, "empty_classroom.occupied"),
+                    I18n.of(context)!.emptyClassroomOccupied,
                   ),
                 ].toRow().padding(right: 8.0),
                 [
                   getIcon(false),
                   const SizedBox(width: 4.0),
-                  Text(FlutterI18n.translate(context, "empty_classroom.empty")),
+                  Text(I18n.of(context)!.emptyClassroomEmpty),
                 ].toRow(),
               ].toRow(mainAxisAlignment: MainAxisAlignment.center),
             ]

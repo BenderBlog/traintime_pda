@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class TimeSelector extends StatefulWidget {
   final int initialWeek;
@@ -55,10 +55,7 @@ class _TimeSelectorState extends State<TimeSelector> {
                 children: [
                   Icon(Icons.schedule, color: widget.color, size: 16),
                   Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.class_add.input_time_hint",
-                    ),
+                    I18n.of(context)!.classtableClassAddInputTimeHint,
                   ).textStyle(TextStyle(color: widget.color)).padding(left: 4),
                 ],
               ),
@@ -68,28 +65,19 @@ class _TimeSelectorState extends State<TimeSelector> {
                   Row(
                     children: [
                       Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.input_time_weekday_hint",
-                            ),
+                            I18n.of(context)!.classtableClassAddInputTimeWeekdayHint,
                           )
                           .textStyle(TextStyle(color: widget.color))
                           .center()
                           .flexible(),
                       Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.input_start_time_hint",
-                            ),
+                            I18n.of(context)!.classtableClassAddInputStartTimeHint,
                           )
                           .textStyle(TextStyle(color: widget.color))
                           .center()
                           .flexible(),
                       Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.input_end_time_hint",
-                            ),
+                            I18n.of(context)!.classtableClassAddInputEndTimeHint,
                           )
                           .textStyle(TextStyle(color: widget.color))
                           .center()
@@ -122,13 +110,7 @@ class _TimeSelectorState extends State<TimeSelector> {
                           11,
                           (index) => WheelChooseOptions(
                             data: index + 1,
-                            hint: FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.wheel_choose_hint",
-                              translationParams: {
-                                "index": (index + 1).toString(),
-                              },
-                            ),
+                            hint: I18n.of(context)!.classtableClassAddWheelChooseHint((index + 1).toString()),
                           ),
                         ),
                       ).flexible(),
@@ -142,13 +124,7 @@ class _TimeSelectorState extends State<TimeSelector> {
                           11,
                           (index) => WheelChooseOptions(
                             data: index + 1,
-                            hint: FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.wheel_choose_hint",
-                              translationParams: {
-                                "index": (index + 1).toString(),
-                              },
-                            ),
+                            hint: I18n.of(context)!.classtableClassAddWheelChooseHint((index + 1).toString()),
                           ),
                         ),
                       ).flexible(),

@@ -2,7 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -10,6 +9,7 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/score/score_compose_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/repository/preference.dart';
+import 'package:watermeter/generated/l10n.dart';
 
 class ScoreInfoCard extends StatefulWidget {
   // Mark is a variable in ScoreInfo class
@@ -91,10 +91,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                   TextSpan(text: "${c.scoreData[widget.mark].scoreStatus} "),
                 if (c.scoreData[widget.mark].isPassed == false)
                   TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "score.score_info_card.failed",
-                    ),
+                    text: I18n.of(context)!.scoreScoreInfoCardFailed,
                   ),
                 TextSpan(text: c.scoreData[widget.mark].name),
               ],
@@ -107,13 +104,13 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
             ),
             child: [
               Text(
-                "${FlutterI18n.translate(context, "score.score_compose_card.credit")}: ${c.scoreData[widget.mark].credit}",
+                "${I18n.of(context)!.scoreScoreComposeCardCredit}: ${c.scoreData[widget.mark].credit}",
               ).expanded(flex: 2),
               Text(
-                "${FlutterI18n.translate(context, "score.score_compose_card.gpa")}: ${c.scoreData[widget.mark].gpa}",
+                "${I18n.of(context)!.scoreScoreComposeCardGpa}: ${c.scoreData[widget.mark].gpa}",
               ).expanded(flex: 3),
               Text(
-                "${FlutterI18n.translate(context, "score.score_compose_card.score")}: ${c.scoreData[widget.mark].scoreStr}",
+                "${I18n.of(context)!.scoreScoreComposeCardScore}: ${c.scoreData[widget.mark].scoreStr}",
               ).expanded(flex: 3),
             ].toRow(),
           ),

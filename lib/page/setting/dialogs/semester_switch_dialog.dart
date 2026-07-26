@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:flutter_i18n/flutter_i18n.dart' as i18n;
 import 'package:watermeter/repository/logger.dart' as log;
+import 'package:watermeter/generated/l10n.dart';
 
 class SemesterSwitchDialog extends StatefulWidget {
   const SemesterSwitchDialog({super.key});
@@ -52,28 +52,18 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
         .map(
           (e) => WheelChooseOptions(
             data: e,
-            hint: i18n.FlutterI18n.translate(
-              context,
-              'classtable.semester_switcher.year',
-              translationParams: {'year': '$e'},
-            ),
+            hint: I18n.of(context)!.classtableSemesterSwitcherYear('$e'),
           ),
         )
         .toList();
     semesterOptions = [
       WheelChooseOptions(
         data: 1,
-        hint: i18n.FlutterI18n.translate(
-          context,
-          'classtable.semester_switcher.first_academic_year',
-        ),
+        hint: I18n.of(context)!.classtableSemesterSwitcherFirstAcademicYear,
       ),
       WheelChooseOptions(
         data: 2,
-        hint: i18n.FlutterI18n.translate(
-          context,
-          'classtable.semester_switcher.second_academic_year',
-        ),
+        hint: I18n.of(context)!.classtableSemesterSwitcherSecondAcademicYear,
       ),
     ];
   }
@@ -120,7 +110,7 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              i18n.FlutterI18n.translate(context, 'error_detected'),
+              I18n.of(context)!.errorDetected,
             ),
           ),
         );
@@ -137,17 +127,14 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: i18n.I18nText('classtable.semester_switcher.choose_semester'),
+      title: Text(I18n.of(context)!.classtableSemesterSwitcherChooseSemester),
       content: SizedBox(
         width: double.maxFinite,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              i18n.FlutterI18n.translate(
-                context,
-                'classtable.semester_switcher.only_future_hint',
-              ),
+              I18n.of(context)!.classtableSemesterSwitcherOnlyFutureHint,
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             AbsorbPointer(
@@ -197,14 +184,8 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
                     : const Icon(Icons.cloud_download),
                 label: Text(
                   _isFetching
-                      ? i18n.FlutterI18n.translate(
-                          context,
-                          'classtable.semester_switcher.fetching_remote_semester',
-                        )
-                      : i18n.FlutterI18n.translate(
-                          context,
-                          'classtable.semester_switcher.fetch_remote_semester',
-                        ),
+                      ? I18n.of(context)!.classtableSemesterSwitcherFetchingRemoteSemester
+                      : I18n.of(context)!.classtableSemesterSwitcherFetchRemoteSemester,
                 ),
               ),
             ),
@@ -216,7 +197,7 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
           onPressed: () {
             Navigator.of(context).pop(false);
           },
-          child: i18n.I18nText('cancel'),
+          child: Text(I18n.of(context)!.cancel),
         ),
         TextButton(
           onPressed: _isFetching
@@ -233,7 +214,7 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
                     Navigator.of(context).pop(didChange);
                   }
                 },
-          child: i18n.I18nText('confirm'),
+          child: Text(I18n.of(context)!.confirm),
         ),
       ],
     );

@@ -536,7 +536,7 @@ homepage:
     tomorrow: "{remain} arrangment(s) tomorrow"
     tomorrow_none: No arrangement tomorrow
     week_info: Week {weekinfo}
-    holiday: On vacation
+    on_holiday: On vacation
     error_message: "An error occurred: {error}"
     fetching_message: Fetching class schedule
     error_infoText: An error occurred
@@ -1349,7 +1349,7 @@ easter_egg_apple: |
   And I never could say
   What I'm feeling today
   For you...
-For youeaster_egg_others: |
+easter_egg_others: |
   === Cardcaptor Sakura OP3 ===
   Vocal: Maaya Sakamoto, 2000
   In Japanese Roman Letters
@@ -1467,6 +1467,7 @@ ruisi:
     daily_checkin: Daily Check-in
     settings: Settings
     about: About
+    search: Search
   login:
     title: Login to Ruisi
     username: Username
@@ -1521,6 +1522,7 @@ ruisi:
     sticky: Pinned
   forum_list:
     title: Forum List
+    empty: Ruisi Forum section grouping is empty
   favorites:
     title: My Favorites
     empty: No favorites
@@ -1550,3 +1552,9 @@ ruisi:
     title: Me
     tab_profile: Profile
     unknown: Unknown User
+loadError: Load Error
+course_reminder:
+  title: "Pre-class Reminder: {name}"
+  body: "Class starts in {time} minutes"
+  location: "Location: {location}"
+  teacher: "Teacher: {teacher}"
