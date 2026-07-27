@@ -32,7 +32,7 @@ class _BookDetailCardState extends State<BookDetailCard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            BookCover(toUse: widget.toUse, width: 120, height: 150)
+            BookCover(toUse: widget.toUse)
                 .clipRRect(all: 14)
                 .padding(all: 2)
                 .decorated(
