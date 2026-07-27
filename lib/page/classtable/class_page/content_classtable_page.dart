@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
@@ -26,7 +27,6 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/generated/l10n.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 class ContentClassTablePage extends StatefulWidget {
   const ContentClassTablePage({super.key});
@@ -209,7 +209,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         )!.classtableStatusSourceOtherExperiment,
       };
 
-    Object? sourceHintKey(ClassTableStatusSource source) => switch (source) {
+    CacheHint? sourceHintKey(ClassTableStatusSource source) => switch (source) {
       ClassTableStatusSource.classTable => state.classTableCacheHintKey,
       ClassTableStatusSource.exam => state.examCacheHintKey,
       ClassTableStatusSource.physicsExperiment =>
@@ -224,7 +224,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       ...errorWithoutCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
-            ? _classtableHintKey(context, hintKey)
+            ? hintKey.resolve(I18n.of(context)!)
             : I18n.of(context)!.networkError;
         return "${sourceLabel(source)}: $detail";
       }),
@@ -236,7 +236,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       ...errorWithCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
-            ? _classtableHintKey(context, hintKey)
+            ? hintKey.resolve(I18n.of(context)!)
             : I18n.of(context)!.networkError;
         return "${sourceLabel(source)}: $detail";
       }),
@@ -864,15 +864,3 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   );
 }
 
-String _classtableHintKey(BuildContext context, Object? hint) =>
-    switch (hint) {
-      ClasstableCacheHint.passwordWrong =>
-        I18n.of(context)!.classtableCacheHintPasswordWrong,
-      ClasstableCacheHint.loginFailed =>
-        I18n.of(context)!.classtableCacheHintLoginFailed,
-      ClasstableCacheHint.networkFailed =>
-        I18n.of(context)!.classtableCacheHintNetworkFailed,
-      ClasstableCacheHint.unknownError =>
-        I18n.of(context)!.classtableCacheHintUnknownError,
-      _ => I18n.of(context)!.networkError,
-    };

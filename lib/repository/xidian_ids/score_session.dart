@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:watermeter/generated/l10n.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
@@ -20,11 +21,19 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-enum ScoreCacheHint {
+enum ScoreCacheHint implements CacheHint {
   passwordWrong,
   loginFailed,
   networkFailed,
-  unknownError,
+  unknownError;
+
+  @override
+  String resolve(I18n i18n) => switch (this) {
+    passwordWrong => i18n.scoreCacheHintPasswordWrong,
+    loginFailed  => i18n.scoreCacheHintLoginFailed,
+    networkFailed => i18n.scoreCacheHintNetworkFailed,
+    unknownError => i18n.scoreCacheHintUnknownError,
+  };
 }
 
 ScoreCacheHint _cacheHintFromError(Object error) {

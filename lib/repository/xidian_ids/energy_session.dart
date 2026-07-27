@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:intl/intl.dart';
 import 'package:time/time.dart';
+import 'package:watermeter/generated/l10n.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
@@ -19,7 +20,7 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-enum EnergyCacheHint {
+enum EnergyCacheHint implements CacheHint {
   notSchoolNetwork,
   accountMissing,
   accountParseFailed,
@@ -27,7 +28,16 @@ enum EnergyCacheHint {
   passwordWrong,
   loginFailed,
   networkFailed,
-  unknownError,
+  unknownError;
+
+  @override
+  String resolve(I18n i18n) => switch (this) {
+    notSchoolNetwork  => i18n.electricityNotSchoolNetwork,
+    loginFailed       => i18n.electricityCacheHintLoginFailed,
+    networkFailed     => i18n.electricityCacheHintNetworkFailed,
+    unknownError      => i18n.electricityCacheHintUnknownError,
+    _                 => i18n.cacheReasonDefault,
+  };
 }
 
 EnergyCacheHint _cacheHintFromError(Object error) {

@@ -62,7 +62,7 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
         if (result.isCache)
           CacheAlerter(
             dataType: I18n.of(context)!.schoolNetTitle,
-            hint: _schoolnetCacheHint(context, result.cacheHint),
+            hint: result.cacheHint?.resolve(I18n.of(context)!) ?? I18n.of(context)!.cacheReasonDefault,
             placeOfCache: PlaceOfCache.inapp,
             fetchTime: result.fetchTime,
           ).center(),
@@ -303,15 +303,3 @@ class _DeviceListLite extends StatelessWidget {
   }
 }
 
-String _schoolnetCacheHint(BuildContext context, Object? hint) {
-  if (hint == null) {
-    return I18n.of(context)!.cacheReasonDefault;
-  }
-  return switch (hint) {
-    SchoolnetCacheHint.captchaFailed =>
-      I18n.of(context)!.schoolNetCacheHintCaptchaFailed,
-    SchoolnetCacheHint.requestFailed =>
-      I18n.of(context)!.schoolNetCacheHintRequestFailed,
-    _ => I18n.of(context)!.cacheReasonDefault,
-  };
-}

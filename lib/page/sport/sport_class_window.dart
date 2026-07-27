@@ -61,7 +61,7 @@ class _SportClassWindowState extends State<SportClassWindow>
                 if (result.isCache)
                   CacheAlerter(
                     dataType: I18n.of(context)!.sportTitle,
-                    hint: _sportCacheHint(context, result.cacheHint),
+                    hint: result.cacheHint?.resolve(I18n.of(context)!) ?? I18n.of(context)!.cacheReasonDefault,
                     placeOfCache: PlaceOfCache.inapp,
                     fetchTime: result.fetchTime,
                   ),
@@ -153,25 +153,3 @@ class SportClassCard extends StatelessWidget {
   }
 }
 
-String _sportCacheHint(BuildContext context, Object? hint) {
-  if (hint == null) {
-    return I18n.of(context)!.cacheReasonDefault;
-  }
-  return switch (hint) {
-    SportCacheHint.missingPassword =>
-      I18n.of(context)!.sportCacheHintMissingPassword,
-    SportCacheHint.credentialInvalid =>
-      I18n.of(context)!.sportCacheHintCredentialInvalid,
-    SportCacheHint.maintain =>
-      I18n.of(context)!.sportCacheHintMaintain,
-    SportCacheHint.loginFailed =>
-      I18n.of(context)!.sportCacheHintLoginFailed,
-    SportCacheHint.queryFailed =>
-      I18n.of(context)!.sportCacheHintQueryFailed,
-    SportCacheHint.networkFailed =>
-      I18n.of(context)!.sportCacheHintNetwork,
-    SportCacheHint.unknownError =>
-      I18n.of(context)!.sportCacheHintUnknown,
-    _ => I18n.of(context)!.cacheReasonDefault,
-  };
-}

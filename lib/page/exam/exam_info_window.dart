@@ -17,7 +17,6 @@ import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dar
 import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 import 'package:watermeter/generated/l10n.dart';
-import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 
 class ExamInfoWindow extends StatefulWidget {
   const ExamInfoWindow({super.key});
@@ -123,7 +122,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     if (isFromCache && fetchTime != null)
                       CacheAlerter(
                         dataType: I18n.of(context)!.examTitle,
-                        hint: _examCacheHint(context, cacheHintKey),
+                        hint: cacheHintKey?.resolve(I18n.of(context)!) ?? I18n.of(context)!.cacheReasonDefault,
                         placeOfCache: PlaceOfCache.device,
                         fetchTime: fetchTime,
                       ),
@@ -170,19 +169,3 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
   }
 }
 
-String _examCacheHint(BuildContext context, Object? hint) {
-  if (hint == null) {
-    return I18n.of(context)!.cacheReasonDefault;
-  }
-  return switch (hint) {
-    ExamCacheHint.passwordWrong =>
-      I18n.of(context)!.examCacheHintPasswordWrong,
-    ExamCacheHint.loginFailed =>
-      I18n.of(context)!.examCacheHintLoginFailed,
-    ExamCacheHint.networkFailed =>
-      I18n.of(context)!.examCacheHintNetworkFailed,
-    ExamCacheHint.unknownError =>
-      I18n.of(context)!.examCacheHintUnknownError,
-    _ => I18n.of(context)!.cacheReasonDefault,
-  };
-}

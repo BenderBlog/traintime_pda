@@ -95,7 +95,7 @@ class OtherExperimentController {
     () => _lastValidOtherExperiment.value?.fetchTime,
   );
 
-  late final otherExperimentCacheHintKey = computed<Object?>(
+  late final otherExperimentCacheHintKey = computed<CacheHint?>(
     () => _lastValidOtherExperiment.value?.cacheHint,
   );
 

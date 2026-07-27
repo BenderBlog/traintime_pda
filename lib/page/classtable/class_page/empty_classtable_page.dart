@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
 import 'package:watermeter/page/exam/exam_info_window.dart';
 import 'package:watermeter/page/experiment/experiment_window.dart';
@@ -9,7 +10,6 @@ import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/generated/l10n.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 
 class EmptyClassTablePage extends StatelessWidget {
   const EmptyClassTablePage({super.key});
@@ -31,7 +31,7 @@ class EmptyClassTablePage extends StatelessWidget {
             I18n.of(context)!.classtableStatusSourceOtherExperiment,
         };
 
-    Object? sourceHintKey(ClassTableStatusSource source) => switch (source) {
+    CacheHint? sourceHintKey(ClassTableStatusSource source) => switch (source) {
       ClassTableStatusSource.classTable => state.classTableCacheHintKey,
       ClassTableStatusSource.exam => state.examCacheHintKey,
       ClassTableStatusSource.physicsExperiment =>
@@ -46,7 +46,7 @@ class EmptyClassTablePage extends StatelessWidget {
       ...errorWithoutCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
-            ? _classtableHintKey(context, hintKey)
+            ? hintKey.resolve(I18n.of(context)!)
             : I18n.of(context)!.networkError;
         return "${sourceLabel(source)}: $detail";
       }),
@@ -58,7 +58,7 @@ class EmptyClassTablePage extends StatelessWidget {
       ...errorWithCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
-            ? _classtableHintKey(context, hintKey)
+            ? hintKey.resolve(I18n.of(context)!)
             : I18n.of(context)!.networkError;
         return "${sourceLabel(source)}: $detail";
       }),
@@ -179,15 +179,3 @@ class EmptyClassTablePage extends StatelessWidget {
   }
 }
 
-String _classtableHintKey(BuildContext context, Object? hint) =>
-    switch (hint) {
-      ClasstableCacheHint.passwordWrong =>
-        I18n.of(context)!.classtableCacheHintPasswordWrong,
-      ClasstableCacheHint.loginFailed =>
-        I18n.of(context)!.classtableCacheHintLoginFailed,
-      ClasstableCacheHint.networkFailed =>
-        I18n.of(context)!.classtableCacheHintNetworkFailed,
-      ClasstableCacheHint.unknownError =>
-        I18n.of(context)!.classtableCacheHintUnknownError,
-      _ => I18n.of(context)!.networkError,
-    };

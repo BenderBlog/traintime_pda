@@ -1,11 +1,17 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/l10n.dart';
+
+abstract interface class CacheHint {
+  String resolve(I18n i18n);
+}
+
 class FetchResult<T> {
   final bool isCache;
   final DateTime fetchTime;
   final T data;
-  final Object? cacheHint;
+  final CacheHint? cacheHint;
 
   const FetchResult._({
     required this.isCache,
@@ -20,7 +26,7 @@ class FetchResult<T> {
   factory FetchResult.cache({
     required DateTime fetchTime,
     required T data,
-    Object? cacheHint,
+    CacheHint? cacheHint,
   }) => FetchResult._(
     isCache: true,
     fetchTime: fetchTime,

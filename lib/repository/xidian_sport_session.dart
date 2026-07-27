@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/generated/l10n.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
@@ -19,14 +20,25 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
-enum SportCacheHint {
+enum SportCacheHint implements CacheHint {
   missingPassword,
   credentialInvalid,
   maintain,
   loginFailed,
   queryFailed,
   networkFailed,
-  unknownError,
+  unknownError;
+
+  @override
+  String resolve(I18n i18n) => switch (this) {
+    missingPassword    => i18n.sportCacheHintMissingPassword,
+    credentialInvalid  => i18n.sportCacheHintCredentialInvalid,
+    maintain           => i18n.sportCacheHintMaintain,
+    loginFailed        => i18n.sportCacheHintLoginFailed,
+    queryFailed        => i18n.sportCacheHintQueryFailed,
+    networkFailed      => i18n.sportCacheHintNetwork,
+    unknownError       => i18n.sportCacheHintUnknown,
+  };
 }
 
 class SportSession {

@@ -13,7 +13,6 @@ import 'package:watermeter/page/energy/electricity_usage_graph.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/generated/l10n.dart';
-import 'package:watermeter/repository/xidian_ids/energy_session.dart';
 
 class ElectricityEnergyCard extends StatelessWidget {
   const ElectricityEnergyCard({super.key});
@@ -91,7 +90,7 @@ class ElectricityEnergyCard extends StatelessWidget {
             if (isFromCache && fetchTime != null)
               CacheAlerter(
                 dataType: I18n.of(context)!.electricityPowerTitle,
-                hint: _electricityCacheHint(context, cacheHintKey),
+                hint: cacheHintKey?.resolve(I18n.of(context)!) ?? I18n.of(context)!.cacheReasonDefault,
                 placeOfCache: PlaceOfCache.device,
                 fetchTime: fetchTime,
               ).padding(bottom: 8, horizontal: 12),
@@ -159,19 +158,3 @@ class ElectricityEnergyCard extends StatelessWidget {
   }
 }
 
-String _electricityCacheHint(BuildContext context, Object? hint) {
-  if (hint == null) {
-    return I18n.of(context)!.cacheReasonDefault;
-  }
-  return switch (hint) {
-    EnergyCacheHint.notSchoolNetwork =>
-      I18n.of(context)!.electricityNotSchoolNetwork,
-    EnergyCacheHint.loginFailed =>
-      I18n.of(context)!.electricityCacheHintLoginFailed,
-    EnergyCacheHint.networkFailed =>
-      I18n.of(context)!.electricityCacheHintNetworkFailed,
-    EnergyCacheHint.unknownError =>
-      I18n.of(context)!.electricityCacheHintUnknownError,
-    _ => I18n.of(context)!.cacheReasonDefault,
-  };
-}

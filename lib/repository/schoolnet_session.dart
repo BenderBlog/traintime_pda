@@ -8,6 +8,7 @@ import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pointycastle/asymmetric/api.dart';
+import 'package:watermeter/generated/l10n.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/network_usage.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
@@ -16,9 +17,15 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
-enum SchoolnetCacheHint {
+enum SchoolnetCacheHint implements CacheHint {
   captchaFailed,
-  requestFailed,
+  requestFailed;
+
+  @override
+  String resolve(I18n i18n) => switch (this) {
+    captchaFailed => i18n.schoolNetCacheHintCaptchaFailed,
+    requestFailed => i18n.schoolNetCacheHintRequestFailed,
+  };
 }
 
 class SchoolnetSession extends NetworkSession {

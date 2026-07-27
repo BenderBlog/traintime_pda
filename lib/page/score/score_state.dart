@@ -44,7 +44,7 @@ class ScoreState extends ChangeNotifier {
   StackTrace? stackTrace;
 
   /// Hintkey for cache result
-  Object? cacheHint;
+  CacheHint? cacheHint;
 
   /// Is score is selected to count.
   List<bool> isSelected = [];

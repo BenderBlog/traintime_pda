@@ -18,8 +18,6 @@ import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dar
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/generated/l10n.dart';
-import 'package:watermeter/repository/physics_experiment_session.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 
 class ExperimentWindow extends StatefulWidget {
   const ExperimentWindow({super.key});
@@ -49,33 +47,6 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
       return I18n.of(context)!.experimentFetchingHintPhysics;
     }
     return I18n.of(context)!.experimentFetchingHintOther;
-  }
-
-  String _resolveCacheHint(BuildContext context, {required Object? cacheHint}) {
-    if (cacheHint == null) {
-      return I18n.of(context)!.cacheReasonDefault;
-    }
-    return switch (cacheHint) {
-      PhysicsExperimentCacheHint.missingPassword =>
-        I18n.of(context)!.experimentPhysicsCacheHintMissingPassword,
-      PhysicsExperimentCacheHint.loginFailed =>
-        I18n.of(context)!.experimentPhysicsCacheHintLoginFailed,
-      PhysicsExperimentCacheHint.notSchoolNetwork =>
-        I18n.of(context)!.experimentPhysicsCacheHintNotSchoolNetwork,
-      PhysicsExperimentCacheHint.networkFailed =>
-        I18n.of(context)!.experimentPhysicsCacheHintNetworkFailed,
-      PhysicsExperimentCacheHint.unknownError =>
-        I18n.of(context)!.experimentPhysicsCacheHintUnknownError,
-      OtherExperimentCacheHint.loginFailed =>
-        I18n.of(context)!.experimentOtherCacheHintLoginFailed,
-      OtherExperimentCacheHint.notSchoolNetwork =>
-        I18n.of(context)!.experimentOtherCacheHintNotSchoolNetwork,
-      OtherExperimentCacheHint.networkFailed =>
-        I18n.of(context)!.experimentOtherCacheHintNetworkFailed,
-      OtherExperimentCacheHint.unknownError =>
-        I18n.of(context)!.experimentOtherCacheHintUnknownError,
-      _ => I18n.of(context)!.cacheReasonDefault,
-    };
   }
 
   List<ExperimentData> _sortExperiments(Iterable<ExperimentData> data) {
@@ -155,24 +126,14 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
         if (isPhysicsFromCache && physicsFetchTime != null)
           CacheAlerter(
             dataType: I18n.of(context)!.experimentPhysicsExperiment,
-            hint: _resolveCacheHint(
-              context,
-              cacheHint: PhysicsExperimentController
-                  .i
-                  .physicsExperimentCacheHintKey
-                  .value,
-            ),
+            hint: PhysicsExperimentController.i.physicsExperimentCacheHintKey.value?.resolve(I18n.of(context)!) ?? I18n.of(context)!.cacheReasonDefault,
             placeOfCache: PlaceOfCache.device,
             fetchTime: physicsFetchTime,
           ),
         if (isOtherFromCache && otherFetchTime != null)
           CacheAlerter(
             dataType: I18n.of(context)!.experimentOtherExperiment,
-            hint: _resolveCacheHint(
-              context,
-              cacheHint:
-                  OtherExperimentController.i.otherExperimentCacheHintKey.value,
-            ),
+            hint: OtherExperimentController.i.otherExperimentCacheHintKey.value?.resolve(I18n.of(context)!) ?? I18n.of(context)!.cacheReasonDefault,
             placeOfCache: PlaceOfCache.device,
             fetchTime: otherFetchTime,
           ),

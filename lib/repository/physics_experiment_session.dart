@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:pool/pool.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/generated/l10n.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/password_exceptions.dart';
@@ -20,12 +21,21 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-enum PhysicsExperimentCacheHint {
+enum PhysicsExperimentCacheHint implements CacheHint {
   missingPassword,
   loginFailed,
   notSchoolNetwork,
   networkFailed,
-  unknownError,
+  unknownError;
+
+  @override
+  String resolve(I18n i18n) => switch (this) {
+    missingPassword  => i18n.experimentPhysicsCacheHintMissingPassword,
+    loginFailed      => i18n.experimentPhysicsCacheHintLoginFailed,
+    notSchoolNetwork => i18n.experimentPhysicsCacheHintNotSchoolNetwork,
+    networkFailed    => i18n.experimentPhysicsCacheHintNetworkFailed,
+    unknownError     => i18n.experimentPhysicsCacheHintUnknownError,
+  };
 }
 
 PhysicsExperimentCacheHint _cacheHintFromError(Object error) {

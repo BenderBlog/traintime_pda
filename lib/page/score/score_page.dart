@@ -16,7 +16,6 @@ import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
 import 'package:watermeter/generated/l10n.dart';
-import 'package:watermeter/repository/xidian_ids/score_session.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({super.key});
@@ -76,7 +75,7 @@ class _ScorePageState extends State<ScorePage> {
             builder: (context, state, _) {
               if (state.state == ScoreFetchState.readyCache) {
                 return CacheAlerter(
-                  hint: _scoreCacheHint(context, state.cacheHint),
+                  hint: state.cacheHint?.resolve(I18n.of(context)!) ?? I18n.of(context)!.cacheReasonDefault,
                   placeOfCache: PlaceOfCache.device,
                   fetchTime: state.fetchDate,
                 );
@@ -256,23 +255,3 @@ class _ScorePageState extends State<ScorePage> {
   }
 }
 
-String _scoreCacheHint(BuildContext context, Object? hint) {
-  if (hint == null) {
-    return I18n.of(context)!.cacheReasonDefault;
-  }
-  return switch (hint) {
-    ScoreCacheHint.passwordWrong => I18n.of(
-      context,
-    )!.scoreCacheHintPasswordWrong,
-    ScoreCacheHint.loginFailed => I18n.of(
-      context,
-    )!.scoreCacheHintLoginFailed,
-    ScoreCacheHint.networkFailed => I18n.of(
-      context,
-    )!.scoreCacheHintNetworkFailed,
-    ScoreCacheHint.unknownError => I18n.of(
-      context,
-    )!.scoreCacheHintUnknownError,
-    _ => I18n.of(context)!.cacheReasonDefault,
-  };
-}

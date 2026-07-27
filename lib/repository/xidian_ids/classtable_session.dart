@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/generated/l10n.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -21,11 +22,19 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-enum ClasstableCacheHint {
+enum ClasstableCacheHint implements CacheHint {
   passwordWrong,
   loginFailed,
   networkFailed,
-  unknownError,
+  unknownError;
+
+  @override
+  String resolve(I18n i18n) => switch (this) {
+    passwordWrong => i18n.classtableCacheHintPasswordWrong,
+    loginFailed  => i18n.classtableCacheHintLoginFailed,
+    networkFailed => i18n.classtableCacheHintNetworkFailed,
+    unknownError => i18n.classtableCacheHintUnknownError,
+  };
 }
 
 ClasstableCacheHint _cacheHintFromError(Object error) {
