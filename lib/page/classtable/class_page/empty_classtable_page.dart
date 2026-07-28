@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
 import 'package:watermeter/page/exam/exam_info_window.dart';
 import 'package:watermeter/page/experiment/experiment_window.dart';
@@ -9,6 +9,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class EmptyClassTablePage extends StatelessWidget {
   const EmptyClassTablePage({super.key});
@@ -19,17 +20,18 @@ class EmptyClassTablePage extends StatelessWidget {
     final errorWithCacheSources = state.errorWithCacheSources;
 
     String sourceLabel(ClassTableStatusSource source) =>
-        FlutterI18n.translate(context, switch (source) {
+        switch (source) {
           ClassTableStatusSource.classTable =>
-            "classtable.status_source.class_table",
-          ClassTableStatusSource.exam => "classtable.status_source.exam",
+            context.t.classtable.statusSource.classTable,
+          ClassTableStatusSource.exam =>
+            context.t.classtable.statusSource.exam,
           ClassTableStatusSource.physicsExperiment =>
-            "classtable.status_source.physics_experiment",
+            context.t.classtable.statusSource.physicsExperiment,
           ClassTableStatusSource.otherExperiment =>
-            "classtable.status_source.other_experiment",
-        });
+            context.t.classtable.statusSource.otherExperiment,
+        };
 
-    String? sourceHintKey(ClassTableStatusSource source) => switch (source) {
+    CacheHint? sourceHintKey(ClassTableStatusSource source) => switch (source) {
       ClassTableStatusSource.classTable => state.classTableCacheHintKey,
       ClassTableStatusSource.exam => state.examCacheHintKey,
       ClassTableStatusSource.physicsExperiment =>
@@ -40,36 +42,24 @@ class EmptyClassTablePage extends StatelessWidget {
 
     final content = <String>[
       if (errorWithoutCacheSources.isNotEmpty)
-        FlutterI18n.translate(
-          context,
-          "classtable.status_banner.error_summary",
-          translationParams: {
-            "sources": errorWithoutCacheSources.map(sourceLabel).join("、"),
-          },
-        ),
+        context.t.classtable.statusBanner.errorSummary(sources: errorWithoutCacheSources.map(sourceLabel).join("、")),
       ...errorWithoutCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
-            ? FlutterI18n.translate(context, hintKey)
-            : FlutterI18n.translate(context, "network_error");
+            ? hintKey.resolve(context.t)
+            : context.t.common.networkError;
         return "${sourceLabel(source)}: $detail";
       }),
       if (errorWithoutCacheSources.isNotEmpty &&
           errorWithCacheSources.isNotEmpty)
         "",
       if (errorWithCacheSources.isNotEmpty)
-        FlutterI18n.translate(
-          context,
-          "classtable.status_banner.cache",
-          translationParams: {
-            "sources": errorWithCacheSources.map(sourceLabel).join("、"),
-          },
-        ),
+        context.t.classtable.statusBanner.cache(sources: errorWithCacheSources.map(sourceLabel).join("、")),
       ...errorWithCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
-            ? FlutterI18n.translate(context, hintKey)
-            : FlutterI18n.translate(context, "network_error");
+            ? hintKey.resolve(context.t)
+            : context.t.common.networkError;
         return "${sourceLabel(source)}: $detail";
       }),
     ].join("\n");
@@ -77,12 +67,12 @@ class EmptyClassTablePage extends StatelessWidget {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(FlutterI18n.translate(context, "load_error")),
+        title: Text(context.t.common.loadError),
         content: Text(content),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(FlutterI18n.translate(context, "confirm")),
+            child: Text(context.t.common.confirm),
           ),
         ],
       ),
@@ -97,17 +87,21 @@ class EmptyClassTablePage extends StatelessWidget {
         state.errorWithCacheSources.isNotEmpty;
     final hasExamArrangement = state.hasExamArrangement;
     final hasExperimentArrangement = state.hasExperimentArrangement;
-    final emptyMessageKey = hasExamArrangement && hasExperimentArrangement
-        ? "classtable.empty_state.with_exam_and_experiment"
-        : hasExamArrangement
-        ? "classtable.empty_state.with_exam"
-        : hasExperimentArrangement
-        ? "classtable.empty_state.with_experiment"
-        : "classtable.empty_state.no_course";
+    final semesterCode = state.semesterCode;
+    final emptyMessage = switch ((hasExamArrangement, hasExperimentArrangement)) {
+      (true, true) =>
+        context.t.classtable.emptyState.withExamAndExperiment(semester_code: semesterCode),
+      (true, false) =>
+        context.t.classtable.emptyState.withExam(semester_code: semesterCode),
+      (false, true) =>
+        context.t.classtable.emptyState.withExperiment(semester_code: semesterCode),
+      (false, false) =>
+        context.t.classtable.emptyState.noCourse(semester_code: semesterCode),
+    };
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "classtable.page_title")),
+        title: Text(context.t.classtable.pageTitle),
         leading: IconButton(
           icon: Icon(
             Platform.isIOS || Platform.isMacOS
@@ -121,7 +115,7 @@ class EmptyClassTablePage extends StatelessWidget {
             IconButton(
               onPressed: () => _showLoadErrorDialog(context),
               icon: const Icon(Icons.error_outline),
-              tooltip: FlutterI18n.translate(context, "load_error"),
+              tooltip: context.t.common.loadError,
             ),
         ],
       ),
@@ -133,15 +127,7 @@ class EmptyClassTablePage extends StatelessWidget {
         [
           EmptyListView(
             type: EmptyListViewType.rolling,
-            text: FlutterI18n.translate(
-              context,
-              emptyMessageKey,
-              translationParams: {
-                "semester_code": ClassTableState.of(
-                  context,
-                )!.controllers.semesterCode,
-              },
-            ),
+            text: emptyMessage,
           ),
           if (hasExamArrangement)
             TextButton.icon(
@@ -150,10 +136,7 @@ class EmptyClassTablePage extends StatelessWidget {
               ),
               icon: const Icon(Icons.assignment_outlined),
               label: Text(
-                FlutterI18n.translate(
-                  context,
-                  "classtable.empty_action.view_exam",
-                ),
+                context.t.classtable.emptyAction.viewExam,
               ),
             ),
           if (hasExperimentArrangement)
@@ -165,20 +148,14 @@ class EmptyClassTablePage extends StatelessWidget {
               ),
               icon: const Icon(Icons.science_outlined),
               label: Text(
-                FlutterI18n.translate(
-                  context,
-                  "classtable.empty_action.view_experiment",
-                ),
+                context.t.classtable.emptyAction.viewExperiment,
               ),
             ),
           TextButton.icon(
             onPressed: () async {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "classtable.refresh_classtable.ready",
-                ),
+                msg: context.t.classtable.refreshClasstable.ready,
               );
               await ClassTableState.of(
                 context,
@@ -186,20 +163,14 @@ class EmptyClassTablePage extends StatelessWidget {
                 if (context.mounted) {
                   showToast(
                     context: context,
-                    msg: FlutterI18n.translate(
-                      context,
-                      "classtable.refresh_classtable.success",
-                    ),
+                    msg: context.t.classtable.refreshClasstable.success,
                   );
                 }
               });
             },
             icon: const Icon(Icons.update),
             label: Text(
-              FlutterI18n.translate(
-                context,
-                "classtable.popup_menu.refresh_classtable",
-              ),
+              context.t.classtable.popupMenu.refreshClasstable,
             ),
           ),
         ].toColumn(mainAxisAlignment: MainAxisAlignment.center).expanded(),
@@ -207,3 +178,4 @@ class EmptyClassTablePage extends StatelessWidget {
     );
   }
 }
+

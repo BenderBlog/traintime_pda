@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/energy/aircon_energy_card.dart';
 import 'package:watermeter/page/energy/electricity_energy_card.dart';
 import 'package:watermeter/page/energy/water_energy_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ElectricityWindow extends StatelessWidget {
   const ElectricityWindow({super.key});
@@ -17,12 +17,12 @@ class ElectricityWindow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "electricity.title")),
+        title: Text(context.t.electricity.title),
       ),
       body:
           [
                 Text(
-                      FlutterI18n.translate(context, "electricity.info"),
+                      context.t.electricity.info,
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.orange[800],

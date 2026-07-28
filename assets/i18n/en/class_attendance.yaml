@@ -1,0 +1,53 @@
+title: Attendance Query
+detail_title: Attendance Detail - {courseName}
+no_data: No course info
+no_attendance_record: No attendance record
+long_load: It takes about half minute to load attendance data, pleace wait patiently
+course_state:
+  unknown: unknown
+  ineligible: ineligible
+  eligible: eligible
+  warning: warning
+table:
+  course_name: Course Name
+  status: Status
+  attendance_rate: Rate
+  check_in: Check-in
+  absence: Absence
+  required: Required
+  leave: Leave(P/S/O)
+  filter: Filter
+  filter_all: All
+  showing_count: Showing {count}/{total} courses
+card:
+  time: Attendances
+  time_info: '{checkInCount} Checked / {absenceCount} Absences / {requiredCheckIn}
+    Required'
+  not_attend: Rebirths
+  not_attend_info: '{timeToHaveError} Times / {totalTimes} Total'
+  not_attend_info_error: Cannot match course in the classtable
+  leave: Leaves
+  leave_info: Personal {personalLeave} / Sick {sickLeave} / Official {officialLeave}
+  study: Study
+  study_info: Task {taskProgress} / Works {homeworkProgress} / Exam {examProgress}
+detail_card:
+  creator_name: Creator
+  start_time: Start at
+  summit_time: Summit at
+sign_type:
+  qr_code: QR Code Checkin
+  gesture: Gesture Checkin
+  position: Position Checkin
+  default: Normal Checkin
+sign_status:
+  absenceNotParticipating: Absence (Not participating)
+  signed: Signed
+  signedByTeacher: Signed by teacher
+  personalLeave2: Personal Leave
+  absence: Absence
+  sickLeave: Sick Leave
+  personalLeave: Personal Leave
+  late: Late
+  leaveEarly: Leave Early
+  signExpiredy: Sign Expired
+  publicLeave: Public Leave

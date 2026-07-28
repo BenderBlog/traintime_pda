@@ -14,6 +14,7 @@ import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
+import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -123,7 +124,7 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get isClassTableFromCache =>
       classTableController.isClassTableFromCacheComputedSignal.value;
 
-  String? get classTableCacheHintKey =>
+  CacheHint? get classTableCacheHintKey =>
       classTableController.classTableCacheHintKeyComputedSignal.value;
 
   DateTime? get classTableFetchTime =>
@@ -136,7 +137,7 @@ class ClassTableWidgetState with ChangeNotifier {
 
   bool get isExamFromCache => examController.isExamFromCache.value;
 
-  String? get examCacheHintKey => examController.examCacheHintKey.value;
+  CacheHint? get examCacheHintKey => examController.examCacheHintKey.value;
 
   bool get isPhysicsExperimentLoading =>
       physicsExperimentController.physicsExperimentStateSignal.value.isLoading;
@@ -148,7 +149,7 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get isPhysicsExperimentFromCache =>
       physicsExperimentController.isPhysicsExperimentFromCache.value;
 
-  String? get physicsExperimentCacheHintKey =>
+  CacheHint? get physicsExperimentCacheHintKey =>
       physicsExperimentController.physicsExperimentCacheHintKey.value;
 
   bool get isOtherExperimentLoading =>
@@ -160,7 +161,7 @@ class ClassTableWidgetState with ChangeNotifier {
   bool get isOtherExperimentFromCache =>
       otherExperimentController.isOtherExperimentFromCache.value;
 
-  String? get otherExperimentCacheHintKey =>
+  CacheHint? get otherExperimentCacheHintKey =>
       otherExperimentController.otherExperimentCacheHintKey.value;
 
   bool get hasExamArrangement => examController.hasExamArrangement.value;

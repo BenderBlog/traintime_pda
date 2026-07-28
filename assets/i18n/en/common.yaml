@@ -1,0 +1,169 @@
+drag_text: Pull to request more
+ready_text: Loading...
+processing_text: Processing...
+processed_text: Successfully requested
+no_more_text: No more data
+failed_text: Failed to load data
+choose_semester: Choose Semester
+error_detected: Ouch! An error occurred!
+click_to_refresh: Click to refresh
+confirm_title: Confirm? (ゝ∀･)
+cancel: Cancel
+confirm: Okay
+network_error: Network error, maybe you are not connected to the Internet, or the
+  school server is down :P
+error_detect: An error has occurred,
+query_failed: Query failed
+not_school_network: Not on the Campus Network
+cancel_exam: Disqualified to exam :P
+no_info: No information
+catcher_detected: An error has occurred
+catcher_description: Details are shown as follows
+new_homepage_hint: A new homepage is developing here, the pigimg is a placeholder,
+  have fun
+local_cache_hint: Local cache from {datetime}
+inapp_cache_hint: 'In-app cache from {datetime}
+
+  Cache will be cleared once restart!'
+cache_reason_default: Showing cached data.
+easter_egg_apple: '=== Fly Me To The Moon ===
+
+  Vocal: Frank Sintara, 1964
+
+
+  Fly me to the moon
+
+  Let me play among the stars
+
+
+  Let me see what''s spring is like
+
+  on a Jupiter and Mars
+
+
+  Fill my heart with song
+
+  and let me sing forever more
+
+
+  You are all I long for
+
+  all I worship and I adore
+
+
+  In other words
+
+  Please, be true
+
+
+  In other words
+
+  I love you
+
+
+  === Living Inside Your Love ===
+
+  Guitar: Earl Klugh, 1976
+
+
+  Can''t get over the feeling
+
+  Living inside your love
+
+
+  I never want to lose the feeling
+
+  Living inside your love
+
+
+  Baby, you made my life so free
+
+  Living inside your love
+
+
+  I''m just where I want to be
+
+  Living inside your love
+
+
+  And I never could say
+
+  What I''m feeling today
+
+  For you...
+
+  '
+easter_egg_others: '=== Cardcaptor Sakura OP3 ===
+
+  Vocal: Maaya Sakamoto, 2000
+
+  In Japanese Roman Letters
+
+
+  I''m a dreamer
+
+  hisomu PAWA-
+
+
+  watashi no sekai
+
+  yume to koi to fuan de dekite''ru
+
+  demo souzou wo shinai mono
+
+  kakurete''ru hazu
+
+
+  sora ni mukau kiki no you ni anata wo
+
+  massugu mitsumete''ru
+
+  mitsuketai naa kanaetai naa
+
+  shinjiru sore dake de
+
+
+  koerarenai mono wa nai
+
+  utau you ni kiseki no you ni
+
+  "omoi" ga subete wo kaete yuku yo
+
+  kitto kitto
+
+  odoroku kurai
+
+
+  === Living Inside Your Love ===
+
+  Guitar: Earl Klugh, 1976
+
+
+  Can''t get over the feeling
+
+  Living inside your love
+
+
+  I never want to lose the feeling
+
+  Living inside your love
+
+
+  Baby, you made my life so free
+
+  Living inside your love
+
+
+  I''m just where I want to be
+
+  Living inside your love
+
+
+  And I never could say
+
+  What I''m feeling today
+
+  For you...
+
+  '
+loadError: Load Error

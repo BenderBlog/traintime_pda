@@ -1,0 +1,15 @@
+pending: Pending
+remain_fetching: Fetching...
+remain_network_issue: Network malfunction
+remain_not_found: Query failed
+remain_other_issue: Query malfunction
+owe_fetching: Obtaining arrearage
+owe_issue: Network malfunction of overdue information
+owe_not_found: Cannot query arrearage, check log window for detail
+owe_no_need: None
+owe_need_pay: Need to pay {due} yuan
+owe_issue_unable: Cannot query arrearage
+need_more_info: Need to improve information on the payment platform
+need_account: Need to input electricity account
+captcha_failed: Failed to check captcha
+other_issue: Program malfunction

@@ -1,0 +1,47 @@
+title: Library Information
+borrow_state_title: Borrowing Status
+search_book_title: Search Books
+search_field_title: Search Field
+search_field_keyword_option: Any
+search_field_title_option: Title
+search_field_author_option: Author
+search_field_isbn_option: ISBN
+search_field_barcode_option: Bar Code
+search_field_callno_option: Call No
+not_provided: No information provided
+author: 'Author '
+publish_house: 'Publisher '
+call_number: 'Call Number '
+publish_date: Publication Date
+isbn: ISBN
+arrangement_code: 'Arrangement Code '
+avaliable_borrow: Available to borrow
+storage: Storage
+on_shelve: On shelf
+book_code: 'Book code: {barCode}'
+due_date: ' Due date'
+borrow_str: ' Borrow'
+after_due_date: ' day(s) overdue'
+before_due_date: ' day(s) left'
+can_be_renewable: Renewable
+cannot_be_renewable: Not renewable
+renewing: Renewing
+empty_borrow_list: No borrowed books found
+borrow_list_info: Borrowing {borrow} book(s), among which {dued} book(s) have expired
+search_book_window: ""
+search_here: Search here
+normal_search: Normal Search
+advanced_search: Advanced Search
+search: Search
+match_mode: Match Mode
+match_exact: Exact
+match_fuzzy: Fuzzy
+match_prefix: Prefix
+document_type: Document Type
+document_type_all: All
+document_type_book: Book
+only_on_shelf: Only on shelf
+publish_year_begin: Publish year from
+publish_year_end: Publish year to
+book_detail: Book details
+no_result: No result, change parameter or start your search

@@ -3,10 +3,23 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_detail.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
+import 'package:watermeter/generated/translations.g.dart';
+
+String attendanceStatusName(BuildContext context, AttendanceStatus status) {
+  return switch (status) {
+    AttendanceStatus.unknown =>
+      context.t.classAttendance.courseState.unknown,
+    AttendanceStatus.eligible =>
+      context.t.classAttendance.courseState.eligible,
+    AttendanceStatus.warning =>
+      context.t.classAttendance.courseState.warning,
+    AttendanceStatus.ineligible =>
+      context.t.classAttendance.courseState.ineligible,
+  };
+}
 
 class ClassAttendanceTable extends StatefulWidget {
   final List<ClassAttendance> courses;
@@ -120,7 +133,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
       child: Row(
         children: [
           Text(
-            FlutterI18n.translate(context, "class_attendance.table.filter"),
+            context.t.classAttendance.table.filter,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(width: 16),
@@ -131,10 +144,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                 children: [
                   FilterChip(
                     label: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "class_attendance.table.filter_all",
-                      ),
+                      context.t.classAttendance.table.filterAll,
                     ),
                     selected: _selectedFilter == null,
                     onSelected: (selected) {
@@ -147,10 +157,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                   const SizedBox(width: 8),
                   FilterChip(
                     label: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "class_attendance.course_state.ineligible",
-                      ),
+                      context.t.classAttendance.courseState.ineligible,
                     ),
                     selected: _selectedFilter == AttendanceStatus.ineligible,
                     selectedColor: Colors.red.withValues(alpha: 0.2),
@@ -165,10 +172,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                   const SizedBox(width: 8),
                   FilterChip(
                     label: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "class_attendance.course_state.warning",
-                      ),
+                      context.t.classAttendance.courseState.warning,
                     ),
                     selected: _selectedFilter == AttendanceStatus.warning,
                     selectedColor: Colors.orange.withValues(alpha: 0.2),
@@ -183,10 +187,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                   const SizedBox(width: 8),
                   FilterChip(
                     label: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "class_attendance.course_state.eligible",
-                      ),
+                      context.t.classAttendance.courseState.eligible,
                     ),
                     selected: _selectedFilter == AttendanceStatus.eligible,
                     selectedColor: Colors.green.withValues(alpha: 0.2),
@@ -201,10 +202,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                   const SizedBox(width: 8),
                   FilterChip(
                     label: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "class_attendance.course_state.unknown",
-                      ),
+                      context.t.classAttendance.courseState.unknown,
                     ),
                     selected: _selectedFilter == AttendanceStatus.unknown,
                     selectedColor: Colors.grey.withValues(alpha: 0.2),
@@ -222,14 +220,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
           ),
           SizedBox(width: 16),
           Text(
-            FlutterI18n.translate(
-              context,
-              "class_attendance.table.showing_count",
-              translationParams: {
-                "count": filteredCourses.length.toString(),
-                "total": widget.courses.length.toString(),
-              },
-            ),
+            context.t.classAttendance.table.showingCount(count: '${filteredCourses.length}', total: '${widget.courses.length}'),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
@@ -257,10 +248,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                   columns: [
                     DataColumn(
                       label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.course_name",
-                        ),
+                        context.t.classAttendance.table.courseName,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -273,10 +261,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                     ),
                     DataColumn(
                       label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.status",
-                        ),
+                        context.t.classAttendance.table.status,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -289,10 +274,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                     ),
                     DataColumn(
                       label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.attendance_rate",
-                        ),
+                        context.t.classAttendance.table.attendanceRate,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -306,10 +288,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                     ),
                     DataColumn(
                       label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.check_in",
-                        ),
+                        context.t.classAttendance.table.checkIn,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -323,10 +302,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                     ),
                     DataColumn(
                       label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.absence",
-                        ),
+                        context.t.classAttendance.table.absence,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -340,10 +316,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                     ),
                     DataColumn(
                       label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.required",
-                        ),
+                        context.t.classAttendance.table.required,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -357,10 +330,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                     ),
                     DataColumn(
                       label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.leave",
-                        ),
+                        context.t.classAttendance.table.leave,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -383,13 +353,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                             if (status != AttendanceStatus.unknown) {
                               await BothSideSheet.show(
                                 context: context,
-                                title: FlutterI18n.translate(
-                                  context,
-                                  "class_attendance.detail_title",
-                                  translationParams: {
-                                    "courseName": course.courseName,
-                                  },
-                                ),
+                                title: context.t.classAttendance.detailTitle(course_name: course.courseName),
                                 child: ClassAttendanceDetailView(
                                   classAttendance: course,
                                   showAppBar: false,
@@ -409,7 +373,7 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              FlutterI18n.translate(context, status.i18nString),
+                              attendanceStatusName(context, status),
                               style: TextStyle(
                                 color: statusColor,
                                 fontWeight: FontWeight.bold,

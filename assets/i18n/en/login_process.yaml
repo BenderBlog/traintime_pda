@@ -1,0 +1,6 @@
+ready_page: Prepare to obtain login environment
+get_encrypt: Obtain password encryption key
+ready_login: Prepare to login
+slider: Logging in
+after_process: Post-login processing
+failed: 'Login failed, response status code: {statusCode}'

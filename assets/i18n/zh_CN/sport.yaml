@@ -1,0 +1,32 @@
+title: 体育查询
+class_info: 课程信息
+empty_class_info: 未查询到课程信息
+test_score: 体测成绩
+total_score: 四年总分
+total_score_label: 总分
+rank_label: 等级
+semester: '{year} 第{gradeType}'
+subject: 项目
+data: 数据
+score: 分数
+passed: 及格
+from_to: 第{start}节到第{stop}节
+score_string: '{score}分'
+situation_nopassword: 没密码
+situation_maintain: 系统维护
+situation_failed_login: 登录失败
+situation_query: 查询失败
+situation_network: 网络故障
+situation_unknown: 未知故障{situation}
+situation_fetching: 正在获取
+situation_error: '坏事: {situation}'
+cache_hint_missing_password: 请先填写体育密码后重试。
+cache_hint_credential_invalid: 体育登录已失效，请更新体育密码后重试。
+cache_hint_maintain: 体育服务正在维护中，请稍后重试。
+cache_hint_login_failed: 体育服务登录失败。
+cache_hint_query_failed: 体育信息查询失败。
+cache_hint_network: 体育服务网络请求失败。
+cache_hint_unknown: 在线获取体育信息失败。详细错误请查看日志。
+error_auth_expired: 体育登录已失效，请重试。
+error_missing_password: 未填写体育密码
+error_credential_invalid: 体育登录已失效，请更新体育密码后重试。

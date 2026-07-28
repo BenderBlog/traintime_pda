@@ -1,0 +1,46 @@
+title: School Net Usage Query
+ids_account_net:
+  title: Current user
+  notice: 'This is the current PDA user''s information.
+
+    Notice that network traffic is charged in GB (1GB = 1000MB).
+
+    If you cannot see any info, go to zfw.xidian.edu.cn for password reset'
+  overview: Overview
+  account: Account
+  used: Data usage
+  remain: Balance
+  current_online: Online devices (currently {length})
+  no_device_online: No device is online at the moment
+current_login_net:
+  title: Current using
+  notice: 'This is the information of the current using account.
+
+    It may be different from the current user''s, and DON''T BE EVIL!
+
+    Notice that network traffic is charged in GB (1GB=1000MB).'
+  overview: Overview of the account
+  account: Account
+  plan_type: Type of the plan
+  remain: Balance
+  usage_situation: Traffic usage info
+  used_percent: Used {percent}%
+  used: Data usage
+  remain_count: Data remaining
+  total: Total data
+  non_schoolnet: Not in school net environment
+device_list:
+  ip: Device IP
+  time: Online time
+  remain: Traffic used
+fetching: Fetching schoolnet usage data
+empty_password: You may forgot to enter the schoolnet password
+not_initalized: It seems the backend is not open for query:P
+captcha_failed: Failed to idenify captcha
+captcha_empty: Captcha is empty
+cache_hint_captcha_failed: Captcha recognition failed. Please try again.
+cache_hint_request_failed: The schoolnet request failed. Please try again later.
+wrong_password: Wrong schoolnet password
+error_fetch: Failed to fetch：{msg}
+error_other: Other error：{msg}
+refresh: Refresh

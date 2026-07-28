@@ -1,0 +1,49 @@
+title: 图书馆信息
+borrow_state_title: 借书状态
+search_book_title: 查询藏书
+search_field_title: 搜索字段
+search_field_keyword_option: 任意词
+search_field_title_option: 标题
+search_field_author_option: 责任者
+search_field_isbn_option: ISBN
+search_field_barcode_option: 条码号
+search_field_callno_option: 索书号
+not_provided: 未提供相关信息
+author: '作者 '
+publish_house: '出版社 '
+call_number: '索书号 '
+publish_date: '发行时间 '
+isbn: ISBN
+arrangement_code: '编排号码 '
+avaliable_borrow: 可借
+storage: 馆藏
+on_shelve: 在架
+book_code: 书籍编号：{barCode}
+due_date: ' 到期'
+borrow_str: ' 借阅'
+after_due_date: ' 天前到期'
+before_due_date: ' 天后'
+can_be_renewable: 续借
+cannot_be_renewable: 不可续借
+renewing: 正在续借
+empty_borrow_list: '目前没有查询到在借图书
+
+  不借书就要变成上面的小呆瓜咯'
+borrow_list_info: 在借 {borrow} 本，其中已过期 {dued} 本
+search_book_window: ""
+search_here: 在此搜索
+normal_search: 普通搜索
+advanced_search: 高级搜索
+search: 搜索
+match_mode: 匹配方式
+match_exact: 精确匹配
+match_fuzzy: 模糊匹配
+match_prefix: 前方一致
+document_type: 文献类型
+document_type_all: 全部
+document_type_book: 图书
+only_on_shelf: 仅看在架
+publish_year_begin: 出版年起
+publish_year_end: 出版年止
+book_detail: 书籍详细信息
+no_result: 没有结果，请修改搜索参数或者开始你的搜索

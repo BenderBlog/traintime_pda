@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/time_list.dart';
 
@@ -15,6 +14,7 @@ import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/translations.g.dart';
 
 /// THe classtable view, the way the the classtable sheet rendered.
 class ClassTableView extends StatefulWidget {
@@ -142,10 +142,7 @@ class _ClassTableViewState extends State<ClassTableView> {
                 SizedBox(height: blockheight(8)),
                 Image.asset("assets/art/pda_classtable_empty.png", scale: 2),
                 const SizedBox(height: 20),
-                ...FlutterI18n.translate(
-                  context,
-                  "classtable.no_class",
-                ).split("\n").map((e) => Text(e)),
+                ...context.t.classtable.noClass.split("\n").map((e) => Text(e)),
               ],
             ),
           ).padding(left: leftRow),
@@ -182,18 +179,12 @@ class _ClassTableViewState extends State<ClassTableView> {
               children: [
                 if (indexOfChar == -1)
                   TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "classtable.noon_break",
-                    ),
+                    text: context.t.classtable.noonBreak,
                     style: const TextStyle(fontSize: 12),
                   )
                 else if (indexOfChar == -2)
                   TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "classtable.supper_break",
-                    ),
+                    text: context.t.classtable.supperBreak,
                     style: const TextStyle(fontSize: 12),
                   )
                 else ...[

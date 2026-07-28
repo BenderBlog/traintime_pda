@@ -1,0 +1,20 @@
+base_locale: zh_CN
+input_directory: assets/i18n
+input_file_pattern: .yaml
+string_interpolation: braces
+output_directory: lib/generated
+output_file_name: translations.g.dart
+namespaces: true
+lazy: false
+fallback_strategy: base_locale
+
+# 符合 Flutter 语法规范的 API 清洗
+key_case: camel # 函数
+key_map_case: pascal # 对象
+param_case: snake # 参数
+
+# 命名清洗，使用了关键字的 key 会被加上 k 的前缀
+sanitization:
+  enabled: true
+  prefix: k
+  case: camel

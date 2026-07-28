@@ -1,0 +1,6 @@
+ready_page: 准备获取登录网页
+get_encrypt: 获取密码加密密钥
+ready_login: 准备登录
+slider: 登录中
+after_process: 登录后处理
+failed: 登录失败，响应状态码：{statusCode}

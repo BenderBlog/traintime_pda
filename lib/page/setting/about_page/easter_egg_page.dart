@@ -4,9 +4,9 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class EasterEggPage extends StatefulWidget {
   const EasterEggPage({super.key});
@@ -24,7 +24,7 @@ class _EasterEggPageState extends State<EasterEggPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "easter_egg_robot.appbar")),
+        title: Text(context.t.easterEggRobot.appbar),
       ),
       body: [
         if (counter > 1)
@@ -33,11 +33,11 @@ class _EasterEggPageState extends State<EasterEggPage> {
           Image.asset("assets/art/aboutRobots-icon.png"),
         const SizedBox(height: 24),
         Text(
-          FlutterI18n.translate(context, "easter_egg_robot.title"),
+          context.t.easterEggRobot.title,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 24),
-        Text(FlutterI18n.translate(context, "easter_egg_robot.contents")),
+        Text(context.t.easterEggRobot.contents),
         Visibility(
           visible: counter <= 1,
           child: TextButton(
@@ -48,20 +48,14 @@ class _EasterEggPageState extends State<EasterEggPage> {
               if (counter > 1) {
                 showToast(
                   context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "easter_egg_robot.button_notice",
-                  ),
+                  msg: context.t.easterEggRobot.buttonNotice,
                 );
               }
             },
             child: Text(
-              FlutterI18n.translate(
-                context,
-                counter == 0
-                    ? "easter_egg_robot.button_one"
-                    : "easter_egg_robot.button_two",
-              ),
+              counter == 0
+                  ? context.t.easterEggRobot.buttonOne
+                  : context.t.easterEggRobot.buttonTwo,
             ),
           ),
         ),

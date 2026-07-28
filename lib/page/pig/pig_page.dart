@@ -5,10 +5,10 @@
 // Pig page — random pig image from pighub.top.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/repository/pighub_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class PigPage extends StatefulWidget {
   const PigPage({super.key});
@@ -40,7 +40,7 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "homepage.dashboard")),
+        title: Text(context.t.homepage.dashboard),
         actions: [
           IconButton(
             icon: const Icon(Icons.replay_outlined),
@@ -57,7 +57,7 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
           if (snapshot.hasError || !snapshot.hasData) {
             return [
                   Text(
-                    FlutterI18n.translate(context, "new_homepage_hint"),
+                    context.t.common.newHomepageHint,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
@@ -82,7 +82,7 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
           final image = snapshot.data!;
           return [
                 Text(
-                  FlutterI18n.translate(context, "new_homepage_hint"),
+                  context.t.common.newHomepageHint,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),

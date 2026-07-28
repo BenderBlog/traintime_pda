@@ -1,8 +1,8 @@
+import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 
 import '../controller/ruisi_controller.dart';
@@ -15,7 +15,7 @@ class FavoritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, 'ruisi.favorites.title')),
+        title: Text(context.t.ruisi.favorites.title),
       ),
       body: TopicListPage(
         getTopicList: (int page) =>

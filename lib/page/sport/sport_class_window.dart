@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
@@ -12,6 +11,7 @@ import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class SportClassWindow extends StatefulWidget {
   const SportClassWindow({super.key});
@@ -28,12 +28,11 @@ class _SportClassWindowState extends State<SportClassWindow>
   Future<FetchResult<SportClass>> _future = SportSession().getClass();
 
   Object? _translateError(BuildContext context, Object? error) {
-    if (error is SportCredentialMissingException ||
-        error is SportCredentialInvalidException) {
-      return FlutterI18n.translate(context, error.toString());
+    if (error is SportCredentialMissingException) {
+      return context.t.sport.errorMissingPassword;
     }
-    if (error is String) {
-      return FlutterI18n.translate(context, error);
+    if (error is SportCredentialInvalidException) {
+      return context.t.sport.errorCredentialInvalid;
     }
     return error;
   }
@@ -61,21 +60,15 @@ class _SportClassWindowState extends State<SportClassWindow>
               children: [
                 if (result.isCache)
                   CacheAlerter(
-                    dataType: FlutterI18n.translate(context, "sport.title"),
-                    hint: FlutterI18n.translate(
-                      context,
-                      result.hintKey ?? "cache_reason_default",
-                    ),
+                    dataType: context.t.sport.title,
+                    hint: result.cacheHint?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
                     placeOfCache: PlaceOfCache.inapp,
                     fetchTime: result.fetchTime,
                   ),
                 if (toShow.isEmpty)
                   EmptyListView(
                     type: EmptyListViewType.singing,
-                    text: FlutterI18n.translate(
-                      context,
-                      "sport.empty_class_info",
-                    ),
+                    text: context.t.sport.emptyClassInfo,
                   )
                 else
                   Expanded(
@@ -125,29 +118,18 @@ class SportClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> weekList = [
-      'monday',
-      'tuesday',
-      'wednesday',
-      'thursday',
-      'friday',
-      'saturday',
-      'sunday',
-    ];
+    String timeWeek = switch (data.week) {
+      1 => context.t.weekday.monday,
+      2 => context.t.weekday.tuesday,
+      3 => context.t.weekday.wednesday,
+      4 => context.t.weekday.thursday,
+      5 => context.t.weekday.friday,
+      6 => context.t.weekday.saturday,
+      7 => context.t.weekday.sunday,
+      _ => context.t.weekday.monday,
+    };
 
-    String timeWeek = FlutterI18n.translate(
-      context,
-      "weekday.${weekList[data.week - 1]}",
-    );
-
-    String timePlace = FlutterI18n.translate(
-      context,
-      "sport.from_to",
-      translationParams: {
-        "start": data.start.toString(),
-        "stop": data.stop.toString(),
-      },
-    );
+    String timePlace = context.t.sport.fromTo(start: data.start.toString(), stop: data.stop.toString());
 
     return ReXCard(
       title: Text(data.termToShow),
@@ -170,3 +152,4 @@ class SportClassCard extends StatelessWidget {
     );
   }
 }
+

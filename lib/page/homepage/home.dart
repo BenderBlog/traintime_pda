@@ -8,7 +8,6 @@ import 'dart:async';
 
 import 'package:based_split_view/based_split_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/external/ruisi_flutter/ruisi_flutter.dart';
 import 'package:watermeter/page/pig/pig_page.dart';
@@ -29,6 +28,7 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/translations.g.dart';
 
 class PageInformation {
   final int index;
@@ -81,7 +81,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   void _loginAsync() async {
     showToast(
       context: context,
-      msg: FlutterI18n.translate(context, "homepage.login_message"),
+      msg: context.t.homepage.loginMessage,
     );
 
     try {
@@ -100,10 +100,7 @@ class _HomePageMasterState extends State<HomePageMaster>
         if (mounted) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              "homepage.successful_login_message",
-            ),
+            msg: context.t.homepage.successfulLoginMessage,
           );
         }
       } else if (loginState == IDSLoginState.passwordWrong) {
@@ -115,25 +112,16 @@ class _HomePageMasterState extends State<HomePageMaster>
             barrierDismissible: false,
             builder: (context) => AlertDialog(
               title: Text(
-                FlutterI18n.translate(context, "homepage.password_wrong_title"),
+                context.t.homepage.passwordWrongTitle,
               ),
               content: Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.password_wrong_content",
-                ),
+                context.t.homepage.passwordWrongContent,
               ),
               actions: [
                 TextButton(
                   onPressed: () async {
-                    String title = FlutterI18n.translate(
-                      context,
-                      "restart_app.title_password_wrong",
-                    );
-                    String body = FlutterI18n.translate(
-                      context,
-                      "restart_app.content",
-                    );
+                    String title = context.t.restartApp.titlePasswordWrong;
+                    String body = context.t.restartApp.content;
                     await syncWidgetLoginState(false);
                     if (mounted) {
                       if (Platform.isIOS) {
@@ -147,7 +135,7 @@ class _HomePageMasterState extends State<HomePageMaster>
                       }
                     }
                   },
-                  child: Text(FlutterI18n.translate(context, "confirm")),
+                  child: Text(context.t.common.confirm),
                 ),
                 TextButton(
                   onPressed: () {
@@ -155,10 +143,7 @@ class _HomePageMasterState extends State<HomePageMaster>
                     _showOfflineModeNotice();
                   },
                   child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "homepage.password_wrong_denial",
-                    ),
+                    context.t.homepage.passwordWrongDenial,
                   ),
                 ),
               ],
@@ -177,15 +162,15 @@ class _HomePageMasterState extends State<HomePageMaster>
         context: context,
         builder: (context) => AlertDialog(
           title: Text(
-            FlutterI18n.translate(context, "homepage.offline_mode_title"),
+            context.t.homepage.offlineModeTitle,
           ),
           content: Text(
-            FlutterI18n.translate(context, "homepage.offline_mode_content"),
+            context.t.homepage.offlineModeContent,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(FlutterI18n.translate(context, "confirm")),
+              child: Text(context.t.common.confirm),
             ),
           ],
         ),
@@ -232,31 +217,31 @@ class _HomePageMasterState extends State<HomePageMaster>
     final destinations = [
       PageInformation(
         index: 0,
-        name: FlutterI18n.translate(context, "homepage.homepage"),
+        name: context.t.homepage.homepage,
         icon: Icons.school_outlined,
         iconChoice: Icons.school,
       ),
       PageInformation(
         index: 1,
-        name: FlutterI18n.translate(context, "homepage.ruisi"),
+        name: context.t.homepage.ruisi,
         icon: Icons.forum_outlined,
         iconChoice: Icons.forum,
       ),
       PageInformation(
         index: 2,
-        name: FlutterI18n.translate(context, "homepage.toolbox.toolbox"),
+        name: context.t.homepage.toolbox.toolbox,
         icon: MingCuteIcons.mgc_tool_line,
         iconChoice: MingCuteIcons.mgc_tool_fill,
       ),
       PageInformation(
         index: 3,
-        name: FlutterI18n.translate(context, "homepage.dashboard"),
+        name: context.t.homepage.dashboard,
         icon: MingCuteIcons.mgc_pig_line,
         iconChoice: MingCuteIcons.mgc_pig_fill,
       ),
       PageInformation(
         index: 4,
-        name: FlutterI18n.translate(context, "homepage.setting"),
+        name: context.t.homepage.setting,
         icon: MingCuteIcons.mgc_user_2_line,
         iconChoice: MingCuteIcons.mgc_user_2_fill,
       ),

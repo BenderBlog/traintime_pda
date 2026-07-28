@@ -1,0 +1,192 @@
+partner_classtable:
+  override_dialog: Currently there is a partner classtable data, do you want to overwrite?
+  no_file: Import file not found
+  no_permission: Storage permission denied , cannot read file
+  problem: Maybe there's a problem with the import file :P
+  success: Successfully imported
+  share_dialog:
+    title: Caution!
+    content: The exported file may include your personal information, please DO NOT
+      share casually
+  save_dialog:
+    title: Save calendar file to...
+    success_message: Should be saved
+    failure_message: Can not create the file, save fails.
+  delete_dialog:
+    title: (｡í _ ì｡)For real?
+    message: Are you sure to delete the partner classtable?
+    success_message: Done
+  name_dialog:
+    title: Input the name of the partner classtable to be shown on your partner's
+      screen
+    hint: Input here, otherwise it will be shown as 'Sweetie'
+    cancel: There's nobody other than my sweetie
+    accept: Submit
+    blank_input: Input is blank!
+page_title: My Schedule
+partner_page_title: '{partner_name}''s Schedule'
+popup_menu:
+  not_arranged: View unarranged classes
+  class_changed: View schedule changes
+  add_class: Add class
+  generate_ical: Export calendar file
+  generate_partner_file: Export partner classtable file
+  import_partner_file: Import partner classtable file
+  delete_partner_file: Delete partner classtable file
+  output_to_system: Export to system calendar
+  refresh_classtable: Refresh schedule
+  switch_semester: Switch classtable semester
+  current_time_settings: Time indicator settings
+  class_color_settings: Class color settings
+visual_settings:
+  current_time_settings_title: Time indicator settings
+  class_color_settings_title: Class color settings
+  completed_style_enabled: Completed class styling distinction
+  current_time_section: Time indicators
+  show_current_time_indicator: Show current time indicator
+  show_current_time_label: Show mini time label
+  show_today_column_highlight: Highlight today's column
+  unfinished_section: Class style
+  active_brightness_factor: 'Brightness: {value}'
+  active_border_alpha: 'Border opacity: {value}'
+  active_inner_alpha: 'Fill opacity: {value}'
+  completed_section: Completed class style
+  completed_saturation_factor: 'Fill saturation: {value}'
+  completed_brightness_factor: 'Brightness: {value}'
+  completed_text_saturation_factor: 'Text saturation: {value}'
+  completed_border_alpha: 'Border opacity: {value}'
+  completed_inner_alpha: 'Fill opacity: {value}'
+status_source:
+  class_table: Class Table
+  exam: Exams
+  physics_experiment: Physics Experiments
+  other_experiment: Other Experiments
+error_dialog_title: Error Info
+status_banner:
+  loading: 'Updating: {sources}'
+  cache: 'Using cached data: {sources}'
+  error_summary: 'Failed to load: {sources}'
+empty_state:
+  no_course: No classes are arranged for semester {semester_code}.
+  with_exam: No classes are arranged for semester {semester_code}, but exam arrangements
+    are available.
+  with_experiment: No classes are arranged for semester {semester_code}, but experiment
+    arrangements are available.
+  with_exam_and_experiment: No classes are arranged for semester {semester_code},
+    but exam and experiment arrangements are available.
+empty_action:
+  view_exam: View exams
+  view_experiment: View experiments
+class_change_page:
+  title: Schedule Changes
+  empty_message: Currently there's no class schedule changes
+  teacher_change: Teacher has been changed from {previous_teacher} to {new_teacher}
+  no_teacher_change: Teacher kept unchanged
+  '1': One
+  '2': Two
+  '3': Three
+  '4': Four
+  '5': Five
+  '6': Six
+  '7': Seven
+  change_class_message: This is a course adjustment info，Originally scheduled on period
+    {originalClassRangeStart} to period {originalClassRangeEnd} at the {weekChar_originalWeek}th
+    day of the {originalAffectedWeeks}th week(s), now it is at the {newClassroom}
+    classroom, arranged at the period {newClassRangeStart} to period {newClassRangeStop}
+    at the {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).
+  patch_class_message: This is a course reschedule info，The course have been rescheduled
+    at the {newClassroom}, on the period {newClassRangeStart} to period {newClassRangeStop}
+    at the {weekChar_newWeek}th day of the {newAffectedWeeksListStr} week(s).
+  stop_class_message: This is a course suspension info. The class will be suspended
+    at the period {originalClassRangeStart} to period {originalClassRangeEnd} at the
+    {weekChar_originalWeek} day of the {originalAffectedWeeks} week(s).
+  class_info: 'Code: {classCode} | Class {classNumber}
+
+    Schedule change: {classChange}
+
+    {teacherChange}'
+not_arranged_page:
+  title: Unscheduled Classes
+  empty_message: All courses have been scheduled
+  content: 'Code {classCode} | Class {classNumber}
+
+    Teacher: {teacher}'
+empty_class_message: Semester {semester_code} has no class arranged
+empty_class_with_exam: 'Semester {semester_code} has no class arranged
+
+  but we have exam info now!
+
+  Go back to mainpage and goto the exam info page.'
+week_title: Week {week}
+noon_break: Noon
+supper_break: Supper
+month: '{month}
+
+  mo'
+no_class: No schedule arranged in this week, please do not spend much of your time
+  on bed.
+class_card:
+  title: Schedule Information
+  unknown_classroom: Unknown classroom
+  remains_hint: There is/are {remain_count} schedule(s) remaining
+class_add:
+  add_class_title: Add class information
+  change_class_title: Modify class info
+  class_name_empty_message: Class name cannot be empty
+  wrong_time_message: Incorrect time input
+  save_button: Save
+  input_classname_hint: Class name (required)
+  input_teacher_hint: Teacher's name (optional)
+  input_classroom_hint: Classroom location (optional)
+  input_week_hint: Select weeks
+  input_time_hint: Select time
+  input_time_weekday_hint: Weekday
+  input_start_time_hint: Time start
+  input_end_time_hint: Time end
+  wheel_choose_hint: Period {index}
+  choose_at_least_one: Please choose at least one time for class
+  repeat_weekly: Repeat Weekly
+  free_time: Free Time
+  date_selector_free:
+    rule: Time must be between 8:30 and 21:25.
+    rule_2: The end time must be later than the start time.
+    class_start_time: Start time
+    class_end_time: End time
+    edit_class_time: Edit the class time
+    choose_class_time: Choose a class time
+course_detail_card:
+  class_number_string: Class {number}
+  unknown_teacher: Unknown teacher
+  unknown_place: Unknown classroom
+  class_period: period {start} to {stop}
+  edit: Edit
+  delete: Delete
+  delete_single: Delete this one
+  delete_all: Delete all
+  delete_content: Everything will be excuted.
+  delete_content_single: Only the information within this time range of the class
+    will be removed.
+  delete_title: Are you sure to delete this class information?
+output_to_system:
+  success: Successfully output to the system calendar.
+  failure: Problem occurred while outputing to the system calendar.
+  request_all_title: Information on requesting permission
+  request_all: Due to technical difficulties, users must grant both read calendar
+    and write calendar permissions to this software in order to export schedules properly.
+    However, this software will not read the calendar.
+refresh_classtable:
+  ready: Ready to refresh the schedule
+  success: Successfully refresh the schedule
+cache_hint_password_wrong: IDS password is incorrect or expired.
+cache_hint_login_failed: Failed to log in to the classtable service.
+cache_hint_network_failed: Classtable network request failed.
+cache_hint_unknown_error: Failed to fetch the latest classtable online. Check logs
+  for details.
+semester_switcher:
+  choose_semester: Choose a Semester
+  first_academic_year: Academic year 1
+  second_academic_year: Academic year 2
+  fetch_remote_semester: Fetch Current Semester
+  fetching_remote_semester: Fetching...
+  year: '{year}'
+  only_future_hint: This app only allows viewing course schedules for future semesters.

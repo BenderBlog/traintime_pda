@@ -1,0 +1,332 @@
+acknowledgement: Made With Love From {developers} People
+about: About
+about_this_program: About this APP
+version: Version：{version}
+user_info: User information
+check_update: Check for updates
+latest_version: 'Latest version: {latest}'
+waiting: Waiting for obtain
+fetching_update: Fetching update information
+new_version: New version released!
+current_stable: You are running the latest version
+current_testing: You are running the testing version
+fetch_failed: Failed to fetch update information
+ui_setting: UI Settings
+brightness_setting: Light/Dark mode
+color_setting: Color theme
+simplify_timeline: Simplify schedule timeline
+simplify_timeline_description: Reduce space occupation while no schedule
+low_electricity_warning: Low electricity card color warning
+low_electricity_warning_description: Change the homepage electricity card color when
+  remaining electricity is below the threshold
+low_electricity_threshold: Low electricity threshold
+low_electricity_threshold_description: 'Current: {threshold} kWh'
+low_electricity_threshold_dialog:
+  title: Set low electricity threshold
+  input_hint: Input remaining electricity
+account_setting: Account Settings
+sport_password_setting: PE system password
+experiment_password_setting: Physics experiment password
+electricity_password_setting: Electricity account password
+electricity_password_description: Please set if not default
+electricity_account_setting: Electricity account setting
+schoolnet_password_setting: Campus net password
+schoolnet_password_description: If you have not setted it, you cannot query it.
+aircon_imei_title: Aircon electricity data source
+aircon_imei: Aircon IMEI
+aircon_imei_not_set: Not set. Aircon electricity will be hidden on the power page.
+aircon_imei_current: 'Current IMEI: {imei}'
+aircon_imei_saved: Aircon IMEI saved
+aircon_imei_cleared: Aircon IMEI cleared
+aircon_imei_invalid: No valid 15-digit IMEI found
+aircon_imei_clear: Clear
+scan_aircon_qr: Scan aircon QR code
+pick_aircon_qr_image: Choose QR image
+aircon_camera_unavailable: Camera scanning is unavailable on this platform. Choose
+  a QR image or enter the IMEI manually.
+notification_setting: Notification Settings
+course_reminder_setting: Pre-class Reminder Settings
+course_reminder_description: Configure pre-class reminder notifications
+notification_page:
+  title: Pre-class Reminder Settings
+  load_failed: 'Failed to load settings: {error}'
+  function_section: Notification Function
+  enable_notification: Enable Pre-class Reminders
+  notification_scheduled: '{count} notifications scheduled'
+  notification_disabled_hint: All scheduled notifications will be cancelled when disabled
+  update_schedule: Update Notification Schedule
+  update_schedule_hint: Reschedule notifications based on the latest course data
+  delete_all_schedule: Delete All Scheduled Reminder
+  delete_all_schedule_hint: This action will delete all scheduled events, but you
+    can click 'Update Notification Schedule' again to re-add them.
+  delete_all_success: Delete successfully
+  view_the_instructions: View the instructions
+  view_the_instructions_hint: Check more instructions to ensure that you can see the
+    notifications sent by the program
+  permission_section: Permission Status
+  notification_permission: Notification Permission
+  exact_alarm_permission: Exact Alarm Permission
+  permission_granted: Granted
+  permission_denied: Denied
+  request_permission: Request Permission
+  system_settings: System Notification Settings
+  system_settings_hint: Open system settings to check notification configuration
+  permission_granted_msg: Permission granted
+  permission_denied_msg: Permission denied, please enable it in system settings
+  reminder_section: Reminder Settings
+  experiment_reminder: Include the physics experiments
+  experiment_reminder_hint: Enable this option to add the physics experiment to the
+    Pre-class Reminder
+  minutes_before: Advance Reminder Time
+  minutes_before_hint: The time setting for pre-class reminders
+  minutes_unit: minutes
+  days_to_schedule: Schedule Duration
+  days_to_schedule_hint: This program writes course information into the planned schedule
+    in advance. This setting can adjust the number of days for writing into the planned
+    schedule
+  days_unit: days
+  settings_guide_title: Notification Settings Guide
+  settings_guide_content_1: 'To ensure you receive pre-class reminders in time, please
+    make sure:
+
+    1. App notification permission is enabled
+
+    2. Notification sound is enabled
+
+    3. Banner notifications are enabled
+
+    4. Non-native Android users, enable auto-start and disable power optimization'
+  settings_guide_content_2: 'Pre-class Reminder Module Operating Mechanism:
+
+    1. When first activated, it will automatically schedule pre-class reminders for
+    the upcoming days
+
+    2. Each time the app is opened, it will automatically check and update the notification
+    schedule
+
+    3. After modifying settings, it will automatically reschedule all notifications'
+  got_it: Got it
+  open_settings: Open System Settings
+  no_classtable_data: Please fetch course schedule, exam, or experiment data first
+  schedule_success: Scheduled {count} pre-class reminders
+  schedule_failed: 'Failed to schedule notifications: {error}'
+  cancel_all_success: All pre-class reminders cancelled
+  reschedule_success: Rescheduled {count} pre-class reminders
+  reschedule_failed: 'Failed to reschedule notifications: {error}'
+notification_debug_page: Notification Services Debug Page
+classtable_setting: Class Schedule Related
+background: Background image
+no_background: You need to select an image first, it's at below
+choose_background: Choose background image
+no_permission: No storage permission obtained, cannot read files
+successful_setting: Successfully set
+failure_setting: You did not select an image
+clear_user_class: Clear all customized courses
+clear_user_class_title: Clear Confirmation
+clear_user_class_content: Do you want to clear all user-added courses? This function
+  does not affect the schedule obtained from the school.
+clear_user_class_clear: Already cleared
+class_refresh: Force refresh class schedule
+class_refresh_title: Refresh Confirmation
+class_refresh_content: Do you want to force refreshing the class schedule? If you
+  agree, we will fetch the schedule from the school, which may takes a long time.
+class_swift: Class schedule offset setting
+class_swift_description: 'Positive number delays the start date, negative number advances
+  the start date
+
+  Currently {swift}
+
+  '
+core_setting: Cached login settings
+check_logger: View network interceptor and logs
+clear_and_restart: Clear cache and restart
+clear_and_restart_dialog:
+  title: Restart confirmation
+  content: Are you sure to clear cache and restart the program?
+  cleaning: Clearing cache...
+  clear: Cache has been cleared
+logout: Log out and restart the app
+logout_dialog:
+  title: Logout confirmation
+  content: Are you want to log out? All your data will be completely deleted!
+  logging_out: Logging out...
+need_close_dialog:
+  title: Crashed
+  content: Due to technical limitations, you need to close the window manually and
+    then reopen the app.
+change_color_dialog:
+  title: Color setting
+  default: Default
+  blue: Sky Blue
+  deepPurple: Deep Purple
+  green: Spring Green
+  orange: Asuka Orange
+  pink: Sakura Pink
+change_brightness_dialog:
+  title: Brightness settings
+  follow_setting: Follow system
+  day_mode: Day mode
+  night_mode: Night mode
+change_swift_dialog:
+  title: Class schedule offset setting
+  input_hint: Please input number here
+change_electricity_title: Modify electricity account
+change_electricity_account:
+  title: Modify electricity account
+  campus: Campus
+  northCampus: Northern Campus
+  southCampus: Southern Campus
+  unitOrZone: Unit  / Zone
+  unitCode: Unit
+  zoneCode: Zone
+  pleaseInput: Please input {unitOrZoneCode}
+  successful_fetch: 'Successful fetching account: {accountNumber}'
+  failed_fetch: 'Failed to fetch: {e}'
+  account_saved: Account saved：{accountNumber}
+  unknown_coding_pattern: Unknown coding pattern
+  select_building: Select Building
+  building: Building
+  northern_building: Northern Building
+  southern_building: Southern Building
+  failed_generate: 'Failed to generate: {e}'
+  building_number: Building number
+  building_number_hint: 'eg: 16, 7, 55'
+  building_number_query: Please input building No.
+  yard: Yard
+  yard_hint: Select Yard
+  northYard: North Yard
+  southYard: South Yard
+  yard_query: Please select yard
+  apartment: Apartment
+  apartment_hint: Select Apartment
+  northApartment: North Apartment
+  southApartment: South Apartment
+  apartment_query: Please select apartment
+  levelCode: Floor number
+  levelCode_query: Floor number
+  roomCode: Room code
+  roomCode_hint: 'eg: 304, 508'
+  roomCode_query: Please input room code
+  account: Electricity Account
+  account_hint: Please enter your account
+  account_query: Please input your account
+  account_length: Account length is larger than 10
+  fetching: Fetching...
+  fetch_from_internet: Sync from backend
+  save_account: Save account
+  confirm_saving: Confirm account
+  calculate_account: Calculate account
+  calculate: Calculate
+  input: Input
+  confirm_account: 'Confirm your account: '
+  change: Edit
+  cancel: Cancel
+  no_setting: No new electricity account set
+  successful_setting: Successfully setting new electricity account
+change_experiment_title: Modify physics experiment account password
+change_sport_title: Modify sports system account password
+change_password_dialog:
+  input_hint: Please input password here
+  blank_input: Blank input!
+change_schoolnet_password_title: Modify the schoolnet query password
+update_dialog:
+  new_version: New version available
+  not_now: Not now
+  app_store: Update from App Store
+  download_apk: Download APK
+  github_release: Go to Git Release
+  new_content: 'New features from version {code}:
+
+    '
+localization_dialog:
+  title: Languages
+  undefined: Follow system setting
+  simplifiedChinese: Simplified Chinese
+  traditionalChinese: Traditional Chinese
+  english: English
+semester_change: Change semester
+semester_change_description: Using semester {semester}
+semester_update_data: Applying new semester setting
+easter_egg_page: You found an Easter egg
+about_page:
+  benderblog: Main developer, iOS widget
+  alnair: 'Development: Library search and cover'
+  aqqkad: 'Development: Class attandance history'
+  bellssgit: 'Support: best and longest feedback source'
+  brackrat: 'Design: homepage, login page, color scheme, iOS widgets, etc.'
+  breezeline: 'Support: valueless and meaningless product manager (from his own description)'
+  cafebabe: 'Support: provide Easter egg code / Development: Development: New Slider
+    ''26'
+  chitao1234: 'Development: fix slider misalignment issue'
+  copperkoi: 'Development: latest time arrangement sync to calendar'
+  dimole: 'Development support: assist in fixing slider issue'
+  elitewars: 'Design: sports score page'
+  elliot: 'Internationalization: English translation / Development guidance: on partner
+    classtable development (This function has been removed)'
+  flyingpig: 'Development: Fix null pointer exception at user defined class info'
+  godhu777777: 'Internationalization: Traditional Chinese conversion code & Easter
+    egg code / Development: Optimize outputing arrangements to the calendar'
+  hancl777: 'Internationalization: Traditional Chinese conversion code'
+  hazuki-keatsu: 'Development: Physics experiment score query and recognization'
+  hawa130: 'Design: Class info card'
+  hhzm: 'Development: electricity fee inquiry account calculation'
+  imaginary_17: 'Developement: Ruisi navigator stack fix'
+  imoscarz: 'Development: Homepage for software / Development: Checkin check for pad
+    / Development: Sport UI Change'
+  ka-mate-ka-ora: 'Internationalization: English correction'
+  lagrange-x: 'Development: Class progress indicator (adopted) / Development: Gray
+    cover on attended class and other classtable design'
+  lhx-666-cool: 'Support: Windows and Linux build scripts / Development: New Slider
+    ''26'
+  lichtyy: 'Design: color pattern and blank page picture / Development: HTML reader
+    for the experiment system'
+  lqsy-h: 'Support: Promotion Picture'
+  lsy223622: 'Design: iOS and Android icons / Support: titled XDYou'
+  mrbrilliant2046: 'Support: Provided the school net user guide / Internationalization:
+    English correction'
+  nancunchild: 'Development: library search function / Internationalization: English
+    correction'
+  nkanf: 'Development: Class progress indicator (original) / Support: MacOS build
+    support'
+  pairman: 'Development: score cache and optimize slider algorithm / Internationalization:
+    English correction'
+  reverierxu: 'Design: REX card for information display / Development support: on
+    postgraduate class schedule'
+  rrrilac: 'Development support: electricity query'
+  ray: 'Design: splash screen / Support: iOS publisher / Development guidance: on
+    partner classtable development (This function has been removed) / Internationalization:
+    English correction'
+  shadowyingyi: 'Support: two times of pigeon house official account publicity'
+  stalomeow: 'Design: homepage timeline / Development: asynchronous login and captcha
+    predict'
+  xeonds: 'Design: settings page / Development: XDU Planet / Development: Payment
+    Code'
+  xingshuyu: 'Development: Fix physics experiment api and electricity graph'
+  xiue233: 'Development: Android applet'
+  xizi: 'Development support: on postgraduate version'
+  wirsbf: 'Development: fix course adjustment did not proceed as expected'
+  zcwzy: 'Development: fix Dingxiang apartment electricity fee / development support:
+    on postgraduate version / design: blank page picture'
+  zyar-er: 'Development support: fix shortcut url'
+  homepage: Homepage
+  code: Source code
+  know_more: Learn more
+  copyright_notice: 'This software is compiled, or derived from the traintime_pda
+    (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.
+
+
+    This APP has no relation to Xidian University, Tishineng Service, Shuwow and other
+    services.
+
+
+    Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+
+    Copyright 2025-present Traintime PDA authors.
+
+
+    The Source Code Form is subject to the terms of the Mozilla Public License, v.
+    2.0. If a copy of the MPL was not distributed with this file, you can obtain one
+    at https://mozilla.org/MPL/2.0/.'
+  beian: ICP record code
+  sign_android: Android signature
+  title: About this APP

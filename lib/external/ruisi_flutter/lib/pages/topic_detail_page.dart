@@ -3,12 +3,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 import '../controller/ruisi_controller.dart';
 import '../models/post.dart';
@@ -86,10 +86,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            FlutterI18n.translate(
-              context,
-              'ruisi.topic_detail.reply_too_short',
-            ),
+            context.t.ruisi.topicDetail.replyTooShort,
           ),
         ),
       );
@@ -118,7 +115,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            FlutterI18n.translate(context, 'ruisi.topic_detail.reply_success'),
+            context.t.ruisi.topicDetail.replySuccess,
           ),
         ),
       );
@@ -127,7 +124,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            FlutterI18n.translate(context, 'ruisi.topic_detail.reply_failure'),
+            context.t.ruisi.topicDetail.replyFailure,
           ),
         ),
       );
@@ -208,14 +205,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       SnackBar(
         content: Text(
           ok
-              ? FlutterI18n.translate(
-                  context,
-                  'ruisi.topic_detail.favorite_success',
-                )
-              : FlutterI18n.translate(
-                  context,
-                  'ruisi.topic_detail.favorite_failure',
-                ),
+              ? context.t.ruisi.topicDetail.favoriteSuccess
+              : context.t.ruisi.topicDetail.favoriteFailure,
         ),
       ),
     );
@@ -232,12 +223,12 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         appBar: AppBar(
           title: Text(
             _detail?.title ??
-                FlutterI18n.translate(context, 'ruisi.topic_detail.title'),
+                context.t.ruisi.topicDetail.title,
           ),
           actions: [
             IconButton(
               icon: const Icon(Icons.bookmark_border),
-              tooltip: FlutterI18n.translate(context, 'ruisi.common.favorite'),
+              tooltip: context.t.ruisi.common.favorite,
               onPressed: _addFavorite,
             ),
             Builder(
@@ -279,7 +270,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                     FilledButton.tonal(
                       onPressed: () => _load(),
                       child: Text(
-                        FlutterI18n.translate(context, 'ruisi.common.retry'),
+                        context.t.ruisi.common.retry,
                       ),
                     ),
                   ],
@@ -288,7 +279,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             : _detail == null
             ? Center(
                 child: Text(
-                  FlutterI18n.translate(context, 'ruisi.topic_detail.no_data'),
+                  context.t.ruisi.topicDetail.noData,
                 ),
               )
             : Column(
@@ -369,10 +360,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                 maxLines: 3,
                                 minLines: 1,
                                 decoration: InputDecoration(
-                                  hintText: FlutterI18n.translate(
-                                    context,
-                                    'ruisi.topic_detail.reply_hint',
-                                  ),
+                                  hintText: context.t.ruisi.topicDetail.replyHint,
                                   border: OutlineInputBorder(),
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 12,
@@ -578,7 +566,7 @@ class _PostTile extends StatelessWidget {
               TextButton.icon(
                 icon: const Icon(Icons.reply, size: 16),
                 label: Text(
-                  FlutterI18n.translate(context, 'ruisi.common.reply'),
+                  context.t.ruisi.common.reply,
                 ),
                 onPressed: onReply,
               ),
@@ -878,15 +866,8 @@ class _VoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final typeText = vote.maxSelection > 1
-        ? FlutterI18n.translate(
-            context,
-            'ruisi.topic_detail.vote.multi_select',
-            translationParams: {'count': '${vote.maxSelection}'},
-          )
-        : FlutterI18n.translate(
-            context,
-            'ruisi.topic_detail.vote.single_select',
-          );
+        ? context.t.ruisi.topicDetail.vote.multiSelect(count: '${vote.maxSelection}')
+        : context.t.ruisi.topicDetail.vote.singleSelect;
 
     return Padding(
       padding: const EdgeInsets.all(12),
@@ -903,7 +884,7 @@ class _VoteCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '${FlutterI18n.translate(context, 'ruisi.topic_detail.vote.title_prefix')} · $typeText',
+                '${context.t.ruisi.topicDetail.vote.titlePrefix} · $typeText',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -912,11 +893,7 @@ class _VoteCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            FlutterI18n.translate(
-              context,
-              'ruisi.topic_detail.vote.count',
-              translationParams: {'count': '${vote.voteCount}'},
-            ),
+            context.t.ruisi.topicDetail.vote.count(count: '${vote.voteCount}'),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.outline,
             ),
@@ -933,7 +910,7 @@ class _VoteCard extends StatelessWidget {
               ),
             const SizedBox(height: 8),
             Text(
-              FlutterI18n.translate(context, 'ruisi.topic_detail.vote.expired'),
+              context.t.ruisi.topicDetail.vote.expired,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.error,
               ),
@@ -943,10 +920,7 @@ class _VoteCard extends StatelessWidget {
             for (final r in vote.results) _ResultRow(result: r),
             const SizedBox(height: 8),
             Text(
-              FlutterI18n.translate(
-                context,
-                'ruisi.topic_detail.vote.already_voted',
-              ),
+              context.t.ruisi.topicDetail.vote.alreadyVoted,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.outline,
               ),
@@ -956,7 +930,7 @@ class _VoteCard extends StatelessWidget {
             for (final r in vote.results) _ResultRow(result: r),
             const SizedBox(height: 8),
             Text(
-              FlutterI18n.translate(context, 'ruisi.topic_detail.vote.ended'),
+              context.t.ruisi.topicDetail.vote.ended,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.outline,
               ),
@@ -968,7 +942,7 @@ class _VoteCard extends StatelessWidget {
             FilledButton.tonal(
               onPressed: onVote,
               child: Text(
-                FlutterI18n.translate(context, 'ruisi.topic_detail.vote.open'),
+                context.t.ruisi.topicDetail.vote.open,
               ),
             ),
           ] else ...[
@@ -982,7 +956,7 @@ class _VoteCard extends StatelessWidget {
             FilledButton.tonal(
               onPressed: onVote,
               child: Text(
-                FlutterI18n.translate(context, 'ruisi.topic_detail.vote.open'),
+                context.t.ruisi.topicDetail.vote.open,
               ),
             ),
           ],
@@ -1061,11 +1035,7 @@ class _VoteSheetState extends State<_VoteSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                FlutterI18n.translate(
-                  context,
-                  'ruisi.topic_detail.vote.max_selection',
-                  translationParams: {'count': '${widget.vote.maxSelection}'},
-                ),
+                context.t.ruisi.topicDetail.vote.maxSelection(count: '${widget.vote.maxSelection}'),
               ),
             ),
           );
@@ -1083,10 +1053,7 @@ class _VoteSheetState extends State<_VoteSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            FlutterI18n.translate(
-              context,
-              'ruisi.topic_detail.vote.not_selected',
-            ),
+            context.t.ruisi.topicDetail.vote.notSelected,
           ),
         ),
       );
@@ -1105,7 +1072,7 @@ class _VoteSheetState extends State<_VoteSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              FlutterI18n.translate(context, 'ruisi.topic_detail.vote.success'),
+              context.t.ruisi.topicDetail.vote.success,
             ),
           ),
         );
@@ -1115,10 +1082,7 @@ class _VoteSheetState extends State<_VoteSheet> {
           SnackBar(
             content: Text(
               err ??
-                  FlutterI18n.translate(
-                    context,
-                    'ruisi.topic_detail.vote.failure',
-                  ),
+                  context.t.ruisi.topicDetail.vote.failure,
             ),
           ),
         );
@@ -1132,15 +1096,8 @@ class _VoteSheetState extends State<_VoteSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final typeText = _isMulti
-        ? FlutterI18n.translate(
-            context,
-            'ruisi.topic_detail.vote.multi_select',
-            translationParams: {'count': '${widget.vote.maxSelection}'},
-          )
-        : FlutterI18n.translate(
-            context,
-            'ruisi.topic_detail.vote.single_select',
-          );
+        ? context.t.ruisi.topicDetail.vote.multiSelect(count: '${widget.vote.maxSelection}')
+        : context.t.ruisi.topicDetail.vote.singleSelect;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.5,
@@ -1156,7 +1113,7 @@ class _VoteSheetState extends State<_VoteSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      '${FlutterI18n.translate(context, 'ruisi.topic_detail.vote.sheet_title')}($typeText)',
+                      '${context.t.ruisi.topicDetail.vote.sheetTitle}($typeText)',
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -1208,10 +1165,7 @@ class _VoteSheetState extends State<_VoteSheet> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : Text(
-                            FlutterI18n.translate(
-                              context,
-                              'ruisi.common.submit',
-                            ),
+                            context.t.ruisi.common.submit,
                           ),
                   ),
                 ),

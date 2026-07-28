@@ -5,7 +5,6 @@
 // Interface of the sport score window of the sport data.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/fetch_result.dart';
@@ -14,6 +13,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/model/xidian_sport/sport_score.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/xidian_sport_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 // 常量定义
 const double _textBackgroundAlpha = 0.3;
@@ -53,12 +53,11 @@ class _SportScoreWindowState extends State<SportScoreWindow>
   Future<FetchResult<SportScore>> _future = SportSession().getScore();
 
   Object? _translateError(BuildContext context, Object? error) {
-    if (error is SportCredentialMissingException ||
-        error is SportCredentialInvalidException) {
-      return FlutterI18n.translate(context, error.toString());
+    if (error is SportCredentialMissingException) {
+      return context.t.sport.errorMissingPassword;
     }
-    if (error is String) {
-      return FlutterI18n.translate(context, error);
+    if (error is SportCredentialInvalidException) {
+      return context.t.sport.errorCredentialInvalid;
     }
     return error;
   }
@@ -109,9 +108,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
             );
             List<Widget> things = [
               ReXCard(
-                title: Text(
-                  FlutterI18n.translate(context, "sport.total_score"),
-                ),
+                title: Text(context.t.sport.totalScore),
                 remaining: [],
                 bottomRow: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,10 +116,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                     [
                           [
                                 Text(
-                                  FlutterI18n.translate(
-                                    context,
-                                    "sport.total_score_label",
-                                  ),
+                                  context.t.sport.totalScoreLabel,
                                   style: const TextStyle(
                                     fontSize: _labelFontSize,
                                   ),
@@ -155,10 +149,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                           const SizedBox(width: 12),
                           [
                                 Text(
-                                  FlutterI18n.translate(
-                                    context,
-                                    "sport.rank_label",
-                                  ),
+                                  context.t.sport.rankLabel,
                                   style: const TextStyle(
                                     fontSize: _labelFontSize,
                                   ),
@@ -174,10 +165,13 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
-                                    FlutterI18n.translate(
-                                      context,
-                                      data.scoreRankI18nStr,
-                                    ),
+                                    data.scoreRankI18nStr == null
+                                        ? context
+                                              .t
+                                              .classAttendance
+                                              .courseState
+                                              .unknown
+                                        : data.scoreRankI18nStr!,
                                     style: TextStyle(
                                       color: scoreColorScheme.rankTextColor,
                                       fontWeight: FontWeight.bold,
@@ -220,11 +214,10 @@ class _SportScoreWindowState extends State<SportScoreWindow>
               children: [
                 if (result.isCache)
                   CacheAlerter(
-                    dataType: FlutterI18n.translate(context, "sport.title"),
-                    hint: FlutterI18n.translate(
-                      context,
-                      result.hintKey ?? "cache_reason_default",
-                    ),
+                    dataType: context.t.sport.title,
+                    hint:
+                        result.cacheHint?.resolve(context.t) ??
+                        context.t.common.cacheReasonDefault,
                     placeOfCache: PlaceOfCache.inapp,
                     fetchTime: result.fetchTime,
                   ),
@@ -297,13 +290,9 @@ class ScoreCard extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              FlutterI18n.translate(
-                context,
-                "sport.semester",
-                translationParams: {
-                  "year": toUse.year,
-                  "gradeType": toUse.gradeType,
-                },
+              context.t.sport.semester(
+                year: toUse.year,
+                grade_type: toUse.gradeType,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -316,7 +305,7 @@ class ScoreCard extends StatelessWidget {
               runSpacing: 4,
               children: [
                 Text(
-                  "${FlutterI18n.translate(context, "sport.total_score_label")}：",
+                  "${context.t.sport.totalScoreLabel}：",
                   style: const TextStyle(fontSize: _labelFontSize),
                 ),
                 Container(
@@ -357,26 +346,23 @@ class ScoreCard extends StatelessWidget {
               children: [
                 TableRow(
                   children: [
+                    Text(context.t.sport.subject, textAlign: TextAlign.start),
                     Text(
-                      FlutterI18n.translate(context, "sport.subject"),
-                      textAlign: TextAlign.start,
-                    ),
-                    Text(
-                      FlutterI18n.translate(context, "sport.data"),
+                      context.t.sport.data,
                       style: const TextStyle(
                         fontFeatures: [FontFeature.tabularFigures()],
                       ),
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      FlutterI18n.translate(context, "sport.score"),
+                      context.t.sport.score,
                       style: const TextStyle(
                         fontFeatures: [FontFeature.tabularFigures()],
                       ),
                       textAlign: TextAlign.start,
                     ),
                     Text(
-                      FlutterI18n.translate(context, "sport.passed"),
+                      context.t.sport.passed,
                       style: const TextStyle(
                         fontFeatures: [FontFeature.tabularFigures()],
                       ),
@@ -404,11 +390,7 @@ class ScoreCard extends StatelessWidget {
                         textAlign: TextAlign.start,
                       ),
                       Text(
-                        FlutterI18n.translate(
-                          context,
-                          "sport.score_string",
-                          translationParams: {"score": i.score.toString()},
-                        ),
+                        context.t.sport.scoreString(score: i.score.toString()),
                         style: const TextStyle(
                           fontFeatures: [FontFeature.tabularFigures()],
                         ),
