@@ -1,0 +1,298 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+acknowledgement: Made With Love From {developers} People
+about: 關於
+about_this_program: 關於本程序
+version: 版本號：{version}
+user_info: 用戶信息
+check_update: 檢查軟件更新
+latest_version: '最新版本: {latest}'
+waiting: 等待獲取
+fetching_update: 正在獲取更新信息
+new_version: 有新版本發佈！
+current_stable: 目前您正在運行最新版
+current_testing: 目前您正在運行測試版
+fetch_failed: 獲取更新信息失敗
+ui_setting: 界面設置
+brightness_setting: 設置深淺色
+color_setting: 顏色設置
+simplify_timeline: 簡化日程時間軸
+simplify_timeline_description: 沒有日程時 減少空間佔用
+low_electricity_warning: 低電量卡片變色提醒
+low_electricity_warning_description: 電量小於閾值時 電量卡片變色提醒
+low_electricity_threshold: 低電量閾值
+low_electricity_threshold_description: 當前為 {threshold} 度
+low_electricity_threshold_dialog:
+  title: 設置低電量閾值
+  input_hint: 請輸入電量度數
+account_setting: 賬號設置
+sport_password_setting: 體育系統密碼設置
+experiment_password_setting: 物理實驗系統密碼設置
+electricity_password_setting: 電費帳號密碼設置
+electricity_password_description: 非 123456 請設置
+electricity_account_setting: 電費賬號設置
+schoolnet_password_setting: 校園網帳號密碼設置
+schoolnet_password_description: 不設置查看不了網費
+aircon_imei_title: 空調用電數據源
+aircon_imei: 空調 IMEI
+aircon_imei_not_set: 未設置，電費頁不顯示空調用電
+aircon_imei_current: 當前 IMEI：{imei}
+aircon_imei_saved: 空調 IMEI 已保存
+aircon_imei_cleared: 空調 IMEI 已清除
+aircon_imei_invalid: 沒有識別到有效的 15 位 IMEI
+aircon_imei_clear: 清除
+scan_aircon_qr: 掃描空調二維碼
+pick_aircon_qr_image: 從相冊選擇二維碼圖片
+aircon_camera_unavailable: 當前平臺不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI
+notification_setting: 通知設置
+course_reminder_setting: 課前通知設置
+course_reminder_description: 設置課前提醒通知
+notification_page:
+  title: 課前通知設置
+  load_failed: '加載設置失敗: {error}'
+  function_section: 通知功能
+  enable_notification: 啟用課前通知
+  notification_scheduled: 已安排 {count} 個通知
+  notification_disabled_hint: 關閉後將取消所有已安排的通知
+  update_schedule: 更新通知日程
+  update_schedule_hint: 根據最新的課程數據重新安排通知
+  view_the_instructions: 查看使用說明
+  view_the_instructions_hint: 查看更多使用說明確保您能看到程序發出的通知
+  delete_all_schedule: 刪除通知日程
+  delete_all_schedule_hint: 這個操作會刪除所有已經安排的日程，但是您可以再次點擊更新通知日程來重新添加
+  delete_all_success: 刪除操作成功
+  permission_section: 權限狀態
+  notification_permission: 通知權限
+  exact_alarm_permission: 精確時鐘權限
+  permission_granted: 已授予
+  permission_denied: 未授予
+  request_permission: 請求權限
+  system_settings: 系統通知設置
+  system_settings_hint: 打開系統設置檢查通知配置
+  permission_granted_msg: 權限已授予
+  permission_denied_msg: 權限被拒絕，請在系統設置中開啟
+  reminder_section: 提醒設置
+  experiment_reminder: 將物理實驗加入課程提醒
+  experiment_reminder_hint: 將物理實驗的時間安排一併加入課前提醒系統
+  minutes_before: 提前提醒時間
+  minutes_before_hint: 課前提前提醒的時間設置
+  minutes_unit: 分鐘
+  days_to_schedule: 計劃通知天數
+  days_to_schedule_hint: 本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數
+  days_unit: 天
+  settings_guide_title: 通知設置提示
+  settings_guide_content_1: '為了確保您能及時收到課前提醒，請確保：
+
+    1. 開啟了應用的通知權限
+
+    2. 開啟了通知的聲音提示
+
+    3. 開啟了懸浮通知（橫幅通知）
+
+    4. 非原生安卓用戶，開啟自啟動和關閉電源優化'
+  settings_guide_content_2: '課前提醒模塊運行機制：
+
+    1. 首次開啟時自動安排未來幾天的課前提醒
+
+    2. 每次打開應用時自動檢查並更新通知日程
+
+    3. 修改設置後自動重新安排所有通知'
+  got_it: 知道了
+  open_settings: 打開系統設置
+  no_classtable_data: 請先獲取課程表、考試或實驗數據
+  schedule_success: 已安排 {count} 個課前提醒
+  schedule_failed: '安排通知失敗: {error}'
+  cancel_all_success: 已取消所有課前提醒
+  reschedule_success: 已重新安排 {count} 個課前提醒
+  reschedule_failed: '重新安排通知失敗: {error}'
+notification_debug_page: 通知服務調試頁面
+classtable_setting: 課表相關設置
+background: 開啟課表背景圖
+no_background: 你先選個圖片罷，就在下面
+choose_background: 課表背景圖選擇
+no_permission: 未獲取存儲權限，無法讀取文件
+successful_setting: 設定成功
+failure_setting: 你沒有選圖片捏
+clear_user_class: 清除所有用戶添加課程
+clear_user_class_title: 確認對話框
+clear_user_class_content: 是否要清除所有用戶添加課程？這個功能對從學校獲取的日程沒有影響。
+clear_user_class_clear: 已經清除完畢
+class_refresh: 強制刷新課表
+class_refresh_title: 確認對話框
+class_refresh_content: 是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。
+class_swift: 課程偏移設置
+class_swift_description: '正數錯後開學日期 負數提前開學日期
+
+  目前為 {swift}'
+core_setting: 緩存登錄設置
+check_logger: 查看網絡攔截器和日誌
+clear_and_restart: 清除緩存後重啟
+clear_and_restart_dialog:
+  title: 確認對話框
+  content: 確定清除緩存後重啟程序？
+  cleaning: 正在清理緩存
+  clear: 緩存已被清除
+logout: 退出登錄並重啟應用
+logout_dialog:
+  title: 確認對話框
+  content: 確定退出登錄？你的所有數據將會被徹底刪除！
+  logging_out: 正在退出登錄
+need_close_dialog:
+  title: 請關閉應用
+  content: 因為技術限制，用戶需要自行關閉窗口，然後重新打開應用。
+change_color_dialog:
+  title: 顏色設置
+  default: 默認顏色
+  blue: 聰明藍
+  deepPurple: 基佬紫
+  green: 春風綠
+  orange: 明日香橙
+  pink: 櫻花粉
+change_brightness_dialog:
+  title: 亮度設置
+  follow_setting: 跟隨系統
+  day_mode: 白天模式
+  night_mode: 黑夜模式
+change_swift_dialog:
+  title: 課程偏移設置
+  input_hint: 請在此輸入數字
+change_electricity_title: 修改電費帳號
+change_electricity_account:
+  title: 修改電費帳號
+  campus: 校區
+  northCampus: 北校區
+  southCampus: 南校區
+  unitOrZone: 單元/區號
+  unitCode: 單元號
+  zoneCode: 區號
+  pleaseInput: 請輸入{unitOrZoneCode}
+  successful_fetch: 賬號獲取成功：{accountNumber}
+  failed_fetch: 獲取失敗：{e}
+  account_saved: 賬號已保存：{accountNumber}
+  unknown_coding_pattern: 該樓號編碼規則未知
+  select_building: 選擇樓棟
+  building: 樓棟
+  northern_building: 北棟
+  southern_building: 南棟
+  failed_generate: 生成失敗：{e}
+  building_number: 樓號
+  building_number_hint: '例如: 16, 7, 55'
+  building_number_query: 請輸入樓號
+  yard: 院區
+  yard_hint: 選擇院區
+  northYard: 北院
+  southYard: 南院
+  yard_query: 請選擇院區
+  apartment: 樓棟
+  apartment_hint: 選擇樓棟
+  northApartment: 北樓
+  southApartment: 南樓
+  apartment_query: 請選擇樓棟
+  levelCode: 層號
+  levelCode_query: 請輸入層號
+  roomCode: 房間號
+  roomCode_hint: '例如: 304, 508'
+  roomCode_query: 請輸入房間號
+  account: 電費賬號
+  account_hint: 請輸入或從網絡獲取
+  account_query: 請輸入電費賬號
+  account_length: 賬號長度通常不小於10位
+  fetching: 正在獲取...
+  fetch_from_internet: 從網絡同步
+  save_account: 保存賬號
+  confirm_saving: 確認保存
+  calculate_account: 計算賬號
+  calculate: 計算
+  input: 輸入
+  confirm_account: 請確認賬號：
+  change: 修改
+  cancel: 取消
+  no_setting: 未設置新的電費賬號
+  successful_setting: 已設置新的電費賬號
+change_experiment_title: 修改物理實驗賬號密碼
+change_sport_title: 修改體育系統賬號密碼
+change_password_dialog:
+  input_hint: 請在此輸入密碼
+  blank_input: 輸入空白!
+change_schoolnet_password_title: 修改校園網查詢帳號密碼
+update_dialog:
+  new_version: 新版本發佈
+  not_now: 暫不更新
+  app_store: App Store 更新
+  download_apk: 下載安裝包
+  github_release: 去 Git Release
+  new_content: '版本號 {code} 新增內容：
+
+    '
+localization_dialog:
+  title: 修改語言
+  undefined: 追隨系統設置
+  simplifiedChinese: 簡體中文
+  traditionalChinese: 繁體中文
+  english: 英語
+semester_change: 修改學期
+semester_change_description: 使用學期 {semester}
+semester_update_data: 應用新學期設置中
+easter_egg_page: 你找到了彩蛋
+about_page:
+  benderblog: 主要開發者，iOS 小部件編寫和拼接
+  alnair: 開發：圖書館搜索和封面
+  aqqkad: 開發：考勤歷史記錄
+  bellssgit: 支持：最佳&最久故障反饋者
+  brackrat: 設計：主頁，登錄頁，配色，iOS 小部件等
+  breezeline: 支持：無價值無意義的產品經理(他自己的描述)
+  cafebabe: 支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配
+  chitao1234: 開發：修復滑塊不對齊問題
+  copperkoi: 開發：系統日曆最新課表同步
+  dimole: 開發支持：輔助修復滑塊問題
+  elitewars: 設計：體育成績頁面
+  elliot: 國際化：軟件英語翻譯 / 開發指導：情侶課表功能開發指導（該功能已經被移除）
+  flyingpig: 開發：修復自定義課程編輯頁的空指針異常
+  godhu777777: 國際化：繁體中文轉換代碼和彩蛋代碼 / 開發：優化導出日曆文件大小
+  hancl777: 國際化：繁體中文轉換代碼
+  hazuki-keatsu: 開發：物理實驗成績查詢和識別
+  hawa130: 設計：課程詳情卡片
+  hhzm: 開發：電費查詢賬號計算
+  imaginary_17: 開發：睿思論壇路由修復
+  imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI
+  ka-mate-ka-ora: 國際化：軟件英語翻譯優化
+  lagrange-x: 開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性
+  lhx-666-cool: 支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配
+  lichtyy: 設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼
+  lqsy-h: 支持：推文宣傳圖片製作
+  lsy223622: 設計：iOS 和 Android 圖標 / 支持：冠名 XDYou
+  mrbrilliant2046: 支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯
+  nancunchild: 開發：圖書館搜索功能 / 國際化：優化英語翻譯
+  nkanf: 開發：課程表時間進度展示（初版方案） / 支持：MacOS 構建支持
+  pairman: 開發：成績緩存功能和優化滑塊算法 / 國際化：優化英語翻譯
+  reverierxu: 設計：用於信息展示的 ReX 卡片 / 開發支持：研究生課表
+  rrrilac: 開發支持：電費查詢
+  ray: 設計：開屏畫面 / 支持：iOS 發行商 & 搭子課表 / 開發指導：情侶課表功能開發指導（該功能已經被移除） / 國際化：優化英語翻譯
+  shadowyingyi: 支持：兩次鴿子公眾號宣傳
+  stalomeow: 設計：首頁時間軸 / 開發：異步登錄 & 驗證碼預測
+  xeonds: 設計：設置頁面 / 開發：XDU Planet / 開發：校園卡付款碼
+  xingshuyu: 開發：修復物理實驗獲取問題和電費窗口問題
+  xiue233: 開發：Android 小部件和拼接
+  xizi: 開發支持：研究生版本開發
+  wirsbf: 開發：修復調課未按預期進行
+  zcwzy: 開發：修復丁香電費 / 開發支持：研究生版本開發 / 設計：空白頁面貼圖
+  zyar-er: 開發支持：小工具頁面地址更新
+  homepage: 主頁
+  code: 開源代碼
+  know_more: 知道更多
+  copyright_notice: '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla
+    Public License, v. 2.0 授權。
+
+    本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
+
+
+    Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+
+    Copyright 2025-present Traintime PDA authors.
+
+
+    The Source Code Form is subject to the terms of the Mozilla Public License, v.
+    2.0. If a copy of the MPL was not distributed with this file, you can obtain one
+    at https://mozilla.org/MPL/2.0/.'
+  beian: 備案號
+  sign_android: 安卓簽名
+  title: 關於本軟件

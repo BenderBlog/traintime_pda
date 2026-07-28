@@ -1,0 +1,6 @@
+title: 图书馆当前状况
+fetching: 正在获取图书馆信息
+northern_library: 北校区状况
+southern_library: 南校区状况
+people: 在馆 {people} 人
+seat: 空位 {seat} 个

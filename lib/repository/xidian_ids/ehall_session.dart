@@ -47,7 +47,7 @@ class EhallSession extends IDSSession {
     required String username,
     required String password,
     required Future<void> Function(String) sliderCaptcha,
-    required void Function(int, String) onResponse,
+    required void Function(int, LoginProcessStep) onResponse,
   }) async {
     String location = await super.login(
       target:

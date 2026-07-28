@@ -1,0 +1,11 @@
+title: Campus Card Transaction History
+income: Income ￥{income}
+expense: Expense ￥{expense}
+select_range: 'Select date: from {startDay} to {endDay}'
+store_name: Expense place
+balance: Amount
+time_with_sum: Time ({sum})
+no_record: No records found, please try again with different dates
+qr_code: Payment Code
+qr_code_error: 'Get QR Code failed: {info}'
+reload: Reload

@@ -16,6 +16,14 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
+enum LoginProcessStep {
+  readyPage,
+  getEncrypt,
+  readyLogin,
+  slider,
+  afterProcess,
+}
+
 enum IDSLoginState {
   none,
   requesting,
@@ -172,12 +180,12 @@ class IDSSession extends NetworkSession {
     required String password,
     required Future<void> Function(String) sliderCaptcha,
     bool forceReLogin = false,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
     String? target,
   }) async {
     /// Get the login webpage.
     if (onResponse != null) {
-      onResponse(10, "login_process.ready_page");
+      onResponse(10, LoginProcessStep.readyPage);
       log.info(
         "[IDSSession][login] "
         "Ready to get the login webpage.",
@@ -211,7 +219,7 @@ class IDSSession extends NetworkSession {
 
     /// Get AES encrypt key. There must be.
     if (onResponse != null) {
-      onResponse(30, "login_process.get_encrypt");
+      onResponse(30, LoginProcessStep.getEncrypt);
     }
     String keys = form
         .firstWhere((element) => element.id == "pwdEncryptSalt")
@@ -223,7 +231,7 @@ class IDSSession extends NetworkSession {
 
     /// Prepare for login.
     if (onResponse != null) {
-      onResponse(40, "login_process.ready_login");
+      onResponse(40, LoginProcessStep.readyLogin);
     }
     Map<String, dynamic> head = {
       'username': username,
@@ -243,7 +251,7 @@ class IDSSession extends NetworkSession {
     }
 
     if (onResponse != null) {
-      onResponse(45, "login_process.slider");
+      onResponse(45, LoginProcessStep.slider);
     }
 
     await dioNoOfflineCheck.get(
@@ -259,7 +267,7 @@ class IDSSession extends NetworkSession {
 
     /// Post login request.
     if (onResponse != null) {
-      onResponse(50, "login_process.ready_login");
+      onResponse(50, LoginProcessStep.readyLogin);
     }
     try {
       var data = await dioNoOfflineCheck.post(
@@ -274,7 +282,7 @@ class IDSSession extends NetworkSession {
       if (data.statusCode == 301 || data.statusCode == 302) {
         /// Post login progress.
         if (onResponse != null) {
-          onResponse(80, "login_process.after_process");
+          onResponse(80, LoginProcessStep.afterProcess);
         }
         return data.headers[HttpHeaders.locationHeader]![0];
       } else {
@@ -308,7 +316,7 @@ class IDSSession extends NetworkSession {
           if (data.statusCode == 301 || data.statusCode == 302) {
             /// Post login progress.
             if (onResponse != null) {
-              onResponse(80, "login_process.after_process");
+              onResponse(80, LoginProcessStep.afterProcess);
             }
             return data.headers[HttpHeaders.locationHeader]![0];
           }

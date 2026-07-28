@@ -1,10 +1,10 @@
+import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 
 import '../controller/ruisi_controller.dart';
@@ -110,7 +110,7 @@ class _CaptchaDialogState extends State<CaptchaDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(context, 'ruisi.login.captcha')),
+      title: Text(context.t.ruisi.login.captcha),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -159,10 +159,7 @@ class _CaptchaDialogState extends State<CaptchaDialog> {
             controller: _captchaCtrl,
             autofocus: true,
             decoration: InputDecoration(
-              labelText: FlutterI18n.translate(
-                context,
-                'ruisi.login.captcha_hint',
-              ),
+              labelText: context.t.ruisi.login.captchaHint,
               border: const OutlineInputBorder(),
             ),
             onSubmitted: (_) => _handleSubmit(),
@@ -186,7 +183,7 @@ class _CaptchaDialogState extends State<CaptchaDialog> {
           onPressed: _submitting
               ? null
               : () => Navigator.of(context).pop(false),
-          child: Text(FlutterI18n.translate(context, 'ruisi.common.cancel')),
+          child: Text(context.t.ruisi.common.cancel),
         ),
         FilledButton(
           onPressed: _submitting ? null : _handleSubmit,
@@ -196,7 +193,7 @@ class _CaptchaDialogState extends State<CaptchaDialog> {
                   width: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(FlutterI18n.translate(context, 'ruisi.common.confirm')),
+              : Text(context.t.ruisi.common.confirm),
         ),
       ],
     );

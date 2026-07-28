@@ -4,7 +4,6 @@
 
 import 'dart:math';
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/library/search_book_constant.dart';
 import 'package:watermeter/page/library/search_fields.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
@@ -17,6 +16,7 @@ import 'package:watermeter/repository/xidian_ids/library_session.dart'
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class SearchBookWindow extends StatefulWidget {
   const SearchBookWindow({super.key});
@@ -135,7 +135,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                       Icon(Icons.search, size: 96.0),
                       const SizedBox(height: 16),
                       Text(
-                        FlutterI18n.translate(context, "library.no_result"),
+                        context.t.library.noResult,
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -171,7 +171,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
     FocusManager.instance.primaryFocus?.unfocus();
     await BothSideSheet.show(
       context: context,
-      title: FlutterI18n.translate(context, "library.book_detail"),
+      title: context.t.library.bookDetail,
       child: BookDetailCard(toUse: item),
     );
   }

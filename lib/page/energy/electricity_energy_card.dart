@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -13,6 +12,7 @@ import 'package:watermeter/page/energy/electricity_average_usage_graph.dart';
 import 'package:watermeter/page/energy/electricity_usage_graph.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ElectricityEnergyCard extends StatelessWidget {
   const ElectricityEnergyCard({super.key});
@@ -29,11 +29,11 @@ class ElectricityEnergyCard extends StatelessWidget {
         if (displayInfo == null) {
           return InfoCard(
             iconData: Icons.electric_meter,
-            title: FlutterI18n.translate(context, "electricity.power_title"),
+            title: context.t.electricity.powerTitle,
             children: [
               if (state is AsyncError)
                 Text(
-                  FlutterI18n.translate(context, "electricity.fetch_error"),
+                  context.t.electricity.fetchError,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ).padding(vertical: 8, horizontal: 12)
               else
@@ -47,10 +47,7 @@ class ElectricityEnergyCard extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "electricity.fetching_hint",
-                        ),
+                        context.t.electricity.fetchingHint,
                       ),
                     ),
                   ],
@@ -68,12 +65,12 @@ class ElectricityEnergyCard extends StatelessWidget {
 
         return InfoCard(
           iconData: Icons.electric_meter,
-          title: FlutterI18n.translate(context, "electricity.power_title"),
+          title: context.t.electricity.powerTitle,
           icon: state is AsyncData<FetchResult<EnergyInfo>>
               ? Icons.refresh
               : null,
           buttonText: state is AsyncData<FetchResult<EnergyInfo>>
-              ? FlutterI18n.translate(context, "electricity.update")
+              ? context.t.electricity.update
               : null,
           onTap: state is AsyncData<FetchResult<EnergyInfo>>
               ? c.refreshElectricityInfo
@@ -87,39 +84,31 @@ class ElectricityEnergyCard extends StatelessWidget {
             SizedBox(height: 4),
             if (state is AsyncError)
               Text(
-                FlutterI18n.translate(context, "electricity.fetch_error"),
+                context.t.electricity.fetchError,
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ).padding(bottom: 8, horizontal: 12),
             if (isFromCache && fetchTime != null)
               CacheAlerter(
-                dataType: FlutterI18n.translate(
-                  context,
-                  "electricity.power_title",
-                ),
-                hint: FlutterI18n.translate(
-                  context,
-                  cacheHintKey == null || cacheHintKey == "local_cache_hint"
-                      ? "cache_reason_default"
-                      : cacheHintKey,
-                ),
+                dataType: context.t.electricity.powerTitle,
+                hint: cacheHintKey?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
                 placeOfCache: PlaceOfCache.device,
                 fetchTime: fetchTime,
               ).padding(bottom: 8, horizontal: 12),
             InfoItem(
               icon: Icons.cached,
-              label: FlutterI18n.translate(context, "electricity.cache_notice"),
+              label: context.t.electricity.cacheNotice,
               value: DateFormat(
                 "yyyy-MM-dd",
               ).format(displayInfo.electricityMeterList.first.ReadTime),
             ),
             InfoItem(
               icon: Icons.electric_meter,
-              label: FlutterI18n.translate(context, "electricity.remain_power"),
+              label: context.t.electricity.remainPower,
               value: "${displayInfo.electricityRemain} kWh",
             ),
             InfoItem(
               icon: Icons.history,
-              label: FlutterI18n.translate(context, "electricity.history"),
+              label: context.t.electricity.history,
             ),
             LayoutBuilder(
                   builder: (context, constraints) => ElectricityUsageGraph(
@@ -136,7 +125,7 @@ class ElectricityEnergyCard extends StatelessWidget {
                 .padding(horizontal: 12),
             InfoItem(
               icon: Icons.bar_chart,
-              label: FlutterI18n.translate(context, "electricity.daily_usage"),
+              label: context.t.electricity.dailyUsage,
             ),
             LayoutBuilder(
                   builder: (context, constraints) =>
@@ -164,7 +153,8 @@ class ElectricityEnergyCard extends StatelessWidget {
     return FilledButton.icon(
       onPressed: onRefresh,
       icon: const Icon(Icons.refresh),
-      label: Text(FlutterI18n.translate(context, "electricity.update")),
+      label: Text(context.t.electricity.update),
     ).padding(top: 12, horizontal: 12).width(double.infinity);
   }
 }
+

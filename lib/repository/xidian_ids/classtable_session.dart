@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -21,17 +22,32 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-String _cacheHintFromError(Object error) {
+enum ClasstableCacheHint implements CacheHint {
+  passwordWrong,
+  loginFailed,
+  networkFailed,
+  unknownError;
+
+  @override
+  String resolve(Translations tr) => switch (this) {
+    passwordWrong => tr.classtable.cacheHintPasswordWrong,
+    loginFailed  => tr.classtable.cacheHintLoginFailed,
+    networkFailed => tr.classtable.cacheHintNetworkFailed,
+    unknownError => tr.classtable.cacheHintUnknownError,
+  };
+}
+
+ClasstableCacheHint _cacheHintFromError(Object error) {
   if (error is PasswordWrongException) {
-    return "classtable.cache_hint_password_wrong";
+    return ClasstableCacheHint.passwordWrong;
   }
   if (error is LoginFailedException) {
-    return "classtable.cache_hint_login_failed";
+    return ClasstableCacheHint.loginFailed;
   }
   if (error is DioException) {
-    return "classtable.cache_hint_network_failed";
+    return ClasstableCacheHint.networkFailed;
   }
-  return "classtable.cache_hint_unknown_error";
+  return ClasstableCacheHint.unknownError;
 }
 
 Future<FetchResult<ClassTableData>> getClassTable(String semesterCode) async {
@@ -49,7 +65,7 @@ Future<FetchResult<ClassTableData>> getClassTable(String semesterCode) async {
       return FetchResult.cache(
         fetchTime: cache.$1,
         data: cache.$2,
-        hintKey: _cacheHintFromError(e),
+        cacheHint: _cacheHintFromError(e),
       );
     }
     rethrow;

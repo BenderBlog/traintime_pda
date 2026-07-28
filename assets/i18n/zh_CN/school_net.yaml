@@ -1,0 +1,44 @@
+title: 校园网使用详情
+ids_account_net:
+  title: 当前用户
+  notice: '这是登录到 PDA 账户的校园网信息
+
+    注意: 流量计费采用GB单位（1000进制）
+
+    如果没有看到信息，请访问 zfw.xidian.edu.cn 重置网络密码'
+  overview: 账户概览
+  account: 账号
+  used: 已使用流量
+  remain: 余额
+  current_online: 在线设备（{length}台）
+  no_device_online: 当前没有在线设备
+current_login_net:
+  title: 正在使用
+  notice: '这是您正在使用中校园网的信息，可能和您登录 PDA 的信息不一致
+
+    注意: 流量计费采用GB单位（1000进制）'
+  overview: 账户概览
+  account: 账号
+  plan_type: 套餐类型
+  remain: 余额
+  usage_situation: 流量使用情况
+  used_percent: 已使用 {percent}%
+  used: 已使用流量
+  remain_count: 剩余流量
+  total: 总流量
+  non_schoolnet: 非校园网
+device_list:
+  ip: 在线设备IP
+  time: 上线时间
+  remain: 流量用量
+fetching: 正在获取校园网信息
+empty_password: 您忘记输入账号密码了
+not_initalized: 疑似查询后端尚未开放查询
+captcha_failed: 验证码识别失败
+captcha_empty: 验证码为空
+cache_hint_captcha_failed: 验证码识别失败，请重试。
+cache_hint_request_failed: 校园网请求失败，请稍后重试。
+wrong_password: 密码错误
+error_fetch: 获取失败：{msg}
+error_other: 其他错误：{msg}
+refresh: 刷新

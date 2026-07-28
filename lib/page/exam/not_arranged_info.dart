@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class NoArrangedInfo extends StatelessWidget {
   final List<ToBeArranged> list;
@@ -17,7 +17,7 @@ class NoArrangedInfo extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          FlutterI18n.translate(context, "exam.no_arrangement.title"),
+          context.t.exam.noArrangement.title,
         ),
       ),
       body: Builder(
@@ -25,10 +25,7 @@ class NoArrangedInfo extends StatelessWidget {
           if (list.isEmpty) {
             return EmptyListView(
               type: EmptyListViewType.defaultimg,
-              text: FlutterI18n.translate(
-                context,
-                "exam.no_arrangement.all_arranged",
-              ),
+              text: context.t.exam.noArrangement.allArranged,
             );
           }
           return DataList<ToBeArranged>(
@@ -48,11 +45,7 @@ class NoArrangedInfo extends StatelessWidget {
                   ),
                 ),
                 subtitle: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "exam.no_arrangement.subtitle",
-                    translationParams: {"id": toUse.id},
-                  ),
+                  context.t.exam.noArrangement.subtitle(id: toUse.id),
                 ),
               ),
             ),

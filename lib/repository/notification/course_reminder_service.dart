@@ -5,7 +5,6 @@
 // Course reminder notification service implementation
 
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -19,9 +18,10 @@ import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
+import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/routing/routes.dart';
-import 'package:watermeter/generated/non_ui_i18n.g.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 /// Course Reminder Service implementation
 class CourseReminderService extends NotificationService
@@ -301,35 +301,7 @@ class CourseReminderService extends NotificationService
     );
   }
 
-  String _getCurrentLocale() {
-    // Get current locale from preference
-    String locale = preference.getString(preference.Preference.localization);
-    // If localization is not set or empty, get system locale
-    if (locale.isEmpty) {
-      String systemLocale = Platform.localeName;
-      log.info(
-        "[CourseReminderService] [getCurrentLocale] Using system locale: $systemLocale",
-      );
-      if (systemLocale.contains("zh")) {
-        if (Platform.isIOS || Platform.isMacOS) {
-          if (systemLocale.contains("Hans")) {
-            locale = "zh_CN";
-          } else {
-            locale = "zh_TW";
-          }
-        } else {
-          if (systemLocale.contains("CN") || systemLocale.contains("SG")) {
-            locale = "zh_CN";
-          } else {
-            locale = "zh_TW";
-          }
-        }
-      } else {
-        locale = "en_US";
-      }
-    }
-    return locale;
-  }
+  String _getCurrentLocale() => Localization.fromPreference().resolved.string;
 
   bool get hasSchedulableReminderSourceData {
     final classTableData =
@@ -375,7 +347,7 @@ class CourseReminderService extends NotificationService
         return;
       }
 
-      final String locale = _getCurrentLocale();
+      final tr = AppLocaleUtils.parse(_getCurrentLocale()).buildSync();
       int scheduledCount = 0;
 
       for (final customClass in data) {
@@ -405,26 +377,18 @@ class CourseReminderService extends NotificationService
             '${classStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
           );
 
-          String title = NonUII18n.translate(
-            locale,
-            'course_reminder.title',
-            translateParams: {'name': customClass.name},
-          );
+          String title = tr.courseReminder.title(name: customClass.name);
 
-          String body = NonUII18n.translate(
-            locale,
-            'course_reminder.body',
-            translateParams: {'time': minutesBefore.toString()},
-          );
+          String body = tr.courseReminder.body(time: minutesBefore.toString());
 
           if (customClass.classroom != null &&
               customClass.classroom!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": customClass.classroom!})}';
+                '\n${tr.courseReminder.location(location: customClass.classroom!)}';
           }
           if (customClass.teacher != null && customClass.teacher!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": customClass.teacher!})}';
+                '\n${tr.courseReminder.teacher(teacher: customClass.teacher!)}';
           }
 
           final Map<String, dynamic> payload = {
@@ -493,6 +457,8 @@ class CourseReminderService extends NotificationService
 
       int scheduledCount = 0;
 
+      final tr = AppLocaleUtils.parse(_getCurrentLocale()).buildSync();
+
       for (int weekIndex = currentWeek; weekIndex <= endWeek; weekIndex++) {
         for (var timeArrangement in data.timeArrangement) {
           if (weekIndex >= timeArrangement.weekList.length ||
@@ -526,29 +492,19 @@ class CourseReminderService extends NotificationService
             '${classStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
           );
 
-          String locale = _getCurrentLocale();
+          String title = tr.courseReminder.title(name: classDetail.name);
 
-          String title = NonUII18n.translate(
-            locale,
-            'course_reminder.title',
-            translateParams: {'name': classDetail.name},
-          );
-
-          String body = NonUII18n.translate(
-            locale,
-            'course_reminder.body',
-            translateParams: {'time': minutesBefore.toString()},
-          );
+          String body = tr.courseReminder.body(time: minutesBefore.toString());
 
           if (timeArrangement.classroom != null &&
               timeArrangement.classroom!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": timeArrangement.classroom!})}';
+                '\n${tr.courseReminder.location(location: timeArrangement.classroom!)}';
           }
           if (timeArrangement.teacher != null &&
               timeArrangement.teacher!.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": timeArrangement.teacher!})}';
+                '\n${tr.courseReminder.teacher(teacher: timeArrangement.teacher!)}';
           }
 
           Map<String, dynamic> payload = {
@@ -613,6 +569,8 @@ class CourseReminderService extends NotificationService
 
       int scheduledCount = 0;
 
+      final tr = AppLocaleUtils.parse(_getCurrentLocale()).buildSync();
+
       for (
         int experimentIndex = 0;
         experimentIndex < experiments.length;
@@ -657,28 +615,18 @@ class CourseReminderService extends NotificationService
             '$minutesBefore|$weekIndex',
           );
 
-          String locale = _getCurrentLocale();
-
           // Use course_reminder translation keys to treat experiments as courses
-          String title = NonUII18n.translate(
-            locale,
-            'course_reminder.title',
-            translateParams: {'name': experiment.name},
-          );
+          String title = tr.courseReminder.title(name: experiment.name);
 
-          String body = NonUII18n.translate(
-            locale,
-            'course_reminder.body',
-            translateParams: {'time': minutesBefore.toString()},
-          );
+          String body = tr.courseReminder.body(time: minutesBefore.toString());
 
           if (experiment.classroom.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": experiment.classroom})}';
+                '\n${tr.courseReminder.location(location: experiment.classroom)}';
           }
           if (experiment.teacher.isNotEmpty) {
             body +=
-                '\n${NonUII18n.translate(locale, 'course_reminder.teacher', translateParams: {"teacher": experiment.teacher})}';
+                '\n${tr.courseReminder.teacher(teacher: experiment.teacher)}';
           }
 
           Map<String, dynamic> payload = {
@@ -760,22 +708,14 @@ class CourseReminderService extends NotificationService
           '${examStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
         );
         final locale = _getCurrentLocale();
+        final tr = AppLocaleUtils.parse(locale).buildSync();
 
-        String title = NonUII18n.translate(
-          locale,
-          'course_reminder.title',
-          translateParams: {'name': '${exam.subject}考试'},
-        );
+        String title = tr.courseReminder.title(name: '${exam.subject}考试');
 
-        String body = NonUII18n.translate(
-          locale,
-          'course_reminder.body',
-          translateParams: {'time': minutesBefore.toString()},
-        );
+        String body = tr.courseReminder.body(time: minutesBefore.toString());
 
         if (exam.place.isNotEmpty) {
-          body +=
-              '\n${NonUII18n.translate(locale, 'course_reminder.location', translateParams: {"location": exam.place})}';
+          body += '\n${tr.courseReminder.location(location: exam.place)}';
         }
 
         final payload = <String, dynamic>{
@@ -814,7 +754,7 @@ class CourseReminderService extends NotificationService
     int minutesBefore = 5,
   }) async {
     try {
-    // Schedule course, custom course, experiment, and exam notifications in parallel.
+      // Schedule course, custom course, experiment, and exam notifications in parallel.
       await Future.wait([
         _scheduleNotificationFromCourseData(
           daysToSchedule: daysToSchedule,

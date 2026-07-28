@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ScoreCard extends StatelessWidget {
   const ScoreCard({super.key});
@@ -21,17 +21,14 @@ class ScoreCard extends StatelessWidget {
         if (offline && !ScoreSession.isCacheExist) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              "homepage.toolbox.score_cannot_reach",
-            ),
+            msg: context.t.homepage.toolbox.scoreCannotReach,
           );
         } else {
           context.pushReplacementNamed(Routes.score);
         }
       },
       icon: Icons.grading_rounded,
-      nameKey: "homepage.toolbox.score",
+      name: context.t.homepage.toolbox.score,
     );
   }
 }

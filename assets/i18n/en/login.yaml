@@ -1,0 +1,20 @@
+identity_number: Student ID
+password: IDS Login password
+login: Login
+incorrect_password_pattern: Username or password does not meet requirements, student
+  ID must be 11 digits and password cannot be empty
+on_login_progress: Logging in...
+complete_login: Login successful
+failed_login_cannot_connect_to_server: Cannot connect to server
+failed_login_with_code: 'Request failed, response status code: {code}'
+failed_login_with_message: 'Request failed, error message: {message}'
+failed_login_other: Unknown error, please contact the developer
+clear_cache: Clear cache
+complete_clear_cache: Cache cleared successfully
+see_inspector: View network interaction
+captcha_window:
+  title: Please enter captcha
+  hint: Input captcha
+  message_on_empty: Please enter captcha
+  refresh_failed: 'Failed to refresh captcha: {error}'
+slider_title: Server authentication service

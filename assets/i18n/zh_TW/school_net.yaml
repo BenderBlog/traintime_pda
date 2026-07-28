@@ -1,0 +1,45 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+title: 校園網使用詳情
+ids_account_net:
+  title: 當前用戶
+  notice: '這是登錄到 PDA 賬戶的校園網信息
+
+    注意: 流量計費採用GB單位（1000進制）
+
+    如果沒有看到信息，請訪問 zfw.xidian.edu.cn 重置網絡密碼'
+  overview: 賬戶概覽
+  account: 賬號
+  used: 已使用流量
+  remain: 餘額
+  current_online: 在線設備（{length}臺）
+  no_device_online: 當前沒有在線設備
+current_login_net:
+  title: 正在使用
+  notice: '這是您正在使用中校園網的信息，可能和您登錄 PDA 的信息不一致
+
+    注意: 流量計費採用GB單位（1000進制）'
+  overview: 賬戶概覽
+  account: 賬號
+  plan_type: 套餐類型
+  remain: 餘額
+  usage_situation: 流量使用情況
+  used_percent: 已使用 {percent}%
+  used: 已使用流量
+  remain_count: 剩餘流量
+  total: 總流量
+  non_schoolnet: 非校園網
+device_list:
+  ip: 在線設備IP
+  time: 上線時間
+  remain: 流量用量
+fetching: 正在獲取校園網信息
+empty_password: 您忘記輸入賬號密碼了
+not_initalized: 疑似查詢後端尚未開放查詢
+captcha_failed: 驗證碼識別失敗
+captcha_empty: 驗證碼為空
+cache_hint_captcha_failed: 驗證碼識別失敗，請重試。
+cache_hint_request_failed: 校園網請求失敗，請稍後重試。
+wrong_password: 密碼錯誤
+error_fetch: 獲取失敗：{msg}
+error_other: 其他錯誤：{msg}
+refresh: 刷新

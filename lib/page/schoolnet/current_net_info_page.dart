@@ -5,7 +5,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/network_usage.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
@@ -13,6 +12,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/schoolnet/net_data_row.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/repository/schoolnet_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class CurrentNetInfoPage extends StatefulWidget {
   const CurrentNetInfoPage({super.key});
@@ -67,10 +67,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
           return [
                 // 注意事项
                 Text(
-                      FlutterI18n.translate(
-                        context,
-                        "school_net.current_login_net.notice",
-                      ),
+                      context.t.schoolNet.currentLoginNet.notice,
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.orange[800],
@@ -90,34 +87,22 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
 
                 // 用户信息卡片
                 InfoCard(
-                      title: FlutterI18n.translate(
-                        context,
-                        "school_net.current_login_net.overview",
-                      ),
+                      title: context.t.schoolNet.currentLoginNet.overview,
                       children: [
                         InfoItem(
                           icon: Icons.person,
-                          label: FlutterI18n.translate(
-                            context,
-                            "school_net.current_login_net.account",
-                          ),
+                          label: context.t.schoolNet.currentLoginNet.account,
                           value: currentUserNetInfo.userName,
                         ),
                         InfoItem(
                           icon: Icons.assignment,
-                          label: FlutterI18n.translate(
-                            context,
-                            "school_net.current_login_net.plan_type",
-                          ),
+                          label: context.t.schoolNet.currentLoginNet.planType,
                           value: currentUserNetInfo.productsName,
                           valueColor: Colors.green,
                         ),
                         InfoItem(
                           icon: Icons.account_balance_wallet,
-                          label: FlutterI18n.translate(
-                            context,
-                            "school_net.current_login_net.remain",
-                          ),
+                          label: context.t.schoolNet.currentLoginNet.remain,
                           value:
                               '¥'
                               '${currentUserNetInfo.userBalance.toStringAsFixed(2)}',
@@ -131,10 +116,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
 
                 // 流量使用卡片
                 InfoCard(
-                      title: FlutterI18n.translate(
-                        context,
-                        "school_net.current_login_net.usage_situation",
-                      ),
+                      title: context.t.schoolNet.currentLoginNet.usageSituation,
                       children: [
                         const SizedBox(height: 8),
                         LinearProgressIndicator(
@@ -142,39 +124,22 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                         ).padding(horizontal: 12),
                         const SizedBox(height: 4),
                         Text(
-                          FlutterI18n.translate(
-                            context,
-                            "school_net.current_login_net.used_percent",
-                            translationParams: {
-                              "percent": (usedPercentage * 100).toStringAsFixed(
-                                1,
-                              ),
-                            },
-                          ),
+                          context.t.schoolNet.currentLoginNet.usedPercent(percent: (usedPercentage * 100).toStringAsFixed(1)),
                           textAlign: TextAlign.right,
                         ).padding(horizontal: 12),
                         const SizedBox(height: 8),
                         NetDataRow(
-                          label: FlutterI18n.translate(
-                            context,
-                            "school_net.current_login_net.used",
-                          ),
+                          label: context.t.schoolNet.currentLoginNet.used,
                           value: _formatBytes(currentUserNetInfo.sumBytes),
                           color: Colors.redAccent,
                         ).padding(horizontal: 12),
                         NetDataRow(
-                          label: FlutterI18n.translate(
-                            context,
-                            "school_net.current_login_net.remain_count",
-                          ),
+                          label: context.t.schoolNet.currentLoginNet.remainCount,
                           value: _formatBytes(currentUserNetInfo.remainBytes),
                           color: Colors.green,
                         ).padding(horizontal: 12),
                         NetDataRow(
-                          label: FlutterI18n.translate(
-                            context,
-                            "school_net.current_login_net.total",
-                          ),
+                          label: context.t.schoolNet.currentLoginNet.total,
                           value: _formatBytes(totalBytes),
                           color: Colors.blue,
                         ).padding(horizontal: 12),
@@ -187,7 +152,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                 FilledButton(
                       onPressed: _reload,
                       child: Text(
-                        FlutterI18n.translate(context, "school_net.refresh"),
+                        context.t.schoolNet.refresh,
                       ),
                     )
                     .padding(horizontal: 4, vertical: 8)
@@ -205,12 +170,9 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
         final errorStatus = snapshot.error;
         return ReloadWidget(
           errorStatus: errorStatus is NotSchoolNetworkException
-              ? FlutterI18n.translate(
-                  context,
-                  "school_net.current_login_net.non_schoolnet",
-                )
+              ? context.t.schoolNet.currentLoginNet.nonSchoolnet
               : errorStatus is String
-              ? FlutterI18n.translate(context, errorStatus)
+              ? errorStatus
               : errorStatus,
           stackTrace: snapshot.stackTrace,
           function: _reload,

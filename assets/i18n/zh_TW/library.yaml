@@ -1,0 +1,50 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+title: 圖書館信息
+borrow_state_title: 借書狀態
+search_book_title: 查詢藏書
+search_field_title: 搜索字段
+search_field_keyword_option: 任意詞
+search_field_title_option: 標題
+search_field_author_option: 責任者
+search_field_isbn_option: ISBN
+search_field_barcode_option: 條碼號
+search_field_callno_option: 索書號
+not_provided: 未提供相關信息
+author: '作者 '
+publish_house: '出版社 '
+call_number: '索書號 '
+publish_date: '發行時間 '
+isbn: ISBN
+arrangement_code: '編排號碼 '
+avaliable_borrow: 可借
+storage: 館藏
+on_shelve: 在架
+book_code: 書籍編號：{barCode}
+due_date: ' 到期'
+borrow_str: ' 借閱'
+after_due_date: ' 天前到期'
+before_due_date: ' 天后'
+can_be_renewable: 續借
+cannot_be_renewable: 不可續借
+renewing: 正在續借
+empty_borrow_list: '目前沒有查詢到在借圖書
+
+  不借書就要變成上面的小呆瓜咯'
+borrow_list_info: 在借 {borrow} 本，其中已過期 {dued} 本
+search_book_window: ""
+search_here: 在此搜索
+normal_search: 普通搜索
+advanced_search: 高級搜索
+search: 搜索
+match_mode: 匹配方式
+match_exact: 精確匹配
+match_fuzzy: 模糊匹配
+match_prefix: 前方一致
+document_type: 文獻類型
+document_type_all: 全部
+document_type_book: 圖書
+only_on_shelf: 僅看在架
+publish_year_begin: 出版年起
+publish_year_end: 出版年止
+book_detail: 書籍詳細信息
+no_result: 沒有結果，請修改搜索參數或者開始你的搜索

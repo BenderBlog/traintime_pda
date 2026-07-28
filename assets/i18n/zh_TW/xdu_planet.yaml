@@ -1,0 +1,31 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+all: 全部
+loading: 加載中，請稍等 <(=ω=)>
+unknown_author: 未知作者
+load_failed_title: 加載失敗
+load_failed_bottom: 文章加載失敗，如有需要可以點擊右上方的按鈕在瀏覽器裡打開。
+no_comment: 暫無評論
+reply_audit: '回覆評論 #{reply_to} 已被舉報或刪除'
+reply: '回覆評論 #{reply_to}：{content}'
+have_been_audit: 本評論已經被舉報
+audit: 舉報
+confirm_audit_dialog:
+  title: 確認是否舉報
+  content: 三思而後行，確定您想舉報嗎？舉報後該評論會有標籤，不一定會刪除。
+  cancel: 不舉報了
+  ongoing: 正在舉報評論
+  failed: 舉報失敗
+  success: 舉報成功
+comment: 回覆
+send: 發送
+sending: 正在發送評論
+empty_send: 發送信息空白
+hint_send_comment: 發表您的高見:)
+comment_title: 評論該篇文章
+comment_success: 評論成功
+comment_failed: 評論失敗，請去網絡查看器和日誌查看器查看報錯
+comment_canceled: 沒想好要說啥嘛
+comment_loading: 加載評論中……
+block: 被屏蔽
+delete: 被刪除
+audio: 被刪除

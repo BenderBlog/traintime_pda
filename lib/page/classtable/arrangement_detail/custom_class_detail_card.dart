@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/course_detail_card.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class CustomClassDetailCard extends StatelessWidget {
   final CustomClass customClass;
@@ -52,20 +52,14 @@ class CustomClassDetailCard extends StatelessWidget {
                 icon: Icons.person,
                 str:
                     customClass.teacher ??
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.course_detail_card.unknown_teacher",
-                    ),
+                    context.t.classtable.courseDetailCard.unknownTeacher,
                 infoColor: infoColor,
               ),
               CustomListTile(
                 icon: Icons.room,
                 str:
                     customClass.classroom ??
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.course_detail_card.unknown_place",
-                    ),
+                    context.t.classtable.courseDetailCard.unknownPlace,
                 infoColor: infoColor,
               ),
               Padding(
@@ -110,10 +104,7 @@ class CustomClassDetailCard extends StatelessWidget {
                       ).pop((customClass.id, timeRange.id, 'edit'));
                     },
                     child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "classtable.course_detail_card.edit",
-                      ),
+                      context.t.classtable.courseDetailCard.edit,
                       style: TextStyle(color: infoColor.shade900),
                     ),
                   ),
@@ -123,16 +114,10 @@ class CustomClassDetailCard extends StatelessWidget {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.course_detail_card.delete_title",
-                            ),
+                            context.t.classtable.courseDetailCard.deleteTitle,
                           ),
                           content: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.course_detail_card.delete_content_single",
-                            ),
+                            context.t.classtable.courseDetailCard.deleteContentSingle,
                           ),
                           actions: [
                             TextButton(
@@ -146,13 +131,13 @@ class CustomClassDetailCard extends StatelessWidget {
                               ),
                               onPressed: () => Navigator.pop(context, false),
                               child: Text(
-                                FlutterI18n.translate(context, "cancel"),
+                                context.t.common.cancel,
                               ),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
                               child: Text(
-                                FlutterI18n.translate(context, "confirm"),
+                                context.t.common.confirm,
                               ),
                             ),
                           ],
@@ -165,10 +150,7 @@ class CustomClassDetailCard extends StatelessWidget {
                       }
                     },
                     child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "classtable.course_detail_card.delete_single",
-                      ),
+                      context.t.classtable.courseDetailCard.deleteSingle,
                       style: TextStyle(color: infoColor.shade900),
                     ),
                   ),
@@ -178,16 +160,10 @@ class CustomClassDetailCard extends StatelessWidget {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.course_detail_card.delete_title",
-                            ),
+                            context.t.classtable.courseDetailCard.deleteTitle,
                           ),
                           content: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.course_detail_card.delete_content",
-                            ),
+                            context.t.classtable.courseDetailCard.deleteContent,
                           ),
                           actions: [
                             TextButton(
@@ -201,13 +177,13 @@ class CustomClassDetailCard extends StatelessWidget {
                               ),
                               onPressed: () => Navigator.pop(context, false),
                               child: Text(
-                                FlutterI18n.translate(context, 'cancel'),
+                                context.t.common.cancel,
                               ),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
                               child: Text(
-                                FlutterI18n.translate(context, 'confirm'),
+                                context.t.common.confirm,
                               ),
                             ),
                           ],
@@ -220,10 +196,7 @@ class CustomClassDetailCard extends StatelessWidget {
                       }
                     },
                     child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "classtable.course_detail_card.delete_all",
-                      ),
+                      context.t.classtable.courseDetailCard.deleteAll,
                       style: TextStyle(color: Colors.red.shade700),
                     ),
                   ),

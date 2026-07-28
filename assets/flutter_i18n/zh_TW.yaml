@@ -603,7 +603,7 @@ library:
 
     不借書就要變成上面的小呆瓜咯'
   borrow_list_info: 在借 {borrow} 本，其中已過期 {dued} 本
-  search_book_window: null
+  search_book_window: ""
   search_here: 在此搜索
   normal_search: 普通搜索
   advanced_search: 高級搜索
@@ -689,7 +689,7 @@ school_net:
   cache_hint_captcha_failed: 驗證碼識別失敗，請重試。
   cache_hint_request_failed: 校園網請求失敗，請稍後重試。
   wrong_password: 密碼錯誤
-  error_fetch: 獲取失敗
+  error_fetch: 獲取失敗：{msg}
   error_other: 其他錯誤：{msg}
   refresh: 刷新
 school_card_window:
@@ -1332,6 +1332,7 @@ ruisi:
     daily_checkin: 每日簽到
     settings: 設置
     about: 關於
+    search: 搜尋
   login:
     title: 登錄睿思
     username: 用戶名
@@ -1386,6 +1387,7 @@ ruisi:
     sticky: 置頂
   forum_list:
     title: 論壇板塊
+    empty: 睿思論壇板塊分組為空
   favorites:
     title: 我的收藏
     empty: 暫無收藏
@@ -1415,3 +1417,9 @@ ruisi:
     title: 我的
     tab_profile: 資料
     unknown: 未知用戶
+loadError: 加載錯誤
+course_reminder:
+  title: 課前提醒：{name}
+  body: '{time} 分鐘後開始上課'
+  location: 地點：{location}
+  teacher: 教師：{teacher}

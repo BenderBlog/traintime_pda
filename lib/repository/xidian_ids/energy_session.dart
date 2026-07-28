@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:intl/intl.dart';
 import 'package:time/time.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
@@ -19,38 +20,58 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
-String _cacheHintFromError(Object error) {
+enum EnergyCacheHint implements CacheHint {
+  notSchoolNetwork,
+  accountMissing,
+  accountParseFailed,
+  captchaFailed,
+  passwordWrong,
+  loginFailed,
+  networkFailed,
+  unknownError;
+
+  @override
+  String resolve(Translations tr) => switch (this) {
+    notSchoolNetwork  => tr.electricity.notSchoolNetwork,
+    loginFailed       => tr.electricity.cacheHintLoginFailed,
+    networkFailed     => tr.electricity.cacheHintNetworkFailed,
+    unknownError      => tr.electricity.cacheHintUnknownError,
+    _                 => tr.common.cacheReasonDefault,
+  };
+}
+
+EnergyCacheHint _cacheHintFromError(Object error) {
   if (error is NotSchoolNetworkException) {
-    return "electricity.not_school_network";
+    return EnergyCacheHint.notSchoolNetwork;
   }
   if (error is NoAccountInfoException) {
-    return "electricity.cache_hint_account_missing";
+    return EnergyCacheHint.accountMissing;
   }
   if (error is AccountFailedParseException) {
-    return "electricity.cache_hint_account_parse_failed";
+    return EnergyCacheHint.accountParseFailed;
   }
   if (error is CaptchaFailedException) {
-    return "electricity.cache_hint_captcha_failed";
+    return EnergyCacheHint.captchaFailed;
   }
   if (error is PasswordWrongException) {
-    return "electricity.cache_hint_password_wrong";
+    return EnergyCacheHint.passwordWrong;
   }
   if (error is LoginFailedException) {
-    return "electricity.cache_hint_login_failed";
+    return EnergyCacheHint.loginFailed;
   }
   if (error is NotInitalizedException) {
     if (error.msg == "用户名或密码错误") {
-      return "electricity.cache_hint_password_wrong";
+      return EnergyCacheHint.passwordWrong;
     }
     if (error.msg.contains("验证码")) {
-      return "electricity.cache_hint_captcha_failed";
+      return EnergyCacheHint.captchaFailed;
     }
-    return "electricity.cache_hint_login_failed";
+    return EnergyCacheHint.loginFailed;
   }
   if (error is DioException) {
-    return "electricity.cache_hint_network_failed";
+    return EnergyCacheHint.networkFailed;
   }
-  return "electricity.cache_hint_unknown_error";
+  return EnergyCacheHint.unknownError;
 }
 
 Future<FetchResult<EnergyInfo>> getElectricityInfo({
@@ -80,7 +101,7 @@ Future<FetchResult<EnergyInfo>> getElectricityInfo({
       return FetchResult.cache(
         fetchTime: cache.fetchTime,
         data: cache.data,
-        hintKey: _cacheHintFromError(e),
+        cacheHint: _cacheHintFromError(e),
       );
     }
     rethrow;

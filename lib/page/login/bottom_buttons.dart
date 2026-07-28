@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ButtomButtons extends StatelessWidget {
   /// Variables of the three buttons in the bottom
@@ -24,7 +24,7 @@ class ButtomButtons extends StatelessWidget {
       children: [
         TextButton(
           child: Text(
-            FlutterI18n.translate(context, "login.clear_cache"),
+            context.t.login.clearCache,
             style: _bottomTextStyle,
           ),
           onPressed: () {
@@ -32,10 +32,7 @@ class ButtomButtons extends StatelessWidget {
               if (context.mounted) {
                 showToast(
                   context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "login.complete_clear_cache",
-                  ),
+                  msg: context.t.login.completeClearCache,
                 );
               }
             });
@@ -43,7 +40,7 @@ class ButtomButtons extends StatelessWidget {
         ),
         TextButton(
           child: Text(
-            FlutterI18n.translate(context, "login.see_inspector"),
+            context.t.login.seeInspector,
             style: _bottomTextStyle,
           ),
           onPressed: () {

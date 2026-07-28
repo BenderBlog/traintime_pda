@@ -28,7 +28,7 @@ Future<FetchResult<AirconEnergyInfo>> getAirconEnergyInfo(String imei) async {
       return FetchResult.cache(
         fetchTime: cache.fetchTime,
         data: cache.data,
-        hintKey: e.toString(),
+        cacheHint: null,
       );
     }
     rethrow;

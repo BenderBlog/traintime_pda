@@ -1,0 +1,19 @@
+identity_number: 学号
+password: 一站式登录密码
+login: 登录
+incorrect_password_pattern: 用户名或密码不符合要求，学号必须 11 位且密码非空
+on_login_progress: 正在登录学校一站式
+complete_login: 登录成功
+failed_login_cannot_connect_to_server: 无法连接到服务器
+failed_login_with_code: 请求失败，响应状态码：{code}
+failed_login_with_message: 请求失败，报错信息：{message}
+failed_login_other: 未知错误，请联系开发者
+clear_cache: 清除登录缓存
+complete_clear_cache: 清理缓存成功
+see_inspector: 查看网络交互
+captcha_window:
+  title: 请输入验证码
+  hint: 输入验证码
+  message_on_empty: 请输入验证码
+  refresh_failed: '刷新验证码失败: {error}'
+slider_title: 服务器认证服务

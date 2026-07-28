@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
@@ -18,6 +17,7 @@ import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart'
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ExperimentWindow extends StatefulWidget {
   const ExperimentWindow({super.key});
@@ -27,34 +27,27 @@ class ExperimentWindow extends StatefulWidget {
 }
 
 class _ExperimentWindowState extends State<ExperimentWindow> {
-  String _resolveLoadingHintKey({
+  String _resolveLoadingHint(
+    BuildContext context, {
     required bool physicsLoading,
     required bool otherLoading,
     required bool physicsFatalError,
     required bool otherFatalError,
   }) {
     if (physicsLoading && otherLoading) {
-      return "experiment.fetching_hint_both";
+      return context.t.experiment.fetchingHintBoth;
     }
     if (physicsLoading && otherFatalError) {
-      return "experiment.fetching_hint_physics_with_other_failed";
+      return context.t.experiment.fetchingHintPhysicsWithOtherFailed;
     }
     if (otherLoading && physicsFatalError) {
-      return "experiment.fetching_hint_other_with_physics_failed";
+      return context.t.experiment.fetchingHintOtherWithPhysicsFailed;
     }
     if (physicsLoading) {
-      return "experiment.fetching_hint_physics";
+      return context.t.experiment.fetchingHintPhysics;
     }
-    return "experiment.fetching_hint_other";
+    return context.t.experiment.fetchingHintOther;
   }
-
-  String _resolveCacheHint(BuildContext context, {required String? hintKey}) =>
-      FlutterI18n.translate(
-        context,
-        hintKey == null || hintKey == "local_cache_hint"
-            ? "cache_reason_default"
-            : hintKey,
-      );
 
   List<ExperimentData> _sortExperiments(Iterable<ExperimentData> data) {
     final result = data.toList();
@@ -87,10 +80,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                FlutterI18n.translate(
-                  context,
-                  "experiment_controller.no_password",
-                ),
+                context.t.experimentController.noPassword,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Theme.of(context).colorScheme.primary),
               ),
@@ -105,10 +95,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                   await PhysicsExperimentController.i.reloadPhysicsExperiment();
                 },
                 child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "setting.change_experiment_title",
-                  ),
+                  context.t.setting.changeExperimentTitle,
                 ),
               ),
             ],
@@ -118,11 +105,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
     }
 
     return ExperimentInfoCard(
-      title: FlutterI18n.translate(
-        context,
-        "experiment.error_physics",
-        translationParams: {"info": physicsError.toString()},
-      ),
+      title: context.t.experiment.errorPhysics(info: physicsError.toString()),
     );
   }
 
@@ -142,31 +125,15 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
       children: [
         if (isPhysicsFromCache && physicsFetchTime != null)
           CacheAlerter(
-            dataType: FlutterI18n.translate(
-              context,
-              "experiment.physics_experiment",
-            ),
-            hint: _resolveCacheHint(
-              context,
-              hintKey: PhysicsExperimentController
-                  .i
-                  .physicsExperimentCacheHintKey
-                  .value,
-            ),
+            dataType: context.t.experiment.physicsExperiment,
+            hint: PhysicsExperimentController.i.physicsExperimentCacheHintKey.value?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
             placeOfCache: PlaceOfCache.device,
             fetchTime: physicsFetchTime,
           ),
         if (isOtherFromCache && otherFetchTime != null)
           CacheAlerter(
-            dataType: FlutterI18n.translate(
-              context,
-              "experiment.other_experiment",
-            ),
-            hint: _resolveCacheHint(
-              context,
-              hintKey:
-                  OtherExperimentController.i.otherExperimentCacheHintKey.value,
-            ),
+            dataType: context.t.experiment.otherExperiment,
+            hint: OtherExperimentController.i.otherExperimentCacheHintKey.value?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
             placeOfCache: PlaceOfCache.device,
             fetchTime: otherFetchTime,
           ),
@@ -187,21 +154,14 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 _buildPhysicsErrorCard(context, physicsError),
               if (otherError != null)
                 ExperimentInfoCard(
-                  title: FlutterI18n.translate(
-                    context,
-                    "experiment.error_other",
-                    translationParams: {"info": otherError.toString()},
-                  ),
+                  title: context.t.experiment.errorOther(info: otherError.toString()),
                 ),
               ExperimentInfoCard(
-                title: FlutterI18n.translate(
-                  context,
-                  "experiment.score_hint_0",
-                ),
+                title: context.t.experiment.scoreHint0,
               ),
               if (doing.isNotEmpty) ...[
                 TimelineTitle(
-                  title: FlutterI18n.translate(context, "experiment.ongoing"),
+                  title: context.t.experiment.ongoing,
                 ),
                 Column(
                   children: doing
@@ -210,10 +170,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 ),
               ],
               TimelineTitle(
-                title: FlutterI18n.translate(
-                  context,
-                  "experiment.not_finished",
-                ),
+                title: context.t.experiment.notFinished,
               ),
               unDone.isNotEmpty
                   ? Column(
@@ -225,13 +182,10 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                           .toList(),
                     )
                   : TimelineTitle(
-                      title: FlutterI18n.translate(
-                        context,
-                        "experiment.all_finished",
-                      ),
+                      title: context.t.experiment.allFinished,
                     ),
               TimelineTitle(
-                title: FlutterI18n.translate(context, "experiment.finished"),
+                title: context.t.experiment.finished,
               ),
               done.isNotEmpty
                   ? Column(
@@ -243,10 +197,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                           .toList(),
                     )
                   : TimelineTitle(
-                      title: FlutterI18n.translate(
-                        context,
-                        "experiment.none_finished",
-                      ),
+                      title: context.t.experiment.noneFinished,
                     ),
             ],
           ),
@@ -282,8 +233,9 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
         final otherFatalError = otherState is AsyncError && !hasValidOther;
         final otherError = otherFatalError ? otherState.error : null;
 
-        final loadingHintKey = isLoading
-            ? _resolveLoadingHintKey(
+        final loadingHint = isLoading
+            ? _resolveLoadingHint(
+                context,
                 physicsLoading: physicsLoading,
                 otherLoading: otherLoading,
                 physicsFatalError: physicsFatalError,
@@ -310,7 +262,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(FlutterI18n.translate(context, "experiment.title")),
+            title: Text(context.t.experiment.title),
             actions: [
               if (!offline && hasAnyValidData)
                 IconButton(
@@ -334,10 +286,10 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 return Stack(
                   children: [
                     const Center(child: CircularProgressIndicator()),
-                    if (loadingHintKey != null)
+                    if (loadingHint != null)
                       LoadingAlerter(
                         isLoading: true,
-                        hint: FlutterI18n.translate(context, loadingHintKey),
+                        hint: loadingHint,
                         opacity: 0,
                         showOverlay: false,
                       ),
@@ -377,7 +329,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                   ),
                   LoadingAlerter(
                     isLoading: true,
-                    hint: FlutterI18n.translate(context, loadingHintKey!),
+                    hint: loadingHint!,
                     opacity: 0.15,
                     showOverlay: true,
                   ),

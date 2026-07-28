@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/experiment_score/image_recognition.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ExperimentInfoCard extends StatelessWidget {
   final ExperimentData? data;
@@ -28,15 +28,8 @@ class ExperimentInfoCard extends StatelessWidget {
               if (data!.score != null)
                 ReXCardRemaining(
                   data!.score!.found
-                      ? FlutterI18n.translate(
-                          context,
-                          "experiment.score_info",
-                          translationParams: {"score": data!.score!.label},
-                        )
-                      : FlutterI18n.translate(
-                          context,
-                          "experiment.tap_for_score",
-                        ),
+                      ? context.t.experiment.scoreInfo(score: data!.score!.label)
+                      : context.t.experiment.tapForScore,
                   isBold: true,
                   onTap: () {
                     _showAlertDialog(
@@ -142,19 +135,14 @@ class ExperimentInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  FlutterI18n.translate(
-                    context,
-                    isFound
-                        ? "experiment.score_hint_3"
-                        : "experiment.score_hint_1",
-                  ),
+                  isFound
+                      ? context.t.experiment.scoreHint3
+                      : context.t.experiment.scoreHint1,
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Text(
-                      FlutterI18n.translate(context, "experiment.your_score"),
-                    ),
+                    Text(context.t.experiment.yourScore),
                     Container(
                       constraints: const BoxConstraints(
                         maxHeight: 300,
@@ -186,22 +174,16 @@ class ExperimentInfoCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 if (recognition?.found ?? false)
                   Text(
-                    FlutterI18n.translate(
-                      context,
-                      "experiment.predict_score",
-                      translationParams: {"score": recognition!.label},
-                    ),
+                    context.t.experiment.predictScore(score: recognition!.label),
                   ),
                 Divider(),
-                Text(FlutterI18n.translate(context, "experiment.score_hint_2")),
+                Text(context.t.experiment.scoreHint2),
               ],
             ),
           ),
           actions: [
             TextButton(
-              child: Text(
-                FlutterI18n.translate(context, "experiment.send_mail"),
-              ),
+              child: Text(context.t.experiment.sendMail),
               onPressed: () async {
                 final subject = Uri.encodeComponent("XDYou 物理实验图片识别追加");
                 final body = Uri.encodeComponent(
@@ -217,7 +199,7 @@ class ExperimentInfoCard extends StatelessWidget {
               },
             ),
             TextButton(
-              child: Text(FlutterI18n.translate(context, "cancel")),
+              child: Text(context.t.common.cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },

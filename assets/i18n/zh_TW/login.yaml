@@ -1,0 +1,20 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+identity_number: 學號
+password: 一站式登錄密碼
+login: 登錄
+incorrect_password_pattern: 用戶名或密碼不符合要求，學號必須 11 位且密碼非空
+on_login_progress: 正在登錄學校一站式
+complete_login: 登錄成功
+failed_login_cannot_connect_to_server: 無法連接到服務器
+failed_login_with_code: 請求失敗，響應狀態碼：{code}
+failed_login_with_message: 請求失敗，報錯信息：{message}
+failed_login_other: 未知錯誤，請聯繫開發者
+clear_cache: 清除登錄緩存
+complete_clear_cache: 清理緩存成功
+see_inspector: 查看網絡交互
+captcha_window:
+  title: 請輸入驗證碼
+  hint: 輸入驗證碼
+  message_on_empty: 請輸入驗證碼
+  refresh_failed: '刷新驗證碼失敗: {error}'
+slider_title: 服務器認證服務

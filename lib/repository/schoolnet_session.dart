@@ -8,6 +8,7 @@ import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pointycastle/asymmetric/api.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/network_usage.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
@@ -16,12 +17,18 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
-class SchoolnetSession extends NetworkSession {
-  static const _cacheHintCaptchaFailedKey =
-      "school_net.cache_hint_captcha_failed";
-  static const _cacheHintRequestFailedKey =
-      "school_net.cache_hint_request_failed";
+enum SchoolnetCacheHint implements CacheHint {
+  captchaFailed,
+  requestFailed;
 
+  @override
+  String resolve(Translations tr) => switch (this) {
+    captchaFailed => tr.schoolNet.cacheHintCaptchaFailed,
+    requestFailed => tr.schoolNet.cacheHintRequestFailed,
+  };
+}
+
+class SchoolnetSession extends NetworkSession {
   static GeneralNetworkUsage? _generalUsageCache;
   static DateTime _generalUsageCacheFetchTime = DateTime.now();
 
@@ -115,12 +122,12 @@ class SchoolnetSession extends NetworkSession {
         error == "homepage.school_net.failed";
   }
 
-  String? _cacheHintFromError(Object error) {
+SchoolnetCacheHint? _cacheHintFromError(Object error) {
     if (error == "school_net.captcha_failed") {
-      return _cacheHintCaptchaFailedKey;
+      return SchoolnetCacheHint.captchaFailed;
     }
     if (error is DioException || error == "homepage.school_net.failed") {
-      return _cacheHintRequestFailedKey;
+      return SchoolnetCacheHint.requestFailed;
     }
     return null;
   }
@@ -301,7 +308,7 @@ class SchoolnetSession extends NetworkSession {
         return FetchResult.cache(
           fetchTime: _generalUsageCacheFetchTime,
           data: _generalUsageCache!,
-          hintKey: _cacheHintFromError(e),
+          cacheHint: _cacheHintFromError(e),
         );
       }
       rethrow;

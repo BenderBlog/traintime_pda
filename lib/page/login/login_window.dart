@@ -7,7 +7,6 @@
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -23,6 +22,7 @@ import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({super.key});
@@ -61,7 +61,7 @@ class _LoginWindowState extends State<LoginWindow> {
         controller: _idsAccountController,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_user_3_fill,
-          hintText: FlutterI18n.translate(context, "login.identity_number"),
+          hintText: context.t.login.identityNumber,
         ),
       ).center(),
       const SizedBox(height: 16.0),
@@ -70,7 +70,7 @@ class _LoginWindowState extends State<LoginWindow> {
         obscureText: _couldNotView,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_safe_lock_fill,
-          hintText: FlutterI18n.translate(context, "login.password"),
+          hintText: context.t.login.password,
           suffixIcon: IconButton(
             icon: Icon(_couldNotView ? Icons.visibility : Icons.visibility_off),
             onPressed: () {
@@ -88,7 +88,7 @@ class _LoginWindowState extends State<LoginWindow> {
           maximumSize: const Size(double.infinity, 64),
         ),
         child: Text(
-          FlutterI18n.translate(context, "login.login"),
+          context.t.login.login,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
         ),
         onPressed: () async {
@@ -97,10 +97,7 @@ class _LoginWindowState extends State<LoginWindow> {
           } else {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "login.incorrect_password_pattern",
-              ),
+              msg: context.t.login.incorrectPasswordPattern,
             );
           }
         },
@@ -114,11 +111,11 @@ class _LoginWindowState extends State<LoginWindow> {
     bool isGood = true;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
-      msg: FlutterI18n.translate(context, "login.on_login_progress"),
+      msg: context.t.login.onLoginProgress,
       max: 100,
       hideValue: true,
       completed: Completed(
-        completedMsg: FlutterI18n.translate(context, "login.complete_login"),
+        completedMsg: context.t.login.completeLogin,
       ),
     );
     EhallSession ses = EhallSession();
@@ -140,8 +137,19 @@ class _LoginWindowState extends State<LoginWindow> {
       await ses.loginEhall(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
-        onResponse: (int number, String status) => pd.update(
-          msg: FlutterI18n.translate(context, status),
+        onResponse: (int number, LoginProcessStep status) => pd.update(
+          msg: switch (status) {
+            LoginProcessStep.readyPage =>
+              context.t.loginProcess.readyPage,
+            LoginProcessStep.getEncrypt =>
+              context.t.loginProcess.getEncrypt,
+            LoginProcessStep.readyLogin =>
+              context.t.loginProcess.readyLogin,
+            LoginProcessStep.slider =>
+              context.t.loginProcess.slider,
+            LoginProcessStep.afterProcess =>
+              context.t.loginProcess.afterProcess,
+          },
           value: number,
         ),
         sliderCaptcha: (String cookieStr) {
@@ -192,31 +200,18 @@ class _LoginWindowState extends State<LoginWindow> {
             if (e.response == null) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "login.failed_login_cannot_connect_to_server",
-                ),
+                msg: context.t.login.failedLoginCannotConnectToServer,
               );
             } else {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "login.failed_login_with_code",
-                  translationParams: {
-                    "code": e.response!.statusCode.toString(),
-                  },
-                ),
+                msg: context.t.login.failedLoginWithCode(code: e.response!.statusCode.toString()),
               );
             }
           } else {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "login.failed_login_with_message",
-                translationParams: {"message": e.message.toString()},
-              ),
+              msg: context.t.login.failedLoginWithMessage(message: e.message.toString()),
             );
           }
         } else {
@@ -233,7 +228,7 @@ class _LoginWindowState extends State<LoginWindow> {
           );
           showToast(
             context: context,
-            msg: FlutterI18n.translate(context, "login.failed_login_other"),
+            msg: context.t.login.failedLoginOther,
           );
         }
       }

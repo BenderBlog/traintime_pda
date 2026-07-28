@@ -10,7 +10,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -28,7 +27,6 @@ import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/setting/notification_page/notification_debug_page.dart';
 import 'package:watermeter/page/setting/notification_page/notification_page.dart';
-import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
@@ -58,6 +56,7 @@ import 'package:watermeter/repository/xidian_sport_session.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/themes/color_seed.dart';
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class SettingWindow extends StatefulWidget {
   const SettingWindow({super.key});
@@ -105,10 +104,7 @@ class _SettingWindowState extends State<SettingWindow> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          FlutterI18n.translate(
-            context,
-            "setting.low_electricity_threshold_dialog.title",
-          ),
+          context.t.setting.lowElectricityThresholdDialog.title,
         ),
         content: TextFormField(
           autofocus: true,
@@ -118,16 +114,13 @@ class _SettingWindowState extends State<SettingWindow> {
           maxLines: 1,
           onChanged: (value) => inputText = value,
           decoration: InputDecoration(
-            hintText: FlutterI18n.translate(
-              context,
-              "setting.low_electricity_threshold_dialog.input_hint",
-            ),
+            hintText: context.t.setting.lowElectricityThresholdDialog.inputHint,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(FlutterI18n.translate(context, "cancel")),
+            child: Text(context.t.common.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -139,7 +132,7 @@ class _SettingWindowState extends State<SettingWindow> {
                     : parsed,
               );
             },
-            child: Text(FlutterI18n.translate(context, "confirm")),
+            child: Text(context.t.common.confirm),
           ),
         ],
       ),
@@ -155,18 +148,9 @@ class _SettingWindowState extends State<SettingWindow> {
   @override
   Widget build(BuildContext context) {
     List<String> demoBlueModeName = [
-      FlutterI18n.translate(
-        context,
-        "setting.change_brightness_dialog.follow_setting",
-      ),
-      FlutterI18n.translate(
-        context,
-        "setting.change_brightness_dialog.day_mode",
-      ),
-      FlutterI18n.translate(
-        context,
-        "setting.change_brightness_dialog.night_mode",
-      ),
+      context.t.setting.changeBrightnessDialog.followSetting,
+      context.t.setting.changeBrightnessDialog.dayMode,
+      context.t.setting.changeBrightnessDialog.nightMode,
     ];
     return Scaffold(
       body: ListView(
@@ -192,38 +176,21 @@ class _SettingWindowState extends State<SettingWindow> {
           ).padding(horizontal: 8.0),
           const SizedBox(height: 20),
           ReXCard(
-            title: _buildListSubtitle(
-              FlutterI18n.translate(context, "setting.about"),
-            ),
+            title: _buildListSubtitle(context.t.setting.about),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.about_this_program",
-                    ),
-                  ),
+                  title: Text(context.t.setting.aboutThisProgram),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.version",
-                      translationParams: {
-                        "version":
-                            "${preference.packageInfo.version}+"
-                            "${preference.packageInfo.buildNumber}",
-                      },
-                    ),
+                    context.t.setting.version(version: "${preference.packageInfo.version}+"),
                   ),
                   onTap: () => context.pushReplacementNamed(Routes.about),
                   trailing: const Icon(Icons.navigate_next),
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.check_update"),
-                  ),
+                  title: Text(context.t.setting.checkUpdate),
                   subtitle: SignalBuilder(
                     builder: (context) {
                       final updateState = UpdateNoticeController
@@ -231,28 +198,15 @@ class _SettingWindowState extends State<SettingWindow> {
                           .updateMessageStateSignal
                           .value;
                       return Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.latest_version",
-                          translationParams: {
-                            "latest":
-                                updateState.value?.code ??
-                                FlutterI18n.translate(
-                                  context,
-                                  "setting.waiting",
-                                ),
-                          },
-                        ),
+                        context.t.setting.latestVersion(latest: updateState.value?.code ??
+                              context.t.setting.waiting),
                       );
                     },
                   ),
                   onTap: () {
                     showToast(
                       context: context,
-                      msg: FlutterI18n.translate(
-                        context,
-                        "setting.fetching_update",
-                      ),
+                      msg: context.t.setting.fetchingUpdate,
                     );
                     UpdateNoticeController.i.reloadUpdateNoticeInfo().then((
                       value,
@@ -265,10 +219,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             .hasError) {
                           showToast(
                             context: context,
-                            msg: FlutterI18n.translate(
-                              context,
-                              "setting.fetch_failed",
-                            ),
+                            msg: context.t.setting.fetchFailed,
                           );
                           return;
                         }
@@ -279,11 +230,7 @@ class _SettingWindowState extends State<SettingWindow> {
                           case null:
                             showToast(
                               context: context,
-                              msg: FlutterI18n.translate(
-                                context,
-
-                                "setting.current_testing",
-                              ),
+                              msg: context.t.setting.currentTesting,
                             );
                           case true:
                             await showDialog(
@@ -301,10 +248,7 @@ class _SettingWindowState extends State<SettingWindow> {
                           case false:
                             showToast(
                               context: context,
-                              msg: FlutterI18n.translate(
-                                context,
-                                "setting.current_stable",
-                              ),
+                              msg: context.t.setting.currentStable,
                             );
                         }
                       }
@@ -316,21 +260,18 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
           ),
           ReXCard(
-            title: _buildListSubtitle(
-              FlutterI18n.translate(context, "setting.ui_setting"),
-            ),
+            title: _buildListSubtitle(context.t.setting.uiSetting),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.color_setting"),
-                  ),
+                  title: Text(context.t.setting.colorSetting),
                   subtitle: Text(
-                    FlutterI18n.translate(
+                    _colorSeedToI18n(
                       context,
-                      "setting.change_color_dialog."
-                      "${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
+                      ColorSeed.values[preference.getInt(
+                        preference.Preference.color,
+                      )],
                     ),
                   ),
                   trailing: const Icon(Icons.navigate_next),
@@ -343,12 +284,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.brightness_setting",
-                    ),
-                  ),
+                  title: Text(context.t.setting.brightnessSetting),
                   subtitle: Text(
                     demoBlueModeName[preference.getInt(
                       preference.Preference.brightness,
@@ -379,14 +315,9 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.simplify_timeline"),
-                  ),
+                  title: Text(context.t.setting.simplifyTimeline),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.simplify_timeline_description",
-                    ),
+                    context.t.setting.simplifyTimelineDescription,
                   ),
                   trailing: Switch(
                     value: preference.getBool(
@@ -409,17 +340,9 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.low_electricity_warning",
-                    ),
-                  ),
+                  title: Text(context.t.setting.lowElectricityWarning),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.low_electricity_warning_description",
-                    ),
+                    context.t.setting.lowElectricityWarningDescription,
                   ),
                   trailing: Switch(
                     value: _lowElectricityWarningEnabled,
@@ -436,20 +359,9 @@ class _SettingWindowState extends State<SettingWindow> {
                 const Divider(),
                 ListTile(
                   enabled: _lowElectricityWarningEnabled,
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.low_electricity_threshold",
-                    ),
-                  ),
+                  title: Text(context.t.setting.lowElectricityThreshold),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.low_electricity_threshold_description",
-                      translationParams: {
-                        "threshold": _lowElectricityWarningThreshold.toString(),
-                      },
-                    ),
+                    context.t.setting.lowElectricityThresholdDescription(threshold: _lowElectricityWarningThreshold.toString()),
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: _lowElectricityWarningEnabled
@@ -458,24 +370,12 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.localization_dialog.title",
-                    ),
-                  ),
-                  subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      Localization.values
-                          .firstWhere(
-                            (value) =>
-                                value.string ==
-                                preference.getString(
-                                  preference.Preference.localization,
-                                ),
-                          )
-                          .toShow,
+                  title: Text(context.t.setting.localizationDialog.title),
+                  subtitle: SignalBuilder(
+                    builder: (_) => Text(
+                      ThemeController.i.savedLocale.value.displayName(
+                        context.t,
+                      ),
                     ),
                   ),
                   trailing: const Icon(Icons.navigate_next),
@@ -491,20 +391,13 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
           ),
           ReXCard(
-            title: _buildListSubtitle(
-              FlutterI18n.translate(context, "setting.account_setting"),
-            ),
+            title: _buildListSubtitle(context.t.setting.accountSetting),
             remaining: const [],
             bottomRow: Column(
               children: [
                 if (!preference.getBool(preference.Preference.role)) ...[
                   ListTile(
-                    title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.sport_password_setting",
-                      ),
-                    ),
+                    title: Text(context.t.setting.sportPasswordSetting),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
                       showDialog(
@@ -517,10 +410,7 @@ class _SettingWindowState extends State<SettingWindow> {
                   const Divider(),
                   ListTile(
                     title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.experiment_password_setting",
-                      ),
+                      context.t.setting.experimentPasswordSetting,
                     ),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
@@ -536,16 +426,10 @@ class _SettingWindowState extends State<SettingWindow> {
 
                 ListTile(
                   title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.schoolnet_password_setting",
-                    ),
+                    context.t.setting.schoolnetPasswordSetting,
                   ),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.schoolnet_password_description",
-                    ),
+                    context.t.setting.schoolnetPasswordDescription,
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () {
@@ -557,26 +441,15 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.aircon_imei_title"),
-                  ),
+                  title: Text(context.t.setting.airconImeiTitle),
                   subtitle: Text(
                     preference
                             .getString(preference.Preference.airconImei)
                             .isEmpty
-                        ? FlutterI18n.translate(
-                            context,
-                            "setting.aircon_imei_not_set",
-                          )
-                        : FlutterI18n.translate(
-                            context,
-                            "setting.aircon_imei_current",
-                            translationParams: {
-                              "imei": preference.getString(
-                                preference.Preference.airconImei,
-                              ),
-                            },
-                          ),
+                        ? context.t.setting.airconImeiNotSet
+                        : context.t.setting.airconImeiCurrent(imei: preference.getString(
+                              preference.Preference.airconImei,
+                            )),
                   ),
                   trailing: const Icon(Icons.qr_code_scanner),
                   onTap: () {
@@ -594,23 +467,15 @@ class _SettingWindowState extends State<SettingWindow> {
           if (Platform.isAndroid || Platform.isIOS)
             ReXCard(
               title: _buildListSubtitle(
-                FlutterI18n.translate(context, "setting.notification_setting"),
+                context.t.setting.notificationSetting,
               ),
               remaining: const [],
               bottomRow: Column(
                 children: [
                   ListTile(
-                    title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.course_reminder_setting",
-                      ),
-                    ),
+                    title: Text(context.t.setting.courseReminderSetting),
                     subtitle: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.course_reminder_description",
-                      ),
+                      context.t.setting.courseReminderDescription,
                     ),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
@@ -622,15 +487,13 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
           ReXCard(
             title: _buildListSubtitle(
-              FlutterI18n.translate(context, "setting.classtable_setting"),
+              context.t.setting.classtableSetting,
             ),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.background"),
-                  ),
+                  title: Text(context.t.setting.background),
                   trailing: Switch(
                     value: preference.getBool(preference.Preference.decorated),
                     onChanged: (bool value) {
@@ -640,10 +503,7 @@ class _SettingWindowState extends State<SettingWindow> {
                           )) {
                         showToast(
                           context: context,
-                          msg: FlutterI18n.translate(
-                            context,
-                            "setting.no_background",
-                          ),
+                          msg: context.t.setting.noBackground,
                         );
                       } else {
                         setState(() {
@@ -658,9 +518,7 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.choose_background"),
-                  ),
+                  title: Text(context.t.setting.chooseBackground),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () async {
                     PlatformFile? result;
@@ -670,10 +528,7 @@ class _SettingWindowState extends State<SettingWindow> {
                       if (context.mounted) {
                         showToast(
                           context: context,
-                          msg: FlutterI18n.translate(
-                            context,
-                            "setting.no_permission",
-                          ),
+                          msg: context.t.setting.noPermission,
                         );
                       }
                     }
@@ -689,20 +544,14 @@ class _SettingWindowState extends State<SettingWindow> {
                         if (context.mounted) {
                           showToast(
                             context: context,
-                            msg: FlutterI18n.translate(
-                              context,
-                              "setting.successful_setting",
-                            ),
+                            msg: context.t.setting.successfulSetting,
                           );
                         }
                       } else {
                         if (context.mounted) {
                           showToast(
                             context: context,
-                            msg: FlutterI18n.translate(
-                              context,
-                              "setting.failure_setting",
-                            ),
+                            msg: context.t.setting.failureSetting,
                           );
                         }
                       }
@@ -711,24 +560,14 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.clear_user_class"),
-                  ),
+                  title: Text(context.t.setting.clearUserClass),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.clear_user_class_title",
-                        ),
-                      ),
+                      title: Text(context.t.setting.clearUserClassTitle),
                       content: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.clear_user_class_content",
-                        ),
+                        context.t.setting.clearUserClassContent,
                       ),
                       actions: [
                         TextButton(
@@ -741,7 +580,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             ).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text(FlutterI18n.translate(context, "cancel")),
+                          child: Text(context.t.common.cancel),
                         ),
                         TextButton(
                           onPressed: () async {
@@ -751,16 +590,11 @@ class _SettingWindowState extends State<SettingWindow> {
                             }
                             showToast(
                               context: context,
-                              msg: FlutterI18n.translate(
-                                context,
-                                "setting.clear_user_class_clear",
-                              ),
+                              msg: context.t.setting.clearUserClassClear,
                             );
                             Navigator.pop(context);
                           },
-                          child: Text(
-                            FlutterI18n.translate(context, "confirm"),
-                          ),
+                          child: Text(context.t.common.confirm),
                         ),
                       ],
                     ),
@@ -768,24 +602,14 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.class_refresh"),
-                  ),
+                  title: Text(context.t.setting.classRefresh),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                      title: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.class_refresh_title",
-                        ),
-                      ),
+                      title: Text(context.t.setting.classRefreshTitle),
                       content: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.class_refresh_content",
-                        ),
+                        context.t.setting.classRefreshContent,
                       ),
                       actions: [
                         TextButton(
@@ -798,7 +622,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             ).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text(FlutterI18n.translate(context, "cancel")),
+                          child: Text(context.t.common.cancel),
                         ),
                         TextButton(
                           onPressed: () async {
@@ -818,9 +642,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               Navigator.pop(context);
                             }
                           },
-                          child: Text(
-                            FlutterI18n.translate(context, "confirm"),
-                          ),
+                          child: Text(context.t.common.confirm),
                         ),
                       ],
                     ),
@@ -828,19 +650,9 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.class_swift"),
-                  ),
+                  title: Text(context.t.setting.classSwift),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.class_swift_description",
-                      translationParams: {
-                        "swift": preference
-                            .getInt(preference.Preference.swift)
-                            .toString(),
-                      },
-                    ),
+                    context.t.setting.classSwiftDescription(swift: preference.getInt(preference.Preference.swift).toString()),
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () {
@@ -855,19 +667,11 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.semester_change"),
-                  ),
+                  title: Text(context.t.setting.semesterChange),
                   subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.semester_change_description",
-                      translationParams: {
-                        "semester": preference.getString(
-                          preference.Preference.currentSemester,
-                        ),
-                      },
-                    ),
+                    context.t.setting.semesterChangeDescription(semester: preference.getString(
+                        preference.Preference.currentSemester,
+                      )),
                   ),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () {
@@ -894,53 +698,36 @@ class _SettingWindowState extends State<SettingWindow> {
             ),
           ),
           ReXCard(
-            title: _buildListSubtitle(
-              FlutterI18n.translate(context, "setting.core_setting"),
-            ),
+            title: _buildListSubtitle(context.t.setting.coreSetting),
             remaining: const [],
             bottomRow: Column(
               children: [
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.check_logger"),
-                  ),
+                  title: Text(context.t.setting.checkLogger),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => context.push(TalkerScreen(talker: log)),
                 ),
                 const Divider(),
                 if (Platform.isAndroid || Platform.isIOS) ...[
                   ListTile(
-                    title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.notification_debug_page",
-                      ),
-                    ),
+                    title: Text(context.t.setting.notificationDebugPage),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () => context.push(NotificationDebugPage()),
                   ),
                   const Divider(),
                 ],
                 ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.clear_and_restart"),
-                  ),
+                  title: Text(context.t.setting.clearAndRestart),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     barrierDismissible: false,
                     builder: (BuildContext context) => AlertDialog(
                       title: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.clear_and_restart_dialog.title",
-                        ),
+                        context.t.setting.clearAndRestartDialog.title,
                       ),
                       content: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.clear_and_restart_dialog.content",
-                        ),
+                        context.t.setting.clearAndRestartDialog.content,
                       ),
                       actions: [
                         TextButton(
@@ -953,7 +740,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             ).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text(FlutterI18n.translate(context, "cancel")),
+                          child: Text(context.t.common.cancel),
                         ),
                         TextButton(
                           onPressed: () async {
@@ -961,10 +748,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               context: context,
                             );
                             pd.show(
-                              msg: FlutterI18n.translate(
-                                context,
-                                "setting.clear_and_restart_dialog.cleaning",
-                              ),
+                              msg: context.t.setting.clearAndRestartDialog.cleaning,
                             );
 
                             /// Clean Cookie
@@ -1000,31 +784,20 @@ class _SettingWindowState extends State<SettingWindow> {
                             if (context.mounted) {
                               showToast(
                                 context: context,
-                                msg: FlutterI18n.translate(
-                                  context,
-                                  "setting.clear_and_restart_dialog.clear",
-                                ),
+                                msg: context.t.setting.clearAndRestartDialog.clear,
                               );
                               if (Platform.isIOS) {
                                 Restart.restartApp(
                                   mode: RestartMode.notificationFallback,
-                                  notificationTitle: FlutterI18n.translate(
-                                    context,
-                                    "restart_app.title_cache_cleared",
-                                  ),
-                                  notificationBody: FlutterI18n.translate(
-                                    context,
-                                    "restart_app.content",
-                                  ),
+                                  notificationTitle: context.t.restartApp.titleCacheCleared,
+                                  notificationBody: context.t.restartApp.content,
                                 );
                               } else {
                                 Restart.restartApp();
                               }
                             }
                           },
-                          child: Text(
-                            FlutterI18n.translate(context, "confirm"),
-                          ),
+                          child: Text(context.t.common.confirm),
                         ),
                       ],
                     ),
@@ -1032,23 +805,15 @@ class _SettingWindowState extends State<SettingWindow> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text(FlutterI18n.translate(context, "setting.logout")),
+                  title: Text(context.t.setting.logout),
                   trailing: const Icon(Icons.navigate_next),
                   onTap: () => showDialog<String>(
                     context: context,
                     barrierDismissible: false,
                     builder: (BuildContext context) => AlertDialog(
-                      title: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.logout_dialog.title",
-                        ),
-                      ),
+                      title: Text(context.t.setting.logoutDialog.title),
                       content: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.logout_dialog.content",
-                        ),
+                        context.t.setting.logoutDialog.content,
                       ),
                       actions: [
                         TextButton(
@@ -1061,7 +826,7 @@ class _SettingWindowState extends State<SettingWindow> {
                             ).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: Text(FlutterI18n.translate(context, "cancel")),
+                          child: Text(context.t.common.cancel),
                         ),
                         TextButton(
                           onPressed: () async {
@@ -1069,10 +834,7 @@ class _SettingWindowState extends State<SettingWindow> {
                               context: context,
                             );
                             pd.show(
-                              msg: FlutterI18n.translate(
-                                context,
-                                "setting.logout_dialog.logging_out",
-                              ),
+                              msg: context.t.setting.logoutDialog.loggingOut,
                             );
 
                             /// Clean Cookie
@@ -1130,23 +892,15 @@ class _SettingWindowState extends State<SettingWindow> {
                               if (Platform.isIOS) {
                                 Restart.restartApp(
                                   mode: RestartMode.notificationFallback,
-                                  notificationTitle: FlutterI18n.translate(
-                                    context,
-                                    "restart_app.title_logged_out",
-                                  ),
-                                  notificationBody: FlutterI18n.translate(
-                                    context,
-                                    "restart_app.content",
-                                  ),
+                                  notificationTitle: context.t.restartApp.titleLoggedOut,
+                                  notificationBody: context.t.restartApp.content,
                                 );
                               } else {
                                 Restart.restartApp();
                               }
                             }
                           },
-                          child: Text(
-                            FlutterI18n.translate(context, "confirm"),
-                          ),
+                          child: Text(context.t.common.confirm),
                         ),
                       ],
                     ),
@@ -1159,4 +913,17 @@ class _SettingWindowState extends State<SettingWindow> {
       ).constrained(maxWidth: 600).center().safeArea(top: true),
     );
   }
+}
+
+
+
+String _colorSeedToI18n(BuildContext context, ColorSeed seed) {
+  return switch (seed) {
+    ColorSeed.indigo => context.t.setting.changeColorDialog.kDefault,
+    ColorSeed.blue => context.t.setting.changeColorDialog.blue,
+    ColorSeed.deepPurple => context.t.setting.changeColorDialog.deepPurple,
+    ColorSeed.green => context.t.setting.changeColorDialog.green,
+    ColorSeed.orange => context.t.setting.changeColorDialog.orange,
+    ColorSeed.pink => context.t.setting.changeColorDialog.pink,
+  };
 }

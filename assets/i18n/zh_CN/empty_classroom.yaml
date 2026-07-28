@@ -1,0 +1,7 @@
+title: 空闲教室
+date: 日期 {date}
+building: 教学楼 {building}
+search_hint: 教室名称或者教室代码
+classroom: 教室
+empty: 空闲
+occupied: 占用

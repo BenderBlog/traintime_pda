@@ -5,10 +5,10 @@
 // Change app color pattern.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ChangeColorDialog extends StatefulWidget {
   const ChangeColorDialog({super.key});
@@ -22,7 +22,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        FlutterI18n.translate(context, "setting.change_color_dialog.title"),
+        context.t.setting.changeColorDialog.title,
       ),
       content: SingleChildScrollView(
         child: RadioGroup(
@@ -43,10 +43,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
                 title: Row(
                   children: [
                     Text(
-                      FlutterI18n.translate(
-                        context,
-                        "setting.change_color_dialog.${ColorSeed.values[index].label}",
-                      ),
+                      _colorSeedToI18n(context, ColorSeed.values[index]),
                     ),
                     const SizedBox(width: 10),
                     ClipOval(
@@ -68,7 +65,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(context.t.common.confirm),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -77,4 +74,16 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
       contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
     );
   }
+}
+
+String _colorSeedToI18n(BuildContext context, ColorSeed seed) {
+  return switch (seed) {
+    ColorSeed.indigo => context.t.setting.changeColorDialog.kDefault,
+    ColorSeed.blue => context.t.setting.changeColorDialog.blue,
+    ColorSeed.deepPurple =>
+      context.t.setting.changeColorDialog.deepPurple,
+    ColorSeed.green => context.t.setting.changeColorDialog.green,
+    ColorSeed.orange => context.t.setting.changeColorDialog.orange,
+    ColorSeed.pink => context.t.setting.changeColorDialog.pink,
+  };
 }
