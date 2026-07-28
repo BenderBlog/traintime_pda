@@ -6,6 +6,7 @@ output_directory: lib/generated
 output_file_name: translations.g.dart
 namespaces: true
 lazy: false
+fallback_strategy: base_locale
 
 # 符合 Flutter 语法规范的 API 清洗
 key_case: camel # 函数
