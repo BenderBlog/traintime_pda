@@ -1,0 +1,506 @@
+# Apple Watch 版本技术说明
+
+本文面向 Traintime PDA 原维护者，用于快速说明 Apple Watch 版本增加了什么、为什么采用当前架构，以及 iPhone 与 Apple Watch 之间如何完成课表同步。
+
+## 一分钟概览
+
+本次改动没有把 Flutter 应用直接运行在手表上，而是新增了一个原生 SwiftUI watchOS Companion App。
+
+整体设计遵循以下原则：
+
+- iPhone 仍然是唯一的数据源；
+- Flutter 负责整合课程、考试、实验、周次和提醒配置；
+- iOS 原生层负责保存快照并通过 `WatchConnectivity` 响应手表；
+- Apple Watch 只负责同步、缓存和展示；
+- 手机不可达时，手表继续显示本地缓存；
+- 每次刷新按“当天 → 近 14 天 → 全学期”渐进更新，不阻塞现有页面。
+
+```mermaid
+flowchart LR
+    A["Flutter 现有课表/考试/实验状态"] --> B["WatchScheduleSnapshotBuilder"]
+    B --> C["版本化 JSON 快照"]
+    C --> D["Pigeon: WatchSyncSwiftApi"]
+    D --> E["iOS PhoneWatchConnectivityManager"]
+    E --> F["WCSession / WatchConnectivity"]
+    F --> G["watchOS WatchConnectivityManager"]
+    G --> H["WatchScheduleStore"]
+    H --> I["SwiftUI 手表界面"]
+    H --> J["UserDefaults 离线缓存"]
+```
+
+## 改动范围
+
+这次新增主要分为两部分：
+
+1. 手机端新增手表数据生产和通信能力；
+2. 新增完整的原生 watchOS 应用。
+
+原有手机业务仍负责获取学校数据。本次没有在手表端重复登录学校系统，也没有让手表直接发起校园接口请求。
+
+---
+
+## 手机端新增内容
+
+### 1. 手表专用日程快照
+
+新增文件：
+
+- `lib/repository/watch/watch_schedule_snapshot.dart`
+
+`WatchScheduleSnapshotBuilder` 会把现有的多种业务模型统一转换为手表可以直接显示的具体日程：
+
+- 普通课程；
+- 自定义课程；
+- 考试；
+- 物理实验；
+- 其他实验。
+
+手机端会先把课程周次展开为具体日期，再输出绝对开始和结束时间。这样手表不需要理解 Flutter 侧复杂的课表、周次和课程来源模型。
+
+快照还包含：
+
+- 学期开始日期；
+- 手机同步的当前周次；
+- 快照生成时间；
+- 数据有效范围；
+- 时区偏移；
+- 上课提醒提前时间；
+- 与手机一致的课程颜色。
+
+快照使用 `schemaVersion` 标记协议版本。手表当前接受版本 1 至 4。
+
+### 2. 自动同步服务
+
+新增文件：
+
+- `lib/repository/watch/watch_schedule_sync_service.dart`
+
+`WatchScheduleSyncService` 监听以下状态：
+
+- 课表；
+- 学期开始时间；
+- 当前周次；
+- 考试；
+- 物理实验；
+- 其他实验；
+- 上课提醒配置。
+
+任一数据变化后，服务会使用约 400 毫秒防抖重新生成完整学期快照，再提交到 iOS 原生层。
+
+该服务只在 iOS 上运行，并由 `lib/main.dart` 启动。Android 和其他平台不会执行手表同步逻辑。
+
+### 3. Pigeon 接口扩展
+
+修改入口：
+
+- `pigeon_bridge/save_to_groupid.dart`
+
+新增接口：
+
+```dart
+class WatchSchedulePayload {
+  String json;
+}
+
+@HostApi()
+abstract class WatchSyncSwiftApi {
+  @async
+  bool syncSchedule(WatchSchedulePayload payload);
+
+  @async
+  bool clearSchedule();
+}
+```
+
+生成文件：
+
+- `lib/bridge/save_to_groupid.g.dart`
+- `ios/Runner/SaveToGroupID.g.swift`
+
+调用关系如下：
+
+```text
+WatchScheduleSyncService
+    → WatchSyncSwiftApi
+    → WatchSyncApiImplementation
+    → PhoneWatchConnectivityManager
+```
+
+Pigeon 生成文件不应手动维护。修改接口后应从 `pigeon_bridge/save_to_groupid.dart` 重新生成。
+
+### 4. iOS WatchConnectivity 管理器
+
+新增文件：
+
+- `ios/Runner/WatchConnectivityManager.swift`
+
+`PhoneWatchConnectivityManager` 负责：
+
+- 激活 iPhone 侧 `WCSession`；
+- 接收 Flutter 提交的完整学期 JSON；
+- 在 iPhone 的 `UserDefaults` 中保留最近快照；
+- 通过 `updateApplicationContext` 发布最近可用的 14 天数据；
+- 响应 Apple Watch 的即时请求；
+- 按当天、14 天或全学期范围过滤数据；
+- 将完整学期拆成小块传输。
+
+完整学期默认每块发送 50 条日程，避免单条 WatchConnectivity 消息过大。
+
+`ios/Runner/AppDelegate.swift` 增加了两项初始化：
+
+- 应用启动时激活 `PhoneWatchConnectivityManager`；
+- Flutter Engine 建立后注册 `WatchSyncSwiftApi`。
+
+### 5. Xcode 工程扩展
+
+Xcode 工程新增：
+
+- `TraintimeWatch` watchOS Target；
+- `TraintimeWatch` Shared Scheme；
+- watchOS Swift 源文件；
+- Watch AppIcon Asset Catalog；
+- iPhone 与 Watch App 的依赖和嵌入关系。
+
+签名、Development Team、Bundle Identifier 和 App Group 属于发布环境配置，不属于通信协议本身。合并前应由维护者按原项目的开发者账号和标识符统一确认。
+
+---
+
+## Apple Watch 新增内容
+
+### 1. 原生 SwiftUI 应用
+
+新增目录：
+
+- `watchOS/`
+
+应用入口：
+
+- `watchOS/TraintimeWatchApp.swift`
+
+手表端采用 SwiftUI，而不是 Flutter，主要原因是：
+
+- 可直接使用 watchOS 原生导航和数码表冠；
+- 更容易适配不同尺寸 Apple Watch；
+- 能使用 watchOS 的液态玻璃按钮样式；
+- 不需要在手表上引入另一套 Flutter 运行时；
+- 与 `WatchConnectivity`、应用生命周期和本地缓存衔接更直接。
+
+### 2. 数据模型
+
+新增文件：
+
+- `watchOS/Models/WatchScheduleSnapshot.swift`
+
+核心模型：
+
+- `WatchScheduleSnapshot`：一次同步范围内的完整快照；
+- `WatchCourse`：统一表示课程、考试或实验；
+- `WatchScheduleScope`：表示 `today`、`fourteenDays`、`semester` 三个同步阶段。
+
+Swift 端使用 `Codable` 解码手机生成的 JSON。
+
+### 3. 状态和缓存
+
+新增文件：
+
+- `watchOS/Storage/WatchScheduleStore.swift`
+
+`WatchScheduleStore` 是手表端中心状态仓库，基于 `ObservableObject` 和 `@Published`，负责：
+
+- 当前显示的快照；
+- 当前同步阶段；
+- 同步错误；
+- 是否正在刷新；
+- 同步完成提示；
+- 全学期分块合并；
+- 本地缓存读取和写入。
+
+手表分别保存三个缓存：
+
+| 缓存 | 内容 |
+| --- | --- |
+| `today` | 当天日程 |
+| `fourteenDays` | 当天起 14 天日程 |
+| `semester` | 完整学期日程 |
+
+启动时优先选择：
+
+1. 有效的完整学期缓存；
+2. 有效的 14 天缓存；
+3. 有效的当天缓存；
+4. 如果都过期，则显示最近一次缓存。
+
+同步开始时不会清空已有缓存。只有一个阶段完整解码成功后，才替换当前页面数据并持久化该阶段缓存。
+
+### 4. watchOS 通信管理器
+
+新增文件：
+
+- `watchOS/Connectivity/WatchConnectivityManager.swift`
+
+它负责：
+
+- 激活 Watch 侧 `WCSession`；
+- 应用进入活动状态后自动刷新；
+- 发起当天、14 天和全学期请求；
+- 处理手机返回的 JSON；
+- 逐块接收并合并完整学期；
+- 手机不可达时读取最近 Application Context；
+- 处理连接超时和错误。
+
+### 5. 手表界面
+
+主要文件：
+
+- `watchOS/Views/RootScheduleView.swift`
+- `watchOS/Views/WeekScheduleView.swift`
+- `watchOS/Views/CourseRow.swift`
+
+新增视图：
+
+- 下一节课；
+- 课程列表；
+- 日视图；
+- 周视图；
+- 周视图课程详情。
+
+界面特性：
+
+- 课程颜色与手机端一致；
+- 同时展示课程、考试和实验；
+- 显示教室、教师和考试座位号；
+- 课程时间统一使用 24 小时制；
+- 周视图显示第几周和 1 至 10 节课；
+- 点击周视图色块从底部弹出详情；
+- 日视图只用于浏览，不打开详情；
+- 页面切换和刷新按钮使用 watchOS 原生液态玻璃样式；
+- 数码表冠滚动时隐藏浮动按钮；
+- 同步在后台执行，刷新图标显示旋转动画；
+- 全部阶段完成后显示非阻塞的同步完成提示。
+
+---
+
+## 手机与手表如何通信
+
+### 使用的 WatchConnectivity 通道
+
+当前使用两类通道：
+
+#### `sendMessage`
+
+用于手表能够即时连接手机时的请求/响应。
+
+适合：
+
+- 手表打开应用后主动请求；
+- 手动刷新；
+- 按范围获取最新数据；
+- 全学期分页传输。
+
+要求 `session.isReachable == true`。
+
+#### `updateApplicationContext`
+
+由手机发布最近一次可用的 14 天数据。
+
+适合：
+
+- 手机暂时不可达时兜底；
+- 手表稍后启动时读取最近上下文；
+- 即时请求失败时恢复部分可用数据。
+
+Application Context 只保留最新状态，不用于传输全学期分页。
+
+### 消息字段
+
+iPhone 和 Apple Watch 使用以下固定 Key：
+
+| Key | 类型 | 作用 |
+| --- | --- | --- |
+| `requestSchedule` | `Bool` | 表示手表请求日程 |
+| `scheduleScope` | `String` | `today`、`fourteenDays` 或 `semester` |
+| `scheduleOffset` | `Int` | 完整学期当前请求偏移 |
+| `scheduleNextOffset` | `Int` | 下一块起始偏移 |
+| `scheduleHasMore` | `Bool` | 是否还有后续分块 |
+| `scheduleJSON` | `String` | 当前范围的快照 JSON |
+
+### 一次完整刷新的时序
+
+```mermaid
+sequenceDiagram
+    participant W as Apple Watch
+    participant WC as Watch WCSession
+    participant PC as iPhone WCSession
+    participant P as iPhone 快照缓存
+
+    W->>WC: 请求 today
+    WC->>PC: sendMessage(scope=today)
+    PC->>P: 读取完整学期快照
+    P-->>PC: JSON
+    PC-->>WC: 当天快照
+    WC-->>W: 解码、缓存并替换页面
+
+    W->>WC: 请求 fourteenDays
+    WC->>PC: sendMessage(scope=fourteenDays)
+    PC-->>WC: 14 天快照
+    WC-->>W: 解码、缓存并替换页面
+
+    W->>WC: 请求 semester(offset=0)
+    WC->>PC: sendMessage(scope=semester)
+    PC-->>WC: 第 1 块 + nextOffset + hasMore
+    WC-->>W: 写入临时 semesterBuffer
+
+    loop hasMore == true
+        W->>WC: 请求 semester(nextOffset)
+        WC->>PC: sendMessage
+        PC-->>WC: 下一块
+        WC-->>W: 合并到 semesterBuffer
+    end
+
+    W->>W: 生成完整学期快照
+    W->>W: 原子替换页面并写入缓存
+    W->>W: 显示“同步完成”
+```
+
+### 手机不可达时
+
+如果 `session.isReachable == false`：
+
+1. 手表尝试读取 `receivedApplicationContext`；
+2. 如果存在有效 JSON，则展示 Application Context 数据；
+3. 如果没有，则继续保留手表本地缓存；
+4. 页面不会因为同步失败被清空；
+5. 用户只会看到非阻塞错误提示。
+
+---
+
+## 数据协议
+
+### `WatchScheduleSnapshot`
+
+| 字段 | 说明 |
+| --- | --- |
+| `schemaVersion` | 快照协议版本 |
+| `generatedAtEpochMs` | 手机生成快照的时间 |
+| `semesterStartEpochMs` | 学期开始日期 |
+| `currentWeekIndex` | 手机同步的零基周次 |
+| `validThroughEpochMs` | 当前快照有效期 |
+| `rangeStartEpochMs` | 数据范围开始 |
+| `rangeEndEpochMs` | 数据范围结束 |
+| `timeZoneOffsetMinutes` | 手机时区偏移 |
+| `reminderMinutes` | 上课前提醒分钟数 |
+| `courses` | 具体日程数组 |
+
+### `WatchCourse`
+
+| 字段 | 说明 |
+| --- | --- |
+| `id` | 可跨分块去重的稳定标识 |
+| `name` | 课程、考试或实验名称 |
+| `teacher` | 教师，可为空 |
+| `classroom` | 教室或考场，可为空 |
+| `startAtEpochMs` | 开始时间 |
+| `endAtEpochMs` | 结束时间 |
+| `startSection` | 开始节次 |
+| `endSection` | 结束节次 |
+| `colorARGB` | 与手机一致的颜色 |
+| `kind` | `course`、`exam`、`physicsExperiment`、`otherExperiment` |
+| `note` | 考试座位号或实验附加信息 |
+
+---
+
+## 关键文件索引
+
+| 文件 | 作用 |
+| --- | --- |
+| `lib/repository/watch/watch_schedule_snapshot.dart` | 把手机业务模型转换为手表快照 |
+| `lib/repository/watch/watch_schedule_sync_service.dart` | 监听数据并自动向 iOS 提交快照 |
+| `pigeon_bridge/save_to_groupid.dart` | 定义 Flutter 到 Swift 的同步接口 |
+| `ios/Runner/WatchConnectivityManager.swift` | iPhone 侧快照缓存、过滤和通信 |
+| `watchOS/Connectivity/WatchConnectivityManager.swift` | Watch 侧渐进式同步 |
+| `watchOS/Storage/WatchScheduleStore.swift` | Watch 状态、缓存和分块合并 |
+| `watchOS/Models/WatchScheduleSnapshot.swift` | Watch 侧 Codable 模型 |
+| `watchOS/Views/RootScheduleView.swift` | 根页面、刷新和页面切换 |
+| `watchOS/Views/WeekScheduleView.swift` | 列表、日视图和周视图 |
+| `watchOS/Views/CourseRow.swift` | 课程行和课程详情 |
+| `watchOS/Assets.xcassets` | Apple Watch AppIcon |
+
+---
+
+## 构建与验证
+
+### Dart 快照测试
+
+```bash
+flutter test test/watch_schedule_snapshot_test.dart
+```
+
+覆盖内容包括：
+
+- 只展开有效周次课程；
+- 自定义课程；
+- 考试和座位号；
+- 实验；
+- 当前周次和学期起始时间；
+- JSON 协议字段。
+
+### watchOS 构建
+
+```bash
+xcodebuild \
+  -workspace ios/Runner.xcworkspace \
+  -scheme TraintimeWatch \
+  -configuration Debug \
+  -destination 'generic/platform=watchOS Simulator' \
+  CODE_SIGNING_ALLOWED=NO \
+  build
+```
+
+真机测试还需要：
+
+- iPhone 和 Apple Watch 已配对；
+- 两台设备开启开发者模式；
+- Runner、Widget 和 Watch Target 使用匹配的签名团队；
+- Watch App 的 Companion Bundle Identifier 指向 Runner；
+- 使用实际开发者账号可用的 App Group。
+
+---
+
+## 当前限制与后续建议
+
+### 1. 提醒仍由 iPhone 负责
+
+当前手表主要依赖 iPhone 本地通知自动转发到 Apple Watch。
+
+没有额外建立手表本地通知调度器，避免手机和手表同时触发造成重复提醒。如果未来需要手表脱离手机独立提醒，应先增加“通知责任端”设置。
+
+### 2. 手表不直接登录校园系统
+
+这是有意的架构选择。登录凭据、接口兼容、验证码和数据合并仍由手机处理。手表保持只读、轻量和离线可用。
+
+### 3. 全学期数据依赖手机快照
+
+手机必须至少成功生成过一次完整学期快照。之后即使手机暂时不在线，手表也能继续使用自己的完整缓存。
+
+### 4. Schema 升级需要双端兼容
+
+新增、删除或改变快照字段时，需要同步修改 Dart 和 Swift 模型，并提升 `schemaVersion`。对于可选新增字段，优先保持向后兼容。
+
+### 5. Bundle 与签名配置需要维护者复核
+
+开发过程中的个人 Team、Bundle Identifier 和 App Group 不能直接作为正式发布配置。合并时应统一回到项目现有的开发者账号和应用标识体系。
+
+---
+
+## 建议维护者优先审查
+
+如果只做一次快速 Code Review，建议按以下顺序：
+
+1. 检查 `WatchScheduleSnapshotBuilder` 是否正确映射现有课程、考试和实验模型；
+2. 检查 Pigeon 接口是否符合项目现有原生桥接规范；
+3. 检查 iPhone 与 Watch 两端的消息 Key 和范围语义是否完全一致；
+4. 检查三级缓存是否满足离线和失败回退预期；
+5. 检查 Xcode Target、嵌入关系、Bundle Identifier 和 App Group；
+6. 最后审查 SwiftUI 页面布局和交互。
+
+核心结论是：本次实现没有改变手机端作为数据源的职责，而是在现有 Flutter 业务数据之上增加了一层手表专用快照，通过 Pigeon 和 WatchConnectivity 把它交给一个原生、可缓存、渐进同步的 SwiftUI watchOS 应用。
