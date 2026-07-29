@@ -27,6 +27,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/watch/watch_schedule_sync_service.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {
@@ -58,6 +59,9 @@ void main() async {
 
   // Load package info.
   preference.packageInfo = await PackageInfo.fromPlatform();
+
+  // The phone remains the source of truth for the paired Apple Watch.
+  WatchScheduleSyncService.instance.start();
 
   // Have user registered?
   String username = preference.getString(preference.Preference.idsAccount);

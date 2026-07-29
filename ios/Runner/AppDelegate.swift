@@ -9,6 +9,7 @@ import flutter_local_notifications
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
+        PhoneWatchConnectivityManager.shared.activate()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
@@ -21,6 +22,10 @@ import flutter_local_notifications
         
         let api = ApiImplementation()
         SaveToGroupIdSwiftApiSetup.setUp(binaryMessenger: engineBridge.applicationRegistrar.messenger(), api: api)
+        WatchSyncSwiftApiSetup.setUp(
+            binaryMessenger: engineBridge.applicationRegistrar.messenger(),
+            api: WatchSyncApiImplementation()
+        )
     }
     
     override func userNotificationCenter(

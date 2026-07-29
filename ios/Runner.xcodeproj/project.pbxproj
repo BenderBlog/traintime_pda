@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -35,6 +35,16 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		A17A00000000000000000013 /* TraintimeWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000B /* TraintimeWatchApp.swift */; };
+		A17A00000000000000000014 /* Models/WatchScheduleSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000C /* Models/WatchScheduleSnapshot.swift */; };
+		A17A00000000000000000015 /* Storage/WatchScheduleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000D /* Storage/WatchScheduleStore.swift */; };
+		A17A00000000000000000016 /* Connectivity/WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000E /* Connectivity/WatchConnectivityManager.swift */; };
+		A17A00000000000000000017 /* Views/CourseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000F /* Views/CourseRow.swift */; };
+		A17A00000000000000000018 /* Views/WeekScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000010 /* Views/WeekScheduleView.swift */; };
+		A17A0000000000000000001C /* TraintimeWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000002 /* TraintimeWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A17A0000000000000000001D /* Views/RootScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000011 /* Views/RootScheduleView.swift */; };
+		A17A0000000000000000001E /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000001F /* WatchConnectivityManager.swift */; };
+		A17A00000000000000000020 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000021 /* Assets.xcassets */; };
 		FA8AF369ED4978041E518B36 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D245FC4ADA0FCAFBD569A11 /* Pods_RunnerTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -52,6 +62,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
+		};
+		A17A00000000000000000019 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A17A00000000000000000001;
+			remoteInfo = TraintimeWatch;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -75,6 +92,17 @@
 			files = (
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A17A0000000000000000001B /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				A17A0000000000000000001C /* TraintimeWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -127,6 +155,17 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A17A00000000000000000002 /* TraintimeWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TraintimeWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A17A00000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A17A0000000000000000000B /* TraintimeWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraintimeWatchApp.swift; sourceTree = "<group>"; };
+		A17A0000000000000000000C /* Models/WatchScheduleSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/WatchScheduleSnapshot.swift; sourceTree = "<group>"; };
+		A17A0000000000000000000D /* Storage/WatchScheduleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage/WatchScheduleStore.swift; sourceTree = "<group>"; };
+		A17A0000000000000000000E /* Connectivity/WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectivity/WatchConnectivityManager.swift; sourceTree = "<group>"; };
+		A17A0000000000000000000F /* Views/CourseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CourseRow.swift; sourceTree = "<group>"; };
+		A17A00000000000000000010 /* Views/WeekScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WeekScheduleView.swift; sourceTree = "<group>"; };
+		A17A00000000000000000011 /* Views/RootScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RootScheduleView.swift; sourceTree = "<group>"; };
+		A17A00000000000000000012 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A17A0000000000000000001F /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
 		B3B0B2380ADA394C1804262A /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		B8A7F8FC2F7D169D4772F1C5 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -155,6 +194,13 @@
 			files = (
 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
 				22F13ACD6516E421A8912721 /* Pods_Runner.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A17A00000000000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,6 +253,7 @@
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				26947AA62B49B50B006B2B17 /* ClasstableWidget */,
+				A17A0000000000000000000A /* watchOS */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				C9C6CBC03B7F1A33197D45B4 /* Pods */,
@@ -220,6 +267,7 @@
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 				26947AA12B49B50B006B2B17 /* ClasstableWidgetExtension.appex */,
+				A17A00000000000000000002 /* TraintimeWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -236,10 +284,28 @@
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				A17A0000000000000000001F /* WatchConnectivityManager.swift */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		A17A0000000000000000000A /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				A17A0000000000000000000B /* TraintimeWatchApp.swift */,
+				A17A0000000000000000000C /* Models/WatchScheduleSnapshot.swift */,
+				A17A0000000000000000000D /* Storage/WatchScheduleStore.swift */,
+				A17A0000000000000000000E /* Connectivity/WatchConnectivityManager.swift */,
+				A17A0000000000000000000F /* Views/CourseRow.swift */,
+				A17A00000000000000000010 /* Views/WeekScheduleView.swift */,
+				A17A00000000000000000011 /* Views/RootScheduleView.swift */,
+				A17A00000000000000000021 /* Assets.xcassets */,
+				A17A00000000000000000012 /* README.md */,
+			);
+			name = watchOS;
+			path = ../watchOS;
 			sourceTree = "<group>";
 		};
 		C9C6CBC03B7F1A33197D45B4 /* Pods */ = {
@@ -315,6 +381,7 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				26947AB52B49B50C006B2B17 /* Embed Foundation Extensions */,
+				A17A0000000000000000001B /* Embed Watch Content */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				0CED640916642A3F556DCD39 /* [CP] Embed Pods Frameworks */,
@@ -323,6 +390,7 @@
 			);
 			dependencies = (
 				26947AAF2B49B50C006B2B17 /* PBXTargetDependency */,
+				A17A0000000000000000001A /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -330,6 +398,23 @@
 			);
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A17A00000000000000000001 /* TraintimeWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A17A00000000000000000003 /* Build configuration list for PBXNativeTarget "TraintimeWatch" */;
+			buildPhases = (
+				A17A00000000000000000007 /* Sources */,
+				A17A00000000000000000008 /* Frameworks */,
+				A17A00000000000000000009 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TraintimeWatch;
+			productName = TraintimeWatch;
+			productReference = A17A00000000000000000002 /* TraintimeWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -340,7 +425,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1510;
+				LastUpgradeCheck = 2700;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					26947AA02B49B50B006B2B17 = {
@@ -353,6 +438,9 @@
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1100;
+					};
+					A17A00000000000000000001 = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -368,7 +456,7 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
+				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -377,6 +465,7 @@
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				26947AA02B49B50B006B2B17 /* ClasstableWidgetExtension */,
+				A17A00000000000000000001 /* TraintimeWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -409,6 +498,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A17A00000000000000000009 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A17A00000000000000000020 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -420,9 +517,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -541,7 +642,22 @@
 				262B016C2B58FED30094B372 /* SaveToGroupID.g.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				262B01702B5905FA0094B372 /* ApiImplementation.swift in Sources */,
+				A17A0000000000000000001E /* WatchConnectivityManager.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A17A00000000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A17A00000000000000000013 /* TraintimeWatchApp.swift in Sources */,
+				A17A00000000000000000014 /* Models/WatchScheduleSnapshot.swift in Sources */,
+				A17A00000000000000000015 /* Storage/WatchScheduleStore.swift in Sources */,
+				A17A00000000000000000016 /* Connectivity/WatchConnectivityManager.swift in Sources */,
+				A17A00000000000000000017 /* Views/CourseRow.swift in Sources */,
+				A17A00000000000000000018 /* Views/WeekScheduleView.swift in Sources */,
+				A17A0000000000000000001D /* Views/RootScheduleView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -557,6 +673,11 @@
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
+		};
+		A17A0000000000000000001A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A17A00000000000000000001 /* TraintimeWatch */;
+			targetProxy = A17A00000000000000000019 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -634,7 +755,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				STRIP_STYLE = "non-global";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -893,7 +1014,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				STRIP_STYLE = "non-global";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -947,7 +1068,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				STRIP_STYLE = "non-global";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1004,6 +1125,93 @@
 			};
 			name = Release;
 		};
+		A17A00000000000000000004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YXS6PA6787;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Traintime PDA";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		A17A00000000000000000005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YXS6PA6787;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Traintime PDA";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		A17A00000000000000000006 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YXS6PA6787;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Traintime PDA";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1047,10 +1255,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		A17A00000000000000000003 /* Build configuration list for PBXNativeTarget "TraintimeWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A17A00000000000000000004 /* Debug */,
+				A17A00000000000000000005 /* Release */,
+				A17A00000000000000000006 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */ = {
+		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};

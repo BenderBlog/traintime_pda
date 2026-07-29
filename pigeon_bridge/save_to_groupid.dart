@@ -4,13 +4,15 @@
 
 import 'package:pigeon/pigeon.dart';
 
-@ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/bridge/save_to_groupid.g.dart',
-  dartOptions: DartOptions(),
-  swiftOut: 'ios/Runner/SaveToGroupID.g.swift',
-  swiftOptions: SwiftOptions(),
-  copyrightHeader: "pigeon_bridge/copyright_header.txt",
-))
+@ConfigurePigeon(
+  PigeonOptions(
+    dartOut: 'lib/bridge/save_to_groupid.g.dart',
+    dartOptions: DartOptions(),
+    swiftOut: 'ios/Runner/SaveToGroupID.g.swift',
+    swiftOptions: SwiftOptions(),
+    copyrightHeader: "pigeon_bridge/copyright_header.txt",
+  ),
+)
 class FileToGroupID {
   FileToGroupID({
     required this.appid,
@@ -20,6 +22,12 @@ class FileToGroupID {
   String appid;
   String fileName;
   String data;
+}
+
+class WatchSchedulePayload {
+  WatchSchedulePayload({required this.json});
+
+  String json;
 }
 
 @HostApi()
@@ -35,4 +43,13 @@ abstract class SaveToGroupIdSwiftApi {
 
 abstract class SaveToGroupIdFlutterApi {
   bool saveToGroupId(FileToGroupID data);
+}
+
+@HostApi()
+abstract class WatchSyncSwiftApi {
+  @async
+  bool syncSchedule(WatchSchedulePayload payload);
+
+  @async
+  bool clearSchedule();
 }
