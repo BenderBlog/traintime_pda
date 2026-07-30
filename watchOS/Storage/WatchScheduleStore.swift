@@ -170,7 +170,7 @@ final class WatchScheduleStore: ObservableObject {
             )
             return true
         } catch {
-            syncError = "课表数据无法读取"
+            syncError = String(localized: "课表数据无法读取")
             logDecodeFailure(error)
             return false
         }
@@ -189,7 +189,7 @@ final class WatchScheduleStore: ObservableObject {
     @discardableResult
     func appendSemesterChunk(json: String, isFinal: Bool) -> Bool {
         guard hasPayload(json) else {
-            failRefresh("手机端没有可用的学期课表")
+            failRefresh(String(localized: "手机端没有可用的学期课表"))
             return false
         }
 
@@ -202,7 +202,7 @@ final class WatchScheduleStore: ObservableObject {
             return true
         } catch {
             clearSemesterBuffer(keepingCapacity: false)
-            failRefresh("全学期课表无法合并")
+            failRefresh(String(localized: "全学期课表无法合并"))
             logSemesterMergeFailure(error)
             return false
         }
@@ -227,7 +227,9 @@ final class WatchScheduleStore: ObservableObject {
     /// 只有当前完全没有页面内容时才显示“手机暂无课表”。
     private func setMissingScheduleErrorIfNeeded() {
         guard snapshot == nil else { return }
-        syncError = "手机端暂无课表，请先在 iPhone 打开并刷新课表"
+        syncError = String(
+            localized: "手机端暂无课表，请先在 iPhone 打开并刷新课表"
+        )
     }
 
     /// 解码课表并验证数据结构版本。

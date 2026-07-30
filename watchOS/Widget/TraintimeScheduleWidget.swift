@@ -277,7 +277,7 @@ private enum ScheduleWidgetTextFormatter {
         let value = course.classroom?.trimmingCharacters(
             in: .whitespacesAndNewlines
         ) ?? ""
-        return value.isEmpty ? "地点未定" : value
+        return value.isEmpty ? String(localized: "地点未定") : value
     }
 }
 
@@ -424,8 +424,12 @@ struct TraintimeScheduleWidgetView: View {
 
     /// “当前/下一节”状态标题。
     private var statusTitle: String {
-        guard entry.currentCourse != nil else { return "下一节" }
-        return entry.displaysNextCourse ? "下一节" : "当前"
+        guard entry.currentCourse != nil else {
+            return String(localized: "下一节")
+        }
+        return entry.displaysNextCourse
+            ? String(localized: "下一节")
+            : String(localized: "当前")
     }
 }
 

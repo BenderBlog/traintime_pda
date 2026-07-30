@@ -168,6 +168,7 @@ struct WeekScheduleView: View {
                         .offset(y: 2)
 
                     WeekPeriodGrid(
+                        weekStart: weekStart,
                         courses: courses,
                         select: selectCourse,
                         onEmptyTap: handleEmptyTap
@@ -224,7 +225,7 @@ struct WeekScheduleView: View {
                 to: weekStart
             ).day ?? 0
             let zeroBasedIndex = reference.zeroBasedIndex + elapsedDays / 7
-            return "第\(max(1, zeroBasedIndex + 1))周"
+            return localizedWeekNumber(max(1, zeroBasedIndex + 1))
         }
 
         let termStart = startOfWeek(
@@ -235,7 +236,7 @@ struct WeekScheduleView: View {
             from: termStart,
             to: weekStart
         ).day ?? 0
-        return "第\(max(1, elapsedDays / 7 + 1))周"
+        return localizedWeekNumber(max(1, elapsedDays / 7 + 1))
     }
 
     /// 左右按钮按整周移动。
@@ -322,15 +323,14 @@ private struct DateNavigationHeader: View {
 /// 周网格顶部的月份、星期和日期行。
 private struct WeekdayHeader: View {
     let weekStart: Date
-    private let symbols = ["一", "二", "三", "四", "五", "六", "日"]
 
     var body: some View {
         GeometryReader { proxy in
             let fontSize = max(6, min(8, proxy.size.width * 0.035))
             let labelWidth = max(11, min(15, proxy.size.width * 0.075))
-            let month = Calendar.current.component(.month, from: weekStart)
+            let symbols = mondayFirstWeekdaySymbols()
             HStack(spacing: 0) {
-                Text("\(month)月")
+                Text(weekStart, format: .dateTime.month(.abbreviated))
                     .font(.system(size: fontSize, weight: .medium))
                     .foregroundStyle(.secondary)
                     .minimumScaleFactor(0.75)
@@ -349,6 +349,17 @@ private struct WeekdayHeader: View {
                     }
                     .font(.system(size: fontSize, weight: .medium))
                     .frame(maxWidth: .infinity)
+                    // 今天的表头使用不参与布局的淡色背景，避免改变原有列宽。
+                    // 它会与网格中的同列高亮带连成一条完整的“今天”标记。
+                    .background {
+                        if Calendar.current.isDateInToday(date) {
+                            RoundedRectangle(
+                                cornerRadius: 2,
+                                style: .continuous
+                            )
+                            .fill(Color.accentColor.opacity(0.18))
+                        }
+                    }
                     .foregroundStyle(
                         Calendar.current.isDateInToday(date)
                             ? Color.accentColor
@@ -362,6 +373,7 @@ private struct WeekdayHeader: View {
 
 /// 周课表的节次网格、课程色块和点击命中区域。
 private struct WeekPeriodGrid: View {
+    let weekStart: Date
     let courses: [WatchCourse]
     let select: (WatchCourse) -> Void
     let onEmptyTap: () -> Void
@@ -383,6 +395,12 @@ private struct WeekPeriodGrid: View {
 
             ZStack(alignment: .topLeading) {
                 Color.clear
+
+                todayColumnHighlight(
+                    size: proxy.size,
+                    labelWidth: labelWidth,
+                    columnWidth: columnWidth
+                )
 
                 gridLines(
                     size: proxy.size,
@@ -423,7 +441,7 @@ private struct WeekPeriodGrid: View {
                     )
                     .contentShape(Rectangle())
                     .accessibilityLabel(
-                        "\(course.name)，第\(course.startPeriod)到\(course.endPeriod)节"
+                        localizedCoursePeriodRange(course)
                     )
                     .accessibilityAddTraits(.isButton)
                     .accessibilityAction {
@@ -448,6 +466,45 @@ private struct WeekPeriodGrid: View {
                     }
             )
         }
+    }
+
+    /// 当前展示周包含今天时，在今天所在列的底层绘制一条淡色高亮带。
+    ///
+    /// 高亮位于网格线和课程色块下方，不会覆盖课程颜色，也不会参与手势命中；
+    /// 原有色块坐标命中算法因此保持不变。
+    @ViewBuilder
+    private func todayColumnHighlight(
+        size: CGSize,
+        labelWidth: CGFloat,
+        columnWidth: CGFloat
+    ) -> some View {
+        if let column = todayColumnIndex {
+            Rectangle()
+                .fill(Color.accentColor.opacity(0.09))
+                .frame(width: columnWidth, height: size.height)
+                .offset(
+                    x: labelWidth + CGFloat(column) * columnWidth,
+                    y: 0
+                )
+                .accessibilityHidden(true)
+        }
+    }
+
+    /// 仅当今天位于当前展示的七天范围内时，返回“周一为 0”的列序号。
+    private var todayColumnIndex: Int? {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let displayedStart = calendar.startOfDay(for: weekStart)
+        let displayedEnd = calendar.date(
+            byAdding: .day,
+            value: 7,
+            to: displayedStart
+        ) ?? displayedStart
+
+        guard today >= displayedStart, today < displayedEnd else {
+            return nil
+        }
+        return weekdayIndex(for: today)
     }
 
     /// 在与绘制完全相同的几何参数下执行命中测试。
@@ -521,6 +578,36 @@ private struct WeekPeriodGrid: View {
         let weekday = Calendar.current.component(.weekday, from: date)
         return max(0, min(6, (weekday + 5) % 7))
     }
+}
+
+/// 按手机端相同的系统区域规则，生成“第 N 周”标题。
+private func localizedWeekNumber(_ number: Int) -> String {
+    String.localizedStringWithFormat(
+        String(localized: "第%lld周"),
+        Int64(number)
+    )
+}
+
+/// 获取系统本地化的极短星期符号，并转换为周一到周日顺序。
+///
+/// 简体/繁体中文分别得到“一…日”，英语得到“M…S”，既能适配窄表盘，
+/// 也避免手工维护三套星期缩写。
+private func mondayFirstWeekdaySymbols() -> [String] {
+    let symbols = Calendar.current.veryShortStandaloneWeekdaySymbols
+    guard symbols.count == 7 else {
+        return ["M", "T", "W", "T", "F", "S", "S"]
+    }
+    return Array(symbols[1...6]) + [symbols[0]]
+}
+
+/// 生成 VoiceOver 使用的本地化节次范围。
+private func localizedCoursePeriodRange(_ course: WatchCourse) -> String {
+    String.localizedStringWithFormat(
+        String(localized: "%1$@，第%2$lld到第%3$lld节"),
+        course.name,
+        Int64(course.startPeriod),
+        Int64(course.endPeriod)
+    )
 }
 
 /// 返回给定日期所在周的周一零点。

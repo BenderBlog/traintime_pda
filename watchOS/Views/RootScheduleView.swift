@@ -12,17 +12,17 @@ private enum WatchCalendarMode: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// 视图选择列表中的中文名称。
+    /// 视图选择列表中的本地化名称。
     var title: String {
         switch self {
         case .nextCourse:
-            "下一节课"
+            String(localized: "下一节课")
         case .courseList:
-            "课程列表"
+            String(localized: "课程列表")
         case .day:
-            "日视图"
+            String(localized: "日视图")
         case .week:
-            "周视图"
+            String(localized: "周视图")
         }
     }
 
@@ -217,7 +217,12 @@ struct RootScheduleView: View {
         ContentUnavailableView {
             Label("暂无课表", systemImage: "iphone.and.arrow.forward")
         } description: {
-            Text(store.syncError ?? "请在配对的 iPhone 上打开应用并刷新课表")
+            Text(
+                store.syncError
+                    ?? String(
+                        localized: "请在配对的 iPhone 上打开应用并刷新课表"
+                    )
+            )
         }
         .padding(.horizontal, 4)
     }
@@ -255,7 +260,11 @@ struct RootScheduleView: View {
         .scaleEffect(controlsVisible ? 1 : 0.82)
         .allowsHitTesting(controlsVisible)
         .animation(.easeOut(duration: 0.2), value: controlsVisible)
-        .accessibilityLabel(store.isRefreshing ? "正在刷新" : "从手机刷新")
+        .accessibilityLabel(
+            store.isRefreshing
+                ? String(localized: "正在刷新")
+                : String(localized: "从手机刷新")
+        )
     }
 
     /// 视图切换按钮的系统版本适配。

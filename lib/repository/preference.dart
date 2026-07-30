@@ -24,7 +24,7 @@ final GlobalKey leftKey = GlobalKey();
 /// iOS 主 App、小组件和 Apple Watch 共享文件时使用的 App Group。
 ///
 /// 修改该值时还必须同步修改各 Target 的 entitlements 与原生 Swift 常量。
-const String appId = "group.com.qingye0312.traintimepda";
+const String appId = "group.xyz.superbart.xdyou";
 
 Catcher2Options catcherOptions = Catcher2Options(
   PageReportMode(showStackTrace: true),

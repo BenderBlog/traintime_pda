@@ -51,7 +51,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     func activate(store: WatchScheduleStore) {
         self.store = store
         guard WCSession.isSupported() else {
-            store.failRefresh("此设备不支持与 iPhone 同步")
+            store.failRefresh(
+                String(localized: "此设备不支持与 iPhone 同步")
+            )
             return
         }
 
@@ -109,7 +111,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             ) {
                 self.store?.finishRefresh()
             } else {
-                self.store?.failRefresh("暂时无法连接 iPhone")
+                self.store?.failRefresh(
+                    String(localized: "暂时无法连接 iPhone")
+                )
             }
         }
     }
@@ -142,7 +146,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     private func reportActivationFailure(_ error: Error) {
         Task { @MainActor [weak self] in
             self?.store?.failRefresh(
-                "无法连接 iPhone：\(error.localizedDescription)"
+                String.localizedStringWithFormat(
+                    String(localized: "无法连接 iPhone：%@"),
+                    error.localizedDescription
+                )
             )
         }
     }
@@ -240,7 +247,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         if consumeLatestApplicationContext(from: session) {
             store.finishRefresh()
         } else {
-            store.failRefresh("请在配对的 iPhone 上打开 Traintime PDA")
+            store.failRefresh(
+                String(localized: "请在配对的 iPhone 上打开 Traintime PDA")
+            )
         }
     }
 
@@ -257,7 +266,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             store?.finishRefresh()
         } else {
             store?.failRefresh(
-                "同步失败：\(error.localizedDescription)"
+                String.localizedStringWithFormat(
+                    String(localized: "同步失败：%@"),
+                    error.localizedDescription
+                )
             )
         }
     }
@@ -292,7 +304,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             json: payload.json,
             scope: payload.scope
         ) else {
-            store.failRefresh("手机端暂无课表，请先刷新手机课表")
+            store.failRefresh(
+                String(localized: "手机端暂无课表，请先刷新手机课表")
+            )
             return
         }
 
