@@ -10,7 +10,8 @@
 
 - iPhone 仍然是唯一的数据源；
 - Flutter 负责整合课程、考试、实验、周次和提醒配置；
-- iOS 原生层负责保存快照并通过 `WatchConnectivity` 响应手表；
+- Flutter 还负责把手机当前实际生效的界面语言同步给手表；
+- iOS 原生层负责保存快照和语言状态，并通过 `WatchConnectivity` 响应手表；
 - Apple Watch 只负责同步、缓存和展示；
 - 手机不可达时，手表继续显示本地缓存；
 - 每次刷新按“当天 → 近 14 天 → 全学期”渐进更新，不阻塞现有页面。
@@ -20,6 +21,7 @@ flowchart LR
     A["Flutter 现有课表/考试/实验状态"] --> B["WatchScheduleSnapshotBuilder"]
     B --> C["版本化 JSON 快照"]
     C --> D["Pigeon: WatchSyncSwiftApi"]
+    A2["ThemeController 实际生效语言"] --> D
     D --> E["iOS PhoneWatchConnectivityManager"]
     E --> F["WCSession / WatchConnectivity"]
     F --> G["watchOS WatchConnectivityManager"]
@@ -87,8 +89,11 @@ flowchart LR
 - 物理实验；
 - 其他实验；
 - 上课提醒配置。
+- 手机当前实际生效的语言。
 
 任一数据变化后，服务会使用约 400 毫秒防抖重新生成完整学期快照，再提交到 iOS 原生层。
+
+语言使用 `ThemeController.localeIdentifierSignal` 建立响应式依赖。选择“跟随系统”时，手机会先把系统语言解析成明确的 `zh_CN`、`zh_TW` 或 `en_US`，再发送给原生层。语言同步与课表是否存在解耦：即使用户尚未获得课表，切换语言仍然会更新 Apple Watch。
 
 该服务只在 iOS 上运行，并由 `lib/main.dart` 启动。Android 和其他平台不会执行手表同步逻辑。
 
@@ -107,6 +112,9 @@ class WatchSchedulePayload {
 
 @HostApi()
 abstract class WatchSyncSwiftApi {
+  @async
+  bool syncPreferredLanguage(String localeIdentifier);
+
   @async
   bool syncSchedule(WatchSchedulePayload payload);
 
@@ -141,13 +149,19 @@ Pigeon 生成文件不应手动维护。修改接口后应从 `pigeon_bridge/sav
 
 - 激活 iPhone 侧 `WCSession`；
 - 接收 Flutter 提交的完整学期 JSON；
+- 接收并规范化 Flutter 提交的实际语言；
 - 在 iPhone 的 `UserDefaults` 中保留最近快照；
+- 在 iPhone 的 `UserDefaults` 中保留最近语言；
 - 通过 `updateApplicationContext` 发布最近可用的 14 天数据；
+- 通过 Application Context 持久发布语言状态；
+- 手表当前可达时，通过即时消息立即发布语言；
 - 响应 Apple Watch 的即时请求；
 - 按当天、14 天或全学期范围过滤数据；
 - 将完整学期拆成小块传输。
 
 完整学期默认每块发送 50 条日程，避免单条 WatchConnectivity 消息过大。
+
+每个课表请求回复也会携带当前语言。这样即使手表错过了语言即时消息，也能在下一次自动刷新或手动刷新时自动修正界面语言。
 
 `ios/Runner/AppDelegate.swift` 增加了两项初始化：
 
@@ -213,6 +227,7 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 `WatchScheduleStore` 是手表端中心状态仓库，基于 `ObservableObject` 和 `@Published`，负责：
 
 - 当前显示的快照；
+- 手机同步的实际语言；
 - 当前同步阶段；
 - 同步错误；
 - 是否正在刷新；
@@ -247,6 +262,7 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 
 - 激活 Watch 侧 `WCSession`；
 - 应用进入活动状态后自动刷新；
+- 从即时消息、Application Context 和课表回复中安装语言；
 - 发起当天、14 天和全学期请求；
 - 处理手机返回的 JSON；
 - 逐块接收并合并完整学期；
@@ -283,7 +299,28 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 - 同步在后台执行，刷新图标显示旋转动画；
 - 全部阶段完成后显示非阻塞的同步完成提示。
 
-### 6. Smart Stack 课程小组件
+### 6. 国际化与语言同步
+
+主要文件：
+
+- `lib/controller/theme_controller.dart`
+- `watchOS/Localizable.xcstrings`
+- `watchOS/Shared/WatchWidgetShared.swift`
+- `watchOS/TraintimeWatchApp.swift`
+
+手表界面支持简体中文、繁体中文和英语。手机 App 内的语言设置是手表界面的首选语言来源，不要求 Apple Watch 的系统语言与手机 App 设置一致。同步后的语言会写入 App Group，Watch App 和 Widget Extension 共用同一状态。
+
+SwiftUI 根视图通过 `.environment(\.locale, ...)` 更新日期和星期格式。切换页目录、“第 N 周”等显式生成的字符串则通过 `watchLocalizedString` 按同步语言直接读取：
+
+- `en.lproj`；
+- `zh-Hant.lproj`；
+- String Catalog 的简体中文源键。
+
+这里不能只依赖 `String(localized:locale:)`：它的 `locale` 主要参与插值格式化，Bundle 仍可能按照手表系统语言选择资源。例如手机 App 使用英语而手表系统使用中文时，仅传入 Locale 可能仍得到中文目录。
+
+语言同步只改变手表界面文字、日期和星期格式。课程、考试和实验的业务名称来自手机端教务数据，不做机器翻译或字面转换。
+
+### 7. Smart Stack 课程小组件
 
 主要文件：
 
@@ -300,6 +337,7 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 - 在右侧显示包含周六、周日的 5×7 点阵；
 - 将点阵宽度限制为组件总宽度的四分之一；
 - 在课程开始和结束时间建立 Timeline 节点；
+- 与 Watch App 共用手机同步的语言设置；
 - 所有缓存过期时继续显示最后生成的一份离线数据。
 
 ---
@@ -319,21 +357,23 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 - 手表打开应用后主动请求；
 - 手动刷新；
 - 按范围获取最新数据；
-- 全学期分页传输。
+- 全学期分页传输；
+- 手机切换语言后立即通知当前可达的手表。
 
 要求 `session.isReachable == true`。
 
 #### `updateApplicationContext`
 
-由手机发布最近一次可用的 14 天数据。
+由手机发布最近一次可用的 14 天数据和当前语言。
 
 适合：
 
 - 手机暂时不可达时兜底；
 - 手表稍后启动时读取最近上下文；
-- 即时请求失败时恢复部分可用数据。
+- 即时请求失败时恢复部分可用数据；
+- 手表稍后启动时恢复手机最后设置的语言。
 
-Application Context 只保留最新状态，不用于传输全学期分页。
+Application Context 只保留最新状态，不用于传输全学期分页。语言可以独立于课表存在，因此首次登录前的上下文也可能只包含 `preferredLanguage`。
 
 ### 消息字段
 
@@ -347,6 +387,7 @@ iPhone 和 Apple Watch 使用以下固定 Key：
 | `scheduleNextOffset` | `Int` | 下一块起始偏移 |
 | `scheduleHasMore` | `Bool` | 是否还有后续分块 |
 | `scheduleJSON` | `String` | 当前范围的快照 JSON |
+| `preferredLanguage` | `String` | `zh_CN`、`zh_TW` 或 `en_US` |
 
 ### 一次完整刷新的时序
 
@@ -361,8 +402,8 @@ sequenceDiagram
     WC->>PC: sendMessage(scope=today)
     PC->>P: 读取完整学期快照
     P-->>PC: JSON
-    PC-->>WC: 当天快照
-    WC-->>W: 解码、缓存并替换页面
+    PC-->>WC: 当天快照 + preferredLanguage
+    WC-->>W: 安装语言、解码、缓存并替换页面
 
     W->>WC: 请求 fourteenDays
     WC->>PC: sendMessage(scope=fourteenDays)
@@ -386,6 +427,30 @@ sequenceDiagram
     W->>W: 显示“同步完成”
 ```
 
+### 一次语言切换的时序
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant F as Flutter ThemeController
+    participant P as iPhone WatchConnectivity
+    participant W as Apple Watch
+    participant C as App Group / Widget
+
+    U->>F: 切换简体、繁体或英语
+    F->>F: 解析实际生效语言
+    F->>P: Pigeon syncPreferredLanguage
+    P->>P: 写入 UserDefaults
+    P->>P: updateApplicationContext
+    alt Watch App 当前可达
+        P-->>W: sendMessage(preferredLanguage)
+    else Watch App 当前不可达
+        W->>P: 下次激活读取最近 Application Context
+    end
+    W->>C: 写入共享语言并刷新 Widget Timeline
+    W->>W: 更新 SwiftUI Locale 和显式字符串
+```
+
 ### 手机不可达时
 
 如果 `session.isReachable == false`：
@@ -399,6 +464,8 @@ sequenceDiagram
 ---
 
 ## 数据协议
+
+`preferredLanguage` 不属于 `WatchScheduleSnapshot`。它是独立的轻量设置状态，避免只切换语言时重新生成或传输整学期 JSON。
 
 ### `WatchScheduleSnapshot`
 
@@ -437,14 +504,17 @@ sequenceDiagram
 
 | 文件 | 作用 |
 | --- | --- |
+| `lib/controller/theme_controller.dart` | 解析手机实际生效语言并暴露语言 Signal |
 | `lib/repository/watch/watch_schedule_snapshot.dart` | 把手机业务模型转换为手表快照 |
-| `lib/repository/watch/watch_schedule_sync_service.dart` | 监听数据并自动向 iOS 提交快照 |
+| `lib/repository/watch/watch_schedule_sync_service.dart` | 监听业务数据和语言并自动向 iOS 提交 |
 | `pigeon_bridge/save_to_groupid.dart` | 定义 Flutter 到 Swift 的同步接口 |
-| `ios/Runner/WatchConnectivityManager.swift` | iPhone 侧快照缓存、过滤和通信 |
-| `watchOS/Connectivity/WatchConnectivityManager.swift` | Watch 侧渐进式同步 |
-| `watchOS/Storage/WatchScheduleStore.swift` | Watch 状态、缓存和分块合并 |
+| `ios/Runner/WatchConnectivityManager.swift` | iPhone 侧快照/语言缓存、过滤和通信 |
+| `watchOS/Connectivity/WatchConnectivityManager.swift` | Watch 侧渐进式同步和语言接收 |
+| `watchOS/Storage/WatchScheduleStore.swift` | Watch 状态、课表缓存、语言和分块合并 |
 | `watchOS/Models/WatchScheduleSnapshot.swift` | Watch 侧 Codable 模型 |
-| `watchOS/Shared/WatchWidgetShared.swift` | Watch App 与小组件的 App Group 缓存 |
+| `watchOS/Shared/WatchWidgetShared.swift` | Watch App 与小组件的课表/语言共享缓存 |
+| `watchOS/Localizable.xcstrings` | Watch App 与 Widget 的三语 String Catalog |
+| `watchOS/TraintimeWatchApp.swift` | 注入 Store 和手机同步的 SwiftUI Locale |
 | `watchOS/Views/RootScheduleView.swift` | 根页面、刷新和页面切换 |
 | `watchOS/Views/WeekScheduleView.swift` | 列表、日视图和周视图 |
 | `watchOS/Views/CourseRow.swift` | 课程行和课程详情 |
@@ -458,7 +528,7 @@ sequenceDiagram
 ### Dart 快照测试
 
 ```bash
-flutter test test/watch_schedule_snapshot_test.dart
+.flutter/bin/flutter test test/watch_schedule_snapshot_test.dart
 ```
 
 覆盖内容包括：
@@ -472,6 +542,8 @@ flutter test test/watch_schedule_snapshot_test.dart
 - 当前周次和学期起始时间；
 - JSON 协议字段。
 
+当前测试文件共包含 6 项测试。语言资源属于原生 watchOS 层，应同时通过编译产物中的 `en.lproj` 和 `zh-Hant.lproj` 检查目录、周次标题等关键字符串。
+
 ### watchOS 构建
 
 ```bash
@@ -482,6 +554,19 @@ xcodebuild \
   -destination 'generic/platform=watchOS Simulator' \
   CODE_SIGNING_ALLOWED=NO \
   build
+```
+
+### 完整 iPhone + Watch Companion 构建
+
+Flutter 检测到 Watch Companion App 后，模拟器构建必须指定一个已与 Watch 模拟器配对的 iPhone 模拟器 UDID：
+
+```bash
+.flutter/bin/flutter devices
+
+.flutter/bin/flutter build ios \
+  --simulator \
+  --debug \
+  -d <PAIRED_IPHONE_SIMULATOR_UDID>
 ```
 
 真机测试还需要：
@@ -518,6 +603,10 @@ xcodebuild \
 
 开发过程中的个人 Team、Bundle Identifier 和 App Group 不能直接作为正式发布配置。合并时应统一回到项目现有的开发者账号和应用标识体系。
 
+### 6. 课程名称不属于界面本地化
+
+手表的目录、状态、日期、星期、课程类型和同步提示支持三语切换；具体课程、考试和实验名称来自学校或用户数据，当前保持原文。若未来需要翻译业务数据，应在手机数据层增加明确的多语言字段，而不是在手表端根据名称猜测或机器翻译。
+
 ---
 
 ## 建议维护者优先审查
@@ -527,8 +616,9 @@ xcodebuild \
 1. 检查 `WatchScheduleSnapshotBuilder` 是否正确映射现有课程、考试和实验模型；
 2. 检查 Pigeon 接口是否符合项目现有原生桥接规范；
 3. 检查 iPhone 与 Watch 两端的消息 Key 和范围语义是否完全一致；
-4. 检查三级缓存是否满足离线和失败回退预期；
-5. 检查 Xcode Target、嵌入关系、Bundle Identifier 和 App Group；
-6. 最后审查 SwiftUI 页面布局和交互。
+4. 检查语言 Signal、`preferredLanguage` 和 App Group 语言缓存链路；
+5. 检查三级缓存是否满足离线和失败回退预期；
+6. 检查 Xcode Target、嵌入关系、Bundle Identifier 和 App Group；
+7. 最后审查 SwiftUI 页面布局、国际化和交互。
 
-核心结论是：本次实现没有改变手机端作为数据源的职责，而是在现有 Flutter 业务数据之上增加了一层手表专用快照，通过 Pigeon 和 WatchConnectivity 把它交给一个原生、可缓存、渐进同步的 SwiftUI watchOS 应用。
+核心结论是：本次实现没有改变手机端作为数据源和界面语言来源的职责，而是在现有 Flutter 业务数据之上增加了一层手表专用快照与轻量设置同步，通过 Pigeon 和 WatchConnectivity 把它们交给一个原生、可缓存、渐进同步且支持三语界面的 SwiftUI watchOS 应用。
