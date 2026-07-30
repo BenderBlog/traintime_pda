@@ -61,7 +61,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>xyz.superbart.xdyou</string>
+			<string>com.qingye0312.traintimepda</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>xdyou</string>

@@ -136,4 +136,109 @@ void main() {
     expect(snapshot.courses[1].name, '光学实验');
     expect(snapshot.courses[1].teacher, '张老师');
   });
+
+  test('rejects a non-positive synchronization range', () {
+    final classTable = ClassTableData(
+      semesterLength: 1,
+      semesterCode: '2026-1',
+      termStartDay: '2026-07-20 00:00:00',
+    );
+
+    expect(
+      () => const WatchScheduleSnapshotBuilder().build(
+        classTable: classTable,
+        effectiveTermStart: DateTime(2026, 7, 20),
+        currentWeekIndex: 0,
+        now: DateTime(2026, 7, 20),
+        days: 0,
+      ),
+      throwsArgumentError,
+    );
+  });
+
+  test('keeps exams with the same subject and time but different seats', () {
+    final classTable = ClassTableData(
+      semesterLength: 1,
+      semesterCode: '2026-1',
+      termStartDay: '2026-07-20 00:00:00',
+    );
+    final firstSeat = Subject.generate(
+      subject: '大学物理',
+      typeStr: '期末考试',
+      time: '2026-07-21 14:00-15:35',
+      place: 'A-422',
+      seat: '8',
+    );
+    final secondSeat = Subject.generate(
+      subject: '大学物理',
+      typeStr: '期末考试',
+      time: '2026-07-21 14:00-15:35',
+      place: 'A-422',
+      seat: '9',
+    );
+
+    final snapshot = const WatchScheduleSnapshotBuilder().build(
+      classTable: classTable,
+      effectiveTermStart: DateTime(2026, 7, 20, 12),
+      currentWeekIndex: 0,
+      now: DateTime(2026, 7, 20, 18),
+      subjects: [firstSeat, secondSeat],
+      days: 7,
+    );
+
+    expect(snapshot.semesterStart, DateTime(2026, 7, 20));
+    expect(snapshot.rangeStart, DateTime(2026, 7, 20));
+    expect(snapshot.courses, hasLength(2));
+    expect(snapshot.courses.map((course) => course.id).toSet(), hasLength(2));
+    expect(
+      snapshot.courses.map((course) => course.note),
+      containsAll(<String?>['座位 8', '座位 9']),
+    );
+  });
+
+  test('keeps overlapping school arrangements with different rooms', () {
+    final classTable = ClassTableData(
+      semesterLength: 1,
+      semesterCode: '2026-1',
+      termStartDay: '2026-07-20 00:00:00',
+      classDetail: [ClassDetail(name: '大学英语')],
+      timeArrangement: [
+        TimeArrangement(
+          source: Source.school,
+          index: 0,
+          weekList: [true],
+          teacher: '张老师',
+          classroom: 'A-101',
+          day: DateTime.monday,
+          start: 1,
+          stop: 2,
+        ),
+        TimeArrangement(
+          source: Source.school,
+          index: 0,
+          weekList: [true],
+          teacher: '李老师',
+          classroom: 'B-202',
+          day: DateTime.monday,
+          start: 1,
+          stop: 2,
+        ),
+      ],
+    );
+
+    final snapshot = const WatchScheduleSnapshotBuilder().build(
+      classTable: classTable,
+      effectiveTermStart: DateTime(2026, 7, 20),
+      currentWeekIndex: 0,
+      now: DateTime(2026, 7, 20),
+      days: 7,
+    );
+
+    expect(snapshot.courses, hasLength(2));
+    expect(snapshot.courses.map((course) => course.id).toSet(), hasLength(2));
+    expect(
+      snapshot.courses.map((course) => course.classroom),
+      containsAll(<String?>['A-101', 'B-202']),
+    );
+  });
 }

@@ -12,7 +12,7 @@ import WidgetKit
 import SwiftUI
 import OSLog
 
-private let widgetGroupId = "group.xyz.superbart.xdyou"
+private let widgetGroupId = "group.com.qingye0312.traintimepda"
 private let classTableFile = "ClassTable.json"
 private let customClassFile = "CustomClassesV2.json"
 private let examFile = "ExamFile.json"
@@ -22,7 +22,7 @@ private let swiftFile = "WeekSwift.txt"
 private let format = "yyyy-MM-dd HH:mm:ss"
 private let myDateFormatter = DateFormatter()
 let logger = Logger(
-  subsystem: "xyz.superbart.xdyou",
+  subsystem: "com.qingye0312.traintimepda",
   category: "ClassTableWidget"
 )
 

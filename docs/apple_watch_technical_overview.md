@@ -26,14 +26,17 @@ flowchart LR
     G --> H["WatchScheduleStore"]
     H --> I["SwiftUI 手表界面"]
     H --> J["UserDefaults 离线缓存"]
+    H --> K["App Group 完整阶段缓存"]
+    K --> L["WidgetKit 课程小组件"]
 ```
 
 ## 改动范围
 
-这次新增主要分为两部分：
+这次新增主要分为三部分：
 
 1. 手机端新增手表数据生产和通信能力；
-2. 新增完整的原生 watchOS 应用。
+2. 新增完整的原生 watchOS 应用；
+3. 新增读取同一份手表缓存的 WidgetKit 课程小组件。
 
 原有手机业务仍负责获取学校数据。本次没有在手表端重复登录学校系统，也没有让手表直接发起校园接口请求。
 
@@ -156,10 +159,12 @@ Pigeon 生成文件不应手动维护。修改接口后应从 `pigeon_bridge/sav
 Xcode 工程新增：
 
 - `TraintimeWatch` watchOS Target；
+- `TraintimeWatchWidgetExtension` Widget Extension Target；
 - `TraintimeWatch` Shared Scheme；
 - watchOS Swift 源文件；
+- WidgetKit Swift 源文件；
 - Watch AppIcon Asset Catalog；
-- iPhone 与 Watch App 的依赖和嵌入关系。
+- iPhone、Watch App 与 Widget Extension 的依赖和嵌入关系。
 
 签名、Development Team、Bundle Identifier 和 App Group 属于发布环境配置，不属于通信协议本身。合并前应由维护者按原项目的开发者账号和标识符统一确认。
 
@@ -277,6 +282,25 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 - 数码表冠滚动时隐藏浮动按钮；
 - 同步在后台执行，刷新图标显示旋转动画；
 - 全部阶段完成后显示非阻塞的同步完成提示。
+
+### 6. Smart Stack 课程小组件
+
+主要文件：
+
+- `watchOS/Shared/WatchWidgetShared.swift`
+- `watchOS/Widget/TraintimeScheduleWidget.swift`
+- `watchOS/Widget/TraintimeWatchWidgetBundle.swift`
+
+小组件不会访问手机或校园接口，而是读取 Watch App 在 App Group 中写入的
+完整阶段缓存。它会：
+
+- 显示当前课程；当前无课时显示下一节；
+- 当前和下一节同时存在时提供切换按钮；
+- 显示 24 小时制时间和地点；
+- 在右侧显示包含周六、周日的 5×7 点阵；
+- 将点阵宽度限制为组件总宽度的四分之一；
+- 在课程开始和结束时间建立 Timeline 节点；
+- 所有缓存过期时继续显示最后生成的一份离线数据。
 
 ---
 
@@ -420,9 +444,11 @@ sequenceDiagram
 | `watchOS/Connectivity/WatchConnectivityManager.swift` | Watch 侧渐进式同步 |
 | `watchOS/Storage/WatchScheduleStore.swift` | Watch 状态、缓存和分块合并 |
 | `watchOS/Models/WatchScheduleSnapshot.swift` | Watch 侧 Codable 模型 |
+| `watchOS/Shared/WatchWidgetShared.swift` | Watch App 与小组件的 App Group 缓存 |
 | `watchOS/Views/RootScheduleView.swift` | 根页面、刷新和页面切换 |
 | `watchOS/Views/WeekScheduleView.swift` | 列表、日视图和周视图 |
 | `watchOS/Views/CourseRow.swift` | 课程行和课程详情 |
+| `watchOS/Widget/TraintimeScheduleWidget.swift` | 当前/下一节课程 Smart Stack 小组件 |
 | `watchOS/Assets.xcassets` | Apple Watch AppIcon |
 
 ---
@@ -441,6 +467,8 @@ flutter test test/watch_schedule_snapshot_test.dart
 - 自定义课程；
 - 考试和座位号；
 - 实验；
+- 非正同步范围拒绝；
+- 同科目同时间、不同座位考试的 ID 去重保护；
 - 当前周次和学期起始时间；
 - JSON 协议字段。
 

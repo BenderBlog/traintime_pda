@@ -1,20 +1,22 @@
-# Traintime PDA for Apple Watch
+# Traintime PDA Apple Watch
 
-This directory contains the native SwiftUI companion app for watchOS.
+本目录包含原生 SwiftUI watchOS Companion App 和 WidgetKit 小组件。
 
-The iPhone app remains the source of truth. It expands the current class table
-into a full-semester snapshot and stores it on the native iOS side. Each time
-the watch app becomes active, it progressively requests:
+iPhone 始终是课表数据源。Flutter 将课程、自定义课程、考试和实验展开为
+完整学期快照，iOS 原生层负责持久化并响应 WatchConnectivity 请求。手表每次
+进入前台后依次获取：
 
-1. today;
-2. the next 14 days;
-3. the full semester in small chunks.
+1. 当天；
+2. 近 14 天；
+3. 分块传输的完整学期。
 
-The watch persists the completed semester snapshot for offline viewing. Its
-three-dot view switcher provides the next-course, course-list, day, and week
-views. Course colors use the same Material color sequence as the Flutter phone
-interface.
+手表会分别缓存三个同步阶段。手机离线、未启动或同步中断时，已有页面和缓存
+不会被清空。三点按钮可切换下一节课、课程列表、日视图和周视图，课程颜色与
+Flutter 手机端保持一致。
 
-The first version intentionally relies on iOS notification forwarding for class
-reminders. A watch-local notification scheduler can be added after a single
-notification owner setting is available, avoiding duplicate alerts.
+`Widget/` 提供 Smart Stack 课程小组件，显示当前/下一节课程、地点、时间和
+一周 5×7 点阵。小组件通过 App Group 读取手表 App 已校验并完整写入的缓存，
+不自行发起网络或校园系统请求。
+
+提醒目前仍由 iPhone 本地通知转发，避免手机和手表重复提醒。若未来增加手表
+本地调度器，应先引入唯一的“通知责任端”配置。

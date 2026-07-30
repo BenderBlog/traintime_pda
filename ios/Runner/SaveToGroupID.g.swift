@@ -232,6 +232,11 @@ struct FileToGroupID: Hashable, CustomStringConvertible {
   }
 }
 
+/// Flutter 发送给 iOS 原生层的自包含课表 JSON。
+///
+/// 使用单一载荷对象而不是散落参数，后续协议增加压缩或校验字段时可以保持
+/// Host API 方法签名稳定。
+///
 /// Generated class from Pigeon that represents data sent in messages.
 struct WatchSchedulePayload: Hashable, CustomStringConvertible {
   var json: String
@@ -373,7 +378,9 @@ class SaveToGroupIdSwiftApiSetup {
 }
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WatchSyncSwiftApi {
+  /// 保存最新学期快照，并通过 WatchConnectivity 发布给 Apple Watch。
   func syncSchedule(payload: WatchSchedulePayload, completion: @escaping (Result<Bool, Error>) -> Void)
+  /// 清除手机端持久化课表并向手表发布空上下文。
   func clearSchedule(completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
@@ -383,6 +390,7 @@ class WatchSyncSwiftApiSetup {
   /// Sets up an instance of `WatchSyncSwiftApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: WatchSyncSwiftApi?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+    /// 保存最新学期快照，并通过 WatchConnectivity 发布给 Apple Watch。
     let syncScheduleChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.syncSchedule\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       syncScheduleChannel.setMessageHandler { message, reply in
@@ -400,6 +408,7 @@ class WatchSyncSwiftApiSetup {
     } else {
       syncScheduleChannel.setMessageHandler(nil)
     }
+    /// 清除手机端持久化课表并向手表发布空上下文。
     let clearScheduleChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.clearSchedule\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       clearScheduleChannel.setMessageHandler { _, reply in

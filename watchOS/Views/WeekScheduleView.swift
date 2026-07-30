@@ -3,10 +3,15 @@
 
 import SwiftUI
 
+/// 按自然日分组的完整课程列表。
+///
+/// 列表与日视图复用 `CourseRow`，从而保证课程、考试和实验的颜色、地点及
+/// 教师/座位信息使用同一套展示规则。
 struct CourseListView: View {
     @EnvironmentObject private var store: WatchScheduleStore
     let onCrownInteraction: () -> Void
 
+    /// 每次 Store 快照替换后重新生成有序日期分组。
     private var groups: [CourseDayGroup] {
         let grouped = Dictionary(grouping: store.allCourses) {
             Calendar.current.startOfDay(for: $0.startAt)
@@ -48,11 +53,15 @@ struct CourseListView: View {
     }
 }
 
+/// 单日课程视图。
+///
+/// 日视图只负责日期切换和列表展示；按需求禁止从这里打开详情页。
 struct DayScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
     @State private var selectedDate = Calendar.current.startOfDay(for: Date())
     let onCrownInteraction: () -> Void
 
+    /// 当前选中日期内开始的全部日程。
     private var courses: [WatchCourse] {
         store.courses(on: selectedDate)
     }
@@ -107,6 +116,7 @@ struct DayScheduleView: View {
         }
     }
 
+    /// 以自然日为单位移动，避免手工增减时间戳造成夏令时边界错误。
     private func moveDay(_ amount: Int) {
         selectedDate = Calendar.current.date(
             byAdding: .day,
@@ -116,6 +126,10 @@ struct DayScheduleView: View {
     }
 }
 
+/// 一周七列、最多十节的紧凑课表。
+///
+/// 色块点击在网格容器中统一做坐标命中测试，空白点击才会唤回浮动按钮；
+/// 因而不会再次出现“点中色块却被识别为空白”的手势竞争。
 struct WeekScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
     @State private var anchorDate = Date()
@@ -125,10 +139,12 @@ struct WeekScheduleView: View {
     let onEmptyTap: () -> Void
     let onCrownInteraction: () -> Void
 
+    /// 当前周的周一零点。
     private var weekStart: Date {
         startOfWeek(containing: anchorDate)
     }
 
+    /// 只保留当前周 `[周一, 下周一)` 内的日程。
     private var courses: [WatchCourse] {
         let end = Calendar.current.date(
             byAdding: .day,
@@ -198,6 +214,7 @@ struct WeekScheduleView: View {
         }
     }
 
+    /// 优先采用手机同步的周次参考；旧缓存再回退到学期开始日期推算。
     private var weekTitle: String {
         if let reference = store.synchronizedWeekReference {
             let referenceWeek = startOfWeek(containing: reference.date)
@@ -221,6 +238,7 @@ struct WeekScheduleView: View {
         return "第\(max(1, elapsedDays / 7 + 1))周"
     }
 
+    /// 左右按钮按整周移动。
     private func moveWeek(_ amount: Int) {
         anchorDate = Calendar.current.date(
             byAdding: .day,
@@ -229,6 +247,7 @@ struct WeekScheduleView: View {
         ) ?? anchorDate
     }
 
+    /// 打开课程详情前取消表冠焦点并隐藏根页面悬浮按钮。
     private func selectCourse(_ course: WatchCourse) {
         crownFocused = false
         onCrownInteraction()
@@ -237,15 +256,18 @@ struct WeekScheduleView: View {
         }
     }
 
+    /// 详情页从底部弹入和弹回所使用的统一弹簧动画。
     private var detailAnimation: Animation {
         .spring(response: 0.38, dampingFraction: 0.84)
     }
 
+    /// 空白区域轻点只恢复控件，不改变课程选择。
     private func handleEmptyTap() {
         crownFocused = true
         onEmptyTap()
     }
 
+    /// 透明焦点节点只观察表冠旋转，不参与可见布局和点击命中。
     private var crownObserver: some View {
         Color.clear
             .frame(width: 1, height: 1)
@@ -259,6 +281,7 @@ struct WeekScheduleView: View {
     }
 }
 
+/// 课程列表中的一个自然日分组。
 private struct CourseDayGroup: Identifiable {
     let date: Date
     let courses: [WatchCourse]
@@ -266,6 +289,7 @@ private struct CourseDayGroup: Identifiable {
     var id: Date { date }
 }
 
+/// 日/周视图左上角共用的日期导航条。
 private struct DateNavigationHeader: View {
     let title: String
     let previous: () -> Void
@@ -295,6 +319,7 @@ private struct DateNavigationHeader: View {
     }
 }
 
+/// 周网格顶部的月份、星期和日期行。
 private struct WeekdayHeader: View {
     let weekStart: Date
     private let symbols = ["一", "二", "三", "四", "五", "六", "日"]
@@ -335,6 +360,7 @@ private struct WeekdayHeader: View {
     }
 }
 
+/// 周课表的节次网格、课程色块和点击命中区域。
 private struct WeekPeriodGrid: View {
     let courses: [WatchCourse]
     let select: (WatchCourse) -> Void
@@ -343,6 +369,7 @@ private struct WeekPeriodGrid: View {
     private let maximumPeriod = 10
     private let totalUnits: CGFloat = 56
 
+    /// 第 11 节及之后开始的课程不进入当前 1–10 节网格。
     private var visibleCourses: [WatchCourse] {
         courses.filter { $0.startPeriod <= maximumPeriod }
     }
@@ -423,6 +450,10 @@ private struct WeekPeriodGrid: View {
         }
     }
 
+    /// 在与绘制完全相同的几何参数下执行命中测试。
+    ///
+    /// `last` 与 ZStack 最后绘制者优先的规则一致；即使未来出现重叠课程，
+    /// 用户点到的也会是视觉上位于最上层的色块。
     private func course(
         at location: CGPoint,
         labelWidth: CGFloat,
@@ -443,6 +474,7 @@ private struct WeekPeriodGrid: View {
         }
     }
 
+    /// 绘制七列和十节课的辅助线。
     private func gridLines(
         size: CGSize,
         labelWidth: CGFloat,
@@ -467,6 +499,7 @@ private struct WeekPeriodGrid: View {
         .stroke(.secondary.opacity(0.18), lineWidth: 0.5)
     }
 
+    /// 把节次映射到纵向布局单位；第 4、8 节后各留出午休/晚休间隔。
     private func periodStartUnit(_ period: Int) -> CGFloat {
         let period = min(maximumPeriod, max(1, period))
         if period <= 4 {
@@ -478,16 +511,19 @@ private struct WeekPeriodGrid: View {
         return CGFloat(period - 1) * 5 + 6
     }
 
+    /// 每节课固定占五个纵向单位。
     private func periodEndUnit(_ period: Int) -> CGFloat {
         periodStartUnit(period) + 5
     }
 
+    /// 将 Foundation 的周日为 1 转换为周一为 0。
     private func weekdayIndex(for date: Date) -> Int {
         let weekday = Calendar.current.component(.weekday, from: date)
         return max(0, min(6, (weekday + 5) % 7))
     }
 }
 
+/// 返回给定日期所在周的周一零点。
 private func startOfWeek(containing date: Date) -> Date {
     let calendar = Calendar.current
     let day = calendar.startOfDay(for: date)
@@ -499,6 +535,7 @@ private func startOfWeek(containing date: Date) -> Date {
     ) ?? day
 }
 
+/// 能检测触摸/表冠导致的滚动，并通知根页面隐藏悬浮按钮。
 struct InteractionAwareScrollView<Content: View>: View {
     let onScroll: () -> Void
     @ViewBuilder let content: () -> Content
@@ -532,6 +569,7 @@ struct InteractionAwareScrollView<Content: View>: View {
     }
 }
 
+/// 在滚动内容与外层视图之间传递当前纵向偏移。
 private struct ScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
 

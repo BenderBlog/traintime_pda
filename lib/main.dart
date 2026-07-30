@@ -60,7 +60,8 @@ void main() async {
   // Load package info.
   preference.packageInfo = await PackageInfo.fromPlatform();
 
-  // The phone remains the source of truth for the paired Apple Watch.
+  // iPhone 始终作为 Apple Watch 课表的数据源；服务会监听课程、考试、
+  // 实验和周次变化，并在后台把完整学期快照同步给手表。
   WatchScheduleSyncService.instance.start();
 
   // Have user registered?

@@ -3,6 +3,10 @@
 
 import SwiftUI
 
+/// 课程列表、日视图和下一节课共用的卡片。
+///
+/// 通过参数控制日期、突出样式和同行元数据，避免三个页面各自维护一份容易
+/// 分叉的课程卡片代码。
 struct CourseRow: View {
     let course: WatchCourse
     var showsDate = false
@@ -65,13 +69,14 @@ struct CourseRow: View {
         )
     }
 
+    /// 生成“位置 · 教师”或“位置 · 座位”的单行摘要。
+    ///
+    /// `lineLimit(1)` 与尾部截断由调用处统一负责，窄表盘不会把卡片撑宽。
     private var locationSummary: (text: String, systemImage: String)? {
-        let classroom = course.classroom?.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
+        let classroom = normalizedText(course.classroom)
         var values = [String]()
 
-        if let classroom, !classroom.isEmpty {
+        if let classroom {
             values.append(classroom)
         }
 
@@ -79,16 +84,14 @@ struct CourseRow: View {
             let metadata = course.kind == "exam"
                 ? course.note
                 : course.teacher
-            if let metadata = metadata?.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            ), !metadata.isEmpty {
+            if let metadata = normalizedText(metadata) {
                 values.append(metadata)
             }
         }
 
         guard !values.isEmpty else { return nil }
         let systemImage: String
-        if let classroom, !classroom.isEmpty {
+        if classroom != nil {
             systemImage = "mappin.and.ellipse"
         } else if course.kind == "exam" {
             systemImage = "number.square"
@@ -99,6 +102,10 @@ struct CourseRow: View {
     }
 }
 
+/// 周视图课程色块对应的详情页。
+///
+/// 详情页拥有独立背景并从底部弹出；日视图和列表不创建该视图，因此不会
+/// 误触进入详情。关闭按钮仅在周视图模式启用。
 struct CourseDetailView: View {
     let course: WatchCourse
     var showsTopCloseButton = false
@@ -205,6 +212,7 @@ struct CourseDetailView: View {
         }
     }
 
+    /// watchOS 26 的关闭按钮使用液态玻璃，旧系统使用描边样式。
     @ViewBuilder
     private var topCloseButton: some View {
         if #available(watchOS 26.0, *) {
@@ -216,6 +224,7 @@ struct CourseDetailView: View {
         }
     }
 
+    /// 保持与刷新、模式切换按钮一致的 20×20 内容尺寸。
     private var closeButton: some View {
         Button(action: dismiss) {
             Image(systemName: "xmark")
@@ -229,6 +238,7 @@ struct CourseDetailView: View {
     }
 }
 
+/// 统一生成不受系统 12/24 小时偏好影响的 `HH:mm` 文本。
 private func twentyFourHourTime(_ date: Date) -> String {
     date.formatted(
         Date.VerbatimFormatStyle(
@@ -239,7 +249,17 @@ private func twentyFourHourTime(_ date: Date) -> String {
     )
 }
 
+/// 清理可选文本：去除首尾空白并把空字符串统一视为缺失值。
+private func normalizedText(_ value: String?) -> String? {
+    let normalized = value?.trimmingCharacters(
+        in: .whitespacesAndNewlines
+    )
+    guard let normalized, !normalized.isEmpty else { return nil }
+    return normalized
+}
+
 private extension View {
+    /// 详情页只关闭顶部滚动边缘虚化，避免课程名被系统效果遮住。
     @ViewBuilder
     func detailTopEdgeEffectHidden() -> some View {
         if #available(watchOS 26.0, *) {

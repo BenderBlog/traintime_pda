@@ -12,6 +12,7 @@
 
 import Foundation
 import SwiftUI
+import WidgetKit
 
 private let formatHourMinute = "HH:mm"
 private let myDateFormatter = DateFormatter()
@@ -86,4 +87,3 @@ struct EventItem_Previews: PreviewProvider {
     }
 }
 */
-
