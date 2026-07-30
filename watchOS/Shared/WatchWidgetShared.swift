@@ -227,10 +227,34 @@ enum WatchWidgetShared {
     }
 }
 
-/// 使用手机同步语言解析显式字符串。
+/// 使用手机同步语言从指定 `.lproj` 中读取显式字符串。
 ///
-/// SwiftUI 的 `Text("键")` 会读取环境 Locale；错误消息、格式化字符串等在
-/// View 外生成，必须显式传入同一 Locale 才能和页面保持一致。
-func watchLocalizedString(_ key: String.LocalizationValue) -> String {
-    String(localized: key, locale: WatchWidgetShared.preferredLocale)
+/// `String(localized:locale:)` 的 `locale` 主要参与插值格式化，Bundle 仍可能
+/// 按手表系统首选语言选择资源。因此手机设置为英语、而手表系统是中文时，
+/// 目录标题仍会返回中文。这里显式选择 `en.lproj` 或 `zh-Hant.lproj`；
+/// 简体中文是 String Catalog 的源语言，直接返回中文键即可。
+func watchLocalizedString(_ key: String) -> String {
+    let resourceName: String
+    switch WatchWidgetShared.preferredLanguageIdentifier {
+    case "en_US":
+        resourceName = "en"
+    case "zh_TW":
+        resourceName = "zh-Hant"
+    default:
+        return key
+    }
+
+    guard let path = Bundle.main.path(
+        forResource: resourceName,
+        ofType: "lproj"
+    ),
+        let localizationBundle = Bundle(path: path)
+    else {
+        return key
+    }
+    return localizationBundle.localizedString(
+        forKey: key,
+        value: key,
+        table: nil
+    )
 }

@@ -306,7 +306,7 @@ struct RootScheduleView: View {
     private var modePicker: some View {
         NavigationStack {
             List {
-                Section("切换视图") {
+                Section {
                     ForEach(WatchCalendarMode.allCases) { candidate in
                         Button {
                             mode = candidate
@@ -326,6 +326,8 @@ struct RootScheduleView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                } header: {
+                    Text(verbatim: watchLocalizedString("切换视图"))
                 }
             }
         }
