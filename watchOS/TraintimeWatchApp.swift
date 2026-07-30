@@ -16,6 +16,9 @@ struct TraintimeWatchApp: App {
         WindowGroup {
             RootScheduleView()
                 .environmentObject(store)
+                // 手机语言是产品内设置，不一定等于手表系统语言。将同步值注入
+                // 根环境后，所有 SwiftUI Text 与日期格式会在原地立即刷新。
+                .environment(\.locale, store.preferredLocale)
                 .task {
                     // 首次进入时恢复的本地缓存已经可以显示；随后激活手机通信，
                     // 新数据会按“当天、14 天、整学期”逐阶段替换。

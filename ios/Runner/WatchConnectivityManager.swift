@@ -45,15 +45,19 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         static let offset = "scheduleOffset"
         static let nextOffset = "scheduleNextOffset"
         static let hasMore = "scheduleHasMore"
+        static let preferredLanguage = "preferredLanguage"
     }
 
     private static let persistedScheduleKey =
         "TraintimeWatchSemesterSchedule"
+    private static let persistedLanguageKey =
+        "TraintimeWatchPreferredLanguage"
     private static let semesterChunkSize = 50
 
     /// WCSession 回调和 Flutter Pigeon 调用可能来自不同线程。
     private let stateLock = NSLock()
     private var latestScheduleJSON: String?
+    private var latestPreferredLanguage: String?
     private var latestRevision = 0
     private var pendingSchedule: PendingPhoneSchedule?
 
@@ -62,7 +66,11 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         let storedJSON = UserDefaults.standard.string(
             forKey: Self.persistedScheduleKey
         )
+        let storedLanguage = UserDefaults.standard.string(
+            forKey: Self.persistedLanguageKey
+        )
         latestScheduleJSON = storedJSON
+        latestPreferredLanguage = Self.normalizedLanguage(storedLanguage)
         super.init()
 
         if let storedJSON, !isValidScheduleJSON(storedJSON) {
@@ -112,6 +120,34 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     @discardableResult
     func clearSchedule() -> Bool {
         syncSchedule(json: "")
+    }
+
+    /// 保存手机当前实际生效的语言，并发布给配对 Apple Watch。
+    ///
+    /// Application Context 负责手表离线时的最终一致性；当手表 App 当前可达
+    /// 时，再额外发送一次实时消息，使切换语言后无需重新打开手表应用。
+    @discardableResult
+    func syncPreferredLanguage(_ localeIdentifier: String) -> Bool {
+        guard let language = Self.normalizedLanguage(localeIdentifier) else {
+            log("Rejected unsupported language: \(localeIdentifier)")
+            return false
+        }
+
+        withStateLock {
+            latestPreferredLanguage = language
+        }
+        UserDefaults.standard.set(
+            language,
+            forKey: Self.persistedLanguageKey
+        )
+
+        guard WCSession.isSupported() else { return false }
+        let session = WCSession.default
+        guard session.activationState == .activated else {
+            configureAndActivate(session)
+            return true
+        }
+        return publishPreferredLanguage(using: session)
     }
 
     /// 配置代理并激活 WCSession。
@@ -172,6 +208,11 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         withStateLock { latestScheduleJSON }
     }
 
+    /// 读取当前语言的线程安全副本。
+    private func currentPreferredLanguage() -> String? {
+        withStateLock { latestPreferredLanguage }
+    }
+
     /// 使用 NSLock 保护闭包内的共享状态访问。
     private func withStateLock<T>(_ body: () -> T) -> T {
         stateLock.lock()
@@ -212,10 +253,54 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     private func applicationContext(
         for response: PhoneScheduleResponse
     ) -> [String: Any] {
-        [
+        var context: [String: Any] = [
             Key.scheduleJSON: response.json,
             Key.scope: PhoneScheduleScope.fourteenDays.rawValue,
         ]
+        if let language = currentPreferredLanguage() {
+            context[Key.preferredLanguage] = language
+        }
+        return context
+    }
+
+    /// 在不覆盖已有课表上下文的前提下更新语言，并在可达时即时通知手表。
+    private func publishPreferredLanguage(using session: WCSession) -> Bool {
+        guard let language = currentPreferredLanguage() else {
+            return false
+        }
+
+        var context = session.applicationContext
+        if context[Key.scheduleJSON] == nil,
+           let json = currentLatestScheduleJSON()
+        {
+            let fallback = responsePayload(
+                sourceJSON: json,
+                scope: .fourteenDays,
+                offset: 0,
+                now: Date()
+            )
+            context = applicationContext(for: fallback)
+        }
+        context[Key.preferredLanguage] = language
+
+        do {
+            try session.updateApplicationContext(context)
+        } catch {
+            log("Failed to update language context: \(error)")
+            return false
+        }
+
+        if session.isReachable {
+            session.sendMessage(
+                [Key.preferredLanguage: language],
+                replyHandler: nil
+            ) { [weak self] error in
+                self?.log(
+                    "Failed to send immediate language update: \(error)"
+                )
+            }
+        }
+        return true
     }
 
     /// 按请求范围过滤或分页，并更新响应中的覆盖区间。
@@ -437,6 +522,29 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         Int64((date.timeIntervalSince1970 * 1_000).rounded())
     }
 
+    /// 把 Flutter、iOS 系统和历史版本可能产生的语言格式收敛为协议值。
+    private static func normalizedLanguage(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let normalized = value
+            .replacingOccurrences(of: "-", with: "_")
+            .lowercased()
+
+        if normalized.hasPrefix("zh_hant")
+            || normalized.hasPrefix("zh_tw")
+            || normalized.hasPrefix("zh_hk")
+            || normalized.hasPrefix("zh_mo")
+        {
+            return "zh_TW"
+        }
+        if normalized.hasPrefix("zh") {
+            return "zh_CN"
+        }
+        if normalized.hasPrefix("en") {
+            return "en_US"
+        }
+        return nil
+    }
+
     /// 从多个持久化来源选择当前完整学期 JSON。
     private func sourceScheduleJSON(
         session: WCSession
@@ -459,16 +567,16 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
             log("Activation failed: \(error)")
             return
         }
-        guard activationState == .activated,
-              let pending = currentPendingSchedule()
-        else {
-            return
+        guard activationState == .activated else { return }
+
+        if let pending = currentPendingSchedule() {
+            _ = updateApplicationContext(
+                json: pending.json,
+                revision: pending.revision,
+                session: session
+            )
         }
-        _ = updateApplicationContext(
-            json: pending.json,
-            revision: pending.revision,
-            session: session
-        )
+        _ = publishPreferredLanguage(using: session)
     }
 
     /// iOS 会话切换阶段无需额外处理。
@@ -526,12 +634,16 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         response: PhoneScheduleResponse,
         scope: PhoneScheduleScope
     ) -> [String: Any] {
-        [
+        var reply: [String: Any] = [
             Key.scheduleJSON: response.json,
             Key.scope: scope.rawValue,
             Key.nextOffset: response.nextOffset,
             Key.hasMore: response.hasMore,
         ]
+        if let language = currentPreferredLanguage() {
+            reply[Key.preferredLanguage] = language
+        }
+        return reply
     }
 
     /// 统一输出 WatchConnectivity 日志。
@@ -544,6 +656,18 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
 ///
 /// 这里只负责把异步完成回调桥接到管理器，业务逻辑全部留在可审计的管理器中。
 final class WatchSyncApiImplementation: WatchSyncSwiftApi {
+    /// 保存手机实际生效的语言并通知手表。
+    func syncPreferredLanguage(
+        localeIdentifier: String,
+        completion: @escaping (Result<Bool, Error>) -> Void
+    ) {
+        let accepted =
+            PhoneWatchConnectivityManager.shared.syncPreferredLanguage(
+                localeIdentifier
+            )
+        completion(.success(accepted))
+    }
+
     /// 保存并发布新课表。
     func syncSchedule(
         payload: WatchSchedulePayload,

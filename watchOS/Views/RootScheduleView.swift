@@ -16,13 +16,13 @@ private enum WatchCalendarMode: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .nextCourse:
-            String(localized: "下一节课")
+            watchLocalizedString("下一节课")
         case .courseList:
-            String(localized: "课程列表")
+            watchLocalizedString("课程列表")
         case .day:
-            String(localized: "日视图")
+            watchLocalizedString("日视图")
         case .week:
-            String(localized: "周视图")
+            watchLocalizedString("周视图")
         }
     }
 
@@ -219,8 +219,8 @@ struct RootScheduleView: View {
         } description: {
             Text(
                 store.syncError
-                    ?? String(
-                        localized: "请在配对的 iPhone 上打开应用并刷新课表"
+                    ?? watchLocalizedString(
+                        "请在配对的 iPhone 上打开应用并刷新课表"
                     )
             )
         }
@@ -262,8 +262,8 @@ struct RootScheduleView: View {
         .animation(.easeOut(duration: 0.2), value: controlsVisible)
         .accessibilityLabel(
             store.isRefreshing
-                ? String(localized: "正在刷新")
-                : String(localized: "从手机刷新")
+                ? watchLocalizedString("正在刷新")
+                : watchLocalizedString("从手机刷新")
         )
     }
 

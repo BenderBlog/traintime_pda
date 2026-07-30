@@ -11,6 +11,7 @@ import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -32,6 +33,7 @@ final class _WatchScheduleSourceState {
     required this.subjects,
     required this.experiments,
     required this.reminderMinutes,
+    required this.localeIdentifier,
   });
 
   final ClassTableData classTable;
@@ -41,6 +43,7 @@ final class _WatchScheduleSourceState {
   final List<Subject> subjects;
   final List<ExperimentData> experiments;
   final int reminderMinutes;
+  final String localeIdentifier;
 }
 
 /// 将手机端最新课表持续同步给配对 Apple Watch。
@@ -115,6 +118,9 @@ class WatchScheduleSyncService {
         ...OtherExperimentController.i.otherExperiments.value,
       ]),
       reminderMinutes: _normalizedReminderMinutes(configuredMinutes),
+      // 读取 Signal 会把语言变化纳入同一个响应式同步流程。
+      // 即使当前还没有学期课表，语言也会先独立发送给手表。
+      localeIdentifier: ThemeController.i.localeIdentifierSignal.value,
     );
   }
 
@@ -131,19 +137,49 @@ class WatchScheduleSyncService {
   /// 定时器到期后再次检查代次，避免已经过期的闭包继续工作。
   void _runScheduledUpdate(_WatchScheduleSourceState state, int generation) {
     if (!_isCurrentGeneration(generation)) return;
+    unawaited(_performScheduledUpdate(state, generation));
+  }
+
+  /// 每轮先同步轻量语言状态，再处理可能较大的课表数据。
+  ///
+  /// 语言发送与课表是否存在解耦，首次登录前或课表被清空后切换语言也能立即
+  /// 更新 Apple Watch；语言发送失败不会阻断原有课表同步。
+  Future<void> _performScheduledUpdate(
+    _WatchScheduleSourceState state,
+    int generation,
+  ) async {
+    await _syncPreferredLanguageIfCurrent(state.localeIdentifier, generation);
+    if (!_isCurrentGeneration(generation)) return;
 
     final termStart = state.effectiveTermStart;
     if (termStart == null) {
-      unawaited(_clearIfCurrent(generation));
+      await _clearIfCurrent(generation);
       return;
     }
-    unawaited(
-      _sync(
-        state: state,
-        effectiveTermStart: termStart,
-        generation: generation,
-      ),
+    await _sync(
+      state: state,
+      effectiveTermStart: termStart,
+      generation: generation,
     );
+  }
+
+  /// 把手机当前实际语言代码发送到原生 WatchConnectivity 层。
+  Future<void> _syncPreferredLanguageIfCurrent(
+    String localeIdentifier,
+    int generation,
+  ) async {
+    if (!_isCurrentGeneration(generation)) return;
+
+    try {
+      await _api.syncPreferredLanguage(localeIdentifier);
+    } catch (error, stackTrace) {
+      if (!_isCurrentGeneration(generation)) return;
+      log.handle(
+        error,
+        stackTrace,
+        '[WatchScheduleSyncService] Failed to sync preferred language',
+      );
+    }
   }
 
   /// 构建并发送完整学期快照。

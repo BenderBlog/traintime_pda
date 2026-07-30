@@ -378,6 +378,8 @@ class SaveToGroupIdSwiftApiSetup {
 }
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WatchSyncSwiftApi {
+  /// 将手机 App 当前实际使用的语言同步给 Apple Watch。
+  func syncPreferredLanguage(localeIdentifier: String, completion: @escaping (Result<Bool, Error>) -> Void)
   /// 保存最新学期快照，并通过 WatchConnectivity 发布给 Apple Watch。
   func syncSchedule(payload: WatchSchedulePayload, completion: @escaping (Result<Bool, Error>) -> Void)
   /// 清除手机端持久化课表并向手表发布空上下文。
@@ -390,6 +392,24 @@ class WatchSyncSwiftApiSetup {
   /// Sets up an instance of `WatchSyncSwiftApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: WatchSyncSwiftApi?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+    /// 将手机 App 当前实际使用的语言同步给 Apple Watch。
+    let syncPreferredLanguageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.syncPreferredLanguage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      syncPreferredLanguageChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let localeIdentifierArg = args[0] as! String
+        api.syncPreferredLanguage(localeIdentifier: localeIdentifierArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      syncPreferredLanguageChannel.setMessageHandler(nil)
+    }
     /// 保存最新学期快照，并通过 WatchConnectivity 发布给 Apple Watch。
     let syncScheduleChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.syncSchedule\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

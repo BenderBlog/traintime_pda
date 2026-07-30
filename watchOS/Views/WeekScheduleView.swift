@@ -105,7 +105,11 @@ struct DayScheduleView: View {
             ToolbarItem(placement: .topBarLeading) {
                 DateNavigationHeader(
                     title: selectedDate.formatted(
-                        .dateTime.month().day().weekday(.short)
+                        .dateTime
+                            .month()
+                            .day()
+                            .weekday(.short)
+                            .locale(WatchWidgetShared.preferredLocale)
                     ),
                     previous: { moveDay(-1) },
                     next: { moveDay(1) }
@@ -583,7 +587,7 @@ private struct WeekPeriodGrid: View {
 /// 按手机端相同的系统区域规则，生成“第 N 周”标题。
 private func localizedWeekNumber(_ number: Int) -> String {
     String.localizedStringWithFormat(
-        String(localized: "第%lld周"),
+        watchLocalizedString("第%lld周"),
         Int64(number)
     )
 }
@@ -593,7 +597,9 @@ private func localizedWeekNumber(_ number: Int) -> String {
 /// 简体/繁体中文分别得到“一…日”，英语得到“M…S”，既能适配窄表盘，
 /// 也避免手工维护三套星期缩写。
 private func mondayFirstWeekdaySymbols() -> [String] {
-    let symbols = Calendar.current.veryShortStandaloneWeekdaySymbols
+    var calendar = Calendar.current
+    calendar.locale = WatchWidgetShared.preferredLocale
+    let symbols = calendar.veryShortStandaloneWeekdaySymbols
     guard symbols.count == 7 else {
         return ["M", "T", "W", "T", "F", "S", "S"]
     }
@@ -603,7 +609,7 @@ private func mondayFirstWeekdaySymbols() -> [String] {
 /// 生成 VoiceOver 使用的本地化节次范围。
 private func localizedCoursePeriodRange(_ course: WatchCourse) -> String {
     String.localizedStringWithFormat(
-        String(localized: "%1$@，第%2$lld到第%3$lld节"),
+        watchLocalizedString("%1$@，第%2$lld到第%3$lld节"),
         course.name,
         Int64(course.startPeriod),
         Int64(course.endPeriod)

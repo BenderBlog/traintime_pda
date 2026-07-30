@@ -30,6 +30,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         static let offset = "scheduleOffset"
         static let nextOffset = "scheduleNextOffset"
         static let hasMore = "scheduleHasMore"
+        static let preferredLanguage = "preferredLanguage"
     }
 
     /// 当前实现允许手机响应的最长时间。
@@ -52,7 +53,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         self.store = store
         guard WCSession.isSupported() else {
             store.failRefresh(
-                String(localized: "此设备不支持与 iPhone 同步")
+                watchLocalizedString("此设备不支持与 iPhone 同步")
             )
             return
         }
@@ -112,7 +113,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                 self.store?.finishRefresh()
             } else {
                 self.store?.failRefresh(
-                    String(localized: "暂时无法连接 iPhone")
+                    watchLocalizedString("暂时无法连接 iPhone")
                 )
             }
         }
@@ -142,12 +143,22 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// 手机语言切换时会在 Application Context 之外补发实时消息。
+    func session(
+        _ session: WCSession,
+        didReceiveMessage message: [String: Any]
+    ) {
+        Task { @MainActor [weak self] in
+            self?.consumePreferredLanguage(from: message)
+        }
+    }
+
     /// 把激活错误切回主线程交给 Store 展示。
     private func reportActivationFailure(_ error: Error) {
         Task { @MainActor [weak self] in
             self?.store?.failRefresh(
                 String.localizedStringWithFormat(
-                    String(localized: "无法连接 iPhone：%@"),
+                    watchLocalizedString("无法连接 iPhone：%@"),
                     error.localizedDescription
                 )
             )
@@ -248,7 +259,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             store.finishRefresh()
         } else {
             store.failRefresh(
-                String(localized: "请在配对的 iPhone 上打开 Traintime PDA")
+                watchLocalizedString(
+                    "请在配对的 iPhone 上打开 Traintime PDA"
+                )
             )
         }
     }
@@ -267,7 +280,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         } else {
             store?.failRefresh(
                 String.localizedStringWithFormat(
-                    String(localized: "同步失败：%@"),
+                    watchLocalizedString("同步失败：%@"),
                     error.localizedDescription
                 )
             )
@@ -287,6 +300,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             return
         }
 
+        // 每个课表请求的回复都携带语言，手表错过实时消息时也能自动修正。
+        consumePreferredLanguage(from: reply)
+
         let payload = parseReply(
             reply,
             fallbackScope: expectedScope
@@ -305,7 +321,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             scope: payload.scope
         ) else {
             store.failRefresh(
-                String(localized: "手机端暂无课表，请先刷新手机课表")
+                watchLocalizedString("手机端暂无课表，请先刷新手机课表")
             )
             return
         }
@@ -398,6 +414,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     private func consumeApplicationContext(
         _ context: [String: Any]
     ) -> Bool {
+        // 语言上下文可以独立存在，因此必须在检查课表字段之前安装。
+        consumePreferredLanguage(from: context)
+
         guard let json = context[Key.scheduleJSON] as? String,
               !json.isEmpty
         else {
@@ -408,6 +427,15 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             rawValue: context[Key.scope] as? String ?? ""
         ) ?? .fourteenDays
         return store?.replaceSchedule(json: json, scope: scope) ?? false
+    }
+
+    /// 从任意 WatchConnectivity 载荷中安装手机指定语言。
+    @MainActor
+    private func consumePreferredLanguage(from payload: [String: Any]) {
+        guard let language = payload[Key.preferredLanguage] as? String else {
+            return
+        }
+        _ = store?.setPreferredLanguage(language)
     }
 
     /// 判断异步回调是否仍属于最新一轮刷新。

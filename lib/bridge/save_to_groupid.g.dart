@@ -13,9 +13,9 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart' show immutable, protected, visibleForTesting;
 
 Object? _extractReplyValueOrThrow(
-    List<Object?>? replyList,
-    String channelName, {
-    required bool isNullValid,
+  List<Object?>? replyList,
+  String channelName, {
+  required bool isNullValid,
 }) {
   if (replyList == null) {
     throw PlatformException(
@@ -49,8 +49,9 @@ bool _deepEquals(Object? a, Object? b) {
   }
   if (a is List && b is List) {
     return a.length == b.length &&
-        a.indexed
-            .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
+        a.indexed.every(
+          ((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]),
+        );
   }
   if (a is Map && b is Map) {
     if (a.length != b.length) {
@@ -99,7 +100,6 @@ int _deepHash(Object? value) {
   return value.hashCode;
 }
 
-
 class FileToGroupID {
   FileToGroupID({
     required this.appid,
@@ -114,15 +114,12 @@ class FileToGroupID {
   String data;
 
   List<Object?> _toList() {
-    return <Object?>[
-      appid,
-      fileName,
-      data,
-    ];
+    return <Object?>[appid, fileName, data];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static FileToGroupID decode(Object result) {
     result as List<Object?>;
@@ -142,7 +139,9 @@ class FileToGroupID {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(appid, other.appid) && _deepEquals(fileName, other.fileName) && _deepEquals(data, other.data);
+    return _deepEquals(appid, other.appid) &&
+        _deepEquals(fileName, other.fileName) &&
+        _deepEquals(data, other.data);
   }
 
   @override
@@ -160,26 +159,21 @@ class FileToGroupID {
 /// 使用单一载荷对象而不是散落参数，后续协议增加压缩或校验字段时可以保持
 /// Host API 方法签名稳定。
 class WatchSchedulePayload {
-  WatchSchedulePayload({
-    required this.json,
-  });
+  WatchSchedulePayload({required this.json});
 
   String json;
 
   List<Object?> _toList() {
-    return <Object?>[
-      json,
-    ];
+    return <Object?>[json];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static WatchSchedulePayload decode(Object result) {
     result as List<Object?>;
-    return WatchSchedulePayload(
-      json: result[0]! as String,
-    );
+    return WatchSchedulePayload(json: result[0]! as String);
   }
 
   @override
@@ -204,7 +198,6 @@ class WatchSchedulePayload {
   }
 }
 
-
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -212,10 +205,10 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is FileToGroupID) {
+    } else if (value is FileToGroupID) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    }    else if (value is WatchSchedulePayload) {
+    } else if (value is WatchSchedulePayload) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
     } else {
@@ -240,9 +233,13 @@ class SaveToGroupIdSwiftApi {
   /// Constructor for [SaveToGroupIdSwiftApi]. The [binaryMessenger] named argument is
   /// available for dependency injection. If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  SaveToGroupIdSwiftApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  SaveToGroupIdSwiftApi({
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
+           ? '.$messageChannelSuffix'
+           : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -250,7 +247,8 @@ class SaveToGroupIdSwiftApi {
   final String pigeonVar_messageChannelSuffix;
 
   Future<String> getHostLanguage() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.getHostLanguage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.getHostLanguage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -260,49 +258,52 @@ class SaveToGroupIdSwiftApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as String;
   }
 
   Future<bool> saveToGroupId(FileToGroupID data) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.saveToGroupId$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.saveToGroupId$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[data]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[data],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   Future<bool> deleteFromGroupId(FileToGroupID data) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.deleteFromGroupId$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.deleteFromGroupId$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[data]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[data],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 }
@@ -311,38 +312,67 @@ class WatchSyncSwiftApi {
   /// Constructor for [WatchSyncSwiftApi]. The [binaryMessenger] named argument is
   /// available for dependency injection. If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  WatchSyncSwiftApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  WatchSyncSwiftApi({
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
+           ? '.$messageChannelSuffix'
+           : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
   final String pigeonVar_messageChannelSuffix;
 
-  /// 保存最新学期快照，并通过 WatchConnectivity 发布给 Apple Watch。
-  Future<bool> syncSchedule(WatchSchedulePayload payload) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.syncSchedule$pigeonVar_messageChannelSuffix';
+  /// 将手机 App 当前实际使用的语言同步给 Apple Watch。
+  Future<bool> syncPreferredLanguage(String localeIdentifier) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.syncPreferredLanguage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[payload]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[localeIdentifier],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as bool;
+  }
+
+  /// 保存最新学期快照，并通过 WatchConnectivity 发布给 Apple Watch。
+  Future<bool> syncSchedule(WatchSchedulePayload payload) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.syncSchedule$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[payload],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   /// 清除手机端持久化课表并向手表发布空上下文。
   Future<bool> clearSchedule() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.clearSchedule$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.WatchSyncSwiftApi.clearSchedule$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -352,11 +382,10 @@ class WatchSyncSwiftApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 }

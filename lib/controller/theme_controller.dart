@@ -21,6 +21,13 @@ class ThemeController {
 
   final colorStateSignal = signal(ThemeMode.system);
   final localeSignal = signal(const Locale("zh", "CN"));
+
+  /// 手机当前实际使用的语言代码。
+  ///
+  /// 与设置项的 `zh_CN / zh_TW / en_US` 格式保持一致。选择“跟随系统”时，
+  /// `updateTheme` 会先解析系统语言再写入该 Signal，因此 Apple Watch 收到
+  /// 的始终是明确语言，而不是无法解释的空字符串。
+  final localeIdentifierSignal = signal("zh_CN");
   final colorSignal = signal<List<FlexSchemeColor>>([pdaColorScheme.first]);
 
   late final i18nDelegateSignal = computed<FlutterI18nDelegate>(() {
@@ -74,6 +81,7 @@ class ThemeController {
       }
     }
     log.info("[ThemeController] Locale to set $localization");
+    localeIdentifierSignal.value = localization;
     localeSignal.value = Locale.fromSubtags(languageCode: localization);
   }
 }

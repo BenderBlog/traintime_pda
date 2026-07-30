@@ -16,11 +16,11 @@ enum WatchScheduleScope: String, CaseIterable {
     var progressTitle: String {
         switch self {
         case .today:
-            String(localized: "正在获取今天")
+            watchLocalizedString("正在获取今天")
         case .fourteenDays:
-            String(localized: "正在获取近 14 天")
+            watchLocalizedString("正在获取近 14 天")
         case .semester:
-            String(localized: "正在获取整个学期")
+            watchLocalizedString("正在获取整个学期")
         }
     }
 
@@ -107,11 +107,11 @@ struct WatchCourse: Codable, Hashable, Identifiable {
     var kindTitle: String? {
         switch kind {
         case "exam":
-            String(localized: "考试")
+            watchLocalizedString("考试")
         case "physicsExperiment":
-            String(localized: "物理实验")
+            watchLocalizedString("物理实验")
         case "otherExperiment":
-            String(localized: "实验")
+            watchLocalizedString("实验")
         default:
             nil
         }

@@ -51,6 +51,10 @@ abstract class SaveToGroupIdFlutterApi {
 
 @HostApi()
 abstract class WatchSyncSwiftApi {
+  /// 将手机 App 当前实际使用的语言同步给 Apple Watch。
+  @async
+  bool syncPreferredLanguage(String localeIdentifier);
+
   /// 保存最新学期快照，并通过 WatchConnectivity 发布给 Apple Watch。
   @async
   bool syncSchedule(WatchSchedulePayload payload);

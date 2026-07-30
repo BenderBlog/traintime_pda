@@ -23,6 +23,9 @@ enum WatchWidgetShared {
     /// 小组件交互按钮使用的轻量状态键。
     static let selectedCurrentCourseKey = "watchWidget.selectedCurrentCourse"
 
+    /// 手机同步过来的实际语言。App 与 Widget 共用，避免两个界面语言不一致。
+    static let preferredLanguageKey = "watchPreferredLanguage"
+
     /// 当前代码可以读取的数据结构版本。
     private static let supportedSchemaVersions = 1...4
 
@@ -40,6 +43,76 @@ enum WatchWidgetShared {
     /// 返回可选值是因为签名或 entitlement 配置错误时系统可能无法创建 suite。
     static var defaults: UserDefaults? {
         UserDefaults(suiteName: appGroupIdentifier)
+    }
+
+    /// 当前手机指定的语言；首次同步前回退到手表系统语言。
+    static var preferredLanguageIdentifier: String {
+        if let stored = defaults?.string(forKey: preferredLanguageKey),
+           let normalized = normalizedPreferredLanguage(stored)
+        {
+            return normalized
+        }
+
+        let systemLanguage =
+            Locale.preferredLanguages.first ?? Locale.current.identifier
+        return normalizedPreferredLanguage(systemLanguage) ?? "zh_CN"
+    }
+
+    /// SwiftUI 和 String Catalog 使用的标准 Locale。
+    static var preferredLocale: Locale {
+        locale(for: preferredLanguageIdentifier)
+    }
+
+    /// 将不同平台的语言代码收敛为与手机设置一致的三个协议值。
+    static func normalizedPreferredLanguage(_ value: String) -> String? {
+        let normalized = value
+            .replacingOccurrences(of: "-", with: "_")
+            .lowercased()
+
+        if normalized.hasPrefix("zh_hant")
+            || normalized.hasPrefix("zh_tw")
+            || normalized.hasPrefix("zh_hk")
+            || normalized.hasPrefix("zh_mo")
+        {
+            return "zh_TW"
+        }
+        if normalized.hasPrefix("zh") {
+            return "zh_CN"
+        }
+        if normalized.hasPrefix("en") {
+            return "en_US"
+        }
+        return nil
+    }
+
+    /// 将协议语言值映射为 String Catalog 能正确匹配的 Locale。
+    static func locale(for languageIdentifier: String) -> Locale {
+        switch normalizedPreferredLanguage(languageIdentifier) {
+        case "zh_TW":
+            Locale(identifier: "zh-Hant")
+        case "en_US":
+            Locale(identifier: "en")
+        default:
+            Locale(identifier: "zh-Hans")
+        }
+    }
+
+    /// 保存新语言并刷新 Widget；返回值表示语言是否实际发生变化。
+    @discardableResult
+    static func updatePreferredLanguage(_ value: String) -> Bool {
+        guard let normalized = normalizedPreferredLanguage(value),
+              let defaults
+        else {
+            return false
+        }
+
+        let changed =
+            defaults.string(forKey: preferredLanguageKey) != normalized
+        defaults.set(normalized, forKey: preferredLanguageKey)
+        if changed {
+            reloadWidgetTimelines()
+        }
+        return changed
     }
 
     /// 将同步范围映射为稳定的缓存键。
@@ -152,4 +225,12 @@ enum WatchWidgetShared {
     private static func reloadWidgetTimelines() {
         WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
     }
+}
+
+/// 使用手机同步语言解析显式字符串。
+///
+/// SwiftUI 的 `Text("键")` 会读取环境 Locale；错误消息、格式化字符串等在
+/// View 外生成，必须显式传入同一 Locale 才能和页面保持一致。
+func watchLocalizedString(_ key: String.LocalizationValue) -> String {
+    String(localized: key, locale: WatchWidgetShared.preferredLocale)
 }

@@ -11,6 +11,7 @@ import Foundation
 @MainActor
 final class WatchScheduleStore: ObservableObject {
     @Published private(set) var snapshot: WatchScheduleSnapshot?
+    @Published private(set) var preferredLanguageIdentifier: String
     @Published private(set) var syncError: String?
     @Published private(set) var loadingScope: WatchScheduleScope?
     @Published private(set) var loadedScope: WatchScheduleScope?
@@ -43,7 +44,34 @@ final class WatchScheduleStore: ObservableObject {
     /// 初始化时立即恢复缓存，让界面在连接手机之前就可以显示。
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        preferredLanguageIdentifier =
+            WatchWidgetShared.preferredLanguageIdentifier
         loadCachedSchedule()
+    }
+
+    /// SwiftUI 根视图使用的语言环境；修改后整棵视图树会立即重新本地化。
+    var preferredLocale: Locale {
+        WatchWidgetShared.locale(for: preferredLanguageIdentifier)
+    }
+
+    /// 安装手机同步过来的语言，并写入 App Group 供 Widget 使用。
+    @discardableResult
+    func setPreferredLanguage(_ value: String) -> Bool {
+        guard let normalized =
+            WatchWidgetShared.normalizedPreferredLanguage(value)
+        else {
+            return false
+        }
+
+        let changed = preferredLanguageIdentifier != normalized
+        _ = WatchWidgetShared.updatePreferredLanguage(normalized)
+        preferredLanguageIdentifier = normalized
+        if changed {
+            // 错误文本是在产生时本地化的；语言切换后清除旧文本，空状态会用
+            // 新 Locale 重新生成默认提示，避免页面同时出现两种语言。
+            syncError = nil
+        }
+        return changed
     }
 
     /// 当前展示快照是否超过手机给出的有效期。
@@ -170,7 +198,7 @@ final class WatchScheduleStore: ObservableObject {
             )
             return true
         } catch {
-            syncError = String(localized: "课表数据无法读取")
+            syncError = watchLocalizedString("课表数据无法读取")
             logDecodeFailure(error)
             return false
         }
@@ -189,7 +217,7 @@ final class WatchScheduleStore: ObservableObject {
     @discardableResult
     func appendSemesterChunk(json: String, isFinal: Bool) -> Bool {
         guard hasPayload(json) else {
-            failRefresh(String(localized: "手机端没有可用的学期课表"))
+            failRefresh(watchLocalizedString("手机端没有可用的学期课表"))
             return false
         }
 
@@ -202,7 +230,7 @@ final class WatchScheduleStore: ObservableObject {
             return true
         } catch {
             clearSemesterBuffer(keepingCapacity: false)
-            failRefresh(String(localized: "全学期课表无法合并"))
+            failRefresh(watchLocalizedString("全学期课表无法合并"))
             logSemesterMergeFailure(error)
             return false
         }
@@ -227,8 +255,8 @@ final class WatchScheduleStore: ObservableObject {
     /// 只有当前完全没有页面内容时才显示“手机暂无课表”。
     private func setMissingScheduleErrorIfNeeded() {
         guard snapshot == nil else { return }
-        syncError = String(
-            localized: "手机端暂无课表，请先在 iPhone 打开并刷新课表"
+        syncError = watchLocalizedString(
+            "手机端暂无课表，请先在 iPhone 打开并刷新课表"
         )
     }
 
