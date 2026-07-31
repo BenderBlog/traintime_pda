@@ -131,6 +131,22 @@
         }
       }
     },
+    "关闭缓存提示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss cached schedule notice"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉快取課表提示"
+          }
+        }
+      }
+    },
     "切换当前与下一节课" : {
       "localizations" : {
         "en" : {
@@ -292,6 +308,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "實驗"
+          }
+        }
+      }
+    },
+    "已加载缓存课表" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cached schedule loaded"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已載入快取課表"
           }
         }
       }
@@ -511,6 +543,22 @@
         }
       }
     },
+    "更新请打开手机 XDYou 以同步" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open XDYou on iPhone to update"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如需更新，請在手機開啟 XDYou 同步"
+          }
+        }
+      }
+    },
     "本周课程点阵" : {
       "localizations" : {
         "en" : {
@@ -572,6 +620,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在上課"
+          }
+        }
+      }
+    },
+    "正在从手机同步课表" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Syncing schedule from iPhone"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在從手機同步課表"
           }
         }
       }
@@ -759,6 +824,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "請在配對的 iPhone 上開啟 App 並重新整理課表"
+          }
+        }
+      }
+    },
+    "请打开手机 XDYou 以同步课表" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open XDYou on iPhone to sync your schedule"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請在手機開啟 XDYou 以同步課表"
           }
         }
       }

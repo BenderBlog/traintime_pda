@@ -15,6 +15,15 @@ struct WatchCourseDayGroup: Identifiable {
     var id: Date { date }
 }
 
+/// 一份已解码缓存及其同步范围。
+///
+/// 使用命名类型代替散落的元组后，缓存恢复策略可以拆成多个职责单一的筛选
+/// 函数，同时避免调用处混淆 `scope` 和 `snapshot` 的位置。
+private struct CachedScheduleSelection {
+    let scope: WatchScheduleScope
+    let snapshot: WatchScheduleSnapshot
+}
+
 /// 手表界面的课表状态中心。
 ///
 /// 该对象只在主线程修改可观察状态；同步过程收到的数据必须先完整解码，
@@ -28,6 +37,8 @@ final class WatchScheduleStore: ObservableObject {
     @Published private(set) var loadedScope: WatchScheduleScope?
     @Published private(set) var isRefreshing = false
     @Published private(set) var completedRefreshCount = 0
+    @Published private(set) var isAwaitingLaunchSyncReply = false
+    @Published private(set) var launchSyncTimedOut = false
     @Published private(set) var courseListGroups: [WatchCourseDayGroup] = []
     @Published private(set) var courseListInitialDate: Date?
     private(set) var installedScheduleVersion: String?
@@ -46,6 +57,12 @@ final class WatchScheduleStore: ObservableObject {
         (.today, WatchWidgetShared.todayCacheKey),
     ]
 
+    /// 整学期缓存不存在时，短范围缓存的恢复优先级。
+    private static let partialCacheScopes: [WatchScheduleScope] = [
+        .fourteenDays,
+        .today,
+    ]
+
     /// 手表 App 自身的标准缓存，用于不依赖 Widget 的离线恢复。
     private let defaults: UserDefaults
 
@@ -59,6 +76,12 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 当前页面使用的稳定排序结果，随快照安装同步更新。
     private var sortedVisibleCourses: [WatchCourse] = []
+
+    /// 日视图三页预加载使用的自然日索引。
+    ///
+    /// 连续翻页期间会同时读取前一天、当天和后一天。提前建立索引后无需在
+    /// 每一帧对整学期课表执行三次过滤，真机上的页面换底会更稳定。
+    private var coursesByDay: [Date: [WatchCourse]] = [:]
 
     /// 初始化时立即恢复缓存，让界面在连接手机之前就可以显示。
     init(defaults: UserDefaults = .standard) {
@@ -106,6 +129,27 @@ final class WatchScheduleStore: ObservableObject {
     /// 所有日程按开始时间稳定排序。
     var allCourses: [WatchCourse] {
         sortedVisibleCourses
+    }
+
+    /// 本地持久化缓存中是否至少包含一条本学期日程。
+    ///
+    /// “已成功解码一个快照”不等于“已有课表”：手机可能同步过覆盖范围与
+    /// 周次等元数据、但 `courses` 为空的快照。启动超时提示必须检查实际
+    /// 课程、考试或实验记录，避免空快照被误报为“已加载缓存课表”。历史
+    /// 日程仍属于本学期课表，因此不按结束时间或有效期排除。整学期缓存一旦
+    /// 存在便是权威结果：若它为空，不得再被旧的当天/14 天缓存误判为有课。
+    var hasCachedScheduleContent: Bool {
+        if let semester = cachedSnapshots[.semester] {
+            return containsScheduleContent(semester)
+        }
+        return cachedSnapshots.values.contains(where: containsScheduleContent)
+    }
+
+    /// 空快照仍可携带周次与范围元数据，但不能代表存在可展示课表。
+    private func containsScheduleContent(
+        _ snapshot: WatchScheduleSnapshot
+    ) -> Bool {
+        !snapshot.courses.isEmpty
     }
 
     /// 计算周次时使用的学期起点。
@@ -174,8 +218,24 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 返回指定自然日内开始的全部日程。
     func courses(on date: Date) -> [WatchCourse] {
-        allCourses.filter {
-            Calendar.current.isDate($0.startAt, inSameDayAs: date)
+        coursesByDay[Calendar.current.startOfDay(for: date)] ?? []
+    }
+
+    /// 返回从指定日期开始若干自然日内的课程，供周视图预加载相邻页面。
+    ///
+    /// 只访问至多 `dayCount` 个字典槽位，不随整学期课程数量增长；表冠每次
+    /// 改变横向偏移时，前、中、后三个周页面都可以稳定地复用这份索引。
+    func courses(startingAt date: Date, dayCount: Int) -> [WatchCourse] {
+        guard dayCount > 0 else { return [] }
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: date)
+        return (0..<dayCount).flatMap { dayOffset in
+            let day = calendar.date(
+                byAdding: .day,
+                value: dayOffset,
+                to: start
+            ) ?? start
+            return coursesByDay[day] ?? []
         }
     }
 
@@ -188,6 +248,33 @@ final class WatchScheduleStore: ObservableObject {
             loadingScope: .today,
             error: nil
         )
+    }
+
+    /// 每次 App 打开或重新回到前台时开始等待手机的实时回复。
+    ///
+    /// 该状态与普通课表刷新分离：同步失败或超时都不能清空现有快照。这样
+    /// 有缓存时页面会继续可用，只显示一条紧凑提醒；完全没有缓存时才由
+    /// 根视图切换到“打开手机”的整页引导。
+    func beginLaunchSyncAttempt() {
+        isAwaitingLaunchSyncReply = true
+        launchSyncTimedOut = false
+    }
+
+    /// 收到本轮手机实时通信后清除离线提示。
+    ///
+    /// 这里只表示手机已经响应；当天、14 天、学期三个阶段仍由各自的
+    /// 安装流程决定何时替换页面以及何时结束刷新动画。
+    func receiveLaunchSyncReply() {
+        isAwaitingLaunchSyncReply = false
+        launchSyncTimedOut = false
+    }
+
+    /// 启动请求在限定时间内没有收到手机实时回复。
+    ///
+    /// 不调用 `failRefresh`，也不修改 `snapshot`，以保证已有缓存原样保留。
+    func markLaunchSyncTimedOut() {
+        isAwaitingLaunchSyncReply = false
+        launchSyncTimedOut = true
     }
 
     /// 进入指定同步阶段。
@@ -559,8 +646,7 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 从标准缓存和 App Group 中恢复每个阶段。
     ///
-    /// 两个来源会分别尝试解码：标准缓存损坏时仍会继续读取共享缓存，
-    /// 不再因为 `nil` 合并顺序而错误丢弃一份有效数据。
+    /// 两个来源会分别尝试解码；任一来源损坏时仍会继续检查另一份缓存。
     private func loadCachedSchedule() {
         for descriptor in Self.cacheDescriptors {
             guard let cached = loadFirstValidCache(
@@ -633,29 +719,62 @@ final class WatchScheduleStore: ObservableObject {
         rebuildVisibleScheduleIndex()
     }
 
-    /// 优先选择尚未过期且覆盖范围最大的缓存。
+    /// 优先恢复权威的整学期缓存，历史课程也必须保持可浏览。
     ///
-    /// 全部过期时选择生成时间最新的一份，确保离线情况下仍有内容可看。
-    private func preferredCachedSnapshot()
-        -> (
-            scope: WatchScheduleScope,
-            snapshot: WatchScheduleSnapshot
-        )?
-    {
-        let now = Date()
-        for descriptor in Self.cacheDescriptors {
-            if let cached = cachedSnapshots[descriptor.scope],
-               !isExpired(cached, comparedWith: now)
-            {
-                return (descriptor.scope, cached)
-            }
+    /// 只有尚未完成过整学期同步时，才在当天/14 天缓存中选择。此时优先
+    /// 非空快照，防止一个较新的空当天快照把实际有内容的缓存遮住。
+    private func preferredCachedSnapshot() -> CachedScheduleSelection? {
+        if let semester = cachedSelection(for: .semester) {
+            return semester
         }
 
-        return cachedSnapshots.max {
-            $0.value.generatedAt < $1.value.generatedAt
-        }.map {
-            (scope: $0.key, snapshot: $0.value)
+        let now = Date()
+        if let fresh = firstFreshPartialCache(comparedWith: now) {
+            return fresh
         }
+        if let nonempty = newestPartialCache(requiringContent: true) {
+            return nonempty
+        }
+        return newestPartialCache(requiringContent: false)
+    }
+
+    /// 返回指定阶段的命名缓存对象。
+    private func cachedSelection(
+        for scope: WatchScheduleScope
+    ) -> CachedScheduleSelection? {
+        cachedSnapshots[scope].map {
+            CachedScheduleSelection(scope: scope, snapshot: $0)
+        }
+    }
+
+    /// 按 14 天、当天的既定优先级寻找仍有效且包含日程的缓存。
+    private func firstFreshPartialCache(
+        comparedWith date: Date
+    ) -> CachedScheduleSelection? {
+        for scope in Self.partialCacheScopes {
+            guard let selection = cachedSelection(for: scope),
+                  containsScheduleContent(selection.snapshot),
+                  !isExpired(selection.snapshot, comparedWith: date)
+            else {
+                continue
+            }
+            return selection
+        }
+        return nil
+    }
+
+    /// 从短范围缓存中选择生成时间最新的一份。
+    private func newestPartialCache(
+        requiringContent: Bool
+    ) -> CachedScheduleSelection? {
+        Self.partialCacheScopes
+            .compactMap { cachedSelection(for: $0) }
+            .filter {
+                !requiringContent || containsScheduleContent($0.snapshot)
+            }
+            .max {
+                $0.snapshot.generatedAt < $1.snapshot.generatedAt
+            }
     }
 
     /// 判断快照是否已经过期。
@@ -690,6 +809,7 @@ final class WatchScheduleStore: ObservableObject {
         let grouped = Dictionary(grouping: sorted) {
             calendar.startOfDay(for: $0.startAt)
         }
+        coursesByDay = grouped
         let groups = grouped.keys.sorted().map { date in
             WatchCourseDayGroup(
                 date: date,

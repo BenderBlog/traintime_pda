@@ -104,6 +104,25 @@ struct WatchCrownTurnSession {
         accumulator.formTruncatingRemainder(dividingBy: threshold)
         return true
     }
+
+    /// 当前累计量相对一个逻辑刻度的进度，供页面逐帧插值视觉位置。
+    ///
+    /// `consume` 仍负责真正提交翻页/换卡；该值只让未达到阈值的每个表冠
+    /// 事件也能产生小幅位移，避免通过提高阈值降速后看起来像低刷新率。
+    func progress(toward threshold: Double) -> Double {
+        guard threshold > 0 else { return 0 }
+        return min(1, max(0, accumulator / threshold))
+    }
+
+    /// 主动结束当前表冠会话。
+    ///
+    /// 横向分页吸附完成后必须清空旧方向和残余刻度，否则下一页第一次转动
+    /// 会继承上一页的速度/方向，表现为轻碰表冠就再次翻页。
+    mutating func reset() {
+        accumulator = 0
+        lastEventTime = 0
+        direction = 0
+    }
 }
 
 /// 手表课表支持的四种顶层展示方式。
@@ -151,6 +170,10 @@ private enum WatchCalendarMode: String, CaseIterable, Identifiable {
 private enum RootScheduleLayout {
     static let controlContentSize: CGFloat = 20
     static let completionBottomInset: CGFloat = 31
+    static let cachedScheduleNoticeBottomInset: CGFloat = 42
+
+    /// 顶部安全距离由各滚动内容内部负责；根容器保持全屏。
+    static let contentTopInset: CGFloat = 0
 
     static func edgeInset(for size: CGSize) -> CGFloat {
         max(2, min(size.width, size.height) * 0.02)
@@ -164,15 +187,6 @@ private enum RootScheduleLayout {
         max(10, height * 0.08)
     }
 
-    static func contentTopInset(
-        for mode: WatchCalendarMode,
-        height: CGFloat
-    ) -> CGFloat {
-        // 顶部安全距离必须属于 ScrollView 的内容，用户继续向上滚动时它才会
-        // 随内容离开屏幕并允许内容进入系统时钟下方的虚化区域。根视图不再
-        // 施加固定顶部边距，否则无论怎样滚动都会永久浪费这块空间。
-        0
-    }
 }
 
 /// Apple Watch 课表的根容器。
@@ -184,15 +198,19 @@ struct RootScheduleView: View {
     @State private var mode = WatchCalendarMode.nextCourse
     @State private var showsModePicker = false
     @State private var showsSyncCompletion = false
+    @State private var showsCachedScheduleNotice = false
     @State private var refreshRotation = 0.0
     @State private var controlsVisible = true
     @State private var hideControlsTask: Task<Void, Never>?
+    @State private var cachedScheduleNoticeTask: Task<Void, Never>?
     @State private var selectedCourse: WatchCourse?
     private let connectivity = WatchConnectivityManager.shared
 
     /// 手机同步期间两个入口必须保持可见，不受滚动和自动隐藏计时影响。
     private var controlsShouldBeVisible: Bool {
-        controlsVisible || store.isRefreshing
+        controlsVisible
+            || store.isRefreshing
+            || store.isAwaitingLaunchSyncReply
     }
 
     var body: some View {
@@ -201,10 +219,7 @@ struct RootScheduleView: View {
                 let edgeInset = RootScheduleLayout.edgeInset(
                     for: proxy.size
                 )
-                let topInset = RootScheduleLayout.contentTopInset(
-                    for: mode,
-                    height: proxy.size.height
-                )
+                let topInset = RootScheduleLayout.contentTopInset
 
                 ZStack {
                     // 课表主体铺满表盘；非周视图轻点内容可唤回按钮。
@@ -273,8 +288,35 @@ struct RootScheduleView: View {
                             )
                     }
 
+                    // 启动请求超时但本机仍有缓存时，只显示紧凑、非阻塞提示。
+                    // 提示不会替换课表，也不会抢占日/周视图的任何手势。
+                    if showsCachedScheduleNotice,
+                       store.hasCachedScheduleContent
+                    {
+                        cachedScheduleNotice
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: .infinity,
+                                alignment: .bottom
+                            )
+                            .padding(.horizontal, edgeInset + 6)
+                            .padding(
+                                .bottom,
+                                RootScheduleLayout
+                                    .cachedScheduleNoticeBottomInset
+                            )
+                            .transition(
+                                .opacity.combined(with: .scale(scale: 0.92))
+                            )
+                            .zIndex(90)
+                    }
+
                     courseDetailOverlay
                 }
+                .animation(
+                    .easeInOut(duration: 0.22),
+                    value: store.launchSyncTimedOut
+                )
             }
             .ignoresSafeArea()
             .navigationTitle("")
@@ -283,35 +325,67 @@ struct RootScheduleView: View {
         .sheet(isPresented: $showsModePicker) {
             modePicker
         }
-        .onAppear {
-            updateRefreshAnimation(isRefreshing: store.isRefreshing)
-            revealControls()
-        }
-        .onDisappear {
-            hideControlsTask?.cancel()
-        }
+        .onAppear(perform: handleAppear)
+        .onDisappear(perform: handleDisappear)
         .onChange(of: store.isRefreshing) { _, isRefreshing in
-            updateRefreshAnimation(isRefreshing: isRefreshing)
-            if isRefreshing {
-                keepControlsVisibleDuringRefresh()
-            } else {
-                // 同步完成后重新开始常规自动隐藏倒计时。
-                revealControls()
-            }
+            handleRefreshStateChange(isRefreshing)
+        }
+        .onChange(of: store.isAwaitingLaunchSyncReply) { _, isAwaiting in
+            handleLaunchReplyWaitChange(isAwaiting)
+        }
+        .onChange(of: store.launchSyncTimedOut) { _, didTimeOut in
+            updateCachedScheduleNotice(didTimeOut: didTimeOut)
         }
         .onChange(of: store.completedRefreshCount) { _, count in
             guard count > 0 else { return }
             showCompletion(for: count)
         }
-        .onChange(of: mode) { _, _ in
-            selectedCourse = nil
+        .onChange(of: mode) { _, _ in dismissCourseDetailImmediately() }
+    }
+
+    /// 初始化只与根页面生命周期相关的视觉状态。
+    ///
+    /// 数据请求由 `TraintimeWatchApp` 和 `WatchConnectivityManager` 负责；根
+    /// 页面只读取 Store 状态，避免视图重建时重复创建同步任务。
+    private func handleAppear() {
+        updateRefreshAnimation(isRefreshing: store.isRefreshing)
+        revealControls()
+        updateCachedScheduleNotice(didTimeOut: store.launchSyncTimedOut)
+    }
+
+    /// 页面离开时取消只服务于界面的延迟任务。
+    private func handleDisappear() {
+        hideControlsTask?.cancel()
+        cachedScheduleNoticeTask?.cancel()
+    }
+
+    /// 将刷新状态映射为旋转动画和悬浮控件可见性。
+    private func handleRefreshStateChange(_ isRefreshing: Bool) {
+        updateRefreshAnimation(isRefreshing: isRefreshing)
+        if isRefreshing {
+            keepControlsVisibleDuringRefresh()
+        } else {
+            revealControls()
+        }
+    }
+
+    /// 启动同步等待期间保持操作入口可见；收到回复后恢复自动隐藏计时。
+    private func handleLaunchReplyWaitChange(_ isAwaiting: Bool) {
+        if isAwaiting {
+            keepControlsVisibleDuringRefresh()
+        } else if !store.isRefreshing {
+            revealControls()
         }
     }
 
     /// 根据当前模式选择内容，并统一传入表冠交互回调。
     @ViewBuilder
     private var content: some View {
-        if store.snapshot == nil {
+        if store.launchSyncTimedOut,
+           !store.hasCachedScheduleContent
+        {
+            openPhoneSyncState
+        } else if store.snapshot == nil {
             emptyState
         } else {
             switch mode {
@@ -366,6 +440,11 @@ struct RootScheduleView: View {
         }
     }
 
+    /// 模式切换不需要退出动画，直接清理不再属于当前页面的详情状态。
+    private func dismissCourseDetailImmediately() {
+        selectedCourse = nil
+    }
+
     /// 完全没有缓存时显示；离线但有缓存时仍会展示课表。
     private var emptyState: some View {
         InteractionAwareScrollView(
@@ -377,12 +456,29 @@ struct RootScheduleView: View {
                 Label("暂无课表", systemImage: "iphone.and.arrow.forward")
             } description: {
                 Text(
-                    store.syncError
-                        ?? watchLocalizedString(
-                            "请在配对的 iPhone 上打开应用并刷新课表"
-                        )
+                    store.isAwaitingLaunchSyncReply
+                        ? watchLocalizedString("正在从手机同步课表")
+                        : store.syncError
+                            ?? watchLocalizedString(
+                                "请在配对的 iPhone 上打开应用并刷新课表"
+                            )
                 )
             }
+            .padding(.horizontal, 4)
+        }
+    }
+
+    /// 本机完全没有可展示缓存且启动请求超时时显示的整页引导。
+    private var openPhoneSyncState: some View {
+        InteractionAwareScrollView(
+            onScroll: hideControls,
+            centersShortContent: true,
+            protectsInitialTopEdge: true
+        ) {
+            ContentUnavailableView(
+                "请打开手机 XDYou 以同步课表",
+                systemImage: "iphone.and.arrow.forward"
+            )
             .padding(.horizontal, 4)
         }
     }
@@ -404,7 +500,7 @@ struct RootScheduleView: View {
         Button {
             WatchHaptics.refreshStarted()
             revealControls()
-            connectivity.beginProgressiveRefresh(force: true)
+            connectivity.beginLaunchRefresh()
         } label: {
             // 先把对称图标放进固定正方形，再旋转整个正方形。若先旋转
             // SF Symbol 本身，其不对称的字形边界会造成箭头绕偏心点打转。
@@ -528,6 +624,76 @@ struct RootScheduleView: View {
             .padding(.vertical, 5)
     }
 
+    /// 有缓存时的超时提示，压缩成两行以尽量少遮挡课表内容。
+    @ViewBuilder
+    private var cachedScheduleNotice: some View {
+        Group {
+            if #available(watchOS 26.0, *) {
+                cachedScheduleNoticeLabel
+                    .glassEffect(.regular, in: Capsule())
+                    .glassEffectTransition(.materialize)
+            } else {
+                cachedScheduleNoticeLabel
+                    .background(.ultraThinMaterial, in: Capsule())
+            }
+        }
+        .contentShape(Capsule())
+        .onTapGesture(perform: dismissCachedScheduleNotice)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel("关闭缓存提示")
+    }
+
+    private var cachedScheduleNoticeLabel: some View {
+        HStack(spacing: 5) {
+            Image(systemName: "iphone.slash")
+                .font(.caption2.weight(.semibold))
+            VStack(alignment: .leading, spacing: 0) {
+                Text("已加载缓存课表")
+                    .font(.caption2.weight(.semibold))
+                Text("更新请打开手机 XDYou 以同步")
+                    .font(.system(size: 8.5))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+    }
+
+    /// 缓存提示最多展示 15 秒；手机提前回复时由超时状态变化立即撤下。
+    private func updateCachedScheduleNotice(didTimeOut: Bool) {
+        cachedScheduleNoticeTask?.cancel()
+        guard didTimeOut,
+              store.hasCachedScheduleContent
+        else {
+            withAnimation(.easeInOut(duration: 0.18)) {
+                showsCachedScheduleNotice = false
+            }
+            return
+        }
+
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showsCachedScheduleNotice = true
+        }
+        cachedScheduleNoticeTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 15_000_000_000)
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.28)) {
+                showsCachedScheduleNotice = false
+            }
+        }
+    }
+
+    /// 用户轻点提示时立即撤下，并取消尚未结束的自动隐藏任务。
+    private func dismissCachedScheduleNotice() {
+        cachedScheduleNoticeTask?.cancel()
+        WatchHaptics.selection()
+        withAnimation(.easeInOut(duration: 0.18)) {
+            showsCachedScheduleNotice = false
+        }
+    }
+
     /// 开始或停止刷新图标的连续旋转。
     private func updateRefreshAnimation(isRefreshing: Bool) {
         if isRefreshing {
@@ -590,7 +756,9 @@ struct RootScheduleView: View {
 
     /// 表冠或滚动发生时立即隐藏按钮，释放课程内容区域。
     private func hideControls() {
-        guard !store.isRefreshing else {
+        guard !store.isRefreshing,
+              !store.isAwaitingLaunchSyncReply
+        else {
             keepControlsVisibleDuringRefresh()
             return
         }

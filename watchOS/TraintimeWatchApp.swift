@@ -26,9 +26,9 @@ struct TraintimeWatchApp: App {
                 }
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }
-                    // 每次回到前台都尝试静默更新。管理器会忽略重复的刷新请求，
-                    // 因而不会因为系统多次发送 active 而并发同步。
-                    WatchConnectivityManager.shared.beginProgressiveRefresh()
+                    // 每次回到前台都建立新的实时回复等待窗口。旧缓存保持可见；
+                    // 超时后根视图会按“有缓存提示、无缓存整页”分别处理。
+                    WatchConnectivityManager.shared.beginLaunchRefresh()
                 }
         }
     }

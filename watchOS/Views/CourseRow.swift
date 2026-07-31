@@ -175,8 +175,7 @@ struct CourseDetailView: View {
 
     /// 等待详情 ScrollView 提交到实体表层级后再申请原生表冠焦点。
     ///
-    /// 使用 ScrollView 本身作为 responder 后，表冠直接驱动系统滚动机制，
-    /// 不再经过透明节点、累计阈值和零高度锚点。
+    /// ScrollView 本身作为 responder，表冠直接驱动系统滚动机制。
     private func acquireDetailScrollFocus() {
         detailScrollFocused = false
         DispatchQueue.main.async {

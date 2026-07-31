@@ -93,32 +93,47 @@ struct CourseListView: View {
 /// 单日课程视图。
 ///
 /// 日视图只负责日期切换和列表展示；按需求禁止从这里打开详情页。
+/// 日视图收到表冠输入后要执行的唯一操作。
+///
+/// 先计算路由、再执行视觉更新，可以保证“课程滚动、边界拖动、横向翻日”
+/// 三种状态互斥，也让主事件处理函数保持可审计。
+private enum DayCrownRoute {
+    case horizontalPage
+    case course(direction: Int)
+    case dayBoundary(direction: Int)
+}
+
 struct DayScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
     @State private var selectedDate = Calendar.current.startOfDay(for: Date())
     @State private var crownValue = 0.0
+    @State private var lastCrownEventOffset = 0.0
     @State private var crownSession = WatchCrownTurnSession()
     @State private var boundaryDragOffset: CGFloat = 0
-    @State private var boundaryInteractionToken = 0
-    @State private var boundarySwitchPending = false
     @State private var continuousDayNavigation = false
-    @State private var continuousDayPageCount = 0
     @State private var boundaryHapticPlayed = false
     @State private var selectedCourseIndex = 0
+    @State private var horizontalPageOffset: CGFloat = 0
+    @State private var lastHorizontalTouchTranslation: CGFloat = 0
+    @State private var horizontalPageWidth: CGFloat = 1
+    @State private var horizontalCrownVelocity: CGFloat = 0
+    @State private var pageTransitionToken = 0
+    @State private var pageTransitionTask: Task<Void, Never>?
+    @State private var pageTransitionInFlight = false
     @FocusState private var crownFocused: Bool
     let onCrownInteraction: () -> Void
 
-    /// 累计两个表冠小刻度后平滑滚动到相邻课程卡片。
-    private let cardScrollThreshold = 0.5
-
-    /// 进入连续切日状态后需要三个表冠小刻度，避免日期跳动过快。
-    private let continuousDaySwitchThreshold = 0.75
+    /// 累计四个表冠小刻度后平滑滚动到相邻课程卡片。
+    ///
+    /// 表冠每个原始 detent 为 0.25；阈值 1.0 只降低当天内容的纵向浏览
+    /// 速度，不会改变进入翻日状态后的横向页面位移倍率。
+    private let cardScrollThreshold = 1.0
 
     /// 到达列表边界后，每个逻辑刻度推动内容移动的屏幕高度比例。
     ///
     /// 日期切换阈值单独固定为二分之一屏，因此这里仅决定拖动的细腻程度，
     /// 不会让少量误触提前切换日期。
-    private let boundaryDragStepRatio: CGFloat = 0.05
+    private let boundaryDragStepRatio: CGFloat = 0.025
 
     /// 内容必须在表盘内实际越过二分之一可视高度，才允许切换日期。
     private let boundarySwitchDistanceRatio: CGFloat = 1.0 / 2.0
@@ -129,55 +144,23 @@ struct DayScheduleView: View {
     }
 
     var body: some View {
-        ScrollViewReader { scrollProxy in
-            GeometryReader { viewport in
-                ZStack(alignment: .bottomLeading) {
-                    Group {
-                        if courses.isEmpty {
-                            emptyDayState(in: viewport.size)
-                        } else {
-                            InteractionAwareScrollView(
-                                onScroll: onCrownInteraction,
-                                protectsInitialTopEdge: true,
-                                alwaysProtectsInitialTopEdge: true,
-                                protectedTopInsetRatio: 0.25
-                            ) {
-                                LazyVStack(spacing: 5) {
-                                    ForEach(courses) { course in
-                                        CourseRow(
-                                            course: course,
-                                            showsInlineMetadata: true
-                                        )
-                                        .id(course.id)
-                                    }
-                                }
-                                .padding(.horizontal, 2)
-                                .padding(.top, 1)
-                            }
-                            // 每个日期使用独立滚动标识，避免重新进入日视图时恢复
-                            // 到上一次位于顶部虚化区内的旧偏移。
-                            .id(selectedDate)
-                            // 有课程时整页卡片直接跟随边界拖动。
-                            .offset(y: boundaryDragOffset)
-                        }
-                    }
-
-                    dayCrownObserver(
-                        scrollProxy: scrollProxy,
-                        viewportHeight: viewport.size.height
-                    )
-                }
-            }
-            .onAppear {
-                crownFocused = true
-                selectedCourseIndex = 0
-                resetBoundaryDrag(animated: false)
-            }
-        }
-        .horizontalPageSwipe(
-            previous: { handleDaySwipe(-1) },
-            next: { handleDaySwipe(1) }
+        CalendarHorizontalPager(
+            pageOffset: horizontalPageOffset,
+            page: dayPage,
+            onViewportWidthChange: { horizontalPageWidth = max(1, $0) },
+            onHorizontalDragBegan: beginDayHorizontalDrag,
+            onHorizontalDragChanged: updateDayHorizontalDrag,
+            onHorizontalDragEnded: finishDayHorizontalDrag
         )
+        .onAppear {
+            crownFocused = true
+            lastCrownEventOffset = crownValue
+            selectedCourseIndex = 0
+            resetBoundaryDrag(animated: false)
+        }
+        .onDisappear {
+            pageTransitionTask?.cancel()
+        }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 DateNavigationHeader(
@@ -188,8 +171,8 @@ struct DayScheduleView: View {
                             .weekday(.short)
                             .locale(WatchWidgetShared.preferredLocale)
                     ),
-                    previous: { moveDay(-1) },
-                    next: { moveDay(1) }
+                    previous: { requestDayPage(-1) },
+                    next: { requestDayPage(1) }
                 )
                 .frame(width: 116)
                 .offset(y: -10)
@@ -197,21 +180,95 @@ struct DayScheduleView: View {
         }
     }
 
-    /// 横滑按自然日翻页，并恢复日视图的表冠焦点。
+    /// 预先渲染前一天、当天和后一天；三页共用同一个横向触摸检测层。
     ///
-    /// 实际日期修改仍统一进入 `moveDay`，所以课程索引、连续表冠状态和
-    /// 翻页触觉与顶部左右按钮完全一致。
-    private func handleDaySwipe(_ amount: Int) {
-        crownFocused = true
-        onCrownInteraction()
-        moveDay(amount)
+    /// 中间页保留原生纵向 `ScrollView`，分页层只在轴锁定为横向后改变
+    /// `x` 偏移，因此上下滚动与左右翻页不会再由两个自定义手势竞争。
+    @ViewBuilder
+    private func dayPage(_ relativePage: Int) -> some View {
+        let date = Calendar.current.date(
+            byAdding: .day,
+            value: relativePage,
+            to: selectedDate
+        ) ?? selectedDate
+
+        GeometryReader { viewport in
+            if relativePage == 0 {
+                ScrollViewReader { scrollProxy in
+                    ZStack(alignment: .bottomLeading) {
+                        dayContent(
+                            on: date,
+                            in: viewport.size,
+                            boundaryOffset: boundaryDragOffset,
+                            isInteractive: true
+                        )
+
+                        dayCrownObserver(
+                            scrollProxy: scrollProxy,
+                            viewportHeight: viewport.size.height
+                        )
+                    }
+                }
+            } else {
+                dayContent(
+                    on: date,
+                    in: viewport.size,
+                    boundaryOffset: 0,
+                    isInteractive: false
+                )
+            }
+        }
+        .allowsHitTesting(relativePage == 0)
+    }
+
+    /// 生成任意一天的原有内容布局，供横向分页器的三页复用。
+    @ViewBuilder
+    private func dayContent(
+        on date: Date,
+        in viewportSize: CGSize,
+        boundaryOffset: CGFloat,
+        isInteractive: Bool
+    ) -> some View {
+        let dayCourses = store.courses(on: date)
+        if dayCourses.isEmpty {
+            emptyDayState(
+                in: viewportSize,
+                boundaryOffset: boundaryOffset
+            )
+        } else {
+            InteractionAwareScrollView(
+                onScroll: isInteractive ? onCrownInteraction : {},
+                protectsInitialTopEdge: true,
+                alwaysProtectsInitialTopEdge: true,
+                protectedTopInsetRatio: 0.25
+            ) {
+                LazyVStack(spacing: 5) {
+                    ForEach(dayCourses) { course in
+                        CourseRow(
+                            course: course,
+                            showsInlineMetadata: true
+                        )
+                        .id(course.id)
+                    }
+                }
+                .padding(.horizontal, 2)
+                .padding(.top, 1)
+            }
+            // 每个日期使用独立滚动标识，防止前后页复用旧的纵向偏移。
+            .id(date)
+            .scrollDisabled(!isInteractive)
+            .offset(y: boundaryOffset)
+        }
     }
 
     /// 无课程时的图标和提示保持垂直居中，并限制边界拖动后的可见范围。
     ///
     /// `boundaryDragOffset` 仍记录用户完整的二分之一屏拖动距离；这里只对
     /// 可见位置做钳制，确保提示最高不进入系统顶部栏，最低不越过屏幕底边。
-    private func emptyDayState(in viewportSize: CGSize) -> some View {
+    private func emptyDayState(
+        in viewportSize: CGSize,
+        boundaryOffset: CGFloat
+    ) -> some View {
         let contentHeight: CGFloat = 60
         let topLimit = max(28, viewportSize.height * 0.16)
         let bottomLimit = max(
@@ -219,7 +276,7 @@ struct DayScheduleView: View {
             viewportSize.height - 4
         )
         let proposedCenterY = viewportSize.height / 2
-            + boundaryDragOffset
+            + boundaryOffset
         let centerY = min(
             max(
                 proposedCenterY,
@@ -252,22 +309,24 @@ struct DayScheduleView: View {
             .focusable()
             .focused($crownFocused)
             .digitalCrownRotation(
-                $crownValue,
+                detent: $crownValue,
                 from: -1_000,
                 through: 1_000,
                 by: 0.25,
                 sensitivity: .medium,
                 isContinuous: true,
-                isHapticFeedbackEnabled: false
+                isHapticFeedbackEnabled: false,
+                onChange: { event in
+                    handleDayCrownChange(
+                        event,
+                        scrollProxy: scrollProxy,
+                        viewportHeight: viewportHeight
+                    )
+                },
+                onIdle: {
+                    handleDayCrownIdle(scrollProxy: scrollProxy)
+                }
             )
-            .onChange(of: crownValue) { oldValue, newValue in
-                handleDayCrownChange(
-                    from: oldValue,
-                    to: newValue,
-                    scrollProxy: scrollProxy,
-                    viewportHeight: viewportHeight
-                )
-            }
             .accessibilityHidden(true)
     }
 
@@ -276,130 +335,193 @@ struct DayScheduleView: View {
     /// 旋转方向始终保持一致：数值增加向下浏览，数值减少向上浏览。只有在
     /// 当前方向已无法继续滚动，并额外越过指定阈值时，才进入相邻日期。
     private func handleDayCrownChange(
-        from oldValue: Double,
-        to newValue: Double,
+        _ event: DigitalCrownEvent,
         scrollProxy: ScrollViewProxy,
         viewportHeight: CGFloat
     ) {
-        let delta = newValue - oldValue
+        let delta = frameBoundCrownDelta(
+            from: lastCrownEventOffset,
+            to: event.offset
+        )
+        lastCrownEventOffset = event.offset
         guard let update = crownSession.register(delta: delta) else { return }
 
         onCrownInteraction()
-        // 新一轮旋转不继承上一轮未完成的慢转刻度。
-        if update.startsNewSession {
-            resetBoundaryDrag()
-            continuousDayNavigation = false
-            continuousDayPageCount = 0
-            boundaryHapticPlayed = false
-        }
+        crownFocused = true
+        prepareDayCrownSession(update, scrollProxy: scrollProxy)
 
-        if update.reversesDirection {
-            // 已经进入连续翻日后，反向只改变翻页方向，不退出翻页模式；
-            // 用户无需再次把课程卡片拉过半屏，但新方向的前两页重新使用
-            // 双倍行程，方便精确停在紧邻日期。尚未进入翻页时仍正常复位
-            // 边界拖动，防止两个方向的位移错误相加。
-            if continuousDayNavigation {
-                continuousDayPageCount = 0
-            } else {
-                resetBoundaryDrag()
-            }
-            boundaryHapticPlayed = false
+        switch dayCrownRoute(for: update.direction) {
+        case .horizontalPage:
+            applyHorizontalCrownDelta(delta, velocity: event.velocity)
+        case let .dayBoundary(direction):
+            smoothlyAdvanceDayBoundary(
+                direction,
+                delta: delta,
+                viewportHeight: viewportHeight
+            )
+        case let .course(direction):
+            updateCourseSelectionPreview(
+                direction: direction,
+                using: scrollProxy
+            )
         }
-
-        let activeThreshold: Double
-        if continuousDayNavigation {
-            activeThreshold = continuousDayPageCount < 2
-                ? continuousDaySwitchThreshold * 2
-                : continuousDaySwitchThreshold
-        } else {
-            activeThreshold = cardScrollThreshold
-        }
-        guard crownSession.consume(threshold: activeThreshold) else { return }
-        advanceDayContent(
-            update.direction,
-            using: scrollProxy,
-            viewportHeight: viewportHeight
-        )
     }
 
-    /// 优先滚动当天课程；已经位于边界时把整页内容继续向外拉动。
+    /// 为新一轮旋转或方向反转准备日视图状态。
     ///
-    /// 这里使用可视高度而非固定刻度作为日期切换条件。只有橡皮筋偏移严格
-    /// 超过二分之一屏幕，才执行相邻日期切换。
-    private func advanceDayContent(
+    /// 横向翻日一旦开始，同一轮旋转即使反向也仍由横向分页器接管；只有尚在
+    /// 课程列表阶段的反向输入才会清理边界位移并把当前卡片拉回中心。
+    private func prepareDayCrownSession(
+        _ update: WatchCrownTurnUpdate,
+        scrollProxy: ScrollViewProxy
+    ) {
+        if update.startsNewSession {
+            resetBoundaryDrag()
+            if abs(horizontalPageOffset) < 0.5 {
+                continuousDayNavigation = courses.isEmpty
+            }
+            boundaryHapticPlayed = false
+        }
+
+        guard update.reversesDirection,
+              !continuousDayNavigation
+        else {
+            return
+        }
+        resetBoundaryDrag()
+        recenterCurrentCourse(using: scrollProxy)
+        boundaryHapticPlayed = false
+    }
+
+    /// 根据当前页面状态选择本次表冠事件的处理路径。
+    private func dayCrownRoute(for direction: Int) -> DayCrownRoute {
+        if continuousDayNavigation {
+            return .horizontalPage
+        }
+        let nextIndex = selectedCourseIndex + direction
+        return courses.indices.contains(nextIndex)
+            ? .course(direction: direction)
+            : .dayBoundary(direction: direction)
+    }
+
+    /// 更新相邻课程的连续预览，并在累计阈值到达时提交选择。
+    private func updateCourseSelectionPreview(
+        direction: Int,
+        using scrollProxy: ScrollViewProxy
+    ) {
+        previewAdjacentCourse(direction: direction, using: scrollProxy)
+        guard crownSession.consume(threshold: cardScrollThreshold) else {
+            return
+        }
+        commitAdjacentCourse(direction, using: scrollProxy)
+    }
+
+    /// 每个表冠事件都把当前卡片向相邻卡片连续插值，避免低帧率式跳动。
+    private func previewAdjacentCourse(
+        direction: Int,
+        using scrollProxy: ScrollViewProxy
+    ) {
+        guard courses.indices.contains(selectedCourseIndex) else { return }
+        let progress = crownSession.progress(toward: cardScrollThreshold)
+        // 相邻课程卡片通常相距约三分之一屏高；只改变滚动锚点，不改布局。
+        let anchorY = CGFloat(
+            0.5 - Double(direction) * progress * 0.36
+        )
+        performWithoutAnimation {
+            scrollProxy.scrollTo(
+                courses[selectedCourseIndex].id,
+                anchor: UnitPoint(x: 0.5, y: anchorY)
+            )
+        }
+    }
+
+    /// 累计到四个小刻度后提交相邻卡片；预览已把它移动到接近中心的位置。
+    private func commitAdjacentCourse(
         _ amount: Int,
-        using scrollProxy: ScrollViewProxy,
+        using scrollProxy: ScrollViewProxy
+    ) {
+        let nextIndex = selectedCourseIndex + amount
+        guard courses.indices.contains(nextIndex) else { return }
+        resetBoundaryDrag()
+        boundaryHapticPlayed = false
+        selectedCourseIndex = nextIndex
+        WatchHaptics.selection()
+        performWithoutAnimation {
+            scrollProxy.scrollTo(courses[nextIndex].id, anchor: .center)
+        }
+    }
+
+    /// 到达列表边界后按每个原始 detent 更新位置，同时保持既定总速度。
+    private func smoothlyAdvanceDayBoundary(
+        _ amount: Int,
+        delta: Double,
         viewportHeight: CGFloat
     ) {
-        guard !boundarySwitchPending else { return }
-
-        // 第一次越过二分之一屏后，同一次没有停顿、没有反向的连续旋转
-        // 已经明确表达了切日意图，后续刻度直接切日，不再重复拉动阈值。
-        if continuousDayNavigation {
-            moveDay(
-                amount,
-                preservesContinuousCrownNavigation: true
-            )
-            return
-        }
-
-        let nextIndex = selectedCourseIndex + amount
-        if courses.indices.contains(nextIndex) {
-            resetBoundaryDrag()
-            boundaryHapticPlayed = false
-            selectedCourseIndex = nextIndex
-            WatchHaptics.selection()
-            withAnimation(.easeOut(duration: 0.2)) {
-                scrollProxy.scrollTo(courses[nextIndex].id, anchor: .center)
-            }
-            return
-        }
-
         if !boundaryHapticPlayed {
             WatchHaptics.boundary(amount)
             boundaryHapticPlayed = true
         }
 
-        let dragStep = max(8, viewportHeight * boundaryDragStepRatio)
-        let proposedOffset = boundaryDragOffset
-            - CGFloat(amount) * dragStep
-        let switchDistance = max(
-            1,
-            viewportHeight * boundarySwitchDistanceRatio
+        let proposedOffset = proposedDayBoundaryOffset(
+            direction: amount,
+            delta: delta,
+            viewportHeight: viewportHeight
         )
-
-        invalidateBoundaryReset()
-        withAnimation(.interactiveSpring(response: 0.2, dampingFraction: 0.82)) {
+        performWithoutAnimation {
             boundaryDragOffset = proposedOffset
         }
 
-        guard abs(proposedOffset) > switchDistance else {
-            scheduleBoundaryReset()
+        guard abs(proposedOffset) > dayBoundarySwitchDistance(
+            viewportHeight: viewportHeight
+        ) else {
             return
         }
 
-        // 先让超过阈值的最后一段拉动显示出来，再切换日期并复位。短暂延迟
-        // 仅服务于视觉反馈，不会阻塞界面或表冠事件。
-        boundarySwitchPending = true
         continuousDayNavigation = true
-        let token = boundaryInteractionToken
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            guard boundarySwitchPending,
-                  token == boundaryInteractionToken
-            else {
-                return
-            }
-            moveDay(
-                amount,
-                preservesContinuousCrownNavigation: true
+        performWithoutAnimation {
+            boundaryDragOffset = 0
+            horizontalPageOffset = -CGFloat(amount)
+                * horizontalPageWidth * 0.52
+        }
+    }
+
+    /// 把本次表冠增量换算成日内容在边界处的纵向位移。
+    private func proposedDayBoundaryOffset(
+        direction: Int,
+        delta: Double,
+        viewportHeight: CGFloat
+    ) -> CGFloat {
+        let fullThresholdStep = max(
+            8,
+            viewportHeight * boundaryDragStepRatio
+        )
+        let inputFraction = CGFloat(
+            min(1, abs(delta) / cardScrollThreshold)
+        )
+        return boundaryDragOffset
+            - CGFloat(direction) * fullThresholdStep * inputFraction
+    }
+
+    /// 返回从纵向边界切换到横向翻日所需的固定半屏距离。
+    private func dayBoundarySwitchDistance(viewportHeight: CGFloat) -> CGFloat {
+        max(1, viewportHeight * boundarySwitchDistanceRatio)
+    }
+
+    /// 未达到换卡阈值便停止时，把当前卡片立即吸回中心。
+    private func recenterCurrentCourse(using scrollProxy: ScrollViewProxy) {
+        guard courses.indices.contains(selectedCourseIndex) else { return }
+        withAnimation(.easeOut(duration: 0.08)) {
+            scrollProxy.scrollTo(
+                courses[selectedCourseIndex].id,
+                anchor: .center
             )
         }
     }
 
-    /// 以自然日为单位移动，避免手工增减时间戳造成夏令时边界错误。
+    /// 以自然日为单位提交已完成的横向翻页。
     private func moveDay(
         _ amount: Int,
-        preservesContinuousCrownNavigation: Bool = false
+        preservesHorizontalNavigation: Bool = false
     ) {
         let nextDate = Calendar.current.date(
             byAdding: .day,
@@ -409,45 +531,162 @@ struct DayScheduleView: View {
         guard nextDate != selectedDate else { return }
         selectedCourseIndex = 0
         resetBoundaryDrag(animated: false)
-        if !preservesContinuousCrownNavigation {
+        if !preservesHorizontalNavigation {
             continuousDayNavigation = false
-            continuousDayPageCount = 0
-            boundaryHapticPlayed = false
-        } else {
-            continuousDayPageCount += 1
         }
-        // 每成功切换一个自然日只播放一次最短促的点击触觉。
+        boundaryHapticPlayed = false
+        // 手指、表冠和顶部按钮都在页面真正提交时反馈一次。
         WatchHaptics.navigation(amount)
         selectedDate = nextDate
     }
 
-    /// 使所有尚未执行的边界回弹任务失效。
-    private func invalidateBoundaryReset() {
-        boundaryInteractionToken += 1
+    /// 顶部按钮与触摸、表冠共用相同的平移和吸附动画。
+    private func requestDayPage(_ amount: Int) {
+        guard !pageTransitionInFlight else { return }
+        crownFocused = true
+        onCrownInteraction()
+        settleDayPage(direction: amount, velocity: horizontalPageWidth * 2.2)
     }
 
-    /// 表冠停止后让未达到阈值的内容自动回弹，不把半次拖动留到下一轮。
-    private func scheduleBoundaryReset() {
-        invalidateBoundaryReset()
-        let token = boundaryInteractionToken
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-            guard token == boundaryInteractionToken,
-                  !boundarySwitchPending
-            else {
-                return
-            }
+    private func beginDayHorizontalDrag() {
+        guard !pageTransitionInFlight else { return }
+        resetBoundaryDrag()
+        continuousDayNavigation = false
+        lastHorizontalTouchTranslation = 0
+        crownFocused = true
+        onCrownInteraction()
+    }
+
+    private func updateDayHorizontalDrag(_ translation: CGFloat) {
+        guard !pageTransitionInFlight else { return }
+        let incrementalDelta = translation - lastHorizontalTouchTranslation
+        lastHorizontalTouchTranslation = translation
+        updateContinuousDayOffset(by: incrementalDelta)
+    }
+
+    private func finishDayHorizontalDrag(_ value: DragGesture.Value) {
+        guard !pageTransitionInFlight else { return }
+        let motion = horizontalDragMotion(
+            value,
+            currentOffset: horizontalPageOffset,
+            pageWidth: horizontalPageWidth
+        )
+        settleDayPage(direction: motion.direction, velocity: motion.velocity)
+    }
+
+    /// 将表冠刻度转换成横向像素；快速旋转提高每刻度位移，慢转便于精确停页。
+    private func applyHorizontalCrownDelta(
+        _ delta: Double,
+        velocity: Double
+    ) {
+        guard !pageTransitionInFlight else { return }
+        let tickDistance = calendarPageCrownTickDistance(
+            pageWidth: horizontalPageWidth,
+            velocity: velocity
+        )
+        let pointDelta = CGFloat(delta / 0.25) * tickDistance
+        horizontalCrownVelocity = CGFloat(abs(velocity) / 0.25)
+            * tickDistance
+        updateContinuousDayOffset(by: -pointDelta)
+    }
+
+    /// 页面完整越过一屏时立即无动画换底，再把偏移归一化到中间页附近。
+    ///
+    /// 视觉上屏幕仍停留在同一张完整页面，但数据基准已经前进/后退一天，
+    /// 三页容器马上获得新的相邻页；同一次表冠旋转或手指拖动因此可以持续
+    /// 翻过任意多天，而不是等待停下后才能开始下一页。
+    private func updateContinuousDayOffset(by delta: CGFloat) {
+        guard horizontalPageWidth > 0 else { return }
+        var offset = horizontalPageOffset + delta
+        var crossedPage = 0
+        if offset <= -horizontalPageWidth {
+            crossedPage = 1
+            offset += horizontalPageWidth
+        } else if offset >= horizontalPageWidth {
+            crossedPage = -1
+            offset -= horizontalPageWidth
+        }
+
+        if crossedPage == 0 {
+            horizontalPageOffset = offset
+            return
+        }
+
+        performWithoutAnimation {
+            moveDay(
+                crossedPage,
+                preservesHorizontalNavigation: true
+            )
+            horizontalPageOffset = offset
+        }
+    }
+
+    /// 系统确认表冠停止时立即吸附最近日期页。
+    private func handleDayCrownIdle(scrollProxy: ScrollViewProxy) {
+        guard !pageTransitionInFlight else { return }
+        if continuousDayNavigation {
+            let direction = nearestPageDirection(
+                for: horizontalPageOffset,
+                width: horizontalPageWidth
+            )
+            settleDayPage(
+                direction: direction,
+                velocity: horizontalCrownVelocity
+            )
+        } else {
+            // 尚未越过半屏时，停止表冠便立即启动纵向边界回弹。
             resetBoundaryDrag()
+            recenterCurrentCourse(using: scrollProxy)
+            boundaryHapticPlayed = false
+            crownSession.reset()
+        }
+    }
+
+    /// 动画到目标页后才原子替换日期，再无动画复位三页容器的位置。
+    private func settleDayPage(direction: Int, velocity: CGFloat) {
+        let snap = horizontalPageSnap(
+            direction: direction,
+            currentOffset: horizontalPageOffset,
+            velocity: velocity,
+            width: horizontalPageWidth
+        )
+
+        pageTransitionToken += 1
+        let token = pageTransitionToken
+        pageTransitionTask?.cancel()
+        pageTransitionInFlight = true
+        withAnimation(
+            .timingCurve(0.2, 0.82, 0.2, 1, duration: snap.duration)
+        ) {
+            horizontalPageOffset = snap.target
+        }
+
+        pageTransitionTask = Task { @MainActor in
+            try? await Task.sleep(
+                nanoseconds: UInt64(
+                    (snap.duration + 0.015) * 1_000_000_000
+                )
+            )
+            guard !Task.isCancelled, token == pageTransitionToken else { return }
+            if snap.direction != 0 {
+                moveDay(snap.direction)
+            }
+            performWithoutAnimation {
+                horizontalPageOffset = 0
+            }
+            pageTransitionInFlight = false
+            continuousDayNavigation = false
+            horizontalCrownVelocity = 0
+            crownSession.reset()
         }
     }
 
     /// 清除边界拖动状态；按需要使用弹簧动画恢复原位。
     private func resetBoundaryDrag(animated: Bool = true) {
-        invalidateBoundaryReset()
-        boundarySwitchPending = false
         guard boundaryDragOffset != 0 else { return }
 
         if animated {
-            withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
+            withAnimation(.easeOut(duration: 0.06)) {
                 boundaryDragOffset = 0
             }
         } else {
@@ -465,19 +704,20 @@ struct WeekScheduleView: View {
     @State private var anchorDate = Date()
     @Binding var selectedCourse: WatchCourse?
     @State private var crownValue = 0.0
+    @State private var lastCrownEventOffset = 0.0
     @State private var crownSession = WatchCrownTurnSession()
-    @State private var boundaryHapticPlayed = false
-    @State private var continuousWeekPageCount = 0
+    @State private var horizontalPageOffset: CGFloat = 0
+    @State private var lastHorizontalTouchTranslation: CGFloat = 0
+    @State private var horizontalPageWidth: CGFloat = 1
+    @State private var horizontalCrownVelocity: CGFloat = 0
+    @State private var pageTransitionToken = 0
+    @State private var pageTransitionTask: Task<Void, Never>?
+    @State private var pageTransitionInFlight = false
+    @State private var weekBoundaryHapticPlayed = false
     @State private var restoreCrownFocusTask: Task<Void, Never>?
     @FocusState private var crownFocused: Bool
     let onEmptyTap: () -> Void
     let onCrownInteraction: () -> Void
-
-    /// 七个表冠小刻度切换一周，进一步提高低速旋转时的定位精度。
-    ///
-    /// 每轮转动及反转后的前两周还会在输入处理中乘以 2，因此对应约
-    /// 十四个小刻度；第三周起恢复这里定义的常规行程。
-    private let weekSwitchCrownThreshold = 1.75
 
     /// 当前周的周一零点。
     private var weekStart: Date {
@@ -485,53 +725,32 @@ struct WeekScheduleView: View {
     }
 
     /// 只保留当前周 `[周一, 下周一)` 内的日程。
-    private var courses: [WatchCourse] {
-        let end = Calendar.current.date(
-            byAdding: .day,
-            value: 7,
-            to: weekStart
-        ) ?? weekStart
-        return store.allCourses.filter {
-            $0.startAt >= weekStart && $0.startAt < end
-        }
+    private func courses(in start: Date) -> [WatchCourse] {
+        store.courses(startingAt: start, dayCount: 7)
     }
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            GeometryReader { proxy in
-                let topBarContentInset = max(26, proxy.size.height * 0.13)
-                let weekdayHeight = max(15, proxy.size.height * 0.075)
-
-                VStack(spacing: max(1, proxy.size.height * 0.008)) {
-                    WeekdayHeader(weekStart: weekStart)
-                        .frame(height: weekdayHeight)
-                        .offset(y: 2)
-
-                    WeekPeriodGrid(
-                        weekStart: weekStart,
-                        courses: courses,
-                        select: selectCourse,
-                        onEmptyTap: handleEmptyTap
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .layoutPriority(1)
-                }
-                .padding(.top, topBarContentInset)
-            }
+            CalendarHorizontalPager(
+                pageOffset: horizontalPageOffset,
+                page: weekPage,
+                onViewportWidthChange: {
+                    horizontalPageWidth = max(1, $0)
+                },
+                onHorizontalDragBegan: beginWeekHorizontalDrag,
+                onHorizontalDragChanged: updateWeekHorizontalDrag,
+                onHorizontalDragEnded: finishWeekHorizontalDrag
+            )
 
             crownObserver
         }
-        .horizontalPageSwipe(
-            previous: { handleWeekSwipe(-1) },
-            next: { handleWeekSwipe(1) }
-        )
         .toolbar {
             if selectedCourse == nil {
                 ToolbarItem(placement: .topBarLeading) {
                     DateNavigationHeader(
                         title: weekTitle,
-                        previous: { moveWeek(-1) },
-                        next: { moveWeek(1) }
+                        previous: { requestWeekPage(-1) },
+                        next: { requestWeekPage(1) }
                     )
                     .frame(width: 116)
                     .offset(y: -10)
@@ -540,6 +759,7 @@ struct WeekScheduleView: View {
         }
         .onAppear {
             crownFocused = true
+            lastCrownEventOffset = crownValue
             clampAnchorToSemester()
         }
         .onChange(of: store.semesterRangeStart) { _, _ in
@@ -553,14 +773,71 @@ struct WeekScheduleView: View {
         }
         .onDisappear {
             restoreCrownFocusTask?.cancel()
+            pageTransitionTask?.cancel()
         }
     }
 
-    /// 横滑按整周翻页，继续复用手机同步的学期边界和既有触觉。
-    private func handleWeekSwipe(_ amount: Int) {
+    /// 生成前一周、当前周和后一周；课程网格本身的尺寸与布局保持不变。
+    private func weekPage(_ relativePage: Int) -> some View {
+        let pageStart = Calendar.current.date(
+            byAdding: .day,
+            value: relativePage * 7,
+            to: weekStart
+        ) ?? weekStart
+
+        return GeometryReader { proxy in
+            let topBarContentInset = max(26, proxy.size.height * 0.13)
+            let weekdayHeight = max(15, proxy.size.height * 0.075)
+
+            VStack(spacing: max(1, proxy.size.height * 0.008)) {
+                WeekdayHeader(weekStart: pageStart)
+                    .frame(height: weekdayHeight)
+                    .offset(y: 2)
+
+                WeekPeriodGrid(
+                    weekStart: pageStart,
+                    courses: courses(in: pageStart),
+                    select: selectCourse,
+                    onEmptyTap: handleEmptyTap
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .layoutPriority(1)
+            }
+            .padding(.top, topBarContentInset)
+        }
+        .allowsHitTesting(relativePage == 0)
+    }
+
+    private func beginWeekHorizontalDrag() {
+        guard selectedCourse == nil, !pageTransitionInFlight else { return }
+        lastHorizontalTouchTranslation = 0
         crownFocused = true
         onCrownInteraction()
-        _ = moveWeek(amount)
+    }
+
+    private func updateWeekHorizontalDrag(_ translation: CGFloat) {
+        guard selectedCourse == nil, !pageTransitionInFlight else { return }
+        let incrementalDelta = translation - lastHorizontalTouchTranslation
+        lastHorizontalTouchTranslation = translation
+        updateContinuousWeekOffset(by: incrementalDelta)
+    }
+
+    private func finishWeekHorizontalDrag(_ value: DragGesture.Value) {
+        guard selectedCourse == nil, !pageTransitionInFlight else { return }
+        let motion = horizontalDragMotion(
+            value,
+            currentOffset: horizontalPageOffset,
+            pageWidth: horizontalPageWidth
+        )
+        settleWeekPage(direction: motion.direction, velocity: motion.velocity)
+    }
+
+    /// 顶部按钮与触摸、表冠共用相同的横向动画。
+    private func requestWeekPage(_ amount: Int) {
+        guard selectedCourse == nil, !pageTransitionInFlight else { return }
+        crownFocused = true
+        onCrownInteraction()
+        settleWeekPage(direction: amount, velocity: horizontalPageWidth * 2.2)
     }
 
     /// 详情完全退出后再把表冠焦点交还周视图。
@@ -582,7 +859,7 @@ struct WeekScheduleView: View {
         }
     }
 
-    /// 优先采用手机同步的周次参考；旧缓存再回退到学期开始日期推算。
+    /// 优先采用手机同步的周次参考；缺少参考时按学期开始日期推算。
     private var weekTitle: String {
         if let reference = store.synchronizedWeekReference {
             let referenceWeek = startOfWeek(containing: reference.date)
@@ -631,11 +908,140 @@ struct WeekScheduleView: View {
         return true
     }
 
+    /// 将表冠的连续刻度直接映射成页面像素，速度越快每刻度推进越多。
+    private func applyWeekCrownDelta(
+        _ delta: Double,
+        velocity: Double
+    ) {
+        guard !pageTransitionInFlight else { return }
+        let tickDistance = calendarPageCrownTickDistance(
+            pageWidth: horizontalPageWidth,
+            velocity: velocity
+        )
+        let pointDelta = CGFloat(delta / 0.25) * tickDistance
+        horizontalCrownVelocity = CGFloat(abs(velocity) / 0.25)
+            * tickDistance
+        updateContinuousWeekOffset(by: -pointDelta)
+    }
+
+    /// 完整跨过一屏后立即换底，使同一次表冠旋转可以无缝连续翻周。
+    private func updateContinuousWeekOffset(by delta: CGFloat) {
+        guard horizontalPageWidth > 0 else { return }
+        var offset = horizontalPageOffset + delta
+
+        // 学期首尾只显示带阻尼的边缘位移，不允许无效相邻周占满屏幕。
+        let attemptedDirection = offset < 0 ? 1 : -1
+        let candidate = Calendar.current.date(
+            byAdding: .day,
+            value: attemptedDirection * 7,
+            to: anchorDate
+        ) ?? anchorDate
+        if offset != 0, !isWeekInsideSemester(candidate) {
+            if !weekBoundaryHapticPlayed {
+                WatchHaptics.boundary(attemptedDirection)
+                weekBoundaryHapticPlayed = true
+            }
+            let resisted = min(
+                horizontalPageWidth * 0.2,
+                abs(offset) * 0.18
+            )
+            horizontalPageOffset = (offset < 0 ? -1 : 1) * resisted
+            return
+        }
+        weekBoundaryHapticPlayed = false
+
+        var crossedPage = 0
+        if offset <= -horizontalPageWidth {
+            crossedPage = 1
+            offset += horizontalPageWidth
+        } else if offset >= horizontalPageWidth {
+            crossedPage = -1
+            offset -= horizontalPageWidth
+        }
+
+        guard crossedPage != 0 else {
+            horizontalPageOffset = offset
+            return
+        }
+
+        performWithoutAnimation {
+            _ = moveWeek(crossedPage, playsBoundaryFeedback: false)
+            horizontalPageOffset = offset
+        }
+    }
+
+    /// 系统报告表冠空闲时立刻吸附最近周。
+    private func handleWeekCrownIdle() {
+        guard selectedCourse == nil, !pageTransitionInFlight else { return }
+        let direction = nearestPageDirection(
+            for: horizontalPageOffset,
+            width: horizontalPageWidth
+        )
+        settleWeekPage(
+            direction: direction,
+            velocity: horizontalCrownVelocity
+        )
+    }
+
+    /// 动画结束后提交周次；越过学期边界时回弹并使用既有边界反馈。
+    private func settleWeekPage(direction: Int, velocity: CGFloat) {
+        var direction = min(1, max(-1, direction))
+        if direction != 0 {
+            let candidate = Calendar.current.date(
+                byAdding: .day,
+                value: direction * 7,
+                to: anchorDate
+            ) ?? anchorDate
+            if !isWeekInsideSemester(candidate) {
+                WatchHaptics.boundary(direction)
+                direction = 0
+            }
+        }
+
+        let snap = horizontalPageSnap(
+            direction: direction,
+            currentOffset: horizontalPageOffset,
+            velocity: velocity,
+            width: horizontalPageWidth
+        )
+        pageTransitionToken += 1
+        let token = pageTransitionToken
+        pageTransitionTask?.cancel()
+        pageTransitionInFlight = true
+        withAnimation(
+            .timingCurve(0.2, 0.82, 0.2, 1, duration: snap.duration)
+        ) {
+            horizontalPageOffset = snap.target
+        }
+
+        pageTransitionTask = Task { @MainActor in
+            try? await Task.sleep(
+                nanoseconds: UInt64(
+                    (snap.duration + 0.015) * 1_000_000_000
+                )
+            )
+            guard !Task.isCancelled, token == pageTransitionToken else { return }
+            if snap.direction != 0 {
+                _ = moveWeek(
+                    snap.direction,
+                    playsBoundaryFeedback: false
+                )
+            }
+            performWithoutAnimation {
+                horizontalPageOffset = 0
+            }
+            pageTransitionInFlight = false
+            horizontalCrownVelocity = 0
+            weekBoundaryHapticPlayed = false
+            crownSession.reset()
+        }
+    }
+
     /// 判断目标周是否落在手机可浏览的 `semesterLength` 个周页面内。
     private func isWeekInsideSemester(_ date: Date) -> Bool {
         guard let bounds = semesterWeekBounds else {
-            // 旧缓存尚未包含完整学期元数据时维持原行为，收到整学期快照后
-            // `onChange` 会立即校正，避免把用户永久锁在某个临时范围。
+            // 缓存缺少完整学期元数据时暂不限制范围；学期快照安装后
+            // `onChange` 会立即校正当前周。
             return true
         }
         let target = startOfWeek(containing: date)
@@ -690,120 +1096,262 @@ struct WeekScheduleView: View {
             .focusable()
             .focused($crownFocused)
             .digitalCrownRotation(
-                $crownValue,
+                detent: $crownValue,
                 from: -1_000,
                 through: 1_000,
                 by: 0.25,
                 sensitivity: .medium,
                 isContinuous: true,
-                isHapticFeedbackEnabled: false
+                isHapticFeedbackEnabled: false,
+                onChange: { event in
+                    handleWeekCrownChange(event)
+                },
+                onIdle: {
+                    handleWeekCrownIdle()
+                }
             )
-            .onChange(of: crownValue) { oldValue, newValue in
-                handleWeekCrownChange(from: oldValue, to: newValue)
-            }
             .accessibilityHidden(true)
     }
 
-    /// 表冠累计一个完整逻辑刻度后切换一周；停顿后不会继承残余刻度。
+    /// 周视图一开始转动表冠就进入横向拖页，停止后自动吸附最近页。
     private func handleWeekCrownChange(
-        from oldValue: Double,
-        to newValue: Double
+        _ event: DigitalCrownEvent
     ) {
         guard selectedCourse == nil else { return }
-        let delta = newValue - oldValue
-        guard let update = crownSession.register(delta: delta) else { return }
+        let delta = frameBoundCrownDelta(
+            from: lastCrownEventOffset,
+            to: event.offset
+        )
+        lastCrownEventOffset = event.offset
+        guard crownSession.register(delta: delta) != nil else { return }
 
         onCrownInteraction()
-        if update.startsNewSession {
-            continuousWeekPageCount = 0
-            boundaryHapticPlayed = false
-        }
-
-        if update.reversesDirection {
-            // 反转仍属于同一轮连续翻周，不退出翻页状态；仅把新方向的
-            // 精细计数归零，使反转后的前两周也重新使用双倍行程。
-            continuousWeekPageCount = 0
-            boundaryHapticPlayed = false
-        }
-
-        if !boundaryHapticPlayed {
-            WatchHaptics.boundary(update.direction)
-            boundaryHapticPlayed = true
-        }
-
-        let activeThreshold = continuousWeekPageCount < 2
-            ? weekSwitchCrownThreshold * 2
-            : weekSwitchCrownThreshold
-        guard crownSession.consume(threshold: activeThreshold) else { return }
-        boundaryHapticPlayed = false
-        // 表冠开始转动时已经播放过边界短点击，碰到学期边界不再重复。
-        if moveWeek(update.direction, playsBoundaryFeedback: false) {
-            continuousWeekPageCount += 1
-        }
+        applyWeekCrownDelta(delta, velocity: event.velocity)
     }
 }
 
-/// 日视图与周视图共用的横向翻页手势。
-///
-/// 手势使用 `simultaneousGesture`，不会夺走日视图纵向 ScrollView 或周网格
-/// `SpatialTapGesture` 的识别权。结束时必须同时满足：
-///
-/// 1. 实际位移以横向为主；
-/// 2. 实际或预测位移越过最小阈值。
-///
-/// 因此轻点课程色块、上下浏览课程和斜向小幅抖动都不会误翻页。
-private struct HorizontalPageSwipeModifier: ViewModifier {
-    let previous: () -> Void
-    let next: () -> Void
-
-    private let minimumHorizontalDistance: CGFloat = 36
-    private let horizontalDominanceRatio: CGFloat = 1.25
-
-    func body(content: Content) -> some View {
-        content.simultaneousGesture(
-            DragGesture(minimumDistance: 10, coordinateSpace: .local)
-                .onEnded(handleDragEnded)
-        )
-    }
-
-    /// 将一次明确的横滑转换成前一页或后一页。
-    private func handleDragEnded(_ value: DragGesture.Value) {
-        let horizontal = value.translation.width
-        let vertical = value.translation.height
-        guard abs(horizontal)
-                > abs(vertical) * horizontalDominanceRatio
-        else {
-            return
-        }
-
-        let projectedHorizontal = value.predictedEndTranslation.width
-        let effectiveDistance = max(
-            abs(horizontal),
-            abs(projectedHorizontal)
-        )
-        guard effectiveDistance >= minimumHorizontalDistance else { return }
-
-        if horizontal > 0 {
-            previous()
-        } else {
-            next()
-        }
-    }
+/// 单个触摸层判定横向翻页或纵向滚动的轴向。
+private enum CalendarPagingDragAxis {
+    case horizontal
+    case vertical
 }
 
-private extension View {
-    /// 添加不影响原有布局和纵向交互的左右翻页能力。
-    func horizontalPageSwipe(
-        previous: @escaping () -> Void,
-        next: @escaping () -> Void
-    ) -> some View {
-        modifier(
-            HorizontalPageSwipeModifier(
-                previous: previous,
-                next: next
+/// 仿系统日历的三页横向容器。
+///
+/// 前一页、当前页、后一页始终并排预渲染，外部只需要提供一个连续像素偏移。
+/// 手指横拖和表冠旋转因此能看到同一套跟手动画；日期数据只在吸附动画结束
+/// 后替换，避免中途出现空白或旧页闪烁。
+private struct CalendarHorizontalPager<Page: View>: View {
+    let pageOffset: CGFloat
+    let page: (Int) -> Page
+    let onViewportWidthChange: (CGFloat) -> Void
+    let onHorizontalDragBegan: () -> Void
+    let onHorizontalDragChanged: (CGFloat) -> Void
+    let onHorizontalDragEnded: (DragGesture.Value) -> Void
+
+    @State private var dragAxis: CalendarPagingDragAxis?
+    @State private var horizontalDragStarted = false
+
+    init(
+        pageOffset: CGFloat,
+        @ViewBuilder page: @escaping (Int) -> Page,
+        onViewportWidthChange: @escaping (CGFloat) -> Void,
+        onHorizontalDragBegan: @escaping () -> Void,
+        onHorizontalDragChanged: @escaping (CGFloat) -> Void,
+        onHorizontalDragEnded: @escaping (DragGesture.Value) -> Void
+    ) {
+        self.pageOffset = pageOffset
+        self.page = page
+        self.onViewportWidthChange = onViewportWidthChange
+        self.onHorizontalDragBegan = onHorizontalDragBegan
+        self.onHorizontalDragChanged = onHorizontalDragChanged
+        self.onHorizontalDragEnded = onHorizontalDragEnded
+    }
+
+    var body: some View {
+        GeometryReader { proxy in
+            HStack(spacing: 0) {
+                ForEach(-1...1, id: \.self) { relativePage in
+                    page(relativePage)
+                        .frame(
+                            width: proxy.size.width,
+                            height: proxy.size.height
+                        )
+                }
+            }
+            .frame(
+                width: proxy.size.width * 3,
+                height: proxy.size.height,
+                alignment: .leading
             )
-        )
+            .offset(x: -proxy.size.width + pageOffset)
+            .contentShape(Rectangle())
+            // 日视图只挂这一层自定义 DragGesture。锁定横向时由分页器处理，
+            // 锁定纵向时完全不改偏移，让中间页的原生 ScrollView 跟手。
+            .simultaneousGesture(pagingGesture)
+            .onAppear {
+                onViewportWidthChange(proxy.size.width)
+            }
+            .onChange(of: proxy.size.width) { _, width in
+                onViewportWidthChange(width)
+            }
+        }
+        .clipped()
     }
+
+    private var pagingGesture: some Gesture {
+        DragGesture(minimumDistance: 5, coordinateSpace: .local)
+            .onChanged { value in
+                if dragAxis == nil {
+                    let horizontal = abs(value.translation.width)
+                    let vertical = abs(value.translation.height)
+                    guard max(horizontal, vertical) >= 5 else { return }
+                    dragAxis = horizontal > vertical
+                        ? .horizontal
+                        : .vertical
+                }
+
+                guard dragAxis == .horizontal else { return }
+                if !horizontalDragStarted {
+                    horizontalDragStarted = true
+                    onHorizontalDragBegan()
+                }
+                onHorizontalDragChanged(value.translation.width)
+            }
+            .onEnded { value in
+                if dragAxis == .horizontal, horizontalDragStarted {
+                    onHorizontalDragEnded(value)
+                }
+                dragAxis = nil
+                horizontalDragStarted = false
+            }
+    }
+}
+
+/// 一次触摸结束时推算出的目标页和横向速度。
+private struct HorizontalPageMotion {
+    let direction: Int
+    let velocity: CGFloat
+}
+
+/// 一次吸附动画已经归一化的方向、终点和时长。
+private struct HorizontalPageSnap {
+    let direction: Int
+    let target: CGFloat
+    let duration: Double
+}
+
+/// 在不触发隐式动画的事务中原子更新分页或滚动状态。
+///
+/// 三页容器跨过整页后需要同时切换数据基准并归一化偏移；统一使用该函数可
+/// 避免某个调用点遗漏 `transaction.animation = nil` 而产生闪动。
+private func performWithoutAnimation(_ updates: () -> Void) {
+    var transaction = Transaction()
+    transaction.animation = nil
+    withTransaction(transaction) {
+        updates()
+    }
+}
+
+/// 丢弃掉帧期间积压的旧表冠位移，只消费当前绘制周期内合理的输入量。
+///
+/// `DigitalCrownEvent.offset` 可能在主线程繁忙后一次跳过很多 detent。如果把
+/// 差值全量应用，页面会在动画恢复时突然追赶。限制为两个 0.25 小刻度后，
+/// 当前速度仍参与位移倍率，但历史积压不会污染下一帧。
+private func frameBoundCrownDelta(
+    from previousOffset: Double,
+    to currentOffset: Double
+) -> Double {
+    min(0.5, max(-0.5, currentOffset - previousOffset))
+}
+
+/// 日、周视图统一的表冠速度倍率，确保两个页面具有相同的机械手感。
+private func calendarPageCrownSpeedScale(_ velocity: Double) -> Double {
+    min(2.0, max(0.85, 0.8 + abs(velocity) * 0.09))
+}
+
+/// 把一个表冠小刻度换算成日、周分页共用的横向像素行程。
+private func calendarPageCrownTickDistance(
+    pageWidth: CGFloat,
+    velocity: Double
+) -> CGFloat {
+    pageWidth * 0.044 * calendarPageCrownSpeedScale(velocity)
+}
+
+/// 结合实际位移和系统预测位移，选择最接近的前/当前/后页。
+private func horizontalDragMotion(
+    _ value: DragGesture.Value,
+    currentOffset: CGFloat,
+    pageWidth: CGFloat
+) -> HorizontalPageMotion {
+    let projectedRemainder = value.predictedEndTranslation.width
+        - value.translation.width
+    let projectedOffset = currentOffset + projectedRemainder * 0.28
+    let direction = nearestPageDirection(
+        for: projectedOffset,
+        width: pageWidth
+    )
+    // `predictedEndTranslation` 通常覆盖约 0.2 秒减速过程，用它估算速度
+    // 可以让快甩吸附更利落、慢拖吸附更柔和。
+    let velocity = abs(projectedRemainder) / 0.2
+    return HorizontalPageMotion(direction: direction, velocity: velocity)
+}
+
+/// 偏移超过半页时选择相邻页，否则回到当前页。
+private func nearestPageDirection(
+    for offset: CGFloat,
+    width: CGFloat
+) -> Int {
+    guard width > 0 else { return 0 }
+    if offset <= -width / 2 { return 1 }
+    if offset >= width / 2 { return -1 }
+    return 0
+}
+
+/// 统一生成日、周页面的吸附参数。
+///
+/// 调用方可以在生成前按业务范围调整方向，例如周视图在学期边界把方向改为
+/// `0`。这里仅处理视觉参数，不修改日期、周次或触觉状态。
+private func horizontalPageSnap(
+    direction: Int,
+    currentOffset: CGFloat,
+    velocity: CGFloat,
+    width: CGFloat
+) -> HorizontalPageSnap {
+    let normalizedDirection = min(1, max(-1, direction))
+    let target = -CGFloat(normalizedDirection) * width
+    return HorizontalPageSnap(
+        direction: normalizedDirection,
+        target: target,
+        duration: pageSnapDuration(
+            from: currentOffset,
+            to: target,
+            velocity: velocity,
+            width: width
+        )
+    )
+}
+
+/// 根据剩余距离与输入速度选择短促吸附时长。
+///
+/// 系统 `onIdle` 会立即触发；这里把动画限制在 35–65ms，只保留两到四帧
+/// 完成视觉收口，避免表冠已经松开后页面仍长时间移动。
+private func pageSnapDuration(
+    from current: CGFloat,
+    to target: CGFloat,
+    velocity: CGFloat,
+    width: CGFloat
+) -> Double {
+    let remainingRatio = min(1, abs(target - current) / max(1, width))
+    let normalizedVelocity = abs(velocity) / max(1, width)
+    let distanceDuration = 0.035 + Double(remainingRatio) * 0.03
+    return min(
+        0.065,
+        max(
+            0.035,
+            distanceDuration / (1 + Double(normalizedVelocity) * 0.08)
+        )
+    )
 }
 
 /// 日/周视图左上角共用的日期导航条。
@@ -830,8 +1378,8 @@ private struct DateNavigationHeader: View {
                 .accessibilityHidden(true)
         }
         .frame(height: 22)
-        // 两个透明按钮通过 overlay 扩大热区，不参与 HStack 宽度计算；
-        // 日期文字因此保持修改前的位置、宽度和缩放比例。
+        // 两个透明按钮通过 overlay 扩大热区，不参与 HStack 宽度计算，
+        // 日期文字的可用宽度和缩放比例保持稳定。
         .overlay(alignment: .leading) {
             Button(action: previous) {
                 Color.clear

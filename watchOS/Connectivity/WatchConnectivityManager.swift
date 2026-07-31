@@ -37,9 +37,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         static let scheduleUnchanged = "scheduleUnchanged"
     }
 
-    /// 当前实现允许手机响应的最长时间。
+    /// 一整轮渐进刷新允许的最长等待时间。
     private static let refreshTimeoutNanoseconds: UInt64 =
         12_000_000_000
+
+    /// App 打开后等待手机首次实时回复的时间。
+    private static let launchReplyTimeoutNanoseconds: UInt64 =
+        3_000_000_000
 
     /// Store 由 App 生命周期持有，此处使用弱引用避免单例形成所有权环。
     private weak var store: WatchScheduleStore?
@@ -49,6 +53,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
     /// 当前三阶段响应必须全部属于同一个手机课表版本。
     private var activeIncomingScheduleVersion: String?
+
+    /// 每次 App 打开时建立一次独立的实时回复等待窗口。
+    ///
+    /// 它不能复用普通刷新超时：手机不可达时普通刷新会立即回退到系统保存的
+    /// Application Context，而启动提示需要继续等待真正的手机实时回复。
+    private var launchAttemptID: UUID?
+    private var launchAttemptRefreshID: UUID?
 
     private override init() {
         super.init()
@@ -68,17 +79,45 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         let session = WCSession.default
         configureAndActivate(session)
         consumeLatestApplicationContext(from: session)
-
-        if session.activationState == .activated {
-            beginProgressiveRefresh()
-        }
+        beginLaunchRefresh()
     }
 
     /// 启动或强制重启三阶段渐进刷新。
     @MainActor
     func beginProgressiveRefresh(force: Bool = false) {
+        _ = startProgressiveRefresh(force: force)
+    }
+
+    /// App 每次打开或回到前台时调用：发起课表请求，并单独等待实时回复。
+    ///
+    /// Application Context 仍可立即恢复缓存，但旧上下文不算本轮手机回复；
+    /// 只有实时消息返回后才会取消“打开手机”的提示。
+    @MainActor
+    func beginLaunchRefresh() {
         guard let store else { return }
-        guard force || !store.isRefreshing else { return }
+
+        let attemptID = UUID()
+        launchAttemptID = attemptID
+        launchAttemptRefreshID = nil
+        store.beginLaunchSyncAttempt()
+        scheduleLaunchReplyTimeout(for: attemptID)
+
+        let session = WCSession.default
+        guard session.activationState == .activated else {
+            if session.activationState == .notActivated {
+                configureAndActivate(session)
+            }
+            return
+        }
+        startProgressiveRefreshForLaunchAttempt()
+    }
+
+    /// 创建一轮渐进刷新并返回其 ID，供启动实时回复与具体请求精确关联。
+    @MainActor
+    @discardableResult
+    private func startProgressiveRefresh(force: Bool) -> UUID? {
+        guard let store else { return nil }
+        guard force || !store.isRefreshing else { return nil }
 
         let newRefreshID = UUID()
         refreshID = newRefreshID
@@ -90,6 +129,18 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             refreshID: newRefreshID
         )
         scheduleTimeout(for: newRefreshID)
+        return newRefreshID
+    }
+
+    /// WCSession 激活后为当前启动等待窗口发送唯一一轮渐进请求。
+    @MainActor
+    private func startProgressiveRefreshForLaunchAttempt() {
+        guard launchAttemptID != nil,
+              launchAttemptRefreshID == nil
+        else {
+            return
+        }
+        launchAttemptRefreshID = startProgressiveRefresh(force: true)
     }
 
     /// 设置 WCSession 代理并触发系统激活。
@@ -127,6 +178,23 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// 启动请求超时只改变提示状态，不触碰任何已安装或正在展示的缓存。
+    @MainActor
+    private func scheduleLaunchReplyTimeout(for expectedAttemptID: UUID) {
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(
+                nanoseconds: Self.launchReplyTimeoutNanoseconds
+            )
+            guard !Task.isCancelled,
+                  let self,
+                  self.launchAttemptID == expectedAttemptID
+            else {
+                return
+            }
+            self.store?.markLaunchSyncTimedOut()
+        }
+    }
+
     /// WCSession 激活完成回调。
     func session(
         _ session: WCSession,
@@ -148,6 +216,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     ) {
         Task { @MainActor [weak self] in
             guard let self else { return }
+            self.receiveLivePhoneReply()
             let requiresFullSync =
                 self.applicationContextRequiresFullSync(applicationContext)
             _ = self.consumeApplicationContext(applicationContext)
@@ -164,6 +233,22 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     ) {
         Task { @MainActor [weak self] in
             self?.consumePreferredLanguage(from: message)
+        }
+    }
+
+    /// 超时提示出现后用户再打开手机时，系统会更新可达状态。
+    ///
+    /// 只要当前仍有一轮启动等待尚未收到回复，就重建请求与超时窗口；手机
+    /// 成功回复后 `receiveLivePhoneReply` 会自动撤下缓存提示或整页引导。
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        guard session.isReachable else { return }
+        Task { @MainActor [weak self] in
+            guard let self,
+                  self.launchAttemptID != nil
+            else {
+                return
+            }
+            self.beginLaunchRefresh()
         }
     }
 
@@ -186,8 +271,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     /// 导致真正的请求永远没有发送，只能等到超时。
     private func handleActivatedSession(_ session: WCSession) {
         Task { @MainActor [weak self] in
-            self?.consumeLatestApplicationContext(from: session)
-            self?.beginProgressiveRefresh(force: true)
+            guard let self else { return }
+            self.consumeLatestApplicationContext(from: session)
+            if self.launchAttemptID == nil {
+                self.beginLaunchRefresh()
+            } else {
+                self.startProgressiveRefreshForLaunchAttempt()
+            }
         }
     }
 
@@ -257,6 +347,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             ),
             replyHandler: { [weak self] reply in
                 Task { @MainActor in
+                    self?.receiveLivePhoneReply(
+                        refreshID: expectedRefreshID
+                    )
                     self?.handle(
                         reply: reply,
                         expectedScope: scope,
@@ -500,7 +593,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         // 语言上下文可以独立存在，因此必须在检查课表字段之前安装。
         consumePreferredLanguage(from: context)
 
-        // 已完整安装相同版本时不再解码 14 天 JSON，也不触发页面重新分组。
+        // 相同的完整版本直接复用本地缓存，避免重复解码和页面重新分组。
         if let version = context[Key.scheduleVersion] as? String,
            version == store?.installedScheduleVersion
         {
@@ -539,6 +632,24 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             return
         }
         _ = store?.setPreferredLanguage(language)
+    }
+
+    /// 标记当前启动请求已收到手机实时通信，并让缓存提示或空状态页自动消失。
+    ///
+    /// 消息请求回复必须匹配本轮关联的刷新 ID；Application Context 的代理
+    /// 回调本身就是实时到达，因此可以不传 ID。磁盘中旧的 Context 由主动
+    /// `consumeLatestApplicationContext` 读取，不会经过这里，也不会误判。
+    @MainActor
+    private func receiveLivePhoneReply(refreshID: UUID? = nil) {
+        guard launchAttemptID != nil else { return }
+        if let refreshID,
+           refreshID != launchAttemptRefreshID
+        {
+            return
+        }
+        launchAttemptID = nil
+        launchAttemptRefreshID = nil
+        store?.receiveLaunchSyncReply()
     }
 
     /// 判断异步回调是否仍属于最新一轮刷新。
