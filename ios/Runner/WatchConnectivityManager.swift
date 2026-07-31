@@ -1,6 +1,7 @@
 // Copyright 2026 Traintime PDA Authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import CryptoKit
 import Foundation
 import WatchConnectivity
 
@@ -27,7 +28,15 @@ private struct PhoneScheduleDocument {
 /// 尚未成功写入 WCSession Application Context 的课表。
 private struct PendingPhoneSchedule {
     let json: String
+    let version: String
     let revision: Int
+}
+
+/// 更新手机本地完整课表后的判定结果。
+private struct StoredPhoneScheduleResult {
+    let version: String?
+    let revision: Int
+    let changed: Bool
 }
 
 /// iPhone 端的 WatchConnectivity 管理器。
@@ -46,17 +55,23 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         static let nextOffset = "scheduleNextOffset"
         static let hasMore = "scheduleHasMore"
         static let preferredLanguage = "preferredLanguage"
+        static let scheduleVersion = "scheduleVersion"
+        static let scheduleUnchanged = "scheduleUnchanged"
     }
 
     private static let persistedScheduleKey =
         "TraintimeWatchSemesterSchedule"
     private static let persistedLanguageKey =
         "TraintimeWatchPreferredLanguage"
+    private static let persistedScheduleVersionKey =
+        "TraintimeWatchSemesterScheduleVersion"
+    private static let scheduleVersionPrefix = "v1:"
     private static let semesterChunkSize = 50
 
     /// WCSession 回调和 Flutter Pigeon 调用可能来自不同线程。
     private let stateLock = NSLock()
     private var latestScheduleJSON: String?
+    private var latestScheduleVersion: String?
     private var latestPreferredLanguage: String?
     private var latestRevision = 0
     private var pendingSchedule: PendingPhoneSchedule?
@@ -70,15 +85,25 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
             forKey: Self.persistedLanguageKey
         )
         latestScheduleJSON = storedJSON
+        latestScheduleVersion = Self.scheduleVersion(for: storedJSON)
         latestPreferredLanguage = Self.normalizedLanguage(storedLanguage)
         super.init()
 
         if let storedJSON, !isValidScheduleJSON(storedJSON) {
             latestScheduleJSON = nil
+            latestScheduleVersion = nil
             UserDefaults.standard.removeObject(
                 forKey: Self.persistedScheduleKey
             )
+            UserDefaults.standard.removeObject(
+                forKey: Self.persistedScheduleVersionKey
+            )
             log("Removed invalid persisted schedule")
+        } else if let latestScheduleVersion {
+            UserDefaults.standard.set(
+                latestScheduleVersion,
+                forKey: Self.persistedScheduleVersionKey
+            )
         }
     }
 
@@ -98,20 +123,31 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
             return false
         }
 
-        let revision = storeLatestSchedule(json)
-        persistSchedule(json)
+        let result = storeLatestSchedule(json)
+        guard result.changed else {
+            log("Schedule content unchanged; skipped republishing")
+            return true
+        }
+        persistSchedule(json, version: result.version)
 
         guard WCSession.isSupported() else { return false }
         let session = WCSession.default
         guard session.activationState == .activated else {
-            setPendingSchedule(json: json, revision: revision)
+            if let version = result.version {
+                setPendingSchedule(
+                    json: json,
+                    version: version,
+                    revision: result.revision
+                )
+            }
             configureAndActivate(session)
             return true
         }
 
         return updateApplicationContext(
             json: json,
-            revision: revision,
+            version: result.version,
+            revision: result.revision,
             session: session
         )
     }
@@ -156,35 +192,66 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         session.activate()
     }
 
-    /// 更新最近课表并返回本次写入的 revision。
-    private func storeLatestSchedule(_ json: String) -> Int {
-        withStateLock {
+    /// 比较完整课表语义版本，仅在内容变化时更新内存状态。
+    ///
+    /// `generatedAtEpochMs` 不参与版本计算，因此 App 重启或响应式 effect
+    /// 重建同一份课表时不会触发无意义的 WatchConnectivity 传输。
+    private func storeLatestSchedule(
+        _ json: String
+    ) -> StoredPhoneScheduleResult {
+        let version = Self.scheduleVersion(for: json)
+        return withStateLock {
+            guard version != latestScheduleVersion else {
+                return StoredPhoneScheduleResult(
+                    version: version,
+                    revision: latestRevision,
+                    changed: false
+                )
+            }
+
             latestRevision += 1
-            latestScheduleJSON = json
-            return latestRevision
+            latestScheduleJSON = json.isEmpty ? nil : json
+            latestScheduleVersion = version
+            return StoredPhoneScheduleResult(
+                version: version,
+                revision: latestRevision,
+                changed: true
+            )
         }
     }
 
-    /// 把完整学期快照持久化到手机本地。
-    private func persistSchedule(_ json: String) {
+    /// 把完整学期快照及其稳定版本号持久化到手机本地。
+    private func persistSchedule(_ json: String, version: String?) {
         if json.isEmpty {
             UserDefaults.standard.removeObject(
                 forKey: Self.persistedScheduleKey
+            )
+            UserDefaults.standard.removeObject(
+                forKey: Self.persistedScheduleVersionKey
             )
         } else {
             UserDefaults.standard.set(
                 json,
                 forKey: Self.persistedScheduleKey
             )
+            UserDefaults.standard.set(
+                version,
+                forKey: Self.persistedScheduleVersionKey
+            )
         }
     }
 
     /// 只记录仍属于最新 revision 的待发送数据。
-    private func setPendingSchedule(json: String, revision: Int) {
+    private func setPendingSchedule(
+        json: String,
+        version: String,
+        revision: Int
+    ) {
         withStateLock {
             guard revision == latestRevision else { return }
             pendingSchedule = PendingPhoneSchedule(
                 json: json,
+                version: version,
                 revision: revision
             )
         }
@@ -208,6 +275,11 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         withStateLock { latestScheduleJSON }
     }
 
+    /// 读取手机当前完整学期课表的稳定版本号。
+    private func currentLatestScheduleVersion() -> String? {
+        withStateLock { latestScheduleVersion }
+    }
+
     /// 读取当前语言的线程安全副本。
     private func currentPreferredLanguage() -> String? {
         withStateLock { latestPreferredLanguage }
@@ -226,6 +298,7 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     /// 大 JSON；手表主动打开后再通过 sendMessage 分页请求全部数据。
     private func updateApplicationContext(
         json: String,
+        version: String?,
         revision: Int,
         session: WCSession
     ) -> Bool {
@@ -238,12 +311,21 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
 
         do {
             try session.updateApplicationContext(
-                applicationContext(for: fallback)
+                applicationContext(
+                    for: fallback,
+                    scheduleVersion: version
+                )
             )
             clearPendingSchedule(revision: revision)
             return true
         } catch {
-            setPendingSchedule(json: json, revision: revision)
+            if let version {
+                setPendingSchedule(
+                    json: json,
+                    version: version,
+                    revision: revision
+                )
+            }
             log("Failed to update application context: \(error)")
             return false
         }
@@ -251,12 +333,16 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
 
     /// 生成 Application Context 使用的协议字典。
     private func applicationContext(
-        for response: PhoneScheduleResponse
+        for response: PhoneScheduleResponse,
+        scheduleVersion: String?
     ) -> [String: Any] {
         var context: [String: Any] = [
             Key.scheduleJSON: response.json,
             Key.scope: PhoneScheduleScope.fourteenDays.rawValue,
         ]
+        if let scheduleVersion {
+            context[Key.scheduleVersion] = scheduleVersion
+        }
         if let language = currentPreferredLanguage() {
             context[Key.preferredLanguage] = language
         }
@@ -279,7 +365,10 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
                 offset: 0,
                 now: Date()
             )
-            context = applicationContext(for: fallback)
+            context = applicationContext(
+                for: fallback,
+                scheduleVersion: currentLatestScheduleVersion()
+            )
         }
         context[Key.preferredLanguage] = language
 
@@ -504,6 +593,39 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         return String(data: data, encoding: .utf8)
     }
 
+    /// 为完整学期课表生成跨启动稳定的语义版本号。
+    ///
+    /// JSON 使用排序键重新编码后计算 SHA-256；唯一被剔除的字段是每次构建
+    /// 都变化、但不影响展示内容的 `generatedAtEpochMs`。课程、考试、实验、
+    /// 周次、提醒、颜色或时间等任何实际字段变化都会产生新版本。
+    private static func scheduleVersion(for json: String?) -> String? {
+        guard let json,
+              !json.isEmpty,
+              let data = json.data(using: .utf8),
+              let object = try? JSONSerialization.jsonObject(with: data),
+              var root = object as? [String: Any],
+              root["courses"] is [[String: Any]]
+        else {
+            return nil
+        }
+
+        root.removeValue(forKey: "generatedAtEpochMs")
+        guard JSONSerialization.isValidJSONObject(root),
+              let canonicalData = try? JSONSerialization.data(
+                  withJSONObject: root,
+                  options: [.sortedKeys]
+              )
+        else {
+            return nil
+        }
+
+        let digest = SHA256.hash(data: canonicalData)
+        let hexadecimal = digest.map {
+            String(format: "%02x", $0)
+        }.joined()
+        return scheduleVersionPrefix + hexadecimal
+    }
+
     /// 从 JSON 的 NSNumber 字段读取毫秒时间戳。
     private func epochValue(_ value: Any?) -> Int64? {
         (value as? NSNumber)?.int64Value
@@ -572,6 +694,7 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         if let pending = currentPendingSchedule() {
             _ = updateApplicationContext(
                 json: pending.json,
+                version: pending.version,
                 revision: pending.revision,
                 session: session
             )
@@ -599,13 +722,38 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         }
 
         let scope = requestedScope(from: message)
+        let sourceJSON = sourceScheduleJSON(session: session)
+        let scheduleVersion =
+            currentLatestScheduleVersion()
+            ?? Self.scheduleVersion(for: sourceJSON)
+
+        // 手表只上传它已经完整安装的版本号。相同则用一个轻量回复结束，
+        // 不生成当天/14 天 JSON，更不会启动整学期分页传输。
+        if let scheduleVersion,
+           requestedScheduleVersion(from: message) == scheduleVersion
+        {
+            replyHandler(
+                unchangedReplyDictionary(
+                    scope: scope,
+                    scheduleVersion: scheduleVersion
+                )
+            )
+            return
+        }
+
         let response = responsePayload(
-            sourceJSON: sourceScheduleJSON(session: session),
+            sourceJSON: sourceJSON,
             scope: scope,
             offset: requestedOffset(from: message),
             now: Date()
         )
-        replyHandler(replyDictionary(response: response, scope: scope))
+        replyHandler(
+            replyDictionary(
+                response: response,
+                scope: scope,
+                scheduleVersion: scheduleVersion
+            )
+        )
     }
 
     /// 判断消息是否为课表请求。
@@ -629,16 +777,45 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         message[Key.offset] as? Int ?? 0
     }
 
+    /// 读取手表已经完整安装的课表版本；请求本身不携带任何课表正文。
+    private func requestedScheduleVersion(
+        from message: [String: Any]
+    ) -> String? {
+        message[Key.scheduleVersion] as? String
+    }
+
     /// 生成返回给手表的协议字典。
     private func replyDictionary(
         response: PhoneScheduleResponse,
-        scope: PhoneScheduleScope
+        scope: PhoneScheduleScope,
+        scheduleVersion: String?
     ) -> [String: Any] {
         var reply: [String: Any] = [
             Key.scheduleJSON: response.json,
             Key.scope: scope.rawValue,
             Key.nextOffset: response.nextOffset,
             Key.hasMore: response.hasMore,
+        ]
+        if let scheduleVersion {
+            reply[Key.scheduleVersion] = scheduleVersion
+        }
+        if let language = currentPreferredLanguage() {
+            reply[Key.preferredLanguage] = language
+        }
+        return reply
+    }
+
+    /// 版本一致时返回的轻量确认，不包含课表 JSON。
+    private func unchangedReplyDictionary(
+        scope: PhoneScheduleScope,
+        scheduleVersion: String
+    ) -> [String: Any] {
+        var reply: [String: Any] = [
+            Key.scope: scope.rawValue,
+            Key.scheduleVersion: scheduleVersion,
+            Key.scheduleUnchanged: true,
+            Key.hasMore: false,
+            Key.nextOffset: 0,
         ]
         if let language = currentPreferredLanguage() {
             reply[Key.preferredLanguage] = language

@@ -22,6 +22,7 @@
     },
     "%1$@，第%2$lld到第%3$lld节" : {
       "comment" : "VoiceOver 对课程名称和节次范围的描述",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -40,7 +41,11 @@
     "%lld" : {
 
     },
+    "上一项" : {
+
+    },
     "下一节" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57,6 +62,7 @@
       }
     },
     "下一节课" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -72,7 +78,11 @@
         }
       }
     },
+    "下一项" : {
+
+    },
     "从手机刷新" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -89,6 +99,7 @@
       }
     },
     "全学期课表无法合并" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -137,6 +148,7 @@
       }
     },
     "切换视图" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -169,6 +181,7 @@
       }
     },
     "同步失败：%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -201,6 +214,7 @@
       }
     },
     "周视图" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -233,6 +247,7 @@
       }
     },
     "地点未定" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -265,6 +280,7 @@
       }
     },
     "实验" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -281,6 +297,7 @@
       }
     },
     "当前" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -345,6 +362,7 @@
       }
     },
     "手机端暂无课表，请先刷新手机课表" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -361,6 +379,7 @@
       }
     },
     "手机端暂无课表，请先在 iPhone 打开并刷新课表" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -377,6 +396,7 @@
       }
     },
     "手机端没有可用的学期课表" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -409,6 +429,7 @@
       }
     },
     "无法连接 iPhone：%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -425,6 +446,7 @@
       }
     },
     "日视图" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -473,6 +495,7 @@
       }
     },
     "暂时无法连接 iPhone" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -520,6 +543,23 @@
         }
       }
     },
+    "概览" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overview"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "概覽"
+          }
+        }
+      }
+    },
     "正在上课" : {
       "localizations" : {
         "en" : {
@@ -537,6 +577,7 @@
       }
     },
     "正在刷新" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -553,6 +594,7 @@
       }
     },
     "正在获取今天" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -569,6 +611,7 @@
       }
     },
     "正在获取整个学期" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -585,6 +628,7 @@
       }
     },
     "正在获取近 14 天" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -601,6 +645,7 @@
       }
     },
     "此设备不支持与 iPhone 同步" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -633,6 +678,7 @@
       }
     },
     "物理实验" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -650,6 +696,7 @@
     },
     "第%lld周" : {
       "comment" : "学期周次标题",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -666,6 +713,7 @@
       }
     },
     "考试" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -682,6 +730,7 @@
       }
     },
     "请在配对的 iPhone 上打开 Traintime PDA" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -698,6 +747,7 @@
       }
     },
     "请在配对的 iPhone 上打开应用并刷新课表" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -714,6 +764,7 @@
       }
     },
     "课程列表" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -746,6 +797,7 @@
       }
     },
     "课表数据无法读取" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

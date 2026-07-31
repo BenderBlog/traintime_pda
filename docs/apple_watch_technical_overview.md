@@ -15,6 +15,7 @@
 - Apple Watch 只负责同步、缓存和展示；
 - 手机不可达时，手表继续显示本地缓存；
 - 每次刷新按“当天 → 近 14 天 → 全学期”渐进更新，不阻塞现有页面。
+- 手表请求只携带已完整安装的课表版本号；版本未变化时不重复传输 JSON。
 
 ```mermaid
 flowchart LR
@@ -157,9 +158,15 @@ Pigeon 生成文件不应手动维护。修改接口后应从 `pigeon_bridge/sav
 - 手表当前可达时，通过即时消息立即发布语言；
 - 响应 Apple Watch 的即时请求；
 - 按当天、14 天或全学期范围过滤数据；
-- 将完整学期拆成小块传输。
+- 将完整学期拆成小块传输；
+- 为完整课表生成稳定的语义版本号，并对相同版本返回轻量确认。
 
 完整学期默认每块发送 50 条日程，避免单条 WatchConnectivity 消息过大。
+
+语义版本号由规范化后的完整快照计算：JSON 重新按键排序后使用 SHA-256，
+仅排除每次构建都会变化、但不影响展示内容的 `generatedAtEpochMs`。课程、
+考试、实验、周次、提醒、颜色或时间发生变化时都会得到新版本。这样手机
+即使重新启动，也能判断手表已有数据是否真的需要重传。
 
 每个课表请求回复也会携带当前语言。这样即使手表错过了语言即时消息，也能在下一次自动刷新或手动刷新时自动修正界面语言。
 
@@ -250,7 +257,15 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 3. 有效的当天缓存；
 4. 如果都过期，则显示最近一次缓存。
 
-同步开始时不会清空已有缓存。只有一个阶段完整解码成功后，才替换当前页面数据并持久化该阶段缓存。
+同步开始时不会清空已有缓存。只有一个阶段完整解码成功后，才替换当前页面数据并持久化该阶段缓存：
+
+- `today` 完成后只替换当天覆盖的日期范围，其他日期保持原样；
+- `fourteenDays` 完成后只替换对应 14 天范围，范围外数据保持原样；
+- `semester` 的中间分块只写入内存缓冲区，最后一块校验、编码成功后才原子替换完整学期。
+
+手表只有在完整学期全部安装成功后才持久化 `scheduleVersion`。如果在当天或
+14 天阶段就写入版本号，中途断线会让一份局部缓存被误认为完整课表。若完整
+学期缓存损坏或丢失，Store 也会主动清除孤立版本号，避免手机错误返回“无需更新”。
 
 ### 4. watchOS 通信管理器
 
@@ -266,6 +281,8 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 - 发起当天、14 天和全学期请求；
 - 处理手机返回的 JSON；
 - 逐块接收并合并完整学期；
+- 在请求中仅携带已安装版本号，并处理“不变更”轻量回复；
+- 保证同一轮三个阶段属于同一个手机课表版本；
 - 手机不可达时读取最近 Application Context；
 - 处理连接超时和错误。
 
@@ -292,14 +309,38 @@ Swift 端使用 `Codable` 解码手机生成的 JSON。
 - 显示教室、教师和考试座位号；
 - 课程时间统一使用 24 小时制；
 - 周视图显示第几周和 1 至 10 节课；
-- 点击周视图色块从底部弹出详情；
+- 点击周视图色块后，在根视图最顶层从底部弹出详情；
 - 日视图只用于浏览，不打开详情；
+- 日视图和周视图支持左右滑动切换相邻日或相邻周，并保留既有学期边界与触觉；
 - 页面切换和刷新按钮使用 watchOS 原生液态玻璃样式；
 - 数码表冠滚动时隐藏浮动按钮；
+- 日、周和详情页分别把表冠输入映射为滚动、翻页或边界回弹；
 - 同步在后台执行，刷新图标显示旋转动画；
 - 全部阶段完成后显示非阻塞的同步完成提示。
 
-### 6. 国际化与语言同步
+### 6. 视图职责与函数化边界
+
+本轮代码审计将交互状态、页面语义和绘制内容拆开，方便后续维护时只修改
+一个层级。该重构不改变现有 frame、padding、spacing、颜色、动画或表冠阈值：
+
+- `RootScheduleView` 负责页面切换、刷新控件和根级课程详情覆盖层；
+- `WeekScheduleView` 只负责周网格、周切换和把选中的课程写回根视图；
+- `DayScheduleView` 负责日内滚动、边界回弹和切日规则；
+- `CourseDetailView` 负责详情内容、随内容滚动的关闭按钮及原生表冠滚动；
+- `WatchCrownTurnSession` 只识别一次连续表冠操作、方向和剩余刻度，不决定页面阈值、动画或触觉类型；
+- `WatchConnectivityManager` 只编排通信阶段，`WatchScheduleStore` 负责解码、合并、缓存和发布状态。
+
+课程详情使用根级覆盖层而不是子视图 Sheet。打开时把课程写入根视图的
+`selectedCourse`，关闭时直接置空，因此不会遗留系统自动生成的第二个关闭
+按钮。详情内容由原生 ScrollView 同时处理手指、表冠和边界皮筋，关闭按钮
+属于同一滚动内容。关闭时先释放详情滚动焦点，待退出转场结束后再把焦点
+交还周视图，避免实体 Apple Watch 上两个 Crown/Scroll 响应器同时抢占。
+
+维护布局时应继续把尺寸与间距留在对应 View 中。通信、缓存或表冠状态机的
+重构不应顺带修改视觉常量；若确需改布局，应作为独立改动通过真机和多尺寸
+模拟器截图验证。
+
+### 7. 国际化与语言同步
 
 主要文件：
 
@@ -320,7 +361,7 @@ SwiftUI 根视图通过 `.environment(\.locale, ...)` 更新日期和星期格�
 
 语言同步只改变手表界面文字、日期和星期格式。课程、考试和实验的业务名称来自手机端教务数据，不做机器翻译或字面转换。
 
-### 7. Smart Stack 课程小组件
+### 8. Smart Stack 课程小组件
 
 主要文件：
 
@@ -364,7 +405,7 @@ SwiftUI 根视图通过 `.environment(\.locale, ...)` 更新日期和星期格�
 
 #### `updateApplicationContext`
 
-由手机发布最近一次可用的 14 天数据和当前语言。
+由手机发布最近一次可用的 14 天数据、对应课表版本和当前语言。
 
 适合：
 
@@ -373,7 +414,11 @@ SwiftUI 根视图通过 `.environment(\.locale, ...)` 更新日期和星期格�
 - 即时请求失败时恢复部分可用数据；
 - 手表稍后启动时恢复手机最后设置的语言。
 
-Application Context 只保留最新状态，不用于传输全学期分页。语言可以独立于课表存在，因此首次登录前的上下文也可能只包含 `preferredLanguage`。
+Application Context 只保留最新状态，不用于传输全学期分页。手表已经完整
+安装相同 `scheduleVersion` 时会跳过 14 天 JSON 解码；版本不同则先把这份
+14 天数据按范围合入当前页面，再启动正常的“当天 → 14 天 → 学期”刷新。
+语言可以独立于课表存在，因此首次登录前的上下文也可能只包含
+`preferredLanguage`。
 
 ### 消息字段
 
@@ -387,6 +432,8 @@ iPhone 和 Apple Watch 使用以下固定 Key：
 | `scheduleNextOffset` | `Int` | 下一块起始偏移 |
 | `scheduleHasMore` | `Bool` | 是否还有后续分块 |
 | `scheduleJSON` | `String` | 当前范围的快照 JSON |
+| `scheduleVersion` | `String` | 完整学期课表的语义版本；请求端只发送版本号，不发送课表正文 |
+| `scheduleUnchanged` | `Bool` | 版本一致的轻量确认；为 `true` 时回复不包含 `scheduleJSON` |
 | `preferredLanguage` | `String` | `zh_CN`、`zh_TW` 或 `en_US` |
 
 ### 一次完整刷新的时序
@@ -398,34 +445,46 @@ sequenceDiagram
     participant PC as iPhone WCSession
     participant P as iPhone 快照缓存
 
-    W->>WC: 请求 today
-    WC->>PC: sendMessage(scope=today)
+    W->>WC: 请求 today + 已安装 scheduleVersion
+    WC->>PC: sendMessage(scope=today, version)
     PC->>P: 读取完整学期快照
     P-->>PC: JSON
-    PC-->>WC: 当天快照 + preferredLanguage
-    WC-->>W: 安装语言、解码、缓存并替换页面
+    PC->>PC: 计算/读取语义版本
 
-    W->>WC: 请求 fourteenDays
-    WC->>PC: sendMessage(scope=fourteenDays)
-    PC-->>WC: 14 天快照
-    WC-->>W: 解码、缓存并替换页面
+    alt 与手表版本一致
+        PC-->>WC: scheduleUnchanged=true + preferredLanguage
+        WC-->>W: 保留现有页面与缓存，结束刷新
+    else 版本不同或手表没有完整版本
+        PC-->>WC: 当天快照 + scheduleVersion + preferredLanguage
+        WC-->>W: 只替换当天范围并缓存
 
-    W->>WC: 请求 semester(offset=0)
-    WC->>PC: sendMessage(scope=semester)
-    PC-->>WC: 第 1 块 + nextOffset + hasMore
-    WC-->>W: 写入临时 semesterBuffer
+        W->>WC: 请求 fourteenDays
+        WC->>PC: sendMessage(scope=fourteenDays)
+        PC-->>WC: 14 天快照 + 同一 scheduleVersion
+        WC-->>W: 只替换 14 天范围并缓存
 
-    loop hasMore == true
-        W->>WC: 请求 semester(nextOffset)
-        WC->>PC: sendMessage
-        PC-->>WC: 下一块
-        WC-->>W: 合并到 semesterBuffer
+        W->>WC: 请求 semester(offset=0)
+        WC->>PC: sendMessage(scope=semester)
+        PC-->>WC: 第 1 块 + nextOffset + hasMore + 同一版本
+        WC-->>W: 写入临时 semesterBuffer
+
+        loop hasMore == true
+            W->>WC: 请求 semester(nextOffset)
+            WC->>PC: sendMessage
+            PC-->>WC: 下一块 + 同一版本
+            WC-->>W: 合并到 semesterBuffer
+        end
+
+        W->>W: 生成完整学期快照
+        W->>W: 原子替换页面、写入缓存并确认版本
+        W->>W: 显示“同步完成”
     end
-
-    W->>W: 生成完整学期快照
-    W->>W: 原子替换页面并写入缓存
-    W->>W: 显示“同步完成”
 ```
+
+如果三个阶段之间手机课表版本发生变化，Watch 端会丢弃尚未完成的学期
+缓冲，并从 `today` 重新开始。这样不会把两个版本的课程拼接进同一份缓存。
+当天和 14 天每一步成功后会立即更新各自日期范围；未覆盖日期继续显示同步
+前缓存，失败也不会清空原页面。
 
 ### 一次语言切换的时序
 
@@ -525,6 +584,24 @@ sequenceDiagram
 
 ## 构建与验证
 
+### 静态审计
+
+不启动模拟器即可先检查本轮 Swift 重构的语法和差异格式：
+
+```bash
+swiftc -parse \
+  watchOS/Views/RootScheduleView.swift \
+  watchOS/Views/WeekScheduleView.swift \
+  watchOS/Views/CourseRow.swift \
+  watchOS/Connectivity/WatchConnectivityManager.swift \
+  watchOS/Storage/WatchScheduleStore.swift
+
+git diff --check
+```
+
+`swiftc -parse` 只检查语法，不替代 Xcode 的 SDK 类型检查、Target Membership、
+签名和嵌入验证，因此仍必须继续执行下面的双端构建。
+
 ### Dart 快照测试
 
 ```bash
@@ -557,6 +634,18 @@ xcodebuild \
 ```
 
 ### 完整 iPhone + Watch Companion 构建
+
+验证真机 SDK、Runner 与 Watch Companion 的嵌入关系：
+
+```bash
+xcodebuild \
+  -workspace ios/Runner.xcworkspace \
+  -scheme Runner \
+  -configuration Debug \
+  -destination 'generic/platform=iOS' \
+  -allowProvisioningUpdates \
+  build
+```
 
 Flutter 检测到 Watch Companion App 后，模拟器构建必须指定一个已与 Watch 模拟器配对的 iPhone 模拟器 UDID：
 

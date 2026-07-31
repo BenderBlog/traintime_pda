@@ -13,12 +13,14 @@ private struct ScheduleReplyPayload {
     let json: String
     let hasMore: Bool
     let nextOffset: Int
+    let scheduleVersion: String?
+    let isUnchanged: Bool
 }
 
 /// 管理 watchOS 与配对 iPhone 之间的课表同步。
 ///
-/// 同步顺序固定为：当天 → 近 14 天 → 整学期分页。每个阶段完整成功后，
-/// `WatchScheduleStore` 才会替换页面和缓存。
+/// 同步顺序固定为：当天 → 近 14 天 → 整学期分页。当天和 14 天阶段完整
+/// 成功后只替换其日期范围，整学期分页全部完成后再整体替换。
 final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     static let shared = WatchConnectivityManager()
 
@@ -31,6 +33,8 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         static let nextOffset = "scheduleNextOffset"
         static let hasMore = "scheduleHasMore"
         static let preferredLanguage = "preferredLanguage"
+        static let scheduleVersion = "scheduleVersion"
+        static let scheduleUnchanged = "scheduleUnchanged"
     }
 
     /// 当前实现允许手机响应的最长时间。
@@ -42,6 +46,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
     /// 每轮刷新使用独立 ID，忽略上一轮迟到的回复和超时任务。
     private var refreshID = UUID()
+
+    /// 当前三阶段响应必须全部属于同一个手机课表版本。
+    private var activeIncomingScheduleVersion: String?
 
     private override init() {
         super.init()
@@ -75,6 +82,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
         let newRefreshID = UUID()
         refreshID = newRefreshID
+        activeIncomingScheduleVersion = nil
         store.beginRefresh()
         request(
             scope: .today,
@@ -139,7 +147,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         didReceiveApplicationContext applicationContext: [String: Any]
     ) {
         Task { @MainActor [weak self] in
-            self?.consumeApplicationContext(applicationContext)
+            guard let self else { return }
+            let requiresFullSync =
+                self.applicationContextRequiresFullSync(applicationContext)
+            _ = self.consumeApplicationContext(applicationContext)
+            if requiresFullSync {
+                self.beginProgressiveRefresh()
+            }
         }
     }
 
@@ -205,6 +219,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             through: session,
             scope: scope,
             offset: offset,
+            installedScheduleVersion: store?.installedScheduleVersion,
             refreshID: expectedRefreshID
         )
     }
@@ -212,13 +227,18 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     /// 构造协议消息，所有字段在单一函数中维护。
     private func requestMessage(
         scope: WatchScheduleScope,
-        offset: Int
+        offset: Int,
+        installedScheduleVersion: String?
     ) -> [String: Any] {
-        [
+        var message: [String: Any] = [
             Key.requestSchedule: true,
             Key.scope: scope.rawValue,
             Key.offset: offset,
         ]
+        if let installedScheduleVersion {
+            message[Key.scheduleVersion] = installedScheduleVersion
+        }
+        return message
     }
 
     /// 实际发送消息并把闭包结果重新调度到主线程。
@@ -226,10 +246,15 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         through session: WCSession,
         scope: WatchScheduleScope,
         offset: Int,
+        installedScheduleVersion: String?,
         refreshID expectedRefreshID: UUID
     ) {
         session.sendMessage(
-            requestMessage(scope: scope, offset: offset),
+            requestMessage(
+                scope: scope,
+                offset: offset,
+                installedScheduleVersion: installedScheduleVersion
+            ),
             replyHandler: { [weak self] reply in
                 Task { @MainActor in
                     self?.handle(
@@ -308,6 +333,18 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             fallbackScope: expectedScope
         )
 
+        // 版本一致时手机不会附带 JSON；直接结束刷新，现有本地课表不变。
+        guard !finishUnchangedRefreshIfNeeded(payload, store: store) else {
+            return
+        }
+
+        // 三阶段中途若手机课表再次变化，丢弃旧学期分页并从“当天”重启，
+        // 防止把两个版本的课程拼成一份整学期缓存。
+        guard acceptIncomingScheduleVersion(payload.scheduleVersion) else {
+            beginProgressiveRefresh(force: true)
+            return
+        }
+
         if payload.scope == .semester {
             handleSemesterReply(
                 payload,
@@ -316,6 +353,39 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             return
         }
 
+        guard installCompletedRange(payload, into: store) else { return }
+
+        continueAfterCompletedScope(
+            payload.scope,
+            refreshID: expectedRefreshID
+        )
+    }
+
+    /// 处理手机返回的“版本未变化”轻量确认。
+    ///
+    /// 该回复没有 `scheduleJSON`。这里不能尝试走普通解码流程，也不能清空
+    /// 当前页面；只结束刷新状态即可继续使用手表已经完整安装的学期缓存。
+    @MainActor
+    private func finishUnchangedRefreshIfNeeded(
+        _ payload: ScheduleReplyPayload,
+        store: WatchScheduleStore
+    ) -> Bool {
+        guard payload.isUnchanged else { return false }
+        activeIncomingScheduleVersion = nil
+        store.finishRefreshWithoutScheduleChanges()
+        return true
+    }
+
+    /// 安装当天或近 14 天阶段，并集中处理无效载荷错误。
+    ///
+    /// 学期分页由 `handleSemesterReply` 负责，不会进入此函数。Store 会只替换
+    /// 当前阶段覆盖的日期范围，因此当天阶段不会误删其他日期，14 天阶段也
+    /// 不会提前覆盖尚未完成的整学期缓存。
+    @MainActor
+    private func installCompletedRange(
+        _ payload: ScheduleReplyPayload,
+        into store: WatchScheduleStore
+    ) -> Bool {
         guard store.replaceSchedule(
             json: payload.json,
             scope: payload.scope
@@ -323,13 +393,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             store.failRefresh(
                 watchLocalizedString("手机端暂无课表，请先刷新手机课表")
             )
-            return
+            return false
         }
-
-        continueAfterCompletedScope(
-            payload.scope,
-            refreshID: expectedRefreshID
-        )
+        return true
     }
 
     /// 把弱类型字典解析成稳定结构；缺失 scope 时使用请求中的预期范围。
@@ -345,8 +411,24 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             scope: scope,
             json: reply[Key.scheduleJSON] as? String ?? "",
             hasMore: reply[Key.hasMore] as? Bool ?? false,
-            nextOffset: reply[Key.nextOffset] as? Int ?? 0
+            nextOffset: reply[Key.nextOffset] as? Int ?? 0,
+            scheduleVersion: reply[Key.scheduleVersion] as? String,
+            isUnchanged: reply[Key.scheduleUnchanged] as? Bool ?? false
         )
+    }
+
+    /// 锁定本轮手机课表版本，并拒绝中途出现的另一个版本。
+    @MainActor
+    private func acceptIncomingScheduleVersion(_ value: String?) -> Bool {
+        guard let value, !value.isEmpty else {
+            // 与尚未升级协议的手机保持兼容。
+            return activeIncomingScheduleVersion == nil
+        }
+        guard let activeIncomingScheduleVersion else {
+            self.activeIncomingScheduleVersion = value
+            return true
+        }
+        return activeIncomingScheduleVersion == value
     }
 
     /// 合并学期分页；仍有下一页时继续请求，否则 Store 会结束整轮刷新。
@@ -358,7 +440,8 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         guard let store else { return }
         let accepted = store.appendSemesterChunk(
             json: payload.json,
-            isFinal: !payload.hasMore
+            isFinal: !payload.hasMore,
+            scheduleVersion: payload.scheduleVersion
         )
         guard accepted, payload.hasMore else { return }
 
@@ -417,6 +500,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         // 语言上下文可以独立存在，因此必须在检查课表字段之前安装。
         consumePreferredLanguage(from: context)
 
+        // 已完整安装相同版本时不再解码 14 天 JSON，也不触发页面重新分组。
+        if let version = context[Key.scheduleVersion] as? String,
+           version == store?.installedScheduleVersion
+        {
+            return true
+        }
+
         guard let json = context[Key.scheduleJSON] as? String,
               !json.isEmpty
         else {
@@ -427,6 +517,19 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             rawValue: context[Key.scope] as? String ?? ""
         ) ?? .fourteenDays
         return store?.replaceSchedule(json: json, scope: scope) ?? false
+    }
+
+    /// 判断手机主动推送的轻量上下文是否代表一份尚未完整安装的新课表。
+    @MainActor
+    private func applicationContextRequiresFullSync(
+        _ context: [String: Any]
+    ) -> Bool {
+        guard let version = context[Key.scheduleVersion] as? String,
+              !version.isEmpty
+        else {
+            return false
+        }
+        return version != store?.installedScheduleVersion
     }
 
     /// 从任意 WatchConnectivity 载荷中安装手机指定语言。

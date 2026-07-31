@@ -110,13 +110,15 @@ struct CourseDetailView: View {
     let course: WatchCourse
     var showsTopCloseButton = false
     let dismiss: () -> Void
+    @State private var isDismissing = false
+    @FocusState private var detailScrollFocused: Bool
 
     var body: some View {
         GeometryReader { proxy in
-            let detailTopInset = max(24, proxy.size.height * 0.13)
-            let detailContentTopInset = showsTopCloseButton
-                ? max(18, proxy.size.height * 0.06)
-                : detailTopInset
+            // 在系统状态栏下方为课程内容保留一整行空白。关闭按钮会在
+            // ScrollView 内用反向补偿保持原位置，因此只下移课程信息。
+            let detailContentTopInset: CGFloat = 27
+            let closeButtonTopInset = max(30, proxy.size.height * 0.16)
 
             ZStack(alignment: .topTrailing) {
                 Color.black
@@ -124,91 +126,125 @@ struct CourseDetailView: View {
                     .ignoresSafeArea()
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(course.name)
-                            .font(.title3.weight(.semibold))
-                            .fixedSize(
-                                horizontal: false,
-                                vertical: true
-                            )
-                            .padding(
-                                .trailing,
-                                showsTopCloseButton
-                                    ? max(52, proxy.size.width * 0.27)
-                                    : 0
-                            )
+                    ZStack(alignment: .topTrailing) {
+                        detailContent(width: proxy.size.width)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        RoundedRectangle(
-                            cornerRadius: 2,
-                            style: .continuous
-                        )
-                        .fill(course.color)
-                        .frame(width: max(34, proxy.size.width * 0.24), height: 4)
-
-                        if let kindTitle = course.kindTitle {
-                            Label(
-                                kindTitle,
-                                systemImage: course.kindSystemImage
-                            )
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(course.color)
-                        }
-
-                        Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(
-                                    course.startAt,
-                                    format: .dateTime
-                                        .month()
-                                        .day()
-                                        .weekday(.wide)
+                        if showsTopCloseButton {
+                            topCloseButton
+                                .scaleEffect(0.82)
+                                // 外层内容稍后统一添加顶部 inset；减去该值
+                                // 后，按钮首次出现的位置与固定版本完全相同。
+                                .padding(
+                                    .top,
+                                    max(
+                                        0,
+                                        closeButtonTopInset
+                                            - detailContentTopInset
+                                    )
                                 )
-                                Text(
-                                    "\(twentyFourHourTime(course.startAt)) – \(twentyFourHourTime(course.endAt))"
+                                .padding(
+                                    .trailing,
+                                    max(3, proxy.size.width * 0.018)
                                 )
-                                .monospacedDigit()
-                            }
-                        } icon: {
-                            Image(systemName: "clock")
-                                .foregroundStyle(course.color)
-                        }
-
-                        if let classroom = course.classroom,
-                           !classroom.isEmpty
-                        {
-                            Label(
-                                classroom,
-                                systemImage: "mappin.and.ellipse"
-                            )
-                        }
-                        if let teacher = course.teacher, !teacher.isEmpty {
-                            Label(teacher, systemImage: "person")
-                        }
-                        if let note = course.note, !note.isEmpty {
-                            Label(note, systemImage: "info.circle")
-                        }
-
-                        if !showsTopCloseButton {
-                            Button("完成") {
-                                dismiss()
-                            }
-                            .tint(course.color)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, max(8, proxy.size.width * 0.045))
                     .padding(.top, detailContentTopInset)
-                    .padding(.bottom, 8)
+                    // 不移动初始内容，只增加可滚动的尾部安全区，让教师、
+                    // 座位号等最后一行能离开圆角屏幕的底部裁切区域。
+                    .padding(.bottom, max(8, proxy.size.height * 0.2))
                 }
                 .detailTopEdgeEffectHidden()
+                // 由原生 ScrollView 直接处理手指和表冠滚动。watchOS 会提供
+                // 与系统页面一致的减速、边界皮筋和滚动反馈，比人工锚点跳转
+                // 在实体设备上更稳定。
+                .focusable()
+                .focused($detailScrollFocused)
 
-                if showsTopCloseButton {
-                    topCloseButton
-                        .scaleEffect(0.82)
-                        .padding(.top, detailTopInset)
-                        .padding(.trailing, max(3, proxy.size.width * 0.018))
-                }
             }
+            .onAppear {
+                isDismissing = false
+                acquireDetailScrollFocus()
+            }
+            .onDisappear {
+                detailScrollFocused = false
+            }
+        }
+    }
+
+    /// 等待详情 ScrollView 提交到实体表层级后再申请原生表冠焦点。
+    ///
+    /// 使用 ScrollView 本身作为 responder 后，表冠直接驱动系统滚动机制，
+    /// 不再经过透明节点、累计阈值和零高度锚点。
+    private func acquireDetailScrollFocus() {
+        detailScrollFocused = false
+        DispatchQueue.main.async {
+            guard !isDismissing else { return }
+            detailScrollFocused = true
+        }
+    }
+
+    /// 详情页可滚动的业务内容。
+    ///
+    /// 这里只描述课程信息本身；滚动、表冠与边界皮筋全部交给外层原生
+    /// ScrollView，避免内容长度接近一屏时零高度锚点无法产生实际位移。
+    @ViewBuilder
+    private func detailContent(width: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(course.name)
+                .font(.title3.weight(.semibold))
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(
+                    .trailing,
+                    showsTopCloseButton ? max(52, width * 0.27) : 0
+                )
+
+            RoundedRectangle(cornerRadius: 2, style: .continuous)
+                .fill(course.color)
+                .frame(width: max(34, width * 0.24), height: 4)
+
+            if let kindTitle = course.kindTitle {
+                Label(kindTitle, systemImage: course.kindSystemImage)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(course.color)
+            }
+
+            courseDateAndTime
+
+            if let classroom = course.classroom, !classroom.isEmpty {
+                Label(classroom, systemImage: "mappin.and.ellipse")
+            }
+            if let teacher = course.teacher, !teacher.isEmpty {
+                Label(teacher, systemImage: "person")
+            }
+            if let note = course.note, !note.isEmpty {
+                Label(note, systemImage: "info.circle")
+            }
+
+            if !showsTopCloseButton {
+                Button("完成", action: closeDetail)
+                    .tint(course.color)
+            }
+        }
+    }
+
+    /// 日期与 24 小时时间组合成一个语义完整的 Label。
+    private var courseDateAndTime: some View {
+        Label {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(
+                    course.startAt,
+                    format: .dateTime.month().day().weekday(.wide)
+                )
+                Text(
+                    "\(twentyFourHourTime(course.startAt)) – \(twentyFourHourTime(course.endAt))"
+                )
+                .monospacedDigit()
+            }
+        } icon: {
+            Image(systemName: "clock")
+                .foregroundStyle(course.color)
         }
     }
 
@@ -224,9 +260,11 @@ struct CourseDetailView: View {
         }
     }
 
-    /// 保持与刷新、模式切换按钮一致的 20×20 内容尺寸。
+    /// 保持与刷新、模式切换按钮一致的视觉尺寸。
+    ///
+    /// 按钮位于详情 ScrollView 内容层，随课程信息一起上下滚动。
     private var closeButton: some View {
-        Button(action: dismiss) {
+        Button(action: closeDetail) {
             Image(systemName: "xmark")
                 .font(.caption.weight(.semibold))
                 .frame(width: 20, height: 20)
@@ -234,7 +272,25 @@ struct CourseDetailView: View {
         .controlSize(.small)
         .buttonBorderShape(.circle)
         .fixedSize()
+        .contentShape(Circle())
+        .disabled(isDismissing)
         .accessibilityLabel("关闭课程详情")
+    }
+
+    /// 先停止详情交互并释放表冠焦点，下一次主线程循环再移除覆盖层。
+    ///
+    /// 实体 Apple Watch 上，表冠焦点、ScrollView 回弹和根层转场若在同一
+    /// 事务内同时变更，系统偶发会保留旧命中层，表现为需要点击两次或退出
+    /// 卡顿。这里让关闭成为幂等操作，并给系统一个循环提交焦点释放；不会
+    /// 增加肉眼可见的延迟，也不改变详情页布局或退出动画。
+    private func closeDetail() {
+        guard !isDismissing else { return }
+        isDismissing = true
+        detailScrollFocused = false
+        WatchHaptics.selection()
+        DispatchQueue.main.async {
+            dismiss()
+        }
     }
 }
 

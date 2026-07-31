@@ -4,6 +4,17 @@
 import Combine
 import Foundation
 
+/// 课程列表预先生成的自然日分组。
+///
+/// 这份索引在课表安装时一次性构造，进入课程列表页面时只负责渲染和定位，
+/// 避免第一次切换页面时才对整学期课程做分组、排序而产生明显卡顿。
+struct WatchCourseDayGroup: Identifiable {
+    let date: Date
+    let courses: [WatchCourse]
+
+    var id: Date { date }
+}
+
 /// 手表界面的课表状态中心。
 ///
 /// 该对象只在主线程修改可观察状态；同步过程收到的数据必须先完整解码，
@@ -17,9 +28,14 @@ final class WatchScheduleStore: ObservableObject {
     @Published private(set) var loadedScope: WatchScheduleScope?
     @Published private(set) var isRefreshing = false
     @Published private(set) var completedRefreshCount = 0
+    @Published private(set) var courseListGroups: [WatchCourseDayGroup] = []
+    @Published private(set) var courseListInitialDate: Date?
+    private(set) var installedScheduleVersion: String?
 
     /// 当前代码可读取的缓存结构版本。
     private static let supportedSchemaVersions = 1...4
+    private static let installedScheduleVersionKey =
+        "TraintimeWatchInstalledSemesterScheduleVersion"
 
     /// 缓存加载优先级与共享键集中定义，避免循环内重复拼装。
     private static let cacheDescriptors: [
@@ -41,12 +57,19 @@ final class WatchScheduleStore: ObservableObject {
     /// 整学期数据可能分多个消息传输，先按课程 ID 合并到临时缓冲区。
     private var semesterBuffer: [String: WatchCourse] = [:]
 
+    /// 当前页面使用的稳定排序结果，随快照安装同步更新。
+    private var sortedVisibleCourses: [WatchCourse] = []
+
     /// 初始化时立即恢复缓存，让界面在连接手机之前就可以显示。
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        installedScheduleVersion = defaults.string(
+            forKey: Self.installedScheduleVersionKey
+        )
         preferredLanguageIdentifier =
             WatchWidgetShared.preferredLanguageIdentifier
         loadCachedSchedule()
+        discardOrphanedScheduleVersionIfNeeded()
     }
 
     /// SwiftUI 根视图使用的语言环境；修改后整棵视图树会立即重新本地化。
@@ -82,7 +105,7 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 所有日程按开始时间稳定排序。
     var allCourses: [WatchCourse] {
-        sortedCourses(snapshot?.courses ?? [])
+        sortedVisibleCourses
     }
 
     /// 计算周次时使用的学期起点。
@@ -117,6 +140,28 @@ final class WatchScheduleStore: ObservableObject {
             return (semester.generatedAt, index)
         }
         return nil
+    }
+
+    /// 与手机课表 `0 ..< semesterLength` 完全一致的第一周开始日期。
+    ///
+    /// 渐进同步的当天/14 天阶段范围较短，不能拿来限制周视图；这里只读取
+    /// 已完整落盘的整学期快照，避免同步过程中错误缩小可浏览范围。
+    var semesterRangeStart: Date? {
+        semesterNavigationSnapshot?.rangeStart
+    }
+
+    /// 整学期范围的右开边界，即手机最后一周结束后的日期。
+    var semesterRangeEnd: Date? {
+        semesterNavigationSnapshot?.rangeEnd
+    }
+
+    /// 周视图日期限制所使用的完整学期快照。
+    private var semesterNavigationSnapshot: WatchScheduleSnapshot? {
+        if let semester = cachedSnapshots[.semester] {
+            return semester
+        }
+        guard loadedScope == .semester else { return nil }
+        return snapshot
     }
 
     /// 返回“仍未结束的第一条日程”。
@@ -166,8 +211,24 @@ final class WatchScheduleStore: ObservableObject {
         }
     }
 
+    /// 手机确认版本未变化时恢复已安装整学期缓存并结束刷新。
+    ///
+    /// 通常页面本来就是该缓存；额外恢复用于处理一个极端竞态：同步过程中
+    /// 手机课表先变化、随后又恢复为手表已安装版本，避免保留先前局部阶段
+    /// 已经合入页面的临时内容。
+    func finishRefreshWithoutScheduleChanges() {
+        if let semester = cachedSnapshots[.semester] {
+            snapshot = semester
+            loadedScope = .semester
+            syncError = nil
+            rebuildVisibleScheduleIndex()
+        }
+        finishRefresh(showCompletion: true)
+    }
+
     /// 刷新失败时保留最后一份完整缓存，并向界面报告原因。
     func failRefresh(_ message: String) {
+        clearSemesterBuffer(keepingCapacity: false)
         restoreCacheIfNeeded()
         updateRefreshState(
             isRefreshing: false,
@@ -191,7 +252,7 @@ final class WatchScheduleStore: ObservableObject {
 
         do {
             let decoded = try decode(json)
-            installCompletedSnapshot(
+            installProgressiveSnapshot(
                 decoded,
                 json: json,
                 scope: scope
@@ -215,7 +276,11 @@ final class WatchScheduleStore: ObservableObject {
     /// 非最后一块只进入内存缓冲区，不会覆盖原有缓存；因此中途断线时，
     /// 手表仍然可以继续展示同步前的完整数据。
     @discardableResult
-    func appendSemesterChunk(json: String, isFinal: Bool) -> Bool {
+    func appendSemesterChunk(
+        json: String,
+        isFinal: Bool,
+        scheduleVersion: String?
+    ) -> Bool {
         guard hasPayload(json) else {
             failRefresh(watchLocalizedString("手机端没有可用的学期课表"))
             return false
@@ -226,7 +291,10 @@ final class WatchScheduleStore: ObservableObject {
             mergeSemesterCourses(from: chunk)
 
             guard isFinal else { return true }
-            try completeSemesterTransfer(using: chunk)
+            try completeSemesterTransfer(
+                using: chunk,
+                scheduleVersion: scheduleVersion
+            )
             return true
         } catch {
             clearSemesterBuffer(keepingCapacity: false)
@@ -289,11 +357,117 @@ final class WatchScheduleStore: ObservableObject {
         snapshot = completedSnapshot
         loadedScope = scope
         syncError = nil
+        rebuildVisibleScheduleIndex()
         persistCompletedStage(
             snapshot: completedSnapshot,
             json: json,
             scope: scope
         )
+    }
+
+    /// 安装渐进同步阶段，同时保留该阶段日期范围外的现有课程。
+    ///
+    /// 当天和 14 天阶段完成后会立刻反映到页面，但只替换新快照明确覆盖的
+    /// `[rangeStart, rangeEnd)` 日期范围。整学期阶段是一份完整数据，直接
+    /// 整体替换。这样既能逐步显示新内容，又不会让其他日期突然消失。
+    private func installProgressiveSnapshot(
+        _ completedSnapshot: WatchScheduleSnapshot,
+        json: String,
+        scope: WatchScheduleScope
+    ) {
+        guard scope != .semester, snapshot != nil else {
+            installCompletedSnapshot(
+                completedSnapshot,
+                json: json,
+                scope: scope
+            )
+            return
+        }
+
+        snapshot = mergeVisibleSnapshot(
+            replacing: completedSnapshot
+        )
+        syncError = nil
+        rebuildVisibleScheduleIndex()
+
+        // 阶段缓存保存手机发来的原始范围，而不是混合后的页面快照，便于
+        // Widget 与离线回退准确识别该缓存实际覆盖的日期。
+        persistCompletedStage(
+            snapshot: completedSnapshot,
+            json: json,
+            scope: scope
+        )
+        if loadedScope == nil {
+            loadedScope = scope
+        }
+    }
+
+    /// 将局部快照合入当前页面，范围内以新数据为准，范围外完整保留。
+    private func mergeVisibleSnapshot(
+        replacing incoming: WatchScheduleSnapshot
+    ) -> WatchScheduleSnapshot {
+        guard let current = snapshot else { return incoming }
+
+        let lowerBound = incoming.rangeStart
+        let upperBound = incoming.rangeEnd
+        var mergedByID: [String: WatchCourse] = [:]
+
+        for course in current.courses
+        where course.startAt < lowerBound || course.startAt >= upperBound {
+            mergedByID[course.id] = course
+        }
+        for course in incoming.courses {
+            mergedByID[course.id] = course
+        }
+
+        return WatchScheduleSnapshot(
+            schemaVersion: max(
+                current.schemaVersion,
+                incoming.schemaVersion
+            ),
+            generatedAtEpochMs: incoming.generatedAtEpochMs,
+            semesterStartEpochMs:
+                incoming.semesterStartEpochMs
+                ?? current.semesterStartEpochMs,
+            currentWeekIndex:
+                incoming.currentWeekIndex
+                ?? current.currentWeekIndex,
+            validThroughEpochMs: max(
+                current.validThroughEpochMs,
+                incoming.validThroughEpochMs
+            ),
+            rangeStartEpochMs: minimumEpoch(
+                current.rangeStartEpochMs,
+                incoming.rangeStartEpochMs
+            ),
+            rangeEndEpochMs: maximumEpoch(
+                current.rangeEndEpochMs,
+                incoming.rangeEndEpochMs
+            ),
+            timeZoneOffsetMinutes: incoming.timeZoneOffsetMinutes,
+            reminderMinutes: incoming.reminderMinutes,
+            courses: sortedCourses(Array(mergedByID.values))
+        )
+    }
+
+    /// 返回两个可选毫秒时间戳中的较小值。
+    private func minimumEpoch(_ lhs: Int64?, _ rhs: Int64?) -> Int64? {
+        switch (lhs, rhs) {
+        case let (lhs?, rhs?): min(lhs, rhs)
+        case let (lhs?, nil): lhs
+        case let (nil, rhs?): rhs
+        case (nil, nil): nil
+        }
+    }
+
+    /// 返回两个可选毫秒时间戳中的较大值。
+    private func maximumEpoch(_ lhs: Int64?, _ rhs: Int64?) -> Int64? {
+        switch (lhs, rhs) {
+        case let (lhs?, rhs?): max(lhs, rhs)
+        case let (lhs?, nil): lhs
+        case let (nil, rhs?): rhs
+        case (nil, nil): nil
+        }
     }
 
     /// 把分块中的日程按 ID 合并；后到的记录覆盖先到的同 ID 记录。
@@ -325,18 +499,57 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 原子完成学期传输：构造、编码、持久化成功后才替换当前页面。
     private func completeSemesterTransfer(
-        using metadata: WatchScheduleSnapshot
+        using metadata: WatchScheduleSnapshot,
+        scheduleVersion: String?
     ) throws {
         let complete = makeCompletedSemesterSnapshot(metadata: metadata)
         let json = try encode(complete)
 
-        installCompletedSnapshot(
+        installProgressiveSnapshot(
             complete,
             json: json,
             scope: .semester
         )
+        installCompletedScheduleVersion(scheduleVersion)
         clearSemesterBuffer(keepingCapacity: false)
         finishRefresh(showCompletion: true)
+    }
+
+    /// 只有整学期全部分页安装成功后才确认版本。
+    ///
+    /// 当天或 14 天阶段不能写入版本，否则手表可能只有局部缓存，却在下一次
+    /// 请求中误报“已完整安装”。缺少版本号代表旧协议，主动清除旧版本以便
+    /// 下次仍执行正常三阶段同步。
+    private func installCompletedScheduleVersion(_ value: String?) {
+        guard let value, !value.isEmpty else {
+            installedScheduleVersion = nil
+            defaults.removeObject(
+                forKey: Self.installedScheduleVersionKey
+            )
+            return
+        }
+
+        installedScheduleVersion = value
+        defaults.set(
+            value,
+            forKey: Self.installedScheduleVersionKey
+        )
+    }
+
+    /// 完整学期缓存损坏或被清除时同步清除孤立版本号。
+    ///
+    /// 否则手表可能只有一个版本号却没有对应课表，向手机误报“无需更新”后
+    /// 永远停留在空页面。
+    private func discardOrphanedScheduleVersionIfNeeded() {
+        guard installedScheduleVersion != nil,
+              cachedSnapshots[.semester] == nil
+        else {
+            return
+        }
+        installedScheduleVersion = nil
+        defaults.removeObject(
+            forKey: Self.installedScheduleVersionKey
+        )
     }
 
     /// 清空学期分块缓冲区。
@@ -417,6 +630,7 @@ final class WatchScheduleStore: ObservableObject {
         }
         snapshot = cached.snapshot
         loadedScope = cached.scope
+        rebuildVisibleScheduleIndex()
     }
 
     /// 优先选择尚未过期且覆盖范围最大的缓存。
@@ -462,6 +676,55 @@ final class WatchScheduleStore: ObservableObject {
             }
             return $0.startAt < $1.startAt
         }
+    }
+
+    /// 预生成所有课程列表派生数据，包括排序、按日分组和首次定位目标。
+    ///
+    /// 该方法仅在缓存恢复或某个同步阶段完成时执行，用户第一次打开课程
+    /// 列表时无需再遍历当前全部课程。
+    private func rebuildVisibleScheduleIndex() {
+        let sorted = sortedCourses(snapshot?.courses ?? [])
+        sortedVisibleCourses = sorted
+
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: sorted) {
+            calendar.startOfDay(for: $0.startAt)
+        }
+        let groups = grouped.keys.sorted().map { date in
+            WatchCourseDayGroup(
+                date: date,
+                courses: grouped[date] ?? []
+            )
+        }
+        courseListGroups = groups
+        courseListInitialDate = preferredCourseListDate(
+            in: groups,
+            calendar: calendar
+        )
+    }
+
+    /// 首次打开列表优先定位今天；今天无课则选择距离最近的有课日期。
+    ///
+    /// 前后距离相同时优先未来日期，便于用户直接查看接下来要上的课。
+    private func preferredCourseListDate(
+        in groups: [WatchCourseDayGroup],
+        calendar: Calendar
+    ) -> Date? {
+        let today = calendar.startOfDay(for: Date())
+        if groups.contains(where: {
+            calendar.isDate($0.date, inSameDayAs: today)
+        }) {
+            return today
+        }
+
+        return groups.min { lhs, rhs in
+            let lhsDistance = abs(lhs.date.timeIntervalSince(today))
+            let rhsDistance = abs(rhs.date.timeIntervalSince(today))
+            if lhsDistance == rhsDistance {
+                return lhs.date > rhs.date
+            }
+            return lhsDistance < rhsDistance
+        }?.date
     }
 
     /// 从已排序日程中查找指定时刻后仍未结束的第一条。
