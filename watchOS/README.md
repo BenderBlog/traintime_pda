@@ -1,4 +1,4 @@
-# Traintime PDA Apple Watch
+# XDYou Apple Watch
 
 本目录包含原生 SwiftUI watchOS Companion App 和 WidgetKit Smart Stack
 小组件。完整架构、协议和维护说明见

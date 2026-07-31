@@ -794,19 +794,19 @@
         }
       }
     },
-    "请在配对的 iPhone 上打开 Traintime PDA" : {
+    "请在配对的 iPhone 上打开 XDYou" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Traintime PDA on the paired iPhone"
+            "value" : "Open XDYou on the paired iPhone"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請在配對的 iPhone 上開啟 Traintime PDA"
+            "value" : "請在配對的 iPhone 上開啟 XDYou"
           }
         }
       }

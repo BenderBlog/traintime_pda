@@ -378,7 +378,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         } else {
             store.failRefresh(
                 watchLocalizedString(
-                    "请在配对的 iPhone 上打开 Traintime PDA"
+                    "请在配对的 iPhone 上打开 XDYou"
                 )
             )
         }

@@ -1239,7 +1239,7 @@
 				DEVELOPMENT_TEAM = YXS6PA6787;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Traintime PDA";
+				INFOPLIST_KEY_CFBundleDisplayName = XDYou;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
@@ -1271,7 +1271,7 @@
 				DEVELOPMENT_TEAM = YXS6PA6787;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Traintime PDA";
+				INFOPLIST_KEY_CFBundleDisplayName = XDYou;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
@@ -1302,7 +1302,7 @@
 				DEVELOPMENT_TEAM = YXS6PA6787;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Traintime PDA";
+				INFOPLIST_KEY_CFBundleDisplayName = XDYou;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
