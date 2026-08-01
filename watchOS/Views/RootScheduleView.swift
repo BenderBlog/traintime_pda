@@ -2,147 +2,28 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import SwiftUI
-import WatchKit
 
-/// 手表端统一的轻量触觉反馈入口。
-///
-/// 只在用户完成明确操作或跨越一个导航刻度时播放，避免表冠连续转动期间
-/// 高频触发导致触觉含义变得模糊。
-@MainActor
-enum WatchHaptics {
-    static func selection() {
-        WKInterfaceDevice.current().play(.click)
-    }
-
-    /// 到达边界时使用与课程列表表冠刻度一致的短点击触觉。
-    static func boundary(_ amount: Int) {
-        _ = amount
-        WKInterfaceDevice.current().play(.click)
-    }
-
-    static func navigation(_ amount: Int) {
-        // Core Haptics 不对普通 watchOS App target 开放；使用课程列表同款
-        // 短点击组成双脉冲。边界为单击、翻页为双击，同时避开 `.start`
-        // 等会附带明显系统提示音的反馈类型。
-        _ = amount
-        let device = WKInterfaceDevice.current()
-        device.play(.click)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-            device.play(.click)
-        }
-    }
-
-    static func refreshStarted() {
-        WKInterfaceDevice.current().play(.click)
-    }
-
-    static func success() {
-        WKInterfaceDevice.current().play(.click)
-    }
-}
-
-/// 一次表冠输入更新的语义结果。
-///
-/// 页面只需要关心方向、是否开始了新一轮旋转、以及是否发生反转；原始
-/// 时间戳和累计小数刻度统一由 `WatchCrownTurnSession` 管理。
-struct WatchCrownTurnUpdate {
-    let direction: Int
-    let startsNewSession: Bool
-    let reversesDirection: Bool
-}
-
-/// 日视图、周视图和课程详情共用的表冠连续旋转状态机。
-///
-/// 该类型不决定“多少刻度翻页”，也不播放触觉；它只提供三项基础能力：
-///
-/// 1. 超过 0.35 秒没有输入时开始新一轮；
-/// 2. 反向时丢弃旧方向尚未完成的残余刻度；
-/// 3. 达到页面给定阈值后消费一次，并保留超出的余量。
-///
-/// 将机械输入归一化后，各视图可以分别实现半屏切日、精细翻周或详情皮筋，
-/// 同时避免复制容易产生细微差异的时间和方向判断。
-struct WatchCrownTurnSession {
-    private static let inactivityTimeout: TimeInterval = 0.35
-
-    private var accumulator = 0.0
-    private var lastEventTime = 0.0
-    private var direction = 0
-
-    /// 接收一次非零表冠变化，并返回本次输入对应的会话语义。
-    mutating func register(
-        delta: Double,
-        now: TimeInterval = Date.timeIntervalSinceReferenceDate
-    ) -> WatchCrownTurnUpdate? {
-        guard abs(delta) > .ulpOfOne else { return nil }
-
-        let startsNewSession = lastEventTime == 0
-            || now - lastEventTime > Self.inactivityTimeout
-        let newDirection = delta > 0 ? 1 : -1
-        let reversesDirection = !startsNewSession
-            && direction != 0
-            && newDirection != direction
-
-        // 新一轮与方向反转都不能继承旧方向不足一个阈值的零碎输入。
-        if startsNewSession || reversesDirection {
-            accumulator = 0
-        }
-
-        lastEventTime = now
-        direction = newDirection
-        accumulator += abs(delta)
-
-        return WatchCrownTurnUpdate(
-            direction: newDirection,
-            startsNewSession: startsNewSession,
-            reversesDirection: reversesDirection
-        )
-    }
-
-    /// 达到阈值时消费一次逻辑刻度；快速旋转产生的超额输入继续保留。
-    mutating func consume(threshold: Double) -> Bool {
-        guard threshold > 0, accumulator >= threshold else { return false }
-        accumulator.formTruncatingRemainder(dividingBy: threshold)
-        return true
-    }
-
-    /// 当前累计量相对一个逻辑刻度的进度，供页面逐帧插值视觉位置。
-    ///
-    /// `consume` 仍负责真正提交翻页/换卡；该值只让未达到阈值的每个表冠
-    /// 事件也能产生小幅位移，避免通过提高阈值降速后看起来像低刷新率。
-    func progress(toward threshold: Double) -> Double {
-        guard threshold > 0 else { return 0 }
-        return min(1, max(0, accumulator / threshold))
-    }
-
-    /// 主动结束当前表冠会话。
-    ///
-    /// 横向分页吸附完成后必须清空旧方向和残余刻度，否则下一页第一次转动
-    /// 会继承上一页的速度/方向，表现为轻碰表冠就再次翻页。
-    mutating func reset() {
-        accumulator = 0
-        lastEventTime = 0
-        direction = 0
-    }
-}
-
-/// 手表课表支持的四种顶层展示方式。
+/// 手表课表支持的五种顶层展示方式。
 private enum WatchCalendarMode: String, CaseIterable, Identifiable {
-    case nextCourse
+    case overview
     case courseList
     case day
     case week
+    case month
 
     var id: String { rawValue }
 
     /// 视图选择列表中的本地化名称。
     var title: String {
         switch self {
-        case .nextCourse:
+        case .overview:
             watchLocalizedString("概览")
         case .courseList:
             watchLocalizedString("课程列表")
         case .day:
             watchLocalizedString("日视图")
+        case .month:
+            watchLocalizedString("月视图")
         case .week:
             watchLocalizedString("周视图")
         }
@@ -151,12 +32,14 @@ private enum WatchCalendarMode: String, CaseIterable, Identifiable {
     /// 视图选择列表中的 SF Symbol。
     var systemImage: String {
         switch self {
-        case .nextCourse:
+        case .overview:
             "forward.end"
         case .courseList:
             "list.bullet"
         case .day:
             "calendar.day.timeline.left"
+        case .month:
+            "calendar.circle"
         case .week:
             "calendar"
         }
@@ -192,10 +75,10 @@ private enum RootScheduleLayout {
 /// Apple Watch 课表的根容器。
 ///
 /// 该视图负责模式切换、刷新入口、自动隐藏控件和同步完成提示；具体课程内容
-/// 由四个子视图分别承担，避免在根页面中混入日/周布局细节。
+/// 由五个独立页面分别承担，避免在根页面中混入日/周/月布局细节。
 struct RootScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
-    @State private var mode = WatchCalendarMode.nextCourse
+    @State private var mode = WatchCalendarMode.overview
     @State private var showsModePicker = false
     @State private var showsSyncCompletion = false
     @State private var showsCachedScheduleNotice = false
@@ -204,6 +87,13 @@ struct RootScheduleView: View {
     @State private var hideControlsTask: Task<Void, Never>?
     @State private var cachedScheduleNoticeTask: Task<Void, Never>?
     @State private var selectedCourse: WatchCourse?
+    @State private var daySelectedDate = Calendar.current.startOfDay(
+        for: Date()
+    )
+    @State private var showsDayDatePicker = false
+    @State private var dayDatePickerInitialDate = Calendar.current.startOfDay(
+        for: Date()
+    )
     private let connectivity = WatchConnectivityManager.shared
 
     /// 手机同步期间两个入口必须保持可见，不受滚动和自动隐藏计时影响。
@@ -213,112 +103,149 @@ struct RootScheduleView: View {
             || store.isAwaitingLaunchSyncReply
     }
 
+    /// 日视图日期入口与模式目录中的“月视图”必须复用同一个全屏承载层。
+    ///
+    /// 过去从模式目录进入时，`MonthScheduleView` 会被放进课表主体的缩进
+    /// 容器，再额外创建一层导航栈；从日视图日期入口进入时却位于根层，
+    /// 两条路径因此获得不同的安全区和可用尺寸。这里统一路由条件，避免
+    /// 月历在直接切换模式时发生缩放、位移或星期栏错位。
+    private var presentsFullScreenMonthPage: Bool {
+        if showsDayDatePicker {
+            return true
+        }
+        guard mode == .month else { return false }
+        guard store.snapshot != nil else { return false }
+        return !store.launchSyncTimedOut || store.hasCachedScheduleContent
+    }
+
     var body: some View {
         NavigationStack {
-            GeometryReader { proxy in
-                let edgeInset = RootScheduleLayout.edgeInset(
-                    for: proxy.size
-                )
-                let topInset = RootScheduleLayout.contentTopInset
+            ZStack {
+                GeometryReader { proxy in
+                    let edgeInset = RootScheduleLayout.edgeInset(
+                        for: proxy.size
+                    )
+                    let topInset = RootScheduleLayout.contentTopInset
 
-                ZStack {
-                    // 课表主体铺满表盘；非周视图轻点内容可唤回按钮。
-                    content
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity,
-                            alignment: .top
-                        )
-                        .padding(.horizontal, edgeInset)
-                        .padding(.top, topInset)
-                        .padding(.bottom, edgeInset)
-                        .contentShape(Rectangle())
-                        .simultaneousGesture(
-                            TapGesture().onEnded {
-                                guard mode != .week else { return }
-                                revealControls()
-                            }
-                        )
-
-                    // 按比例下移刷新按钮，避免遮住系统时钟。
-                    refreshControl
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity,
-                            alignment: .topTrailing
-                        )
-                        .padding(
-                            .top,
-                            RootScheduleLayout.refreshTopInset(
-                                for: proxy.size.height
-                            )
-                        )
-                        .padding(.trailing, edgeInset)
-
-                    // 模式按钮悬浮在右下角，不挤压课表主体。
-                    modeControl
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity,
-                            alignment: .bottomTrailing
-                        )
-                        .padding(.trailing, edgeInset)
-                        .padding(
-                            .bottom,
-                            RootScheduleLayout.modeBottomInset(
-                                for: proxy.size.height
-                            )
-                        )
-
-                    // 提示不截获手势，显示期间仍可滚动或点击课程。
-                    if showsSyncCompletion {
-                        syncCompletionToast
+                    ZStack {
+                        // 课表主体铺满表盘；非周视图轻点内容可唤回按钮。
+                        content
                             .frame(
                                 maxWidth: .infinity,
                                 maxHeight: .infinity,
-                                alignment: .bottom
+                                alignment: .top
                             )
-                            .padding(
-                                .bottom,
-                                RootScheduleLayout.completionBottomInset
+                            .padding(.horizontal, edgeInset)
+                            .padding(.top, topInset)
+                            .padding(.bottom, edgeInset)
+                            .contentShape(Rectangle())
+                            .simultaneousGesture(
+                                TapGesture().onEnded {
+                                    guard mode != .week else { return }
+                                    revealControls()
+                                }
                             )
-                            .allowsHitTesting(false)
-                            .transition(
-                                .opacity.combined(with: .scale(scale: 0.84))
-                            )
-                    }
 
-                    // 启动请求超时但本机仍有缓存时，只显示紧凑、非阻塞提示。
-                    // 提示不会替换课表，也不会抢占日/周视图的任何手势。
-                    if showsCachedScheduleNotice,
-                       store.hasCachedScheduleContent
-                    {
-                        cachedScheduleNotice
+                        // 按比例下移刷新按钮，避免遮住系统时钟。
+                        refreshControl
                             .frame(
                                 maxWidth: .infinity,
                                 maxHeight: .infinity,
-                                alignment: .bottom
+                                alignment: .topTrailing
                             )
-                            .padding(.horizontal, edgeInset + 6)
+                            .padding(
+                                .top,
+                                RootScheduleLayout.refreshTopInset(
+                                    for: proxy.size.height
+                                )
+                            )
+                            .padding(.trailing, edgeInset)
+
+                        // 模式按钮悬浮在右下角，不挤压课表主体。
+                        modeControl
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: .infinity,
+                                alignment: .bottomTrailing
+                            )
+                            .padding(.trailing, edgeInset)
                             .padding(
                                 .bottom,
-                                RootScheduleLayout
-                                    .cachedScheduleNoticeBottomInset
+                                RootScheduleLayout.modeBottomInset(
+                                    for: proxy.size.height
+                                )
                             )
-                            .transition(
-                                .opacity.combined(with: .scale(scale: 0.92))
-                            )
-                            .zIndex(90)
-                    }
 
-                    courseDetailOverlay
+                        // 提示不截获手势，显示期间仍可滚动或点击课程。
+                        if showsSyncCompletion {
+                            syncCompletionToast
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: .infinity,
+                                    alignment: .bottom
+                                )
+                                .padding(
+                                    .bottom,
+                                    RootScheduleLayout.completionBottomInset
+                                )
+                                .allowsHitTesting(false)
+                                .transition(
+                                    .opacity.combined(with: .scale(scale: 0.84))
+                                )
+                        }
+
+                        // 启动请求超时但本机仍有缓存时，只显示紧凑提示。
+                        if showsCachedScheduleNotice,
+                           store.hasCachedScheduleContent
+                        {
+                            cachedScheduleNotice
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: .infinity,
+                                    alignment: .bottom
+                                )
+                                .padding(.horizontal, edgeInset + 6)
+                                .padding(
+                                    .bottom,
+                                    RootScheduleLayout
+                                        .cachedScheduleNoticeBottomInset
+                                )
+                                .transition(
+                                    .opacity.combined(with: .scale(scale: 0.92))
+                                )
+                                .zIndex(90)
+                        }
+
+                        courseDetailOverlay
+                    }
+                    .animation(
+                        .easeInOut(duration: 0.22),
+                        value: store.launchSyncTimedOut
+                    )
                 }
-                .animation(
-                    .easeInOut(duration: 0.22),
-                    value: store.launchSyncTimedOut
-                )
+                .ignoresSafeArea()
+                .allowsHitTesting(!presentsFullScreenMonthPage)
+                // `allowsHitTesting` 只阻止触摸，底层日视图仍可能留在
+                // watchOS 焦点树中并继续接收表冠。选择器展示期间同时禁用
+                // 整个底层页面，确保 Digital Crown 只路由到顶层选择器。
+                .disabled(presentsFullScreenMonthPage)
+                .accessibilityHidden(presentsFullScreenMonthPage)
+
+                // 日期选择器和顶层月视图共用根容器中的独立全屏页面，保证
+                // 两种入口具有完全相同的尺寸、安全区、星期栏和分页行为。
+                if presentsFullScreenMonthPage {
+                    MonthScheduleView(
+                        initialDate: presentedMonthInitialDate,
+                        initialWindow: store.preparedMonthCalendarWindow(
+                            centeredOn: presentedMonthInitialDate
+                        ),
+                        submit: submitPresentedMonthDate,
+                        cancel: dismissPresentedMonthPage
+                    )
+                    .transition(.move(edge: .bottom))
+                    .zIndex(200)
+                }
             }
-            .ignoresSafeArea()
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -340,7 +267,15 @@ struct RootScheduleView: View {
             guard count > 0 else { return }
             showCompletion(for: count)
         }
-        .onChange(of: mode) { _, _ in dismissCourseDetailImmediately() }
+        .onChange(of: daySelectedDate) { _, date in
+            // 用户浏览日视图时同步准备对应月份；以后从标题进入月视图不会
+            // 把月份模型计算推迟到点击发生的那一帧。
+            store.prewarmMonthCalendar(around: date)
+        }
+        .onChange(of: mode) { _, _ in
+            dismissCourseDetailImmediately()
+            dismissDayDatePickerImmediately()
+        }
     }
 
     /// 初始化只与根页面生命周期相关的视觉状态。
@@ -357,6 +292,60 @@ struct RootScheduleView: View {
     private func handleDisappear() {
         hideControlsTask?.cancel()
         cachedScheduleNoticeTask?.cancel()
+    }
+
+    /// 从日视图进入独立日期选择页；页面从表盘底部向上弹入。
+    private func presentDayDatePicker(_ date: Date) {
+        guard mode == .day, !showsDayDatePicker else { return }
+        dayDatePickerInitialDate = Calendar.current.startOfDay(for: date)
+        hideControlsTask?.cancel()
+        withAnimation(monthScheduleTransitionAnimation) {
+            showsDayDatePicker = true
+        }
+    }
+
+    /// 日期格被点中时才提交选择；随后沿进入路径退回底部。
+    private func submitDayDatePicker(_ date: Date) {
+        daySelectedDate = Calendar.current.startOfDay(for: date)
+        WatchHaptics.selection()
+        dismissDayDatePicker()
+    }
+
+    /// 点击月份标题退出，不修改 `daySelectedDate`。
+    private func dismissDayDatePicker() {
+        guard showsDayDatePicker else { return }
+        withAnimation(monthScheduleTransitionAnimation) {
+            showsDayDatePicker = false
+        }
+        revealControls()
+    }
+
+    /// 模式变化不播放迟到的选择器动画，直接清理独立页面路由。
+    private func dismissDayDatePickerImmediately() {
+        showsDayDatePicker = false
+    }
+
+    /// 根据入口提供初始日期，但不让月视图承担日视图的任何业务状态。
+    private var presentedMonthInitialDate: Date {
+        showsDayDatePicker ? dayDatePickerInitialDate : daySelectedDate
+    }
+
+    /// 全屏月份页只负责选择日期；最终提交路径由打开它的入口决定。
+    private func submitPresentedMonthDate(_ date: Date) {
+        if showsDayDatePicker {
+            submitDayDatePicker(date)
+        } else {
+            submitMonthViewDate(date)
+        }
+    }
+
+    /// 日期入口关闭后留在日视图；顶层月视图关闭后切回日视图。
+    private func dismissPresentedMonthPage() {
+        if showsDayDatePicker {
+            dismissDayDatePicker()
+        } else {
+            dismissMonthView()
+        }
     }
 
     /// 将刷新状态映射为旋转动画和悬浮控件可见性。
@@ -389,12 +378,22 @@ struct RootScheduleView: View {
             emptyState
         } else {
             switch mode {
-            case .nextCourse:
-                NextCourseView(onCrownInteraction: hideControls)
+            case .overview:
+                OverviewScheduleView(onCrownInteraction: hideControls)
             case .courseList:
                 CourseListView(onCrownInteraction: hideControls)
             case .day:
-                DayScheduleView(onCrownInteraction: hideControls)
+                DayScheduleView(
+                    selectedDate: $daySelectedDate,
+                    isDatePickerPresented: showsDayDatePicker,
+                    onDatePickerRequested: presentDayDatePicker,
+                    onContentTap: revealControls,
+                    onCrownInteraction: hideControls
+                )
+            case .month:
+                // 月视图实际内容由根层的全屏页面承载。这里仅提供不会参与
+                // 布局的背景，避免再次把月份页嵌进主体缩进容器。
+                Color.black
             case .week:
                 WeekScheduleView(
                     selectedCourse: $selectedCourse,
@@ -403,6 +402,24 @@ struct RootScheduleView: View {
                 )
             }
         }
+    }
+
+    /// 月视图选择日期后提交给日视图，并保持既有选中反馈。
+    private func submitMonthViewDate(_ date: Date) {
+        daySelectedDate = Calendar.current.startOfDay(for: date)
+        WatchHaptics.selection()
+        withAnimation(monthScheduleTransitionAnimation) {
+            mode = .day
+        }
+        revealControls()
+    }
+
+    /// 点击月视图的月份标题时返回日视图，不改变当前日期。
+    private func dismissMonthView() {
+        withAnimation(monthScheduleTransitionAnimation) {
+            mode = .day
+        }
+        revealControls()
     }
 
     /// 详情页从底部出现、关闭时回到底部的统一动画。
@@ -578,9 +595,7 @@ struct RootScheduleView: View {
                 Section {
                     ForEach(WatchCalendarMode.allCases) { candidate in
                         Button {
-                            WatchHaptics.selection()
-                            mode = candidate
-                            showsModePicker = false
+                            selectMode(candidate)
                         } label: {
                             HStack {
                                 Label(
@@ -601,6 +616,22 @@ struct RootScheduleView: View {
                 }
             }
         }
+    }
+
+    /// 提交模式选择并关闭目录。
+    ///
+    /// 模式选择的触觉、状态提交和目录关闭必须属于同一次操作；集中在这里后，
+    /// 新增视图不会遗漏其中一步，也不会触碰各视图已经保存的浏览位置。
+    private func selectMode(_ candidate: WatchCalendarMode) {
+        WatchHaptics.selection()
+        if candidate == .month {
+            withAnimation(monthScheduleTransitionAnimation) {
+                mode = candidate
+            }
+        } else {
+            mode = candidate
+        }
+        showsModePicker = false
     }
 
     /// 同步提示的系统版本适配。
@@ -763,70 +794,12 @@ struct RootScheduleView: View {
             return
         }
         hideControlsTask?.cancel()
+        hideControlsTask = nil
+        // 表冠连续旋转会高频调用该入口。按钮第一次隐藏后不再创建无意义的
+        // 动画事务，避免每个 detent 都让根 ZStack 与三页课表重新参与更新。
+        guard controlsVisible else { return }
         withAnimation(.easeIn(duration: 0.16)) {
             controlsVisible = false
         }
-    }
-}
-
-/// “下一节课”页面：正在进行的课程优先，否则显示未来最近一节。
-private struct NextCourseView: View {
-    @EnvironmentObject private var store: WatchScheduleStore
-    let onCrownInteraction: () -> Void
-
-    var body: some View {
-        InteractionAwareScrollView(
-            onScroll: onCrownInteraction,
-            centersShortContent: true,
-            protectsInitialTopEdge: true
-        ) {
-            VStack(alignment: .leading, spacing: 8) {
-                if store.isStale {
-                    Label(
-                        "课表可能已过期",
-                        systemImage: "exclamationmark.triangle"
-                    )
-                    .font(.caption2)
-                    .foregroundStyle(.orange)
-                    .padding(.trailing, 34)
-                }
-
-                if let course = store.nextCourse {
-                    timeline(for: course)
-                        .padding(.trailing, 34)
-                    CourseRow(
-                        course: course,
-                        showsDate: true,
-                        isProminent: true
-                    )
-                } else {
-                    ContentUnavailableView(
-                        "没有下一节课",
-                        systemImage: "checkmark.circle"
-                    )
-                    .frame(maxWidth: .infinity)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 2)
-            .padding(.top, 2)
-        }
-    }
-
-    /// 显示当前状态或距下一节课的相对时间。
-    private func timeline(for course: WatchCourse) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
-            if course.startAt <= Date(), course.endAt > Date() {
-                Text("正在上课")
-                    .foregroundStyle(course.color)
-            } else {
-                Text("距离上课")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                Text(course.startAt, style: .relative)
-                    .foregroundStyle(course.color)
-            }
-        }
-        .font(.headline)
     }
 }

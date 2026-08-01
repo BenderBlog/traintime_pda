@@ -39,12 +39,21 @@
 		A17A00000000000000000014 /* WatchScheduleSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000C /* WatchScheduleSnapshot.swift */; };
 		A17A00000000000000000015 /* WatchScheduleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000D /* WatchScheduleStore.swift */; };
 		A17A00000000000000000016 /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000E /* WatchConnectivityManager.swift */; };
-		A17A00000000000000000017 /* CourseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000F /* CourseRow.swift */; };
+		A17A00000000000000000017 /* CourseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000000F /* CourseViews.swift */; };
 		A17A00000000000000000018 /* WeekScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000010 /* WeekScheduleView.swift */; };
+		A27B00000000000000000011 /* CourseListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000001 /* CourseListView.swift */; };
+		A27B00000000000000000012 /* DayScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000002 /* DayScheduleView.swift */; };
+		A27B00000000000000000013 /* MonthScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000003 /* MonthScheduleView.swift */; };
+		A27B00000000000000000014 /* CalendarPagingSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000004 /* CalendarPagingSupport.swift */; };
+		A27B00000000000000000015 /* InteractionAwareScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000005 /* InteractionAwareScrollView.swift */; };
+		A27B00000000000000000016 /* WatchInteractionSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000006 /* WatchInteractionSupport.swift */; };
+		A27B00000000000000000017 /* OverviewScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000007 /* OverviewScheduleView.swift */; };
+		A27B00000000000000000018 /* MonthCalendarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000008 /* MonthCalendarData.swift */; };
 		A17A0000000000000000001C /* TraintimeWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000002 /* TraintimeWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A17A0000000000000000001D /* RootScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000011 /* RootScheduleView.swift */; };
 		A17A0000000000000000001E /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000001F /* WatchConnectivityManager.swift */; };
 		A17A00000000000000000020 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000021 /* Assets.xcassets */; };
+		D27A00000000000000000002 /* PhoneWatchQueuedScheduleTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27A00000000000000000001 /* PhoneWatchQueuedScheduleTransport.swift */; };
 		B17B00000000000000000011 /* TraintimeWatchWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17B0000000000000000000B /* TraintimeWatchWidgetBundle.swift */; };
 		B17B00000000000000000012 /* TraintimeScheduleWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17B0000000000000000000C /* TraintimeScheduleWidget.swift */; };
 		B17B00000000000000000013 /* WatchWidgetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17B0000000000000000000D /* WatchWidgetShared.swift */; };
@@ -188,9 +197,17 @@
 		A17A0000000000000000000C /* WatchScheduleSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/WatchScheduleSnapshot.swift; sourceTree = "<group>"; };
 		A17A0000000000000000000D /* WatchScheduleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage/WatchScheduleStore.swift; sourceTree = "<group>"; };
 		A17A0000000000000000000E /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectivity/WatchConnectivityManager.swift; sourceTree = "<group>"; };
-		A17A0000000000000000000F /* CourseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CourseRow.swift; sourceTree = "<group>"; };
+		A17A0000000000000000000F /* CourseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CourseViews.swift; sourceTree = "<group>"; };
 		A17A00000000000000000010 /* WeekScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WeekScheduleView.swift; sourceTree = "<group>"; };
 		A17A00000000000000000011 /* RootScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RootScheduleView.swift; sourceTree = "<group>"; };
+		A27B00000000000000000001 /* CourseListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CourseListView.swift; sourceTree = "<group>"; };
+		A27B00000000000000000002 /* DayScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DayScheduleView.swift; sourceTree = "<group>"; };
+		A27B00000000000000000003 /* MonthScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MonthScheduleView.swift; sourceTree = "<group>"; };
+		A27B00000000000000000004 /* CalendarPagingSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CalendarPagingSupport.swift; sourceTree = "<group>"; };
+		A27B00000000000000000005 /* InteractionAwareScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/InteractionAwareScrollView.swift; sourceTree = "<group>"; };
+		A27B00000000000000000006 /* WatchInteractionSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WatchInteractionSupport.swift; sourceTree = "<group>"; };
+		A27B00000000000000000007 /* OverviewScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/OverviewScheduleView.swift; sourceTree = "<group>"; };
+		A27B00000000000000000008 /* MonthCalendarData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MonthCalendarData.swift; sourceTree = "<group>"; };
 		A17A00000000000000000012 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A17A0000000000000000001F /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
 		A17A00000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -202,6 +219,7 @@
 		B17B0000000000000000000F /* TraintimeWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TraintimeWatch.entitlements; sourceTree = "<group>"; };
 		B17B00000000000000000010 /* TraintimeWatchWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Widget/TraintimeWatchWidgetExtension.entitlements; sourceTree = "<group>"; };
 		C17C00000000000000000003 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		D27A00000000000000000001 /* PhoneWatchQueuedScheduleTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchQueuedScheduleTransport.swift; sourceTree = "<group>"; };
 		B3B0B2380ADA394C1804262A /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		B8A7F8FC2F7D169D4772F1C5 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -331,6 +349,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				A17A0000000000000000001F /* WatchConnectivityManager.swift */,
+				D27A00000000000000000001 /* PhoneWatchQueuedScheduleTransport.swift */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
@@ -344,8 +363,16 @@
 				A17A0000000000000000000C /* WatchScheduleSnapshot.swift */,
 				A17A0000000000000000000D /* WatchScheduleStore.swift */,
 				A17A0000000000000000000E /* WatchConnectivityManager.swift */,
-				A17A0000000000000000000F /* CourseRow.swift */,
+				A17A0000000000000000000F /* CourseViews.swift */,
+				A27B00000000000000000001 /* CourseListView.swift */,
+				A27B00000000000000000007 /* OverviewScheduleView.swift */,
+				A27B00000000000000000002 /* DayScheduleView.swift */,
 				A17A00000000000000000010 /* WeekScheduleView.swift */,
+				A27B00000000000000000003 /* MonthScheduleView.swift */,
+				A27B00000000000000000008 /* MonthCalendarData.swift */,
+				A27B00000000000000000004 /* CalendarPagingSupport.swift */,
+				A27B00000000000000000005 /* InteractionAwareScrollView.swift */,
+				A27B00000000000000000006 /* WatchInteractionSupport.swift */,
 				A17A00000000000000000011 /* RootScheduleView.swift */,
 				A17A00000000000000000021 /* Assets.xcassets */,
 				C17C00000000000000000003 /* Localizable.xcstrings */,
@@ -724,6 +751,7 @@
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				262B01702B5905FA0094B372 /* ApiImplementation.swift in Sources */,
 				A17A0000000000000000001E /* WatchConnectivityManager.swift in Sources */,
+				D27A00000000000000000002 /* PhoneWatchQueuedScheduleTransport.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -736,8 +764,16 @@
 				A17A00000000000000000014 /* WatchScheduleSnapshot.swift in Sources */,
 				A17A00000000000000000015 /* WatchScheduleStore.swift in Sources */,
 				A17A00000000000000000016 /* WatchConnectivityManager.swift in Sources */,
-				A17A00000000000000000017 /* CourseRow.swift in Sources */,
+				A17A00000000000000000017 /* CourseViews.swift in Sources */,
+				A27B00000000000000000011 /* CourseListView.swift in Sources */,
+				A27B00000000000000000017 /* OverviewScheduleView.swift in Sources */,
+				A27B00000000000000000012 /* DayScheduleView.swift in Sources */,
 				A17A00000000000000000018 /* WeekScheduleView.swift in Sources */,
+				A27B00000000000000000013 /* MonthScheduleView.swift in Sources */,
+				A27B00000000000000000018 /* MonthCalendarData.swift in Sources */,
+				A27B00000000000000000014 /* CalendarPagingSupport.swift in Sources */,
+				A27B00000000000000000015 /* InteractionAwareScrollView.swift in Sources */,
+				A27B00000000000000000016 /* WatchInteractionSupport.swift in Sources */,
 				A17A0000000000000000001D /* RootScheduleView.swift in Sources */,
 				B17B00000000000000000014 /* WatchWidgetShared.swift in Sources */,
 			);

@@ -76,6 +76,10 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     private var latestRevision = 0
     private var pendingSchedule: PendingPhoneSchedule?
 
+    /// 把无法实时送达的手表请求转换为系统后台队列回复。
+    private let queuedScheduleTransport =
+        PhoneWatchQueuedScheduleTransport()
+
     /// 启动时恢复上次完整学期缓存；坏缓存会被清理。
     private override init() {
         let storedJSON = UserDefaults.standard.string(
@@ -716,10 +720,31 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         didReceiveMessage message: [String: Any],
         replyHandler: @escaping ([String: Any]) -> Void
     ) {
-        guard isScheduleRequest(message) else {
-            replyHandler([:])
-            return
+        replyHandler(makeScheduleReply(for: message, session: session) ?? [:])
+    }
+
+    /// 响应手表通过 `transferUserInfo` 排队发送的后台请求。
+    ///
+    /// 队列适配器只负责关联请求和回传；回复正文仍走与实时消息完全相同的
+    /// 版本比较、范围筛选和学期分页逻辑，避免两条传输路径产生数据差异。
+    func session(
+        _ session: WCSession,
+        didReceiveUserInfo userInfo: [String: Any]
+    ) {
+        queuedScheduleTransport.handle(
+            userInfo,
+            through: session
+        ) { [weak self] request in
+            self?.makeScheduleReply(for: request, session: session)
         }
+    }
+
+    /// 为实时消息和后台队列生成同一格式的课表回复。
+    private func makeScheduleReply(
+        for message: [String: Any],
+        session: WCSession
+    ) -> [String: Any]? {
+        guard isScheduleRequest(message) else { return nil }
 
         let scope = requestedScope(from: message)
         let sourceJSON = sourceScheduleJSON(session: session)
@@ -732,13 +757,10 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         if let scheduleVersion,
            requestedScheduleVersion(from: message) == scheduleVersion
         {
-            replyHandler(
-                unchangedReplyDictionary(
-                    scope: scope,
-                    scheduleVersion: scheduleVersion
-                )
+            return unchangedReplyDictionary(
+                scope: scope,
+                scheduleVersion: scheduleVersion
             )
-            return
         }
 
         let response = responsePayload(
@@ -747,12 +769,10 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
             offset: requestedOffset(from: message),
             now: Date()
         )
-        replyHandler(
-            replyDictionary(
-                response: response,
-                scope: scope,
-                scheduleVersion: scheduleVersion
-            )
+        return replyDictionary(
+            response: response,
+            scope: scope,
+            scheduleVersion: scheduleVersion
         )
     }
 

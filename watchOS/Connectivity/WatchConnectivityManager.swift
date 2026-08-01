@@ -35,13 +35,21 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         static let preferredLanguage = "preferredLanguage"
         static let scheduleVersion = "scheduleVersion"
         static let scheduleUnchanged = "scheduleUnchanged"
+        static let messageType = "messageType"
+        static let refreshID = "refreshID"
+        static let requestID = "requestID"
+    }
+
+    private enum MessageType {
+        static let request = "scheduleRequest"
+        static let response = "scheduleResponse"
     }
 
     /// 一整轮渐进刷新允许的最长等待时间。
     private static let refreshTimeoutNanoseconds: UInt64 =
         12_000_000_000
 
-    /// App 打开后等待手机首次实时回复的时间。
+    /// App 打开后等待手机当轮首次新回复的时间。
     private static let launchReplyTimeoutNanoseconds: UInt64 =
         3_000_000_000
 
@@ -54,12 +62,17 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     /// 当前三阶段响应必须全部属于同一个手机课表版本。
     private var activeIncomingScheduleVersion: String?
 
-    /// 每次 App 打开时建立一次独立的实时回复等待窗口。
+    /// 每次 App 打开时建立一次独立的手机回复等待窗口。
     ///
     /// 它不能复用普通刷新超时：手机不可达时普通刷新会立即回退到系统保存的
-    /// Application Context，而启动提示需要继续等待真正的手机实时回复。
+    /// Application Context，而启动提示需要继续等待当轮手机新回复。
     private var launchAttemptID: UUID?
     private var launchAttemptRefreshID: UUID?
+
+    /// 防止系统极少数情况下重复投递同一条队列回复。
+    private var processedQueuedRequestIDs = Set<String>()
+    private var processedQueuedRequestOrder: [String] = []
+    private static let processedQueuedRequestLimit = 64
 
     private override init() {
         super.init()
@@ -88,10 +101,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         _ = startProgressiveRefresh(force: force)
     }
 
-    /// App 每次打开或回到前台时调用：发起课表请求，并单独等待实时回复。
+    /// App 每次打开或回到前台时调用：发起课表请求，并单独等待当轮回复。
     ///
     /// Application Context 仍可立即恢复缓存，但旧上下文不算本轮手机回复；
-    /// 只有实时消息返回后才会取消“打开手机”的提示。
+    /// 即时消息、新 Application Context 或后台队列回复都能取消提示。
     @MainActor
     func beginLaunchRefresh() {
         guard let store else { return }
@@ -112,7 +125,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         startProgressiveRefreshForLaunchAttempt()
     }
 
-    /// 创建一轮渐进刷新并返回其 ID，供启动实时回复与具体请求精确关联。
+    /// 创建一轮渐进刷新并返回其 ID，供启动等待与具体请求精确关联。
     @MainActor
     @discardableResult
     private func startProgressiveRefresh(force: Bool) -> UUID? {
@@ -122,6 +135,8 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         let newRefreshID = UUID()
         refreshID = newRefreshID
         activeIncomingScheduleVersion = nil
+        processedQueuedRequestIDs.removeAll(keepingCapacity: true)
+        processedQueuedRequestOrder.removeAll(keepingCapacity: true)
         store.beginRefresh()
         request(
             scope: .today,
@@ -216,7 +231,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     ) {
         Task { @MainActor [weak self] in
             guard let self else { return }
-            self.receiveLivePhoneReply()
+            self.receiveCurrentPhoneReply()
             let requiresFullSync =
                 self.applicationContextRequiresFullSync(applicationContext)
             _ = self.consumeApplicationContext(applicationContext)
@@ -236,10 +251,47 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// 接收 iPhone 通过 `transferUserInfo` 返回的后台队列回复。
+    ///
+    /// 队列可能在即时消息失败较久后才送达，因此必须同时校验整轮 refreshID
+    /// 和单次 requestID；旧刷新、重复分页均不会污染当前缓存。
+    func session(
+        _ session: WCSession,
+        didReceiveUserInfo userInfo: [String: Any]
+    ) {
+        guard userInfo[Key.messageType] as? String == MessageType.response,
+              let refreshIDString = userInfo[Key.refreshID] as? String,
+              let queuedRefreshID = UUID(uuidString: refreshIDString),
+              let requestID = userInfo[Key.requestID] as? String,
+              !requestID.isEmpty
+        else {
+            return
+        }
+
+        let expectedScope = WatchScheduleScope(
+            rawValue: userInfo[Key.scope] as? String ?? ""
+        ) ?? .fourteenDays
+
+        Task { @MainActor [weak self] in
+            guard let self,
+                  self.isActiveRefresh(queuedRefreshID),
+                  self.registerQueuedReply(requestID)
+            else {
+                return
+            }
+            self.receiveCurrentPhoneReply(refreshID: queuedRefreshID)
+            self.handle(
+                reply: userInfo,
+                expectedScope: expectedScope,
+                refreshID: queuedRefreshID
+            )
+        }
+    }
+
     /// 超时提示出现后用户再打开手机时，系统会更新可达状态。
     ///
     /// 只要当前仍有一轮启动等待尚未收到回复，就重建请求与超时窗口；手机
-    /// 成功回复后 `receiveLivePhoneReply` 会自动撤下缓存提示或整页引导。
+    /// 成功回复后 `receiveCurrentPhoneReply` 会自动撤下缓存提示或整页引导。
     func sessionReachabilityDidChange(_ session: WCSession) {
         guard session.isReachable else { return }
         Task { @MainActor [weak self] in
@@ -300,16 +352,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             return
         }
 
-        guard session.isReachable else {
-            handleUnreachableSession(session)
-            return
-        }
-
+        let requestID = UUID().uuidString
         sendRequest(
             through: session,
             scope: scope,
             offset: offset,
             installedScheduleVersion: store?.installedScheduleVersion,
+            requestID: requestID,
             refreshID: expectedRefreshID
         )
     }
@@ -318,12 +367,17 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     private func requestMessage(
         scope: WatchScheduleScope,
         offset: Int,
-        installedScheduleVersion: String?
+        installedScheduleVersion: String?,
+        requestID: String,
+        refreshID: UUID
     ) -> [String: Any] {
         var message: [String: Any] = [
             Key.requestSchedule: true,
             Key.scope: scope.rawValue,
             Key.offset: offset,
+            Key.messageType: MessageType.request,
+            Key.refreshID: refreshID.uuidString,
+            Key.requestID: requestID,
         ]
         if let installedScheduleVersion {
             message[Key.scheduleVersion] = installedScheduleVersion
@@ -337,17 +391,20 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         scope: WatchScheduleScope,
         offset: Int,
         installedScheduleVersion: String?,
+        requestID: String,
         refreshID expectedRefreshID: UUID
     ) {
         session.sendMessage(
             requestMessage(
                 scope: scope,
                 offset: offset,
-                installedScheduleVersion: installedScheduleVersion
+                installedScheduleVersion: installedScheduleVersion,
+                requestID: requestID,
+                refreshID: expectedRefreshID
             ),
             replyHandler: { [weak self] reply in
                 Task { @MainActor in
-                    self?.receiveLivePhoneReply(
+                    self?.receiveCurrentPhoneReply(
                         refreshID: expectedRefreshID
                     )
                     self?.handle(
@@ -362,6 +419,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                     self?.handleSendFailure(
                         error,
                         session: session,
+                        scope: scope,
+                        offset: offset,
+                        installedScheduleVersion: installedScheduleVersion,
+                        requestID: requestID,
                         refreshID: expectedRefreshID
                     )
                 }
@@ -369,31 +430,35 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         )
     }
 
-    /// 手机当前不可达时，退回系统最近保存的上下文。
-    @MainActor
-    private func handleUnreachableSession(_ session: WCSession) {
-        guard let store else { return }
-        if consumeLatestApplicationContext(from: session) {
-            store.finishRefresh()
-        } else {
-            store.failRefresh(
-                watchLocalizedString(
-                    "请在配对的 iPhone 上打开 XDYou"
-                )
-            )
-        }
-    }
-
-    /// 实时消息失败后同样尝试 Application Context，保证离线体验。
+    /// 即时消息失败后排队后台请求，并继续展示已有 Application Context。
+    ///
+    /// 实体设备上不立即结束刷新：系统稍后送达 UserInfo 后仍会继续当天、
+    /// 14 天和整学期三个阶段。模拟器不建立 UserInfo 队列，只使用
+    /// Application Context 作为失败兜底。
     @MainActor
     private func handleSendFailure(
         _ error: Error,
         session: WCSession,
+        scope: WatchScheduleScope,
+        offset: Int,
+        installedScheduleVersion: String?,
+        requestID: String,
         refreshID expectedRefreshID: UUID
     ) {
         guard isActiveRefresh(expectedRefreshID) else { return }
 
-        if consumeLatestApplicationContext(from: session) {
+        let queued = queueRequest(
+            through: session,
+            scope: scope,
+            offset: offset,
+            installedScheduleVersion: installedScheduleVersion,
+            requestID: requestID,
+            refreshID: expectedRefreshID
+        )
+        let restoredContext = consumeLatestApplicationContext(from: session)
+        guard !queued else { return }
+
+        if restoredContext {
             store?.finishRefresh()
         } else {
             store?.failRefresh(
@@ -403,6 +468,33 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                 )
             )
         }
+    }
+
+    /// 将即时发送失败的同一请求交给 WatchConnectivity 后台可靠队列。
+    @MainActor
+    private func queueRequest(
+        through session: WCSession,
+        scope: WatchScheduleScope,
+        offset: Int,
+        installedScheduleVersion: String?,
+        requestID: String,
+        refreshID expectedRefreshID: UUID
+    ) -> Bool {
+#if targetEnvironment(simulator)
+        return false
+#else
+        guard session.activationState == .activated else { return false }
+        session.transferUserInfo(
+            requestMessage(
+                scope: scope,
+                offset: offset,
+                installedScheduleVersion: installedScheduleVersion,
+                requestID: requestID,
+                refreshID: expectedRefreshID
+            )
+        )
+        return true
+#endif
     }
 
     /// 解析并处理手机回复。
@@ -634,13 +726,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         _ = store?.setPreferredLanguage(language)
     }
 
-    /// 标记当前启动请求已收到手机实时通信，并让缓存提示或空状态页自动消失。
+    /// 标记当前启动请求已收到手机的新回复，并撤下离线提示。
     ///
     /// 消息请求回复必须匹配本轮关联的刷新 ID；Application Context 的代理
-    /// 回调本身就是实时到达，因此可以不传 ID。磁盘中旧的 Context 由主动
+    /// 回调本身代表当轮新到达的状态，因此可以不传 ID。磁盘中的 Context 由主动
     /// `consumeLatestApplicationContext` 读取，不会经过这里，也不会误判。
     @MainActor
-    private func receiveLivePhoneReply(refreshID: UUID? = nil) {
+    private func receiveCurrentPhoneReply(refreshID: UUID? = nil) {
         guard launchAttemptID != nil else { return }
         if let refreshID,
            refreshID != launchAttemptRefreshID
@@ -650,6 +742,27 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         launchAttemptID = nil
         launchAttemptRefreshID = nil
         store?.receiveLaunchSyncReply()
+    }
+
+    /// 登记一条队列回复，并以固定上限保存近期 ID。
+    ///
+    /// WatchConnectivity 正常只投递一次；此保护主要避免系统恢复、重试或
+    /// 未来协议扩展造成同一学期分页被重复追加。
+    @MainActor
+    private func registerQueuedReply(_ requestID: String) -> Bool {
+        guard !processedQueuedRequestIDs.contains(requestID) else {
+            return false
+        }
+        processedQueuedRequestIDs.insert(requestID)
+        processedQueuedRequestOrder.append(requestID)
+
+        if processedQueuedRequestOrder.count
+            > Self.processedQueuedRequestLimit
+        {
+            let oldest = processedQueuedRequestOrder.removeFirst()
+            processedQueuedRequestIDs.remove(oldest)
+        }
+        return true
     }
 
     /// 判断异步回调是否仍属于最新一轮刷新。

@@ -24,6 +24,63 @@ private struct CachedScheduleSelection {
     let snapshot: WatchScheduleSnapshot
 }
 
+/// Watch 各课表视图共用的派生缓存格式。
+///
+/// 这里保存的是“课程 ID 如何排序、如何按自然日分组、月视图五段标记引用哪
+/// 门课”，而不是 SwiftUI 视图或位图。课表语义版本仍只由 iPhone 计算；
+/// Watch 端的来源字段只用于确认落盘索引与当前原始快照属于同一次安装，避免
+/// App 在写盘中途退出后错误复用一份旧索引。
+private enum WatchScheduleRenderCacheLayout {
+    static let schemaVersion = 1
+    static let periodRanges = [
+        1...2,
+        3...4,
+        5...6,
+        7...8,
+        9...10,
+    ]
+}
+
+/// 派生缓存对应的原始快照身份；不参与课表是否变化的业务判断。
+private struct PersistedScheduleRenderSource: Codable, Equatable {
+    let snapshotSchemaVersion: Int
+    let generatedAtEpochMs: Int64
+    let rangeStartEpochMs: Int64?
+    let rangeEndEpochMs: Int64?
+    let courseCount: Int
+}
+
+/// 单个自然日的持久化索引。
+private struct PersistedScheduleRenderDay: Codable {
+    let dayStartEpochMs: Int64
+    let courseIDs: [String]
+    /// 固定对应 1–2、3–4、5–6、7–8、9–10 节。
+    let periodCourseIDs: [String?]
+}
+
+/// 日、周、月和课程列表共同复用的轻量派生缓存。
+private struct PersistedScheduleRenderCache: Codable {
+    let schemaVersion: Int
+    let source: PersistedScheduleRenderSource
+    let sortedCourseIDs: [String]
+    let days: [PersistedScheduleRenderDay]
+    let courseListReferenceDayEpochMs: Int64
+    let courseListInitialDayEpochMs: Int64?
+}
+
+/// 通过完整性校验后，可直接安装到内存中的派生索引。
+private struct RestoredScheduleRenderIndex {
+    let coursesByID: [String: WatchCourse]
+    let coursesByDay: [Date: [WatchCourse]]
+    let periodCourseIDsByDay: [Date: [String?]]
+}
+
+/// 课程列表启动位置及其是否需要在稍后重新落盘。
+private struct RestoredCourseListPosition {
+    let date: Date?
+    let needsPersistence: Bool
+}
+
 /// 手表界面的课表状态中心。
 ///
 /// 该对象只在主线程修改可观察状态；同步过程收到的数据必须先完整解码，
@@ -41,27 +98,14 @@ final class WatchScheduleStore: ObservableObject {
     @Published private(set) var launchSyncTimedOut = false
     @Published private(set) var courseListGroups: [WatchCourseDayGroup] = []
     @Published private(set) var courseListInitialDate: Date?
+    /// 派生索引安装后递增；月视图据此只刷新当前三页的颜色标记。
+    @Published private(set) var renderCacheRevision = 0
     private(set) var installedScheduleVersion: String?
 
-    /// 当前代码可读取的缓存结构版本。
-    private static let supportedSchemaVersions = 1...4
-    private static let installedScheduleVersionKey =
-        "TraintimeWatchInstalledSemesterScheduleVersion"
-
-    /// 缓存加载优先级与共享键集中定义，避免循环内重复拼装。
-    private static let cacheDescriptors: [
-        (scope: WatchScheduleScope, key: String)
-    ] = [
-        (.semester, WatchWidgetShared.semesterCacheKey),
-        (.fourteenDays, WatchWidgetShared.fourteenDayCacheKey),
-        (.today, WatchWidgetShared.todayCacheKey),
-    ]
-
     /// 整学期缓存不存在时，短范围缓存的恢复优先级。
-    private static let partialCacheScopes: [WatchScheduleScope] = [
-        .fourteenDays,
-        .today,
-    ]
+    private static let partialCacheScopes = Array(
+        WatchWidgetShared.scheduleCacheScopesByPriority.dropFirst()
+    )
 
     /// 手表 App 自身的标准缓存，用于不依赖 Widget 的离线恢复。
     private let defaults: UserDefaults
@@ -83,16 +127,34 @@ final class WatchScheduleStore: ObservableObject {
     /// 每一帧对整学期课表执行三次过滤，真机上的页面换底会更稳定。
     private var coursesByDay: [Date: [WatchCourse]] = [:]
 
+    /// 课程 ID 到当前快照模型的映射；恢复持久化索引时无需复制完整课程。
+    private var coursesByID: [String: WatchCourse] = [:]
+
+    /// 月视图每个自然日的五段课程 ID，绘制时再读取课程颜色。
+    private var periodCourseIDsByDay: [Date: [String?]] = [:]
+
+    /// 月视图的日期模型和课程标记由独立缓存管理，Store 不持有其组装细节。
+    private var monthCalendarCache = MonthCalendarCache()
+
+    /// 启动时若派生缓存缺失，先在内存中建立以保证页面可用；待手机回复或
+    /// 三秒启动等待结束后再落盘，避免与即将到达的新课表重复写入。
+    private var renderCacheNeedsPersistence = false
+
     /// 初始化时立即恢复缓存，让界面在连接手机之前就可以显示。
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         installedScheduleVersion = defaults.string(
-            forKey: Self.installedScheduleVersionKey
+            forKey: WatchPersistentCacheKey.installedSemesterVersion
         )
         preferredLanguageIdentifier =
             WatchWidgetShared.preferredLanguageIdentifier
         loadCachedSchedule()
         discardOrphanedScheduleVersionIfNeeded()
+        // 有缓存时，索引安装流程已经完成预热；空课表仍在根视图出现前准备
+        // 日期网格。条件判断避免启动时对同一个三页窗口重复组装。
+        if snapshot == nil {
+            prewarmMonthCalendar(around: Date())
+        }
     }
 
     /// SwiftUI 根视图使用的语言环境；修改后整棵视图树会立即重新本地化。
@@ -239,6 +301,29 @@ final class WatchScheduleStore: ObservableObject {
         }
     }
 
+    /// 提前生成目标月及前后两月的网格和五段日程标记。
+    ///
+    /// App 初始化、课表索引替换以及日视图日期变化都会调用该入口。月份页
+    /// 因此不需要在第一次显示时遍历日期或解析课程颜色。
+    func prewarmMonthCalendar(around date: Date) {
+        monthCalendarCache.prewarm(
+            around: date,
+            periodCourseIDsByDay: periodCourseIDsByDay,
+            coursesByID: coursesByID
+        )
+    }
+
+    /// 返回月份页面可以直接安装的三页原子窗口。
+    func preparedMonthCalendarWindow(
+        centeredOn date: Date
+    ) -> MonthCalendarWindow {
+        monthCalendarCache.window(
+            centeredOn: date,
+            periodCourseIDsByDay: periodCourseIDsByDay,
+            coursesByID: coursesByID
+        )
+    }
+
     /// 开始三阶段刷新，并保留当前可用页面内容。
     func beginRefresh() {
         clearSemesterBuffer(keepingCapacity: true)
@@ -275,6 +360,7 @@ final class WatchScheduleStore: ObservableObject {
     func markLaunchSyncTimedOut() {
         isAwaitingLaunchSyncReply = false
         launchSyncTimedOut = true
+        persistRenderCacheIfNeeded()
     }
 
     /// 进入指定同步阶段。
@@ -308,8 +394,12 @@ final class WatchScheduleStore: ObservableObject {
             snapshot = semester
             loadedScope = .semester
             syncError = nil
-            rebuildVisibleScheduleIndex()
+            prepareVisibleScheduleIndex(
+                preferringPersistentCache: true,
+                persistIfRebuilt: true
+            )
         }
+        persistRenderCacheIfNeeded()
         finishRefresh(showCompletion: true)
     }
 
@@ -317,6 +407,7 @@ final class WatchScheduleStore: ObservableObject {
     func failRefresh(_ message: String) {
         clearSemesterBuffer(keepingCapacity: false)
         restoreCacheIfNeeded()
+        persistRenderCacheIfNeeded()
         updateRefreshState(
             isRefreshing: false,
             loadingScope: nil,
@@ -417,11 +508,11 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 解码课表并验证数据结构版本。
     private func decode(_ json: String) throws -> WatchScheduleSnapshot {
-        let decoded = try JSONDecoder().decode(
+        let decoded = try WatchCacheCoding.decode(
             WatchScheduleSnapshot.self,
-            from: Data(json.utf8)
+            fromJSON: json
         )
-        guard Self.supportedSchemaVersions.contains(
+        guard WatchWidgetShared.supportedScheduleSchemaVersions.contains(
             decoded.schemaVersion
         ) else {
             throw ScheduleError.unsupportedSchema(decoded.schemaVersion)
@@ -431,8 +522,7 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 将完整快照编码回共享缓存格式。
     private func encode(_ snapshot: WatchScheduleSnapshot) throws -> String {
-        let data = try JSONEncoder().encode(snapshot)
-        return String(decoding: data, as: UTF8.self)
+        try WatchCacheCoding.encodeJSON(snapshot)
     }
 
     /// 将新快照安装到页面、内存缓存、标准缓存和 App Group。
@@ -444,7 +534,7 @@ final class WatchScheduleStore: ObservableObject {
         snapshot = completedSnapshot
         loadedScope = scope
         syncError = nil
-        rebuildVisibleScheduleIndex()
+        rebuildVisibleScheduleIndex(persisting: true)
         persistCompletedStage(
             snapshot: completedSnapshot,
             json: json,
@@ -475,7 +565,7 @@ final class WatchScheduleStore: ObservableObject {
             replacing: completedSnapshot
         )
         syncError = nil
-        rebuildVisibleScheduleIndex()
+        rebuildVisibleScheduleIndex(persisting: true)
 
         // 阶段缓存保存手机发来的原始范围，而不是混合后的页面快照，便于
         // Widget 与离线回退准确识别该缓存实际覆盖的日期。
@@ -611,7 +701,7 @@ final class WatchScheduleStore: ObservableObject {
         guard let value, !value.isEmpty else {
             installedScheduleVersion = nil
             defaults.removeObject(
-                forKey: Self.installedScheduleVersionKey
+                forKey: WatchPersistentCacheKey.installedSemesterVersion
             )
             return
         }
@@ -619,7 +709,7 @@ final class WatchScheduleStore: ObservableObject {
         installedScheduleVersion = value
         defaults.set(
             value,
-            forKey: Self.installedScheduleVersionKey
+            forKey: WatchPersistentCacheKey.installedSemesterVersion
         )
     }
 
@@ -635,7 +725,7 @@ final class WatchScheduleStore: ObservableObject {
         }
         installedScheduleVersion = nil
         defaults.removeObject(
-            forKey: Self.installedScheduleVersionKey
+            forKey: WatchPersistentCacheKey.installedSemesterVersion
         )
     }
 
@@ -648,18 +738,19 @@ final class WatchScheduleStore: ObservableObject {
     ///
     /// 两个来源会分别尝试解码；任一来源损坏时仍会继续检查另一份缓存。
     private func loadCachedSchedule() {
-        for descriptor in Self.cacheDescriptors {
+        for scope in WatchWidgetShared.scheduleCacheScopesByPriority {
+            let key = WatchWidgetShared.cacheKey(for: scope)
             guard let cached = loadFirstValidCache(
-                for: descriptor.scope,
-                key: descriptor.key
+                for: scope,
+                key: key
             ) else {
                 continue
             }
 
-            cachedSnapshots[descriptor.scope] = cached.snapshot
+            cachedSnapshots[scope] = cached.snapshot
             migrateToSharedCacheIfNeeded(
                 json: cached.json,
-                key: descriptor.key
+                key: key
             )
         }
         restoreCacheIfNeeded()
@@ -716,7 +807,10 @@ final class WatchScheduleStore: ObservableObject {
         }
         snapshot = cached.snapshot
         loadedScope = cached.scope
-        rebuildVisibleScheduleIndex()
+        prepareVisibleScheduleIndex(
+            preferringPersistentCache: true,
+            persistIfRebuilt: false
+        )
     }
 
     /// 优先恢复权威的整学期缓存，历史课程也必须保持可浏览。
@@ -797,30 +891,326 @@ final class WatchScheduleStore: ObservableObject {
         }
     }
 
-    /// 预生成所有课程列表派生数据，包括排序、按日分组和首次定位目标。
-    ///
-    /// 该方法仅在缓存恢复或某个同步阶段完成时执行，用户第一次打开课程
-    /// 列表时无需再遍历当前全部课程。
-    private func rebuildVisibleScheduleIndex() {
-        let sorted = sortedCourses(snapshot?.courses ?? [])
-        sortedVisibleCourses = sorted
+    /// 优先恢复持久化派生缓存；缺失或校验失败时才遍历原始课表重建。
+    private func prepareVisibleScheduleIndex(
+        preferringPersistentCache: Bool,
+        persistIfRebuilt: Bool
+    ) {
+        if preferringPersistentCache, restorePersistedRenderCache() {
+            return
+        }
 
+        rebuildVisibleScheduleIndex(persisting: persistIfRebuilt)
+        if !persistIfRebuilt {
+            renderCacheNeedsPersistence = true
+        }
+    }
+
+    /// 预生成全部视图共用的派生数据。
+    ///
+    /// 只有手机实际发来某个新同步阶段，或本地派生缓存不可用时才执行。排序、
+    /// 按日分组、课程列表定位及月视图五段课程 ID 在一次遍历内完成，进入任一
+    /// 页面时都只做字典读取。
+    private func rebuildVisibleScheduleIndex(persisting: Bool) {
+        let sorted = sortedCourses(snapshot?.courses ?? [])
         let calendar = Calendar.current
         let grouped = Dictionary(grouping: sorted) {
             calendar.startOfDay(for: $0.startAt)
         }
+        let groups = makeCourseDayGroups(from: grouped)
+
+        installVisibleScheduleIndex(
+            sorted: sorted,
+            grouped: grouped,
+            groups: groups,
+            initialDate: preferredCourseListDate(
+                in: groups,
+                calendar: calendar
+            )
+        )
+
+        if persisting {
+            persistRenderCache()
+        } else {
+            renderCacheNeedsPersistence = true
+        }
+    }
+
+    /// 把已计算或已恢复的索引一次性安装到所有视图读取的内存状态。
+    private func installVisibleScheduleIndex(
+        sorted: [WatchCourse],
+        grouped: [Date: [WatchCourse]],
+        groups: [WatchCourseDayGroup],
+        initialDate: Date?,
+        restoredCourseMap: [String: WatchCourse]? = nil,
+        restoredPeriodCourseIDs: [Date: [String?]]? = nil
+    ) {
+        sortedVisibleCourses = sorted
         coursesByDay = grouped
-        let groups = grouped.keys.sorted().map { date in
+        courseListGroups = groups
+        courseListInitialDate = initialDate
+
+        if let restoredCourseMap {
+            coursesByID = restoredCourseMap
+        } else {
+            var byID: [String: WatchCourse] = [:]
+            byID.reserveCapacity(sorted.count)
+            for course in sorted {
+                byID[course.id] = course
+            }
+            coursesByID = byID
+        }
+        periodCourseIDsByDay = restoredPeriodCourseIDs
+            ?? makePeriodCourseIDsByDay(from: grouped)
+        // 日期格模型可以继续复用，但颜色标记必须与新课表索引一起失效。
+        monthCalendarCache.invalidateScheduleMarkers()
+        prewarmMonthCalendar(around: Date())
+        renderCacheRevision &+= 1
+    }
+
+    /// 按自然日生成课程列表分组，统一新建和恢复两条路径的顺序。
+    private func makeCourseDayGroups(
+        from grouped: [Date: [WatchCourse]]
+    ) -> [WatchCourseDayGroup] {
+        grouped.keys.sorted().map { date in
             WatchCourseDayGroup(
                 date: date,
                 courses: grouped[date] ?? []
             )
         }
-        courseListGroups = groups
-        courseListInitialDate = preferredCourseListDate(
-            in: groups,
-            calendar: calendar
+    }
+
+    /// 为每个有日程的自然日选出五个两节区间中的第一项日程。
+    private func makePeriodCourseIDsByDay(
+        from grouped: [Date: [WatchCourse]]
+    ) -> [Date: [String?]] {
+        var result: [Date: [String?]] = [:]
+        result.reserveCapacity(grouped.count)
+        for (day, courses) in grouped {
+            result[day] = WatchScheduleRenderCacheLayout.periodRanges.map {
+                periodRange in
+                courses.first {
+                    $0.startPeriod <= periodRange.upperBound
+                        && $0.endPeriod >= periodRange.lowerBound
+                }?.id
+            }
+        }
+        return result
+    }
+
+    /// 将内存索引编码到手表 App 自己的 UserDefaults。
+    private func persistRenderCache() {
+        guard let snapshot else {
+            defaults.removeObject(
+                forKey: WatchPersistentCacheKey.scheduleRenderIndex
+            )
+            renderCacheNeedsPersistence = false
+            return
+        }
+
+        let calendar = Calendar.current
+        let days = coursesByDay.keys.sorted().map { day in
+            PersistedScheduleRenderDay(
+                dayStartEpochMs: epochMilliseconds(day),
+                courseIDs: (coursesByDay[day] ?? []).map(\.id),
+                periodCourseIDs: periodCourseIDsByDay[day]
+                    ?? Array(
+                        repeating: nil,
+                        count: WatchScheduleRenderCacheLayout
+                            .periodRanges.count
+                    )
+            )
+        }
+        let today = calendar.startOfDay(for: Date())
+        let cache = PersistedScheduleRenderCache(
+            schemaVersion: WatchScheduleRenderCacheLayout.schemaVersion,
+            source: renderCacheSource(for: snapshot),
+            sortedCourseIDs: sortedVisibleCourses.map(\.id),
+            days: days,
+            courseListReferenceDayEpochMs: epochMilliseconds(today),
+            courseListInitialDayEpochMs: courseListInitialDate.map(
+                epochMilliseconds
+            )
         )
+
+        do {
+            try WatchCacheCoding.persist(
+                cache,
+                key: WatchPersistentCacheKey.scheduleRenderIndex,
+                defaults: defaults
+            )
+            renderCacheNeedsPersistence = false
+        } catch {
+            renderCacheNeedsPersistence = true
+            NSLog("[WatchScheduleStore] Render cache encode failed: \(error)")
+        }
+    }
+
+    /// 启动等待结束且手机未下发新课表时，补写缺失的派生缓存。
+    private func persistRenderCacheIfNeeded() {
+        guard renderCacheNeedsPersistence else { return }
+        persistRenderCache()
+    }
+
+    /// 从磁盘恢复派生索引，并用原始快照做结构完整性校验。
+    ///
+    /// 这里只验证缓存是否属于当前快照，不在 Watch 端计算或比较课表语义
+    /// 版本；“是否有新课表”仍完全以 iPhone 的版本回复为准。
+    private func restorePersistedRenderCache() -> Bool {
+        guard let snapshot,
+              let cache = try? WatchCacheCoding.load(
+                  PersistedScheduleRenderCache.self,
+                  key: WatchPersistentCacheKey.scheduleRenderIndex,
+                  defaults: defaults
+              ),
+              cache.schemaVersion
+                  == WatchScheduleRenderCacheLayout.schemaVersion,
+              cache.source == renderCacheSource(for: snapshot)
+        else {
+            return false
+        }
+
+        guard let restored = restoreScheduleRenderIndex(
+            cache,
+            snapshot: snapshot
+        )
+        else {
+            return false
+        }
+
+        let sorted = cache.sortedCourseIDs.compactMap {
+            restored.coursesByID[$0]
+        }
+        let groups = makeCourseDayGroups(from: restored.coursesByDay)
+        let position = restoreCourseListPosition(
+            from: cache,
+            groups: groups,
+            calendar: .current
+        )
+        renderCacheNeedsPersistence = position.needsPersistence
+
+        // 新建和恢复两条路径最终都经过同一安装入口，确保以后新增派生字段时
+        // 不会只更新其中一条路径。恢复值已经完成完整性校验，因此直接复用，
+        // 不再次扫描课程或重算五段索引。
+        installVisibleScheduleIndex(
+            sorted: sorted,
+            grouped: restored.coursesByDay,
+            groups: groups,
+            initialDate: position.date,
+            restoredCourseMap: restored.coursesByID,
+            restoredPeriodCourseIDs: restored.periodCourseIDsByDay
+        )
+        return true
+    }
+
+    /// 校验持久化课程顺序、自然日归属和五段课程引用，并恢复字典索引。
+    private func restoreScheduleRenderIndex(
+        _ cache: PersistedScheduleRenderCache,
+        snapshot: WatchScheduleSnapshot
+    ) -> RestoredScheduleRenderIndex? {
+        var courseMap: [String: WatchCourse] = [:]
+        courseMap.reserveCapacity(snapshot.courses.count)
+        for course in snapshot.courses {
+            courseMap[course.id] = course
+        }
+        guard courseMap.count == snapshot.courses.count,
+              cache.sortedCourseIDs.count == snapshot.courses.count,
+              Set(cache.sortedCourseIDs) == Set(courseMap.keys)
+        else {
+            return nil
+        }
+
+        let calendar = Calendar.current
+        var grouped: [Date: [WatchCourse]] = [:]
+        var periodIDsByDay: [Date: [String?]] = [:]
+        var groupedCourseIDs: [String] = []
+        groupedCourseIDs.reserveCapacity(snapshot.courses.count)
+
+        for day in cache.days {
+            guard day.periodCourseIDs.count
+                    == WatchScheduleRenderCacheLayout.periodRanges.count
+            else {
+                return nil
+            }
+            let date = date(fromEpochMilliseconds: day.dayStartEpochMs)
+            let courses = day.courseIDs.compactMap { courseMap[$0] }
+            guard courses.count == day.courseIDs.count,
+                  courses.allSatisfy({
+                      calendar.startOfDay(for: $0.startAt) == date
+                  }),
+                  day.periodCourseIDs.allSatisfy({ courseID in
+                      guard let courseID else { return true }
+                      return courseMap[courseID] != nil
+                  })
+            else {
+                return nil
+            }
+            grouped[date] = courses
+            periodIDsByDay[date] = day.periodCourseIDs
+            groupedCourseIDs.append(contentsOf: day.courseIDs)
+        }
+        guard groupedCourseIDs.count == snapshot.courses.count,
+              Set(groupedCourseIDs) == Set(courseMap.keys)
+        else {
+            return nil
+        }
+        return RestoredScheduleRenderIndex(
+            coursesByID: courseMap,
+            coursesByDay: grouped,
+            periodCourseIDsByDay: periodIDsByDay
+        )
+    }
+
+    /// 恢复课程列表入口；缓存跨自然日后只重算入口，不重建其他索引。
+    private func restoreCourseListPosition(
+        from cache: PersistedScheduleRenderCache,
+        groups: [WatchCourseDayGroup],
+        calendar: Calendar
+    ) -> RestoredCourseListPosition {
+        let today = calendar.startOfDay(for: Date())
+        let referenceDay = date(
+            fromEpochMilliseconds: cache.courseListReferenceDayEpochMs
+        )
+        let cachedDate = cache.courseListInitialDayEpochMs.map {
+            date(fromEpochMilliseconds: $0)
+        }
+        let cachedDateIsValid = cachedDate.map { initial in
+            groups.contains(where: { $0.date == initial })
+        } ?? groups.isEmpty
+
+        if referenceDay == today, cachedDateIsValid {
+            return RestoredCourseListPosition(
+                date: cachedDate,
+                needsPersistence: false
+            )
+        }
+        return RestoredCourseListPosition(
+            date: preferredCourseListDate(in: groups, calendar: calendar),
+            needsPersistence: true
+        )
+    }
+
+    /// 创建轻量来源标识，只用于防止原始快照与派生缓存错配。
+    private func renderCacheSource(
+        for snapshot: WatchScheduleSnapshot
+    ) -> PersistedScheduleRenderSource {
+        PersistedScheduleRenderSource(
+            snapshotSchemaVersion: snapshot.schemaVersion,
+            generatedAtEpochMs: snapshot.generatedAtEpochMs,
+            rangeStartEpochMs: snapshot.rangeStartEpochMs,
+            rangeEndEpochMs: snapshot.rangeEndEpochMs,
+            courseCount: snapshot.courses.count
+        )
+    }
+
+    /// 将 Date 转换为缓存统一使用的 Unix 毫秒。
+    private func epochMilliseconds(_ date: Date) -> Int64 {
+        Int64((date.timeIntervalSince1970 * 1_000).rounded())
+    }
+
+    /// 将缓存毫秒时间戳转换回 Date。
+    private func date(fromEpochMilliseconds value: Int64) -> Date {
+        Date(timeIntervalSince1970: TimeInterval(value) / 1_000)
     }
 
     /// 首次打开列表优先定位今天；今天无课则选择距离最近的有课日期。

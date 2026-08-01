@@ -4,6 +4,57 @@
 import Foundation
 import WidgetKit
 
+/// Watch App 私有持久化缓存的稳定键名。
+///
+/// 课表正文的三个 App Group 键仍由 `WatchWidgetShared` 管理；这里仅保存
+/// Widget 不直接读取、但 Watch App 启动性能需要的索引和布局信息。集中定义
+/// 可以避免 Store 与 View 各自维护裸字符串。
+enum WatchPersistentCacheKey {
+    static let installedSemesterVersion =
+        "TraintimeWatchInstalledSemesterScheduleVersion"
+    static let scheduleRenderIndex = "XDYouWatchScheduleRenderCache"
+    static let dayCourseLayout = "XDYouWatchDayCourseLayoutCache"
+}
+
+/// Watch App 私有 Codable 缓存的统一 JSON 读写入口。
+///
+/// 调用方继续负责 schema、来源签名和业务完整性校验；本类型只消除重复的
+/// `JSONEncoder/JSONDecoder + UserDefaults` 模板，并保持写入为单个 Data 值。
+enum WatchCacheCoding {
+    /// 解码 WatchConnectivity 与持久化层共用的 UTF-8 JSON 字符串。
+    static func decode<Value: Decodable>(
+        _ type: Value.Type,
+        fromJSON json: String
+    ) throws -> Value {
+        try JSONDecoder().decode(type, from: Data(json.utf8))
+    }
+
+    /// 将 Codable 值编码成同步协议使用的 UTF-8 JSON 字符串。
+    static func encodeJSON<Value: Encodable>(_ value: Value) throws -> String {
+        String(decoding: try JSONEncoder().encode(value), as: UTF8.self)
+    }
+
+    /// 从指定 Defaults 读取并解码；键不存在时返回 `nil`。
+    static func load<Value: Decodable>(
+        _ type: Value.Type,
+        key: String,
+        defaults: UserDefaults = .standard
+    ) throws -> Value? {
+        guard let data = defaults.data(forKey: key) else { return nil }
+        return try JSONDecoder().decode(type, from: data)
+    }
+
+    /// 编码并覆盖指定键；编码失败时不会改写旧缓存。
+    static func persist<Value: Encodable>(
+        _ value: Value,
+        key: String,
+        defaults: UserDefaults = .standard
+    ) throws {
+        let data = try JSONEncoder().encode(value)
+        defaults.set(data, forKey: key)
+    }
+}
+
 /// 手表 App 与 Widget Extension 的共享存储入口。
 ///
 /// 两个进程不能直接共享 `UserDefaults.standard`，因此课表需要同时写入
@@ -26,13 +77,13 @@ enum WatchWidgetShared {
     /// 手机同步过来的实际语言。App 与 Widget 共用，避免两个界面语言不一致。
     static let preferredLanguageKey = "watchPreferredLanguage"
 
-    /// 当前代码可以读取的数据结构版本。
-    private static let supportedSchemaVersions = 1...4
+    /// Watch App 与 Widget 当前共同支持的课表 schema。
+    static let supportedScheduleSchemaVersions = 1...4
 
     /// 缓存选择优先级：完整学期 > 近 14 天 > 当天。
     ///
     /// 完整学期通常覆盖范围最大；若它已经过期，则继续尝试较小但更新的缓存。
-    private static let scopesByPriority: [WatchScheduleScope] = [
+    static let scheduleCacheScopesByPriority: [WatchScheduleScope] = [
         .semester,
         .fourteenDays,
         .today,
@@ -171,7 +222,7 @@ enum WatchWidgetShared {
     ) -> [WatchScheduleScope: WatchScheduleSnapshot] {
         var snapshots = [WatchScheduleScope: WatchScheduleSnapshot]()
 
-        for scope in scopesByPriority {
+        for scope in scheduleCacheScopesByPriority {
             guard let json = defaults.string(forKey: cacheKey(for: scope)),
                   let snapshot = decodeSnapshot(from: json)
             else {
@@ -186,11 +237,11 @@ enum WatchWidgetShared {
     private static func decodeSnapshot(
         from json: String
     ) -> WatchScheduleSnapshot? {
-        guard let snapshot = try? JSONDecoder().decode(
+        guard let snapshot = try? WatchCacheCoding.decode(
             WatchScheduleSnapshot.self,
-            from: Data(json.utf8)
+            fromJSON: json
         ),
-            supportedSchemaVersions.contains(snapshot.schemaVersion)
+            supportedScheduleSchemaVersions.contains(snapshot.schemaVersion)
         else {
             return nil
         }
@@ -202,7 +253,7 @@ enum WatchWidgetShared {
         in snapshots: [WatchScheduleScope: WatchScheduleSnapshot],
         now: Date
     ) -> WatchScheduleSnapshot? {
-        for scope in scopesByPriority {
+        for scope in scheduleCacheScopesByPriority {
             if let snapshot = snapshots[scope],
                snapshot.validThrough >= now
             {
