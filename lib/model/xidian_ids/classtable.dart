@@ -7,7 +7,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classtable.g.dart';
 
-enum Source { empty, school, user }
+enum Source { empty, school }
 
 @JsonSerializable(explicitToJson: true)
 class NotArrangementClassDetail {
@@ -122,7 +122,6 @@ class ClassTableData {
   String semesterCode;
   String termStartDay;
   List<ClassDetail> classDetail;
-  List<ClassDetail> userDefinedDetail;
   List<NotArrangementClassDetail> notArranged;
   List<TimeArrangement> timeArrangement;
   List<ClassChange> classChanges;
@@ -132,8 +131,6 @@ class ClassTableData {
     switch (t.source) {
       case Source.school:
         return classDetail[t.index];
-      case Source.user:
-        return userDefinedDetail[t.index];
       case Source.empty:
         throw NotImplementedException();
     }
@@ -155,12 +152,10 @@ class ClassTableData {
     this.semesterCode = "",
     this.termStartDay = "",
     List<ClassDetail>? classDetail,
-    List<ClassDetail>? userDefinedDetail,
     List<NotArrangementClassDetail>? notArranged,
     List<TimeArrangement>? timeArrangement,
     List<ClassChange>? classChanges,
   }) : classDetail = classDetail ?? [],
-       userDefinedDetail = userDefinedDetail ?? [],
        notArranged = notArranged ?? [],
        timeArrangement = timeArrangement ?? [],
        classChanges = classChanges ?? [],
@@ -305,23 +300,4 @@ class ClassChange {
       _$ClassChangeFromJson(json);
 
   Map<String, dynamic> toJson() => _$ClassChangeToJson(this);
-}
-
-@JsonSerializable(explicitToJson: true)
-class UserDefinedClassData {
-  List<ClassDetail> userDefinedDetail;
-  List<TimeArrangement> timeArrangement;
-
-  UserDefinedClassData({
-    required this.userDefinedDetail,
-    required this.timeArrangement,
-  });
-
-  factory UserDefinedClassData.fromJson(Map<String, dynamic> json) =>
-      _$UserDefinedClassDataFromJson(json);
-
-  factory UserDefinedClassData.empty() =>
-      UserDefinedClassData(userDefinedDetail: [], timeArrangement: []);
-
-  Map<String, dynamic> toJson() => _$UserDefinedClassDataToJson(this);
 }

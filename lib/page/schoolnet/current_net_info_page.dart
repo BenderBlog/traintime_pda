@@ -139,7 +139,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                         const SizedBox(height: 8),
                         LinearProgressIndicator(
                           value: usedPercentage.clamp(0.0, 1.0).toDouble(),
-                        ),
+                        ).padding(horizontal: 12),
                         const SizedBox(height: 4),
                         Text(
                           FlutterI18n.translate(
@@ -152,7 +152,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                             },
                           ),
                           textAlign: TextAlign.right,
-                        ),
+                        ).padding(horizontal: 12),
                         const SizedBox(height: 8),
                         NetDataRow(
                           label: FlutterI18n.translate(
@@ -161,7 +161,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                           ),
                           value: _formatBytes(currentUserNetInfo.sumBytes),
                           color: Colors.redAccent,
-                        ),
+                        ).padding(horizontal: 12),
                         NetDataRow(
                           label: FlutterI18n.translate(
                             context,
@@ -169,7 +169,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                           ),
                           value: _formatBytes(currentUserNetInfo.remainBytes),
                           color: Colors.green,
-                        ),
+                        ).padding(horizontal: 12),
                         NetDataRow(
                           label: FlutterI18n.translate(
                             context,
@@ -177,7 +177,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                           ),
                           value: _formatBytes(totalBytes),
                           color: Colors.blue,
-                        ),
+                        ).padding(horizontal: 12),
                       ],
                     )
                     .padding(vertical: 4)

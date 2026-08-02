@@ -57,3 +57,5 @@ app.*.map.json
 
 /软件著作权申请资料
 /Ruisi-*
+*.csv
+docs/superpowers/plans/2026-07-26-aircon-meter-logger.md

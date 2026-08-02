@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/energy_controller.dart';
+import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/routing/routes.dart';
@@ -23,6 +24,11 @@ class EnergyCard extends StatelessWidget {
       builder: (context) {
         final state = controller.energyInfoStateSignal.value;
         final displayInfo = controller.displayEnergyInfo.value;
+        final electricityWarning = controller.electricityWarning.value;
+        final lowElectricityWarning =
+            displayInfo != null &&
+            electricityWarning >= 0 &&
+            displayInfo.electricityRemain < electricityWarning;
 
         return MainPageCard(
           onPressed: () async {
@@ -30,6 +36,9 @@ class EnergyCard extends StatelessWidget {
           },
           isLoad: state.isLoading && displayInfo == null,
           icon: MingCuteIcons.mgc_flash_line,
+          type: lowElectricityWarning
+              ? HomeCardType.warning
+              : HomeCardType.plain,
           text: FlutterI18n.translate(
             context,
             "homepage.electricity_card.title",
