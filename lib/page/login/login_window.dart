@@ -297,6 +297,7 @@ class _LoginWindowState extends State<LoginWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.only(
           left: width / height > 1.0 ? width * 0.25 : widthOfSquare,
