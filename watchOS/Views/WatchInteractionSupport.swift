@@ -4,6 +4,23 @@
 import Foundation
 import WatchKit
 
+/// 创建一个可取消的界面自动收起任务。
+///
+/// 缓存提示和新手引导完成提示共用这一入口，避免各自在根视图里重复维护
+/// `Task.sleep`、取消检查和主线程回调。调用方仍负责保存并取消返回的任务。
+@MainActor
+func makeWatchAutoDismissTask(
+    after seconds: TimeInterval,
+    action: @escaping @MainActor () -> Void
+) -> Task<Void, Never> {
+    Task { @MainActor in
+        let nanoseconds = UInt64(max(0, seconds) * 1_000_000_000)
+        try? await Task.sleep(nanoseconds: nanoseconds)
+        guard !Task.isCancelled else { return }
+        action()
+    }
+}
+
 /// 手表端统一的轻量触觉反馈入口。
 ///
 /// 只在用户完成明确操作或跨越一个导航刻度时播放，避免表冠连续转动期间
@@ -38,6 +55,16 @@ enum WatchHaptics {
 
     static func success() {
         WKInterfaceDevice.current().play(.click)
+    }
+
+    /// 新手引导正确操作使用系统“成功”双段触觉，语义与支付成功一致。
+    static func onboardingSuccess() {
+        WKInterfaceDevice.current().play(.success)
+    }
+
+    /// 操作种类、方向轴或点击位置不符时使用系统失败反馈。
+    static func onboardingError() {
+        WKInterfaceDevice.current().play(.failure)
     }
 }
 

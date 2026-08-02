@@ -42,7 +42,7 @@ private enum WatchScheduleRenderCacheLayout {
 }
 
 /// 派生缓存对应的原始快照身份；不参与课表是否变化的业务判断。
-private struct PersistedScheduleRenderSource: Codable, Equatable {
+private struct PersistedScheduleRenderSource: Codable, Equatable, Sendable {
     let snapshotSchemaVersion: Int
     let generatedAtEpochMs: Int64
     let rangeStartEpochMs: Int64?
@@ -51,7 +51,7 @@ private struct PersistedScheduleRenderSource: Codable, Equatable {
 }
 
 /// 单个自然日的持久化索引。
-private struct PersistedScheduleRenderDay: Codable {
+private struct PersistedScheduleRenderDay: Codable, Sendable {
     let dayStartEpochMs: Int64
     let courseIDs: [String]
     /// 固定对应 1–2、3–4、5–6、7–8、9–10 节。
@@ -59,7 +59,7 @@ private struct PersistedScheduleRenderDay: Codable {
 }
 
 /// 日、周、月和课程列表共同复用的轻量派生缓存。
-private struct PersistedScheduleRenderCache: Codable {
+private struct PersistedScheduleRenderCache: Codable, Sendable {
     let schemaVersion: Int
     let source: PersistedScheduleRenderSource
     let sortedCourseIDs: [String]
@@ -136,18 +136,45 @@ final class WatchScheduleStore: ObservableObject {
     /// 月视图的日期模型和课程标记由独立缓存管理，Store 不持有其组装细节。
     private var monthCalendarCache = MonthCalendarCache()
 
+    /// 安装派生索引时一次算好的教学日期。
+    ///
+    /// 该结果只会在课表索引变化时改变，因此与索引同时更新；欢迎页和章节
+    /// 切换时只做常量时间读取。
+    private var preparedOnboardingDate: Date?
+
+    /// 当前派生索引覆盖的课程数量，用于 O(1) 完整性检查。
+    private var indexedCourseCount = 0
+
     /// 启动时若派生缓存缺失，先在内存中建立以保证页面可用；待手机回复或
     /// 三秒启动等待结束后再落盘，避免与即将到达的新课表重复写入。
     private var renderCacheNeedsPersistence = false
 
+    /// 派生索引编码任务及其代次。
+    ///
+    /// 同步的当天、14 天和整学期阶段可能连续触发索引更新。旧任务可以继续在
+    /// 后台完成编码，但只有最新代次允许覆盖磁盘，避免迟到结果写回旧课表。
+    private var renderCachePersistenceTask: Task<Void, Never>?
+    private var renderCachePersistenceGeneration = 0
+
     /// 初始化时立即恢复缓存，让界面在连接手机之前就可以显示。
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        // Swift 要求所有无默认值的存储属性在调用实例方法前完成初始化。
+        // 语言只需读取一次，后续缓存恢复和预热便可安全使用完整的 Store。
+        self.preferredLanguageIdentifier =
+            WatchWidgetShared.preferredLanguageIdentifier
+        prepareLaunchState()
+    }
+
+    /// 启动阶段一次完成离线数据、派生索引和当前月份窗口的准备。
+    ///
+    /// 这里不创建 SwiftUI 页面，也不启动网络。根视图出现后只读取已经安装的
+    /// 内存索引；WatchConnectivity 随后增量替换新数据。缓存编码不在此执行，
+    /// 缺失的派生缓存会交给后台持久化任务，避免阻塞第一帧。
+    private func prepareLaunchState() {
         installedScheduleVersion = defaults.string(
             forKey: WatchPersistentCacheKey.installedSemesterVersion
         )
-        preferredLanguageIdentifier =
-            WatchWidgetShared.preferredLanguageIdentifier
         loadCachedSchedule()
         discardOrphanedScheduleVersionIfNeeded()
         // 有缓存时，索引安装流程已经完成预热；空课表仍在根视图出现前准备
@@ -191,6 +218,42 @@ final class WatchScheduleStore: ObservableObject {
     /// 所有日程按开始时间稳定排序。
     var allCourses: [WatchCourse] {
         sortedVisibleCourses
+    }
+
+    /// 新手教学优先选取日程最多的一天；并列时选择最接近今天的一天。
+    ///
+    /// 课程列表分组在安装课表时已经生成。直接复用该索引可避免每次打开
+    /// 教学都再次对整学期课程做分组和排序，真机首帧会稳定很多。
+    var recommendedOnboardingDate: Date? {
+        preparedOnboardingDate
+    }
+
+    /// 教学所需的课程列表索引和月历三页窗口是否已经完整就绪。
+    func hasPreparedOnboardingRenderData(around date: Date) -> Bool {
+        let sourceCount = snapshot?.courses.count ?? 0
+        return indexedCourseCount == sourceCount
+            && monthCalendarCache.isPrepared(around: date)
+    }
+
+    /// 在用户阅读概览教学时合作式预热后续页面的数据。
+    ///
+    /// 正常启动会直接命中持久化派生缓存；只有缓存缺失或结构不完整时才
+    /// 重建一次。阶段间主动 `yield`，让引导动画先提交当前帧，避免把所有
+    /// 准备工作挤在同一次主线程更新中。SwiftUI 视图仍只在主线程创建，
+    /// 但课程分组、列表定位和月历标记不会再推迟到首次进入页面时计算。
+    func prepareOnboardingRenderData(around date: Date) async {
+        await Task.yield()
+
+        let sourceCount = snapshot?.courses.count ?? 0
+        if indexedCourseCount != sourceCount {
+            rebuildVisibleScheduleIndex(persisting: false)
+        }
+
+        await Task.yield()
+        prewarmMonthCalendar(around: date)
+        // 不在教学动画期间编码和写入 UserDefaults。缺失索引已经标记为
+        // `renderCacheNeedsPersistence`，启动同步回复或三秒等待结束后会走
+        // 既有持久化入口；这里仅准备当前会话马上要绘制的数据。
     }
 
     /// 本地持久化缓存中是否至少包含一条本学期日程。
@@ -438,7 +501,7 @@ final class WatchScheduleStore: ObservableObject {
             return true
         } catch {
             syncError = watchLocalizedString("课表数据无法读取")
-            logDecodeFailure(error)
+            logFailure(.scheduleDecode, error: error)
             return false
         }
     }
@@ -477,7 +540,7 @@ final class WatchScheduleStore: ObservableObject {
         } catch {
             clearSemesterBuffer(keepingCapacity: false)
             failRefresh(watchLocalizedString("全学期课表无法合并"))
-            logSemesterMergeFailure(error)
+            logFailure(.semesterMerge, error: error)
             return false
         }
     }
@@ -770,7 +833,7 @@ final class WatchScheduleStore: ObservableObject {
             do {
                 return (try decode(json), json)
             } catch {
-                logInvalidCache(scope: scope, error: error)
+                logFailure(.invalidCache(scope), error: error)
             }
         }
         return nil
@@ -949,6 +1012,11 @@ final class WatchScheduleStore: ObservableObject {
         coursesByDay = grouped
         courseListGroups = groups
         courseListInitialDate = initialDate
+        indexedCourseCount = sorted.count
+        preparedOnboardingDate = preferredOnboardingDate(
+            in: groups,
+            calendar: .current
+        )
 
         if let restoredCourseMap {
             coursesByID = restoredCourseMap
@@ -964,8 +1032,23 @@ final class WatchScheduleStore: ObservableObject {
             ?? makePeriodCourseIDsByDay(from: grouped)
         // 日期格模型可以继续复用，但颜色标记必须与新课表索引一起失效。
         monthCalendarCache.invalidateScheduleMarkers()
-        prewarmMonthCalendar(around: Date())
+        prewarmInitialMonthWindows()
         renderCacheRevision &+= 1
+    }
+
+    /// 在索引安装阶段准备首次使用月视图和教学可能访问的月份窗口。
+    ///
+    /// 当前日期用于正常的月视图入口；教学日期用于首次引导。两者属于同一
+    /// 个月时只执行一次。页面首次出现后只读取缓存，不再临时组装日期格和
+    /// 五段课程标记。
+    private func prewarmInitialMonthWindows() {
+        let today = Date()
+        prewarmMonthCalendar(around: today)
+        guard let preparedOnboardingDate,
+              monthCalendarStart(for: preparedOnboardingDate)
+                != monthCalendarStart(for: today)
+        else { return }
+        prewarmMonthCalendar(around: preparedOnboardingDate)
     }
 
     /// 按自然日生成课程列表分组，统一新建和恢复两条路径的顺序。
@@ -978,6 +1061,25 @@ final class WatchScheduleStore: ObservableObject {
                 courses: grouped[date] ?? []
             )
         }
+    }
+
+    /// 选择日程最多的教学日期；数量相同时优先选择最接近今天的一天。
+    private func preferredOnboardingDate(
+        in groups: [WatchCourseDayGroup],
+        calendar: Calendar
+    ) -> Date? {
+        let today = calendar.startOfDay(for: Date())
+        return groups.min { lhs, rhs in
+            if lhs.courses.count != rhs.courses.count {
+                return lhs.courses.count > rhs.courses.count
+            }
+            let lhsDistance = abs(lhs.date.timeIntervalSince(today))
+            let rhsDistance = abs(rhs.date.timeIntervalSince(today))
+            if lhsDistance != rhsDistance {
+                return lhsDistance < rhsDistance
+            }
+            return lhs.date < rhs.date
+        }?.date
     }
 
     /// 为每个有日程的自然日选出五个两节区间中的第一项日程。
@@ -998,9 +1100,16 @@ final class WatchScheduleStore: ObservableObject {
         return result
     }
 
-    /// 将内存索引编码到手表 App 自己的 UserDefaults。
+    /// 将内存索引交给后台任务编码，并只提交最新一代结果。
+    ///
+    /// 同步阶段会先立即安装新的内存索引，页面因此可以马上刷新；JSON 编码
+    /// 不占用主线程。当天、14 天和整学期连续到达时，代次校验会丢弃旧任务
+    /// 的迟到结果，避免重复写盘或让旧索引覆盖新索引。
     private func persistRenderCache() {
-        guard let snapshot else {
+        guard let cache = makePersistedRenderCache() else {
+            renderCachePersistenceGeneration &+= 1
+            renderCachePersistenceTask?.cancel()
+            renderCachePersistenceTask = nil
             defaults.removeObject(
                 forKey: WatchPersistentCacheKey.scheduleRenderIndex
             )
@@ -1008,6 +1117,43 @@ final class WatchScheduleStore: ObservableObject {
             return
         }
 
+        renderCacheNeedsPersistence = true
+        renderCachePersistenceGeneration &+= 1
+        let generation = renderCachePersistenceGeneration
+        renderCachePersistenceTask?.cancel()
+        renderCachePersistenceTask = Task { @MainActor [weak self] in
+            let encodingTask = Task.detached(priority: .utility) {
+                try WatchCacheCoding.encode(cache)
+            }
+            do {
+                let data = try await encodingTask.value
+                guard let self,
+                      !Task.isCancelled,
+                      generation == self.renderCachePersistenceGeneration
+                else { return }
+                WatchCacheCoding.persist(
+                    data,
+                    key: WatchPersistentCacheKey.scheduleRenderIndex,
+                    defaults: self.defaults
+                )
+                self.renderCacheNeedsPersistence = false
+                self.renderCachePersistenceTask = nil
+            } catch is CancellationError {
+                return
+            } catch {
+                guard let self,
+                      generation == self.renderCachePersistenceGeneration
+                else { return }
+                self.renderCacheNeedsPersistence = true
+                self.renderCachePersistenceTask = nil
+                self.logFailure(.renderCacheEncoding, error: error)
+            }
+        }
+    }
+
+    /// 捕获当前内存索引，生成可安全交给后台编码的值类型快照。
+    private func makePersistedRenderCache() -> PersistedScheduleRenderCache? {
+        guard let snapshot else { return nil }
         let calendar = Calendar.current
         let days = coursesByDay.keys.sorted().map { day in
             PersistedScheduleRenderDay(
@@ -1022,7 +1168,7 @@ final class WatchScheduleStore: ObservableObject {
             )
         }
         let today = calendar.startOfDay(for: Date())
-        let cache = PersistedScheduleRenderCache(
+        return PersistedScheduleRenderCache(
             schemaVersion: WatchScheduleRenderCacheLayout.schemaVersion,
             source: renderCacheSource(for: snapshot),
             sortedCourseIDs: sortedVisibleCourses.map(\.id),
@@ -1032,18 +1178,6 @@ final class WatchScheduleStore: ObservableObject {
                 epochMilliseconds
             )
         )
-
-        do {
-            try WatchCacheCoding.persist(
-                cache,
-                key: WatchPersistentCacheKey.scheduleRenderIndex,
-                defaults: defaults
-            )
-            renderCacheNeedsPersistence = false
-        } catch {
-            renderCacheNeedsPersistence = true
-            NSLog("[WatchScheduleStore] Render cache encode failed: \(error)")
-        }
     }
 
     /// 启动等待结束且手机未下发新课表时，补写缺失的派生缓存。
@@ -1242,24 +1376,33 @@ final class WatchScheduleStore: ObservableObject {
         allCourses.first { $0.endAt > date }
     }
 
-    /// 记录单阶段 JSON 解码失败。
-    private func logDecodeFailure(_ error: Error) {
-        NSLog("[WatchScheduleStore] Decode failed: \(error)")
-    }
-
-    /// 记录学期分块合并失败。
-    private func logSemesterMergeFailure(_ error: Error) {
-        NSLog("[WatchScheduleStore] Semester merge failed: \(error)")
-    }
-
-    /// 记录某个缓存来源无效；加载流程仍会继续尝试下一个来源。
-    private func logInvalidCache(
-        scope: WatchScheduleScope,
+    /// 统一输出 Store 的可恢复错误；界面提示和回退策略由调用点负责。
+    private func logFailure(
+        _ context: ScheduleStoreFailureContext,
         error: Error
     ) {
-        NSLog(
-            "[WatchScheduleStore] Ignoring invalid \(scope.rawValue) cache: \(error)"
-        )
+        NSLog("[WatchScheduleStore] \(context.message): \(error)")
+    }
+}
+
+/// Store 日志分类只描述失败发生的阶段，不参与用户可见错误文案。
+private enum ScheduleStoreFailureContext {
+    case scheduleDecode
+    case semesterMerge
+    case invalidCache(WatchScheduleScope)
+    case renderCacheEncoding
+
+    var message: String {
+        switch self {
+        case .scheduleDecode:
+            "Schedule decode failed"
+        case .semesterMerge:
+            "Semester merge failed"
+        case .invalidCache(let scope):
+            "Ignoring invalid \(scope.rawValue) cache"
+        case .renderCacheEncoding:
+            "Render cache encode failed"
+        }
     }
 }
 

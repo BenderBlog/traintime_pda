@@ -22,6 +22,16 @@ private enum DayCrownBinding: Equatable {
     case verticalCourses
 }
 
+/// 日视图横向吸附的输入来源。
+///
+/// 触摸和标题按钮在吸附期间可以暂时交出表冠焦点；表冠吸附则必须继续保留
+/// 焦点，这样用户在一次很短的停顿后继续旋转时，可以立即中断尚未完成的
+/// 吸附并从下一刻度继续翻页，而不会被动画锁住。
+private enum DayPageTransitionSource: Equatable {
+    case direct
+    case crown
+}
+
 /// 日视图 ScrollView 的不可见顶部定位点；日期参与身份，避免三张预渲染
 /// 页面之间误用同一个滚动目标。
 private struct DayScrollTopTarget: Hashable {
@@ -36,7 +46,7 @@ private struct DayCourseLayoutMetrics: Equatable {
 }
 
 /// 日视图卡片高度持久化格式。
-private struct PersistedDayCourseLayoutCache: Codable {
+private struct PersistedDayCourseLayoutCache: Codable, Sendable {
     let schemaVersion: Int
     let signature: String
     let cardHeights: [String: Double]
@@ -123,11 +133,12 @@ private final class DayCourseLayoutTracker {
                     .persistenceDelayNanoseconds
             )
             guard !Task.isCancelled else { return }
-            self?.persist()
+            await self?.persist()
         }
     }
 
-    private func persist() {
+    /// 在后台编码高度缓存，回到主线程后再原子写入最新签名的数据。
+    private func persist() async {
         guard let activeSignature, !metrics.cardHeights.isEmpty else { return }
         let cache = PersistedDayCourseLayoutCache(
             schemaVersion: DayCourseLayoutCacheConfiguration.schemaVersion,
@@ -137,8 +148,14 @@ private final class DayCourseLayoutTracker {
             }
         )
         do {
-            try WatchCacheCoding.persist(
-                cache,
+            let data = try await Task.detached(priority: .utility) {
+                try WatchCacheCoding.encode(cache)
+            }.value
+            guard !Task.isCancelled,
+                  self.activeSignature == activeSignature
+            else { return }
+            WatchCacheCoding.persist(
+                data,
                 key: WatchPersistentCacheKey.dayCourseLayout
             )
         } catch {
@@ -275,17 +292,33 @@ struct DayScheduleView: View {
     @State private var inputRecognitionResetToken = 0
     @State private var pageTransitionToken = 0
     @State private var pageTransitionTask: Task<Void, Never>?
+    @State private var pageTransitionSource: DayPageTransitionSource?
+    @State private var pendingSnapDirection = 0
     @State private var crownIdleCoordinator = CalendarCrownIdleCoordinator()
     @State private var verticalMomentumTask: Task<Void, Never>?
     @State private var verticalMomentumToken = 0
     @State private var pageTransitionInFlight = false
     @State private var courseLayoutTracker = DayCourseLayoutTracker()
+    /// 日期格式化只在日期或语言变化时执行，避免横向位移每帧重复创建格式器。
+    @State private var navigationTitle = ""
     @FocusState private var crownFocused: Bool
     let isDatePickerPresented: Bool
     let onDatePickerRequested: (Date) -> Void
     /// 日视图轻点内容时显式通知根视图显示两个悬浮按钮。
     let onContentTap: () -> Void
     let onCrownInteraction: () -> Void
+    /// 表冠确认为真实输入时旁路通知教学层。
+    let onCrownInput: () -> Void
+    /// 表冠连续旋转并真正跨过一整页时通知教学层。
+    let onCrownPageInput: () -> Void
+    /// 单一触摸层锁定方向时，只通知教学说明隐去，不抢占真实拖动。
+    let onTouchInputBegan: () -> Void
+    /// 真实拖动结束后，把已经执行的轴向操作旁路交给教学验证。
+    let onSwipeInput: (CalendarPagingDragAxis) -> Void
+    /// 顶部左箭头的真实点击旁路通知。
+    let onHeaderPreviousTap: () -> Void
+    /// 顶部右箭头的真实点击旁路通知。
+    let onHeaderNextTap: () -> Void
 
     /// 日内纵向浏览使用的表冠位移倍率；横向翻页使用独立倍率。
     private let verticalCrownMotionScale = 0.175
@@ -315,14 +348,24 @@ struct DayScheduleView: View {
             onVerticalDragBegan: beginDayVerticalDrag,
             onVerticalDragChanged: updateDayVerticalDrag,
             onVerticalDragEnded: finishDayVerticalDrag,
-            onDragAxisLocked: { _ in },
+            onDragAxisLocked: { _ in onTouchInputBegan() },
             onDragFinished: {}
         )
+        // 表冠一旦接管横向分页，三页内容子树进入“分页独占”事务：卡片补间、
+        // 边界回弹和数据替换附带的隐式动画全部关闭，只保留停止旋转后由
+        // `settleDayPage` 显式创建的吸附动画。这样持续旋转时不会有其他动画
+        // 与 `horizontalPageOffset` 争用同一帧预算。
+        .transaction { transaction in
+            if continuousDayNavigation && !pageTransitionInFlight {
+                transaction.animation = nil
+            }
+        }
         .onAppear {
             crownFocused = true
             lastCrownEventOffset = crownValue
             feedbackCourseIndex = 0
             configureDayCourseLayoutCache()
+            updateDayNavigationTitle()
         }
         .onDisappear {
             crownIdleCoordinator.cancel()
@@ -347,22 +390,24 @@ struct DayScheduleView: View {
         }
         .onChange(of: store.preferredLanguageIdentifier) { _, _ in
             configureDayCourseLayoutCache()
+            updateDayNavigationTitle()
+        }
+        .onChange(of: selectedDate) { _, _ in
+            updateDayNavigationTitle()
         }
         .toolbar {
             if !isDatePickerPresented {
                 ToolbarItem(placement: .topBarLeading) {
                     DateNavigationHeader(
-                        title: selectedDate.formatted(
-                            .dateTime
-                                .month()
-                                .day()
-                                .weekday(.short)
-                                .locale(
-                                    WatchWidgetShared.preferredLocale
-                                )
-                        ),
-                        previous: { requestDayPage(-1) },
-                        next: { requestDayPage(1) },
+                        title: navigationTitle,
+                        previous: {
+                            onHeaderPreviousTap()
+                            requestDayPage(-1)
+                        },
+                        next: {
+                            onHeaderNextTap()
+                            requestDayPage(1)
+                        },
                         titleAction: requestDatePicker
                     )
                     .frame(width: 116)
@@ -370,6 +415,17 @@ struct DayScheduleView: View {
                 }
             }
         }
+    }
+
+    /// 日期标题不是逐帧动画数据；只在依赖真正变化时格式化一次。
+    private func updateDayNavigationTitle() {
+        navigationTitle = selectedDate.formatted(
+            .dateTime
+                .month()
+                .day()
+                .weekday(.short)
+                .locale(WatchWidgetShared.preferredLocale)
+        )
     }
 
     /// 视口宽度只在表盘尺寸变化时更新；同时用它选择对应的持久化高度缓存。
@@ -499,6 +555,7 @@ struct DayScheduleView: View {
     /// 数值增加先向后浏览课程，到达最后一项便进入下一日横向分页；数值
     /// 减少先向前浏览课程，到达第一项后直接进入前一日横向分页。
     private func handleDayCrownChange(_ event: DigitalCrownEvent) {
+        onCrownInput()
         // 新刻度是“仍在旋转”的唯一可靠信号；先取消可能由短暂 onIdle
         // 排队的吸附，保证连续翻页期间绝不会撞上收口动画。
         crownIdleCoordinator.cancel()
@@ -511,6 +568,11 @@ struct DayScheduleView: View {
             to: event.offset
         )
         lastCrownEventOffset = event.offset
+
+        // `onIdle` 在实体表很慢的连续旋转中偶尔会过早到达。若它已经启动
+        // 表冠吸附，新刻度必须先原子完成那一页并解除动画锁，再继续消费本次
+        // 位移；触摸和标题按钮发起的过渡仍保持不可打断。
+        guard resumeDayCrownFromPendingSnapIfNeeded() else { return }
         guard let update = crownSession.register(delta: delta) else { return }
 
         onCrownInteraction()
@@ -610,13 +672,24 @@ struct DayScheduleView: View {
             courses: courses,
             spacing: courseCardSpacing
         )
-        // 用极短线性补间填充实体表相邻 detent 之间的显示帧；
-        // 新输入会立即重定向目标，不会累积播放历史动画。
-        withAnimation(.linear(duration: 0.045)) {
-            courseContentOffset = nextOffset
+        let entersHorizontalNavigation = direction > 0
+            && nextPosition >= lastPosition
+        if entersHorizontalNavigation {
+            // 切换横向轴的这一帧直接结束最后一段纵向补间。否则 45ms 的
+            // 卡片动画会与三页容器同时运行，在实体表上表现为一次纵向回弹。
+            performWithoutAnimation {
+                courseContentOffset = nextOffset
+                verticalTouchStartOffset = nextOffset
+            }
+        } else {
+            // 只在仍处于纵向浏览时用极短补间填充相邻 detent 间隔；横向会话
+            // 从不创建这类动画，也不会积压历史目标。
+            withAnimation(.linear(duration: 0.045)) {
+                courseContentOffset = nextOffset
+            }
         }
 
-        guard direction > 0, nextPosition >= lastPosition else { return }
+        guard entersHorizontalNavigation else { return }
 
         // 到达末张卡片即切换导航轴，不再继续制造纵向越界位移。
         // 当前刻度如果越过末项，未被纵向消费的部分立即传给横向分页，
@@ -650,6 +723,19 @@ struct DayScheduleView: View {
     /// `moveDay` 才会无动画把新页面重置到首张卡片。
     private func activateHorizontalDayNavigation() {
         guard !continuousDayNavigation else { return }
+        cancelDayVerticalMomentum()
+        // 横向会话独占 `horizontalPageOffset`。固定纵向模型值并暂停持久化，
+        // 防止惯性、边界回弹或延迟写盘在翻页帧中触发额外布局工作。
+        let fixedCourseOffset = courseLayoutTracker.contentOffset(
+            for: courseScrollPosition,
+            courses: courses,
+            spacing: courseCardSpacing
+        )
+        performWithoutAnimation {
+            courseContentOffset = fixedCourseOffset
+            verticalTouchStartOffset = fixedCourseOffset
+        }
+        courseLayoutTracker.suspendPersistence()
         continuousDayNavigation = true
     }
 
@@ -755,6 +841,7 @@ struct DayScheduleView: View {
     /// `courseContentOffset`。速度较小则直接执行原来的边界收口。
     private func finishDayVerticalDrag(_ value: DragGesture.Value) {
         guard !pageTransitionInFlight, !courses.isEmpty else { return }
+        onSwipeInput(.vertical)
         let velocity = verticalDragReleaseVelocity(value)
         let restingRange = dayTouchRestingRange()
         let isOutsideRestingRange = !restingRange.contains(
@@ -967,6 +1054,7 @@ struct DayScheduleView: View {
 
     private func finishDayHorizontalDrag(_ value: DragGesture.Value) {
         guard !pageTransitionInFlight else { return }
+        onSwipeInput(.horizontal)
         let motion = horizontalDragMotion(
             value,
             currentOffset: horizontalPageOffset,
@@ -1020,6 +1108,7 @@ struct DayScheduleView: View {
             )
             horizontalPageOffset = update.offset
         }
+        onCrownPageInput()
         return update.crossedPage
     }
 
@@ -1043,7 +1132,8 @@ struct DayScheduleView: View {
             )
             settleDayPage(
                 direction: direction,
-                velocity: horizontalCrownVelocity
+                velocity: horizontalCrownVelocity,
+                source: .crown
             )
         } else {
             // 纯纵向浏览没有吸附和回弹；表冠停在哪里，卡片就保持在哪里。
@@ -1054,7 +1144,11 @@ struct DayScheduleView: View {
     }
 
     /// 动画到目标页后才原子替换日期，再无动画复位三页容器的位置。
-    private func settleDayPage(direction: Int, velocity: CGFloat) {
+    private func settleDayPage(
+        direction: Int,
+        velocity: CGFloat,
+        source: DayPageTransitionSource = .direct
+    ) {
         crownIdleCoordinator.cancel()
         let snap = horizontalPageSnap(
             direction: direction,
@@ -1067,7 +1161,9 @@ struct DayScheduleView: View {
         let token = pageTransitionToken
         pageTransitionTask?.cancel()
         pageTransitionInFlight = true
-        resetDayInputRecognitionForSnap()
+        pageTransitionSource = source
+        pendingSnapDirection = snap.direction
+        prepareDayInputRecognitionForSnap(source: source)
         withAnimation(calendarPageSnapAnimation(duration: snap.duration)) {
             horizontalPageOffset = snap.target
         }
@@ -1089,27 +1185,70 @@ struct DayScheduleView: View {
                 horizontalPageOffset = 0
             }
             pageTransitionInFlight = false
+            pageTransitionSource = nil
+            pendingSnapDirection = 0
             horizontalCrownVelocity = 0
             courseLayoutTracker.resumePersistence()
             rebindDayCrown(binding, transitionToken: token)
         }
     }
 
-    /// 吸附开始时统一结束当前表冠和触摸输入会话。
+    /// 吸附开始时统一结束触摸识别，并按输入来源处理表冠会话。
     ///
-    /// 除了立即释放 Crown 焦点，还清除表冠基准、方向、触摸累计位移、
-    /// 纵横轴锁定和分页模式。动画完成前不会接收新输入；完成后由目标页
-    /// 的课程数量重新决定横向或纵向绑定。
-    private func resetDayInputRecognitionForSnap() {
+    /// 触摸和标题按钮发起的吸附会释放表冠焦点；表冠停止后发起的吸附则
+    /// 保留焦点与横向会话，使过早到达的 `onIdle` 可被下一刻度立即中断。
+    /// 两种路径都会停止纵向惯性，并重置分页器的触摸轴锁定。
+    private func prepareDayInputRecognitionForSnap(
+        source: DayPageTransitionSource
+    ) {
         cancelDayVerticalMomentum()
+        verticalTouchStartOffset = courseContentOffset
+        inputRecognitionResetToken += 1
+
+        guard source == .direct else {
+            // 表冠停止后的吸附仍保留焦点和横向会话。若用户再次旋转，新的
+            // onChange 可以中断吸附；真正完成后再按落地页课程数重新绑定。
+            crownFocused = true
+            return
+        }
+
         crownFocused = false
         crownSession.reset()
         crownPageRamp.reset()
         lastCrownEventOffset = crownValue
         horizontalCrownVelocity = 0
         continuousDayNavigation = false
-        verticalTouchStartOffset = courseContentOffset
-        inputRecognitionResetToken += 1
+    }
+
+    /// 新表冠刻度到达时中断由表冠自己发起、尚未完成的吸附。
+    ///
+    /// SwiftUI 在 `withAnimation` 开始时模型值已经等于目标页。这里取消完成
+    /// Task，并在无动画事务中提交该目标日期、归零三页容器，然后继续处理
+    /// 当前刻度。这样不会让旧吸附动画继续阻塞最多 220ms，也不会累积掉帧
+    /// 期间的历史位移。触摸或标题按钮发起的过渡不走这条可打断路径。
+    private func resumeDayCrownFromPendingSnapIfNeeded() -> Bool {
+        guard pageTransitionInFlight else { return true }
+        guard pageTransitionSource == .crown else { return false }
+
+        pageTransitionToken += 1
+        pageTransitionTask?.cancel()
+        pageTransitionTask = nil
+        let direction = pendingSnapDirection
+        performWithoutAnimation {
+            if direction != 0 {
+                moveDay(
+                    direction,
+                    preservesHorizontalNavigation: true
+                )
+            }
+            horizontalPageOffset = 0
+            pageTransitionInFlight = false
+            pageTransitionSource = nil
+            pendingSnapDirection = 0
+            continuousDayNavigation = true
+        }
+        crownFocused = true
+        return true
     }
 
     /// 目标日期零或一项日程时继续横向翻页；两项及以上时恢复纵向浏览。

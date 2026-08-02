@@ -49,6 +49,7 @@
 		A27B00000000000000000016 /* WatchInteractionSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000006 /* WatchInteractionSupport.swift */; };
 		A27B00000000000000000017 /* OverviewScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000007 /* OverviewScheduleView.swift */; };
 		A27B00000000000000000018 /* MonthCalendarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000008 /* MonthCalendarData.swift */; };
+		A27B00000000000000000019 /* WatchOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000009 /* WatchOnboardingView.swift */; };
 		A17A0000000000000000001C /* TraintimeWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000002 /* TraintimeWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A17A0000000000000000001D /* RootScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000011 /* RootScheduleView.swift */; };
 		A17A0000000000000000001E /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000001F /* WatchConnectivityManager.swift */; };
@@ -208,6 +209,7 @@
 		A27B00000000000000000006 /* WatchInteractionSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WatchInteractionSupport.swift; sourceTree = "<group>"; };
 		A27B00000000000000000007 /* OverviewScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/OverviewScheduleView.swift; sourceTree = "<group>"; };
 		A27B00000000000000000008 /* MonthCalendarData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MonthCalendarData.swift; sourceTree = "<group>"; };
+		A27B00000000000000000009 /* WatchOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WatchOnboardingView.swift; sourceTree = "<group>"; };
 		A17A00000000000000000012 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A17A0000000000000000001F /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
 		A17A00000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -373,6 +375,7 @@
 				A27B00000000000000000004 /* CalendarPagingSupport.swift */,
 				A27B00000000000000000005 /* InteractionAwareScrollView.swift */,
 				A27B00000000000000000006 /* WatchInteractionSupport.swift */,
+				A27B00000000000000000009 /* WatchOnboardingView.swift */,
 				A17A00000000000000000011 /* RootScheduleView.swift */,
 				A17A00000000000000000021 /* Assets.xcassets */,
 				C17C00000000000000000003 /* Localizable.xcstrings */,
@@ -774,6 +777,7 @@
 				A27B00000000000000000014 /* CalendarPagingSupport.swift in Sources */,
 				A27B00000000000000000015 /* InteractionAwareScrollView.swift in Sources */,
 				A27B00000000000000000016 /* WatchInteractionSupport.swift in Sources */,
+				A27B00000000000000000019 /* WatchOnboardingView.swift in Sources */,
 				A17A0000000000000000001D /* RootScheduleView.swift in Sources */,
 				B17B00000000000000000014 /* WatchWidgetShared.swift in Sources */,
 			);

@@ -7,11 +7,18 @@ import SwiftUI
 struct OverviewScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
     let onCrownInteraction: () -> Void
+    let onCrownInput: () -> Void
+    let onTouchInput: () -> Void
+    var alwaysAllowsTeachingBounce = false
 
     var body: some View {
         InteractionAwareScrollView(
             onScroll: onCrownInteraction,
+            onCrownInput: onCrownInput,
+            onTouchInput: onTouchInput,
             centersShortContent: true,
+            alwaysAllowsBounce: alwaysAllowsTeachingBounce,
+            usesShortContentTouchFallback: alwaysAllowsTeachingBounce,
             protectsInitialTopEdge: true
         ) {
             VStack(alignment: .leading, spacing: 8) {

@@ -30,7 +30,7 @@ struct CalendarCrownPageRamp {
 }
 
 /// 单个触摸层判定横向翻页或纵向滚动的轴向。
-enum CalendarPagingDragAxis {
+enum CalendarPagingDragAxis: Equatable {
     case horizontal
     case vertical
 }
@@ -708,7 +708,12 @@ struct DateNavigationHeader: View {
         accessibilityLabel: LocalizedStringKey
     ) -> some View {
         Button(action: action) {
-            Color.clear
+            // watchOS 真机的 Toolbar 会把完全透明的按钮标签从
+            // 命中树中剔除，结果是箭头可见但按不动。使用几乎
+            // 不可见的实体填充保留真实按钮命中，不改变任何
+            // 主观布局或可见颜色。
+            Rectangle()
+                .fill(Color.white.opacity(0.001))
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

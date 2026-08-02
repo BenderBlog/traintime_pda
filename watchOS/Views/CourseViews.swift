@@ -109,9 +109,12 @@ struct CourseRow: View {
 struct CourseDetailView: View {
     let course: WatchCourse
     var showsTopCloseButton = false
+    let onScroll: () -> Void
+    let onCrownInput: () -> Void
+    let onTouchInput: () -> Void
+    let onCloseButtonFrameChange: (CGRect) -> Void
     let dismiss: () -> Void
     @State private var isDismissing = false
-    @FocusState private var detailScrollFocused: Bool
 
     var body: some View {
         GeometryReader { proxy in
@@ -125,14 +128,32 @@ struct CourseDetailView: View {
                     .overlay(course.color.opacity(0.08))
                     .ignoresSafeArea()
 
-                ScrollView {
+                // 与概览、课程列表复用同一滚动输入桥。详情内容已有真实
+                // 滚动范围，不再附加 DragGesture；系统 ScrollPhase 同时
+                // 驱动画面和上报教学输入，避免检测成功但页面没有位移。
+                InteractionAwareScrollView(
+                    onScroll: onScroll,
+                    onCrownInput: onCrownInput,
+                    onTouchInput: onTouchInput,
+                    requestsCrownFocus: true
+                ) {
                     ZStack(alignment: .topTrailing) {
                         detailContent(width: proxy.size.width)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(
+                                maxWidth: .infinity,
+                                alignment: .leading
+                            )
 
                         if showsTopCloseButton {
                             topCloseButton
                                 .scaleEffect(0.82)
+                                // 在最终缩放与滚动布局之后读取位置，教学点击
+                                // 动画才能始终与屏幕上真正看到的关闭按钮同心。
+                                .background {
+                                    WatchOnboardingFrameReader(
+                                        report: onCloseButtonFrameChange
+                                    )
+                                }
                                 // 外层内容稍后统一添加顶部 inset；减去该值
                                 // 后，按钮首次出现的位置与固定版本完全相同。
                                 .padding(
@@ -154,33 +175,19 @@ struct CourseDetailView: View {
                     // 不移动初始内容，只增加可滚动的尾部安全区，让教师、
                     // 座位号等最后一行能离开圆角屏幕的底部裁切区域。
                     .padding(.bottom, max(8, proxy.size.height * 0.2))
+                    // 详情很短时也保留一段真实滚动距离。它不改变首屏内容
+                    // 的起点，只让原生 ScrollView 能接收并响应数码表冠。
+                    .frame(
+                        minHeight: proxy.size.height
+                            + max(24, proxy.size.height * 0.12),
+                        alignment: .top
+                    )
                 }
                 .detailTopEdgeEffectHidden()
-                // 由原生 ScrollView 直接处理手指和表冠滚动。watchOS 会提供
-                // 与系统页面一致的减速、边界皮筋和滚动反馈，比人工锚点跳转
-                // 在实体设备上更稳定。
-                .focusable()
-                .focused($detailScrollFocused)
-
             }
             .onAppear {
                 isDismissing = false
-                acquireDetailScrollFocus()
             }
-            .onDisappear {
-                detailScrollFocused = false
-            }
-        }
-    }
-
-    /// 等待详情 ScrollView 提交到实体表层级后再申请原生表冠焦点。
-    ///
-    /// ScrollView 本身作为 responder，表冠直接驱动系统滚动机制。
-    private func acquireDetailScrollFocus() {
-        detailScrollFocused = false
-        DispatchQueue.main.async {
-            guard !isDismissing else { return }
-            detailScrollFocused = true
         }
     }
 
@@ -276,16 +283,15 @@ struct CourseDetailView: View {
         .accessibilityLabel("关闭课程详情")
     }
 
-    /// 先停止详情交互并释放表冠焦点，下一次主线程循环再移除覆盖层。
+    /// 先停止详情交互，下一次主线程循环再移除覆盖层。
     ///
     /// 实体 Apple Watch 上，表冠焦点、ScrollView 回弹和根层转场若在同一
     /// 事务内同时变更，系统偶发会保留旧命中层，表现为需要点击两次或退出
-    /// 卡顿。这里让关闭成为幂等操作，并给系统一个循环提交焦点释放；不会
+    /// 卡顿。这里让关闭成为幂等操作，并给系统一个循环提交状态变化；不会
     /// 增加肉眼可见的延迟，也不改变详情页布局或退出动画。
     private func closeDetail() {
         guard !isDismissing else { return }
         isDismissing = true
-        detailScrollFocused = false
         WatchHaptics.selection()
         DispatchQueue.main.async {
             dismiss()

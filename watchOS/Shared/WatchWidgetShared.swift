@@ -14,6 +14,7 @@ enum WatchPersistentCacheKey {
         "TraintimeWatchInstalledSemesterScheduleVersion"
     static let scheduleRenderIndex = "XDYouWatchScheduleRenderCache"
     static let dayCourseLayout = "XDYouWatchDayCourseLayoutCache"
+    static let completedOnboarding = "XDYouWatchCompletedOnboardingV1"
 }
 
 /// Watch App 私有 Codable 缓存的统一 JSON 读写入口。
@@ -21,6 +22,11 @@ enum WatchPersistentCacheKey {
 /// 调用方继续负责 schema、来源签名和业务完整性校验；本类型只消除重复的
 /// `JSONEncoder/JSONDecoder + UserDefaults` 模板，并保持写入为单个 Data 值。
 enum WatchCacheCoding {
+    /// 把可编码值转换成可跨任务传递、一次写入 Defaults 的 Data。
+    static func encode<Value: Encodable>(_ value: Value) throws -> Data {
+        try JSONEncoder().encode(value)
+    }
+
     /// 解码 WatchConnectivity 与持久化层共用的 UTF-8 JSON 字符串。
     static func decode<Value: Decodable>(
         _ type: Value.Type,
@@ -31,7 +37,7 @@ enum WatchCacheCoding {
 
     /// 将 Codable 值编码成同步协议使用的 UTF-8 JSON 字符串。
     static func encodeJSON<Value: Encodable>(_ value: Value) throws -> String {
-        String(decoding: try JSONEncoder().encode(value), as: UTF8.self)
+        String(decoding: try encode(value), as: UTF8.self)
     }
 
     /// 从指定 Defaults 读取并解码；键不存在时返回 `nil`。
@@ -50,7 +56,16 @@ enum WatchCacheCoding {
         key: String,
         defaults: UserDefaults = .standard
     ) throws {
-        let data = try JSONEncoder().encode(value)
+        let data = try encode(value)
+        persist(data, key: key, defaults: defaults)
+    }
+
+    /// 写入已经在后台完成编码的数据，不在调用线程重复执行 JSON 工作。
+    static func persist(
+        _ data: Data,
+        key: String,
+        defaults: UserDefaults = .standard
+    ) {
         defaults.set(data, forKey: key)
     }
 }

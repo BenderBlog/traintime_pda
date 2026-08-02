@@ -14,6 +14,14 @@ struct MonthScheduleView: View {
     let initialDate: Date
     let submit: (Date) -> Void
     let cancel: () -> Void
+    let onEmptyTap: () -> Void
+    let onCrownInput: () -> Void
+    let onTouchInputBegan: () -> Void
+    let onSwipeInput: (CalendarPagingDragAxis) -> Void
+    let onHeaderPreviousTap: () -> Void
+    let onHeaderNextTap: () -> Void
+    /// 启动预热实例只负责建立真实渲染树，不取得表冠焦点或监听课表变化。
+    let prewarmingOnly: Bool
 
     @State private var visibleMonth: Date
     /// App 启动阶段已经准备好的当前月及相邻两月。
@@ -41,13 +49,27 @@ struct MonthScheduleView: View {
         initialDate: Date,
         initialWindow: MonthCalendarWindow,
         submit: @escaping (Date) -> Void,
-        cancel: @escaping () -> Void
+        cancel: @escaping () -> Void,
+        onEmptyTap: @escaping () -> Void,
+        onCrownInput: @escaping () -> Void,
+        onTouchInputBegan: @escaping () -> Void,
+        onSwipeInput: @escaping (CalendarPagingDragAxis) -> Void,
+        onHeaderPreviousTap: @escaping () -> Void,
+        onHeaderNextTap: @escaping () -> Void,
+        prewarmingOnly: Bool = false
     ) {
         let normalizedDate = Calendar.current.startOfDay(for: initialDate)
         let month = monthCalendarStart(for: normalizedDate)
         self.initialDate = normalizedDate
         self.submit = submit
         self.cancel = cancel
+        self.onEmptyTap = onEmptyTap
+        self.onCrownInput = onCrownInput
+        self.onTouchInputBegan = onTouchInputBegan
+        self.onSwipeInput = onSwipeInput
+        self.onHeaderPreviousTap = onHeaderPreviousTap
+        self.onHeaderNextTap = onHeaderNextTap
+        self.prewarmingOnly = prewarmingOnly
         _visibleMonth = State(initialValue: month)
         _loadedMonths = State(initialValue: initialWindow.models)
         _periodMarkersByMonth = State(
@@ -82,8 +104,10 @@ struct MonthScheduleView: View {
                         // 只负责识别并锁定横向手势，不实现第二套纵向物理。
                         onVerticalDragBegan: {},
                         onVerticalDragChanged: { _ in },
-                        onVerticalDragEnded: { _ in },
-                        onDragAxisLocked: { _ in },
+                        onVerticalDragEnded: { _ in
+                            onSwipeInput(.vertical)
+                        },
+                        onDragAxisLocked: { _ in onTouchInputBegan() },
                         onDragFinished: {}
                     )
                 }
@@ -95,12 +119,14 @@ struct MonthScheduleView: View {
             }
             .background(Color.black.ignoresSafeArea())
             .onAppear {
+                guard !prewarmingOnly else { return }
                 crownFocused = true
                 lastCrownEventOffset = crownValue
             }
             // Store 安装新阶段或恢复持久化派生索引后递增修订号。月份页面只
             // 刷新当前三页颜色，不再直接观察整份快照并重新扫描全部课程。
             .onChange(of: store.renderCacheRevision) { _, _ in
+                guard !prewarmingOnly else { return }
                 replaceMonthWindow(
                     store.preparedMonthCalendarWindow(
                         centeredOn: visibleMonth
@@ -108,9 +134,11 @@ struct MonthScheduleView: View {
                 )
             }
             .task {
+                guard !prewarmingOnly else { return }
                 await activateMonthCrownAfterEntrance()
             }
             .onDisappear {
+                guard !prewarmingOnly else { return }
                 crownIdleCoordinator.cancel()
                 pageTransitionTask?.cancel()
             }
@@ -122,8 +150,14 @@ struct MonthScheduleView: View {
                                 .month(.wide)
                                 .locale(WatchWidgetShared.preferredLocale)
                         ),
-                        previous: { requestMonthPage(-1) },
-                        next: { requestMonthPage(1) },
+                        previous: {
+                            onHeaderPreviousTap()
+                            requestMonthPage(-1)
+                        },
+                        next: {
+                            onHeaderNextTap()
+                            requestMonthPage(1)
+                        },
                         titleAction: cancel
                     )
                     .frame(width: 116)
@@ -161,7 +195,8 @@ struct MonthScheduleView: View {
                         selectedDate: initialDate,
                         periodMarkers: periodMarkersByMonth[month] ?? [:],
                         rowHeight: rowHeight,
-                        select: submit
+                        select: submit,
+                        onEmptyTap: onEmptyTap
                     )
                     .frame(
                         height: rowHeight * CGFloat(model.rowCount)
@@ -206,6 +241,7 @@ struct MonthScheduleView: View {
 
     private func finishHorizontalMonthDrag(_ value: DragGesture.Value) {
         guard !pageTransitionInFlight else { return }
+        onSwipeInput(.horizontal)
         let motion = horizontalDragMotion(
             value,
             currentOffset: horizontalPageOffset,
@@ -279,6 +315,7 @@ struct MonthScheduleView: View {
 
     /// 从第一个有效表冠刻度起就直接横向移动月份，不经过纵向滚动或阈值路由。
     private func handleMonthCrownChange(_ event: DigitalCrownEvent) {
+        onCrownInput()
         guard !pageTransitionInFlight else { return }
         crownIdleCoordinator.cancel()
         let delta = frameBoundCrownDelta(
@@ -498,6 +535,7 @@ private struct MonthCalendarCanvas: View {
     let periodMarkers: [Int: MonthPeriodMarker]
     let rowHeight: CGFloat
     let select: (Date) -> Void
+    let onEmptyTap: () -> Void
 
     var body: some View {
         GeometryReader { geometry in
@@ -562,6 +600,7 @@ private struct MonthCalendarCanvas: View {
                     at: location,
                     canvasWidth: geometry.size.width
                 ) else {
+                    onEmptyTap()
                     return
                 }
                 select(date)

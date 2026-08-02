@@ -11,6 +11,13 @@ struct CourseListView: View {
     @EnvironmentObject private var store: WatchScheduleStore
     @State private var didPositionInitialDate = false
     let onCrownInteraction: () -> Void
+    let onCrownInput: () -> Void
+    let onTouchInput: () -> Void
+    var alwaysAllowsTeachingBounce = false
+    /// 正常打开列表时定位到今天或最近日程；新手教学只需要演示滚动，
+    /// 跳过这次跨整学期的 ScrollViewReader 定位，避免实体表为了寻找
+    /// 目标 ID 在首帧同步展开大量 LazyVStack 布局。
+    var positionsInitialDate = true
 
     /// Store 在 App 启动或课表原子替换时已经完成分组，这里只读取结果。
     private var groups: [WatchCourseDayGroup] {
@@ -21,7 +28,17 @@ struct CourseListView: View {
         ScrollViewReader { scrollProxy in
             InteractionAwareScrollView(
                 onScroll: onCrownInteraction,
+                onCrownInput: onCrownInput,
+                onTouchInput: onTouchInput,
                 centersShortContent: true,
+                // 非空列表使用 LazyVStack，必须让原生 ScrollView 直接建立
+                // 完整滚动范围；空状态仍走短内容测量并保持垂直居中。
+                usesLazyContentLayout: !groups.isEmpty,
+                alwaysAllowsBounce: alwaysAllowsTeachingBounce,
+                // 教学时额外旁路标记真实手指拖动的来源，但列表位移仍完全
+                // 交给原生 ScrollView。实体表即使跳过 `.tracking`、直接进入
+                // `.interacting`，结束后也不会被误判成表冠旋转。
+                usesShortContentTouchFallback: alwaysAllowsTeachingBounce,
                 protectsInitialTopEdge: true
             ) {
                 if groups.isEmpty {
@@ -70,7 +87,8 @@ struct CourseListView: View {
 
     /// 首次进入课程列表时定位到今天；今天无课则定位到最近的日程日期。
     private func positionInitialDate(using scrollProxy: ScrollViewProxy) {
-        guard !didPositionInitialDate,
+        guard positionsInitialDate,
+              !didPositionInitialDate,
               let targetDate = initialTargetDate
         else {
             return

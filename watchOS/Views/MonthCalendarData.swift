@@ -43,6 +43,19 @@ struct MonthCalendarWindow {
 struct MonthCalendarCache {
     private var models: [Date: MonthCalendarPageModel] = [:]
     private var periodMarkers: [Date: [Int: MonthPeriodMarker]] = [:]
+    /// 以中心月为键保存已经组装好的三页原子窗口。
+    ///
+    /// `models` 和 `periodMarkers` 负责跨窗口复用单月数据；这里再缓存最终
+    /// 窗口，避免用户第一次打开月视图时才创建两份三元素字典。
+    private var windows: [Date: MonthCalendarWindow] = [:]
+
+    /// 目标月与相邻两页是否已经同时具备日期格和课表色段。
+    ///
+    /// 新手引导进入课程列表前会查询这一状态。只有三页完整就绪才允许
+    /// 黑色章节页淡出，避免第一次进入月视图时才在动画帧内组装网格。
+    func isPrepared(around date: Date) -> Bool {
+        windows[monthCalendarStart(for: date)] != nil
+    }
 
     /// 预生成目标月份前、中、后三页所需的全部轻量数据。
     mutating func prewarm(
@@ -50,7 +63,10 @@ struct MonthCalendarCache {
         periodCourseIDsByDay: [Date: [String?]],
         coursesByID: [String: WatchCourse]
     ) {
-        for month in monthCalendarPageStarts(centeredOn: date) {
+        let center = monthCalendarStart(for: date)
+        guard windows[center] == nil else { return }
+        let starts = monthCalendarPageStarts(centeredOn: center)
+        for month in starts {
             let model = model(for: month)
             guard periodMarkers[month] == nil else { continue }
             periodMarkers[month] = makePeriodMarkers(
@@ -59,6 +75,7 @@ struct MonthCalendarCache {
                 coursesByID: coursesByID
             )
         }
+        windows[center] = makeWindow(for: starts)
     }
 
     /// 返回已成组准备好的三页窗口，确保日期和颜色标记来自同一批缓存。
@@ -67,12 +84,27 @@ struct MonthCalendarCache {
         periodCourseIDsByDay: [Date: [String?]],
         coursesByID: [String: WatchCourse]
     ) -> MonthCalendarWindow {
+        let center = monthCalendarStart(for: date)
+        if let cached = windows[center] {
+            return cached
+        }
         prewarm(
-            around: date,
+            around: center,
             periodCourseIDsByDay: periodCourseIDsByDay,
             coursesByID: coursesByID
         )
-        let starts = monthCalendarPageStarts(centeredOn: date)
+        if let cached = windows[center] {
+            return cached
+        }
+        // `prewarm` 正常路径必定写入窗口；保留无副作用兜底，防止未来调整
+        // 缓存策略时让月份页面因缺少数据而无法构造。
+        return makeWindow(
+            for: monthCalendarPageStarts(centeredOn: center)
+        )
+    }
+
+    /// 从已经准备好的单月缓存组装最终三页窗口。
+    private func makeWindow(for starts: [Date]) -> MonthCalendarWindow {
         return MonthCalendarWindow(
             models: Dictionary(
                 uniqueKeysWithValues: starts.compactMap { month in
@@ -90,6 +122,7 @@ struct MonthCalendarCache {
     /// 课表发生变化时只清除课程相关标记，保留确定性的月份日期网格。
     mutating func invalidateScheduleMarkers() {
         periodMarkers.removeAll(keepingCapacity: true)
+        windows.removeAll(keepingCapacity: true)
     }
 
     /// 返回已有模型；缺失时只计算一次并存入缓存。

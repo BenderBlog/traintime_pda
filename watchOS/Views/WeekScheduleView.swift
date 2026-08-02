@@ -9,7 +9,7 @@ import SwiftUI
 /// 因而色块与空白区域始终使用互斥的命中路径。
 struct WeekScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
-    @State private var anchorDate = Date()
+    @State private var anchorDate: Date
     @Binding var selectedCourse: WatchCourse?
     @State private var crownValue = 0.0
     @State private var lastCrownEventOffset = 0.0
@@ -28,6 +28,42 @@ struct WeekScheduleView: View {
     @FocusState private var crownFocused: Bool
     let onEmptyTap: () -> Void
     let onCrownInteraction: () -> Void
+    let onCrownInput: () -> Void
+    let onTouchInputBegan: () -> Void
+    let onSwipeInput: (CalendarPagingDragAxis) -> Void
+    let onHeaderPreviousTap: () -> Void
+    let onHeaderNextTap: () -> Void
+    let onboardingTargetCourse: WatchCourse?
+    let onCourseFrameChange: (WatchCourse, CGRect) -> Void
+    let onCourseSelected: (WatchCourse) -> Void
+
+    init(
+        selectedCourse: Binding<WatchCourse?>,
+        initialDate: Date,
+        onEmptyTap: @escaping () -> Void,
+        onCrownInteraction: @escaping () -> Void,
+        onCrownInput: @escaping () -> Void,
+        onTouchInputBegan: @escaping () -> Void,
+        onSwipeInput: @escaping (CalendarPagingDragAxis) -> Void,
+        onHeaderPreviousTap: @escaping () -> Void,
+        onHeaderNextTap: @escaping () -> Void,
+        onboardingTargetCourse: WatchCourse?,
+        onCourseFrameChange: @escaping (WatchCourse, CGRect) -> Void,
+        onCourseSelected: @escaping (WatchCourse) -> Void
+    ) {
+        _selectedCourse = selectedCourse
+        _anchorDate = State(initialValue: initialDate)
+        self.onEmptyTap = onEmptyTap
+        self.onCrownInteraction = onCrownInteraction
+        self.onCrownInput = onCrownInput
+        self.onTouchInputBegan = onTouchInputBegan
+        self.onSwipeInput = onSwipeInput
+        self.onHeaderPreviousTap = onHeaderPreviousTap
+        self.onHeaderNextTap = onHeaderNextTap
+        self.onboardingTargetCourse = onboardingTargetCourse
+        self.onCourseFrameChange = onCourseFrameChange
+        self.onCourseSelected = onCourseSelected
+    }
 
     /// 当前周的周一零点。
     private var weekStart: Date {
@@ -55,7 +91,7 @@ struct WeekScheduleView: View {
                 onVerticalDragBegan: {},
                 onVerticalDragChanged: { _ in },
                 onVerticalDragEnded: { _ in },
-                onDragAxisLocked: { _ in },
+                onDragAxisLocked: { _ in onTouchInputBegan() },
                 onDragFinished: {}
             )
 
@@ -66,8 +102,14 @@ struct WeekScheduleView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     DateNavigationHeader(
                         title: weekTitle,
-                        previous: { requestWeekPage(-1) },
-                        next: { requestWeekPage(1) }
+                        previous: {
+                            onHeaderPreviousTap()
+                            requestWeekPage(-1)
+                        },
+                        next: {
+                            onHeaderNextTap()
+                            requestWeekPage(1)
+                        }
                     )
                     .frame(width: 116)
                     .offset(y: -10)
@@ -98,13 +140,17 @@ struct WeekScheduleView: View {
     /// 生成前一周、当前周和后一周；课程网格本身的尺寸与布局保持不变。
     private func weekPage(_ relativePage: Int) -> some View {
         let pageStart = weekDate(relativePage)
-
         return WeekSchedulePageContent(
             weekStart: pageStart,
             courses: courses(in: pageStart),
             languageIdentifier: store.preferredLanguageIdentifier,
             select: selectCourse,
-            onEmptyTap: handleEmptyTap
+            onEmptyTap: handleEmptyTap,
+            // 分页器会同时构建前、中、后三页。只有当前页拿到教学目标，
+            // 从根源上杜绝相邻页上报同 ID 课程的屏外坐标。
+            onboardingTargetCourse:
+                relativePage == 0 ? onboardingTargetCourse : nil,
+            reportCourseFrame: onCourseFrameChange
         )
         .equatable()
         .allowsHitTesting(relativePage == 0)
@@ -155,6 +201,7 @@ struct WeekScheduleView: View {
 
     private func finishWeekHorizontalDrag(_ value: DragGesture.Value) {
         guard selectedCourse == nil, !pageTransitionInFlight else { return }
+        onSwipeInput(.horizontal)
         let motion = horizontalDragMotion(
             value,
             currentOffset: horizontalPageOffset,
@@ -419,6 +466,7 @@ struct WeekScheduleView: View {
     private func selectCourse(_ course: WatchCourse) {
         crownFocused = false
         onCrownInteraction()
+        onCourseSelected(course)
         WatchHaptics.selection()
         withAnimation(.spring(response: 0.38, dampingFraction: 0.84)) {
             selectedCourse = course
@@ -452,6 +500,7 @@ struct WeekScheduleView: View {
     private func handleWeekCrownChange(
         _ event: DigitalCrownEvent
     ) {
+        onCrownInput()
         guard selectedCourse == nil else { return }
         // 连续旋转的新刻度立即撤销尚未开始的吸附确认任务。
         crownIdleCoordinator.cancel()
@@ -482,6 +531,8 @@ private struct WeekSchedulePageContent: View, Equatable {
     let languageIdentifier: String
     let select: (WatchCourse) -> Void
     let onEmptyTap: () -> Void
+    let onboardingTargetCourse: WatchCourse?
+    let reportCourseFrame: (WatchCourse, CGRect) -> Void
 
     static func == (
         lhs: WeekSchedulePageContent,
@@ -490,6 +541,7 @@ private struct WeekSchedulePageContent: View, Equatable {
         lhs.weekStart == rhs.weekStart
             && lhs.courses == rhs.courses
             && lhs.languageIdentifier == rhs.languageIdentifier
+            && lhs.onboardingTargetCourse == rhs.onboardingTargetCourse
     }
 
     var body: some View {
@@ -506,7 +558,9 @@ private struct WeekSchedulePageContent: View, Equatable {
                     weekStart: weekStart,
                     courses: courses,
                     select: select,
-                    onEmptyTap: onEmptyTap
+                    onEmptyTap: onEmptyTap,
+                    onboardingTargetCourse: onboardingTargetCourse,
+                    reportCourseFrame: reportCourseFrame
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .layoutPriority(1)
@@ -573,54 +627,49 @@ private struct WeekPeriodGrid: View {
     let courses: [WatchCourse]
     let select: (WatchCourse) -> Void
     let onEmptyTap: () -> Void
-
-    private let maximumPeriod = 10
-    private let totalUnits: CGFloat = 56
+    let onboardingTargetCourse: WatchCourse?
+    let reportCourseFrame: (WatchCourse, CGRect) -> Void
 
     /// 第 11 节及之后开始的课程不进入当前 1–10 节网格。
     private var visibleCourses: [WatchCourse] {
-        courses.filter { $0.startPeriod <= maximumPeriod }
+        courses.filter {
+            $0.startPeriod <= WeekScheduleGridGeometry.maximumPeriod
+        }
     }
 
     var body: some View {
         GeometryReader { proxy in
-            let labelWidth = max(11, min(15, proxy.size.width * 0.075))
+            let geometry = WeekScheduleGridGeometry(size: proxy.size)
             let labelFontSize = max(5.5, min(7, proxy.size.width * 0.032))
-            let columnWidth = max(1, (proxy.size.width - labelWidth) / 7)
-            let unitHeight = max(0.5, proxy.size.height / totalUnits)
+            let globalGridFrame = proxy.frame(in: .global)
 
             ZStack(alignment: .topLeading) {
                 Color.clear
 
                 todayColumnHighlight(
-                    size: proxy.size,
-                    labelWidth: labelWidth,
-                    columnWidth: columnWidth
+                    geometry: geometry
                 )
 
-                gridLines(
-                    size: proxy.size,
-                    labelWidth: labelWidth,
-                    columnWidth: columnWidth,
-                    unitHeight: unitHeight
-                )
+                gridLines(geometry: geometry)
 
-                ForEach(1...maximumPeriod, id: \.self) { period in
+                ForEach(
+                    1...WeekScheduleGridGeometry.maximumPeriod,
+                    id: \.self
+                ) { period in
                     Text("\(period)")
                         .font(.system(size: labelFontSize, design: .rounded))
                         .foregroundStyle(.secondary)
-                        .frame(width: labelWidth, height: 8)
+                        .frame(width: geometry.labelWidth, height: 8)
                         .offset(
                             x: 0,
-                            y: periodStartUnit(period) * unitHeight
-                                + 2.5 * unitHeight - 4
+                            y: geometry.periodStartUnit(period)
+                                * geometry.unitHeight
+                                + 2.5 * geometry.unitHeight - 4
                         )
                 }
 
                 ForEach(visibleCourses) { course in
-                    let start = periodStartUnit(course.startPeriod)
-                    let end = periodEndUnit(course.endPeriod)
-                    let weekday = weekdayIndex(for: course.startAt)
+                    let frame = geometry.courseFrame(for: course)
 
                     RoundedRectangle(
                         cornerRadius: 2.5,
@@ -628,12 +677,12 @@ private struct WeekPeriodGrid: View {
                     )
                     .fill(course.color)
                     .frame(
-                        width: max(3, columnWidth - 1.5),
-                        height: max(3, (end - start) * unitHeight - 1)
+                        width: frame.width,
+                        height: frame.height
                     )
                     .offset(
-                        x: labelWidth + CGFloat(weekday) * columnWidth + 0.75,
-                        y: start * unitHeight + 0.5
+                        x: frame.minX,
+                        y: frame.minY
                     )
                     .contentShape(Rectangle())
                     .accessibilityLabel(
@@ -653,9 +702,7 @@ private struct WeekPeriodGrid: View {
                     .onEnded { value in
                         if let course = course(
                             at: value.location,
-                            labelWidth: labelWidth,
-                            columnWidth: columnWidth,
-                            unitHeight: unitHeight
+                            geometry: geometry
                         ) {
                             select(course)
                         } else {
@@ -663,7 +710,47 @@ private struct WeekPeriodGrid: View {
                         }
                     }
             )
+            // 教学圆心不再读取每个色块的渲染后 GeometryReader。这里直接
+            // 使用绘制/命中共用的课程矩形公式，再加上网格的全局原点。
+            // 因而圆心不会受分页预渲染、过渡动画或回报先后顺序影响。
+            .onAppear {
+                reportOnboardingTarget(
+                    geometry: geometry,
+                    globalGridFrame: globalGridFrame
+                )
+            }
+            .onChange(of: globalGridFrame) { _, newFrame in
+                reportOnboardingTarget(
+                    geometry: geometry,
+                    globalGridFrame: newFrame
+                )
+            }
+            .onChange(of: onboardingTargetCourse) { _, _ in
+                reportOnboardingTarget(
+                    geometry: geometry,
+                    globalGridFrame: globalGridFrame
+                )
+            }
         }
+    }
+
+    /// 由时间网格的确定性边界反算教学目标的全局矩形。
+    private func reportOnboardingTarget(
+        geometry: WeekScheduleGridGeometry,
+        globalGridFrame: CGRect
+    ) {
+        guard let course = onboardingTargetCourse,
+              globalGridFrame.width > 0,
+              globalGridFrame.height > 0
+        else { return }
+        let localFrame = geometry.courseFrame(for: course)
+        reportCourseFrame(
+            course,
+            localFrame.offsetBy(
+                dx: globalGridFrame.minX,
+                dy: globalGridFrame.minY
+            )
+        )
     }
 
     /// 当前展示周包含今天时，在今天所在列的底层绘制一条淡色高亮带。
@@ -672,16 +759,18 @@ private struct WeekPeriodGrid: View {
     /// 原有色块坐标命中算法因此保持不变。
     @ViewBuilder
     private func todayColumnHighlight(
-        size: CGSize,
-        labelWidth: CGFloat,
-        columnWidth: CGFloat
+        geometry: WeekScheduleGridGeometry
     ) -> some View {
         if let column = todayColumnIndex {
             Rectangle()
                 .fill(Color.accentColor.opacity(0.09))
-                .frame(width: columnWidth, height: size.height)
+                .frame(
+                    width: geometry.columnWidth,
+                    height: geometry.size.height
+                )
                 .offset(
-                    x: labelWidth + CGFloat(column) * columnWidth,
+                    x: geometry.labelWidth
+                        + CGFloat(column) * geometry.columnWidth,
                     y: 0
                 )
                 .accessibilityHidden(true)
@@ -702,7 +791,7 @@ private struct WeekPeriodGrid: View {
         guard today >= displayedStart, today < displayedEnd else {
             return nil
         }
-        return weekdayIndex(for: today)
+        return WeekScheduleGridGeometry.weekdayIndex(for: today)
     }
 
     /// 在与绘制完全相同的几何参数下执行命中测试。
@@ -711,52 +800,84 @@ private struct WeekPeriodGrid: View {
     /// 用户点到的也会是视觉上位于最上层的色块。
     private func course(
         at location: CGPoint,
-        labelWidth: CGFloat,
-        columnWidth: CGFloat,
-        unitHeight: CGFloat
+        geometry: WeekScheduleGridGeometry
     ) -> WatchCourse? {
         visibleCourses.last { course in
-            let start = periodStartUnit(course.startPeriod)
-            let end = periodEndUnit(course.endPeriod)
-            let weekday = weekdayIndex(for: course.startAt)
-            let frame = CGRect(
-                x: labelWidth + CGFloat(weekday) * columnWidth + 0.75,
-                y: start * unitHeight + 0.5,
-                width: max(3, columnWidth - 1.5),
-                height: max(3, (end - start) * unitHeight - 1)
-            )
-            return frame.contains(location)
+            geometry.courseFrame(for: course).contains(location)
         }
     }
 
     /// 绘制七列和十节课的辅助线。
-    private func gridLines(
-        size: CGSize,
-        labelWidth: CGFloat,
-        columnWidth: CGFloat,
-        unitHeight: CGFloat
-    ) -> some View {
+    private func gridLines(geometry: WeekScheduleGridGeometry) -> some View {
         Path { path in
             for column in 0...7 {
-                let x = labelWidth + CGFloat(column) * columnWidth
+                let x = geometry.labelWidth
+                    + CGFloat(column) * geometry.columnWidth
                 path.move(to: CGPoint(x: x, y: 0))
-                path.addLine(to: CGPoint(x: x, y: size.height))
+                path.addLine(to: CGPoint(x: x, y: geometry.size.height))
             }
 
-            for period in 1...maximumPeriod {
-                let y = periodStartUnit(period) * unitHeight
-                path.move(to: CGPoint(x: labelWidth, y: y))
-                path.addLine(to: CGPoint(x: size.width, y: y))
+            for period in 1...WeekScheduleGridGeometry.maximumPeriod {
+                let y = geometry.periodStartUnit(period)
+                    * geometry.unitHeight
+                path.move(to: CGPoint(x: geometry.labelWidth, y: y))
+                path.addLine(to: CGPoint(x: geometry.size.width, y: y))
             }
-            path.move(to: CGPoint(x: labelWidth, y: size.height))
-            path.addLine(to: CGPoint(x: size.width, y: size.height))
+            path.move(
+                to: CGPoint(
+                    x: geometry.labelWidth,
+                    y: geometry.size.height
+                )
+            )
+            path.addLine(
+                to: CGPoint(
+                    x: geometry.size.width,
+                    y: geometry.size.height
+                )
+            )
         }
         .stroke(.secondary.opacity(0.18), lineWidth: 0.5)
     }
+}
 
-    /// 把节次映射到纵向布局单位；第 4、8 节后各留出午休/晚休间隔。
-    private func periodStartUnit(_ period: Int) -> CGFloat {
-        let period = min(maximumPeriod, max(1, period))
+/// 周网格唯一的几何模型。
+///
+/// SwiftUI 的 Path、课程色块、触摸命中和新手引导全部复用这份计算。课程
+/// 位置只由网格尺寸、星期和开始/结束节次决定，不再依赖渲染后的视图采样。
+private struct WeekScheduleGridGeometry {
+    static let maximumPeriod = 10
+    private static let totalUnits: CGFloat = 56
+
+    let size: CGSize
+
+    var labelWidth: CGFloat {
+        max(11, min(15, size.width * 0.075))
+    }
+
+    var columnWidth: CGFloat {
+        max(1, (size.width - labelWidth) / 7)
+    }
+
+    var unitHeight: CGFloat {
+        max(0.5, size.height / Self.totalUnits)
+    }
+
+    /// 返回与色块绘制完全一致的本地矩形。
+    func courseFrame(for course: WatchCourse) -> CGRect {
+        let start = periodStartUnit(course.startPeriod)
+        let end = periodEndUnit(course.endPeriod)
+        let weekday = Self.weekdayIndex(for: course.startAt)
+        return CGRect(
+            x: labelWidth + CGFloat(weekday) * columnWidth + 0.75,
+            y: start * unitHeight + 0.5,
+            width: max(3, columnWidth - 1.5),
+            height: max(3, (end - start) * unitHeight - 1)
+        )
+    }
+
+    /// 把节次映射到纵向单位；第 4、8 节后保留午休/晚休间隔。
+    func periodStartUnit(_ period: Int) -> CGFloat {
+        let period = min(Self.maximumPeriod, max(1, period))
         if period <= 4 {
             return CGFloat(period - 1) * 5
         }
@@ -772,7 +893,7 @@ private struct WeekPeriodGrid: View {
     }
 
     /// 将 Foundation 的周日为 1 转换为周一为 0。
-    private func weekdayIndex(for date: Date) -> Int {
+    static func weekdayIndex(for date: Date) -> Int {
         let weekday = Calendar.current.component(.weekday, from: date)
         return max(0, min(6, (weekday + 5) % 7))
     }

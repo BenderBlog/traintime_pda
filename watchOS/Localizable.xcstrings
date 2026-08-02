@@ -41,8 +41,55 @@
     "%lld" : {
 
     },
+    "Apple Watch 课表" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch Schedule"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch 課表"
+          }
+        }
+      }
+    },
+    "上一步" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上一步"
+          }
+        }
+      }
+    },
     "上一项" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous item"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上一項"
+          }
+        }
+      }
     },
     "下一节" : {
       "extractionState" : "stale",
@@ -79,7 +126,20 @@
       }
     },
     "下一项" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next item"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下一項"
+          }
+        }
+      }
     },
     "从手机刷新" : {
       "extractionState" : "stale",
@@ -115,18 +175,19 @@
         }
       }
     },
-    "关闭课程详情" : {
+    "关闭新手引导提示" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Close class details"
+            "value" : "Dismiss onboarding tip"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "關閉課程詳情"
+            "value" : "關閉新手引導提示"
           }
         }
       }
@@ -147,6 +208,39 @@
         }
       }
     },
+    "关闭详情" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Details"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉詳情"
+          }
+        }
+      }
+    },
+    "关闭课程详情" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close class details"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉課程詳情"
+          }
+        }
+      }
+    },
     "切换当前与下一节课" : {
       "localizations" : {
         "en" : {
@@ -159,6 +253,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "切換當前與下一節課"
+          }
+        }
+      }
+    },
+    "切换日期" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Date"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切換日期"
           }
         }
       }
@@ -181,6 +292,7 @@
       }
     },
     "切换课表视图" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -192,6 +304,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "切換課表檢視"
+          }
+        }
+      }
+    },
+    "刷新课表" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh Schedule"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新整理課表"
           }
         }
       }
@@ -246,6 +375,23 @@
         }
       }
     },
+    "周视图课程" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week Events"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "週視圖課程"
+          }
+        }
+      }
+    },
     "在当前课程和下一节课程之间切换。" : {
       "localizations" : {
         "en" : {
@@ -275,6 +421,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "地點未定"
+          }
+        }
+      }
+    },
+    "好" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好"
           }
         }
       }
@@ -324,6 +487,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已載入快取課表"
+          }
+        }
+      }
+    },
+    "底层数据已准备完成" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schedule data is ready"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "底層資料已準備完成"
           }
         }
       }
@@ -389,6 +569,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "當天沒有課程"
+          }
+        }
+      }
+    },
+    "悬浮按钮" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controls"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "懸浮按鈕"
           }
         }
       }
@@ -460,6 +657,142 @@
         }
       }
     },
+    "打开日期选择器" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Date Picker"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟日期選擇器"
+          }
+        }
+      }
+    },
+    "操作正确" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correct action"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "操作正確"
+          }
+        }
+      }
+    },
+    "操作错误" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrect action"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "操作錯誤"
+          }
+        }
+      }
+    },
+    "新手引导已完成" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guide complete"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新手引導已完成"
+          }
+        }
+      }
+    },
+    "旋转数码表冠，以浏览当前课程和下一节课程。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn the Digital Crown to browse the current and next class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旋轉數碼錶冠，以瀏覽目前課程和下一節課程。"
+          }
+        }
+      }
+    },
+    "旋转数码表冠，以浏览当前页面中的课程。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn the Digital Crown to browse the courses on this page."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旋轉數碼錶冠，以瀏覽目前頁面中的課程。"
+          }
+        }
+      }
+    },
+    "旋转数码表冠，以连续切换前后周。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn the Digital Crown to move continuously between weeks."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旋轉數碼錶冠，以連續切換前後週。"
+          }
+        }
+      }
+    },
+    "旋转数码表冠，以连续切换前后月份。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn the Digital Crown to move continuously between months."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旋轉數碼錶冠，以連續切換前後月份。"
+          }
+        }
+      }
+    },
     "无法连接 iPhone：%@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -477,18 +810,19 @@
         }
       }
     },
-    "月视图" : {
+    "日期选择器" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Month View"
+            "value" : "Date Picker"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "月檢視"
+            "value" : "日期選擇器"
           }
         }
       }
@@ -575,6 +909,23 @@
         }
       }
     },
+    "月视图" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Month View"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月檢視"
+          }
+        }
+      }
+    },
     "本周课程点阵" : {
       "localizations" : {
         "en" : {
@@ -607,6 +958,23 @@
         }
       }
     },
+    "查看课程" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Course"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看課程"
+          }
+        }
+      }
+    },
     "概览" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -620,6 +988,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "概覽"
+          }
+        }
+      }
+    },
+    "概览页面" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overview"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "概覽頁面"
+          }
+        }
+      }
+    },
+    "欢迎使用 XDYou" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to XDYou"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "歡迎使用 XDYou"
           }
         }
       }
@@ -670,6 +1072,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在重新整理"
+          }
+        }
+      }
+    },
+    "正在加载新手引导" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing the guide…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在載入新手引導…"
           }
         }
       }
@@ -758,6 +1177,23 @@
         }
       }
     },
+    "浏览课程" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse Courses"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "瀏覽課程"
+          }
+        }
+      }
+    },
     "物理实验" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -771,6 +1207,312 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "物理實驗"
+          }
+        }
+      }
+    },
+    "用手指上下滑动屏幕，以浏览当前课程和下一节课程。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swipe up or down to browse the current and next class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指上下滑動螢幕，以瀏覽目前課程和下一節課程。"
+          }
+        }
+      }
+    },
+    "用手指上下滑动屏幕，以浏览当前页面中的课程。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swipe up or down to browse the courses on this page."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指上下滑動螢幕，以瀏覽目前頁面中的課程。"
+          }
+        }
+      }
+    },
+    "用手指再次轻点页面空白处，以显示右侧操作按钮。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap an empty area again to show the controls on the right."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指再次輕點頁面空白處，以顯示右側操作按鈕。"
+          }
+        }
+      }
+    },
+    "用手指左右滑动屏幕，以切换前后周。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swipe left or right to move between weeks."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指左右滑動螢幕，以切換前後週。"
+          }
+        }
+      }
+    },
+    "用手指左右滑动屏幕，以切换前后日期。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swipe left or right to move between dates."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指左右滑動螢幕，以切換前後日期。"
+          }
+        }
+      }
+    },
+    "用手指左右滑动屏幕，以切换前后月份。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swipe left or right to move between months."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指左右滑動螢幕，以切換前後月份。"
+          }
+        }
+      }
+    },
+    "用手指按住右下角切换按钮三秒，以重新进入新手引导。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold the bottom-right view button for three seconds to replay the guide."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指按住右下角切換按鈕三秒，以重新進入新手引導。"
+          }
+        }
+      }
+    },
+    "用手指轻点一个日期，以切换到该日期的日视图。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap a date to open its day view."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點一個日期，以切換到該日期的日視圖。"
+          }
+        }
+      }
+    },
+    "用手指轻点一个日期，以打开该日期的日视图。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap a date to open its day view."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點一個日期，以開啟該日期的日視圖。"
+          }
+        }
+      }
+    },
+    "用手指轻点关闭按钮，以返回周视图。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap Close to return to Week View."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點關閉按鈕，以返回週視圖。"
+          }
+        }
+      }
+    },
+    "用手指轻点刷新按钮，以从 iPhone 更新课表。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap Refresh to update the schedule from your iPhone."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點重新整理按鈕，以從 iPhone 更新課表。"
+          }
+        }
+      }
+    },
+    "用手指轻点右下角切换按钮，以打开视图目录。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the bottom-right view button to open the view menu."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點右下角切換按鈕，以開啟檢視目錄。"
+          }
+        }
+      }
+    },
+    "用手指轻点右侧箭头，以切换到下一页。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the right arrow to go to the next page."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點右側箭頭，以切換到下一頁。"
+          }
+        }
+      }
+    },
+    "用手指轻点左侧箭头，以切换到上一页。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the left arrow to go to the previous page."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點左側箭頭，以切換到上一頁。"
+          }
+        }
+      }
+    },
+    "用手指轻点页面空白处，以隐藏右侧操作按钮。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap an empty area to hide the controls on the right."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點頁面空白處，以隱藏右側操作按鈕。"
+          }
+        }
+      }
+    },
+    "用手指轻点顶部日期标题，以打开日期选择器。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the date title at the top to open the date picker."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點頂部日期標題，以開啟日期選擇器。"
+          }
+        }
+      }
+    },
+    "用手指轻点顶部月份标题，以退出月视图。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the month title at the top to exit Month View."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點頂部月份標題，以退出月視圖。"
+          }
+        }
+      }
+    },
+    "用手指轻点高亮的课程色块，以打开课程详情。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the highlighted course block to open course details."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用手指輕點高亮的課程色塊，以開啟課程詳情。"
           }
         }
       }
@@ -793,6 +1535,40 @@
         }
       }
     },
+    "第一次载入课表，正在渲染底层数据" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing your schedule for the first time…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第一次載入課表，正在準備底層資料"
+          }
+        }
+      }
+    },
+    "翻页" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻頁"
+          }
+        }
+      }
+    },
     "考试" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -810,19 +1586,19 @@
         }
       }
     },
-    "请在配对的 iPhone 上打开 XDYou" : {
+    "请先同步课表" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open XDYou on the paired iPhone"
+            "value" : "Sync your schedule first"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請在配對的 iPhone 上開啟 XDYou"
+            "value" : "請先同步課表"
           }
         }
       }
@@ -844,18 +1620,18 @@
         }
       }
     },
-    "请打开手机 XDYou 以同步课表" : {
+    "请打开手机 XDYou 并单击刷新按钮" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open XDYou on iPhone to sync your schedule"
+            "value" : "Open XDYou on iPhone and tap Refresh"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請在手機開啟 XDYou 以同步課表"
+            "value" : "請在手機開啟 XDYou 並點一下重新整理按鈕"
           }
         }
       }
@@ -873,6 +1649,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "課程列表"
+          }
+        }
+      }
+    },
+    "课程详情" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Course Details"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "課程詳情"
           }
         }
       }
@@ -922,6 +1715,243 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "距離上課"
+          }
+        }
+      }
+    },
+    "轻点一个日期" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap a date"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輕點一個日期"
+          }
+        }
+      }
+    },
+    "轻点以继续" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to continue"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輕點以繼續"
+          }
+        }
+      }
+    },
+    "轻点关闭按钮" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap Close"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輕點關閉按鈕"
+          }
+        }
+      }
+    },
+    "轻点刷新按钮" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap Refresh"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輕點重新整理按鈕"
+          }
+        }
+      }
+    },
+    "轻点屏幕以开始" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the screen to begin"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輕點螢幕以開始"
+          }
+        }
+      }
+    },
+    "轻点屏幕继续" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to continue"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輕點螢幕繼續"
+          }
+        }
+      }
+    },
+    "连续旋转数码表冠并越过课程边界，以连续切换日期。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep turning the Digital Crown past the course boundary to move between dates."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "持續旋轉數碼錶冠並越過課程邊界，以連續切換日期。"
+          }
+        }
+      }
+    },
+    "连续旋转表冠翻页" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep rotating the Crown to page"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連續旋轉錶冠翻頁"
+          }
+        }
+      }
+    },
+    "退出" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exit"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出"
+          }
+        }
+      }
+    },
+    "退出月视图" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exit Month View"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出月視圖"
+          }
+        }
+      }
+    },
+    "选择日期" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a Date"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇日期"
+          }
+        }
+      }
+    },
+    "重新打开引导" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replay Guide"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新開啟引導"
+          }
+        }
+      }
+    },
+    "长按右下角切换按钮重新进入新手引导" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long-press the bottom-right view button to replay the guide"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "長按右下角切換按鈕重新進入新手引導"
+          }
+        }
+      }
+    },
+    "长按重新进入新手引导" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long-press to replay the guide"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "長按重新進入新手引導"
           }
         }
       }
