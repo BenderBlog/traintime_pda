@@ -7,6 +7,7 @@
 
 import 'dart:io';
 import 'dart:convert';
+import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
@@ -102,16 +103,184 @@ class IDSSession extends NetworkSession {
     var msg = form?.text ?? "登录遇到问题";
 
     // Simplify the error message because there is no '找回密码' button here XD.
-    // "用户名或密码有误，用户名为工号/学号，如果确认用户名无误，请点‘找回密码’自助重置密码。"
+    // "用户名或密码有误，用户名为工号/学号，如果确认用户名无误，请点'找回密码'自助重置密码。"
     if (msg.contains(RegExp(r"(用户名|密码).*误", unicode: true, dotAll: true))) {
       msg = "用户名或密码有误";
     }
     return msg;
   }
 
+  // ---------------------------------------------------------------------------
+  // Device fingerprint & re-auth (二次认证) support
+  // ---------------------------------------------------------------------------
+
+  static const _authBase = "https://ids.xidian.edu.cn/authserver";
+
+  /// Return a stable device fingerprint, generating one on first call.
+  Future<String> _deviceFingerprint() async {
+    final cached =
+        preference.getString(preference.Preference.deviceFingerprint);
+    if (cached.isNotEmpty) return cached;
+
+    final hex = List.generate(
+      32,
+      (_) => "0123456789ABCDEF"[Random().nextInt(16)],
+    ).join();
+    await preference.setString(preference.Preference.deviceFingerprint, hex);
+    return hex;
+  }
+
+  /// POST the device fingerprint to the auth server so it can associate it
+  /// with a trusted device after the user completes re-auth.
+  Future<void> _registerFingerprint() async {
+    await dioNoOfflineCheck.post(
+      "$_authBase/bfp/info",
+      data: {"bfp": await _deviceFingerprint()},
+    );
+  }
+
+  /// Map reAuthType → authCodeTypeName used by getDynamicCodeByReauth.do.
+  String _reAuthCodeTypeName(String reAuthType) => switch (reAuthType) {
+    "3" => "reAuthDynamicCodeType",
+    "4" => "reAuthWChatDynamicCodeType",
+    "5" => "reAuthCpdailyDynamicCodeType",
+    "11" => "reAuthEmailDynamicCodeType",
+    "12" => "reAuthDingTalkDynamicCodeType",
+    "13" => "reAuthWeLinkDynamicCodeType",
+    "15" => "reAuthWeChatServiceDynamicCodeType",
+    _ => "reAuthWChatDynamicCodeType",
+  };
+
+  /// Extract reAuthParams from the script block embedded in the re-auth page.
+  /// Values may contain JSON escape sequences (e.g. `\/`).
+  Map<String, String> _parseReAuthParams(String html) {
+    final params = <String, String>{};
+    final start = html.indexOf("var reAuthParams");
+    if (start == -1) return params;
+    final end = html.indexOf("};", start);
+    if (end == -1) return params;
+    final block = html.substring(start, end + 1);
+    // Match JSON key-value pairs where values are plain strings (no nested
+    // objects/arrays). The raw value may need JSON unescaping.
+    final re = RegExp(r'"(\w+)":"((?:[^"\\]|\\.)*)"');
+    for (final m in re.allMatches(block)) {
+      final raw = m.group(2)!;
+      // Decode JSON string value (handles \/, \\, \uXXXX, etc.)
+      params[m.group(1)!] = jsonDecode('"$raw"') as String;
+    }
+    return params;
+  }
+
+  /// Handle the complete re-auth flow (mirrors browser-side sequence):
+  ///   fingerprint → get page → send code → ask user → submit → redirect
+  Future<String> _handleReAuth({
+    required String reAuthUrl,
+    String? service,
+    required Future<String> Function(String message) onReAuthCode,
+  }) async {
+    // 1. GET the re-auth page so the server binds this session.
+    final reAuthResp = await dioNoOfflineCheck.get(reAuthUrl);
+    final html = reAuthResp.data.toString();
+    final params = _parseReAuthParams(html);
+    log.info("[IDSSession][_handleReAuth] Parsed reAuth params: $params");
+
+    final reAuthType = params["reAuthType"] ?? "4";
+    final reAuthUserId = params["reAuthUserId"] ?? "";
+    final isMultifactor = params["isMultifactor"] ?? "true";
+    // Only use service from the reAuth page itself; do NOT fall back to
+    // the caller's `target` — the server rejects unrecognised services.
+    final reAuthService = params["service"] ?? "";
+    log.info("[IDSSession][_handleReAuth] reAuthService='$reAuthService'");
+    final codeTypeName = _reAuthCodeTypeName(reAuthType);
+
+    // 2. Request verification code (sms / wechat / …).
+    final codeResp = await dioNoOfflineCheck.post(
+      "$_authBase/dynamicCode/getDynamicCodeByReauth.do",
+      data: {
+        "userName": reAuthUserId,
+        "authCodeTypeName": codeTypeName,
+      },
+    );
+    if (codeResp.data is Map) {
+      final res = codeResp.data["res"]?.toString() ?? "";
+      if (res != "success" &&
+          res != "other_success" &&
+          res != "wechat_success") {
+        throw LoginFailedException(msg: "验证码发送失败，请检查认证方式是否可用");
+      }
+    }
+
+    // 3. Ask the caller for the code (UI dialog).
+    final typeDesc = switch (reAuthType) {
+      "3" => "短信",
+      "4" => "企业微信",
+      "5" => "今日校园",
+      "11" => "邮箱",
+      _ => "验证",
+    };
+    final rawCode = await onReAuthCode("请输入$typeDesc收到的验证码");
+    final code = rawCode.trim();
+
+    // 4. Register fingerprint so server marks this device as trusted.
+    try {
+      await _registerFingerprint();
+    } catch (_) {
+      // Non-fatal.
+    }
+
+    // 5. Submit re-auth with "trust this device" flag.
+    final data = <String, String>{
+      "reAuthType": reAuthType,
+      "service": reAuthService,
+      "isMultifactor": isMultifactor,
+      "dynamicCode": code,
+      "skipTmpReAuth": "true",
+      "uuid": "",
+      "password": "",
+      "answer1": "",
+      "answer2": "",
+      "otpCode": "",
+    };
+
+    final submitResp = await dioNoOfflineCheck.post(
+      "$_authBase/reAuthCheck/reAuthSubmit.do",
+      data: data,
+    );
+
+    // Handle JSON response — server returns 200 with code field.
+    if (submitResp.data is Map) {
+      final result = submitResp.data["code"]?.toString() ?? "";
+      if (result == "reAuth_failed") {
+        final msg =
+            submitResp.data["msg"]?.toString() ?? "二次认证失败";
+        throw LoginFailedException(msg: msg);
+      }
+      if (result == "reAuth_unauthorized") {
+        throw LoginFailedException(msg: "二次认证未授权，请重试");
+      }
+    }
+
+    // If the response contains a redirect, follow it.
+    if (submitResp.statusCode == 301 || submitResp.statusCode == 302) {
+      final loc = submitResp.headers[HttpHeaders.locationHeader];
+      if (loc != null && loc.isNotEmpty) return loc[0];
+    }
+
+    // 6. Fallback: re-build the login redirect URL (browser-side behaviour).
+    if (reAuthService.isNotEmpty) {
+      return "$_authBase/login?service=${Uri.encodeQueryComponent(reAuthService)}";
+    }
+    return "$_authBase/login";
+  }
+
+  // ---------------------------------------------------------------------------
+  // Public API
+  // ---------------------------------------------------------------------------
+
   Future<String> checkAndLogin({
     required String target,
     required Future<void> Function(String) sliderCaptcha,
+    Future<String> Function(String message)? onReAuthCode,
   }) async {
     return await _idslock.synchronized(() async {
       log.info(
@@ -154,7 +323,15 @@ class IDSSession extends NetworkSession {
             ),
           );
           if (data.statusCode == 301 || data.statusCode == 302) {
-            return data.headers[HttpHeaders.locationHeader]![0];
+            var location = data.headers[HttpHeaders.locationHeader]![0];
+            if (location.contains("reAuthCheck") && onReAuthCode != null) {
+              location = await _handleReAuth(
+                reAuthUrl: location,
+                service: target,
+                onReAuthCode: onReAuthCode,
+              );
+            }
+            return location;
           }
         }
         return await login(
@@ -162,6 +339,7 @@ class IDSSession extends NetworkSession {
           password: preference.getString(preference.Preference.idsPassword),
           sliderCaptcha: sliderCaptcha,
           target: target,
+          onReAuthCode: onReAuthCode,
         );
       }
     });
@@ -174,6 +352,7 @@ class IDSSession extends NetworkSession {
     bool forceReLogin = false,
     void Function(int, String)? onResponse,
     String? target,
+    Future<String> Function(String message)? onReAuthCode,
   }) async {
     /// Get the login webpage.
     if (onResponse != null) {
@@ -261,6 +440,7 @@ class IDSSession extends NetworkSession {
     if (onResponse != null) {
       onResponse(50, "login_process.ready_login");
     }
+
     try {
       var data = await dioNoOfflineCheck.post(
         "https://ids.xidian.edu.cn/authserver/login",
@@ -272,11 +452,33 @@ class IDSSession extends NetworkSession {
         ),
       );
       if (data.statusCode == 301 || data.statusCode == 302) {
+        var location = data.headers[HttpHeaders.locationHeader]![0];
+
+        // Check whether the server requires re-auth (二次认证).
+        if (location.contains("reAuthCheck")) {
+          if (onReAuthCode == null) {
+            throw LoginFailedException(msg: "需要二次认证，但未提供验证码处理回调");
+          }
+          location = await _handleReAuth(
+            reAuthUrl: location,
+            service: target,
+            onReAuthCode: onReAuthCode,
+          );
+          // Follow the re-auth success redirect to get the CAS ticket.
+          // Only follow one hop — let loginEhall handle the full chain
+          // with the proper ehall headers afterward.
+          var loginAfterReAuth = await dioNoOfflineCheck.get(location);
+          if (loginAfterReAuth.statusCode == 301 ||
+              loginAfterReAuth.statusCode == 302) {
+            location = loginAfterReAuth.headers[HttpHeaders.locationHeader]![0];
+          }
+        }
+
         /// Post login progress.
         if (onResponse != null) {
           onResponse(80, "login_process.after_process");
         }
-        return data.headers[HttpHeaders.locationHeader]![0];
+        return location;
       } else {
         /// Check whether need continue.
         log.info(
@@ -306,11 +508,19 @@ class IDSSession extends NetworkSession {
             ),
           );
           if (data.statusCode == 301 || data.statusCode == 302) {
+            var location = data.headers[HttpHeaders.locationHeader]![0];
+            if (location.contains("reAuthCheck") && onReAuthCode != null) {
+              location = await _handleReAuth(
+                reAuthUrl: location,
+                service: target,
+                onReAuthCode: onReAuthCode,
+              );
+            }
             /// Post login progress.
             if (onResponse != null) {
               onResponse(80, "login_process.after_process");
             }
-            return data.headers[HttpHeaders.locationHeader]![0];
+            return location;
           }
         }
         throw LoginFailedException(msg: "登录失败，响应状态码：${data.statusCode}。");

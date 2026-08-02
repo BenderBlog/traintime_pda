@@ -110,6 +110,46 @@ class _LoginWindowState extends State<LoginWindow> {
     ],
   ).constrained(maxWidth: 400);
 
+  /// Show a dialog asking the user to enter the re-auth verification code.
+  Future<String> _showReAuthCodeDialog(String message) async {
+    final controller = TextEditingController();
+    final code = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+        titleTextStyle: const TextStyle(fontSize: 16),
+        content: TextField(
+          autofocus: true,
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            hintText: "请输入验证码",
+          ),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 7, 16, 16),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("取消"),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: const Text("确定"),
+          ),
+        ],
+      ),
+    );
+    // Wait for dialog exit animation to finish before disposing.
+    await Future.delayed(const Duration(milliseconds: 300));
+    controller.dispose();
+    if (code == null || code.isEmpty) {
+      throw LoginFailedException(msg: "用户取消了二次认证");
+    }
+    return code;
+  }
+
   Future<void> login() async {
     bool isGood = true;
     ProgressDialog pd = ProgressDialog(context: context);
@@ -150,6 +190,7 @@ class _LoginWindowState extends State<LoginWindow> {
                 solveSliderCaptchaManually(context, provider),
           );
         },
+        onReAuthCode: (String message) => _showReAuthCodeDialog(message),
       );
       if (!mounted) return;
       if (isGood == true) {

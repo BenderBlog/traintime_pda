@@ -48,6 +48,7 @@ class EhallSession extends IDSSession {
     required String password,
     required Future<void> Function(String) sliderCaptcha,
     required void Function(int, String) onResponse,
+    Future<String> Function(String message)? onReAuthCode,
   }) async {
     String location = await super.login(
       target:
@@ -56,6 +57,7 @@ class EhallSession extends IDSSession {
       password: password,
       sliderCaptcha: sliderCaptcha,
       onResponse: onResponse,
+      onReAuthCode: onReAuthCode,
     );
     var response = await dio.get(location);
     while (response.headers[HttpHeaders.locationHeader] != null) {
