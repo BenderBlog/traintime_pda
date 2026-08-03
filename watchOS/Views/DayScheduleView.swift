@@ -271,6 +271,81 @@ private final class DayCourseLayoutTracker {
     }
 }
 
+/// 日分页器实际挂载的一张轻量页面数据。
+///
+/// 这里只保存日期和已经索引好的日程，不包含任何 SwiftUI 视图。横向移动
+/// 过程中因而不再反复调用 Calendar 和 Store，也不会提前创建第四张页面。
+private struct DayPageRenderModel: Equatable {
+    let date: Date
+    let courses: [WatchCourse]
+}
+
+/// 日视图始终只保留前、当前、后三张可见页面。
+///
+/// 跨页时三项数据按环形方式移动；已经离屏的反方向页面槽会承接预测完成的
+/// 新页面，因此视图层级和显存占用始终固定为三页。
+private struct DayPageRenderWindow: Equatable {
+    var previous: DayPageRenderModel
+    var current: DayPageRenderModel
+    var next: DayPageRenderModel
+
+    func model(at relativePage: Int) -> DayPageRenderModel {
+        switch relativePage {
+        case ..<0:
+            previous
+        case 1...:
+            next
+        default:
+            current
+        }
+    }
+}
+
+/// 方向确定后预热的一份“数据快照”，不是第四张渲染页面。
+///
+/// 用户反转表冠时直接覆盖旧方向预测，相当于丢弃反方向机动页。真正跨页时
+/// 才把它放入三页环形窗口的空槽，避免跨页边界临时查询和整理日程。
+@MainActor
+private final class DayPagePredictionCache {
+    private var direction = 0
+    private var model: DayPageRenderModel?
+
+    func replace(
+        direction: Int,
+        model: DayPageRenderModel
+    ) {
+        self.direction = direction
+        self.model = model
+    }
+
+    func contains(
+        direction: Int,
+        date: Date
+    ) -> Bool {
+        self.direction == direction && model?.date == date
+    }
+
+    func take(
+        direction: Int,
+        expectedDate: Date
+    ) -> DayPageRenderModel? {
+        guard self.direction == direction,
+              model?.date == expectedDate
+        else {
+            return nil
+        }
+        let result = model
+        self.direction = 0
+        model = nil
+        return result
+    }
+
+    func removeAll() {
+        direction = 0
+        model = nil
+    }
+}
+
 struct DayScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
     @Binding var selectedDate: Date
@@ -286,6 +361,10 @@ struct DayScheduleView: View {
     @State private var verticalTouchStartOffset: CGFloat = 0
     @State private var dayViewportHeight: CGFloat = 1
     @State private var horizontalPageOffset: CGFloat = 0
+    /// 表冠输入只更新目标值；显示值由刷新循环逐帧追踪。
+    @State private var horizontalTargetPageOffset: CGFloat = 0
+    @State private var horizontalFrameTask: Task<Void, Never>?
+    @State private var horizontalFrameToken = 0
     @State private var horizontalTouchStartOffset: CGFloat = 0
     @State private var horizontalPageWidth: CGFloat = 1
     @State private var horizontalCrownVelocity: CGFloat = 0
@@ -299,6 +378,10 @@ struct DayScheduleView: View {
     @State private var verticalMomentumToken = 0
     @State private var pageTransitionInFlight = false
     @State private var courseLayoutTracker = DayCourseLayoutTracker()
+    /// SwiftUI 永远只渲染这个三页窗口。
+    @State private var dayPageWindow: DayPageRenderWindow?
+    /// 预测数据保存在非观察型引用中，预热本身不会触发页面重绘。
+    @State private var dayPagePrediction = DayPagePredictionCache()
     /// 日期格式化只在日期或语言变化时执行，避免横向位移每帧重复创建格式器。
     @State private var navigationTitle = ""
     @FocusState private var crownFocused: Bool
@@ -331,7 +414,13 @@ struct DayScheduleView: View {
 
     /// 当前选中日期内开始的全部日程。
     private var courses: [WatchCourse] {
-        store.courses(on: selectedDate)
+        if let dayPageWindow,
+           dayPageWindow.current.date
+            == Calendar.current.startOfDay(for: selectedDate)
+        {
+            return dayPageWindow.current.courses
+        }
+        return store.courses(on: selectedDate)
     }
 
     var body: some View {
@@ -361,6 +450,7 @@ struct DayScheduleView: View {
             }
         }
         .onAppear {
+            prepareDayPageWindow(force: true)
             crownFocused = true
             lastCrownEventOffset = crownValue
             feedbackCourseIndex = 0
@@ -370,10 +460,12 @@ struct DayScheduleView: View {
         .onDisappear {
             crownIdleCoordinator.cancel()
             pageTransitionTask?.cancel()
+            cancelHorizontalFrameSmoothing()
             cancelDayVerticalMomentum()
         }
         .onChange(of: isDatePickerPresented) { _, isPresented in
             if isPresented {
+                cancelHorizontalFrameSmoothing()
                 cancelDayVerticalMomentum()
                 crownIdleCoordinator.cancel()
                 crownFocused = false
@@ -386,6 +478,7 @@ struct DayScheduleView: View {
         // 只在 Store 安装了新的课表索引时清理日内位置。此前监听当天课程 ID
         // 会在每次横向翻日时重复执行 moveDay 已做过的状态重置。
         .onChange(of: store.renderCacheRevision) { _, _ in
+            prepareDayPageWindow(force: true)
             recalculateCurrentDayCourseBounds()
         }
         .onChange(of: store.preferredLanguageIdentifier) { _, _ in
@@ -393,6 +486,7 @@ struct DayScheduleView: View {
             updateDayNavigationTitle()
         }
         .onChange(of: selectedDate) { _, _ in
+            prepareDayPageWindow()
             updateDayNavigationTitle()
         }
         .toolbar {
@@ -466,11 +560,155 @@ struct DayScheduleView: View {
     /// 入口只负责暂停日视图输入并请求根容器展示独立选择页面。
     private func requestDatePicker() {
         guard !isDatePickerPresented, !pageTransitionInFlight else { return }
+        cancelHorizontalFrameSmoothing()
         cancelDayVerticalMomentum()
         crownIdleCoordinator.cancel()
         crownFocused = false
         onCrownInteraction()
         onDatePickerRequested(selectedDate)
+    }
+
+    /// 用一次 Store 查询构造一张可复用的日页面数据。
+    private func makeDayPageModel(for date: Date) -> DayPageRenderModel {
+        let normalizedDate = Calendar.current.startOfDay(for: date)
+        return DayPageRenderModel(
+            date: normalizedDate,
+            courses: store.courses(on: normalizedDate)
+        )
+    }
+
+    /// 围绕指定日期生成固定三页窗口；异常回退也必须使用真实落地日期。
+    private func makeDayPageWindow(
+        centeredOn date: Date
+    ) -> DayPageRenderWindow {
+        let centerDate = Calendar.current.startOfDay(for: date)
+        let calendar = Calendar.current
+        let previousDate = calendar.date(
+            byAdding: .day,
+            value: -1,
+            to: centerDate
+        ) ?? centerDate
+        let nextDate = calendar.date(
+            byAdding: .day,
+            value: 1,
+            to: centerDate
+        ) ?? centerDate
+        return DayPageRenderWindow(
+            previous: makeDayPageModel(for: previousDate),
+            current: makeDayPageModel(for: centerDate),
+            next: makeDayPageModel(for: nextDate)
+        )
+    }
+
+    /// 首次进入、外部选日或课表版本变化时一次性准备三张可见页面。
+    private func prepareDayPageWindow(force: Bool = false) {
+        let centerDate = Calendar.current.startOfDay(for: selectedDate)
+        if !force, dayPageWindow?.current.date == centerDate {
+            return
+        }
+        dayPagePrediction.removeAll()
+        dayPageWindow = makeDayPageWindow(centeredOn: centerDate)
+    }
+
+    /// 表冠或手指一确定翻页方向，就覆盖旧方向并预热该方向的下一张数据。
+    ///
+    /// 预测结果不挂载 View；只有跨过完整一页时，才进入三页环形窗口。
+    private func preparePredictedDayPage(direction: Int) {
+        let normalizedDirection = min(1, max(-1, direction))
+        guard normalizedDirection != 0 else { return }
+        if dayPageWindow == nil {
+            prepareDayPageWindow(force: true)
+        }
+        guard let centerDate = dayPageWindow?.current.date,
+              let predictedDate = Calendar.current.date(
+                  byAdding: .day,
+                  value: normalizedDirection * 2,
+                  to: centerDate
+              )
+        else {
+            return
+        }
+        guard !dayPagePrediction.contains(
+            direction: normalizedDirection,
+            date: predictedDate
+        ) else {
+            return
+        }
+        dayPagePrediction.replace(
+            direction: normalizedDirection,
+            model: makeDayPageModel(for: predictedDate)
+        )
+    }
+
+    /// 跨页时环形复用三张页面，并立即为继续旋转准备下一份数据。
+    private func advanceDayPageWindow(
+        direction: Int,
+        landingDate: Date
+    ) {
+        let normalizedDirection = min(1, max(-1, direction))
+        let normalizedLandingDate = Calendar.current.startOfDay(
+            for: landingDate
+        )
+        guard normalizedDirection != 0 else { return }
+        guard let currentWindow = dayPageWindow else {
+            dayPagePrediction.removeAll()
+            dayPageWindow = makeDayPageWindow(centeredOn: normalizedLandingDate)
+            preparePredictedDayPage(direction: normalizedDirection)
+            return
+        }
+
+        let landingModel = normalizedDirection > 0
+            ? currentWindow.next
+            : currentWindow.previous
+        guard landingModel.date == normalizedLandingDate,
+              let incomingDate = Calendar.current.date(
+                  byAdding: .day,
+                  value: normalizedDirection,
+                  to: normalizedLandingDate
+              )
+        else {
+            // 外部选日或同步恰好与翻页同帧发生时，不旋转旧窗口；直接围绕
+            // 真正的落地日期重建三页，避免短暂闪回旧日期。
+            dayPagePrediction.removeAll()
+            dayPageWindow = makeDayPageWindow(centeredOn: normalizedLandingDate)
+            preparePredictedDayPage(direction: normalizedDirection)
+            return
+        }
+
+        let incomingModel = dayPagePrediction.take(
+            direction: normalizedDirection,
+            expectedDate: incomingDate
+        ) ?? makeDayPageModel(for: incomingDate)
+
+        if normalizedDirection > 0 {
+            dayPageWindow = DayPageRenderWindow(
+                previous: currentWindow.current,
+                current: currentWindow.next,
+                next: incomingModel
+            )
+        } else {
+            dayPageWindow = DayPageRenderWindow(
+                previous: incomingModel,
+                current: currentWindow.previous,
+                next: currentWindow.current
+            )
+        }
+
+        // 下一次跨页所需的机动数据仍只是一份轻量模型，不增加可见页面。
+        preparePredictedDayPage(direction: normalizedDirection)
+    }
+
+    /// 返回三页窗口中的稳定模型；初始化首帧才会走同步回退。
+    private func dayPageModel(_ relativePage: Int) -> DayPageRenderModel {
+        if let dayPageWindow {
+            return dayPageWindow.model(at: relativePage)
+        }
+        let date = Calendar.current.date(
+            byAdding: .day,
+            value: relativePage,
+            to: selectedDate
+        ) ?? selectedDate
+        return makeDayPageModel(for: date)
     }
 
     /// 预先渲染前一天、当天和后一天；三页共用同一个横向触摸检测层。
@@ -479,13 +717,13 @@ struct DayScheduleView: View {
     /// 修改课程栈与表冠共用的内容偏移，两条路径在一次触摸中保持互斥。
     @ViewBuilder
     private func dayPage(_ relativePage: Int) -> some View {
-        let date = dayDate(relativePage)
+        let model = dayPageModel(relativePage)
 
         GeometryReader { viewport in
             ZStack(alignment: .bottomLeading) {
                 DaySchedulePageContent(
-                    date: date,
-                    courses: store.courses(on: date),
+                    date: model.date,
+                    courses: model.courses,
                     viewportSize: viewport.size,
                     courseOffset: relativePage == 0
                         ? courseContentOffset
@@ -526,11 +764,7 @@ struct DayScheduleView: View {
     /// “后一页”移动成“当前页”，而不是销毁后重新创建，从而消除有课页面
     /// 刚进入屏幕时的卡片补绘和明显卡顿。
     private func dayDate(_ relativePage: Int) -> Date {
-        Calendar.current.date(
-            byAdding: .day,
-            value: relativePage,
-            to: selectedDate
-        ) ?? selectedDate
+        dayPageModel(relativePage).date
     }
 
     /// 透明节点独占日视图的表冠焦点，以便区分慢转滚动和快转切日。
@@ -759,6 +993,10 @@ struct DayScheduleView: View {
         if !preservesHorizontalNavigation {
             continuousDayNavigation = false
         }
+        advanceDayPageWindow(
+            direction: amount,
+            landingDate: nextDate
+        )
         // 手指、表冠和顶部按钮都在页面真正提交时反馈一次。
         WatchHaptics.navigation(amount)
         selectedDate = nextDate
@@ -797,11 +1035,13 @@ struct DayScheduleView: View {
 
     private func beginDayHorizontalDrag() {
         guard !pageTransitionInFlight else { return }
+        cancelHorizontalFrameSmoothing()
         courseLayoutTracker.suspendPersistence()
         cancelDayVerticalMomentum()
         crownIdleCoordinator.cancel()
         continuousDayNavigation = false
         horizontalTouchStartOffset = horizontalPageOffset
+        horizontalTargetPageOffset = horizontalPageOffset
         crownFocused = true
         onCrownInteraction()
     }
@@ -1049,11 +1289,18 @@ struct DayScheduleView: View {
         guard !pageTransitionInFlight else { return }
         // 一次触摸内始终保持页面身份不变，并让容器位移与手指物理位移
         // 逐点相等；不缩放、不封顶，也不在手指按住时提前提交日期。
-        horizontalPageOffset = horizontalTouchStartOffset + translation
+        let nextOffset = horizontalTouchStartOffset + translation
+        let direction = nextOffset < 0 ? 1 : (nextOffset > 0 ? -1 : 0)
+        if direction != 0 {
+            preparePredictedDayPage(direction: direction)
+        }
+        horizontalTargetPageOffset = nextOffset
+        horizontalPageOffset = nextOffset
     }
 
     private func finishDayHorizontalDrag(_ value: DragGesture.Value) {
         guard !pageTransitionInFlight else { return }
+        cancelHorizontalFrameSmoothing()
         onSwipeInput(.horizontal)
         let motion = horizontalDragMotion(
             value,
@@ -1077,18 +1324,66 @@ struct DayScheduleView: View {
             velocityProfile: .precisionAccelerated
         )
         horizontalCrownVelocity = motion.velocity
-        if updateContinuousDayOffset(by: motion.offsetDelta) != 0 {
-            crownPageRamp.recordCommittedPage()
+        let direction = motion.offsetDelta < 0 ? 1 : -1
+        preparePredictedDayPage(direction: direction)
+        enqueueHorizontalCrownOffset(motion.offsetDelta)
+    }
+
+    /// 把最新表冠位移写入目标值，并启动唯一的逐帧追踪任务。
+    ///
+    /// 目标最多领先显示值一小段屏宽：实体表掉帧时直接丢弃超出的历史输入，
+    /// 恢复绘制后不会补播一串已经过时的页面动画。
+    private func enqueueHorizontalCrownOffset(_ delta: CGFloat) {
+        let maximumLead = max(
+            dayHorizontalFrameMinimumLead,
+            horizontalPageWidth * dayHorizontalFrameMaximumLeadRatio
+        )
+        let requestedTarget = horizontalTargetPageOffset + delta
+        horizontalTargetPageOffset = min(
+            horizontalPageOffset + maximumLead,
+            max(horizontalPageOffset - maximumLead, requestedTarget)
+        )
+        startHorizontalFrameSmoothingIfNeeded()
+    }
+
+    /// 使用接近表盘刷新上限的节拍追踪最新目标，而不是按表冠事件频率跳点。
+    ///
+    /// 每一帧只消费“当前目标与当前显示值”的差，不保存位移队列；即使某帧
+    /// 被系统跳过，下一帧也只朝最新位置前进，不追赶掉帧期间的旧动画。
+    private func startHorizontalFrameSmoothingIfNeeded() {
+        guard horizontalFrameTask == nil else { return }
+        horizontalFrameToken += 1
+        let token = horizontalFrameToken
+        horizontalFrameTask = Task { @MainActor in
+            while !Task.isCancelled, token == horizontalFrameToken {
+                try? await Task.sleep(
+                    nanoseconds: dayHorizontalFrameIntervalNanoseconds
+                )
+                guard !Task.isCancelled,
+                      token == horizontalFrameToken,
+                      !pageTransitionInFlight
+                else {
+                    return
+                }
+
+                let remaining = horizontalTargetPageOffset
+                    - horizontalPageOffset
+                if abs(remaining) <= dayHorizontalFrameSettledDistance {
+                    performWithoutAnimation {
+                        horizontalPageOffset = horizontalTargetPageOffset
+                    }
+                    horizontalFrameTask = nil
+                    return
+                }
+
+                let frameDelta = remaining * dayHorizontalFrameFollowRatio
+                advanceHorizontalCrownFrame(by: frameDelta)
+            }
         }
     }
 
-    /// 页面完整越过一屏时立即无动画换底，再把偏移归一化到中间页附近。
-    ///
-    /// 视觉上屏幕仍停留在同一张完整页面，但数据基准已经前进/后退一天，
-    /// 三页容器马上获得新的相邻页；同一次表冠旋转或手指拖动因此可以持续
-    /// 翻过任意多天，而不是等待停下后才能开始下一页。
-    @discardableResult
-    private func updateContinuousDayOffset(by delta: CGFloat) -> Int {
+    /// 提交一帧显示位移；越过整屏时环形轮换三页并同步归一化目标值。
+    private func advanceHorizontalCrownFrame(by delta: CGFloat) {
         let update = normalizedContinuousPageOffset(
             horizontalPageOffset + delta,
             pageWidth: horizontalPageWidth
@@ -1098,7 +1393,7 @@ struct DayScheduleView: View {
             performWithoutAnimation {
                 horizontalPageOffset = update.offset
             }
-            return 0
+            return
         }
 
         performWithoutAnimation {
@@ -1107,9 +1402,21 @@ struct DayScheduleView: View {
                 preservesHorizontalNavigation: true
             )
             horizontalPageOffset = update.offset
+            // 显示坐标归一化一屏时，目标坐标必须同步平移；两者差值保持
+            // 不变，持续旋转便可毫无停顿地进入下一页。
+            horizontalTargetPageOffset += CGFloat(update.crossedPage)
+                * horizontalPageWidth
         }
+        crownPageRamp.recordCommittedPage()
         onCrownPageInput()
-        return update.crossedPage
+    }
+
+    /// 停止逐帧追踪并丢弃尚未显示的目标；吸附从用户实际看到的位置开始。
+    private func cancelHorizontalFrameSmoothing() {
+        horizontalFrameToken += 1
+        horizontalFrameTask?.cancel()
+        horizontalFrameTask = nil
+        horizontalTargetPageOffset = horizontalPageOffset
     }
 
     /// 系统报告空闲后再确认一小段无新刻度时间，才允许启动吸附。
@@ -1150,6 +1457,10 @@ struct DayScheduleView: View {
         source: DayPageTransitionSource = .direct
     ) {
         crownIdleCoordinator.cancel()
+        cancelHorizontalFrameSmoothing()
+        if direction != 0 {
+            preparePredictedDayPage(direction: direction)
+        }
         let snap = horizontalPageSnap(
             direction: direction,
             currentOffset: horizontalPageOffset,
@@ -1183,6 +1494,7 @@ struct DayScheduleView: View {
             }
             performWithoutAnimation {
                 horizontalPageOffset = 0
+                horizontalTargetPageOffset = 0
             }
             pageTransitionInFlight = false
             pageTransitionSource = nil
@@ -1242,6 +1554,7 @@ struct DayScheduleView: View {
                 )
             }
             horizontalPageOffset = 0
+            horizontalTargetPageOffset = 0
             pageTransitionInFlight = false
             pageTransitionSource = nil
             pendingSnapDirection = 0
@@ -1388,6 +1701,17 @@ private struct DayCourseLayoutPreferenceKey: PreferenceKey {
         value.cardHeights.merge(next.cardHeights) { _, new in new }
     }
 }
+
+/// 日视图横向表冠运动的逐帧参数。
+///
+/// 16.67ms 对齐活动界面的 60Hz 帧预算，避免在同一显示帧内提交两次无效
+/// 状态而挤占布局时间；系统降低刷新率时仍会自然合并。每帧逼近最新目标
+/// 58%，既消除 detent 跳点，又能在约五帧内收敛且不形成长尾追赶。
+private let dayHorizontalFrameIntervalNanoseconds: UInt64 = 16_666_667
+private let dayHorizontalFrameFollowRatio: CGFloat = 0.58
+private let dayHorizontalFrameMaximumLeadRatio: CGFloat = 0.62
+private let dayHorizontalFrameMinimumLead: CGFloat = 24
+private let dayHorizontalFrameSettledDistance: CGFloat = 0.35
 
 /// 日视图纵向触摸的惯性参数。
 ///
