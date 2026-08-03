@@ -26,18 +26,12 @@ class CreativeServiceSession extends IDSSession {
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        log.info(
-          "[CreativeServiceSession][initSession] "
-          "Received location: $location.",
-        );
+        log.info('[CreativeServiceSession][initSession] Following redirect.');
         response = await dio.get(location);
       }
       String urlReceived = "${response.realUri}";
       String ticket = RegExp(r'ST\S+').firstMatch(urlReceived)![0]!;
-      log.info(
-        "[CreativeServiceSession][initSession] "
-        "Received ticket: $ticket.",
-      );
+      log.info('[CreativeServiceSession][initSession] Ticket received.');
       bool isLogin = await dio
           .post(
         "$url/api/v1/auth/ids",

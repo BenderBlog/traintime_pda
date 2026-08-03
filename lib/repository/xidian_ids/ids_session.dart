@@ -15,13 +15,18 @@ import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/xidian_ids/ids_auth_protocol.dart';
+import 'package:watermeter/repository/xidian_ids/ids_fingerprint.dart';
+import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 
 enum IDSLoginState {
   none,
   requesting,
+  awaitingSecondFactor,
   success,
   fail,
   passwordWrong,
+  cancelled,
 
   /// Indicate that the user will login via LoginWindow
   manual,
@@ -112,57 +117,48 @@ class IDSSession extends NetworkSession {
   Future<String> checkAndLogin({
     required String target,
     required Future<void> Function(String) sliderCaptcha,
+    IDSReAuthHandler? reAuthHandler,
   }) async {
     return await _idslock.synchronized(() async {
-      log.info(
-        "[IDSSession][checkAndLogin] "
-        "Ready to get $target.",
-      );
-      var data = await dioNoOfflineCheck.get(
-        "https://ids.xidian.edu.cn/authserver/login",
-        queryParameters: {'service': target},
-      );
-      log.info(
-        "[IDSSession][checkAndLogin] "
-        "Received: $data.",
-      );
-      if (data.statusCode == 401) {
-        throw PasswordWrongException(msg: _parsePasswordWrongMsg(data.data));
-      } else if (data.statusCode == 301 || data.statusCode == 302) {
-        /// Post login progress, due to something wrong, return the location here...
-        return data.headers[HttpHeaders.locationHeader]![0];
-      } else {
-        var page = parse(data.data ?? "");
-        var form = page.getElementsByTagName("form")
-          ..removeWhere((element) => element.id != "continue");
-        log.info(
-          "[IDSSession][login] "
-          "form: $form.",
+      try {
+        log.info('[IDSSession][checkAndLogin] Checking IDS session.');
+        var response = await dioNoOfflineCheck.get(
+          'https://ids.xidian.edu.cn/authserver/login',
+          queryParameters: {'service': target},
         );
-        if (form.isNotEmpty) {
-          var inputSearch = form[0].getElementsByTagName("input");
-          Map<String, String> toPostAgain = {};
-          for (var i in inputSearch) {
-            toPostAgain[i.attributes["name"]!] = i.attributes["value"]!;
-          }
-          var data = await dioNoOfflineCheck.post(
-            "https://ids.xidian.edu.cn/authserver/login",
-            data: toPostAgain,
-            options: Options(
-              validateStatus: (status) =>
-                  status != null && status >= 200 && status < 400,
-            ),
+        if (_isRedirect(response)) {
+          return _completeRedirect(
+            response: response,
+            target: target,
+            username: preference.getString(preference.Preference.idsAccount),
+            reAuthHandler: reAuthHandler,
           );
-          if (data.statusCode == 301 || data.statusCode == 302) {
-            return data.headers[HttpHeaders.locationHeader]![0];
-          }
         }
-        return await login(
+
+        final continued = await _submitContinueForm(response.data);
+        if (continued != null && _isRedirect(continued)) {
+          return _completeRedirect(
+            response: continued,
+            target: target,
+            username: preference.getString(preference.Preference.idsAccount),
+            reAuthHandler: reAuthHandler,
+          );
+        }
+
+        return login(
           username: preference.getString(preference.Preference.idsAccount),
           password: preference.getString(preference.Preference.idsPassword),
           sliderCaptcha: sliderCaptcha,
           target: target,
+          reAuthHandler: reAuthHandler,
         );
+      } on DioException catch (e) {
+        if (e.response?.statusCode == HttpStatus.unauthorized) {
+          throw PasswordWrongException(
+            msg: _parsePasswordWrongMsg(e.response?.data?.toString() ?? ''),
+          );
+        }
+        rethrow;
       }
     });
   }
@@ -174,6 +170,7 @@ class IDSSession extends NetworkSession {
     bool forceReLogin = false,
     void Function(int, String)? onResponse,
     String? target,
+    IDSReAuthHandler? reAuthHandler,
   }) async {
     /// Get the login webpage.
     if (onResponse != null) {
@@ -183,12 +180,32 @@ class IDSSession extends NetworkSession {
         "Ready to get the login webpage.",
       );
     }
-    var response = await dioNoOfflineCheck
-        .get(
-          "https://ids.xidian.edu.cn/authserver/login",
-          queryParameters: target != null ? {'service': target} : null,
-        )
-        .then((value) => value.data);
+    late final Response<dynamic> initialResponse;
+    try {
+      initialResponse = await dioNoOfflineCheck.get(
+        'https://ids.xidian.edu.cn/authserver/login',
+        queryParameters: target != null ? {'service': target} : null,
+      );
+    } on DioException catch (error) {
+      if (error.response?.statusCode == HttpStatus.unauthorized) {
+        throw PasswordWrongException(
+          msg: _parsePasswordWrongMsg(error.response?.data?.toString() ?? ''),
+        );
+      }
+      rethrow;
+    }
+    if (_isRedirect(initialResponse)) {
+      return _completeRedirect(
+        response: initialResponse,
+        target: target,
+        username: username,
+        reAuthHandler: reAuthHandler,
+        onResponse: onResponse,
+      );
+    }
+
+    await _registerBrowserFingerprint();
+    final response = initialResponse.data?.toString() ?? '';
 
     /// Start getting data from webpage.
     var page = parse(response);
@@ -204,10 +221,6 @@ class IDSSession extends NetworkSession {
     for (var i in cookie) {
       cookieStr += "${i.name}=${i.value}; ";
     }
-    log.info(
-      "[IDSSession][login] "
-      "cookie: $cookieStr.",
-    );
 
     /// Get AES encrypt key. There must be.
     if (onResponse != null) {
@@ -216,10 +229,6 @@ class IDSSession extends NetworkSession {
     String keys = form
         .firstWhere((element) => element.id == "pwdEncryptSalt")
         .attributes["value"]!;
-    log.info(
-      "[IDSSession][login] "
-      "encrypt key: $keys.",
-    );
 
     /// Prepare for login.
     if (onResponse != null) {
@@ -271,12 +280,14 @@ class IDSSession extends NetworkSession {
               status != null && status >= 200 && status < 400,
         ),
       );
-      if (data.statusCode == 301 || data.statusCode == 302) {
-        /// Post login progress.
-        if (onResponse != null) {
-          onResponse(80, "login_process.after_process");
-        }
-        return data.headers[HttpHeaders.locationHeader]![0];
+      if (_isRedirect(data)) {
+        return _completeRedirect(
+          response: data,
+          target: target,
+          username: username,
+          reAuthHandler: reAuthHandler,
+          onResponse: onResponse,
+        );
       } else {
         /// Check whether need continue.
         log.info(
@@ -287,10 +298,6 @@ class IDSSession extends NetworkSession {
         var page = parse(data.data ?? "");
         var form = page.getElementsByTagName("form")
           ..removeWhere((element) => element.id != "continue");
-        log.info(
-          "[IDSSession][login] "
-          "form: $form.",
-        );
         if (form.isNotEmpty) {
           var inputSearch = form[0].getElementsByTagName("input");
           Map<String, String> toPostAgain = {};
@@ -305,12 +312,14 @@ class IDSSession extends NetworkSession {
                   status != null && status >= 200 && status < 400,
             ),
           );
-          if (data.statusCode == 301 || data.statusCode == 302) {
-            /// Post login progress.
-            if (onResponse != null) {
-              onResponse(80, "login_process.after_process");
-            }
-            return data.headers[HttpHeaders.locationHeader]![0];
+          if (_isRedirect(data)) {
+            return _completeRedirect(
+              response: data,
+              target: target,
+              username: username,
+              reAuthHandler: reAuthHandler,
+              onResponse: onResponse,
+            );
           }
         }
         throw LoginFailedException(msg: "登录失败，响应状态码：${data.statusCode}。");
@@ -326,6 +335,94 @@ class IDSSession extends NetworkSession {
     }
   }
 
+  bool _isRedirect(Response<dynamic> response) =>
+      response.statusCode == HttpStatus.movedPermanently ||
+      response.statusCode == HttpStatus.found;
+
+  Future<Response<dynamic>?> _submitContinueForm(dynamic responseData) async {
+    final page = parse(responseData?.toString() ?? '');
+    final form = page.getElementById('continue');
+    if (form == null || form.localName != 'form') return null;
+
+    final fields = <String, String>{};
+    for (final input in form.getElementsByTagName('input')) {
+      final name = input.attributes['name'];
+      final value = input.attributes['value'];
+      if (name != null && value != null) fields[name] = value;
+    }
+    return dioNoOfflineCheck.post(
+      'https://ids.xidian.edu.cn/authserver/login',
+      data: fields,
+    );
+  }
+
+  Future<void> _registerBrowserFingerprint() async {
+    final fingerprint = await getOrCreateIDSBrowserFingerprint();
+    await dioNoOfflineCheck.get(
+      'https://ids.xidian.edu.cn/authserver/bfp/info',
+      queryParameters: {
+        'bfp': fingerprint,
+        '_': DateTime.now().millisecondsSinceEpoch.toString(),
+      },
+    );
+  }
+
+  Future<String> _completeRedirect({
+    required Response<dynamic> response,
+    required String? target,
+    required String username,
+    required IDSReAuthHandler? reAuthHandler,
+    void Function(int, String)? onResponse,
+  }) async {
+    final location = response.headers.value(HttpHeaders.locationHeader);
+    if (location == null) {
+      throw const IDSProtocolException('统一认证跳转响应缺少 Location');
+    }
+    final result = classifyIDSRedirect(
+      location,
+      serviceRequested: target != null,
+    );
+    if (result.kind != IDSRedirectKind.reAuthentication) {
+      onResponse?.call(80, 'login_process.after_process');
+      return result.uri.toString();
+    }
+
+    final previousLoginState = loginState;
+    loginState = IDSLoginState.awaitingSecondFactor;
+    final handler = reAuthHandler ?? activeIDSReAuthHandler;
+    if (handler == null) {
+      throw const IDSReAuthRequiredException();
+    }
+
+    try {
+      onResponse?.call(55, 'login_process.second_factor');
+      final uri = await handler(
+        IDSReAuthClient(
+          dio: dioNoOfflineCheck,
+          challengeUri: result.uri,
+          username: username,
+          service: target,
+          registerBrowserFingerprint: _registerBrowserFingerprint,
+        ),
+      );
+      loginState = switch (previousLoginState) {
+        IDSLoginState.success => IDSLoginState.success,
+        IDSLoginState.manual => IDSLoginState.manual,
+        _ => IDSLoginState.requesting,
+      };
+      onResponse?.call(80, 'login_process.after_process');
+      return uri.toString();
+    } on IDSReAuthCancelledException {
+      await clearCookieJar();
+      loginState = IDSLoginState.cancelled;
+      rethrow;
+    } on IDSReAuthExpiredException {
+      await clearCookieJar();
+      loginState = IDSLoginState.fail;
+      rethrow;
+    }
+  }
+
   Future<bool> checkWhetherPostgraduate() async {
     String location = await checkAndLogin(
       target:
@@ -337,7 +434,7 @@ class IDSSession extends NetworkSession {
     var response = await dio.get(location);
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info("[checkWhetherPostgraduate] Received location: $location");
+      log.info('[checkWhetherPostgraduate] Following login redirect.');
       response = await dio.get(location);
     }
 

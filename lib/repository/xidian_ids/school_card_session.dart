@@ -34,10 +34,7 @@ class SchoolCardSession extends IDSSession {
     );
     while (response.headers[HttpHeaders.locationHeader] != null) {
       String location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[SchoolCardSession][_ensureOpenId] "
-        "Received location: $location.",
-      );
+      log.info('[SchoolCardSession][_ensureOpenId] Following login redirect.');
       response = await dio.get(location);
     }
     var page = parse(response.data);

@@ -129,7 +129,7 @@ class ClassTableSession extends EhallSession {
 
     while (location != null) {
       var response = await dio.get(location);
-      log.info("[getClasstable][getYjspt] Received location: $location.");
+      log.info('[getClasstable][getYjspt] Following login redirect.');
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }
 

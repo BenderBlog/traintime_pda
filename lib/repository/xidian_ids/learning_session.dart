@@ -51,7 +51,7 @@ class LearningSession extends IDSSession {
     while (location != null) {
       var response = await dio.get(location);
       log.info(
-        "[LearningSession][loginLearningSession] Received location: $location.",
+        '[LearningSession][loginLearningSession] Following login redirect.',
       );
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }

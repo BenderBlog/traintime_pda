@@ -111,7 +111,7 @@ class ExamSession extends EhallSession {
 
     while (location != null) {
       var response = await dio.get(location);
-      log.info("[ExamFile][getExamYjspt] Received location: $location.");
+      log.info('[ExamFile][getExamYjspt] Following login redirect.');
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }
 
@@ -156,7 +156,7 @@ class ExamSession extends EhallSession {
     String? location = await useApp("4768687067472349");
     while (location != null) {
       var response = await dio.get(location);
-      log.info("[ExamFile][getExamEhall] Received location: $location.");
+      log.info('[ExamFile][getExamEhall] Following login redirect.');
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }
 

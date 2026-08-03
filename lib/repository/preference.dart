@@ -45,6 +45,10 @@ enum Preference {
   //electricityAccount(key: "electricityAccount", type: "String"), // 电费账号
   idsAccount(key: "idsAccount", type: "String"), // 一站式帐号
   idsPassword(key: "idsPassword", type: "String"), // 一站式密码
+  idsBrowserFingerprint(
+    key: "idsBrowserFingerprint",
+    type: "String",
+  ), // IDS 信任设备指纹（独立于 Cookie 保存）
   sportPassword(key: "sportPassword", type: "String"), // 体育系统密码
   experimentPassword(key: "experimentPassword", type: "String"), // 物理实验密码
   //electricityPassword(key: "electricityPassword", type: "String"), // 电费密码

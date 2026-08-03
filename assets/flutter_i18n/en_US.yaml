@@ -25,6 +25,7 @@ login_process:
   get_encrypt: Obtain password encryption key
   ready_login: Prepare to login
   slider: Logging in
+  second_factor: Waiting for SMS verification
   after_process: Post-login processing
   failed: "Login failed, response status code: {statusCode}"
 no_info: No information
@@ -721,6 +722,18 @@ login:
     message_on_empty: Please enter captcha
     refresh_failed: "Failed to refresh captcha: {error}"
   slider_title: Server authentication service
+  second_factor:
+    title: SMS verification
+    description: The school requires an additional verification step. Request and enter the SMS code to continue.
+    code: SMS code
+    empty_code: Enter the SMS code
+    send_code: Send code
+    resend_countdown: "Resend in {seconds}s"
+    trust_device: Trust this device
+    trust_device_hint: The school may skip verification on this device for a limited time
+    network_error: Verification request failed. Check your connection and retry.
+    cancelled: SMS verification cancelled
+    expired: Verification expired. Please log in again.
 school_net:
   title: School Net Usage Query
   ids_account_net:

@@ -22,7 +22,10 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
+import 'package:watermeter/page/login/ids_reauth_dialog.dart';
 import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_auth_protocol.dart';
+import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({super.key});
@@ -112,6 +115,7 @@ class _LoginWindowState extends State<LoginWindow> {
 
   Future<void> login() async {
     bool isGood = true;
+    loginState = IDSLoginState.requesting;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
       msg: FlutterI18n.translate(context, "login.on_login_progress"),
@@ -140,10 +144,30 @@ class _LoginWindowState extends State<LoginWindow> {
       await ses.loginEhall(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
-        onResponse: (int number, String status) => pd.update(
-          msg: FlutterI18n.translate(context, status),
-          value: number,
-        ),
+        onResponse: (int number, String status) {
+          if (pd.isOpen()) {
+            pd.update(
+              msg: FlutterI18n.translate(context, status),
+              value: number,
+            );
+          }
+        },
+        reAuthHandler: (client) async {
+          if (pd.isOpen()) pd.close();
+          if (!mounted) throw const IDSReAuthCancelledException();
+          final result = await showIDSReAuthDialog(context, client);
+          if (mounted && !pd.isOpen()) {
+            pd.show(
+              msg: FlutterI18n.translate(
+                context,
+                'login_process.after_process',
+              ),
+              max: 100,
+              hideValue: true,
+            );
+          }
+          return result;
+        },
         sliderCaptcha: (String cookieStr) {
           return SliderCaptchaClientProvider(cookie: cookieStr).solve(
             manualSolver: (provider) =>
@@ -153,11 +177,12 @@ class _LoginWindowState extends State<LoginWindow> {
       );
       if (!mounted) return;
       if (isGood == true) {
-        preference.setString(
+        loginState = IDSLoginState.success;
+        await preference.setString(
           preference.Preference.idsAccount,
           _idsAccountController.text,
         );
-        preference.setString(
+        await preference.setString(
           preference.Preference.idsPassword,
           _idsPasswordController.text,
         );
@@ -181,13 +206,34 @@ class _LoginWindowState extends State<LoginWindow> {
       }
     } catch (e, s) {
       isGood = false;
-      pd.close();
+      if (pd.isOpen()) pd.close();
       if (mounted) {
         if (e is PasswordWrongException) {
+          loginState = IDSLoginState.passwordWrong;
           showToast(context: context, msg: e.msg);
+        } else if (e is IDSReAuthCancelledException) {
+          loginState = IDSLoginState.cancelled;
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(
+              context,
+              'login.second_factor.cancelled',
+            ),
+          );
+        } else if (e is IDSReAuthExpiredException) {
+          loginState = IDSLoginState.fail;
+          showToast(
+            context: context,
+            msg: FlutterI18n.translate(context, 'login.second_factor.expired'),
+          );
         } else if (e is LoginFailedException) {
+          loginState = IDSLoginState.fail;
           showToast(context: context, msg: e.msg);
+        } else if (e is IDSProtocolException) {
+          loginState = IDSLoginState.fail;
+          showToast(context: context, msg: e.message);
         } else if (e is DioException) {
+          loginState = IDSLoginState.fail;
           if (e.message == null) {
             if (e.response == null) {
               showToast(
@@ -220,6 +266,7 @@ class _LoginWindowState extends State<LoginWindow> {
             );
           }
         } else {
+          loginState = IDSLoginState.fail;
           log.warning(
             "[login_window][login] "
             "Login failed with error: \n$e\nStacktrace is:\n$s",

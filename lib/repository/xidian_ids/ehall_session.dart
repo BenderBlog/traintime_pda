@@ -12,6 +12,7 @@ import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 
 class EhallSession extends IDSSession {
   static final _ehallLock = Lock();
@@ -30,7 +31,11 @@ class EhallSession extends IDSSession {
         "application/x-www-form-urlencoded; charset=UTF-8",
   };
 
-  Dio get dioEhall => super.dio..options = BaseOptions(headers: refererHeader);
+  Dio get dioEhall {
+    final client = super.dioNoOfflineCheck;
+    client.options.headers.addAll(refererHeader);
+    return client;
+  }
 
   Future<bool> isLoggedIn() async {
     var response = await dioEhall.get(
@@ -48,6 +53,7 @@ class EhallSession extends IDSSession {
     required String password,
     required Future<void> Function(String) sliderCaptcha,
     required void Function(int, String) onResponse,
+    IDSReAuthHandler? reAuthHandler,
   }) async {
     String location = await super.login(
       target:
@@ -56,17 +62,25 @@ class EhallSession extends IDSSession {
       password: password,
       sliderCaptcha: sliderCaptcha,
       onResponse: onResponse,
+      reAuthHandler: reAuthHandler,
     );
-    var response = await dio.get(location);
-    while (response.headers[HttpHeaders.locationHeader] != null) {
-      location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[ehall_session][loginEhall] "
-        "Received location: $location",
-      );
+    var response = await dioEhall.get(location);
+    for (
+      var redirectCount = 0;
+      response.headers.value(HttpHeaders.locationHeader) != null;
+      redirectCount++
+    ) {
+      if (redirectCount >= 10) {
+        throw const LoginFailedException(msg: '一站式登录跳转次数过多');
+      }
+      final next = response.headers.value(HttpHeaders.locationHeader)!;
+      location = Uri.parse(location).resolve(next).toString();
+      log.info('[ehall_session][loginEhall] Following login redirect.');
       response = await dioEhall.get(location);
     }
-    return;
+    if (!await isLoggedIn()) {
+      throw const LoginFailedException(msg: '统一认证成功，但一站式大厅登录状态校验失败');
+    }
   }
 
   Future<String> useApp(String appID) async {
@@ -86,10 +100,7 @@ class EhallSession extends IDSSession {
         var response = await dio.get(location);
         while (response.headers[HttpHeaders.locationHeader] != null) {
           location = response.headers[HttpHeaders.locationHeader]![0];
-          log.info(
-            "[ehall_session][useApp] "
-            "Received location: $location.",
-          );
+          log.info('[ehall_session][useApp] Following login redirect.');
           response = await dioEhall.get(location);
         }
       }
@@ -108,7 +119,7 @@ class EhallSession extends IDSSession {
       );
       log.info(
         "[ehall_session][useApp] "
-        "Transfer address: ${value.headers['location']![0]}.",
+        "Received app transfer address.",
       );
 
       return value.headers['location']![0].replaceAll(

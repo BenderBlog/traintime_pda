@@ -601,7 +601,7 @@ class LibrarySession extends IDSSession {
       if (token.isNotEmpty) return;
 
       final response = await dioNoOfflineCheck.get(location);
-      log.info("[LibrarySession][initSession] Received location: $location.");
+      log.info('[LibrarySession][initSession] Following login redirect.');
       final nextLocation = response.headers[HttpHeaders.locationHeader]?[0];
       if (nextLocation != null) {
         location = _resolveLocation(location, nextLocation);

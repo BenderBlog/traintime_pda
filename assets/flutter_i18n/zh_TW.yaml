@@ -24,6 +24,7 @@ login_process:
   get_encrypt: 獲取密碼加密密鑰
   ready_login: 準備登錄
   slider: 登錄中
+  second_factor: 等待短信二次認證
   after_process: 登錄後處理
   failed: 登錄失敗，響應狀態碼：{statusCode}
 no_info: 沒有信息
@@ -647,6 +648,18 @@ login:
     message_on_empty: 請輸入驗證碼
     refresh_failed: '刷新驗證碼失敗: {error}'
   slider_title: 服務器認證服務
+  second_factor:
+    title: 短信二次認證
+    description: 學校要求完成二次認證。請先獲取短信驗證碼，再輸入驗證碼繼續登錄。
+    code: 短信驗證碼
+    empty_code: 請輸入短信驗證碼
+    send_code: 獲取驗證碼
+    resend_countdown: "{seconds} 秒後可重新獲取"
+    trust_device: 信任此設備
+    trust_device_hint: 開啟後學校可能在一段時間內不再要求本設備二次認證
+    network_error: 二次認證請求失敗，請檢查網絡後重試
+    cancelled: 已取消短信二次認證
+    expired: 二次認證已失效，請重新登錄
 school_net:
   title: 校園網使用詳情
   ids_account_net:

@@ -26,8 +26,7 @@ class PersonalInfoSession extends EhallSession {
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
       log.info(
-        "[PersonalInfoSession][getSemesterInfoYjspt] "
-        "Received location: $location.",
+        '[PersonalInfoSession][getSemesterInfoYjspt] Following login redirect.',
       );
       response = await dio.get(location);
     }
@@ -75,10 +74,7 @@ class PersonalInfoSession extends EhallSession {
     );
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[ehall_session][useApp] "
-        "Received location: $location.",
-      );
+      log.info('[ehall_session][useApp] Following login redirect.');
       response = await dioEhall.get(
         location,
         options: Options(

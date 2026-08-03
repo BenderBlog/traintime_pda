@@ -41,10 +41,7 @@ class JiaowuServiceSession extends IDSSession {
 
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[JiaowuServiceSession][getToken] "
-        "Received location: $location.",
-      );
+      log.info('[JiaowuServiceSession][getToken] Following login redirect.');
       if (location.contains("ehall.xidian.edu.cn/jwmobile/index#/?token=")) {
         authorization = location.replaceAll(
           RegExp(r'https?:\/\/ehall.xidian.edu.cn\/jwmobile\/index#\/\?token='),

@@ -205,9 +205,7 @@ class SysjSession extends IDSSession {
 
       while (location != null) {
         var response = await dio.get(location);
-        log.info(
-          "[SysjSession][getDataFromSysj] Received location: $location.",
-        );
+        log.info('[SysjSession][getDataFromSysj] Following login redirect.');
         location = response.headers[HttpHeaders.locationHeader]?[0];
       }
 

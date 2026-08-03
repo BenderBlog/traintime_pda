@@ -27,6 +27,8 @@ import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/page/login/ids_reauth_dialog.dart';
+import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -71,11 +73,17 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   late StreamSubscription _intentSub;
   late PageController _controller;
+  late final IDSReAuthHandler _idsReAuthHandler;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController();
+    _idsReAuthHandler = (client) async {
+      if (!mounted) throw const IDSReAuthRequiredException();
+      return showIDSReAuthDialog(context, client);
+    };
+    activeIDSReAuthHandler = _idsReAuthHandler;
   }
 
   void _loginAsync() async {
@@ -165,7 +173,7 @@ class _HomePageMasterState extends State<HomePageMaster>
             ),
           );
         });
-      } else {
+      } else if (loginState != IDSLoginState.cancelled) {
         _showOfflineModeNotice();
       }
     }
@@ -222,6 +230,9 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   @override
   void dispose() {
+    if (identical(activeIDSReAuthHandler, _idsReAuthHandler)) {
+      activeIDSReAuthHandler = null;
+    }
     if (Platform.isAndroid || Platform.isIOS) _intentSub.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();

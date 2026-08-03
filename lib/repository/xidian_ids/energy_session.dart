@@ -257,17 +257,11 @@ class EnergySession extends IDSSession {
     var response = await dio.get(location);
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[PaymentSession][getOwe] "
-        "Received location: $location.",
-      );
+      log.info('[PaymentSession][getOwe] Following login redirect.');
       response = await dio.get(location);
     }
     String code = Uri.parse(location).queryParameters["code"]!;
-    log.info(
-      "[ElectricitySession][loginEnergy] "
-      "Received location: $location, code is $code",
-    );
+    log.info('[ElectricitySession][loginEnergy] Login redirect received.');
     response = await dio.get(location);
 
     response = await _request(

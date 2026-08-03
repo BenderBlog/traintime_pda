@@ -23,6 +23,7 @@ login_process:
   get_encrypt: 获取密码加密密钥
   ready_login: 准备登录
   slider: 登录中
+  second_factor: 等待短信二次认证
   after_process: 登录后处理
   failed: 登录失败，响应状态码：{statusCode}
 no_info: 没有信息
@@ -649,6 +650,18 @@ login:
     message_on_empty: 请输入验证码
     refresh_failed: "刷新验证码失败: {error}"
   slider_title: 服务器认证服务
+  second_factor:
+    title: 短信二次认证
+    description: 学校要求完成二次认证。请先获取短信验证码，再输入验证码继续登录。
+    code: 短信验证码
+    empty_code: 请输入短信验证码
+    send_code: 获取验证码
+    resend_countdown: "{seconds} 秒后可重新获取"
+    trust_device: 信任此设备
+    trust_device_hint: 开启后学校可能在一段时间内不再要求本设备二次认证
+    network_error: 二次认证请求失败，请检查网络后重试
+    cancelled: 已取消短信二次认证
+    expired: 二次认证已失效，请重新登录
 school_net:
   title: 校园网使用详情
   ids_account_net:

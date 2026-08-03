@@ -131,7 +131,7 @@ class ScoreSession extends EhallSession {
 
     while (location != null) {
       var response = await dio.get(location);
-      log.info("[ExamFile][getScoreFromYjspt] Received location: $location.");
+      log.info('[ExamFile][getScoreFromYjspt] Following login redirect.');
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }
 
