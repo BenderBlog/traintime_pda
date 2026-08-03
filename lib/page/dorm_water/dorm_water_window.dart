@@ -3,12 +3,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:flutter_zxing/flutter_zxing.dart';
 import 'dart:convert' show base64Decode;
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/dorm_water_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 
 class DormWaterWindow extends StatefulWidget {
   const DormWaterWindow({super.key});
@@ -717,42 +717,25 @@ class _QrCodeScannerPage extends StatefulWidget {
 }
 
 class _QrCodeScannerPageState extends State<_QrCodeScannerPage> {
-  final QRCodeDartScanController controller = QRCodeDartScanController();
-  bool _flashOn = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
+  bool _finished = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Scan QR Code"),
-        actions: [
-          IconButton(
-            icon: Icon(_flashOn ? Icons.flash_on : Icons.flash_off),
-            onPressed: () async {
-              await controller.toggleFlash();
-              if (!mounted) return;
-              setState(() {
-                _flashOn = controller.isFlashOn;
-              });
-            },
-          ),
-        ],
-      ),
-      body: QRCodeDartScanView(
-        controller: controller,
-        onCapture: (result) {
-          final text = result.text;
+      appBar: AppBar(title: const Text("Scan QR Code")),
+      body: ReaderWidget(
+        isMultiScan: true,
+        codeFormat: Format.matrixCodes,
+        tryHarder: true,
+        tryInverted: true,
+        tryDownscale: true,
+        showGallery: false,
+        showToggleCamera: false,
+        onMultiScan: (results) {
+          if (_finished) return;
+          final text = results.codes
+              .map((result) => result.text ?? "")
+              .firstWhere((text) => text.isNotEmpty, orElse: () => "");
           if (text.isEmpty) {
             return;
           }
@@ -774,6 +757,7 @@ class _QrCodeScannerPageState extends State<_QrCodeScannerPage> {
             }
           }
 
+          _finished = true;
           Navigator.of(context).pop(deviceId);
         },
       ),

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/schoolnet/network_card_window.dart';
+import 'package:watermeter/routing/routes.dart';
 
 class SchoolnetCard extends StatelessWidget {
   const SchoolnetCard({super.key});
@@ -14,8 +14,7 @@ class SchoolnetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SmallFunctionCard(
-      onPressed: () => context.pushReplacement(const NetworkCardWindow()),
-
+      onPressed: () => context.pushReplacementNamed(Routes.networkCard),
       icon: MingCuteIcons.mgc_wifi_fill,
       nameKey: "homepage.toolbox.schoolnet",
     );

@@ -24,6 +24,10 @@
 		26CC2A472B526A0C007E67CB /* ClasstableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CC2A462B526A0C007E67CB /* ClasstableModel.swift */; };
 		26CC2A492B541A9A007E67CB /* EventItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CC2A482B541A9A007E67CB /* EventItem.swift */; };
 		26E67DD52B9222FD00B2BD5D /* IsTomorrowIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E67DD42B9222FD00B2BD5D /* IsTomorrowIntent.swift */; };
+		26F000022E33A00100CC2026 /* CustomClassModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F000012E33A00100CC2026 /* CustomClassModel.swift */; };
+		26F000032E33A00100CC2026 /* CustomClassModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F000012E33A00100CC2026 /* CustomClassModel.swift */; };
+		26F000042E33A00100CC2026 /* ExamModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B01712B5931740094B372 /* ExamModule.swift */; };
+		26F000052E33A00100CC2026 /* ExperimentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263322A92B908A8A009BEDF5 /* ExperimentModel.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
@@ -103,6 +107,7 @@
 		26D4C13B2D6075DB008FEE1D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		26D4C13C2D6075DB008FEE1D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		26E67DD42B9222FD00B2BD5D /* IsTomorrowIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IsTomorrowIntent.swift; sourceTree = "<group>"; };
+		26F000012E33A00100CC2026 /* CustomClassModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomClassModel.swift; sourceTree = "<group>"; };
 		2C6385329A3FB85873E02BCE /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -169,6 +174,7 @@
 				263322A72B908A1C009BEDF5 /* ColorList.swift */,
 				263322A92B908A8A009BEDF5 /* ExperimentModel.swift */,
 				26E67DD42B9222FD00B2BD5D /* IsTomorrowIntent.swift */,
+				26F000012E33A00100CC2026 /* CustomClassModel.swift */,
 				268A98842DD5AF9B005A573B /* Localizable.xcstrings */,
 			);
 			path = ClasstableWidget;
@@ -312,7 +318,6 @@
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				0CED640916642A3F556DCD39 /* [CP] Embed Pods Frameworks */,
-				84E7D297396575C053FAB585 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -462,23 +467,6 @@
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin\n";
 		};
-		84E7D297396575C053FAB585 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		9740EEB61CF901F6004384FC /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -524,6 +512,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26E67DD52B9222FD00B2BD5D /* IsTomorrowIntent.swift in Sources */,
+				26F000022E33A00100CC2026 /* CustomClassModel.swift in Sources */,
 				26CC2A472B526A0C007E67CB /* ClasstableModel.swift in Sources */,
 				26947AA82B49B50B006B2B17 /* ClasstableWidgetBundle.swift in Sources */,
 				26947AAA2B49B50B006B2B17 /* ClasstableWidget.swift in Sources */,
@@ -538,6 +527,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26F000032E33A00100CC2026 /* CustomClassModel.swift in Sources */,
+				26F000042E33A00100CC2026 /* ExamModule.swift in Sources */,
+				26F000052E33A00100CC2026 /* ExperimentModel.swift in Sources */,
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

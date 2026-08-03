@@ -7,7 +7,7 @@
 /*
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 
@@ -34,17 +34,14 @@ class JiaowuServiceSession extends IDSSession {
           "ehall.xidian.edu.cn%252Fjwmobile%252Fauth%252Findex%26state%3DSTATE"
           "%26qrcode%3D1&from=wap",
       sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
     var response = await dio.get(location);
 
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[JiaowuServiceSession][getToken] "
-        "Received location: $location.",
-      );
+      log.info('[JiaowuServiceSession][getToken] Following login redirect.');
       if (location.contains("ehall.xidian.edu.cn/jwmobile/index#/?token=")) {
         authorization = location.replaceAll(
           RegExp(r'https?:\/\/ehall.xidian.edu.cn\/jwmobile\/index#\/\?token='),

@@ -5,15 +5,35 @@
 // General network class.
 
 import 'dart:io';
+import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/widgets.dart';
+import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/repository/logger.dart';
 
 late Directory supportPath;
+
+/// AES-CBC encryption with Pkcs7 padding
+/// used for IDS CAPTCHA payload & password encryption
+final _rng = Random();
+const int _blockSize = 16;
+const String _aesChars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+
+String aesEncrypt(String text, Uint8List keyBytes) {
+  final randstr = [
+    for (int i = 0; i < _blockSize * 5; i++)
+      _aesChars[_rng.nextInt(_aesChars.length)],
+  ].join();
+  final plain = randstr.substring(0, 64) + text; // prepend 64B nonce
+  final key = encrypt.Key(keyBytes);
+  final iv = encrypt.IV.fromUtf8(randstr.substring(64, 80)); // 16B iv
+  return encrypt.Encrypter(
+    encrypt.AES(key, mode: encrypt.AESMode.cbc),
+  ).encrypt(plain, iv: iv).base64;
+}
 
 class NetworkSession {
   static SessionState _isInit = SessionState.none;
@@ -48,22 +68,20 @@ class NetworkSession {
             status != null && status >= 200 && status < 400;
 
   static Future<bool> isInSchool() async {
-    bool isInSchool = false;
     Dio dio = Dio()
       ..interceptors.add(logDioAdapter)
       ..options.connectTimeout = const Duration(seconds: 30);
-    isInSchool = await dio
-        .get("https://rs.xidian.edu.cn/cas/login.php")
-        .then((value) => true)
+    return await dio
+        .get("https://notice.xidian.edu.cn")
+        .then((value) => !value.data.toString().contains("校外访问"))
         .onError((error, stackTrace) {
           log.warning(
-            "[isSchoolNet] Current net is not schoolnet.",
+            "[isSchoolNet] Unable to fetch, treat as not schoolnet.",
             error,
             stackTrace,
           );
           return false;
         });
-    return isInSchool;
   }
 
   NetworkSession() {
@@ -86,7 +104,7 @@ class NetworkSession {
         "[NetworkSession][initSession] "
         "Fetching...",
       );
-      var response = await dio.get("http://linux.xidian.edu.cn");
+      var response = await dio.get("http://www.xidian.edu.cn");
       if (response.statusCode == 200) {
         _isInit = SessionState.fetched;
         log.info(

@@ -20,7 +20,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-  
+
       - name: Install Flutter
         run: |
           java -version
@@ -30,6 +30,9 @@ jobs:
         run: |
           .flutter/bin/flutter config --no-analytics
           .flutter/bin/flutter pub get
+
+      - name: Remove build id
+        run: sed -i -e 's/-Wl,/-Wl,--build-id=none,/' ~/.pub-cache/hosted/pub.dev/jni-*/src/CMakeLists.txt
 
       - name: Signing APK
         run: |

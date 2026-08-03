@@ -4,6 +4,7 @@
 import 'dart:math';
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -260,10 +261,10 @@ class HistogramPainter extends CustomPainter {
       titles[i].paint(canvas, Offset(titleLeftStart, titleTopStart));
 
       double rectTopStart = rowHeight * (i + 0.5) - rectHeight * 0.5;
-      double rectWidth =
-          paintRange /
-          (maxNum - minNum) *
-          (plotData.values.toList()[i] - minNum);
+      final range = maxNum - minNum;
+      final rectWidth = range == 0
+          ? 0.0
+          : paintRange / range * (plotData.values.toList()[i] - minNum);
       canvas.drawRect(
         Rect.fromLTWH(rectLeftStart, rectTopStart, rectWidth, rectHeight),
         _fillPaint,
@@ -277,5 +278,9 @@ class HistogramPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant HistogramPainter oldDelegate) {
+    return !mapEquals(oldDelegate.plotData, plotData) ||
+        oldDelegate.color != color ||
+        oldDelegate.rowHeight != rowHeight;
+  }
 }

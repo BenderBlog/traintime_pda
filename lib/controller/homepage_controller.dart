@@ -1,14 +1,16 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
-import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/model/home_arrangement.dart';
+import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 enum ArrangementState { fetching, fetched, error, none }
@@ -29,20 +31,8 @@ class HomepageController {
     GlobalTimerController.i;
   }
 
-  int _getInAdvanceMinutes(DateTime updateTime) {
-    final currentTime = updateTime.hour * 60 + updateTime.minute;
-    if (currentTime < 8.5 * 60 ||
-        (currentTime < 14 * 60 && currentTime >= 12 * 60) ||
-        (currentTime < 19 * 60 && currentTime >= 18 * 60)) {
-      return 60;
-    }
-    return 30;
-  }
-
   List<HomeArrangement> _sortArrangements(Iterable<HomeArrangement> data) {
-    final result = data.toList();
-    result.sort((a, b) => a.startTime.compareTo(b.startTime));
-    return result;
+    return data.toList()..sort();
   }
 
   bool _isEffectiveLoading(HomepageSourceState state) =>
@@ -50,6 +40,29 @@ class HomepageController {
 
   bool _isRealError(HomepageSourceState state) =>
       state == HomepageSourceState.error;
+
+  List<HomeArrangement> _getCustomClassOfDay(DateTime day) {
+    final formatter = DateFormat(HomeArrangement.format);
+    final result = <HomeArrangement>[];
+    for (final cc in CustomClassController.i.customClassesSignal.value) {
+      for (final tr in cc.timeRanges) {
+        if (tr.startTime.year == day.year &&
+            tr.startTime.month == day.month &&
+            tr.startTime.day == day.day) {
+          result.add(
+            HomeArrangement(
+              name: cc.name,
+              teacher: cc.teacher,
+              place: cc.classroom,
+              startTimeStr: formatter.format(tr.startTime),
+              endTimeStr: formatter.format(tr.endTime),
+            ),
+          );
+        }
+      }
+    }
+    return result;
+  }
 
   late final updateTimeComputedSignal = computed<DateTime>(
     () => GlobalTimerController.i.currentTimeSignal.value,
@@ -138,6 +151,7 @@ class HomepageController {
   late final todayArrangementComputedSignal = computed<List<HomeArrangement>>(
     () => _sortArrangements([
       ...ClassTableController.i.arrangementOfTodayComputedSignal.value,
+      ..._getCustomClassOfDay(GlobalTimerController.i.currentTimeSignal.value),
       ...ExamController.i.todayExams.value,
       ...PhysicsExperimentController
           .i
@@ -151,6 +165,11 @@ class HomepageController {
       computed<List<HomeArrangement>>(
         () => _sortArrangements([
           ...ClassTableController.i.arrangementOfTomorrowComputedSignal.value,
+          ..._getCustomClassOfDay(
+            GlobalTimerController.i.currentTimeSignal.value.add(
+              const Duration(days: 1),
+            ),
+          ),
           ...ExamController.i.tomorrowExams.value,
           ...PhysicsExperimentController
               .i
@@ -177,67 +196,6 @@ class HomepageController {
       ),
     );
   });
-
-  late final _arrangementSelectionComputedSignal =
-      computed<(HomeArrangement?, HomeArrangement?, int)>(() {
-        final updateTime = updateTimeComputedSignal.value;
-        final arrangement = arrangementComputedSignal.value;
-
-        if (arrangement.isEmpty) {
-          return (null, null, 0);
-        }
-
-        if (isTomorrowComputedSignal.value) {
-          return (null, arrangement.first, arrangement.length - 1);
-        }
-
-        final inAdvance = _getInAdvanceMinutes(updateTime);
-        HomeArrangement? current;
-        HomeArrangement? next;
-        int currentIndex = -1;
-
-        for (var i = 0; i < arrangement.length; ++i) {
-          final item = arrangement[i];
-          final isCurrent =
-              updateTime.microsecondsSinceEpoch >=
-                  item.startTime.microsecondsSinceEpoch &&
-              updateTime.microsecondsSinceEpoch <=
-                  item.endTime.microsecondsSinceEpoch;
-          final isUpcomingSoon =
-              item.startTime.difference(updateTime).inMinutes >= 0 &&
-              item.startTime.difference(updateTime).inMinutes < inAdvance;
-
-          if (isCurrent || isUpcomingSoon) {
-            current = item;
-            currentIndex = i;
-            break;
-          }
-        }
-
-        if (current == null) {
-          next = arrangement.first;
-        } else if (currentIndex + 1 < arrangement.length) {
-          next = arrangement[currentIndex + 1];
-        }
-
-        int remaining = arrangement.length;
-        if (current != null) remaining -= 1;
-        if (next != null) remaining -= 1;
-
-        return (current, next, remaining);
-      });
-
-  late final currentComputedSignal = computed<HomeArrangement?>(
-    () => _arrangementSelectionComputedSignal.value.$1,
-  );
-
-  late final nextComputedSignal = computed<HomeArrangement?>(
-    () => _arrangementSelectionComputedSignal.value.$2,
-  );
-
-  late final remainingComputedSignal = computed<int>(
-    () => _arrangementSelectionComputedSignal.value.$3,
-  );
 
   late final hasArrangementComputedSignal = computed<bool>(
     () => arrangementComputedSignal.value.isNotEmpty,

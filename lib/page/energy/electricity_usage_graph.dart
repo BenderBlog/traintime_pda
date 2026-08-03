@@ -316,8 +316,12 @@ class LineChartPainter extends CustomPainter {
       // CatmullRomSpline require at least 4 dots, copy the head and tail dots.
       final splineInput = List<Offset>.from(points);
       if (splineInput.length == 3) {
-        splineInput.insert(0, splineInput.first);
-        splineInput.add(splineInput.last);
+        final epsilon = (points.last.dx - points.first.dx) * 0.01;
+        splineInput.insert(
+          0,
+          Offset(points.first.dx - epsilon, points.first.dy),
+        );
+        splineInput.add(Offset(points.last.dx + epsilon, points.last.dy));
       }
 
       // AI-generated how to paint Catmull-Rom splines with Flutter

@@ -23,10 +23,11 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  final String urlOthers =
-      "https://www.bilibili.com/video/BV14T411277a?t=739.0";
+  final String urlOthers = "https://www.bilibili.com/video/BV1tW411n7eW";
 
-  final String urlApple = "https://www.bilibili.com/bangumi/play/ep86203/";
+  final String urlApple = "https://www.bilibili.com/video/BV1Dt411Y7a5";
+
+  final String urlAll = "https://www.bilibili.com/video/BV1z57n6NETg?t=1094.5";
 
   List<Developer> getDevelopers() => [
     Developer(
@@ -42,7 +43,7 @@ class _AboutPageState extends State<AboutPage> {
       "https://github.com/A1nair",
     ),
     Developer(
-      "Appkad (Kevin)",
+      "aqqkad (Kevin)",
       "https://avatars.githubusercontent.com/u/97880629",
       FlutterI18n.translate(context, "setting.about_page.aqqkad"),
       "https://github.com/aqqkad",
@@ -137,6 +138,13 @@ class _AboutPageState extends State<AboutPage> {
       FlutterI18n.translate(context, "setting.about_page.hhzm"),
       "https://hhzm.win/",
     ),
+    Developer(
+      "imaginary_17",
+      "https://avatars.githubusercontent.com/u/70046513",
+      FlutterI18n.translate(context, "setting.about_page.imaginary_17"),
+      "https://github.com/clever-max",
+    ),
+
     Developer(
       "imoscarz",
       "https://avatars.githubusercontent.com/u/52318095",
@@ -309,8 +317,8 @@ class _AboutPageState extends State<AboutPage> {
                   TextSpan(text: " v${preference.packageInfo.version}\n"),
                   TextSpan(
                     text:
-                        "${Platform.isIOS || Platform.isMacOS ? "" : ""}"
-                        "Himawari's Hogweed Adventure Edition",
+                        "${Platform.isIOS || Platform.isMacOS ? "Fly Me to The Moon" : "Pursuing Dreams"}"
+                        " And\nLiving Inside Your Love Above Stars Edition",
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
@@ -413,6 +421,14 @@ class _AboutPageState extends State<AboutPage> {
             Uri.parse(
               Platform.isIOS || Platform.isMacOS ? urlApple : urlOthers,
             ),
+            mode: LaunchMode.externalApplication,
+          ),
+          icon: const Icon(Icons.headphones),
+        ),
+        const SizedBox(width: 24),
+        IconButton.filledTonal(
+          onPressed: () => launchUrl(
+            Uri.parse(urlAll),
             mode: LaunchMode.externalApplication,
           ),
           icon: const Icon(Icons.headphones),

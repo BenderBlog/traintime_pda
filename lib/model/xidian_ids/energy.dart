@@ -19,6 +19,11 @@ class ElectricityHistoryInfo {
       _$ElectricityHistoryInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$ElectricityHistoryInfoToJson(this);
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
 }
 
 @JsonSerializable()
@@ -46,7 +51,7 @@ class EnergyInfo {
   final DateTime lastReadDate;
   final num electricityRemain;
   final List<MeterInfo> electricityMeterList;
-  final List<MeterInfo> waterMeterList;
+  final List<MeterInfo>? waterMeterList;
 
   EnergyInfo({
     required this.lastReadDate,

@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/score/score_window.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/homepage/small_function_card.dart';
+import 'package:watermeter/routing/routes.dart';
 
 class ScoreCard extends StatelessWidget {
   const ScoreCard({super.key});
@@ -27,7 +27,7 @@ class ScoreCard extends StatelessWidget {
             ),
           );
         } else {
-          context.pushReplacement(const ScoreWindow());
+          context.pushReplacementNamed(Routes.score);
         }
       },
       icon: Icons.grading_rounded,

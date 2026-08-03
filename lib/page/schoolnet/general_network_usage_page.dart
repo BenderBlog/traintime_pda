@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/password_exceptions.dart';
@@ -37,9 +36,12 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
 
   Future<void> _reload(BuildContext context) =>
       state = session.getGeneralNetworkUsage(
-        captchaFunction: (image) => showDialog<String>(
+        captchaFunction: (image, onRefresh) => showDialog<String>(
           context: context,
-          builder: (context) => CaptchaInputDialog(image: image),
+          builder: (context) => CaptchaInputDialog(
+            image: image,
+            onRefresh: onRefresh,
+          ),
         ).then((value) => value ?? ""),
       );
 
@@ -162,7 +164,8 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
       );
 
   @override
-  Widget build(BuildContext context) => Watch((context) {
+  Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder(
       future: state,
       builder: (context, snapshot) {
@@ -263,7 +266,7 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
         return const Center(child: CircularProgressIndicator());
       },
     );
-  });
+  }
 }
 
 class _DeviceListLite extends StatelessWidget {

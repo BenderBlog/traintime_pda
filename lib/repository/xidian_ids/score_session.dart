@@ -12,7 +12,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/model/fetch_result.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -126,12 +126,12 @@ class ScoreSession extends EhallSession {
     String? location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdcjapp/*default/index.do",
       sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
     while (location != null) {
       var response = await dio.get(location);
-      log.info("[ExamFile][getScoreFromYjspt] Received location: $location.");
+      log.info('[ExamFile][getScoreFromYjspt] Following login redirect.');
       location = response.headers[HttpHeaders.locationHeader]?[0];
     }
 

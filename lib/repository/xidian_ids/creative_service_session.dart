@@ -7,7 +7,7 @@
 /*
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/creative.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -21,23 +21,17 @@ class CreativeServiceSession extends IDSSession {
       String location = await checkAndLogin(
         target: "$url/login/ids",
         sliderCaptcha: (String cookieStr) =>
-            SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+            SliderCaptchaClientProvider(cookie: cookieStr).solve(),
       );
       var response = await dio.get(location);
       while (response.headers[HttpHeaders.locationHeader] != null) {
         location = response.headers[HttpHeaders.locationHeader]![0];
-        log.info(
-          "[CreativeServiceSession][initSession] "
-          "Received location: $location.",
-        );
+        log.info('[CreativeServiceSession][initSession] Following redirect.');
         response = await dio.get(location);
       }
       String urlReceived = "${response.realUri}";
       String ticket = RegExp(r'ST\S+').firstMatch(urlReceived)![0]!;
-      log.info(
-        "[CreativeServiceSession][initSession] "
-        "Received ticket: $ticket.",
-      );
+      log.info('[CreativeServiceSession][initSession] Ticket received.');
       bool isLogin = await dio
           .post(
         "$url/api/v1/auth/ids",

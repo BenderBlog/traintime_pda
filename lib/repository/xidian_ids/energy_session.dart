@@ -13,7 +13,7 @@ import 'package:time/time.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
-import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -251,23 +251,17 @@ class EnergySession extends IDSSession {
           "redirect=https://ignypt.xidian.edu.cn/revenueH5/login?"
           "opcode=MPAY&appid=200260318155520600&state=12312312312312&qrcode=0",
       sliderCaptcha: (String cookieStr) =>
-          SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
     var response = await dio.get(location);
     while (response.headers[HttpHeaders.locationHeader] != null) {
       location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        "[PaymentSession][getOwe] "
-        "Received location: $location.",
-      );
+      log.info('[PaymentSession][getOwe] Following login redirect.');
       response = await dio.get(location);
     }
     String code = Uri.parse(location).queryParameters["code"]!;
-    log.info(
-      "[ElectricitySession][loginEnergy] "
-      "Received location: $location, code is $code",
-    );
+    log.info('[ElectricitySession][loginEnergy] Login redirect received.');
     response = await dio.get(location);
 
     response = await _request(
@@ -296,14 +290,12 @@ class EnergySession extends IDSSession {
 
     int electricityIndex =
         response.data["ResData"]["rows"][0]["MediumCode"] == "2" ? 0 : 1;
-    int waterIndex = electricityIndex == 0 ? 1 : 0;
 
     num electricityRemainNum = num.parse(
       response.data["ResData"]["rows"][electricityIndex]["LastNum"].toString(),
     );
     String electricityMetID =
         response.data["ResData"]["rows"][electricityIndex]["MetID"];
-    String waterMetID = response.data["ResData"]["rows"][waterIndex]["MetID"];
 
     List<int> fetchDate = response
         .data["ResData"]["rows"][electricityIndex]["LastReadDate"]
@@ -343,21 +335,33 @@ class EnergySession extends IDSSession {
               .toList(),
         );
 
-    List<MeterInfo> waterList =
-        await _request(
-          "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/GetMetRead",
-          isGetMethod: true,
-          data: {
-            "MetID": waterMetID,
-            "ReadTimeS": DateFormat("yyyy-MM-dd").format(rangeBeginForWater),
-            "ReadTimeE": DateFormat("yyyy-MM-dd").format(rangeEndForWater),
-            "ReadNum": "",
-          },
-        ).then(
-          (value) => (value.data["ResData"]["rows"] as List<dynamic>)
-              .map((e) => MeterInfo.fromJson(e))
-              .toList(),
-        );
+    List<MeterInfo>? waterList;
+
+    try {
+      int waterIndex = electricityIndex == 0 ? 1 : 0;
+      String waterMetID = response.data["ResData"]["rows"][waterIndex]["MetID"];
+      waterList =
+          await _request(
+            "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/GetMetRead",
+            isGetMethod: true,
+            data: {
+              "MetID": waterMetID,
+              "ReadTimeS": DateFormat("yyyy-MM-dd").format(rangeBeginForWater),
+              "ReadTimeE": DateFormat("yyyy-MM-dd").format(rangeEndForWater),
+              "ReadNum": "",
+            },
+          ).then(
+            (value) => (value.data["ResData"]["rows"] as List<dynamic>)
+                .map((e) => MeterInfo.fromJson(e))
+                .toList(),
+          );
+    } catch (e, s) {
+      log.error(
+        "[EnergySession] failed to fetch water list, it will leave a blank",
+        e,
+        s,
+      );
+    }
 
     return EnergyInfo(
       electricityMeterList: electricityList,

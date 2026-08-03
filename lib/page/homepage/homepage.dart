@@ -2,31 +2,21 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:signals/signals_flutter.dart';
-import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/homepage_controller.dart' as home;
-import 'package:watermeter/page/homepage/notice_card/update_card.dart';
-import 'package:watermeter/page/homepage/toolbox/class_attendance_card.dart';
-import 'package:watermeter/page/homepage/toolbox/schoolnet_card.dart';
-import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/page/homepage/homepage_edit_mode.dart';
+import 'package:watermeter/page/homepage/homepage_widget_registry.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
-import 'package:watermeter/page/homepage/info_widget/energy_card.dart';
-import 'package:watermeter/page/homepage/info_widget/library_card.dart';
-import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
+import 'package:watermeter/page/homepage/notice_card/update_card.dart';
+import 'package:watermeter/page/homepage/staggered_grid.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
-import 'package:watermeter/page/homepage/toolbox/empty_classroom_card.dart';
-import 'package:watermeter/page/homepage/toolbox/exam_card.dart';
-import 'package:watermeter/page/homepage/toolbox/experiment_card.dart';
-import 'package:watermeter/page/homepage/toolbox/score_card.dart';
-import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
-import 'package:watermeter/page/homepage/toolbox/dorm_water_card.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/repository/preference.dart' as prefs;
+import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 
 class MainPage extends StatefulWidget {
   final Function()? changePage;
@@ -37,12 +27,29 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
+  bool _editMode = false;
+  late List<HomepageWidgetEntry> _allEntries;
+  final Map<String, double> _shakeAmplitudes = {};
+  final Set<String> _fadingEntries = {};
+
+  static const _gridColumns = 4;
+
+  late final AnimationController _shakeController;
+  late final Animation<double> _shakeAnimation;
+
   @override
   void initState() {
     super.initState();
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _shakeAnimation = Tween<double>(begin: -0.02, end: 0.02).animate(
+      CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
+    );
+    _allEntries = getOrderedEntries();
 
-    // Validate and update notifications after controllers are initialized
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await CourseReminderService().initialize();
@@ -60,118 +67,141 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  final List<Widget> smallFunction = [
-    const ScoreCard(),
-    const ExamCard(),
-    const EmptyClassroomCard(),
-    const ClassAttendanceCard(),
-    const SchoolnetCard(),
-    const DormWaterCard(),
-    if (prefs.getBool(prefs.Preference.role) == false) ...[
-      const ExperimentCard(),
-      const SportCard(),
-    ],
-  ];
-
-  String get _now {
-    DateTime now = DateTime.now();
-
-    if (now.hour >= 5 && now.hour < 9) {
-      return "homepage.time_string.morning";
-    }
-    if (now.hour >= 9 && now.hour < 11) {
-      return "homepage.time_string.before_noon";
-    }
-    if (now.hour >= 11 && now.hour < 14) {
-      return "homepage.time_string.at_noon";
-    }
-    if (now.hour >= 14 && now.hour < 18) {
-      return "homepage.time_string.afternoon";
-    }
-    if (now.hour >= 18 || now.hour == 0) {
-      return "homepage.time_string.night";
-    }
-    return "homepage.time_string.midnight";
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
   }
 
-  TextStyle textStyle(BuildContext context) => TextStyle(
-    fontSize: 16,
-    color: Theme.of(context).colorScheme.primary,
-    fontWeight: FontWeight.w700,
-  );
+  void _exitEditMode() {
+    setState(() {
+      _editMode = false;
+      _shakeAmplitudes.clear();
+      _fadingEntries.clear();
+      _shakeController.stop();
+      _allEntries = getOrderedEntries();
+    });
+  }
+
+  void _onSwap(String draggedId, String targetId) {
+    setState(() {
+      final from = _allEntries.indexWhere((e) => e.id == draggedId);
+      final to = _allEntries.indexWhere((e) => e.id == targetId);
+      if (from == -1 || to == -1) return;
+      final item = _allEntries.removeAt(from);
+      _allEntries.insert(to > from ? to - 1 : to, item);
+      saveOrder(_allEntries.map((e) => e.id).toList());
+    });
+  }
+
+  Widget _buildShake(String id, Widget child) {
+    final amplitude = _shakeAmplitudes[id] ?? 0.85;
+    return AnimatedBuilder(
+      animation: _shakeAnimation,
+      builder: (_, child) => Transform.rotate(
+        angle: _shakeAnimation.value * amplitude,
+        child: child!,
+      ),
+      child: child,
+    );
+  }
+
+  void _showHiddenSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        final hidden = getHiddenEntries();
+        if (hidden.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              FlutterI18n.translate(context, "homepage.hide_empty"),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+        return ListView(
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                FlutterI18n.translate(context, "homepage.hidden_title"),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            for (final entry in hidden)
+              ListTile(
+                title: Text(FlutterI18n.translate(context, entry.titleKey)),
+                trailing: IconButton(
+                  icon: const Icon(Icons.visibility),
+                  onPressed: () async {
+                    await unhideEntry(entry.id);
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      setState(() => _allEntries = getOrderedEntries());
+                    }
+                  },
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxScrolled) => [
-        SliverAppBar(
-          centerTitle: false,
-          expandedHeight: 160,
-          pinned: true,
-          flexibleSpace: FlexibleSpaceBar(
-            centerTitle: false,
-            titlePadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 12,
+    final gridEntries = _allEntries.toList();
+    final displayEntries = filterHidden(gridEntries);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(FlutterI18n.translate(context, "homepage.title")),
+        actions: [
+          if (_editMode) ...[
+            IconButton(
+              icon: const Icon(Icons.visibility),
+              tooltip: FlutterI18n.translate(context, "homepage.manage_hidden"),
+              onPressed: _showHiddenSheet,
             ),
-            title: Watch((context) {
-              final homepageController = home.HomepageController.i;
-              final classTableController = ClassTableController.i;
-              homepageController.updateTimeComputedSignal.value;
-              final currentWeek =
-                  classTableController.currentWeekComputedSignal.value;
-              final semesterLength = classTableController
-                  .classTableComputedSignal
-                  .value
-                  .semesterLength;
-              final arrangementState =
-                  homepageController.arrangementStateComputedSignal.value;
-
-              final subtitle = switch (arrangementState) {
-                home.ArrangementState.fetched =>
-                  currentWeek >= 0 && currentWeek < semesterLength
-                      ? FlutterI18n.translate(
-                          context,
-                          "homepage.on_weekday",
-                          translationParams: {"current": "${currentWeek + 1}"},
-                        )
-                      : FlutterI18n.translate(context, "homepage.on_holiday"),
-                home.ArrangementState.error => FlutterI18n.translate(
-                  context,
-                  "homepage.load_error",
-                ),
-                _ => FlutterI18n.translate(context, "homepage.loading"),
-              };
-
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    FlutterI18n.translate(context, _now),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? null
-                          : Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? null
-                          : Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ],
-              );
-            }),
+            IconButton(
+              icon: const Icon(Icons.restore),
+              tooltip: FlutterI18n.translate(context, "homepage.edit_reset"),
+              onPressed: () async {
+                await resetAll();
+                setState(() => _allEntries = getOrderedEntries());
+              },
+            ),
+          ],
+          Padding(
+            padding: EdgeInsetsGeometry.only(right: 8),
+            child: IconButton(
+              icon: Icon(_editMode ? Icons.check : Icons.edit),
+              tooltip: FlutterI18n.translate(
+                context,
+                _editMode ? "homepage.edit_done" : "homepage.edit_mode",
+              ),
+              onPressed: () {
+                if (_editMode) {
+                  _exitEditMode();
+                } else {
+                  setState(() {
+                    _editMode = true;
+                    _shakeAmplitudes.clear();
+      _fadingEntries.clear();
+                    for (final entry in _allEntries) {
+                      _shakeAmplitudes[entry.id] =
+                          0.7 + Random().nextDouble() * 0.3;
+                    }
+                  });
+                  _shakeController.repeat(reverse: true);
+                }
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           showToast(
@@ -181,9 +211,10 @@ class _MainPageState extends State<MainPage> {
           await update(
             context: context,
             sliderCaptcha: (String cookieStr) {
-              return SliderCaptchaClientProvider(
-                cookie: cookieStr,
-              ).solve(context);
+              return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+                manualSolver: (provider) =>
+                    solveSliderCaptchaManually(context, provider),
+              );
             },
           );
           if (context.mounted) {
@@ -194,25 +225,92 @@ class _MainPageState extends State<MainPage> {
           }
         },
         child: ListView(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          padding: const EdgeInsets.all(8),
           children: [
-            UpdateCard().padding(bottom: 8),
-            const ClassTableCard().padding(bottom: 8),
-            EnergyCard().padding(bottom: 8),
-            // SchoolnetCard().padding(bottom: 8),
-            LibraryCard().padding(bottom: 8),
-            SchoolCardInfoCard().padding(bottom: 8),
-            MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: GridView.extent(
-                maxCrossAxisExtent: 96,
-                shrinkWrap: true,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                physics: const NeverScrollableScrollPhysics(),
-                children: smallFunction,
+            const UpdateCard(),
+            const ClassTableCard(),
+            if (_editMode)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  FlutterI18n.translate(context, "homepage.edit_hint"),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontSize: 13,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
+
+            // ---- 统一网格 ----
+            StaggeredGrid(
+              crossAxisCount: _gridColumns,
+              rowHeight: 80,
+              builder: (colWidth) => [
+                for (final entry in displayEntries)
+                  StaggeredGridCell(
+                    crossAxisCellCount: entry.gridSpan,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 300),
+                      opacity: _fadingEntries.contains(entry.id) ? 0.0 : 1.0,
+                      child: _editMode
+                          ? _buildShake(
+                            entry.id,
+                            Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                DraggableCard(
+                                  id: entry.id,
+                                  onSwap: _onSwap,
+                                  feedbackWidth: entry.gridSpan * colWidth,
+                                  feedbackHeight: 80,
+                                  child: entry.builder(context, _editMode),
+                                ),
+                                // 隐藏按钮：右上角（课程表不显示）
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() => _fadingEntries.add(entry.id));
+                                      Future.delayed(
+                                        const Duration(milliseconds: 300),
+                                        () async {
+                                          await hideEntry(entry.id);
+                                          _fadingEntries.remove(entry.id);
+                                          if (context.mounted) {
+                                            setState(() =>
+                                                _allEntries = getOrderedEntries());
+                                          }
+                                        },
+                                      );
+                                    },
+                                    child: ClipOval(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.surfaceContainerHighest,
+                                        ),
+                                        padding: const EdgeInsets.all(4),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 16,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : entry.builder(context, _editMode),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

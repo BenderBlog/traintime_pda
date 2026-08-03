@@ -63,11 +63,7 @@ Map<String, dynamic> _$TimeArrangementToJson(TimeArrangement instance) =>
       'classroom': ?instance.classroom,
     };
 
-const _$SourceEnumMap = {
-  Source.empty: 'empty',
-  Source.school: 'school',
-  Source.user: 'user',
-};
+const _$SourceEnumMap = {Source.empty: 'empty', Source.school: 'school'};
 
 ClassTableData _$ClassTableDataFromJson(Map<String, dynamic> json) =>
     ClassTableData(
@@ -75,9 +71,6 @@ ClassTableData _$ClassTableDataFromJson(Map<String, dynamic> json) =>
       semesterCode: json['semesterCode'] as String? ?? "",
       termStartDay: json['termStartDay'] as String? ?? "",
       classDetail: (json['classDetail'] as List<dynamic>?)
-          ?.map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      userDefinedDetail: (json['userDefinedDetail'] as List<dynamic>?)
           ?.map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
       notArranged: (json['notArranged'] as List<dynamic>?)
@@ -101,9 +94,6 @@ Map<String, dynamic> _$ClassTableDataToJson(
   'semesterCode': instance.semesterCode,
   'termStartDay': instance.termStartDay,
   'classDetail': instance.classDetail.map((e) => e.toJson()).toList(),
-  'userDefinedDetail': instance.userDefinedDetail
-      .map((e) => e.toJson())
-      .toList(),
   'notArranged': instance.notArranged.map((e) => e.toJson()).toList(),
   'timeArrangement': instance.timeArrangement.map((e) => e.toJson()).toList(),
   'classChanges': instance.classChanges.map((e) => e.toJson()).toList(),
@@ -156,24 +146,4 @@ const _$ChangeTypeEnumMap = {
   ChangeType.change: 'change',
   ChangeType.stop: 'stop',
   ChangeType.patch: 'patch',
-};
-
-UserDefinedClassData _$UserDefinedClassDataFromJson(
-  Map<String, dynamic> json,
-) => UserDefinedClassData(
-  userDefinedDetail: (json['userDefinedDetail'] as List<dynamic>)
-      .map((e) => ClassDetail.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  timeArrangement: (json['timeArrangement'] as List<dynamic>)
-      .map((e) => TimeArrangement.fromJson(e as Map<String, dynamic>))
-      .toList(),
-);
-
-Map<String, dynamic> _$UserDefinedClassDataToJson(
-  UserDefinedClassData instance,
-) => <String, dynamic>{
-  'userDefinedDetail': instance.userDefinedDetail
-      .map((e) => e.toJson())
-      .toList(),
-  'timeArrangement': instance.timeArrangement.map((e) => e.toJson()).toList(),
 };

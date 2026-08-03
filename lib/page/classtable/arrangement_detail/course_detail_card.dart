@@ -62,12 +62,7 @@ class ClassDetailCard extends StatelessWidget {
         elevation: 0,
         color: infoColor.shade100,
         child: Container(
-          padding: EdgeInsets.fromLTRB(
-            15,
-            15,
-            15,
-            timeArrangement.source == Source.user ? 8 : 15,
-          ),
+          padding: const EdgeInsets.all(15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -133,82 +128,6 @@ class ClassDetailCard extends StatelessWidget {
                   ),
                 ),
               ),
-
-              if (timeArrangement.source == Source.user)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(
-                          context,
-                        ).pop((classDetail, timeArrangement, false));
-                      },
-                      child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.course_detail_card.edit",
-                        ),
-                        style: TextStyle(color: infoColor.shade900),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        bool? isContinue = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(
-                              FlutterI18n.translate(
-                                context,
-                                "classtable.course_detail_card.delete_title",
-                              ),
-                            ),
-                            content: Text(
-                              FlutterI18n.translate(
-                                context,
-                                "classtable.course_detail_card.delete_content",
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
-                                  foregroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimary,
-                                ),
-                                onPressed: () => Navigator.pop(context, false),
-                                child: Text(
-                                  FlutterI18n.translate(context, "cancel"),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                child: Text(
-                                  FlutterI18n.translate(context, "confirm"),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (context.mounted && isContinue == true) {
-                          Navigator.of(
-                            context,
-                          ).pop((classDetail, timeArrangement, true));
-                        }
-                      },
-                      child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "classtable.course_detail_card.delete",
-                        ),
-                        style: TextStyle(color: infoColor.shade900),
-                      ),
-                    ),
-                  ],
-                ),
             ],
           ),
         ),

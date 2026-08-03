@@ -3,6 +3,7 @@ import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:flutter_i18n/flutter_i18n.dart' as i18n;
+import 'package:watermeter/repository/logger.dart' as log;
 
 class SemesterSwitchDialog extends StatefulWidget {
   const SemesterSwitchDialog({super.key});
@@ -17,6 +18,7 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
   late List<int> years;
   late List<WheelChooseOptions<int>> yearOptions;
   late List<WheelChooseOptions<int>> semesterOptions;
+  bool _isFetching = false;
 
   @override
   void initState() {
@@ -76,6 +78,62 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
     ];
   }
 
+  void _applySemesterCode(String semesterCode) {
+    if (!mounted) return;
+    if (semesterCode.length == 5) {
+      final y = int.tryParse(semesterCode.substring(0, 4));
+      final s = int.tryParse(semesterCode.substring(4));
+      if (y != null && s != null && years.contains(y)) {
+        setState(() {
+          selectedYear = y;
+          selectedSemester = s;
+        });
+      }
+    } else if (semesterCode.length == 11) {
+      final parts = semesterCode.split("-");
+      if (parts.length >= 3) {
+        final y = int.tryParse(parts.first);
+        final s = int.tryParse(parts.last);
+        if (y != null && s != null && years.contains(y)) {
+          setState(() {
+            selectedYear = y;
+            selectedSemester = s;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _fetchRemoteSemester() async {
+    setState(() {
+      _isFetching = true;
+    });
+    try {
+      final remoteSemester = await SemesterController.i.fetchRemoteSemester();
+      log.log.info(
+        "[SemesterSwitchDialog] Fetched remote semester: $remoteSemester",
+      );
+      _applySemesterCode(remoteSemester);
+    } catch (e, s) {
+      log.log.handle(e, s);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              i18n.FlutterI18n.translate(context, 'error_detected'),
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isFetching = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -85,40 +143,69 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              "本程序仅允许查看未来学期的课程安排。",
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            Text(
+              i18n.FlutterI18n.translate(
+                context,
+                'classtable.semester_switcher.only_future_hint',
+              ),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
-            const SizedBox(height: 12),
+            AbsorbPointer(
+              absorbing: _isFetching,
+              child: SizedBox(
+                height: 150,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: WheelChoose<int>(
+                        defaultPage: !years.contains(selectedYear)
+                            ? years.length - 1
+                            : years.indexOf(selectedYear),
+                        options: yearOptions,
+                        changeBookIdCallBack: (res) {
+                          setState(() {
+                            selectedYear = res;
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: WheelChoose<int>(
+                        defaultPage: selectedSemester - 1,
+                        options: semesterOptions,
+                        changeBookIdCallBack: (res) {
+                          setState(() {
+                            selectedSemester = res;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             SizedBox(
-              height: 150,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: WheelChoose<int>(
-                      defaultPage: !years.contains(selectedYear)
-                          ? years.length - 1
-                          : years.indexOf(selectedYear),
-                      options: yearOptions,
-                      changeBookIdCallBack: (res) {
-                        setState(() {
-                          selectedYear = res;
-                        });
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: WheelChoose<int>(
-                      defaultPage: selectedSemester - 1,
-                      options: semesterOptions,
-                      changeBookIdCallBack: (res) {
-                        setState(() {
-                          selectedSemester = res;
-                        });
-                      },
-                    ),
-                  ),
-                ],
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: _isFetching ? null : _fetchRemoteSemester,
+                icon: _isFetching
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.cloud_download),
+                label: Text(
+                  _isFetching
+                      ? i18n.FlutterI18n.translate(
+                          context,
+                          'classtable.semester_switcher.fetching_remote_semester',
+                        )
+                      : i18n.FlutterI18n.translate(
+                          context,
+                          'classtable.semester_switcher.fetch_remote_semester',
+                        ),
+                ),
               ),
             ),
           ],
@@ -132,20 +219,20 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
           child: i18n.I18nText('cancel'),
         ),
         TextButton(
-          onPressed: () async {
-            String semester = selectedYear.toString();
-            if (!pref.getBool(pref.Preference.role)) {
-              semester += "-${selectedYear + 1}-";
-            }
-            semester += selectedSemester.toString();
-            final result = await SemesterController.i.switchSemester(semester);
-            if (context.mounted) {
-              Navigator.of(context).pop(
-                result.didChange ||
-                    result.effectiveSemester != result.localSemester,
-              );
-            }
-          },
+          onPressed: _isFetching
+              ? null
+              : () async {
+                  String semester = selectedYear.toString();
+                  if (!pref.getBool(pref.Preference.role)) {
+                    semester += "-${selectedYear + 1}-";
+                  }
+                  semester += selectedSemester.toString();
+                  final didChange = await SemesterController.i
+                      .setSemesterDirectly(semester);
+                  if (context.mounted) {
+                    Navigator.of(context).pop(didChange);
+                  }
+                },
           child: i18n.I18nText('confirm'),
         ),
       ],

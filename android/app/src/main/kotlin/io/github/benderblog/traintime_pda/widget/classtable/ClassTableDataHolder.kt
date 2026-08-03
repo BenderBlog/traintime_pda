@@ -14,14 +14,19 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+
 object ClassTableDataHolder {
 
     @JvmStatic
-    var schoolClassJsonData: Result<String> = Result.success("")
+    var isLoggedIn: Boolean = false
         @Synchronized set
 
     @JvmStatic
-    var userDefinedClassJsonData: Result<String?> = Result.success(null)
+    var schoolClassJsonData: Result<String> = Result.success("")
         @Synchronized set
 
     @JvmStatic
@@ -37,6 +42,10 @@ object ClassTableDataHolder {
         @Synchronized set
 
     @JvmStatic
+    var customClassJsonData: Result<String?> = Result.success(null)
+        @Synchronized set
+
+    @JvmStatic
     var weekSwift: Long = 0
         @Synchronized set
 
@@ -45,6 +54,26 @@ object ClassTableDataHolder {
     suspend fun loadData(context: Context) {
         withContext(Dispatchers.IO) {
             Log.i(TAG, "Starting to load data from files...")
+
+            // Check login state first
+            isLoggedIn = try {
+                val stateFile = File(context.filesDir, ClassTableConstants.WIDGET_STATE_FILE_NAME)
+                if (!stateFile.exists()) {
+                    Log.w(TAG, "WidgetState.json not found, treating as not logged in")
+                    false
+                } else {
+                    val json = Json.parseToJsonElement(stateFile.readText())
+                    json.jsonObject["loggedIn"]?.jsonPrimitive?.boolean ?: false
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to parse WidgetState.json: ${e.message}")
+                false
+            }
+            Log.i(TAG, "isLoggedIn: $isLoggedIn")
+            if (!isLoggedIn) {
+                Log.i(TAG, "User is not logged in, skip loading data")
+                return@withContext
+            }
 
             schoolClassJsonData = loadFileContent(
                 context, ClassTableConstants.CLASS_FILE_NAME
@@ -60,20 +89,6 @@ object ClassTableDataHolder {
             Log.i(
                 TAG,
                 "Exam JSON loaded, isSuccess: ${examJsonData.isSuccess}, " + "length: ${examJsonData.getOrNull()?.length ?: 0}"
-            )
-
-            userDefinedClassJsonData = loadFileContent(
-                context, ClassTableConstants.USER_CLASS_FILE_NAME
-            ).fold(onSuccess = { Result.success(it) }, onFailure = {
-                if (it is FileNotFoundException) {
-                    Result.success(null)
-                } else {
-                    Result.failure(it)
-                }
-            })
-            Log.i(
-                TAG,
-                "User Class JSON loaded, isSuccess: ${userDefinedClassJsonData.isSuccess} " + "length: ${userDefinedClassJsonData.getOrNull()?.length ?: 0}"
             )
 
             physicsExperimentJsonData = loadFileContent(
@@ -102,6 +117,20 @@ object ClassTableDataHolder {
             Log.i(
                 TAG,
                 "Other Experiment JSON loaded, isSuccess: ${otherExperimentJsonData.isSuccess} " + "length: ${otherExperimentJsonData.getOrNull()?.length ?: 0}"
+            )
+
+            customClassJsonData = loadFileContent(
+                context, ClassTableConstants.CUSTOM_CLASS_FILE_NAME
+            ).fold(onSuccess = { Result.success(it) }, onFailure = {
+                if (it is FileNotFoundException) {
+                    Result.success(null)
+                } else {
+                    Result.failure(it)
+                }
+            })
+            Log.i(
+                TAG,
+                "Custom Class JSON loaded, isSuccess: ${customClassJsonData.isSuccess} " + "length: ${customClassJsonData.getOrNull()?.length ?: 0}"
             )
 
             Log.i(TAG, "Finished loading data from files.")

@@ -12,11 +12,62 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 
-class CaptchaInputDialog extends StatelessWidget {
-  final TextEditingController _captchaController = TextEditingController();
+class CaptchaInputDialog extends StatefulWidget {
   final List<int> image;
+  final Future<List<int>> Function()? onRefresh;
 
-  CaptchaInputDialog({super.key, required this.image});
+  const CaptchaInputDialog({super.key, required this.image, this.onRefresh});
+
+  @override
+  State<CaptchaInputDialog> createState() => _CaptchaInputDialogState();
+}
+
+class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
+  final TextEditingController _captchaController = TextEditingController();
+  late Uint8List _currentImageBytes;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentImageBytes = Uint8List.fromList(widget.image);
+  }
+
+  @override
+  void dispose() {
+    _captchaController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleRefresh() async {
+    if (widget.onRefresh == null || _isLoading) return;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final newImage = await widget.onRefresh!();
+      setState(() {
+        _currentImageBytes = Uint8List.fromList(newImage);
+      });
+    } catch (e) {
+      if (mounted) {
+        showToast(
+          context: context,
+          msg: FlutterI18n.translate(
+            context,
+            "login.captcha_window.refresh_failed",
+            translationParams: {"error": e.toString()},
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +78,17 @@ class CaptchaInputDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.memory(Uint8List.fromList(image)),
+          GestureDetector(
+            onTap: _handleRefresh,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Image.memory(_currentImageBytes),
+                if (_isLoading)
+                  const CircularProgressIndicator(),
+              ],
+            ),
+          ),
           const SizedBox(height: 16),
           TextField(
             autofocus: true,

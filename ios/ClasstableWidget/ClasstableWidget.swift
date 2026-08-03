@@ -14,7 +14,7 @@ import OSLog
 
 private let widgetGroupId = "group.xyz.superbart.xdyou"
 private let classTableFile = "ClassTable.json"
-private let userClassFile = "UserClass.json"
+private let customClassFile = "CustomClassesV2.json"
 private let examFile = "ExamFile.json"
 private let physicsExperimentFile = "PhysicsExperiment.json"
 private let otherExperimentFile = "OtherExperiment.json"
@@ -30,6 +30,7 @@ struct StartDayFetchError : Error {}
 
 enum ArrangementType : String {
     case course = "课\n程"
+    case user = "自\n定"
     case exam = "考\n试"
     case experiment = "实\n验"
 }
@@ -40,6 +41,12 @@ enum ErrorType : Int {
    case exam
    case experiment
    case others
+   case notLoggedIn
+}
+
+struct WidgetState : Codable {
+    var loggedIn : Bool
+    var updatedAt : String?
 }
 
 struct SimpleEntry: TimelineEntry {
@@ -98,25 +105,52 @@ struct Provider: TimelineProvider {
         let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: widgetGroupId
         )!
-        
+
+        // Check login state first
+        do {
+            let stateURL = containerURL.appendingPathComponent("WidgetState.json")
+            let stateData = try Data(contentsOf: stateURL)
+            let widgetState = try decoder.decode(WidgetState.self, from: stateData)
+            if !widgetState.loggedIn {
+                logger.info("User is not logged in (WidgetState.loggedIn = false)")
+                let entries = [
+                    SimpleEntry(
+                        date: Date(),
+                        currentWeek: -1,
+                        arrangement: [],
+                        errorType: .notLoggedIn,
+                        error: nil
+                    )
+                ]
+                let timeline = Timeline(entries: entries, policy: .atEnd)
+                completion(timeline)
+                return
+            }
+        } catch {
+            // WidgetState.json missing or unreadable — treat as not logged in
+            logger.warning("Could not read WidgetState.json: \(String(describing: error))")
+            let entries = [
+                SimpleEntry(
+                    date: Date(),
+                    currentWeek: -1,
+                    arrangement: [],
+                    errorType: .notLoggedIn,
+                    error: nil
+                )
+            ]
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
+            return
+        }
+
         // Deal with ClassTable data
         do {
             // Read data
             logger.info("Getting courses data...")
             let fileURL = containerURL.appendingPathComponent(classTableFile)
             let jsonData = try Data(contentsOf: fileURL)
-            var classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
+            let classData : ClassTableData = try decoder.decode(ClassTableData.self, from: jsonData)
 
-            let userClassURL = containerURL.appendingPathComponent(userClassFile)
-            if let userClassJsonData = try? Data(contentsOf: userClassURL) {
-                let userDefinedClassData: UserDefinedClassData = try decoder.decode(
-                    UserDefinedClassData.self,
-                    from: userClassJsonData
-                )
-                classData.userDefinedDetail = userDefinedClassData.userDefinedDetail
-                classData.timeArrangement.append(contentsOf: userDefinedClassData.timeArrangement)
-            }
-            
             // Fetch start day
             guard var startDay = dateFormatter.date(from: classData.termStartDay) else {
                 throw StartDayFetchError()
@@ -199,7 +233,48 @@ struct Provider: TimelineProvider {
             completion(timeline)
             return
         }
-        
+
+        // Deal with custom class data
+        do {
+            logger.info("Getting custom class data...")
+            let customClassURL = containerURL.appendingPathComponent(customClassFile)
+            if let customClassJsonData = try? Data(contentsOf: customClassURL) {
+                let customClasses: [CustomClass] = try decoder.decode(
+                    [CustomClass].self, from: customClassJsonData
+                )
+
+                let components = calendar.dateComponents([.day,.month,.year], from: day)
+                let dayComp = components.day
+                let monthComp = components.month
+                let yearComp = components.year
+
+                for (index, cc) in customClasses.enumerated() {
+                    for tr in cc.timeRanges {
+                        let thisDay = calendar.dateComponents(
+                            [.day,.month,.year], from: tr.startTime
+                        )
+                        if thisDay.year == yearComp &&
+                           thisDay.month == monthComp &&
+                           thisDay.day == dayComp {
+                            arrangement.append(TimeLineStructItems(
+                                type: .user,
+                                name: cc.name,
+                                teacher: cc.teacher ?? "未知老师",
+                                place: cc.classroom ?? "未安排教室",
+                                start_time: tr.startTime,
+                                end_time: tr.endTime,
+                                colorIndex: index
+                            ))
+                        }
+                    }
+                }
+            } else {
+                logger.warning("No custom class data file, will ignore it")
+            }
+        } catch {
+            logger.error("Fetch custom class error: \(String(describing: error))")
+        }
+
         // Deal with exam data
         do {
             // Read data
@@ -408,6 +483,8 @@ struct ClasstableWidgetEntryView : View {
     @ViewBuilder
     private func errorContentView() -> some View {
         let errorMessage = switch entry.errorType {
+        case .notLoggedIn:
+            NSLocalizedString("error_not_logged_in", comment: "Not logged in.")
         case .course:
             NSLocalizedString("error_course", comment: "Failed to load course data.")
         case .exam:
@@ -419,9 +496,12 @@ struct ClasstableWidgetEntryView : View {
         case .none:
             ""
         }
+        let errorIcon = entry.errorType == .notLoggedIn
+            ? "person.crop.circle.badge.questionmark"
+            : "exclamationmark.triangle.fill"
         VStack(alignment: .leading) {
             HStack(alignment: .firstTextBaseline) {
-                Image(systemName: "exclamationmark.triangle.fill")
+                Image(systemName: errorIcon)
                     .font(.system(size: 18))
                     .foregroundStyle(
                         colorScheme == .dark ? .white :
