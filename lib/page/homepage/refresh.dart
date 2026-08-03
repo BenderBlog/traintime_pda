@@ -4,6 +4,8 @@
 
 // Refresh formula for homepage.
 
+import 'dart:io';
+
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
@@ -17,6 +19,7 @@ import 'package:watermeter/repository/notification/course_reminder_service.dart'
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/repository/wear_companion_sync.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 
@@ -99,7 +102,16 @@ Future<void> update({
   }
 
   // Sync login state to iOS widget
-  final hasCredential = preference.getString(preference.Preference.idsAccount).isNotEmpty &&
+  final hasCredential =
+      preference.getString(preference.Preference.idsAccount).isNotEmpty &&
       preference.getString(preference.Preference.idsPassword).isNotEmpty;
   await syncWidgetLoginState(hasCredential);
+  if (Platform.isAndroid && hasCredential) {
+    try {
+      await const WearCompanionSyncService().cacheLatestSnapshot();
+    } catch (e, s) {
+      // Wear sync must never make the phone's normal refresh fail.
+      log.handle(e, s, '[homepage Update][WearCompanion] Cache failed');
+    }
+  }
 }
