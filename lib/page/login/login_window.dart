@@ -58,6 +58,7 @@ class _LoginWindowState extends State<LoginWindow> {
   bool _couldNotView = true;
 
   Widget contentColumn() => Column(
+    mainAxisSize: MainAxisSize.min,
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       TextField(
@@ -302,42 +303,63 @@ class _LoginWindowState extends State<LoginWindow> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape = width / height > 1.0;
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.only(
-          left: width / height > 1.0 ? width * 0.25 : widthOfSquare,
-          right: width / height > 1.0 ? width * 0.25 : widthOfSquare,
-          top: kToolbarHeight,
-        ),
-        child: width / height > 1.0
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const AppIconWidget().gestures(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AboutPage(),
-                      ),
-                    ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontalPadding = isLandscape
+                ? width * 0.25
+                : widthOfSquare;
+            const verticalPadding = 16.0;
+            return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: verticalPadding,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: max(
+                    0,
+                    constraints.maxHeight - verticalPadding * 2,
                   ),
-                  const SizedBox(width: 48),
-                  Expanded(child: contentColumn()),
-                ],
-              )
-            : Column(
-                children: [
-                  const AppIconWidget()
-                      .padding(vertical: kToolbarHeight * 0.75)
-                      .gestures(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const AboutPage(),
+                ),
+                child: isLandscape
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const AppIconWidget().gestures(
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const AboutPage(),
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 48),
+                          Expanded(child: contentColumn()),
+                        ],
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const AppIconWidget()
+                              .padding(vertical: kToolbarHeight * 0.75)
+                              .gestures(
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => const AboutPage(),
+                                  ),
+                                ),
+                              ),
+                          contentColumn(),
+                        ],
                       ),
-                  contentColumn(),
-                ],
-              ).center(),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -23,6 +23,7 @@ import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
+import 'package:watermeter/page/setting/wear_companion_sync_page.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
@@ -198,6 +199,19 @@ class _SettingWindowState extends State<SettingWindow> {
             remaining: const [],
             bottomRow: Column(
               children: [
+                if (Platform.isAndroid) ...[
+                  ListTile(
+                    title: const Text('XDYou Wear'),
+                    subtitle: const Text('配对手表并同步登录状态、课表和实验安排'),
+                    trailing: const Icon(Icons.watch_outlined),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const WearCompanionSyncPage(),
+                      ),
+                    ),
+                  ),
+                  const Divider(),
+                ],
                 ListTile(
                   title: Text(
                     FlutterI18n.translate(
