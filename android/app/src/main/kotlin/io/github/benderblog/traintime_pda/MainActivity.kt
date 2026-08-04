@@ -25,11 +25,13 @@ class MainActivity : FlutterActivity() {
                 "getConnectedWearNodes" -> {
                     Wearable.getNodeClient(this).connectedNodes
                         .addOnSuccessListener { nodes ->
+                            val pairedNodeId = WearCompanionTransport.pairedWatchNodeId(this)
                             result.success(nodes.map { node ->
                                 mapOf(
                                     "id" to node.id,
                                     "name" to node.displayName,
                                     "isNearby" to node.isNearby,
+                                    "isPaired" to (node.id == pairedNodeId),
                                 )
                             })
                         }
@@ -51,7 +53,10 @@ class MainActivity : FlutterActivity() {
                     WearCompanionTransport.cachePayload(this, payload)
                     Wearable.getMessageClient(this)
                         .sendMessage(nodeId, path, payload.toByteArray(Charsets.UTF_8))
-                        .addOnSuccessListener { result.success(null) }
+                        .addOnSuccessListener {
+                            WearCompanionTransport.rememberPairedWatch(this, nodeId)
+                            result.success(null)
+                        }
                         .addOnFailureListener { error ->
                             result.error("send_failed", error.message, null)
                         }

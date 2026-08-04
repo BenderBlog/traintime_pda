@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
+import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 
 /// Phone-side endpoint of the XDYou Wear companion protocol.
@@ -17,7 +18,11 @@ class WearCompanionSyncService {
 
   const WearCompanionSyncService();
 
-  Map<String, dynamic> buildSnapshot({required String sessionId}) {
+  Map<String, dynamic> buildSnapshot({
+    required String sessionId,
+    Uint8List? paymentQr,
+    DateTime? paymentQrFetchedAt,
+  }) {
     final account = preference.getString(preference.Preference.idsAccount);
     final password = preference.getString(preference.Preference.idsPassword);
     final semester = preference.getString(
@@ -48,8 +53,32 @@ class WearCompanionSyncService {
         if (experiments != null)
           'otherExperiments': experiments.map((item) => item.toJson()).toList(),
       },
+      if (paymentQr != null)
+        'paymentQr': {
+          'pngBase64': base64Encode(paymentQr),
+          'fetchedAtEpochMs':
+              (paymentQrFetchedAt ?? DateTime.now()).millisecondsSinceEpoch,
+        },
       'generatedAtEpochMs': DateTime.now().millisecondsSinceEpoch,
     };
+  }
+
+  Future<Map<String, dynamic>> _buildSnapshotWithPaymentQr({
+    required String sessionId,
+  }) async {
+    Uint8List? paymentQr;
+    DateTime? fetchedAt;
+    try {
+      paymentQr = await SchoolCardSession().getQRCode();
+      fetchedAt = DateTime.now();
+    } catch (_) {
+      // Schedule and credential sync must remain usable if payment auth expires.
+    }
+    return buildSnapshot(
+      sessionId: sessionId,
+      paymentQr: paymentQr,
+      paymentQrFetchedAt: fetchedAt,
+    );
   }
 
   Future<List<WearNode>> connectedNodes() async {
@@ -58,18 +87,21 @@ class WearCompanionSyncService {
     );
     return (raw ?? const <Object>[])
         .map((item) {
-      final map = Map<String, dynamic>.from(item as Map);
+          final map = Map<String, dynamic>.from(item as Map);
           return WearNode(
             id: map['id']! as String,
             name: map['name']! as String,
             isNearby: map['isNearby'] == true,
+            isPaired: map['isPaired'] == true,
           );
         })
         .toList(growable: false);
   }
 
   Future<void> pairAndSync(WearNode node) async {
-    final snapshot = buildSnapshot(sessionId: 'direct-pairing');
+    final snapshot = await _buildSnapshotWithPaymentQr(
+      sessionId: 'direct-pairing',
+    );
     snapshot['directPairing'] = true;
     final payload = jsonEncode(snapshot);
     await _channel.invokeMethod<void>('sendSyncPayload', {
@@ -81,7 +113,10 @@ class WearCompanionSyncService {
 
   /// Updates the native cache used to answer a bound watch in the background.
   Future<void> cacheLatestSnapshot() async {
-    final payload = jsonEncode(buildSnapshot(sessionId: 'background-sync'));
+    final snapshot = await _buildSnapshotWithPaymentQr(
+      sessionId: 'background-sync',
+    );
+    final payload = jsonEncode(snapshot);
     await _channel.invokeMethod<void>('cacheSyncPayload', {'payload': payload});
   }
 }
@@ -90,10 +125,12 @@ class WearNode {
   final String id;
   final String name;
   final bool isNearby;
+  final bool isPaired;
 
   const WearNode({
     required this.id,
     required this.name,
     required this.isNearby,
+    required this.isPaired,
   });
 }

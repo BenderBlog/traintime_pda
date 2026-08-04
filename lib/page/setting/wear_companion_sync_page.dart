@@ -21,7 +21,6 @@ class _WearCompanionSyncPageState extends State<WearCompanionSyncPage> {
   void _reload() {
     setState(() {
       _status = null;
-      _completedNodeId = null;
       _nodesFuture = _service.connectedNodes();
     });
   }
@@ -96,8 +95,15 @@ class _WearCompanionSyncPageState extends State<WearCompanionSyncPage> {
                             dimension: 22,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : _completedNodeId == node.id
-                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : node.isPaired || _completedNodeId == node.id
+                        ? const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check_circle, color: Colors.green),
+                              SizedBox(width: 6),
+                              Text('已配对'),
+                            ],
+                          )
                         : FilledButton(
                             onPressed: _sendingNodeId == null
                                 ? () => _pair(node)

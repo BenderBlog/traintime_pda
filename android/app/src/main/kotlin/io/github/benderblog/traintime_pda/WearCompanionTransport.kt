@@ -11,6 +11,7 @@ internal object WearCompanionTransport {
     const val REQUEST_PATH = "/traintime_pda_wear_os/request/v1"
     private const val PREFS = "wear_companion_transport"
     private const val PAYLOAD = "latest_payload"
+    private const val PAIRED_WATCH_NODE_ID = "paired_watch_node_id"
 
     fun cachePayload(context: Context, payload: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -20,6 +21,15 @@ internal object WearCompanionTransport {
     fun cachedPayload(context: Context): String? =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getString(PAYLOAD, null)
+
+    fun rememberPairedWatch(context: Context, nodeId: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putString(PAIRED_WATCH_NODE_ID, nodeId).apply()
+    }
+
+    fun pairedWatchNodeId(context: Context): String? =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(PAIRED_WATCH_NODE_ID, null)
 }
 
 /** Answers a paired watch with the last phone-generated snapshot. */
