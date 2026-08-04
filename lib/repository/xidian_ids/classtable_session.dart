@@ -15,7 +15,7 @@ import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
@@ -32,28 +32,6 @@ String _cacheHintFromError(Object error) {
     return "classtable.cache_hint_network_failed";
   }
   return "classtable.cache_hint_unknown_error";
-}
-
-Future<FetchResult<ClassTableData>> getClassTable(String semesterCode) async {
-  try {
-    ClassTableData data = pref.getBool(pref.Preference.role)
-        ? await ClassTableSession().getYjspt(semesterCode)
-        : await ClassTableSession().getEhall(semesterCode);
-    DateTime fetchTime = DateTime.now();
-    await ClassTableSession.updateCacheAndGroup(data);
-    return FetchResult.fresh(fetchTime: fetchTime, data: data);
-  } catch (e, s) {
-    log.handle(e, s, "[getClassTable] Have issue");
-    (DateTime, ClassTableData)? cache = ClassTableSession.getCache();
-    if (cache != null) {
-      return FetchResult.cache(
-        fetchTime: cache.$1,
-        data: cache.$2,
-        hintKey: _cacheHintFromError(e),
-      );
-    }
-    rethrow;
-  }
 }
 
 /// 课程表 4770397878132218
@@ -105,6 +83,28 @@ class ClassTableSession extends EhallSession {
     } catch (e, s) {
       log.handle(e, s);
       return null;
+    }
+  }
+
+  Future<FetchResult<ClassTableData>> getClassTable(String semesterCode) async {
+    try {
+      ClassTableData data = pref.getBool(pref.Preference.role)
+          ? await ClassTableSession().getYjspt(semesterCode)
+          : await ClassTableSession().getEhall(semesterCode);
+      DateTime fetchTime = DateTime.now();
+      await ClassTableSession.updateCacheAndGroup(data);
+      return FetchResult.fresh(fetchTime: fetchTime, data: data);
+    } catch (e, s) {
+      log.handle(e, s, "[getClassTable] Have issue");
+      (DateTime, ClassTableData)? cache = ClassTableSession.getCache();
+      if (cache != null) {
+        return FetchResult.cache(
+          fetchTime: cache.$1,
+          data: cache.$2,
+          hintKey: _cacheHintFromError(e),
+        );
+      }
+      rethrow;
     }
   }
 

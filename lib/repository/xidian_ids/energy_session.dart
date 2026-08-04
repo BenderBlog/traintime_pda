@@ -15,7 +15,7 @@ import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
@@ -51,40 +51,6 @@ String _cacheHintFromError(Object error) {
     return "electricity.cache_hint_network_failed";
   }
   return "electricity.cache_hint_unknown_error";
-}
-
-Future<FetchResult<EnergyInfo>> getElectricityInfo({
-  Future<String> Function(List<int>)? captchaFunction,
-}) async {
-  log.info("[EletricitySession][update] Ready to update electricity info. ");
-  DateTime fetchDay = DateTime.now();
-
-  //  if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
-  //   if (EnergySession.fileCache.existsSync()) {
-  //     EnergySession.fileCache.deleteSync();
-  //   }
-  // }
-  // Fetch cache info
-  final cache = EnergySession.getCache();
-
-  try {
-    log.info("[EletricitySession][update] Fetching from Internet.");
-    var toReturn = await EnergySession().requestNewEnergyInfo(
-      captchaFunction: captchaFunction,
-    );
-    EnergySession.saveCache(toReturn);
-    return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
-  } catch (e, s) {
-    log.handle(e, s, "[getElectricityInfo] Have issue");
-    if (cache != null) {
-      return FetchResult.cache(
-        fetchTime: cache.fetchTime,
-        data: cache.data,
-        hintKey: _cacheHintFromError(e),
-      );
-    }
-    rethrow;
-  }
 }
 
 /// New energy management system
@@ -170,6 +136,40 @@ class EnergySession extends IDSSession {
     EnergySession.fileHistory.createSync();
   }
 
+  Future<FetchResult<EnergyInfo>> getElectricityInfo({
+    Future<String> Function(List<int>)? captchaFunction,
+  }) async {
+    log.info("[EletricitySession][update] Ready to update electricity info. ");
+    DateTime fetchDay = DateTime.now();
+
+    //  if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
+    //   if (EnergySession.fileCache.existsSync()) {
+    //     EnergySession.fileCache.deleteSync();
+    //   }
+    // }
+    // Fetch cache info
+    final cache = EnergySession.getCache();
+
+    try {
+      log.info("[EletricitySession][update] Fetching from Internet.");
+      var toReturn = await EnergySession().requestNewEnergyInfo(
+        captchaFunction: captchaFunction,
+      );
+      EnergySession.saveCache(toReturn);
+      return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
+    } catch (e, s) {
+      log.handle(e, s, "[getElectricityInfo] Have issue");
+      if (cache != null) {
+        return FetchResult.cache(
+          fetchTime: cache.fetchTime,
+          data: cache.data,
+          hintKey: _cacheHintFromError(e),
+        );
+      }
+      rethrow;
+    }
+  }
+
   static const _aesKey = "1234567812345678";
   static const _iv = "1234567812345678";
 
@@ -241,10 +241,6 @@ class EnergySession extends IDSSession {
   Future<EnergyInfo> requestNewEnergyInfo({
     required Future<String> Function(List<int>)? captchaFunction,
   }) async {
-    if (!await NetworkSession.isInSchool()) {
-      throw NotSchoolNetworkException();
-    }
-
     String location = await checkAndLogin(
       target:
           "https://xxcapp.xidian.edu.cn/uc/api/oauth/index?"

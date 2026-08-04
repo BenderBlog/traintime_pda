@@ -14,7 +14,7 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -30,28 +30,6 @@ String _cacheHintFromError(Object error) {
     return "exam.cache_hint_network_failed";
   }
   return "exam.cache_hint_unknown_error";
-}
-
-Future<FetchResult<ExamData>> getScoreInfo(String semester) async {
-  try {
-    ExamData data = pref.getBool(pref.Preference.role)
-        ? await ExamSession().getExamYjspt(semester)
-        : await ExamSession().getExamEhall(semester);
-    DateTime fetchTime = DateTime.now();
-    await ExamSession.updateCacheAndGroup(data);
-    return FetchResult.fresh(fetchTime: fetchTime, data: data);
-  } catch (e, s) {
-    log.handle(e, s, "[getScoreInfo] Have issue");
-    (DateTime, ExamData)? cache = ExamSession.getCache();
-    if (cache != null) {
-      return FetchResult.cache(
-        fetchTime: cache.$1,
-        data: cache.$2,
-        hintKey: _cacheHintFromError(e),
-      );
-    }
-    rethrow;
-  }
 }
 
 /// 考试安排 4768687067472349
@@ -99,6 +77,28 @@ class ExamSession extends EhallSession {
     } catch (e, s) {
       log.handle(e, s);
       return null;
+    }
+  }
+
+  Future<FetchResult<ExamData>> getScoreInfo(String semester) async {
+    try {
+      ExamData data = pref.getBool(pref.Preference.role)
+          ? await ExamSession().getExamYjspt(semester)
+          : await ExamSession().getExamEhall(semester);
+      DateTime fetchTime = DateTime.now();
+      await ExamSession.updateCacheAndGroup(data);
+      return FetchResult.fresh(fetchTime: fetchTime, data: data);
+    } catch (e, s) {
+      log.handle(e, s, "[getScoreInfo] Have issue");
+      (DateTime, ExamData)? cache = ExamSession.getCache();
+      if (cache != null) {
+        return FetchResult.cache(
+          fetchTime: cache.$1,
+          data: cache.$2,
+          hintKey: _cacheHintFromError(e),
+        );
+      }
+      rethrow;
     }
   }
 

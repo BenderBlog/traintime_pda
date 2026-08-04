@@ -13,7 +13,7 @@ import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_auth_protocol.dart';
 import 'package:watermeter/repository/xidian_ids/ids_fingerprint.dart';
@@ -37,7 +37,7 @@ IDSLoginState loginState = IDSLoginState.none;
 bool get offline =>
     loginState != IDSLoginState.success && loginState != IDSLoginState.manual;
 
-class IDSSession extends NetworkSession {
+class IDSSession with NetworkClient {
   static final _idslock = Lock();
 
   @override

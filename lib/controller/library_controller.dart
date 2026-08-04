@@ -10,6 +10,7 @@ class LibraryController {
   static final LibraryController i = LibraryController._();
   bool _isReloading = false;
   final Map<int, Future<List<BookLocation>>> _bookLocationFutures = {};
+  final LibrarySession session = LibrarySession();
 
   LibraryController._();
 
@@ -25,7 +26,7 @@ class LibraryController {
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await LibrarySession().getBorrowList();
+      final result = await session.getBorrowList();
       libraryBorrowStateSignal.value = AsyncState.data(result);
     } catch (e, s) {
       libraryBorrowStateSignal.value = AsyncState.error(e, s);
@@ -43,7 +44,7 @@ class LibraryController {
 
     return _bookLocationFutures.putIfAbsent(book.docNumber, () async {
       try {
-        return await LibrarySession().bookLocations(book.docNumber);
+        return await session.bookLocations(book.docNumber);
       } catch (e, s) {
         _bookLocationFutures.remove(book.docNumber);
         log.handle(e, s, "[LibraryController][loadBookLocations] Have issue");

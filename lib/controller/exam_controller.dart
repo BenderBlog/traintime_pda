@@ -17,6 +17,7 @@ import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 class ExamController {
   static final ExamController i = ExamController._();
   bool _isReloading = false;
+  final session = ExamSession();
 
   ExamController._() {
     final cache = ExamSession.getCache();
@@ -60,7 +61,7 @@ class ExamController {
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getScoreInfo(
+      final result = await session.getScoreInfo(
         SemesterController.i.semesterSignal.value,
       );
       _lastValidExamInfo.value = result;

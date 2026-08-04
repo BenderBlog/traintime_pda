@@ -9,7 +9,7 @@ import 'package:watermeter/model/aircon_energy.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 
 Future<FetchResult<AirconEnergyInfo>> getAirconEnergyInfo(String imei) async {
   log.info("[AirconSession][update] Ready to update electricity info. ");
@@ -35,7 +35,7 @@ Future<FetchResult<AirconEnergyInfo>> getAirconEnergyInfo(String imei) async {
   }
 }
 
-class AirconSession extends NetworkSession {
+class AirconSession with NetworkClient {
   static const host = "gxkt.juhaolian.cn";
 
   static const airconEnergyCache = "AirconEnergyCache.json";

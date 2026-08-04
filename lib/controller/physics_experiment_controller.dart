@@ -13,9 +13,10 @@ import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:watermeter/repository/physics_experiment_session.dart';
+import 'package:watermeter/repository/experiment_session/physics_experiment_session.dart';
 
 class PhysicsExperimentController {
+  static final ExperimentSession session = ExperimentSession();
   static final PhysicsExperimentController i = PhysicsExperimentController._();
   bool _isReloading = false;
 
@@ -70,7 +71,7 @@ class PhysicsExperimentController {
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getPhysicsExperimentData();
+      final result = await session.getPhysicsExperimentData();
       _lastValidPhysicsExperiment.value = result;
       physicsExperimentStateSignal.value = AsyncState.data(result);
     } catch (e, s) {

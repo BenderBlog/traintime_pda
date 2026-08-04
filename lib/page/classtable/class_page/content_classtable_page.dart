@@ -24,7 +24,7 @@ import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ContentClassTablePage extends StatefulWidget {

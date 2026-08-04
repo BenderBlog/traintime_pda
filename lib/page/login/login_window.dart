@@ -23,7 +23,7 @@ import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
 import 'package:watermeter/page/login/ids_reauth_dialog.dart';
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
+import 'package:watermeter/repository/xidian_ids/semester_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_auth_protocol.dart';
 import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 
@@ -189,8 +189,8 @@ class _LoginWindowState extends State<LoginWindow> {
 
         bool isPostGraduate = await ses.checkWhetherPostgraduate();
         String semesterInfo = isPostGraduate
-            ? await PersonalInfoSession().getSemesterInfoYjspt()
-            : await PersonalInfoSession().getSemesterInfoEhall();
+            ? await SemesterSession().getSemesterInfoYjspt()
+            : await SemesterSession().getSemesterInfoEhall();
         preference.setString(
           preference.Preference.currentSemester,
           semesterInfo,

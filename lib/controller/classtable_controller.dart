@@ -22,6 +22,8 @@ class ClassTableController {
   static final ClassTableController i = ClassTableController._();
   bool _isReloading = false;
 
+  final ClassTableSession session = ClassTableSession();
+
   ClassTableController._() {
     final cache = ClassTableSession.getCache();
     if (cache != null) {
@@ -71,7 +73,7 @@ class ClassTableController {
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getClassTable(
+      final result = await session.getClassTable(
         SemesterController.i.semesterSignal.value,
       );
       _lastValidSchoolClassTable.value = result;

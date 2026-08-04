@@ -16,7 +16,7 @@ import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 

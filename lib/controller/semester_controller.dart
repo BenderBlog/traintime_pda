@@ -9,7 +9,7 @@ import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
+import 'package:watermeter/repository/xidian_ids/semester_session.dart';
 
 class SemesterSyncEvent {
   final String oldSemester;
@@ -45,7 +45,7 @@ class SemesterSyncResult {
 
 class SemesterController {
   static final SemesterController i = SemesterController._();
-
+  final session = SemesterSession();
   SemesterController._();
 
   final semesterSignal = signal(
@@ -69,8 +69,8 @@ class SemesterController {
 
   Future<String> fetchRemoteSemester() async {
     final remoteSemester = pref.getBool(pref.Preference.role)
-        ? await PersonalInfoSession().getSemesterInfoYjspt()
-        : await PersonalInfoSession().getSemesterInfoEhall();
+        ? await session.getSemesterInfoYjspt()
+        : await session.getSemesterInfoEhall();
     return remoteSemester;
   }
 

@@ -4,11 +4,14 @@
 
 // Pig page — random pig image from pighub.top.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:watermeter/repository/pighub_session.dart';
+import 'package:watermeter/model/pighub_image.dart';
+import 'package:watermeter/repository/miscellaneous_session/pighub_session.dart';
 
 class PigPage extends StatefulWidget {
   const PigPage({super.key});
@@ -18,17 +21,20 @@ class PigPage extends StatefulWidget {
 }
 
 class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
-  late Future<PigHubImage> _future;
+  late Future<List<PigHubImage>> _future;
+  final session = PighubSession();
+  int index = 0;
+  final random = Random();
 
   @override
   void initState() {
     super.initState();
-    _future = getRandomPig();
+    _future = session.getPigImages();
   }
 
   void _fetch() {
     setState(() {
-      _future = getRandomPig();
+      _future = session.getPigImages();
     });
   }
 
@@ -48,7 +54,7 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
           ),
         ],
       ),
-      body: FutureBuilder<PigHubImage>(
+      body: FutureBuilder<List<PigHubImage>>(
         future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
@@ -79,7 +85,7 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
                 .center();
           }
 
-          final image = snapshot.data!;
+          final data = snapshot.data!;
           return [
                 Text(
                   FlutterI18n.translate(context, "new_homepage_hint"),
@@ -89,7 +95,7 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
                 SizedBox(
                   height: 300,
                   child: Image.network(
-                    image.url,
+                    data[index].url,
                     fit: BoxFit.contain,
                     loadingBuilder: (context, child, progress) {
                       if (progress == null) return child;
@@ -102,19 +108,23 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
                 ).clipRRect(all: 12),
                 const SizedBox(height: 8),
                 Text(
-                  image.title,
+                  data[index].title,
                   style: Theme.of(context).textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
                 OutlinedButton.icon(
-                  onPressed: _fetch,
+                  onPressed: () {
+                    setState(() {
+                      index = random.nextInt(data.length);
+                    });
+                  },
                   icon: const Icon(Icons.shuffle),
                   label: const Text("Change A Pig"),
                 ),
                 OutlinedButton.icon(
                   onPressed: () => launchUrlString(
-                    image.url,
+                    data[index].url,
                     mode: LaunchMode.externalApplication,
                   ),
                   icon: const Icon(Icons.save),

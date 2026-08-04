@@ -7,9 +7,9 @@ import 'dart:typed_data';
 import 'package:charset_converter/charset_converter.dart';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 
-class ExperimentReportSession extends NetworkSession {
+class ExperimentReportSession with NetworkClient {
   // Cache the Dio instance to avoid recreating it
   Dio? _dioInstance;
 

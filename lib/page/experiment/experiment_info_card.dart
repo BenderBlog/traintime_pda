@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
-import 'package:watermeter/repository/experiment_score/image_recognition.dart';
+import 'package:watermeter/repository/experiment_session/image_recognition.dart';
 
 class ExperimentInfoCard extends StatelessWidget {
   final ExperimentData? data;

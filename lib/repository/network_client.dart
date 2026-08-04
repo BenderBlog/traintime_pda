@@ -11,43 +11,43 @@ import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
-import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/repository/logger.dart';
 
 late Directory supportPath;
 
-/// AES-CBC encryption with Pkcs7 padding
-/// used for IDS CAPTCHA payload & password encryption
-final _rng = Random();
-const int _blockSize = 16;
-const String _aesChars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+/// A General Network Client which provides
+///  - An AES encrypt function [aesEncrypt]
+///  - A network client [dio]
+///  - A method to check schoolnet environment [isInSchool]
+mixin NetworkClient {
+  /// AES-CBC encryption with Pkcs7 padding
+  /// used for IDS CAPTCHA payload & password encryption
+  static String aesEncrypt(String text, Uint8List keyBytes) {
+    final rng = Random();
+    const int blockSize = 16;
+    const String aesChars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+    final randstr = [
+      for (int i = 0; i < blockSize * 5; i++)
+        aesChars[rng.nextInt(aesChars.length)],
+    ].join();
+    final plain = randstr.substring(0, 64) + text; // prepend 64B nonce
+    final key = encrypt.Key(keyBytes);
+    final iv = encrypt.IV.fromUtf8(randstr.substring(64, 80)); // 16B iv
+    return encrypt.Encrypter(
+      encrypt.AES(key, mode: encrypt.AESMode.cbc),
+    ).encrypt(plain, iv: iv).base64;
+  }
 
-String aesEncrypt(String text, Uint8List keyBytes) {
-  final randstr = [
-    for (int i = 0; i < _blockSize * 5; i++)
-      _aesChars[_rng.nextInt(_aesChars.length)],
-  ].join();
-  final plain = randstr.substring(0, 64) + text; // prepend 64B nonce
-  final key = encrypt.Key(keyBytes);
-  final iv = encrypt.IV.fromUtf8(randstr.substring(64, 80)); // 16B iv
-  return encrypt.Encrypter(
-    encrypt.AES(key, mode: encrypt.AESMode.cbc),
-  ).encrypt(plain, iv: iv).base64;
-}
-
-class NetworkSession {
-  static SessionState _isInit = SessionState.none;
-
-  //@protected
-  final PersistCookieJar cookieJar = PersistCookieJar(
+  /// General Cookie Storage
+  PersistCookieJar cookieJar = PersistCookieJar(
     persistSession: true,
     storage: FileStorage("${supportPath.path}/cookie/general"),
   );
-
   Future<void> clearCookieJar() => cookieJar.deleteAll();
 
+  /// General Dio Session
   @protected
-  Dio get dio =>
+  late Dio dio =
       Dio(
           BaseOptions(
             contentType: Headers.formUrlEncodedContentType,
@@ -67,7 +67,8 @@ class NetworkSession {
         ..options.validateStatus = (status) =>
             status != null && status >= 200 && status < 400;
 
-  static Future<bool> isInSchool() async {
+  /// Check whether access in schoolnet
+  Future<bool> isInSchool() async {
     Dio dio = Dio()
       ..interceptors.add(logDioAdapter)
       ..options.connectTimeout = const Duration(seconds: 30);
@@ -82,48 +83,5 @@ class NetworkSession {
           );
           return false;
         });
-  }
-
-  NetworkSession() {
-    if (_isInit == SessionState.none) {
-      initSession();
-    }
-  }
-
-  Future<void> initSession() async {
-    log.info(
-      "[NetworkSession][initSession] "
-      "Current State: $_isInit",
-    );
-    if (_isInit == SessionState.fetching) {
-      return;
-    }
-    try {
-      _isInit = SessionState.fetching;
-      log.info(
-        "[NetworkSession][initSession] "
-        "Fetching...",
-      );
-      var response = await dio.get("http://www.xidian.edu.cn");
-      if (response.statusCode == 200) {
-        _isInit = SessionState.fetched;
-        log.info(
-          "[NetworkSession][initSession] "
-          "Fetched",
-        );
-      } else {
-        _isInit = SessionState.error;
-        log.error(
-          "[NetworkSession][initSession] "
-          "Error",
-        );
-      }
-    } catch (e) {
-      _isInit = SessionState.error;
-      log.error(
-        "[NetworkSession][initSession] "
-        "Error: $e",
-      );
-    }
   }
 }

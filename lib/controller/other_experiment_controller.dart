@@ -17,6 +17,7 @@ import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 class OtherExperimentController {
   static final OtherExperimentController i = OtherExperimentController._();
   bool _isReloading = false;
+  final session = SysjSession();
 
   OtherExperimentController._() {
     /// Load from cache at the beginning
@@ -64,7 +65,7 @@ class OtherExperimentController {
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getOtherExperimentData();
+      final result = await SysjSession().getOtherExperimentData();
       _lastValidOtherExperiment.value = result;
       otherExperimentStateSignal.value = AsyncState.data(result);
     } catch (e, s) {

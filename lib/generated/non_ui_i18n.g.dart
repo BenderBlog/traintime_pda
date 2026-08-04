@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // This file is auto-generated from non_ui_i18n YAML files
-// Generated at: 2026-07-24T16:32:13.968895
+// Generated at: 2026-08-04T23:24:05.772432
 
 /// Static i18n class for non-UI translations
 /// Supports multiple locales without BuildContext

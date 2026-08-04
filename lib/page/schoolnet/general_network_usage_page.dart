@@ -15,7 +15,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:watermeter/repository/schoolnet_session.dart';
+import 'package:watermeter/repository/miscellaneous_session/schoolnet_session.dart';
 
 class GeneralNetworkUsagePage extends StatefulWidget {
   const GeneralNetworkUsagePage({super.key});
@@ -31,17 +31,15 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
   bool get wantKeepAlive => true;
 
   late Future<FetchResult<GeneralNetworkUsage>> state;
-  final SchoolnetSession session = SchoolnetSession();
+  final session = SchoolnetSession();
   bool _initialized = false;
 
   Future<void> _reload(BuildContext context) =>
       state = session.getGeneralNetworkUsage(
         captchaFunction: (image, onRefresh) => showDialog<String>(
           context: context,
-          builder: (context) => CaptchaInputDialog(
-            image: image,
-            onRefresh: onRefresh,
-          ),
+          builder: (context) =>
+              CaptchaInputDialog(image: image, onRefresh: onRefresh),
         ).then((value) => value ?? ""),
       );
 

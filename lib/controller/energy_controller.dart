@@ -14,6 +14,8 @@ class EnergyController {
   static const int defaultLowElectricityWarningThreshold = 20;
   bool _isReloading = false;
 
+  final EnergySession session = EnergySession();
+
   EnergyController._() {
     updateElectricityWarning();
 
@@ -128,7 +130,7 @@ class EnergyController {
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getElectricityInfo();
+      final result = await session.getElectricityInfo();
       _syncLastValidElectricity(result);
       energyInfoStateSignal.value = AsyncState.data(result);
     } catch (e, s) {

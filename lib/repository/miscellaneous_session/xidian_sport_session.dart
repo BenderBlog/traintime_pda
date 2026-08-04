@@ -2,8 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-// Get data from Xidian Sport.
-
 import 'dart:convert';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:crypto/crypto.dart';
@@ -16,10 +14,12 @@ import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/model/xidian_sport/sport_score.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
-class SportSession {
+/// Get data from Xidian Sport.
+/// Notice that it use separate cookie jar
+class SportSession with NetworkClient {
   static final _lock = Lock();
   static const _cacheHintMissingPasswordKey =
       "sport.cache_hint_missing_password";
@@ -46,106 +46,6 @@ class SportSession {
     persistSession: true,
     storage: FileStorage("${supportPath.path}/cookie/sport/"),
   );
-
-  /*
-  Future<void> getPunch() async {
-    punchData.value.reset();
-    try {
-      await login();
-
-      var getStore = await require(
-        subWebsite: "stuTermPunchRecord/findList",
-        body: {'userId': userId},
-      );
-      punchData.value.score.value = getStore["data"][0]["score"];
-      //String termId = await getTermID();
-
-      log.info(
-        "[SportSession][getPunch] "
-        "Ready to fetch all punch info.",
-      );
-
-      await require(
-        subWebsite: "stuPunchRecord/findPager",
-        body: {
-          'sysTermId': 13, //await getTermID(),
-          'pageSize': 999,
-          'pageIndex': 1
-        },
-      ).then((response) {
-        for (var i in response["data"]) {
-          punchData.value.all.add(PunchData(
-            i["machineName"],
-            i["weekNum"],
-            Jiffy.parse(i["punchDay"] + " " + i["punchTime"]),
-            i["state"],
-          ));
-        }
-        punchData.value.all.sort((a, b) => a.time.diff(b.time).toInt());
-        punchData.value.allTime.value = punchData.value.all.length;
-      });
-
-      log.info(
-        "[SportSession][getPunch] "
-        "Ready to fetch successful punch info.",
-      );
-
-      await require(
-        subWebsite: "stuPunchRecord/findPagerOk",
-        body: {
-          'sysTermId': 13, //await getTermID(),
-          'pageSize': 999,
-          'pageIndex': 1
-        },
-      ).then((response) {
-        for (var i in response["data"]) {
-          punchData.value.valid.add(PunchData(
-            i["machineName"],
-            i["weekNum"],
-            Jiffy.parse(i["punchDay"] + " " + i["punchTime"]),
-            i["state"],
-          ));
-        }
-        punchData.value.valid.sort((a, b) => a.time.diff(b.time).toInt());
-        punchData.value.validTime.value = punchData.value.valid.length;
-      });
-
-      punchData.value.situation.value = "";
-    } on NoPasswordException {
-      punchData.value.situation.value = "没密码";
-    } on LoginFailedException catch (e, s) {
-      log.warning(
-        "[SportSession][getPunch] LoginFailedException",
-        error: e,
-        stackTrace: s,
-      );
-      punchData.value.situation.value = e.msg == "系统维护" ? e.msg : "登录失败";
-    } on SemesterFailedException catch (e, s) {
-      log.warning(
-        "[SportSession][getPunch] SemesterFailedException",
-        error: e,
-        stackTrace: s,
-      );
-      punchData.value.situation.value = "查询失败";
-    } on DioException catch (e, s) {
-      log.warning(
-        "[SportSession][getPunch] NetWorkExceptions",
-        error: e,
-        stackTrace: s,
-      );
-      punchData.value.situation.value = "网络故障";
-    } catch (e, s) {
-      log.warning(
-        "[SportSession][getPunch] Exception",
-        error: e,
-        stackTrace: s,
-      );
-      punchData.value.situation.value = "未知故障";
-    } finally {
-      punchData.value.isLoad.value = false;
-    }
-  }
-  */
 
   static SportScore? _scoreCache;
   static DateTime _scoreCacheFetchTime = DateTime.now();

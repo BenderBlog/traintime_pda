@@ -1,6 +1,7 @@
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
+
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -10,13 +11,12 @@ import 'package:html/parser.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/network_usage.dart';
-import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
-class SchoolnetSession extends NetworkSession {
+class SchoolnetSession with NetworkClient {
   static const _cacheHintCaptchaFailedKey =
       "school_net.cache_hint_captcha_failed";
   static const _cacheHintRequestFailedKey =
@@ -25,17 +25,13 @@ class SchoolnetSession extends NetworkSession {
   static GeneralNetworkUsage? _generalUsageCache;
   static DateTime _generalUsageCacheFetchTime = DateTime.now();
 
-  Dio get _dio => super.dio
+  Dio get _dio => dio
     ..options.baseUrl = "https://zfw.xidian.edu.cn"
     ..options.headers = {"Host": "zfw.xidian.edu.cn"}
     ..options.contentType = Headers.formUrlEncodedContentType
     ..options.followRedirects = true;
 
   Future<CurrentUserNetInfo> getCurrentUserNetInfo() async {
-    if (await NetworkSession.isInSchool() == false) {
-      throw NotSchoolNetworkException();
-    }
-
     final networkInfoResponse = await dio
         .get(
           'https://w.xidian.edu.cn/cgi-bin/rad_user_info',
@@ -129,7 +125,8 @@ class SchoolnetSession extends NetworkSession {
     required Future<String> Function(
       List<int> initialImage,
       Future<List<int>> Function() onRefresh,
-    ) captchaFunction,
+    )
+    captchaFunction,
   }) async {
     try {
       // Get username and password
@@ -187,7 +184,9 @@ class SchoolnetSession extends NetworkSession {
 
       // Refresh and fetch captcha helper
       Future<List<int>> refreshCaptcha() async {
-        log.info("[SchoolnetSession][getGeneralNetworkUsage] Refreshing captcha via API");
+        log.info(
+          "[SchoolnetSession][getGeneralNetworkUsage] Refreshing captcha via API",
+        );
         await _dio.get(
           'https://zfw.xidian.edu.cn/site/captcha',
           queryParameters: {
@@ -195,10 +194,12 @@ class SchoolnetSession extends NetworkSession {
             '_': DateTime.now().millisecondsSinceEpoch,
           },
         );
-        var picture = await _dio.get(
-          "https://zfw.xidian.edu.cn/site/captcha",
-          options: Options(responseType: ResponseType.bytes),
-        ).then((data) => data.data);
+        var picture = await _dio
+            .get(
+              "https://zfw.xidian.edu.cn/site/captcha",
+              options: Options(responseType: ResponseType.bytes),
+            )
+            .then((data) => data.data);
 
         if (picture is List<int>) {
           return picture;

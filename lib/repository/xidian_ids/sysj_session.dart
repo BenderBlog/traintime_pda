@@ -15,7 +15,7 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 
@@ -30,33 +30,6 @@ String _cacheHintFromError(Object error) {
     return "experiment.other_cache_hint_network_failed";
   }
   return "experiment.other_cache_hint_unknown_error";
-}
-
-Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() async {
-  try {
-    List<ExperimentData> data = await SysjSession().getDataFromSysj();
-    DateTime fetchTime = DateTime.now();
-    await SysjSession.writeCache(data);
-    return FetchResult.fresh(fetchTime: fetchTime, data: data);
-  } on PasswordWrongException {
-    log.error(
-      "[SysjSession][getExperimentData] "
-      "Password changed, remove cache",
-    );
-    await SysjSession.deleteCache();
-    rethrow;
-  } catch (e, s) {
-    log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
-    var cache = SysjSession.getCache();
-    if (cache != null) {
-      return FetchResult.cache(
-        fetchTime: cache.$1,
-        data: cache.$2,
-        hintKey: _cacheHintFromError(e),
-      );
-    }
-    rethrow;
-  }
 }
 
 class SysjSession extends IDSSession {
@@ -139,9 +112,36 @@ class SysjSession extends IDSSession {
     }
   }
 
+  Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() async {
+    try {
+      List<ExperimentData> data = await SysjSession().getDataFromSysj();
+      DateTime fetchTime = DateTime.now();
+      await SysjSession.writeCache(data);
+      return FetchResult.fresh(fetchTime: fetchTime, data: data);
+    } on PasswordWrongException {
+      log.error(
+        "[SysjSession][getExperimentData] "
+        "Password changed, remove cache",
+      );
+      await SysjSession.deleteCache();
+      rethrow;
+    } catch (e, s) {
+      log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
+      var cache = SysjSession.getCache();
+      if (cache != null) {
+        return FetchResult.cache(
+          fetchTime: cache.$1,
+          data: cache.$2,
+          hintKey: _cacheHintFromError(e),
+        );
+      }
+      rethrow;
+    }
+  }
+
   /// These are from sysj.xidian.edu.cn's js file
   Future<List<ExperimentData>> getDataFromSysj() async {
-    if (!(await NetworkSession.isInSchool())) {
+    if (!(await isInSchool())) {
       throw NotSchoolNetworkException();
     }
 

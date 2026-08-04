@@ -6,7 +6,7 @@ import 'package:time/time.dart';
 import 'package:watermeter/model/aircon_energy.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
-import 'package:watermeter/repository/aircon_session.dart';
+import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 

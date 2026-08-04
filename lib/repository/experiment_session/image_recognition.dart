@@ -3,7 +3,7 @@
 
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
-import 'package:watermeter/repository/experiment_score/experiment_report_session.dart';
+import 'package:watermeter/repository/experiment_session/experiment_report_session.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 

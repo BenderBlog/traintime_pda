@@ -4,36 +4,14 @@
 // Dorm water drink session for Hui798 API.
 
 import 'package:dio/dio.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/model/dorm_water.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'dart:math';
 import 'dart:convert' show base64Encode;
 import 'dart:io' show Platform;
 
-/// Model class for captcha response
-class CaptchaData {
-  final String sessionId;
-  final String imageBase64;
-
-  CaptchaData({required this.sessionId, required this.imageBase64});
-}
-
-/// Model class for device
-class DormWaterDevice {
-  final String id;
-  final String name;
-
-  DormWaterDevice({required this.id, required this.name});
-
-  factory DormWaterDevice.fromJson(Map<String, dynamic> json) {
-    return DormWaterDevice(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-    );
-  }
-}
-
-class DormWaterSession extends NetworkSession {
+class DormWaterSession with NetworkClient {
   static const String apiBaseUrl = 'https://i.ilife798.com';
 
   /// Store current session ID for sending SMS code
@@ -73,7 +51,7 @@ class DormWaterSession extends NetworkSession {
   /// Returns CaptchaData containing:
   /// - sessionId: Session ID for subsequent API calls (generated randomly)
   /// - imageBase64: Base64-encoded captcha image
-  Future<CaptchaData> getCaptcha() async {
+  Future<DormWaterCaptchaData> getCaptcha() async {
     try {
       final sessionId = _generateSessionId();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -97,7 +75,10 @@ class DormWaterSession extends NetworkSession {
         final imageBase64 = base64Encode(response.data as List<int>).toString();
         // Store session ID for later SMS sending
         _currentSessionId = sessionId;
-        return CaptchaData(sessionId: sessionId, imageBase64: imageBase64);
+        return DormWaterCaptchaData(
+          sessionId: sessionId,
+          imageBase64: imageBase64,
+        );
       } else {
         throw Exception('Failed to fetch captcha: ${response.statusCode}');
       }

@@ -11,7 +11,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:image/image.dart' as img;
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 
 /// Finger movement track point
 class TrackPoint {
@@ -70,7 +70,7 @@ class SliderCaptchaClientProvider {
       "moveLength": tracks.isNotEmpty ? tracks.last.a : 0,
       "tracks": tracks,
     });
-    final sign = aesEncrypt(payload, _aesKey!);
+    final sign = NetworkClient.aesEncrypt(payload, _aesKey!);
     dynamic result = await dio.post(
       "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
       data: "sign=${Uri.encodeQueryComponent(sign)}",

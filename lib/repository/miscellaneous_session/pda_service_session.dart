@@ -4,50 +4,50 @@
 
 import 'dart:math' as math;
 
-import 'package:dio/dio.dart';
-import 'package:synchronized/synchronized.dart';
-import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/pda_service/message.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 
-Dio get dio => Dio()..interceptors.add(logDioAdapter);
+class PdaServiceSession with NetworkClient {
+  static final url = "https://legacy.superbart.top/traintime_pda_backend";
 
-const url = "https://legacy.superbart.top/traintime_pda_backend";
-
-//final messageLock = Lock(reentrant: false);
-final updateLock = Lock(reentrant: false);
-//final clubLock = Lock(reentrant: false);
-
-// true: new version avaliable
-// false: latest version
-// null: testing version
-bool? isNewVersionAvaliable(UpdateMessage updateMessage) {
-  List<int> versionCode = updateMessage.code
-      .split('.')
-      .map((value) => int.parse(value))
-      .toList();
-  List<int> localCode = pref.packageInfo.version
-      .split('.')
-      .map((value) => int.parse(value))
-      .toList();
-  bool? isNewAvaliable = false;
-  for (int i = 0; i < math.min(versionCode.length, localCode.length); i++) {
-    if (versionCode[i] > localCode[i]) {
-      isNewAvaliable = true;
-      break;
-    } else if (versionCode[i] < localCode[i]) {
-      isNewAvaliable = null;
-      break;
+  /// Version comparsion function
+  ///
+  /// true: new version avaliable
+  ///
+  /// false: latest version
+  ///
+  /// null: testing version
+  static bool? isNewVersionAvaliable(UpdateMessage updateMessage) {
+    List<int> versionCode = updateMessage.code
+        .split('.')
+        .map((value) => int.parse(value))
+        .toList();
+    List<int> localCode = pref.packageInfo.version
+        .split('.')
+        .map((value) => int.parse(value))
+        .toList();
+    bool? isNewAvaliable = false;
+    for (int i = 0; i < math.min(versionCode.length, localCode.length); i++) {
+      if (versionCode[i] > localCode[i]) {
+        isNewAvaliable = true;
+        break;
+      } else if (versionCode[i] < localCode[i]) {
+        isNewAvaliable = null;
+        break;
+      }
     }
+    return isNewAvaliable;
   }
-  return isNewAvaliable;
+
+  Future<UpdateMessage> checkUpdate() => dio
+      .get("$url/version.json")
+      .then((data) => UpdateMessage.fromJson(data.data));
 }
 
-Future<UpdateMessage> checkUpdate() => updateLock.synchronized<UpdateMessage>(
-  () => dio
-      .get("$url/version.json")
-      .then((data) => UpdateMessage.fromJson(data.data)),
-);
+//final messageLock = Lock(reentrant: false);
+//final clubLock = Lock(reentrant: false);
+
 /*
 Future<void> getClubList() => clubLock.synchronized(() async {
   clubState.value = SessionState.fetching;

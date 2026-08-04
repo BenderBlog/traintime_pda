@@ -40,6 +40,8 @@ import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
+import 'package:watermeter/repository/miscellaneous_session/empty_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
@@ -47,14 +49,13 @@ import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/repository/custom_class_service.dart';
-import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/energy_session.dart';
 import 'package:watermeter/repository/xidian_ids/exam_session.dart';
 import 'package:watermeter/repository/xidian_ids/score_session.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
-import 'package:watermeter/repository/physics_experiment_session.dart';
-import 'package:watermeter/repository/xidian_sport_session.dart';
+import 'package:watermeter/repository/experiment_session/physics_experiment_session.dart';
+import 'package:watermeter/repository/miscellaneous_session/xidian_sport_session.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/themes/color_seed.dart';
 import 'package:watermeter/routing/routes.dart';
@@ -969,7 +970,7 @@ class _SettingWindowState extends State<SettingWindow> {
 
                             /// Clean Cookie
                             try {
-                              await NetworkSession().clearCookieJar();
+                              await SportSession().clearCookieJar();
                               // I don't care.
                               // ignore: empty_catches
                             } on Exception {}
@@ -1077,7 +1078,7 @@ class _SettingWindowState extends State<SettingWindow> {
 
                             /// Clean Cookie
                             try {
-                              await NetworkSession().clearCookieJar();
+                              await EmptySession().clearCookieJar();
                               // I don't care.
                               // ignore: empty_catches
                             } on Exception {}

@@ -17,7 +17,7 @@ import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';

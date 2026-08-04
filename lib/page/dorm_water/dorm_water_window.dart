@@ -4,9 +4,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
+import 'package:watermeter/model/dorm_water.dart';
 import 'dart:convert' show base64Decode;
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/dorm_water_session.dart';
+import 'package:watermeter/repository/miscellaneous_session/dorm_water_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 
