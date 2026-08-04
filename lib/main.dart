@@ -27,6 +27,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/wear_companion_sync.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {
@@ -55,6 +56,7 @@ void main() async {
   preference.prefs = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(),
   );
+  await const WearCompanionSyncService().startPaymentProxy();
 
   // Load package info.
   preference.packageInfo = await PackageInfo.fromPlatform();

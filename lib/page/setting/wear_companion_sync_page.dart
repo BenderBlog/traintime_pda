@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/login/ids_reauth_dialog.dart';
 import 'package:watermeter/repository/wear_companion_sync.dart';
+import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 
 class WearCompanionSyncPage extends StatefulWidget {
   const WearCompanionSyncPage({super.key});
@@ -32,13 +34,22 @@ class _WearCompanionSyncPageState extends State<WearCompanionSyncPage> {
       _completedNodeId = null;
       _status = '正在向 ${node.name} 同步…';
     });
+    final previousReAuthHandler = activeIDSReAuthHandler;
+    Future<Uri> pairingReAuthHandler(IDSReAuthClient client) async {
+      if (!mounted) throw const IDSReAuthRequiredException();
+      return showIDSReAuthDialog(context, client);
+    }
+
+    activeIDSReAuthHandler = pairingReAuthHandler;
     try {
-      await _service.pairAndSync(node);
+      final paymentQrSynced = await _service.pairAndSync(node);
       if (!mounted) return;
       setState(() {
         _sendingNodeId = null;
         _completedNodeId = node.id;
-        _status = '配对与同步完成';
+        _status = paymentQrSynced
+            ? '配对、数据与付款码同步完成'
+            : '配对与数据同步完成，付款码未同步；请完成短信认证后重试';
       });
     } catch (error) {
       if (!mounted) return;
@@ -46,6 +57,10 @@ class _WearCompanionSyncPageState extends State<WearCompanionSyncPage> {
         _sendingNodeId = null;
         _status = error.toString();
       });
+    } finally {
+      if (identical(activeIDSReAuthHandler, pairingReAuthHandler)) {
+        activeIDSReAuthHandler = previousReAuthHandler;
+      }
     }
   }
 

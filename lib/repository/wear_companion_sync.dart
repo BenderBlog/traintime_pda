@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
+import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 
 /// Phone-side endpoint of the XDYou Wear companion protocol.
@@ -17,6 +18,35 @@ class WearCompanionSyncService {
   static const _channel = MethodChannel(channelName);
 
   const WearCompanionSyncService();
+
+  Future<void> startPaymentProxy() async {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method != 'receivePaymentQrRequest') {
+        throw MissingPluginException('Unknown companion call ${call.method}');
+      }
+      final nodeId = call.arguments;
+      if (nodeId is! String || nodeId.isEmpty) return;
+      Map<String, dynamic> response;
+      try {
+        final bytes = await SchoolCardSession().getQRCode();
+        response = {
+          'ok': true,
+          'pngBase64': base64Encode(bytes),
+          'fetchedAtEpochMs': DateTime.now().millisecondsSinceEpoch,
+        };
+      } on IDSReAuthRequiredException {
+        response = {'ok': false, 'error': 'phone_authentication_required'};
+      } on IDSReAuthCancelledException {
+        response = {'ok': false, 'error': 'phone_authentication_cancelled'};
+      } catch (_) {
+        response = {'ok': false, 'error': 'phone_payment_request_failed'};
+      }
+      await _channel.invokeMethod<void>('sendPaymentQrResponse', {
+        'nodeId': nodeId,
+        'payload': jsonEncode(response),
+      });
+    });
+  }
 
   Map<String, dynamic> buildSnapshot({
     required String sessionId,
@@ -98,7 +128,7 @@ class WearCompanionSyncService {
         .toList(growable: false);
   }
 
-  Future<void> pairAndSync(WearNode node) async {
+  Future<bool> pairAndSync(WearNode node) async {
     final snapshot = await _buildSnapshotWithPaymentQr(
       sessionId: 'direct-pairing',
     );
@@ -109,6 +139,7 @@ class WearCompanionSyncService {
       'messagePath': syncPath,
       'payload': payload,
     });
+    return snapshot.containsKey('paymentQr');
   }
 
   /// Updates the native cache used to answer a bound watch in the background.
