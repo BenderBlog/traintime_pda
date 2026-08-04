@@ -1,25 +1,7 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
-}
-
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
+    id "org.jetbrains.kotlin.android"
+    id "org.jetbrains.kotlin.plugin.compose"
 }
 
 def keystoreProperties = new Properties()
@@ -29,8 +11,18 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace = "io.github.benderblog.traintime_pda"
     compileSdk = 36
     ndkVersion = "28.2.13676358"
+
+    defaultConfig {
+        applicationId "io.github.benderblog.traintime_pda"
+        minSdk 28
+        targetSdk 34
+        versionCode 43
+        versionName "1.5.13"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -38,21 +30,17 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = "17"
     }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+    buildFeatures {
+        compose true
     }
 
-    namespace = "io.github.benderblog.traintime_pda"
-
-    defaultConfig {
-        applicationId "io.github.benderblog.traintime_pda"
-        minSdk 28
-        targetSdkVersion 34
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 
     dependenciesInfo {
@@ -71,28 +59,48 @@ android {
 
     buildTypes {
         release {
+            minifyEnabled true
+            shrinkResources true
             signingConfig keystoreProperties['storeFile'] ? signingConfigs.release : signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ""
+        }
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
         }
     }
 }
 
-flutter {
-    source '../..'
-}
-
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.20"
-    implementation 'com.google.android.material:material:1.8.0'
-    implementation 'com.google.android.gms:play-services-wearable:19.0.0'
-}
+    def composeBom = platform("androidx.compose:compose-bom:2026.06.01")
+    implementation composeBom
+    androidTestImplementation composeBom
 
-ext.abiCodes = ["x86_64": 1, "armeabi-v7a": 2, "arm64-v8a": 3]
-import com.android.build.OutputFile
-android.applicationVariants.all { variant ->
-  variant.outputs.each { output ->
-    def abiVersionCode = project.ext.abiCodes.get(output.getFilter(OutputFile.ABI))
-    if (abiVersionCode != null) {
-      output.versionCodeOverride = variant.versionCode * 10 + abiVersionCode
-    }
-  }
+    implementation "androidx.core:core-ktx:1.17.0"
+    implementation "androidx.activity:activity-compose:1.13.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.10.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.10.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0"
+    implementation "androidx.wear.compose:compose-material:1.6.2"
+    implementation "androidx.wear.compose:compose-foundation:1.6.2"
+    implementation "androidx.compose.ui:ui"
+    implementation "androidx.compose.foundation:foundation"
+    implementation "androidx.compose.runtime:runtime"
+    implementation "com.google.android.gms:play-services-wearable:20.0.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2"
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+    implementation "com.squareup.okhttp3:okhttp-urlconnection:4.12.0"
+    implementation "org.jsoup:jsoup:1.18.3"
+
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:2.2.20"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
+    testImplementation "com.google.truth:truth:1.4.4"
+    testImplementation "org.json:json:20240303"
 }

@@ -1,14 +1,15 @@
 # WearOS companion sync integration
 
-XDYou Wear is a companion-only app. Pairing and subsequent synchronization use
-the Wear OS Data Layer; camera/QR pairing is intentionally not used.
+XDYou Wear is a companion-only native Wear OS app (Jetpack Compose for Wear OS).
+Pairing and subsequent synchronization use the Wear OS Data Layer; camera/QR
+pairing is intentionally not used.
 
-The phone app lives at the repository root and the standalone Wear OS Flutter
-target lives in `wearos/`. Both targets use the root `.flutter` submodule.
+The phone app lives at the repository root. The Wear OS target lives in
+`wearos/android/` as a standalone Gradle project (no Flutter embedding).
 
 ## Direct pairing
 
-1. Open `配对手机` on the watch. The watch accepts a first pairing for five
+1. Open the watch app while unpaired. The watch accepts a first pairing for five
    minutes.
 2. Open `设置 > XDYou Wear` on the Android phone.
 3. The phone obtains connected watches from `NodeClient.connectedNodes`.
@@ -20,6 +21,9 @@ target lives in `wearos/`. Both targets use the root `.flutter` submodule.
 Wear OS Data Layer only transports messages between applications with the same
 package name and signing identity. The explicit five-minute window prevents an
 unexpected first import even from another matching development installation.
+
+The watch registers its `MessageClient` listener only while the activity is in
+the foreground (no resident / background polling service).
 
 ## Later synchronization
 
@@ -55,3 +59,10 @@ The JSON envelope uses schema version `1` and contains:
 The watch decodes the complete envelope before replacing local caches. A
 failed or missing synchronization therefore does not remove usable offline
 data.
+
+## Build
+
+```bash
+cd wearos/android
+./gradlew testDebugUnitTest assembleDebug
+```

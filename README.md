@@ -36,7 +36,7 @@ XDYou，代码名称为 Traintime PDA，是为西电学生设计的开源信息�
 13. 上课前提醒。
 14. 完备的国际化支持：支持繁体中文和英语。
 15. 宿舍水机支持。
-16. 提供配套 Wear OS 应用，可同步课程、一卡通余额与付款码，并在断开手机时使用缓存数据。
+16. 提供原生 Compose Wear OS 配套应用，可同步课程与付款码，并在断开手机时使用缓存数据。
 
 ## 其他特性
 
@@ -69,9 +69,9 @@ Tools • Dart 3.12.0 • DevTools 2.57.0
 
 ### 仓库结构与 Wear OS 构建
 
-主应用位于仓库根目录，配套的 Wear OS Flutter 应用位于 [`wearos/`](./wearos)。两端通信协议需要同步演进，因此 Wear OS 源码直接维护在同一仓库中，不使用额外 submodule。
+主应用位于仓库根目录，原生 Kotlin + Compose for Wear OS 应用位于 [`wearos/android/`](./wearos/android)。两端通信协议需要同步演进，因此 Wear OS 源码直接维护在同一仓库中，不使用额外 submodule。
 
-首次拉取后初始化仓库共用的 Flutter SDK：
+主应用仍使用仓库内 Flutter SDK，首次拉取后需要初始化子模块：
 
 ```bash
 git submodule update --init --recursive
@@ -80,11 +80,8 @@ git submodule update --init --recursive
 构建和测试 Wear OS 应用：
 
 ```bash
-cd wearos
-../.flutter/bin/flutter pub get
-../.flutter/bin/flutter analyze
-../.flutter/bin/flutter test
-../.flutter/bin/flutter build apk --release --target-platform android-arm
+cd wearos/android
+./gradlew testDebugUnitTest assembleRelease
 ```
 
 ## 授权信息

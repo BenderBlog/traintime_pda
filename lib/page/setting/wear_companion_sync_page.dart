@@ -111,13 +111,12 @@ class _WearCompanionSyncPageState extends State<WearCompanionSyncPage> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : node.isPaired || _completedNodeId == node.id
-                        ? const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.check_circle, color: Colors.green),
-                              SizedBox(width: 6),
-                              Text('已配对'),
-                            ],
+                        ? OutlinedButton.icon(
+                            onPressed: _sendingNodeId == null
+                                ? () => _pair(node)
+                                : null,
+                            icon: const Icon(Icons.sync),
+                            label: const Text('同步'),
                           )
                         : FilledButton(
                             onPressed: _sendingNodeId == null
