@@ -4,14 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
-import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/network_session.dart' as network;
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
+import 'package:watermeter/wearos/wear_cache_store.dart';
 import 'package:watermeter/wearos/wear_companion_sync.dart';
 import 'package:watermeter/wearos/wear_schedule_service.dart';
 
@@ -98,91 +96,22 @@ void main() {
   });
 
   group('Wear home loading', () {
-    test('network sync preserves successful agenda and balance data', () async {
-      final now = DateTime(2026, 5, 19, 8);
-      final table = _singleCourseTable('数据库系统');
-      var experimentNetworkCalled = false;
-
-      final result = await loadWearHomeData(
-        semesterCode: '2026-1',
-        now: now,
-        classTableFetcher: (_) async =>
-            FetchResult.fresh(fetchTime: now, data: table),
-        otherExperimentFetcher: () async {
-          experimentNetworkCalled = true;
-          throw StateError('experiment fetch should not run');
-        },
-        balanceFetcher: () async => '¥12.34',
-      );
-
-      expect(result.data.balanceText, '¥12.34');
-      expect(result.data.todayItems.map((item) => item.title), ['数据库系统']);
-      expect(result.failures, isEmpty);
-      expect(result.hasUsableData, isTrue);
-      expect(experimentNetworkCalled, isFalse);
-    });
-
     test(
-      'cached fetch result records source warning while keeping data',
+      'cache-only load builds the agenda without network fetchers',
       () async {
         final now = DateTime(2026, 5, 19, 8);
-        final table = _singleCourseTable('操作系统');
+        final table = _singleCourseTable('离线课程');
 
-        final result = await loadWearHomeData(
+        final data = await loadCachedWearHomeData(
           semesterCode: '2026-1',
           now: now,
-          classTableFetcher: (_) async => FetchResult.cache(
-            fetchTime: now,
-            data: table,
-            hintKey: 'classtable.cache_hint_network_failed',
-          ),
-          otherExperimentFetcher: () async =>
-              FetchResult.fresh(fetchTime: now, data: const <ExperimentData>[]),
-          balanceFetcher: () async => '¥12.34',
+          classTableCacheLoader: (_) => table,
+          otherExperimentCacheLoader: () => null,
         );
 
-        expect(result.data.todayItems.map((item) => item.title), ['操作系统']);
-        expect(result.failures.map((failure) => failure.source), [
-          WearDataSource.classTable,
-        ]);
-        expect(result.failures.single.error, isA<WearCachedDataException>());
+        expect(data.todayItems.map((item) => item.title), ['离线课程']);
       },
     );
-
-    test('cache-only load does not call network fetchers', () async {
-      final now = DateTime(2026, 5, 19, 8);
-      final table = _singleCourseTable('离线课程');
-      var classNetworkCalled = false;
-      var experimentNetworkCalled = false;
-      var balanceNetworkCalled = false;
-
-      final result = await loadCachedWearHomeData(
-        semesterCode: '2026-1',
-        now: now,
-        classTableCacheLoader: (_) =>
-            FetchResult.cache(fetchTime: now, data: table, hintKey: null),
-        otherExperimentCacheLoader: () => null,
-        classTableFetcher: (_) async {
-          classNetworkCalled = true;
-          throw StateError('network class fetch should not run');
-        },
-        otherExperimentFetcher: () async {
-          experimentNetworkCalled = true;
-          throw StateError('network experiment fetch should not run');
-        },
-        balanceFetcher: () async {
-          balanceNetworkCalled = true;
-          return '¥0.00';
-        },
-      );
-
-      expect(result.data.todayItems.map((item) => item.title), ['离线课程']);
-      expect(result.data.balanceText, isNull);
-      expect(result.failures, isEmpty);
-      expect(classNetworkCalled, isFalse);
-      expect(experimentNetworkCalled, isFalse);
-      expect(balanceNetworkCalled, isFalse);
-    });
   });
 
   group('Wear companion sync interface', () {
@@ -197,14 +126,14 @@ void main() {
       );
       tempDir = await Directory.systemTemp.createTemp('wear-sync-test-');
       network.supportPath = tempDir;
-      ClassTableSession.schoolClassDataCache = File(
-        '${tempDir.path}/${ClassTableSession.schoolClassName}',
+      WearClassTableCache.file = File(
+        '${tempDir.path}/${WearClassTableCache.fileName}',
       );
-      SysjSession.otherExperimentCacheFile = File(
-        '${tempDir.path}/${SysjSession.otherExperimentCacheName}',
+      WearExperimentCache.file = File(
+        '${tempDir.path}/${WearExperimentCache.fileName}',
       );
-      ClassTableSession.deleteCache();
-      await SysjSession.deleteCache();
+      await WearClassTableCache.clear();
+      await WearExperimentCache.clear();
     });
 
     tearDown(() async {
@@ -215,8 +144,8 @@ void main() {
 
     test('credential import clears previous user-scoped state', () async {
       SchoolCardSession.openid = 'old-openid';
-      await ClassTableSession.updateCacheAndGroup(_singleCourseTable('旧课程'));
-      await SysjSession.writeCache([
+      await WearClassTableCache.write(_singleCourseTable('旧课程'));
+      await WearExperimentCache.write([
         ExperimentData(
           type: ExperimentType.others,
           name: '旧实验',
@@ -243,8 +172,8 @@ void main() {
       );
 
       expect(SchoolCardSession.openid, isEmpty);
-      expect(ClassTableSession.schoolClassDataCache.existsSync(), isFalse);
-      expect(SysjSession.otherExperimentCacheFile.existsSync(), isFalse);
+      expect(WearClassTableCache.file.existsSync(), isFalse);
+      expect(WearExperimentCache.file.existsSync(), isFalse);
       expect(
         preference.getString(preference.Preference.currentSemester),
         isEmpty,
@@ -260,7 +189,7 @@ void main() {
       );
     });
 
-    test('imports credentials for future mobile-device transport', () async {
+    test('imports credentials for watch payment authentication', () async {
       await WearLocalCompanionSyncPort().importCredentials(
         const WearCredentialSyncPayload(
           idsAccount: '2200000000',
@@ -301,11 +230,8 @@ void main() {
           ),
         );
 
-        expect(
-          ClassTableSession.getCache()?.$2.classDetail.single.name,
-          '同步课程',
-        );
-        expect(SysjSession.getCache()?.$2.single.name, '同步实验');
+        expect(WearClassTableCache.read()?.$2.classDetail.single.name, '同步课程');
+        expect(WearExperimentCache.read()?.$2.single.name, '同步实验');
         final cachedHome = await loadCachedWearHomeData(
           semesterCode: '2026-1',
           now: DateTime(2026, 5, 19, 8),
@@ -315,7 +241,7 @@ void main() {
           '2026-1',
         );
         expect(
-          cachedHome.data.todayItems.map((item) => item.title),
+          cachedHome.todayItems.map((item) => item.title),
           contains('同步课程'),
         );
       },
@@ -350,10 +276,7 @@ void main() {
         preference.getString(preference.Preference.currentSemester),
         '2026-1',
       );
-      expect(
-        ClassTableSession.getCache()?.$2.classDetail.single.name,
-        '扫码同步课程',
-      );
+      expect(WearClassTableCache.read()?.$2.classDetail.single.name, '扫码同步课程');
       expect(
         File('${network.supportPath.path}/WearPaymentQr.png').readAsBytesSync(),
         [1, 2, 3],

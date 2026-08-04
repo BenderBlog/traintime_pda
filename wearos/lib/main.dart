@@ -7,8 +7,8 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_session.dart' as network;
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
 import 'package:watermeter/wearos/wear_app.dart';
+import 'package:watermeter/wearos/wear_cache_store.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +42,7 @@ Future<void> main() async {
     // Treat a missing/unavailable native pairing record as unpaired.
   }
   final isFirst =
-      !isCompanionPaired || semester.isEmpty || !ClassTableSession.isCacheExist;
+      !isCompanionPaired || semester.isEmpty || !WearClassTableCache.exists;
   loginState = isFirst ? IDSLoginState.manual : IDSLoginState.none;
 
   runApp(WearApp(isFirst: isFirst));

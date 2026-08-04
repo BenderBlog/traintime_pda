@@ -9,15 +9,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/widgets.dart';
-import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/repository/logger.dart';
 
 late Directory supportPath;
 
 class NetworkSession {
-  static SessionState _isInit = SessionState.none;
-
   //@protected
   final PersistCookieJar cookieJar = PersistCookieJar(
     persistSession: true,
@@ -46,66 +42,4 @@ class NetworkSession {
         ..options.followRedirects = false
         ..options.validateStatus = (status) =>
             status != null && status >= 200 && status < 400;
-
-  static Future<bool> isInSchool() async {
-    bool isInSchool = false;
-    Dio dio = Dio()
-      ..interceptors.add(logDioAdapter)
-      ..options.connectTimeout = const Duration(seconds: 30);
-    isInSchool = await dio
-        .get("https://rs.xidian.edu.cn/cas/login.php")
-        .then((value) => true)
-        .onError((error, stackTrace) {
-          log.warning(
-            "[isSchoolNet] Current net is not schoolnet.",
-            error,
-            stackTrace,
-          );
-          return false;
-        });
-    return isInSchool;
-  }
-
-  NetworkSession() {
-    if (_isInit == SessionState.none) {
-      initSession();
-    }
-  }
-
-  Future<void> initSession() async {
-    log.info(
-      "[NetworkSession][initSession] "
-      "Current State: $_isInit",
-    );
-    if (_isInit == SessionState.fetching) {
-      return;
-    }
-    try {
-      _isInit = SessionState.fetching;
-      log.info(
-        "[NetworkSession][initSession] "
-        "Fetching...",
-      );
-      var response = await dio.get("http://linux.xidian.edu.cn");
-      if (response.statusCode == 200) {
-        _isInit = SessionState.fetched;
-        log.info(
-          "[NetworkSession][initSession] "
-          "Fetched",
-        );
-      } else {
-        _isInit = SessionState.error;
-        log.error(
-          "[NetworkSession][initSession] "
-          "Error",
-        );
-      }
-    } catch (e) {
-      _isInit = SessionState.error;
-      log.error(
-        "[NetworkSession][initSession] "
-        "Error: $e",
-      );
-    }
-  }
 }

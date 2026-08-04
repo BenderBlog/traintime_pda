@@ -22,7 +22,7 @@ class WearHomePage extends StatefulWidget {
 }
 
 class _WearHomePageState extends State<WearHomePage> {
-  late Future<WearHomeLoadResult> _loadFuture;
+  late Future<WearHomeData> _loadFuture;
   late final WearCompanionSyncBridge _companionBridge;
   StreamSubscription<WearCompanionSyncEnvelope>? _syncSubscription;
   Completer<void>? _pendingSync;
@@ -47,7 +47,7 @@ class _WearHomePageState extends State<WearHomePage> {
     unawaited(_companionBridge.start());
   }
 
-  Future<WearHomeLoadResult> _loadCached() async {
+  Future<WearHomeData> _loadCached() async {
     final semester = preference.getString(
       preference.Preference.currentSemester,
     );
@@ -94,7 +94,7 @@ class _WearHomePageState extends State<WearHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: FutureBuilder<WearHomeLoadResult>(
+        child: FutureBuilder<WearHomeData>(
           future: _loadFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
@@ -108,7 +108,7 @@ class _WearHomePageState extends State<WearHomePage> {
               );
             }
             return WearHomeDashboard(
-              result: snapshot.requireData,
+              data: snapshot.requireData,
               onRefresh: _manualSync,
               onLogout: _logout,
             );
@@ -121,13 +121,13 @@ class _WearHomePageState extends State<WearHomePage> {
 
 class WearHomeDashboard extends StatelessWidget {
   static final _timeFormat = DateFormat('HH:mm');
-  final WearHomeLoadResult result;
+  final WearHomeData data;
   final Future<void> Function() onRefresh;
   final VoidCallback onLogout;
 
   const WearHomeDashboard({
     super.key,
-    required this.result,
+    required this.data,
     required this.onRefresh,
     required this.onLogout,
   });
@@ -151,34 +151,16 @@ class WearHomeDashboard extends StatelessWidget {
                 children: [
                   _AgendaSection(
                     title: '今天',
-                    items: result.data.todayItems,
+                    items: data.todayItems,
                     timeFormat: _timeFormat,
                   ),
                   _AgendaSection(
                     title: '明天',
-                    items: result.data.tomorrowItems,
+                    items: data.tomorrowItems,
                     timeFormat: _timeFormat,
                   ),
                   const SizedBox(height: 8),
-                  _BalanceCard(
-                    balanceText: result.data.balanceText,
-                    hasBalanceFailure: result.failures.any(
-                      (failure) =>
-                          failure.source == WearDataSource.schoolCardBalance,
-                    ),
-                  ),
-                  if (result.failures.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Text(
-                        '部分数据刷新失败：${result.failures.map((e) => _sourceName(e.source)).join('、')}',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                    ),
+                  const _CampusCard(),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -204,27 +186,10 @@ class WearHomeDashboard extends StatelessWidget {
       ),
     );
   }
-
-  static String _sourceName(WearDataSource source) {
-    switch (source) {
-      case WearDataSource.classTable:
-        return '课表';
-      case WearDataSource.otherExperiment:
-        return '实验';
-      case WearDataSource.schoolCardBalance:
-        return '一卡通';
-    }
-  }
 }
 
-class _BalanceCard extends StatelessWidget {
-  final String? balanceText;
-  final bool hasBalanceFailure;
-
-  const _BalanceCard({
-    required this.balanceText,
-    required this.hasBalanceFailure,
-  });
+class _CampusCard extends StatelessWidget {
+  const _CampusCard();
 
   @override
   Widget build(BuildContext context) {
@@ -234,17 +199,8 @@ class _BalanceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('一卡通余额', style: Theme.of(context).textTheme.labelMedium),
-            const SizedBox(height: 4),
-            Text(
-              balanceText ?? (hasBalanceFailure ? '查询失败' : '暂无数据'),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 10),
+            Text('校园卡', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
             FilledButton.icon(
               onPressed: () => Navigator.of(
                 context,

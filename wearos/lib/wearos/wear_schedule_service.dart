@@ -1,28 +1,17 @@
-import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
+import 'package:watermeter/wearos/wear_cache_store.dart';
 
-typedef ClassTableFetcher =
-    Future<FetchResult<ClassTableData>> Function(String semesterCode);
-typedef ClassTableCacheLoader =
-    FetchResult<ClassTableData>? Function(String semesterCode);
-typedef ExperimentFetcher =
-    Future<FetchResult<List<ExperimentData>>> Function();
-typedef ExperimentCacheLoader = FetchResult<List<ExperimentData>>? Function();
-typedef BalanceFetcher = Future<String> Function();
+typedef ClassTableCacheLoader = ClassTableData? Function(String semesterCode);
+typedef ExperimentCacheLoader = List<ExperimentData>? Function();
 
 Future<void> clearWearCampusCaches() async {
-  ClassTableSession.deleteCache();
-  await SysjSession.deleteCache();
+  await WearClassTableCache.clear();
+  await WearExperimentCache.clear();
 }
 
 enum WearAgendaKind { course, otherExperiment }
-
-enum WearDataSource { classTable, otherExperiment, schoolCardBalance }
 
 class WearAgendaItem {
   final WearAgendaKind kind;
@@ -42,51 +31,11 @@ class WearAgendaItem {
   });
 }
 
-class WearSourceFailure {
-  final WearDataSource source;
-  final Object error;
-  final StackTrace stackTrace;
-
-  const WearSourceFailure({
-    required this.source,
-    required this.error,
-    required this.stackTrace,
-  });
-}
-
-class WearCachedDataException implements Exception {
-  final String hintKey;
-
-  const WearCachedDataException(this.hintKey);
-
-  @override
-  String toString() => hintKey;
-}
-
 class WearHomeData {
-  final String? balanceText;
   final List<WearAgendaItem> todayItems;
   final List<WearAgendaItem> tomorrowItems;
-  final DateTime fetchedAt;
 
-  const WearHomeData({
-    required this.todayItems,
-    required this.tomorrowItems,
-    required this.fetchedAt,
-    this.balanceText,
-  });
-}
-
-class WearHomeLoadResult {
-  final WearHomeData data;
-  final List<WearSourceFailure> failures;
-
-  const WearHomeLoadResult({required this.data, required this.failures});
-
-  bool get hasUsableData =>
-      data.balanceText != null ||
-      data.todayItems.isNotEmpty ||
-      data.tomorrowItems.isNotEmpty;
+  const WearHomeData({required this.todayItems, required this.tomorrowItems});
 }
 
 class WearAgendaBuilder {
@@ -112,9 +61,7 @@ class WearAgendaBuilder {
 
       final startIndex = (arrangement.start - 1) * 2;
       final endIndex = (arrangement.stop - 1) * 2 + 1;
-      if (startIndex < 0 || endIndex >= timeList.length) {
-        continue;
-      }
+      if (startIndex < 0 || endIndex >= timeList.length) continue;
 
       final ClassDetail detail;
       try {
@@ -170,100 +117,30 @@ class WearAgendaBuilder {
   }
 }
 
-Future<WearHomeLoadResult> loadCachedWearHomeData({
+Future<WearHomeData> loadCachedWearHomeData({
   required String semesterCode,
   DateTime? now,
   ClassTableCacheLoader? classTableCacheLoader,
   ExperimentCacheLoader? otherExperimentCacheLoader,
-  ClassTableFetcher? classTableFetcher,
-  ExperimentFetcher? otherExperimentFetcher,
-  BalanceFetcher? balanceFetcher,
 }) async {
   final effectiveNow = now ?? DateTime.now();
-  final classCache = classTableCacheLoader ?? _loadClassTableCache;
-  final experimentCache =
-      otherExperimentCacheLoader ?? _loadOtherExperimentCache;
-  return _buildWearHomeData(
-    now: effectiveNow,
-    classTableResult: classCache(semesterCode),
-    otherExperimentResult: experimentCache(),
-    balanceText: null,
-  );
-}
-
-Future<WearHomeLoadResult> loadWearHomeData({
-  required String semesterCode,
-  DateTime? now,
-  ClassTableFetcher? classTableFetcher,
-  ExperimentFetcher? otherExperimentFetcher,
-  BalanceFetcher? balanceFetcher,
-}) async {
-  final effectiveNow = now ?? DateTime.now();
-  final failures = <WearSourceFailure>[];
-
-  FetchResult<ClassTableData>? classTableResult;
-  try {
-    classTableResult = await (classTableFetcher ?? getClassTable)(semesterCode);
-  } catch (error, stackTrace) {
-    failures.add(
-      WearSourceFailure(
-        source: WearDataSource.classTable,
-        error: error,
-        stackTrace: stackTrace,
-      ),
-    );
-  }
-
-  String? balanceText;
-  try {
-    balanceText = await (balanceFetcher ?? _fetchSchoolCardBalance)();
-  } catch (error, stackTrace) {
-    failures.add(
-      WearSourceFailure(
-        source: WearDataSource.schoolCardBalance,
-        error: error,
-        stackTrace: stackTrace,
-      ),
-    );
-  }
-
-  final result = _buildWearHomeData(
-    now: effectiveNow,
-    classTableResult: classTableResult,
-    otherExperimentResult: null,
-    balanceText: balanceText,
-    initialFailures: failures,
-  );
-  return result;
-}
-
-WearHomeLoadResult _buildWearHomeData({
-  required DateTime now,
-  required FetchResult<ClassTableData>? classTableResult,
-  required FetchResult<List<ExperimentData>>? otherExperimentResult,
-  required String? balanceText,
-  List<WearSourceFailure> initialFailures = const <WearSourceFailure>[],
-}) {
-  final today = _dateOnly(now);
+  final today = _dateOnly(effectiveNow);
   final tomorrow = today.add(const Duration(days: 1));
-  final failures = <WearSourceFailure>[...initialFailures];
+  final classTable = (classTableCacheLoader ?? _loadClassTableCache)(
+    semesterCode,
+  );
+  final experiments =
+      (otherExperimentCacheLoader ?? _loadOtherExperimentCache)();
   final todayItems = <WearAgendaItem>[];
   final tomorrowItems = <WearAgendaItem>[];
 
-  if (classTableResult != null) {
-    _recordCacheFailure(failures, WearDataSource.classTable, classTableResult);
-    final table = classTableResult.data;
-    todayItems.addAll(WearAgendaBuilder.courseItemsForDay(table, today));
-    tomorrowItems.addAll(WearAgendaBuilder.courseItemsForDay(table, tomorrow));
-  }
-
-  if (otherExperimentResult != null) {
-    _recordCacheFailure(
-      failures,
-      WearDataSource.otherExperiment,
-      otherExperimentResult,
+  if (classTable != null) {
+    todayItems.addAll(WearAgendaBuilder.courseItemsForDay(classTable, today));
+    tomorrowItems.addAll(
+      WearAgendaBuilder.courseItemsForDay(classTable, tomorrow),
     );
-    final experiments = otherExperimentResult.data;
+  }
+  if (experiments != null) {
     todayItems.addAll(
       WearAgendaBuilder.experimentItemsForDay(experiments, today),
     );
@@ -274,46 +151,20 @@ WearHomeLoadResult _buildWearHomeData({
 
   todayItems.sort(_compareAgendaItems);
   tomorrowItems.sort(_compareAgendaItems);
-  return WearHomeLoadResult(
-    data: WearHomeData(
-      balanceText: balanceText,
-      todayItems: List.unmodifiable(todayItems),
-      tomorrowItems: List.unmodifiable(tomorrowItems),
-      fetchedAt: DateTime.now(),
-    ),
-    failures: List.unmodifiable(failures),
+  return WearHomeData(
+    todayItems: List.unmodifiable(todayItems),
+    tomorrowItems: List.unmodifiable(tomorrowItems),
   );
 }
 
-Future<String> _fetchSchoolCardBalance() => SchoolCardSession().getOverview();
-
-FetchResult<ClassTableData>? _loadClassTableCache(String semesterCode) {
-  final cache = ClassTableSession.getCache();
+ClassTableData? _loadClassTableCache(String semesterCode) {
+  final cache = WearClassTableCache.read();
   if (cache == null || cache.$2.semesterCode != semesterCode) return null;
-  return FetchResult.cache(fetchTime: cache.$1, data: cache.$2, hintKey: null);
+  return cache.$2;
 }
 
-FetchResult<List<ExperimentData>>? _loadOtherExperimentCache() {
-  final cache = SysjSession.getCache();
-  if (cache == null) return null;
-  return FetchResult.cache(fetchTime: cache.$1, data: cache.$2, hintKey: null);
-}
-
-void _recordCacheFailure<T>(
-  List<WearSourceFailure> failures,
-  WearDataSource source,
-  FetchResult<T> result,
-) {
-  final hintKey = result.hintKey;
-  if (!result.isCache || hintKey == null) return;
-  failures.add(
-    WearSourceFailure(
-      source: source,
-      error: WearCachedDataException(hintKey),
-      stackTrace: StackTrace.current,
-    ),
-  );
-}
+List<ExperimentData>? _loadOtherExperimentCache() =>
+    WearExperimentCache.read()?.$2;
 
 DateTime _dateOnly(DateTime value) =>
     DateTime(value.year, value.month, value.day);

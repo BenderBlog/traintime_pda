@@ -18,7 +18,6 @@ dependencies:
   path_provider: ^2.0.11
   json_annotation: ^4.9.0
   html: ^0.15.4
-  time: ^2.1.5
   image: ^4.5.4
   flutter:
     sdk: flutter

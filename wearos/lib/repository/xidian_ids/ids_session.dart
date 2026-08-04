@@ -349,37 +349,6 @@ class IDSSession extends NetworkSession {
       }
     }
   }
-
-  Future<bool> checkWhetherPostgraduate({
-    Future<void> Function(String)? sliderCaptcha,
-  }) async {
-    String location = await checkAndLogin(
-      target:
-          "https://yjspt.xidian.edu.cn/gsapp"
-          "/sys/yjsemaphome/portal/index.do",
-      sliderCaptcha:
-          sliderCaptcha ??
-          (cookieStr) =>
-              SliderCaptchaClientProvider(cookie: cookieStr).solve(null),
-    );
-    var response = await dio.get(location);
-    while (response.headers[HttpHeaders.locationHeader] != null) {
-      location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info("[checkWhetherPostgraduate] Received location: $location");
-      response = await dio.get(location);
-    }
-
-    bool toReturn = await dio
-        .post(
-          "https://yjspt.xidian.edu.cn/gsapp"
-          "/sys/yjsemaphome/modules/pubWork/getCanVisitAppList.do",
-        )
-        .then((value) => value.data["res"] != null);
-
-    await preference.setBool(preference.Preference.role, toReturn);
-
-    return toReturn;
-  }
 }
 
 class NeedCaptchaException implements Exception {}

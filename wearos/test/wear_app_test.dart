@@ -40,35 +40,24 @@ void main() {
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
     });
-    const longBalance = '¥123456789012345678901234567890';
+    const longTitle = '很长很长很长很长很长的课程名称';
 
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: WearHomeDashboard(
-            result: WearHomeLoadResult(
-              data: WearHomeData(
-                balanceText: longBalance,
-                todayItems: [
-                  WearAgendaItem(
-                    kind: WearAgendaKind.course,
-                    title: '很长很长很长很长很长的课程名称',
-                    start: DateTime(2026, 5, 19, 8, 30),
-                    end: DateTime(2026, 5, 19, 10, 5),
-                    location: '很长很长很长很长很长的教室名称',
-                    subtitle: '很长很长很长很长很长的教师名称',
-                  ),
-                ],
-                tomorrowItems: const [],
-                fetchedAt: DateTime(2026, 5, 19),
-              ),
-              failures: [
-                WearSourceFailure(
-                  source: WearDataSource.schoolCardBalance,
-                  error: StateError('balance failed'),
-                  stackTrace: StackTrace.current,
+            data: WearHomeData(
+              todayItems: [
+                WearAgendaItem(
+                  kind: WearAgendaKind.course,
+                  title: longTitle,
+                  start: DateTime(2026, 5, 19, 8, 30),
+                  end: DateTime(2026, 5, 19, 10, 5),
+                  location: '很长很长很长很长很长的教室名称',
+                  subtitle: '很长很长很长很长很长的教师名称',
                 ),
               ],
+              tomorrowItems: const [],
             ),
             onRefresh: () async {},
             onLogout: () {},
@@ -78,8 +67,9 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    final balanceText = tester.widget<Text>(find.text(longBalance));
-    expect(balanceText.maxLines, 1);
-    expect(balanceText.overflow, TextOverflow.ellipsis);
+    final titleText = tester.widget<Text>(find.text(longTitle));
+    expect(titleText.maxLines, 1);
+    expect(titleText.overflow, TextOverflow.ellipsis);
+    expect(find.text('校园卡'), findsOneWidget);
   });
 }

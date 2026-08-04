@@ -10,10 +10,9 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/network_session.dart' as network;
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
 import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
+import 'package:watermeter/wearos/wear_cache_store.dart';
 import 'package:watermeter/wearos/wear_schedule_service.dart';
 import 'package:watermeter/wearos/wear_qr_page.dart';
 
@@ -310,7 +309,7 @@ class WearLocalCompanionSyncPort implements WearCompanionSyncPort {
   Future<void> importSchedule(WearScheduleSyncPayload payload) async {
     final classTable = payload.classTable;
     if (classTable != null) {
-      await ClassTableSession.updateCacheAndGroup(classTable);
+      await WearClassTableCache.write(classTable);
       if (classTable.semesterCode.isNotEmpty) {
         await preference.setString(
           preference.Preference.currentSemester,
@@ -325,7 +324,7 @@ class WearLocalCompanionSyncPort implements WearCompanionSyncPort {
 
     final otherExperiments = payload.otherExperiments;
     if (otherExperiments != null) {
-      await SysjSession.writeCache(otherExperiments);
+      await WearExperimentCache.write(otherExperiments);
     }
   }
 
