@@ -15,11 +15,13 @@ class _WearCompanionSyncPageState extends State<WearCompanionSyncPage> {
   final _service = const WearCompanionSyncService();
   late Future<List<WearNode>> _nodesFuture = _service.connectedNodes();
   String? _sendingNodeId;
+  String? _completedNodeId;
   String? _status;
 
   void _reload() {
     setState(() {
       _status = null;
+      _completedNodeId = null;
       _nodesFuture = _service.connectedNodes();
     });
   }
@@ -28,12 +30,17 @@ class _WearCompanionSyncPageState extends State<WearCompanionSyncPage> {
     if (_sendingNodeId != null) return;
     setState(() {
       _sendingNodeId = node.id;
+      _completedNodeId = null;
       _status = '正在向 ${node.name} 同步…';
     });
     try {
       await _service.pairAndSync(node);
       if (!mounted) return;
-      setState(() => _status = '配对与同步已发送，请查看手表');
+      setState(() {
+        _sendingNodeId = null;
+        _completedNodeId = node.id;
+        _status = '配对与同步完成';
+      });
     } catch (error) {
       if (!mounted) return;
       setState(() {
@@ -89,6 +96,8 @@ class _WearCompanionSyncPageState extends State<WearCompanionSyncPage> {
                             dimension: 22,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
+                        : _completedNodeId == node.id
+                        ? const Icon(Icons.check_circle, color: Colors.green)
                         : FilledButton(
                             onPressed: _sendingNodeId == null
                                 ? () => _pair(node)
