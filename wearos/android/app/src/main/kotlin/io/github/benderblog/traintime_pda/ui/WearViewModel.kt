@@ -112,6 +112,27 @@ class WearViewModel(
 
     fun onBackground() {
         container.companionClient.stopListening()
+        if ((_state.value.screen == WearScreen.QR ||
+                _state.value.screen == WearScreen.REAUTH) &&
+            _state.value.qrResult == null
+        ) {
+            qrFlowGeneration++
+            cancelActiveQrWork()
+            _state.update {
+                it.copy(
+                    screen = WearScreen.QR,
+                    qrLoading = false,
+                    qrError = "操作已暂停，请下拉刷新后重试",
+                    reAuthClient = null,
+                    reAuthNotice = null,
+                    reAuthError = null,
+                    reAuthSending = false,
+                    reAuthSubmitting = false,
+                    reAuthSecondsRemaining = 0,
+                    reAuthCode = "",
+                )
+            }
+        }
     }
 
     fun beginPairing() {

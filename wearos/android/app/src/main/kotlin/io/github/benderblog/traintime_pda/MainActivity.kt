@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -17,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.benderblog.traintime_pda.ui.WearApp
 import io.github.benderblog.traintime_pda.ui.WearScreen
 import io.github.benderblog.traintime_pda.ui.WearViewModel
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     private val container by lazy { WearAppContainer(this) }
@@ -46,21 +48,27 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            DisposableEffect(state.screen, state.qrResult) {
-                // Only the displayed payment code needs a continuously lit screen.
-                // Network/authentication waits must not hold a wake lock.
+            LaunchedEffect(state.screen, state.qrResult) {
+                // Give scanners enough time to read the code without allowing an
+                // accidentally abandoned QR screen to keep the watch awake forever.
                 val keepOn = state.screen == WearScreen.QR && state.qrResult != null
                 if (keepOn) {
                     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    try {
+                        delay(QR_SCREEN_ON_TIMEOUT_MS)
+                    } finally {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    }
                 } else {
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                }
-                onDispose {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
             }
 
             WearApp(viewModel = viewModel)
         }
+    }
+
+    private companion object {
+        const val QR_SCREEN_ON_TIMEOUT_MS = 60_000L
     }
 }
