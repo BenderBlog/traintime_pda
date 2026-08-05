@@ -11,13 +11,13 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:encrypter_plus/encrypter_plus.dart' as encrypt;
 import 'package:synchronized/synchronized.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/ids_auth_protocol.dart';
-import 'package:watermeter/repository/xidian_ids/ids_fingerprint.dart';
-import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
+import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
+import 'package:watermeter/repository/ids_session/ids_fingerprint.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 
 enum IDSLoginState {
   none,
@@ -36,11 +36,10 @@ IDSLoginState loginState = IDSLoginState.none;
 bool get offline =>
     loginState != IDSLoginState.success && loginState != IDSLoginState.manual;
 
-class IDSSession with NetworkClient {
+class IDSSession {
   static final _idslock = Lock();
   static const maxAuthRedirects = 30;
 
-  @override
   Dio get dio {
     log.info('[IDSSession][OfflineCheck] Offline status: $offline');
     if (offline) {
@@ -206,7 +205,7 @@ class IDSSession with NetworkClient {
     /// Check whether it need CAPTCHA or not:-P
     /// Used in two captcha.
     String cookieStr = "";
-    var cookie = await cookieJar.loadForRequest(
+    var cookie = await NetworkCookieJars.ids.loadForRequest(
       Uri.parse("https://ids.xidian.edu.cn/authserver"),
     );
     for (var i in cookie) {
@@ -418,11 +417,11 @@ class IDSSession with NetworkClient {
       };
       return resumedUri;
     } on IDSReAuthCancelledException {
-      await clearCookieJar();
+      await NetworkCookieJars.ids.deleteAll();
       loginState = IDSLoginState.cancelled;
       rethrow;
     } on IDSReAuthExpiredException {
-      await clearCookieJar();
+      await NetworkCookieJars.ids.deleteAll();
       loginState = IDSLoginState.fail;
       rethrow;
     }

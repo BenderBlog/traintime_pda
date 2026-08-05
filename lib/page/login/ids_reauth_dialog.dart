@@ -6,8 +6,8 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/repository/xidian_ids/ids_auth_protocol.dart';
-import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
+import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 
 Future<Uri> showIDSReAuthDialog(
   BuildContext context,

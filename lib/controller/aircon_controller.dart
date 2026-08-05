@@ -1,6 +1,7 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+/*
 import 'package:signals/signals.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/model/aircon_energy.dart';
@@ -152,3 +153,4 @@ class AirconImeiInvalidException implements Exception {
   @override
   String toString() => "Invalid aircon IMEI: $raw";
 }
+*/

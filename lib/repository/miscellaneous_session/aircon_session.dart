@@ -1,6 +1,9 @@
-// Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
+// Copyright 2026 Traintime PDA Authours, originally by aqqkad.
 // SPDX-License-Identifier: MPL-2.0
 
+// TODO: Fully implement it.
+
+/*
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,31 +14,7 @@ import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 
-Future<FetchResult<AirconEnergyInfo>> getAirconEnergyInfo(String imei) async {
-  log.info("[AirconSession][update] Ready to update electricity info. ");
-  DateTime fetchDay = DateTime.now();
-
-  final cache = AirconSession.getCache(imei: imei);
-
-  try {
-    log.info("[AirconSession][update] Fetching from Internet.");
-    var toReturn = await AirconSession().getEnergyInfo(imei);
-    AirconSession.saveCache(toReturn);
-    return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
-  } catch (e, s) {
-    log.handle(e, s, "[AirconSession][update] Have issue");
-    if (cache != null) {
-      return FetchResult.cache(
-        fetchTime: cache.fetchTime,
-        data: cache.data,
-        hintKey: e.toString(),
-      );
-    }
-    rethrow;
-  }
-}
-
-class AirconSession with NetworkClient {
+class AirconSession {
   static const host = "gxkt.juhaolian.cn";
 
   static const airconEnergyCache = "AirconEnergyCache.json";
@@ -44,9 +23,9 @@ class AirconSession with NetworkClient {
   static const airconEnergyHistory = "AirconEnergyHistory.json";
   static File fileHistory = File("${supportPath.path}/$airconEnergyHistory");
 
-  static bool get isCacheExist => fileCache.existsSync();
+  bool get isCacheExist => fileCache.existsSync();
 
-  static FetchResult<AirconEnergyInfo>? getCache({String? imei}) {
+  FetchResult<AirconEnergyInfo>? getCache({String? imei}) {
     if (!isCacheExist) return null;
     log.info("[AirconSession][cache] Checking out cache.");
     try {
@@ -64,21 +43,21 @@ class AirconSession with NetworkClient {
     }
   }
 
-  static void saveCache(AirconEnergyInfo info) {
+  void saveCache(AirconEnergyInfo info) {
     if (!isCacheExist) {
       fileCache.createSync(recursive: true);
     }
     fileCache.writeAsStringSync(jsonEncode(info.toJson()));
   }
 
-  static void clearCache() {
+  void clearCache() {
     if (!AirconSession.fileCache.existsSync()) {
       return;
     }
     AirconSession.fileCache.deleteSync();
   }
 
-  static List<ElectricityHistoryInfo> getEnergyHistory() {
+  List<ElectricityHistoryInfo> getEnergyHistory() {
     final list = <ElectricityHistoryInfo>[];
 
     if (!fileHistory.existsSync()) {
@@ -117,7 +96,7 @@ class AirconSession with NetworkClient {
   }
 
   Future<AirconEnergyInfo> getEnergyInfo(String imei) async {
-    final response = await dio.get(
+    final response = await NetworkClients.otherDio.get(
       "https://$host/api/device/direct/state",
       queryParameters: {"imei": imei},
       options: Options(contentType: Headers.jsonContentType),
@@ -143,6 +122,30 @@ class AirconSession with NetworkClient {
       electricAmount: data["result"]["electricAmount"],
     );
   }
+
+  Future<FetchResult<AirconEnergyInfo>> getAirconEnergyInfo(String imei) async {
+    log.info("[AirconSession][update] Ready to update electricity info. ");
+    DateTime fetchDay = DateTime.now();
+
+    final cache = getCache(imei: imei);
+
+    try {
+      log.info("[AirconSession][update] Fetching from Internet.");
+      var toReturn = await AirconSession().getEnergyInfo(imei);
+      saveCache(toReturn);
+      return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
+    } catch (e, s) {
+      log.handle(e, s, "[AirconSession][update] Have issue");
+      if (cache != null) {
+        return FetchResult.cache(
+          fetchTime: cache.fetchTime,
+          data: cache.data,
+          hintKey: e.toString(),
+        );
+      }
+      rethrow;
+    }
+  }
 }
 
 class AirconEnergyParseException implements Exception {
@@ -155,3 +158,4 @@ class AirconEnergyParseException implements Exception {
       ? "Aircon energy response parse failed"
       : "Aircon energy response parse failed: $message";
 }
+*/

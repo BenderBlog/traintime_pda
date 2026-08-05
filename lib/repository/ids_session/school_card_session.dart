@@ -10,7 +10,7 @@ import 'package:html/parser.dart';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 class SchoolCardSession extends IDSSession {
   static String openid = "";

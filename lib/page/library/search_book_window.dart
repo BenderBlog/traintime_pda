@@ -12,7 +12,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart'
+import 'package:watermeter/repository/ids_session/library_session.dart'
     as search_book;
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';

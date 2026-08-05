@@ -22,7 +22,6 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
-import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
@@ -40,7 +39,6 @@ import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
-import 'package:watermeter/repository/miscellaneous_session/empty_session.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -49,13 +47,7 @@ import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/repository/custom_class_service.dart';
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/energy_session.dart';
-import 'package:watermeter/repository/xidian_ids/exam_session.dart';
-import 'package:watermeter/repository/xidian_ids/score_session.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
-import 'package:watermeter/repository/experiment_session/physics_experiment_session.dart';
-import 'package:watermeter/repository/miscellaneous_session/xidian_sport_session.dart';
+import 'package:watermeter/repository/ids_session/score_session.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/themes/color_seed.dart';
 import 'package:watermeter/routing/routes.dart';
@@ -556,39 +548,39 @@ class _SettingWindowState extends State<SettingWindow> {
                     );
                   },
                 ),
-                const Divider(),
-                ListTile(
-                  title: Text(
-                    FlutterI18n.translate(context, "setting.aircon_imei_title"),
-                  ),
-                  subtitle: Text(
-                    preference
-                            .getString(preference.Preference.airconImei)
-                            .isEmpty
-                        ? FlutterI18n.translate(
-                            context,
-                            "setting.aircon_imei_not_set",
-                          )
-                        : FlutterI18n.translate(
-                            context,
-                            "setting.aircon_imei_current",
-                            translationParams: {
-                              "imei": preference.getString(
-                                preference.Preference.airconImei,
-                              ),
-                            },
-                          ),
-                  ),
-                  trailing: const Icon(Icons.qr_code_scanner),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const AirconImeiDialog(),
-                    ).then((_) {
-                      if (mounted) setState(() {});
-                    });
-                  },
-                ),
+                // const Divider(),
+                // ListTile(
+                //   title: Text(
+                //     FlutterI18n.translate(context, "setting.aircon_imei_title"),
+                //   ),
+                //   subtitle: Text(
+                //     preference
+                //             .getString(preference.Preference.airconImei)
+                //             .isEmpty
+                //         ? FlutterI18n.translate(
+                //             context,
+                //             "setting.aircon_imei_not_set",
+                //           )
+                //         : FlutterI18n.translate(
+                //             context,
+                //             "setting.aircon_imei_current",
+                //             translationParams: {
+                //               "imei": preference.getString(
+                //                 preference.Preference.airconImei,
+                //               ),
+                //             },
+                //           ),
+                //   ),
+                //   trailing: const Icon(Icons.qr_code_scanner),
+                //   onTap: () {
+                //     showDialog(
+                //       context: context,
+                //       builder: (context) => const AirconImeiDialog(),
+                //     ).then((_) {
+                //       if (mounted) setState(() {});
+                //     });
+                //   },
+                // ),
               ],
             ),
           ),
@@ -970,33 +962,22 @@ class _SettingWindowState extends State<SettingWindow> {
 
                             /// Clean Cookie
                             try {
-                              await SportSession().clearCookieJar();
-                              // I don't care.
-                              // ignore: empty_catches
-                            } on Exception {}
-
-                            /// Clean sport cookie.
-                            try {
-                              await SportSession().sportCookieJar.deleteAll();
+                              await NetworkCookieJars.ids.deleteAll();
+                              await NetworkCookieJars.schoolnet.deleteAll();
+                              await NetworkCookieJars.sport.deleteAll();
                               // I don't care.
                               // ignore: empty_catches
                             } on Exception {}
 
                             /// Clean cache.
-                            EnergySession.clearCache();
-                            EnergySession.clearElectricityHistory();
-                            for (var value in [
-                              ClassTableSession.schoolClassName,
-                              ExamSession.examDataCacheName,
-                              ExperimentSession.physicsExperimentCacheName,
-                              SysjSession.otherExperimentCacheName,
-                              ScoreSession.scoreListCacheName,
-                            ]) {
-                              var file = File("${supportPath.path}/$value");
-                              if (file.existsSync()) {
-                                file.deleteSync();
-                              }
-                            }
+                            ClassTableController.i.session.deleteCache();
+                            EnergyController.i.session.deleteCache();
+                            EnergyController.i.session
+                                .clearElectricityHistory();
+                            ExamController.i.session.deleteCache();
+                            OtherExperimentController.i.session.deleteCache();
+                            PhysicsExperimentController.i.session.deleteCache();
+                            ScoreSession.deleteCache();
 
                             if (context.mounted) {
                               showToast(
@@ -1078,29 +1059,26 @@ class _SettingWindowState extends State<SettingWindow> {
 
                             /// Clean Cookie
                             try {
-                              await EmptySession().clearCookieJar();
-                              // I don't care.
-                              // ignore: empty_catches
-                            } on Exception {}
-
-                            /// Clean sport cookie.
-                            try {
-                              await SportSession().sportCookieJar.deleteAll();
+                              await NetworkCookieJars.ids.deleteAll();
+                              await NetworkCookieJars.schoolnet.deleteAll();
+                              await NetworkCookieJars.sport.deleteAll();
                               // I don't care.
                               // ignore: empty_catches
                             } on Exception {}
 
                             /// Clean all.
-                            EnergySession.clearCache();
-                            EnergySession.clearElectricityHistory();
+                            ClassTableController.i.session.deleteCache();
+                            EnergyController.i.session.deleteCache();
+                            EnergyController.i.session
+                                .clearElectricityHistory();
+                            ExamController.i.session.deleteCache();
+                            OtherExperimentController.i.session.deleteCache();
+                            PhysicsExperimentController.i.session.deleteCache();
+                            ScoreSession.deleteCache();
+
                             for (var value in [
-                              ClassTableSession.schoolClassName,
                               CustomClassRepository.fileName,
                               ClassTableController.decorationName,
-                              ExamSession.examDataCacheName,
-                              ExperimentSession.physicsExperimentCacheName,
-                              SysjSession.otherExperimentCacheName,
-                              ScoreSession.scoreListCacheName,
                             ]) {
                               var file = File("${supportPath.path}/$value");
                               if (file.existsSync()) {

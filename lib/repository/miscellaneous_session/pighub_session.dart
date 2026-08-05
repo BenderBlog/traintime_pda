@@ -5,11 +5,11 @@
 import 'package:watermeter/model/pighub_image.dart';
 import 'package:watermeter/repository/network_client.dart';
 
-class PighubSession with NetworkClient {
+class PighubSession {
   // PigHub API session. https://www.pighub.top
   final _urlBase = "https://www.pighub.top";
 
-  Future<List<PigHubImage>> getPigImages() => dio
+  Future<List<PigHubImage>> getPigImages() => NetworkClients.otherDio
       .get("$_urlBase/api/images?sort=0")
       .then(
         (response) => (response.data["data"] as List<dynamic>)

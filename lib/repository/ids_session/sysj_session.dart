@@ -13,39 +13,26 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/time_list.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-
-String _cacheHintFromError(Object error) {
-  if (error is LoginFailedException) {
-    return "experiment.other_cache_hint_login_failed";
-  }
-  if (error is NotSchoolNetworkException) {
-    return "experiment.other_cache_hint_not_school_network";
-  }
-  if (error is DioException) {
-    return "experiment.other_cache_hint_network_failed";
-  }
-  return "experiment.other_cache_hint_unknown_error";
-}
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 class SysjSession extends IDSSession {
   static const otherExperimentCacheName = "OtherExperiment.json";
   static File otherExperimentCacheFile = File(
     "${supportPath.path}/$otherExperimentCacheName",
   );
-  static bool get isCacheExist => otherExperimentCacheFile.existsSync();
+  bool get isCacheExist => otherExperimentCacheFile.existsSync();
 
-  static Future<void> deleteCache() async {
+  Future<void> deleteCache() async {
     if (await otherExperimentCacheFile.exists()) {
       await otherExperimentCacheFile.delete();
     }
   }
 
-  static Future<void> writeCache(List<ExperimentData> data) async {
+  Future<void> writeCache(List<ExperimentData> data) async {
     log.info(
       "[ExperimentSession][writeCache] "
       "Store to cache.",
@@ -71,7 +58,7 @@ class SysjSession extends IDSSession {
     }
   }
 
-  static (DateTime, List<ExperimentData>)? getCache() {
+  (DateTime, List<ExperimentData>)? getCache() {
     if (!isCacheExist) return null;
     try {
       List<dynamic> toDecode = jsonDecode(
@@ -114,20 +101,20 @@ class SysjSession extends IDSSession {
 
   Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() async {
     try {
-      List<ExperimentData> data = await SysjSession().getDataFromSysj();
+      List<ExperimentData> data = await _getDataFromSysj();
       DateTime fetchTime = DateTime.now();
-      await SysjSession.writeCache(data);
+      await writeCache(data);
       return FetchResult.fresh(fetchTime: fetchTime, data: data);
     } on PasswordWrongException {
       log.error(
         "[SysjSession][getExperimentData] "
         "Password changed, remove cache",
       );
-      await SysjSession.deleteCache();
+      await deleteCache();
       rethrow;
     } catch (e, s) {
       log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
-      var cache = SysjSession.getCache();
+      var cache = getCache();
       if (cache != null) {
         return FetchResult.cache(
           fetchTime: cache.$1,
@@ -139,8 +126,21 @@ class SysjSession extends IDSSession {
     }
   }
 
+  String _cacheHintFromError(Object error) {
+    if (error is LoginFailedException) {
+      return "experiment.other_cache_hint_login_failed";
+    }
+    if (error is NotSchoolNetworkException) {
+      return "experiment.other_cache_hint_not_school_network";
+    }
+    if (error is DioException) {
+      return "experiment.other_cache_hint_network_failed";
+    }
+    return "experiment.other_cache_hint_unknown_error";
+  }
+
   /// These are from sysj.xidian.edu.cn's js file
-  Future<List<ExperimentData>> getDataFromSysj() async {
+  Future<List<ExperimentData>> _getDataFromSysj() async {
     if (!(await isInSchool())) {
       throw NotSchoolNetworkException();
     }

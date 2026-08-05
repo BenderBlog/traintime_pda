@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
-import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
+import 'package:watermeter/repository/ids_session/school_card_session.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 

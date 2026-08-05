@@ -39,11 +39,10 @@ class ElectricityReadyView extends StatelessWidget {
               .constrained(maxWidth: sheetMaxWidth)
               .center(),
 
-          const AirconEnergyCard()
-              .padding(vertical: 4)
-              .constrained(maxWidth: sheetMaxWidth)
-              .center(),
-
+          //  const AirconEnergyCard()
+          //      .padding(vertical: 4)
+          //      .constrained(maxWidth: sheetMaxWidth)
+          //      .center(),
           const WaterEnergyCard()
               .padding(vertical: 4)
               .constrained(maxWidth: sheetMaxWidth)

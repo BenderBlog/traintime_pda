@@ -8,10 +8,10 @@
 import 'package:dio/dio.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/repository/network_client.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 
 class EhallSession extends IDSSession {
   static final _ehallLock = Lock();

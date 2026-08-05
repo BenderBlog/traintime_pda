@@ -24,12 +24,12 @@ import 'package:watermeter/page/homepage/homepage.dart';
 import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/preference.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/page/login/ids_reauth_dialog.dart';
-import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class PageInformation {

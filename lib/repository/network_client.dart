@@ -19,8 +19,6 @@ late Directory supportPath;
 /// instance for a given directory, otherwise the in-memory caches of multiple
 /// [PersistCookieJar]s can overwrite each other.
 class NetworkCookieJars {
-  NetworkCookieJars._();
-
   static PersistCookieJar? _ids;
   static PersistCookieJar? _schoolnet;
   static PersistCookieJar? _sport;
@@ -45,14 +43,13 @@ class NetworkCookieJars {
 
 /// Shared Dio instances grouped by protocol and authentication policy.
 class NetworkClients {
-  NetworkClients._();
-
   static const defaultUserAgent =
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
       'AppleWebKit/537.36 (KHTML, like Gecko) '
       'Chrome/130.0.0.0 Safari/537.36 XDYou/2.0.0';
 
   static const _ehallHost = 'ehall.xidian.edu.cn';
+
   static const Map<String, String> _ehallHeaders = {
     HttpHeaders.refererHeader: 'http://ehall.xidian.edu.cn/new/index_xd.html',
     HttpHeaders.acceptHeader:
@@ -71,7 +68,6 @@ class NetworkClients {
   static Dio? _ehallDio;
   static Dio? _schoolnetDio;
   static Dio? _sportDio;
-  static Dio? _tokenDio;
   static Dio? _otherDio;
 
   static PersistCookieJar get idsCookieJar => NetworkCookieJars.ids;
@@ -98,9 +94,6 @@ class NetworkClients {
     baseUrl: 'http://tybjxgl.xidian.edu.cn/app/',
     followRedirects: true,
   );
-
-  /// Authenticated by per-request token headers, never by cookies.
-  static Dio get tokenDio => _tokenDio ??= _createDio();
 
   /// Public/stateless requests. It has neither CookieManager nor auth headers.
   static Dio get otherDio => _otherDio ??= _createDio();
@@ -147,53 +140,38 @@ class NetworkClients {
   }
 }
 
-/// A General Network Client which provides
-///  - An AES encrypt function [aesEncrypt]
-///  - A network client [dio]
-///  - A method to check schoolnet environment [isInSchool]
-mixin NetworkClient {
-  /// AES-CBC encryption with Pkcs7 padding
-  /// used for IDS CAPTCHA payload & password encryption
-  static String aesEncrypt(String text, Uint8List keyBytes) {
-    final rng = Random();
-    const int blockSize = 16;
-    const String aesChars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
-    final randstr = [
-      for (int i = 0; i < blockSize * 5; i++)
-        aesChars[rng.nextInt(aesChars.length)],
-    ].join();
-    final plain = randstr.substring(0, 64) + text; // prepend 64B nonce
-    final key = encrypt.Key(keyBytes);
-    final iv = encrypt.IV.fromUtf8(randstr.substring(64, 80)); // 16B iv
-    return encrypt.Encrypter(
-      encrypt.AES(key, mode: encrypt.AESMode.cbc),
-    ).encrypt(plain, iv: iv).base64;
-  }
+/// AES-CBC encryption with Pkcs7 padding
+/// used for IDS CAPTCHA payload & password encryption
+String aesEncrypt(String text, Uint8List keyBytes) {
+  final rng = Random();
+  const int blockSize = 16;
+  const String aesChars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+  final randstr = [
+    for (int i = 0; i < blockSize * 5; i++)
+      aesChars[rng.nextInt(aesChars.length)],
+  ].join();
+  final plain = randstr.substring(0, 64) + text; // prepend 64B nonce
+  final key = encrypt.Key(keyBytes);
+  final iv = encrypt.IV.fromUtf8(randstr.substring(64, 80)); // 16B iv
+  return encrypt.Encrypter(
+    encrypt.AES(key, mode: encrypt.AESMode.cbc),
+  ).encrypt(plain, iv: iv).base64;
+}
 
-  /// Compatibility access for IDS logout. New repositories should depend on
-  /// the specifically classified client/store instead of this general name.
-  PersistCookieJar get cookieJar => NetworkClients.idsCookieJar;
-  Future<void> clearCookieJar() => NetworkClients.idsCookieJar.deleteAll();
-
-  /// Default repository client for public/stateless requests.
-  @protected
-  Dio get dio => NetworkClients.otherDio;
-
-  /// Check whether access in schoolnet
-  Future<bool> isInSchool() async {
-    return await NetworkClients.otherDio
-        .get(
-          "https://notice.xidian.edu.cn",
-          options: Options(followRedirects: true),
-        )
-        .then((value) => !value.data.toString().contains("校外访问"))
-        .onError((error, stackTrace) {
-          log.warning(
-            "[isSchoolNet] Unable to fetch, treat as not schoolnet.",
-            error,
-            stackTrace,
-          );
-          return false;
-        });
-  }
+/// Check whether access in schoolnet
+Future<bool> isInSchool() async {
+  return await NetworkClients.otherDio
+      .get(
+        "https://notice.xidian.edu.cn",
+        options: Options(followRedirects: true),
+      )
+      .then((value) => !value.data.toString().contains("校外访问"))
+      .onError((error, stackTrace) {
+        log.warning(
+          "[isSchoolNet] Unable to fetch, treat as not schoolnet.",
+          error,
+          stackTrace,
+        );
+        return false;
+      });
 }

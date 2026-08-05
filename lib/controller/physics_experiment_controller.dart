@@ -16,13 +16,13 @@ import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/experiment_session/physics_experiment_session.dart';
 
 class PhysicsExperimentController {
-  static final ExperimentSession session = ExperimentSession();
+  final ExperimentSession session = ExperimentSession();
   static final PhysicsExperimentController i = PhysicsExperimentController._();
   bool _isReloading = false;
 
   PhysicsExperimentController._() {
     /// Load from cache at the beginning
-    final cache = ExperimentSession.getCache();
+    final cache = session.getCache();
     if (cache != null) {
       final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
       _lastValidPhysicsExperiment.value = cached;
@@ -53,7 +53,7 @@ class PhysicsExperimentController {
         _lastValidPhysicsExperiment.value = null;
         unawaited(
           Future(() async {
-            ExperimentSession.deleteCache();
+            session.deleteCache();
             await pref.remove(pref.Preference.experimentPassword);
           }),
         );
@@ -71,7 +71,7 @@ class PhysicsExperimentController {
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await session.getPhysicsExperimentData();
+      final result = await session.getData();
       _lastValidPhysicsExperiment.value = result;
       physicsExperimentStateSignal.value = AsyncState.data(result);
     } catch (e, s) {

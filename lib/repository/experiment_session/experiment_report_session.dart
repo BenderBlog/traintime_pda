@@ -7,54 +7,41 @@ import 'dart:typed_data';
 import 'package:charset_converter/charset_converter.dart';
 import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_client.dart';
 
-class ExperimentReportSession with NetworkClient {
-  // Cache the Dio instance to avoid recreating it
-  Dio? _dioInstance;
-
-  @override
-  Dio get dio {
-    if (_dioInstance != null) {
-      return _dioInstance!;
-    }
-
-    _dioInstance = Dio()
-      ..interceptors.add(logDioAdapter)
-      ..options.contentType = Headers.formUrlEncodedContentType
-      ..options.followRedirects = false
-      ..options.responseDecoder = (responseBytes, options, responseBody) async {
-        // Check if the response is JSON by looking at the first character
-        // JSON responses start with '{' or '['
-        if (responseBytes.isNotEmpty &&
-            (responseBytes[0] == 0x7B || responseBytes[0] == 0x5B)) {
-          log.info("[ExperimentReportSession][dio] Return data is json");
-          // This is JSON, decode as UTF-8
-          return utf8.decode(responseBytes);
-        }
-
-        log.info("[ExperimentReportSession][dio] Return data is html text");
-        // For HTML pages, use GBK/GB18030 decoding
-        if (options.headers[HttpHeaders.contentTypeHeader].toString().contains(
-          'gb',
-        )) {
-          log.info("[ExperimentReportSession][dio] GBK detected");
-          String gbk = await CharsetConverter.availableCharsets().then(
-            (value) => value.firstWhere((element) => element.contains("18030")),
-          );
-          return await CharsetConverter.decode(
-            gbk,
-            Uint8List.fromList(responseBytes),
-          );
-        }
-
-        return String.fromCharCodes(responseBytes);
+class ExperimentReportSession {
+  final Dio dio = Dio()
+    ..interceptors.add(logDioAdapter)
+    ..options.contentType = Headers.formUrlEncodedContentType
+    ..options.followRedirects = false
+    ..options.responseDecoder = (responseBytes, options, responseBody) async {
+      // Check if the response is JSON by looking at the first character
+      // JSON responses start with '{' or '['
+      if (responseBytes.isNotEmpty &&
+          (responseBytes[0] == 0x7B || responseBytes[0] == 0x5B)) {
+        log.info("[ExperimentReportSession][dio] Return data is json");
+        // This is JSON, decode as UTF-8
+        return utf8.decode(responseBytes);
       }
-      ..options.validateStatus = (status) =>
-          status != null && status >= 200 && status < 400;
 
-    return _dioInstance!;
-  }
+      log.info("[ExperimentReportSession][dio] Return data is html text");
+      // For HTML pages, use GBK/GB18030 decoding
+      if (options.headers[HttpHeaders.contentTypeHeader].toString().contains(
+        'gb',
+      )) {
+        log.info("[ExperimentReportSession][dio] GBK detected");
+        String gbk = await CharsetConverter.availableCharsets().then(
+          (value) => value.firstWhere((element) => element.contains("18030")),
+        );
+        return await CharsetConverter.decode(
+          gbk,
+          Uint8List.fromList(responseBytes),
+        );
+      }
+
+      return String.fromCharCodes(responseBytes);
+    }
+    ..options.validateStatus = (status) =>
+        status != null && status >= 200 && status < 400;
 
   /// Get the score image from the report system
   Future<Map<String, String>> getScoreImageUrls(
@@ -199,7 +186,9 @@ class ExperimentReportSession with NetworkClient {
     );
 
     var clickPostData =
-        'Ajax=1&IsEvent=1&Obj=O1F&Evt=click&this=O1F&_S_ID=$sid&_fp_=%26O17%3D%25020%2502%2502$account%26O1B%3D%25020%2502%2502$pwd&_seq_=4&_uo_=O0';
+        'Ajax=1&IsEvent=1&Obj=O1F&Evt=click&this=O1F&_S_ID=$sid'
+        '&_fp_=%26O17%3D%25020%2502%2502$account'
+        '%26O1B%3D%25020%2502%2502$pwd&_seq_=4&_uo_=O0';
 
     var clickResponse = await dio.post(
       'http://wlsy.xidian.edu.cn/wgyreport/wgyreport.dll/HandleEvent',

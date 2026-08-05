@@ -6,7 +6,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/routing/routes.dart';
 

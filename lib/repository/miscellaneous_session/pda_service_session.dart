@@ -8,7 +8,7 @@ import 'package:watermeter/model/pda_service/message.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 
-class PdaServiceSession with NetworkClient {
+class PdaServiceSession {
   static final url = "https://legacy.superbart.top/traintime_pda_backend";
 
   /// Version comparsion function
@@ -40,7 +40,7 @@ class PdaServiceSession with NetworkClient {
     return isNewAvaliable;
   }
 
-  Future<UpdateMessage> checkUpdate() => dio
+  Future<UpdateMessage> checkUpdate() => NetworkClients.otherDio
       .get("$url/version.json")
       .then((data) => UpdateMessage.fromJson(data.data));
 }

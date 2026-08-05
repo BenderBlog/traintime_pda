@@ -11,49 +11,40 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/model/user_role.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-
-String _cacheHintFromError(Object error) {
-  if (error is PasswordWrongException) {
-    return "exam.cache_hint_password_wrong";
-  }
-  if (error is LoginFailedException) {
-    return "exam.cache_hint_login_failed";
-  }
-  if (error is DioException) {
-    return "exam.cache_hint_network_failed";
-  }
-  return "exam.cache_hint_unknown_error";
-}
+import 'package:watermeter/repository/ids_session/ehall_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 /// 考试安排 4768687067472349
 class ExamSession extends EhallSession {
-  static const examDataCacheName = "exam.json";
-  static const examDataGroupFileName = "ExamFile.json";
-  static File examDataCache = File("${supportPath.path}/$examDataCacheName");
-  static bool get isCacheExist => examDataCache.existsSync();
+  static const _examDataCacheName = "exam.json";
+  static const _examDataGroupFileName = "ExamFile.json";
+  static final File _examDataCache = File(
+    "${supportPath.path}/$_examDataCacheName",
+  );
 
-  static void deleteCache() {
-    if (examDataCache.existsSync()) {
-      examDataCache.deleteSync();
+  bool get isCacheExist => _examDataCache.existsSync();
+
+  void deleteCache() {
+    if (_examDataCache.existsSync()) {
+      _examDataCache.deleteSync();
     }
   }
 
-  static Future<void> updateCacheAndGroup(ExamData data) async {
-    await examDataCache.writeAsString(jsonEncode(data.toJson()));
+  Future<void> updateCacheAndGroup(ExamData data) async {
+    await _examDataCache.writeAsString(jsonEncode(data.toJson()));
     if (Platform.isIOS) {
       final api = SaveToGroupIdSwiftApi();
       try {
         bool result = await api.saveToGroupId(
           FileToGroupID(
             appid: pref.appId,
-            fileName: "ExamFile.json",
+            fileName: _examDataGroupFileName,
             data: jsonEncode(data.toJson()),
           ),
         );
@@ -67,12 +58,12 @@ class ExamSession extends EhallSession {
     }
   }
 
-  static (DateTime, ExamData)? getCache() {
+  (DateTime, ExamData)? getCache() {
     try {
       ExamData toReturn = ExamData.fromJson(
-        jsonDecode(examDataCache.readAsStringSync()),
+        jsonDecode(_examDataCache.readAsStringSync()),
       );
-      DateTime fetchTime = examDataCache.lastModifiedSync();
+      DateTime fetchTime = _examDataCache.lastModifiedSync();
       return (fetchTime, toReturn);
     } catch (e, s) {
       log.handle(e, s);
@@ -80,17 +71,20 @@ class ExamSession extends EhallSession {
     }
   }
 
-  Future<FetchResult<ExamData>> getScoreInfo(String semester) async {
+  Future<FetchResult<ExamData>> getScoreInfo(
+    String semester,
+    UserRole role,
+  ) async {
     try {
-      ExamData data = pref.getBool(pref.Preference.role)
-          ? await ExamSession().getExamYjspt(semester)
-          : await ExamSession().getExamEhall(semester);
+      ExamData data = role == UserRole.postgraduate
+          ? await _getExamYjspt(semester)
+          : await _getExamEhall(semester);
       DateTime fetchTime = DateTime.now();
-      await ExamSession.updateCacheAndGroup(data);
+      await updateCacheAndGroup(data);
       return FetchResult.fresh(fetchTime: fetchTime, data: data);
     } catch (e, s) {
       log.handle(e, s, "[getScoreInfo] Have issue");
-      (DateTime, ExamData)? cache = ExamSession.getCache();
+      (DateTime, ExamData)? cache = getCache();
       if (cache != null) {
         return FetchResult.cache(
           fetchTime: cache.$1,
@@ -102,7 +96,20 @@ class ExamSession extends EhallSession {
     }
   }
 
-  Future<ExamData> getExamYjspt(String semester) async {
+  String _cacheHintFromError(Object error) {
+    if (error is PasswordWrongException) {
+      return "exam.cache_hint_password_wrong";
+    }
+    if (error is LoginFailedException) {
+      return "exam.cache_hint_login_failed";
+    }
+    if (error is DioException) {
+      return "exam.cache_hint_network_failed";
+    }
+    return "exam.cache_hint_unknown_error";
+  }
+
+  Future<ExamData> _getExamYjspt(String semester) async {
     final location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdksapp/*default/index.do",
       sliderCaptcha: (String cookieStr) =>
@@ -148,7 +155,7 @@ class ExamSession extends EhallSession {
     return ExamData(subject: subject, toBeArranged: []);
   }
 
-  Future<ExamData> getExamEhall(String semester) async {
+  Future<ExamData> _getExamEhall(String semester) async {
     final location = await useApp("4768687067472349");
     await followIDSRedirects(initialLocation: location, client: dio);
 

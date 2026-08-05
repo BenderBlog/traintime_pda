@@ -70,7 +70,7 @@ class SliderCaptchaClientProvider {
       "moveLength": tracks.isNotEmpty ? tracks.last.a : 0,
       "tracks": tracks,
     });
-    final sign = NetworkClient.aesEncrypt(payload, _aesKey!);
+    final sign = aesEncrypt(payload, _aesKey!);
     dynamic result = await dio.post(
       "https://ids.xidian.edu.cn/authserver/common/verifySliderCaptcha.htl",
       data: "sign=${Uri.encodeQueryComponent(sign)}",

@@ -14,7 +14,7 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart';
+import 'package:watermeter/repository/ids_session/library_session.dart';
 
 class BorrowInfoCard extends StatelessWidget {
   final BorrowData toUse;

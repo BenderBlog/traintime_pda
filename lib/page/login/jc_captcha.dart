@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 
 Future<bool> solveSliderCaptchaManually(
   BuildContext context,

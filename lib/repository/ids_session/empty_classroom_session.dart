@@ -2,13 +2,16 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+// TODO: Concept prove: whether remove EhallSession is OK
+
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 
 /// 空闲教室查询 4768402106681759
-class EmptyClassroomSession extends EhallSession {
+class EmptyClassroomSession extends IDSSession {
   String baseUrl = "https://ehall.xidian.edu.cn/jwapp/sys/kxjas/modules/kxjas";
   String target =
       "https://ehall.xidian.edu.cn/jwapp/sys/kxjas/*default/index.do";
@@ -63,9 +66,16 @@ class EmptyClassroomSession extends EhallSession {
   Future<List<EmptyClassroomPlace>> getBuildingList() async {
     List<EmptyClassroomPlace> toReturn = [];
     developer.log("Ready to login the system.", name: "Ehall emptyClassroom");
-    var firstPost = await useApp("4768402106681759");
-    await dioEhall.get(firstPost);
-    var data = await dioEhall
+    var location = await checkAndLogin(
+      target: "https://ehall.xidian.edu.cn/appShow?appId=4768402106681759",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
+    );
+    var response = await followIDSRedirects(
+      initialLocation: location,
+      client: dio,
+    );
+    var data = await dio
         .post("$baseUrl/jxlcx.do", data: {"*order": "+XXXQDM,+PX,+JXLDM"})
         .then((value) => value.data["datas"]["jxlcx"]["rows"]);
     for (var i in data) {
@@ -86,7 +96,7 @@ class EmptyClassroomSession extends EhallSession {
     required String semesterRange,
     required String semesterPart,
   }) async {
-    (dynamic, dynamic) dateData = await dioEhall
+    (dynamic, dynamic) dateData = await dio
         .post(
           "$baseUrl/rqzhzcjc.do",
           data: {"RQ": date, "XN": semesterRange, "XQ": semesterPart},
@@ -100,7 +110,7 @@ class EmptyClassroomSession extends EhallSession {
 
     List<EmptyClassroomData> toReturn = [];
 
-    await dioEhall
+    await dio
         .post(
           "$baseUrl/cxjsqk.do",
           data: {

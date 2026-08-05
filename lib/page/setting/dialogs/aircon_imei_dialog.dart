@@ -1,6 +1,6 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
-
+/*
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -252,3 +252,4 @@ class _AirconImeiScannerPageState extends State<_AirconImeiScannerPage> {
     );
   }
 }
+*/

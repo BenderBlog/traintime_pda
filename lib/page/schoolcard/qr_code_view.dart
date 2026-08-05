@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
+import 'package:watermeter/repository/ids_session/school_card_session.dart';
 
 class QRCodeView extends StatefulWidget {
   const QRCodeView({super.key});

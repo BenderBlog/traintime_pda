@@ -55,15 +55,7 @@ void main() {
     expect(idsRequest.headers, isNot(contains(HttpHeaders.hostHeader)));
   });
 
-  test('token and other clients are distinct and stateless', () {
-    expect(
-      identical(NetworkClients.tokenDio, NetworkClients.otherDio),
-      isFalse,
-    );
-    expect(
-      NetworkClients.tokenDio.interceptors.whereType<CookieManager>(),
-      isEmpty,
-    );
+  test('other client is stateless', () {
     expect(
       NetworkClients.otherDio.interceptors.whereType<CookieManager>(),
       isEmpty,

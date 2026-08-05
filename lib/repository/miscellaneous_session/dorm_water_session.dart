@@ -2,20 +2,32 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Dorm water drink session for Hui798 API.
+// TODO: Move Dorm Water from repo to external
+
+import 'dart:convert' show base64Encode;
+import 'dart:io' show HttpHeaders, Platform;
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/model/dorm_water.dart';
-import 'package:watermeter/repository/network_client.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart';
-import 'dart:math';
-import 'dart:convert' show base64Encode;
-import 'dart:io' show Platform;
 
-class DormWaterSession with NetworkClient {
+class DormWaterSession {
   static const String apiBaseUrl = 'https://i.ilife798.com';
 
-  @override
-  Dio get dio => NetworkClients.tokenDio;
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: apiBaseUrl,
+      contentType: Headers.formUrlEncodedContentType,
+      headers: {HttpHeaders.userAgentHeader: _getUserAgent()},
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 30),
+      followRedirects: false,
+      validateStatus: (status) =>
+          status != null && status >= 200 && status < 400,
+    ),
+  )..interceptors.add(logDioAdapter);
 
   /// Store current session ID for sending SMS code
   String? _currentSessionId;
@@ -28,18 +40,13 @@ class DormWaterSession with NetworkClient {
   /// Android:
   ///   - All: Android_ilife798_2.0.11
   /// Other platforms: Same as iOS
-  String _getUserAgent({bool isCaptcha = false}) {
+  static String _getUserAgent({bool isCaptcha = false}) {
     if (Platform.isAndroid) {
       return 'Android_ilife798_2.0.11';
-    } else if (Platform.isIOS || !Platform.isAndroid) {
-      // iOS or other platforms (default to iOS)
-      if (isCaptcha) {
-        return 'iLife798/3.1.1 (iPhone; iOS 26.2; Scale/3.00)';
-      } else {
-        return 'iOS_ilife798_3.1.1';
-      }
     }
-    return 'iOS_ilife798_3.1.1'; // Fallback
+    return isCaptcha
+        ? 'iLife798/3.1.1 (iPhone; iOS 26.2; Scale/3.00)'
+        : 'iOS_ilife798_3.1.1';
   }
 
   /// Generate a random numeric session ID for captcha
@@ -59,8 +66,8 @@ class DormWaterSession with NetworkClient {
       final sessionId = _generateSessionId();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
 
-      final response = await dio.get(
-        '$apiBaseUrl/api/v1/captcha/',
+      final response = await _dio.get(
+        '/api/v1/captcha/',
         queryParameters: {'s': sessionId, 'r': timestamp.toString()},
         options: Options(
           responseType: ResponseType.bytes,
@@ -108,8 +115,8 @@ class DormWaterSession with NetworkClient {
     }
 
     try {
-      final response = await dio.post(
-        '$apiBaseUrl/api/v1/acc/login/code',
+      final response = await _dio.post(
+        '/api/v1/acc/login/code',
         data: {
           's': _currentSessionId,
           'authCode': imageCode,
@@ -121,7 +128,6 @@ class DormWaterSession with NetworkClient {
             'accept': '*/*',
             'content-type': 'application/json',
             'accept-encoding': 'gzip, deflate, br',
-            'User-Agent': _getUserAgent(isCaptcha: false),
             'priority': 'u=3, i',
             'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
           },
@@ -161,8 +167,8 @@ class DormWaterSession with NetworkClient {
     required String smsCode,
   }) async {
     try {
-      final response = await dio.post(
-        '$apiBaseUrl/api/v1/acc/login',
+      final response = await _dio.post(
+        '/api/v1/acc/login',
         data: {'cid': '', 'authCode': smsCode, 'un': phoneNumber},
         options: Options(
           contentType: Headers.jsonContentType,
@@ -170,7 +176,6 @@ class DormWaterSession with NetworkClient {
             'accept': '*/*',
             'content-type': 'application/json',
             'accept-encoding': 'gzip, deflate, br',
-            'User-Agent': _getUserAgent(isCaptcha: false),
             'priority': 'u=3, i',
             'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
           },
@@ -219,14 +224,13 @@ class DormWaterSession with NetworkClient {
         throw Exception('No valid token. Please login first.');
       }
 
-      final response = await dio.get(
-        '$apiBaseUrl/api/v1/ui/app/master',
+      final response = await _dio.get(
+        '/api/v1/ui/app/master',
         options: Options(
           headers: {
             'accept': '*/*',
             'Authorization': token,
             'accept-encoding': 'gzip, deflate, br',
-            'User-Agent': _getUserAgent(isCaptcha: false),
             'priority': 'u=3, i',
             'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
           },
@@ -287,15 +291,14 @@ class DormWaterSession with NetworkClient {
         throw Exception('No valid token. Please login first.');
       }
 
-      final response = await dio.get(
-        '$apiBaseUrl/api/v1/dev/favo',
+      final response = await _dio.get(
+        '/api/v1/dev/favo',
         queryParameters: {'did': deviceId, 'remove': remove.toString()},
         options: Options(
           headers: {
             'accept': '*/*',
             'Authorization': token,
             'accept-encoding': 'gzip, deflate, br',
-            'User-Agent': _getUserAgent(isCaptcha: false),
             'priority': 'u=3, i',
             'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
           },
@@ -339,8 +342,8 @@ class DormWaterSession with NetworkClient {
         throw Exception('No valid token. Please login first.');
       }
 
-      final response = await dio.get(
-        '$apiBaseUrl/api/v1/dev/start',
+      final response = await _dio.get(
+        '/api/v1/dev/start',
         queryParameters: {
           'args': '',
           'cnt': '1',
@@ -354,7 +357,6 @@ class DormWaterSession with NetworkClient {
             'accept': '*/*',
             'Authorization': token,
             'accept-encoding': 'gzip, deflate, br',
-            'User-Agent': _getUserAgent(isCaptcha: false),
             'priority': 'u=3, i',
             'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
           },
@@ -395,15 +397,14 @@ class DormWaterSession with NetworkClient {
         throw Exception('No valid token. Please login first.');
       }
 
-      final response = await dio.get(
-        '$apiBaseUrl/api/v1/dev/end',
+      final response = await _dio.get(
+        '/api/v1/dev/end',
         queryParameters: {'did': deviceId},
         options: Options(
           headers: {
             'accept': '*/*',
             'Authorization': token,
             'accept-encoding': 'gzip, deflate, br',
-            'User-Agent': _getUserAgent(isCaptcha: false),
             'priority': 'u=3, i',
             'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',
           },
@@ -444,15 +445,10 @@ class DormWaterSession with NetworkClient {
         throw Exception('No valid token. Please login first.');
       }
 
-      final response = await dio.get(
-        '$apiBaseUrl/api/v1/ui/app/dev/status',
+      final response = await _dio.get(
+        '/api/v1/ui/app/dev/status',
         queryParameters: {'did': deviceId, 'more': 'true', 'promo': 'false'},
-        options: Options(
-          headers: {
-            'Authorization': token,
-            'User-Agent': _getUserAgent(isCaptcha: false),
-          },
-        ),
+        options: Options(headers: {'Authorization': token}),
       );
 
       if (response.statusCode == 200 && response.data != null) {

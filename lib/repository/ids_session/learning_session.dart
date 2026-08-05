@@ -11,8 +11,8 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 class LearningSession extends IDSSession {
   static const LOGIN_URL = "https://xdspoc.fanya.chaoxing.com/sso/xdspoc";

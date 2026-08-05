@@ -16,7 +16,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 
-class SchoolnetSession with NetworkClient {
+class SchoolnetSession {
   static const _cacheHintCaptchaFailedKey =
       "school_net.cache_hint_captcha_failed";
   static const _cacheHintRequestFailedKey =
@@ -25,10 +25,8 @@ class SchoolnetSession with NetworkClient {
   static GeneralNetworkUsage? _generalUsageCache;
   static DateTime _generalUsageCacheFetchTime = DateTime.now();
 
-  Dio get _dio => NetworkClients.schoolnetDio;
-
   Future<CurrentUserNetInfo> getCurrentUserNetInfo() async {
-    final networkInfoResponse = await dio
+    final networkInfoResponse = await NetworkClients.otherDio
         .get(
           'https://w.xidian.edu.cn/cgi-bin/rad_user_info',
           queryParameters: {
@@ -59,7 +57,9 @@ class SchoolnetSession with NetworkClient {
 
   Future<GeneralNetworkUsage> _getNetworkUsage() async {
     try {
-      final page = await _dio.get("/home").then((page) => page.data);
+      final page = await NetworkClients.schoolnetDio
+          .get("/home")
+          .then((page) => page.data);
 
       List<(String, String, String)> ipList = [];
       String used = "";
@@ -141,7 +141,7 @@ class SchoolnetSession with NetworkClient {
       log.info(
         "[SchoolnetSession][getGeneralNetworkUsage] Check whether fetch directly",
       );
-      var page = await _dio.get("/home");
+      var page = await NetworkClients.schoolnetDio.get("/home");
       if (!page.isRedirect) {
         final usage = await _getNetworkUsage();
         _generalUsageCache = usage;
@@ -154,7 +154,7 @@ class SchoolnetSession with NetworkClient {
 
       // Get login page
       log.info("[SchoolnetSession][getGeneralNetworkUsage] Get login page");
-      page = await _dio.get("/login");
+      page = await NetworkClients.schoolnetDio.get("/login");
 
       // Get csrf and key
       log.info("[SchoolnetSession][getGeneralNetworkUsage] Get cerf and key");
@@ -183,14 +183,14 @@ class SchoolnetSession with NetworkClient {
         log.info(
           "[SchoolnetSession][getGeneralNetworkUsage] Refreshing captcha via API",
         );
-        await _dio.get(
+        await NetworkClients.schoolnetDio.get(
           'https://zfw.xidian.edu.cn/site/captcha',
           queryParameters: {
             'refresh': 1,
             '_': DateTime.now().millisecondsSinceEpoch,
           },
         );
-        var picture = await _dio
+        var picture = await NetworkClients.schoolnetDio
             .get(
               "https://zfw.xidian.edu.cn/site/captcha",
               options: Options(responseType: ResponseType.bytes),
@@ -227,7 +227,7 @@ class SchoolnetSession with NetworkClient {
 
       // Pre-login post
       log.info("[SchoolnetSession][getGeneralNetworkUsage] Pre-login post");
-      page = await _dio.post(
+      page = await NetworkClients.schoolnetDio.post(
         "/site/validate-user",
         data: _getPostStringBody({
           "LoginForm[username]": username, //prefs.getString("idsAccount"),
@@ -266,7 +266,7 @@ class SchoolnetSession with NetworkClient {
 
       // Login post
       log.info("[SchoolnetSession][getGeneralNetworkUsage] Login post");
-      page = await _dio.post(
+      page = await NetworkClients.schoolnetDio.post(
         "/",
         data: _getPostStringBody({
           "_csrf-8800": csrf,

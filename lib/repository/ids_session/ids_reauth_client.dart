@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:watermeter/repository/xidian_ids/ids_auth_protocol.dart';
+import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
 
 typedef IDSReAuthHandler = Future<Uri> Function(IDSReAuthClient client);
 

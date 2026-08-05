@@ -9,7 +9,7 @@ import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:watermeter/repository/xidian_ids/semester_session.dart';
+import 'package:watermeter/repository/ids_session/semester_session.dart';
 
 class SemesterSyncEvent {
   final String oldSemester;

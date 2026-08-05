@@ -12,7 +12,7 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
+import 'package:watermeter/repository/ids_session/sysj_session.dart';
 
 class OtherExperimentController {
   static final OtherExperimentController i = OtherExperimentController._();
@@ -21,7 +21,7 @@ class OtherExperimentController {
 
   OtherExperimentController._() {
     /// Load from cache at the beginning
-    final cache = SysjSession.getCache();
+    final cache = session.getCache();
     if (cache != null) {
       final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
       _lastValidOtherExperiment.value = cached;
@@ -51,7 +51,7 @@ class OtherExperimentController {
       _lastHandledSemesterSyncEvent = semesterChangeEvent;
       if (semesterChangeEvent.didChange) {
         _lastValidOtherExperiment.value = null;
-        SysjSession.deleteCache();
+        session.deleteCache();
       }
       unawaited(reloadOtherExperiment());
     }, options: EffectOptions(name: "OtherExperimentSemesterChangeEffect"));

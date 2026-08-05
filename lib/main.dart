@@ -26,7 +26,7 @@ import 'package:watermeter/repository/notification/notification_registrar.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {

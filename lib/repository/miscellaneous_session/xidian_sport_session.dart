@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:convert';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
@@ -18,7 +17,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 
 /// Get data from Xidian Sport.
 /// Notice that it use separate cookie jar
-class SportSession with NetworkClient {
+class SportSession {
   static final _lock = Lock();
   static const _cacheHintMissingPasswordKey =
       "sport.cache_hint_missing_password";
@@ -40,8 +39,6 @@ class SportSession with NetworkClient {
     "token失效",
     "重新登录",
   };
-
-  PersistCookieJar get sportCookieJar => NetworkClients.sportCookieJar;
 
   static SportScore? _scoreCache;
   static DateTime _scoreCacheFetchTime = DateTime.now();
@@ -358,7 +355,7 @@ awb4B45zUwIDAQAB
     /// Clear Auth State
     userId = '';
     token = '';
-    await sportCookieJar.deleteAll();
+    await NetworkCookieJars.sport.deleteAll();
 
     await _ensureAuthenticated(force: true);
 
@@ -404,14 +401,12 @@ awb4B45zUwIDAQAB
     return toReturn;
   }
 
-  Dio get _dio => NetworkClients.sportDio;
-
   Future<Map<String, dynamic>> require({
     required String subWebsite,
     required Map<String, dynamic> body,
     bool isForce = false,
   }) async {
-    var response = await _dio.post(
+    var response = await NetworkClients.sportDio.post(
       subWebsite,
       data: body,
       options: Options(headers: _getHead(body)),

@@ -13,67 +13,35 @@ import 'package:time/time.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-
-String _cacheHintFromError(Object error) {
-  if (error is NotSchoolNetworkException) {
-    return "electricity.not_school_network";
-  }
-  if (error is NoAccountInfoException) {
-    return "electricity.cache_hint_account_missing";
-  }
-  if (error is AccountFailedParseException) {
-    return "electricity.cache_hint_account_parse_failed";
-  }
-  if (error is CaptchaFailedException) {
-    return "electricity.cache_hint_captcha_failed";
-  }
-  if (error is PasswordWrongException) {
-    return "electricity.cache_hint_password_wrong";
-  }
-  if (error is LoginFailedException) {
-    return "electricity.cache_hint_login_failed";
-  }
-  if (error is NotInitalizedException) {
-    if (error.msg == "用户名或密码错误") {
-      return "electricity.cache_hint_password_wrong";
-    }
-    if (error.msg.contains("验证码")) {
-      return "electricity.cache_hint_captcha_failed";
-    }
-    return "electricity.cache_hint_login_failed";
-  }
-  if (error is DioException) {
-    return "electricity.cache_hint_network_failed";
-  }
-  return "electricity.cache_hint_unknown_error";
-}
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 /// New energy management system
 /// Online since 2026-4-22
 /// Can be only be accessed through school net
 class EnergySession extends IDSSession {
-  static const energyInfo = "EnergyInfo.json";
-  static File fileCache = File("${supportPath.path}/$energyInfo");
+  static const _energyInfo = "EnergyInfo.json";
+  static final File _fileCache = File("${supportPath.path}/$_energyInfo");
 
-  static const electricityHistory = "ElectricityHistory.json";
-  static File fileHistory = File("${supportPath.path}/$electricityHistory");
+  static const _electricityHistory = "ElectricityHistory.json";
+  static final File _fileHistory = File(
+    "${supportPath.path}/$_electricityHistory",
+  );
 
-  static bool get isCacheExist => fileCache.existsSync();
+  bool get isCacheExist => _fileCache.existsSync();
 
-  static FetchResult<EnergyInfo>? getCache() {
+  FetchResult<EnergyInfo>? getCache() {
     if (!isCacheExist) return null;
     log.info("[EneregySession][cache] Checking out cache.");
     try {
       final cache = EnergyInfo.fromJson(
-        jsonDecode(fileCache.readAsStringSync()),
+        jsonDecode(_fileCache.readAsStringSync()),
       );
       return FetchResult.cache(
-        fetchTime: fileCache.lastModifiedSync(),
+        fetchTime: _fileCache.lastModifiedSync(),
         data: cache,
       );
     } catch (e, s) {
@@ -82,30 +50,29 @@ class EnergySession extends IDSSession {
     }
   }
 
-  static void saveCache(EnergyInfo info) {
+  void saveCache(EnergyInfo info) {
     if (!isCacheExist) {
-      fileCache.createSync(recursive: true);
+      _fileCache.createSync(recursive: true);
     }
-    fileCache.writeAsStringSync(jsonEncode(info.toJson()));
+    _fileCache.writeAsStringSync(jsonEncode(info.toJson()));
   }
 
-  static void clearCache() {
-    if (!EnergySession.fileCache.existsSync()) {
-      return;
+  void deleteCache() {
+    if (_fileCache.existsSync()) {
+      _fileCache.deleteSync();
     }
-    EnergySession.fileCache.deleteSync();
   }
 
-  static List<ElectricityHistoryInfo> getElectricityHistory() {
+  List<ElectricityHistoryInfo> getElectricityHistory() {
     var list = <ElectricityHistoryInfo>[];
 
-    if (!EnergySession.fileHistory.existsSync()) {
-      EnergySession.fileHistory.createSync(recursive: true);
+    if (!_fileHistory.existsSync()) {
+      _fileHistory.createSync(recursive: true);
       return list;
     }
 
     try {
-      String rawHistory = EnergySession.fileHistory.readAsStringSync();
+      String rawHistory = _fileHistory.readAsStringSync();
       List<ElectricityHistoryInfo> toAdd = jsonDecode(rawHistory)
           .map<ElectricityHistoryInfo>(
             (data) => ElectricityHistoryInfo.fromJson(data),
@@ -120,20 +87,54 @@ class EnergySession extends IDSSession {
     return list;
   }
 
-  static void saveElectricityHistory(List<ElectricityHistoryInfo> history) {
-    if (!EnergySession.fileHistory.existsSync()) {
-      EnergySession.fileHistory.createSync(recursive: true);
+  void saveElectricityHistory(List<ElectricityHistoryInfo> history) {
+    if (!_fileHistory.existsSync()) {
+      _fileHistory.createSync(recursive: true);
     }
-    fileHistory.writeAsStringSync(jsonEncode(history));
+    _fileHistory.writeAsStringSync(jsonEncode(history));
   }
 
-  static void clearElectricityHistory() {
-    if (!EnergySession.fileHistory.existsSync()) {
+  void clearElectricityHistory() {
+    if (!_fileHistory.existsSync()) {
       return;
     }
 
-    EnergySession.fileHistory.deleteSync();
-    EnergySession.fileHistory.createSync();
+    _fileHistory.deleteSync();
+    _fileHistory.createSync();
+  }
+
+  String _cacheHintFromError(Object error) {
+    if (error is NotSchoolNetworkException) {
+      return "electricity.not_school_network";
+    }
+    if (error is NoAccountInfoException) {
+      return "electricity.cache_hint_account_missing";
+    }
+    if (error is AccountFailedParseException) {
+      return "electricity.cache_hint_account_parse_failed";
+    }
+    if (error is CaptchaFailedException) {
+      return "electricity.cache_hint_captcha_failed";
+    }
+    if (error is PasswordWrongException) {
+      return "electricity.cache_hint_password_wrong";
+    }
+    if (error is LoginFailedException) {
+      return "electricity.cache_hint_login_failed";
+    }
+    if (error is NotInitalizedException) {
+      if (error.msg == "用户名或密码错误") {
+        return "electricity.cache_hint_password_wrong";
+      }
+      if (error.msg.contains("验证码")) {
+        return "electricity.cache_hint_captcha_failed";
+      }
+      return "electricity.cache_hint_login_failed";
+    }
+    if (error is DioException) {
+      return "electricity.cache_hint_network_failed";
+    }
+    return "electricity.cache_hint_unknown_error";
   }
 
   Future<FetchResult<EnergyInfo>> getElectricityInfo({
@@ -142,20 +143,15 @@ class EnergySession extends IDSSession {
     log.info("[EletricitySession][update] Ready to update electricity info. ");
     DateTime fetchDay = DateTime.now();
 
-    //  if (preference.getString(preference.Preference.electricityAccount).isEmpty) {
-    //   if (EnergySession.fileCache.existsSync()) {
-    //     EnergySession.fileCache.deleteSync();
-    //   }
-    // }
     // Fetch cache info
-    final cache = EnergySession.getCache();
+    final cache = getCache();
 
     try {
       log.info("[EletricitySession][update] Fetching from Internet.");
-      var toReturn = await EnergySession().requestNewEnergyInfo(
+      var toReturn = await _requestNewEnergyInfo(
         captchaFunction: captchaFunction,
       );
-      EnergySession.saveCache(toReturn);
+      saveCache(toReturn);
       return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
     } catch (e, s) {
       log.handle(e, s, "[getElectricityInfo] Have issue");
@@ -238,7 +234,7 @@ class EnergySession extends IDSSession {
     );
   }
 
-  Future<EnergyInfo> requestNewEnergyInfo({
+  Future<EnergyInfo> _requestNewEnergyInfo({
     required Future<String> Function(List<int>)? captchaFunction,
   }) async {
     final location = await checkAndLogin(

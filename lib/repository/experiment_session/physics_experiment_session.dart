@@ -18,22 +18,23 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/model/xidian_ids/experiment.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
-class ExperimentSession with NetworkClient {
+/// For physics experiment
+class ExperimentSession {
   static const physicsExperimentCacheName = "PhysicsExperiment.json";
   static File physicsExperimentCacheFile = File(
     "${supportPath.path}/$physicsExperimentCacheName",
   );
-  static bool get isCacheExist => physicsExperimentCacheFile.existsSync();
+  bool get isCacheExist => physicsExperimentCacheFile.existsSync();
 
-  static void deleteCache() async {
+  void deleteCache() async {
     if (physicsExperimentCacheFile.existsSync()) {
       physicsExperimentCacheFile.deleteSync();
     }
   }
 
-  static Future<void> writeCache(List<ExperimentData> data) async {
+  Future<void> writeCache(List<ExperimentData> data) async {
     log.info(
       "[ExperimentSession][writeCache] "
       "Store to cache.",
@@ -59,7 +60,7 @@ class ExperimentSession with NetworkClient {
     }
   }
 
-  static (DateTime, List<ExperimentData>)? getCache() {
+  (DateTime, List<ExperimentData>)? getCache() {
     if (!isCacheExist) return null;
     try {
       List<dynamic> toDecode = jsonDecode(
@@ -100,8 +101,7 @@ class ExperimentSession with NetworkClient {
     }
   }
 
-  @override
-  Dio get dio => Dio()
+  Dio dio = Dio()
     ..interceptors.add(logDioAdapter)
     ..options.contentType = Headers.formUrlEncodedContentType
     ..options.followRedirects = false
@@ -120,8 +120,7 @@ class ExperimentSession with NetworkClient {
   static Map<String, String> selectInfo = {};
   String cookieStr = "";
 
-  /// This function is used to fetch the teacher for the experiment class.
-  Future<String> teacher({
+  Future<String> _getTeacher({
     required String time,
     required String subject,
   }) async {
@@ -215,7 +214,7 @@ class ExperimentSession with NetworkClient {
     throw NotFoundTeacherException;
   }
 
-  Future<List<ExperimentData>> getData() async {
+  Future<List<ExperimentData>> _getExperimentData() async {
     if (await isInSchool() == false) {
       throw NotSchoolNetworkException();
     }
@@ -371,7 +370,7 @@ class ExperimentSession with NetworkClient {
               classroom: expTds[5].getElementsByTagName("span").first.innerHtml,
               timeRanges: [timeRange],
               reference: expTds[9].getElementsByTagName("span").first.innerHtml,
-              teacher: await teacher(
+              teacher: await _getTeacher(
                 time: expTds[3].getElementsByTagName("span").first.innerHtml,
                 subject: expTds[1]
                     .getElementsByClassName("linkSmallBold")
@@ -404,22 +403,22 @@ class ExperimentSession with NetworkClient {
     return "experiment.physics_cache_hint_unknown_error";
   }
 
-  Future<FetchResult<List<ExperimentData>>> getPhysicsExperimentData() async {
+  Future<FetchResult<List<ExperimentData>>> getData() async {
     try {
-      List<ExperimentData> data = await ExperimentSession().getData();
+      List<ExperimentData> data = await _getExperimentData();
       DateTime fetchTime = DateTime.now();
-      await ExperimentSession.writeCache(data);
+      await writeCache(data);
       return FetchResult.fresh(fetchTime: fetchTime, data: data);
     } on PasswordWrongException {
       log.error(
         "[ExperimentSession][getExperimentData] "
         "Password changed, remove cache",
       );
-      ExperimentSession.deleteCache();
+      deleteCache();
       rethrow;
     } catch (e, s) {
       log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
-      var cache = ExperimentSession.getCache();
+      var cache = getCache();
       if (cache != null) {
         return FetchResult.cache(
           fetchTime: cache.$1,

@@ -12,36 +12,88 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/model/fetch_result.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/model/user_role.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-
-String _cacheHintFromError(Object error) {
-  if (error is PasswordWrongException) {
-    return "score.cache_hint_password_wrong";
-  }
-  if (error is LoginFailedException) {
-    return "score.cache_hint_login_failed";
-  }
-  if (error is DioException) {
-    return "score.cache_hint_network_failed";
-  }
-  return "score.cache_hint_unknown_error";
-}
+import 'package:watermeter/repository/ids_session/ehall_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 /// 考试成绩 4768574631264620
 class ScoreSession extends EhallSession {
-  static const scoreListCacheName = "scores.json";
-  static File file = File("${supportPath.path}/$scoreListCacheName");
+  static const _scoreListCacheName = "scores.json";
+  static final File _file = File("${supportPath.path}/$_scoreListCacheName");
 
-  static bool get isCacheExist => file.existsSync();
+  // Use static since it is not a global function, which is not controller-based.
+  static bool get isCacheExist => _file.existsSync();
+  static void deleteCache() {
+    _file.deleteSync();
+  }
+
+  Future<FetchResult<List<Score>>> getScore(UserRole role) async {
+    List<Score> toReturn = [];
+    List<Score> cache = [];
+
+    /// Try retrieving cached scores first.
+    log.info(
+      "[ScoreSession][getScore] "
+      "Path at ${supportPath.path}/$_scoreListCacheName.",
+    );
+    if (_file.existsSync()) {
+      log.info(
+        "[ScoreSession][getScore] "
+        "Cache file found.",
+      );
+      cache = (jsonDecode(_file.readAsStringSync()) as List<dynamic>)
+          .map((s) => Score.fromJson(s as Map<String, dynamic>))
+          .toList();
+    } else {
+      log.info(
+        "[ScoreSession][getScore] "
+        "Cache file non-existent.",
+      );
+    }
+
+    /// Otherwise get fresh score data.
+    log.info(
+      "[ScoreSession][getScore] "
+      "Start getting score data.",
+    );
+
+    try {
+      toReturn = role == UserRole.postgraduate
+          ? await _getScoreFromYjspt()
+          : await _getScoreFromEhall();
+      DateTime fetchTime = DateTime.now();
+      _file.writeAsStringSync(jsonEncode(toReturn));
+      log.info(
+        "[ScoreWindow][dumpScoreListCache] "
+        "Dumped scoreList to ${supportPath.path}/$_scoreListCacheName.",
+      );
+      log.info(
+        "[ScoreSession][getScore] "
+        "Cached the score data.",
+      );
+      return FetchResult.fresh(fetchTime: fetchTime, data: toReturn);
+    } catch (e, s) {
+      log.handle(e, s, "[ScoreSession][getScore] Have issue");
+      if (cache.isNotEmpty) {
+        return FetchResult.cache(
+          fetchTime: _file.lastModifiedSync(),
+          data: cache,
+          hintKey: _cacheHintFromError(e),
+        );
+      } else {
+        rethrow;
+      }
+    }
+  }
 
   /// Must be called after [getScore]!
   /// If bug, just return dummy data.
+  /// TODO: Return error
   Future<List<ComposeDetail>> getDetail(
     String? JXBID,
     String semesterCode, {
@@ -111,15 +163,20 @@ class ScoreSession extends EhallSession {
     }
   }
 
-  void dumpScoreListCache(List<Score> scores) {
-    file.writeAsStringSync(jsonEncode(scores));
-    log.info(
-      "[ScoreWindow][dumpScoreListCache] "
-      "Dumped scoreList to ${supportPath.path}/$scoreListCacheName.",
-    );
+  String _cacheHintFromError(Object error) {
+    if (error is PasswordWrongException) {
+      return "score.cache_hint_password_wrong";
+    }
+    if (error is LoginFailedException) {
+      return "score.cache_hint_login_failed";
+    }
+    if (error is DioException) {
+      return "score.cache_hint_network_failed";
+    }
+    return "score.cache_hint_unknown_error";
   }
 
-  Future<List<Score>> getScoreFromYjspt() async {
+  Future<List<Score>> _getScoreFromYjspt() async {
     List<Score> toReturn = [];
 
     log.info("[ScoreSession][getScoreFromYjspt] Ready to login the system.");
@@ -168,7 +225,7 @@ class ScoreSession extends EhallSession {
     return toReturn;
   }
 
-  Future<List<Score>> getScoreFromEhall() async {
+  Future<List<Score>> _getScoreFromEhall() async {
     List<Score> toReturn = [];
 
     /// Otherwise get fresh score data.
@@ -236,61 +293,6 @@ class ScoreSession extends EhallSession {
       j++;
     }
     return toReturn;
-  }
-
-  Future<FetchResult<List<Score>>> getScore() async {
-    List<Score> toReturn = [];
-    List<Score> cache = [];
-
-    /// Try retrieving cached scores first.
-    log.info(
-      "[ScoreSession][getScore] "
-      "Path at ${supportPath.path}/$scoreListCacheName.",
-    );
-    if (file.existsSync()) {
-      log.info(
-        "[ScoreSession][getScore] "
-        "Cache file found.",
-      );
-      cache = (jsonDecode(file.readAsStringSync()) as List<dynamic>)
-          .map((s) => Score.fromJson(s as Map<String, dynamic>))
-          .toList();
-    } else {
-      log.info(
-        "[ScoreSession][getScore] "
-        "Cache file non-existent.",
-      );
-    }
-
-    /// Otherwise get fresh score data.
-    log.info(
-      "[ScoreSession][getScore] "
-      "Start getting score data.",
-    );
-
-    try {
-      toReturn = pref.getBool(pref.Preference.role)
-          ? await getScoreFromYjspt()
-          : await getScoreFromEhall();
-      DateTime fetchTime = DateTime.now();
-      dumpScoreListCache(toReturn);
-      log.info(
-        "[ScoreSession][getScore] "
-        "Cached the score data.",
-      );
-      return FetchResult.fresh(fetchTime: fetchTime, data: toReturn);
-    } catch (e, s) {
-      log.handle(e, s, "[ScoreSession][getScore] Have issue");
-      if (cache.isNotEmpty) {
-        return FetchResult.cache(
-          fetchTime: file.lastModifiedSync(),
-          data: cache,
-          hintKey: _cacheHintFromError(e),
-        );
-      } else {
-        rethrow;
-      }
-    }
   }
 }
 

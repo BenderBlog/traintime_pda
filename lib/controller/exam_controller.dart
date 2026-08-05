@@ -12,7 +12,8 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/exam_session.dart';
+import 'package:watermeter/repository/ids_session/exam_session.dart';
+import 'package:watermeter/repository/preference.dart';
 
 class ExamController {
   static final ExamController i = ExamController._();
@@ -20,7 +21,7 @@ class ExamController {
   final session = ExamSession();
 
   ExamController._() {
-    final cache = ExamSession.getCache();
+    final cache = session.getCache();
     if (cache != null) {
       final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
       _lastValidExamInfo.value = cached;
@@ -47,7 +48,7 @@ class ExamController {
       _lastHandledSemesterSyncEvent = semesterChangeEvent;
       if (semesterChangeEvent.didChange) {
         _lastValidExamInfo.value = null;
-        ExamSession.deleteCache();
+        session.deleteCache();
       }
       unawaited(reloadExamInfo());
     }, options: EffectOptions(name: "ExamControllerSemesterChangeEffect"));
@@ -63,6 +64,7 @@ class ExamController {
     try {
       final result = await session.getScoreInfo(
         SemesterController.i.semesterSignal.value,
+        getUserRole(),
       );
       _lastValidExamInfo.value = result;
       examInfoStateSignal.value = AsyncState.data(result);

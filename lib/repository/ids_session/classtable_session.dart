@@ -13,44 +13,32 @@ import 'package:intl/intl.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/model/user_role.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
-
-String _cacheHintFromError(Object error) {
-  if (error is PasswordWrongException) {
-    return "classtable.cache_hint_password_wrong";
-  }
-  if (error is LoginFailedException) {
-    return "classtable.cache_hint_login_failed";
-  }
-  if (error is DioException) {
-    return "classtable.cache_hint_network_failed";
-  }
-  return "classtable.cache_hint_unknown_error";
-}
+import 'package:watermeter/repository/ids_session/ehall_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 /// 课程表 4770397878132218
 class ClassTableSession extends EhallSession {
-  static const schoolClassName = "ClassTable.json";
-
-  static File schoolClassDataCache = File(
-    "${supportPath.path}/$schoolClassName",
+  static const _schoolClassName = "ClassTable.json";
+  static final File _schoolClassDataCache = File(
+    "${supportPath.path}/$_schoolClassName",
   );
-  static bool get isCacheExist => schoolClassDataCache.existsSync();
 
-  static void deleteCache() async {
-    if (schoolClassDataCache.existsSync()) {
-      schoolClassDataCache.deleteSync();
+  bool get isCacheExist => _schoolClassDataCache.existsSync();
+
+  void deleteCache() async {
+    if (_schoolClassDataCache.existsSync()) {
+      _schoolClassDataCache.deleteSync();
     }
   }
 
-  static Future<void> updateCacheAndGroup(ClassTableData data) async {
-    await schoolClassDataCache.writeAsString(jsonEncode(data.toJson()));
+  Future<void> updateCacheAndGroup(ClassTableData data) async {
+    await _schoolClassDataCache.writeAsString(jsonEncode(data.toJson()));
 
     /// TODO: Change ios widgitkit code to parse user defined classtable.
     if (Platform.isIOS) {
@@ -73,12 +61,12 @@ class ClassTableSession extends EhallSession {
     }
   }
 
-  static (DateTime, ClassTableData)? getCache() {
+  (DateTime, ClassTableData)? getCache() {
     try {
       ClassTableData toReturn = ClassTableData.fromJson(
-        jsonDecode(schoolClassDataCache.readAsStringSync()),
+        jsonDecode(_schoolClassDataCache.readAsStringSync()),
       );
-      DateTime fetchTime = schoolClassDataCache.lastModifiedSync();
+      DateTime fetchTime = _schoolClassDataCache.lastModifiedSync();
       return (fetchTime, toReturn);
     } catch (e, s) {
       log.handle(e, s);
@@ -86,17 +74,20 @@ class ClassTableSession extends EhallSession {
     }
   }
 
-  Future<FetchResult<ClassTableData>> getClassTable(String semesterCode) async {
+  Future<FetchResult<ClassTableData>> getClassTable(
+    String semesterCode,
+    UserRole role,
+  ) async {
     try {
-      ClassTableData data = pref.getBool(pref.Preference.role)
-          ? await ClassTableSession().getYjspt(semesterCode)
-          : await ClassTableSession().getEhall(semesterCode);
+      ClassTableData data = role == UserRole.postgraduate
+          ? await _getYjspt(semesterCode)
+          : await _getEhall(semesterCode);
       DateTime fetchTime = DateTime.now();
-      await ClassTableSession.updateCacheAndGroup(data);
+      await updateCacheAndGroup(data);
       return FetchResult.fresh(fetchTime: fetchTime, data: data);
     } catch (e, s) {
       log.handle(e, s, "[getClassTable] Have issue");
-      (DateTime, ClassTableData)? cache = ClassTableSession.getCache();
+      (DateTime, ClassTableData)? cache = getCache();
       if (cache != null) {
         return FetchResult.cache(
           fetchTime: cache.$1,
@@ -108,11 +99,23 @@ class ClassTableSession extends EhallSession {
     }
   }
 
-  Future<ClassTableData> getYjspt(String semesterCode) async {
+  String _cacheHintFromError(Object error) {
+    if (error is PasswordWrongException) {
+      return "classtable.cache_hint_password_wrong";
+    }
+    if (error is LoginFailedException) {
+      return "classtable.cache_hint_login_failed";
+    }
+    if (error is DioException) {
+      return "classtable.cache_hint_network_failed";
+    }
+    return "classtable.cache_hint_unknown_error";
+  }
+
+  // Fetch directly form ids
+  Future<ClassTableData> _getYjspt(String semesterCode) async {
     Map<String, dynamic> qResult = {};
 
-    //  const semesterCodeURL =
-    //      "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/kfdxnxqcx.do";
     const classInfoURL =
         "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/xspkjgcx.do";
     const notArrangedInfoURL =
@@ -290,7 +293,8 @@ class ClassTableSession extends EhallSession {
     return toReturn;
   }
 
-  Future<ClassTableData> getEhall(String semesterCode) async {
+  // Fetch from ehall
+  Future<ClassTableData> _getEhall(String semesterCode) async {
     Map<String, dynamic> qResult = {};
     log.info("[getClasstable][getEhall] Login the system.");
     String get = await useApp("4770397878132218");

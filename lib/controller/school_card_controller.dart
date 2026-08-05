@@ -3,7 +3,7 @@
 
 import 'package:signals/signals.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
+import 'package:watermeter/repository/ids_session/school_card_session.dart';
 
 class SchoolCardController {
   static final SchoolCardController i = SchoolCardController._();

@@ -7,7 +7,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/miscellaneous_session/empty_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 
 class ButtomButtons extends StatelessWidget {
   /// Variables of the three buttons in the bottom
@@ -28,7 +28,7 @@ class ButtomButtons extends StatelessWidget {
             style: _bottomTextStyle,
           ),
           onPressed: () {
-            EmptySession().clearCookieJar().then((value) {
+            NetworkCookieJars.ids.deleteAll().then((value) {
               if (context.mounted) {
                 showToast(
                   context: context,
