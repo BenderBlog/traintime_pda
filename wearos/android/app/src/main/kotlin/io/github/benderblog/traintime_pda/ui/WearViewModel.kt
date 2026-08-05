@@ -218,7 +218,7 @@ class WearViewModel(
                 qrError = null,
             )
         }
-        loadQr(flowId)
+        loadQr(flowId, forceRefresh = false)
     }
 
     fun closeQr() {
@@ -243,13 +243,14 @@ class WearViewModel(
                 qrError = null,
             )
         }
-        loadQr(flowId)
+        loadQr(flowId, forceRefresh = true)
     }
 
-    private fun loadQr(flowId: Long) {
+    private fun loadQr(flowId: Long, forceRefresh: Boolean) {
         qrJob = viewModelScope.launch {
             try {
                 val result = paymentRepo.load(
+                    forceRefresh = forceRefresh,
                     reAuthHandler = { client ->
                         currentCoroutineContext().ensureActive()
                         if (!isQrFlowActive(flowId)) {

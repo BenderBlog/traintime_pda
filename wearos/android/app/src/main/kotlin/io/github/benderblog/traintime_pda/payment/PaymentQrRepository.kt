@@ -53,8 +53,14 @@ class PaymentQrRepository(
     }
 
     suspend fun load(
+        forceRefresh: Boolean = false,
         reAuthHandler: (suspend (WearIDSReAuthClient) -> URI)? = null,
     ): PaymentQrResult {
+        if (!forceRefresh) {
+            cache.readPaymentQr()?.let { (bytes, fetchedAt) ->
+                return PaymentQrResult(bytes, fromCache = true, fetchedAtEpochMs = fetchedAt)
+            }
+        }
         return try {
             requestDirectly(reAuthHandler)
         } catch (cancelled: CancellationException) {
@@ -100,6 +106,15 @@ class PaymentQrRepository(
             username = account,
             password = password,
             browserFingerprint = preferences.getOrCreateIdsBrowserFingerprint(),
+            storedOpenId = preferences.schoolCardOpenId,
+            storedOpenIdFetchedAt = preferences.schoolCardOpenIdFetchedAt,
+            onOpenIdChanged = { value, fetchedAt ->
+                if (value == null || fetchedAt == null) {
+                    preferences.clearSchoolCardOpenId()
+                } else {
+                    preferences.storeSchoolCardOpenId(value, fetchedAt)
+                }
+            },
         )
         activeSession.set(session)
         try {

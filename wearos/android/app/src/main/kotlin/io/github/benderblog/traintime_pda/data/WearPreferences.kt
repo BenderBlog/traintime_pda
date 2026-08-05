@@ -49,6 +49,16 @@ class WearPreferences(context: Context) {
         get() = readBool(KEY_IS_USER_DEFINED_SEMESTER)
         set(value) = prefs.edit().putBoolean(KEY_IS_USER_DEFINED_SEMESTER, value).apply()
 
+    val schoolCardOpenId: String?
+        get() = prefs.getString(KEY_SCHOOL_CARD_OPEN_ID, null)?.ifEmpty { null }
+
+    val schoolCardOpenIdFetchedAt: Long?
+        get() = if (prefs.contains(KEY_SCHOOL_CARD_OPEN_ID_FETCHED_AT)) {
+            prefs.getLong(KEY_SCHOOL_CARD_OPEN_ID_FETCHED_AT, 0L).takeIf { it > 0L }
+        } else {
+            null
+        }
+
     fun contains(key: String): Boolean =
         prefs.contains(key) || flutterPrefs.contains("flutter.$key")
 
@@ -59,6 +69,8 @@ class WearPreferences(context: Context) {
             .remove(KEY_CURRENT_SEMESTER)
             .remove(KEY_ROLE)
             .remove(KEY_IS_USER_DEFINED_SEMESTER)
+            .remove(KEY_SCHOOL_CARD_OPEN_ID)
+            .remove(KEY_SCHOOL_CARD_OPEN_ID_FETCHED_AT)
             .apply()
         flutterPrefs.edit()
             .remove("flutter.$KEY_IDS_ACCOUNT")
@@ -79,6 +91,20 @@ class WearPreferences(context: Context) {
         val generated = bytes.joinToString("") { byte -> "%02X".format(byte.toInt() and 0xFF) }
         prefs.edit().putString(KEY_IDS_BROWSER_FINGERPRINT, generated).apply()
         return generated
+    }
+
+    fun storeSchoolCardOpenId(value: String, fetchedAtEpochMs: Long) {
+        prefs.edit()
+            .putString(KEY_SCHOOL_CARD_OPEN_ID, value)
+            .putLong(KEY_SCHOOL_CARD_OPEN_ID_FETCHED_AT, fetchedAtEpochMs)
+            .apply()
+    }
+
+    fun clearSchoolCardOpenId() {
+        prefs.edit()
+            .remove(KEY_SCHOOL_CARD_OPEN_ID)
+            .remove(KEY_SCHOOL_CARD_OPEN_ID_FETCHED_AT)
+            .apply()
     }
 
     private fun readString(key: String): String {
@@ -105,5 +131,7 @@ class WearPreferences(context: Context) {
         const val KEY_ROLE = "role"
         const val KEY_IS_USER_DEFINED_SEMESTER = "isUserDefinedSemester"
         private const val KEY_IDS_BROWSER_FINGERPRINT = "idsBrowserFingerprint"
+        private const val KEY_SCHOOL_CARD_OPEN_ID = "schoolCardOpenId"
+        private const val KEY_SCHOOL_CARD_OPEN_ID_FETCHED_AT = "schoolCardOpenIdFetchedAt"
     }
 }

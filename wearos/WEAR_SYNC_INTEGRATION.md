@@ -36,10 +36,13 @@ The phone's `WearCompanionListenerService` responds with the last snapshot even
 when the Flutter activity is not running. A normal phone homepage refresh
 updates that native snapshot.
 
-For a payment QR, the watch first uses the synchronized account/password and
-its own persistent cookie store. Automatic slider verification and an on-watch
-SMS MFA page are supported. The phone proxy and the last cached QR are fallback
-paths. Pulling down on a displayed QR requests a fresh code from the watch.
+For a payment QR, a normal page open immediately displays the last local copy
+without networking. Pulling down requests a fresh code, first using the
+synchronized account/password, persisted IDS cookies, browser fingerprint and
+short-lived school-card openid on the watch. Automatic slider verification and
+an on-watch SMS MFA page are supported; the phone proxy and the previous local
+copy remain refresh fallbacks. Transient network errors do not clear a valid
+IDS cookie.
 
 If the phone is disconnected, the watch continues to use its local class-table
 and experiment caches. A successfully fetched payment QR is also cached on the

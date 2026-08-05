@@ -4,9 +4,11 @@
 package io.github.benderblog.traintime_pda.ids
 
 import android.util.Log
+import kotlinx.coroutines.CancellationException
 import okhttp3.Request
 import org.jsoup.Jsoup
 import java.net.URI
+import java.io.IOException
 import java.util.Base64
 import java.util.concurrent.TimeUnit
 
@@ -18,7 +20,13 @@ class SchoolCardSession(
     username: String,
     password: String,
     browserFingerprint: String,
+    storedOpenId: String?,
+    storedOpenIdFetchedAt: Long?,
+    private val onOpenIdChanged: (String?, Long?) -> Unit,
 ) : IdsSession(cookieJar, username, password, browserFingerprint) {
+    init {
+        restoreOpenId(storedOpenId, storedOpenIdFetchedAt)
+    }
     /**
      * Optional SMS re-auth handler. Returns the post-reauth location URI.
      * When null and re-auth is required, [WearIDSReAuthExpiredException] is thrown.
@@ -37,11 +45,14 @@ class SchoolCardSession(
                     ensureOpenId(forceRefresh = true)
                     IdsLoginState.state = IdsLoginState.State.SUCCESS
                     return
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (network: IOException) {
+                    throw network
                 } catch (_: Exception) {
-                    resetOpenId()
+                    clearOpenId()
                 }
             }
-            clearCookieJar()
             val idsService = discoverIdsService()
             var location = checkAndLogin(
                 target = idsService,
@@ -128,7 +139,7 @@ class SchoolCardSession(
 
     private fun ensureOpenId(forceRefresh: Boolean = false) {
         if (!forceRefresh && isOpenIdValid) return
-        resetOpenId()
+        clearOpenId()
         var response = executeGetFollowResult(OPEN_OAUTH_URL)
         // follow already done; capture from final HTML
         captureOpenId(response)
@@ -144,6 +155,12 @@ class SchoolCardSession(
         }
         if (openid.isEmpty()) throw Exception("School card openid not found.")
         openidFetchedAt = System.currentTimeMillis()
+        onOpenIdChanged(openid, openidFetchedAt)
+    }
+
+    private fun clearOpenId() {
+        resetOpenId()
+        onOpenIdChanged(null, null)
     }
 
     private fun discoverIdsService(): String {
@@ -227,6 +244,15 @@ class SchoolCardSession(
         fun resetOpenId() {
             openid = ""
             openidFetchedAt = null
+        }
+
+        fun restoreOpenId(value: String?, fetchedAtEpochMs: Long?) {
+            if (value.isNullOrEmpty() || fetchedAtEpochMs == null) return
+            if (System.currentTimeMillis() - fetchedAtEpochMs !in 0 until OPENID_VALID_MS) return
+            if (openidFetchedAt == null || fetchedAtEpochMs > openidFetchedAt!!) {
+                openid = value
+                openidFetchedAt = fetchedAtEpochMs
+            }
         }
     }
 }

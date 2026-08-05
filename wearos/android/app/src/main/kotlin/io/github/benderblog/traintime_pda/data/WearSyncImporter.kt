@@ -85,6 +85,7 @@ class WearSyncImporter(
         preferences.clearCredentials()
         cache.clearIdsCookies()
         SchoolCardSession.resetOpenId()
+        preferences.clearSchoolCardOpenId()
         cache.clearCampusCaches()
         cache.clearPaymentQr()
         IdsLoginState.state = IdsLoginState.State.MANUAL
@@ -93,6 +94,7 @@ class WearSyncImporter(
     private fun clearUserScopedState(clearPaymentQr: Boolean) {
         cache.clearIdsCookies()
         SchoolCardSession.resetOpenId()
+        preferences.clearSchoolCardOpenId()
         cache.clearCampusCaches()
         if (clearPaymentQr) cache.clearPaymentQr()
         IdsLoginState.state = IdsLoginState.State.NONE
