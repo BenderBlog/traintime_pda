@@ -22,6 +22,7 @@ open class IdsSession(
     protected val cookieJar: PersistentCookieJar,
     protected val username: String,
     protected val password: String,
+    protected val browserFingerprint: String,
 ) {
     protected val client: OkHttpClient = OkHttpClient.Builder()
         .cookieJar(cookieJar)
@@ -47,6 +48,7 @@ open class IdsSession(
             return first.location
                 ?: throw LoginFailedException("登录重定向缺少 Location")
         }
+        registerBrowserFingerprint()
 
         val continueForm = Jsoup.parse(first.body).select("form#continue")
         if (continueForm.isNotEmpty()) {
@@ -84,6 +86,7 @@ open class IdsSession(
             if (target != null) append("&service=").append(urlEncode(target))
         }
         val page = executeGet("https://ids.xidian.edu.cn/authserver/login?$query")
+        registerBrowserFingerprint()
         val doc = Jsoup.parse(page.body)
         val hiddenInputs = doc.select("input[type=hidden]")
 
@@ -153,6 +156,21 @@ open class IdsSession(
 
     fun clearCookieJar() {
         cookieJar.clear()
+    }
+
+    fun cancelRequests() {
+        client.dispatcher.cancelAll()
+    }
+
+    private fun registerBrowserFingerprint() {
+        val url = okhttp3.HttpUrl.Builder()
+            .scheme("https")
+            .host("ids.xidian.edu.cn")
+            .addPathSegments("authserver/bfp/info")
+            .addQueryParameter("bfp", browserFingerprint)
+            .addQueryParameter("_", System.currentTimeMillis().toString())
+            .build()
+        executeGet(url.toString())
     }
 
     protected fun executeGet(url: String): HttpResult {

@@ -28,6 +28,7 @@ class WearIDSReAuthClient(
     val challengeUri: URI,
     val username: String,
     val service: String,
+    private val browserFingerprint: String,
 ) {
     var recipientDescription: String? = null
         private set
@@ -52,6 +53,18 @@ class WearIDSReAuthClient(
         challengeResponse.use {
             if (it.code != 200) {
                 throw WearIDSReAuthExpiredException("二次认证已失效，请重新登录")
+            }
+        }
+        val fingerprintUrl = okhttp3.HttpUrl.Builder()
+            .scheme("https")
+            .host("ids.xidian.edu.cn")
+            .addPathSegments("authserver/bfp/info")
+            .addQueryParameter("bfp", browserFingerprint)
+            .addQueryParameter("_", System.currentTimeMillis().toString())
+            .build()
+        client.newCall(Request.Builder().url(fingerprintUrl).get().build()).execute().use {
+            if (it.code !in 200..399) {
+                throw WearIDSProtocolException("无法注册统一认证设备指纹")
             }
         }
         val form = FormBody.Builder()

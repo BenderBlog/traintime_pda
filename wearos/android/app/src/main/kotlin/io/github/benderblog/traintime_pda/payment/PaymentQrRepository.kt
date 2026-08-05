@@ -9,9 +9,13 @@ import io.github.benderblog.traintime_pda.ids.PersistentCookieJar
 import io.github.benderblog.traintime_pda.ids.SchoolCardSession
 import io.github.benderblog.traintime_pda.ids.WearIDSReAuthClient
 import io.github.benderblog.traintime_pda.sync.WearCompanionClient
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.net.URI
+import java.util.concurrent.atomic.AtomicReference
 
 data class PaymentQrResult(
     val bytes: ByteArray,
@@ -42,15 +46,27 @@ class PaymentQrRepository(
     private val cache: WearCacheStore,
     private val companionClient: WearCompanionClient,
 ) {
+    private val activeSession = AtomicReference<SchoolCardSession?>(null)
+
+    fun cancelActiveRequests() {
+        activeSession.getAndSet(null)?.cancelRequests()
+    }
+
     suspend fun load(
         reAuthHandler: (suspend (WearIDSReAuthClient) -> URI)? = null,
     ): PaymentQrResult {
         return try {
             requestDirectly(reAuthHandler)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (_: Exception) {
+            currentCoroutineContext().ensureActive()
             try {
                 requestFromPhone()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (phone: Exception) {
+                currentCoroutineContext().ensureActive()
                 cache.readPaymentQr()?.let { (bytes, fetchedAt) ->
                     PaymentQrResult(bytes, fromCache = true, fetchedAtEpochMs = fetchedAt)
                 } ?: throw phone
@@ -83,15 +99,21 @@ class PaymentQrRepository(
             cookieJar = PersistentCookieJar(cache.cookieDir),
             username = account,
             password = password,
+            browserFingerprint = preferences.getOrCreateIdsBrowserFingerprint(),
         )
-        session.authenticateWithStoredCredentials(reAuthHandler = reAuthHandler)
-        val bytes = session.getQRCode()
-        val fetchedAt = System.currentTimeMillis()
-        cache.writePaymentQr(bytes, fetchedAt)
-        PaymentQrResult(
-            bytes = bytes,
-            fromCache = false,
-            fetchedAtEpochMs = fetchedAt,
-        )
+        activeSession.set(session)
+        try {
+            session.authenticateWithStoredCredentials(reAuthHandler = reAuthHandler)
+            val bytes = session.getQRCode()
+            val fetchedAt = System.currentTimeMillis()
+            cache.writePaymentQr(bytes, fetchedAt)
+            PaymentQrResult(
+                bytes = bytes,
+                fromCache = false,
+                fetchedAtEpochMs = fetchedAt,
+            )
+        } finally {
+            activeSession.compareAndSet(session, null)
+        }
     }
 }

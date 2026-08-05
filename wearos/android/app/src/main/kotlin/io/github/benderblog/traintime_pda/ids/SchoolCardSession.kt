@@ -17,7 +17,8 @@ class SchoolCardSession(
     cookieJar: PersistentCookieJar,
     username: String,
     password: String,
-) : IdsSession(cookieJar, username, password) {
+    browserFingerprint: String,
+) : IdsSession(cookieJar, username, password, browserFingerprint) {
     /**
      * Optional SMS re-auth handler. Returns the post-reauth location URI.
      * When null and re-auth is required, [WearIDSReAuthExpiredException] is thrown.
@@ -57,6 +58,7 @@ class SchoolCardSession(
                     challengeUri = redirectUri,
                     username = username,
                     service = idsService,
+                    browserFingerprint = browserFingerprint,
                 )
                 location = handler(reAuthClient).toString()
             }

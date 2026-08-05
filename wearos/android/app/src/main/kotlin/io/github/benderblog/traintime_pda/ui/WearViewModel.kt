@@ -10,25 +10,26 @@ import io.github.benderblog.traintime_pda.WearAppContainer
 import io.github.benderblog.traintime_pda.domain.WearAgendaBuilder
 import io.github.benderblog.traintime_pda.domain.WearHomeData
 import io.github.benderblog.traintime_pda.ids.IdsLoginState
-import io.github.benderblog.traintime_pda.ids.WearIDSReAuthCancelledException
 import io.github.benderblog.traintime_pda.ids.WearIDSReAuthClient
 import io.github.benderblog.traintime_pda.payment.PaymentQrRepository
 import io.github.benderblog.traintime_pda.payment.PaymentQrResult
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withContext
 import java.net.URI
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 enum class WearScreen {
     PAIRING,
@@ -76,8 +77,12 @@ class WearViewModel(
 
     private var reAuthContinuation: kotlinx.coroutines.CancellableContinuation<URI>? = null
     private var countdownJob: Job? = null
+    private var reAuthSendJob: Job? = null
+    private var reAuthSubmitJob: Job? = null
     private var pendingSyncJob: Job? = null
     private var qrJob: Job? = null
+    private var qrFlowGeneration = 0L
+    private var activeReAuthGeneration: Long? = null
     private var bootstrapSyncRequested = false
 
     init {
@@ -204,6 +209,7 @@ class WearViewModel(
     }
 
     fun openQr() {
+        val flowId = startNewQrFlow()
         _state.update {
             it.copy(
                 screen = WearScreen.QR,
@@ -212,12 +218,12 @@ class WearViewModel(
                 qrError = null,
             )
         }
-        loadQr()
+        loadQr(flowId)
     }
 
     fun closeQr() {
-        qrJob?.cancel()
-        cancelReAuth()
+        qrFlowGeneration++
+        cancelActiveQrWork()
         _state.update {
             it.copy(
                 screen = WearScreen.HOME,
@@ -229,6 +235,7 @@ class WearViewModel(
     }
 
     fun retryQr() {
+        val flowId = startNewQrFlow()
         _state.update {
             it.copy(
                 qrLoading = true,
@@ -236,16 +243,23 @@ class WearViewModel(
                 qrError = null,
             )
         }
-        loadQr()
+        loadQr(flowId)
     }
 
-    private fun loadQr() {
-        qrJob?.cancel()
+    private fun loadQr(flowId: Long) {
         qrJob = viewModelScope.launch {
             try {
                 val result = paymentRepo.load(
-                    reAuthHandler = { client -> awaitReAuth(client) },
+                    reAuthHandler = { client ->
+                        currentCoroutineContext().ensureActive()
+                        if (!isQrFlowActive(flowId)) {
+                            throw CancellationException("付款码流程已失效")
+                        }
+                        awaitReAuth(client, flowId)
+                    },
                 )
+                ensureActive()
+                if (!isQrFlowActive(flowId)) return@launch
                 _state.update {
                     it.copy(
                         qrLoading = false,
@@ -253,7 +267,10 @@ class WearViewModel(
                         qrError = null,
                     )
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
+                if (!isQrFlowActive(flowId)) return@launch
                 _state.update {
                     it.copy(
                         qrLoading = false,
@@ -265,10 +282,17 @@ class WearViewModel(
         }
     }
 
-    private suspend fun awaitReAuth(client: WearIDSReAuthClient): URI =
-        kotlinx.coroutines.suspendCancellableCoroutine { cont ->
-            reAuthContinuation?.resumeWithException(WearIDSReAuthCancelledException())
+    private suspend fun awaitReAuth(client: WearIDSReAuthClient, flowId: Long): URI {
+        currentCoroutineContext().ensureActive()
+        if (!isQrFlowActive(flowId)) throw CancellationException("付款码流程已失效")
+        return kotlinx.coroutines.suspendCancellableCoroutine { cont ->
+            if (!isQrFlowActive(flowId)) {
+                cont.cancel(CancellationException("付款码流程已失效"))
+                return@suspendCancellableCoroutine
+            }
+            reAuthContinuation?.cancel(CancellationException("短信认证已被新请求替代"))
             reAuthContinuation = cont
+            activeReAuthGeneration = flowId
             _state.update {
                 it.copy(
                     screen = WearScreen.REAUTH,
@@ -287,32 +311,44 @@ class WearViewModel(
                 if (reAuthContinuation === cont) reAuthContinuation = null
             }
         }
+    }
 
     fun sendReAuthSms() {
+        val flowId = activeReAuthGeneration ?: return
+        if (!isQrFlowActive(flowId)) return
         val client = _state.value.reAuthClient ?: return
         if (_state.value.reAuthSending || _state.value.reAuthSecondsRemaining > 0) return
-        viewModelScope.launch {
+        reAuthSendJob?.cancel()
+        reAuthSendJob = viewModelScope.launch {
             _state.update { it.copy(reAuthSending = true, reAuthError = null) }
             try {
                 val delivery = withContext(Dispatchers.IO) { client.sendSms() }
+                ensureActive()
+                if (!isQrFlowActive(flowId)) return@launch
                 val notice = if (delivery.recipient == null) {
                     delivery.message
                 } else {
                     "${delivery.message}\n${delivery.recipient}"
                 }
                 _state.update { it.copy(reAuthNotice = notice) }
-                startCountdown(delivery.retryAfterSeconds)
+                startCountdown(delivery.retryAfterSeconds, flowId)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
+                if (!isQrFlowActive(flowId)) return@launch
                 _state.update {
                     it.copy(reAuthError = e.message ?: "短信验证码发送失败")
                 }
             } finally {
-                _state.update { it.copy(reAuthSending = false) }
+                if (isQrFlowActive(flowId) && _state.value.screen == WearScreen.REAUTH) {
+                    _state.update { it.copy(reAuthSending = false) }
+                }
             }
         }
     }
 
-    private fun startCountdown(seconds: Int) {
+    private fun startCountdown(seconds: Int, flowId: Long) {
+        if (!isQrFlowActive(flowId)) return
         countdownJob?.cancel()
         _state.update { it.copy(reAuthSecondsRemaining = seconds.coerceAtLeast(0)) }
         if (seconds <= 0) return
@@ -320,6 +356,7 @@ class WearViewModel(
             var remaining = seconds
             while (remaining > 0) {
                 kotlinx.coroutines.delay(1_000L)
+                if (!isQrFlowActive(flowId)) return@launch
                 remaining--
                 _state.update { it.copy(reAuthSecondsRemaining = remaining) }
             }
@@ -335,6 +372,8 @@ class WearViewModel(
     }
 
     fun submitReAuth() {
+        val flowId = activeReAuthGeneration ?: return
+        if (!isQrFlowActive(flowId)) return
         val client = _state.value.reAuthClient ?: return
         val code = _state.value.reAuthCode.trim()
         if (code.isEmpty()) {
@@ -342,14 +381,18 @@ class WearViewModel(
             return
         }
         if (_state.value.reAuthSubmitting) return
-        viewModelScope.launch {
+        reAuthSubmitJob?.cancel()
+        reAuthSubmitJob = viewModelScope.launch {
             _state.update { it.copy(reAuthSubmitting = true, reAuthError = null) }
             try {
                 val uri = withContext(Dispatchers.IO) {
                     client.submitSms(code, _state.value.reAuthTrustDevice)
                 }
+                ensureActive()
+                if (!isQrFlowActive(flowId)) return@launch
                 val cont = reAuthContinuation
                 reAuthContinuation = null
+                activeReAuthGeneration = null
                 _state.update {
                     it.copy(
                         screen = WearScreen.QR,
@@ -358,7 +401,10 @@ class WearViewModel(
                     )
                 }
                 cont?.resume(uri)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
+                if (!isQrFlowActive(flowId)) return@launch
                 _state.update {
                     it.copy(
                         reAuthSubmitting = false,
@@ -370,26 +416,36 @@ class WearViewModel(
         }
     }
 
-    fun cancelReAuth() {
+    private fun startNewQrFlow(): Long {
+        cancelActiveQrWork()
+        qrFlowGeneration++
+        return qrFlowGeneration
+    }
+
+    private fun isQrFlowActive(flowId: Long): Boolean =
+        qrFlowGeneration == flowId &&
+            (_state.value.screen == WearScreen.QR || _state.value.screen == WearScreen.REAUTH)
+
+    private fun cancelActiveQrWork() {
+        val cancellation = CancellationException("付款码页面已关闭")
+        qrJob?.cancel(cancellation)
+        qrJob = null
+        paymentRepo.cancelActiveRequests()
+        reAuthSendJob?.cancel(cancellation)
+        reAuthSendJob = null
+        reAuthSubmitJob?.cancel(cancellation)
+        reAuthSubmitJob = null
+        countdownJob?.cancel(cancellation)
+        countdownJob = null
         val cont = reAuthContinuation
         reAuthContinuation = null
-        countdownJob?.cancel()
-        cont?.resumeWithException(WearIDSReAuthCancelledException())
-        _state.update {
-            it.copy(
-                screen = if (it.qrLoading || it.qrResult != null || it.qrError != null) {
-                    WearScreen.QR
-                } else {
-                    WearScreen.HOME
-                },
-                reAuthClient = null,
-            )
-        }
+        activeReAuthGeneration = null
+        cont?.cancel(cancellation)
     }
 
     override fun onCleared() {
-        qrJob?.cancel()
-        cancelReAuth()
+        qrFlowGeneration++
+        cancelActiveQrWork()
         container.companionClient.stopListening()
         super.onCleared()
     }

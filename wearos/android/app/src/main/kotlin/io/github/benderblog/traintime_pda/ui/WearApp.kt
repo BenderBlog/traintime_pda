@@ -47,7 +47,7 @@ fun WearApp(viewModel: WearViewModel) {
         viewModel.closeQr()
     }
     BackHandler(enabled = state.screen == WearScreen.REAUTH) {
-        viewModel.cancelReAuth()
+        viewModel.closeQr()
     }
 
     MaterialTheme(colors = WearColorPalette) {
@@ -87,7 +87,7 @@ fun WearApp(viewModel: WearViewModel) {
                     onTrustChange = viewModel::updateReAuthTrustDevice,
                     onSend = viewModel::sendReAuthSms,
                     onSubmit = viewModel::submitReAuth,
-                    onCancel = viewModel::cancelReAuth,
+                    onCancel = viewModel::closeQr,
                 )
             }
         }

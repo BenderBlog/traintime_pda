@@ -5,6 +5,7 @@ package io.github.benderblog.traintime_pda.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.security.SecureRandom
 
 /**
  * Credential / semester preferences.
@@ -71,6 +72,15 @@ class WearPreferences(context: Context) {
     fun hasPaymentCredentials(): Boolean =
         idsAccount.isNotEmpty() && idsPassword.isNotEmpty()
 
+    fun getOrCreateIdsBrowserFingerprint(): String {
+        val stored = prefs.getString(KEY_IDS_BROWSER_FINGERPRINT, null)
+        if (stored != null && stored.matches(Regex("^[0-9A-F]{32}$"))) return stored
+        val bytes = ByteArray(16).also { SecureRandom().nextBytes(it) }
+        val generated = bytes.joinToString("") { byte -> "%02X".format(byte.toInt() and 0xFF) }
+        prefs.edit().putString(KEY_IDS_BROWSER_FINGERPRINT, generated).apply()
+        return generated
+    }
+
     private fun readString(key: String): String {
         val local = prefs.getString(key, null)
         if (!local.isNullOrEmpty()) return local
@@ -94,5 +104,6 @@ class WearPreferences(context: Context) {
         const val KEY_CURRENT_SEMESTER = "currentSemester"
         const val KEY_ROLE = "role"
         const val KEY_IS_USER_DEFINED_SEMESTER = "isUserDefinedSemester"
+        private const val KEY_IDS_BROWSER_FINGERPRINT = "idsBrowserFingerprint"
     }
 }
