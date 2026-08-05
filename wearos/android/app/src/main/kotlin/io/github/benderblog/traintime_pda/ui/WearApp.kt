@@ -19,10 +19,10 @@ import io.github.benderblog.traintime_pda.ui.screens.QrScreen
 import io.github.benderblog.traintime_pda.ui.screens.ReAuthScreen
 
 private val WearColorPalette = Colors(
-    primary = Color(0xFF00A3FF),
-    primaryVariant = Color(0xFF0077CC),
-    secondary = Color(0xFF4DD0E1),
-    secondaryVariant = Color(0xFF0097A7),
+    primary = Color(0xFF70D6FF),
+    primaryVariant = Color(0xFF38BDF2),
+    secondary = Color(0xFFA7E8F0),
+    secondaryVariant = Color(0xFF62CEDB),
     background = Color.Black,
     surface = Color(0xFF1C1C1E),
     error = Color(0xFFFF6B6B),

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -108,6 +109,25 @@ fun QrScreen(
         }
         result != null -> {
             Column(Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(46.dp)
+                        .padding(horizontal = 34.dp, vertical = 5.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Button(
+                        onClick = onBack,
+                        modifier = Modifier.size(36.dp),
+                        colors = ButtonDefaults.secondaryButtonColors(),
+                    ) { Text("←", fontSize = 17.sp) }
+                    Button(
+                        onClick = onRetry,
+                        modifier = Modifier.size(36.dp),
+                        colors = ButtonDefaults.secondaryButtonColors(),
+                    ) { Text("↻", fontSize = 17.sp) }
+                }
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -120,10 +140,10 @@ fun QrScreen(
                         Box(
                             modifier = Modifier
                                 .align(Alignment.Center)
-                                .padding(start = 22.dp, top = 28.dp, end = 22.dp, bottom = 4.dp)
-                                .clip(RoundedCornerShape(20.dp))
+                                .padding(horizontal = 44.dp, vertical = 2.dp)
+                                .clip(RoundedCornerShape(18.dp))
                                 .background(Color.White)
-                                .padding(14.dp),
+                                .padding(12.dp),
                         ) {
                             Image(
                                 bitmap = bitmap.asImageBitmap(),
@@ -132,21 +152,6 @@ fun QrScreen(
                                 modifier = Modifier.fillMaxWidth(),
                             )
                         }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Button(
-                            onClick = onBack,
-                            colors = ButtonDefaults.secondaryButtonColors(),
-                        ) { Text("←") }
-                        Button(
-                            onClick = onRetry,
-                            colors = ButtonDefaults.secondaryButtonColors(),
-                        ) { Text("↻") }
                     }
                 }
                 if (result.fromCache) {
