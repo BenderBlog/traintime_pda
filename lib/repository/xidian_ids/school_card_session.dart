@@ -4,7 +4,6 @@
 
 // Get your school card money's info, unless you use wechat or alipay...
 
-import 'dart:io';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:html/parser.dart';
@@ -29,14 +28,10 @@ class SchoolCardSession extends IDSSession {
     openid = "";
     _openidFetchedAt = null;
 
-    var response = await dio.get(
-      "https://v8scan.xidian.edu.cn/home/openXDOAuth2Page",
+    final response = await followIDSRedirects(
+      initialLocation: "https://v8scan.xidian.edu.cn/home/openXDOAuth2Page",
+      client: dio,
     );
-    while (response.headers[HttpHeaders.locationHeader] != null) {
-      String location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info('[SchoolCardSession][_ensureOpenId] Following login redirect.');
-      response = await dio.get(location);
-    }
     var page = parse(response.data);
 
     var getOpenId = page.getElementsByTagName('input');

@@ -6,7 +6,6 @@ import 'dart:convert';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:watermeter/model/fetch_result.dart';
@@ -42,10 +41,7 @@ class SportSession with NetworkClient {
     "重新登录",
   };
 
-  final PersistCookieJar sportCookieJar = PersistCookieJar(
-    persistSession: true,
-    storage: FileStorage("${supportPath.path}/cookie/sport/"),
-  );
+  PersistCookieJar get sportCookieJar => NetworkClients.sportCookieJar;
 
   static SportScore? _scoreCache;
   static DateTime _scoreCacheFetchTime = DateTime.now();
@@ -226,8 +222,6 @@ class SportSession with NetworkClient {
   static var userId = '';
 
   static var token = '';
-
-  final baseURL = 'http://tybjxgl.xidian.edu.cn/app/';
 
   final rsaKey = """-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq4l
@@ -410,18 +404,7 @@ awb4B45zUwIDAQAB
     return toReturn;
   }
 
-  /// Maybe I wrote how to store the data is better.
-  Dio get _dio {
-    Dio toReturn = Dio(
-      BaseOptions(
-        baseUrl: baseURL,
-        contentType: Headers.formUrlEncodedContentType,
-      ),
-    );
-    toReturn.interceptors.add(CookieManager(sportCookieJar));
-    toReturn.interceptors.add(logDioAdapter);
-    return toReturn;
-  }
+  Dio get _dio => NetworkClients.sportDio;
 
   Future<Map<String, dynamic>> require({
     required String subWebsite,

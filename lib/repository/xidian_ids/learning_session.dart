@@ -42,19 +42,13 @@ class LearningSession extends IDSSession {
 
   Future<void> loginLearningSession() async {
     log.info("[LearningSession][loginLearningSession] Logging in");
-    String? location = await checkAndLogin(
+    final location = await checkAndLogin(
       target: LOGIN_URL,
       sliderCaptcha: (String cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
-    while (location != null) {
-      var response = await dio.get(location);
-      log.info(
-        '[LearningSession][loginLearningSession] Following login redirect.',
-      );
-      location = response.headers[HttpHeaders.locationHeader]?[0];
-    }
+    await followIDSRedirects(initialLocation: location, client: dio);
   }
 
   // Returns a list of ClassAttandanceDetail and Total and PageNum

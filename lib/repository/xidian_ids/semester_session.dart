@@ -2,15 +2,13 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:io';
-
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
 
 class SemesterSession extends EhallSession {
   Future<String> getSemesterInfoYjspt() async {
-    String location = await checkAndLogin(
+    final location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/",
       sliderCaptcha: (String cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(),
@@ -20,14 +18,7 @@ class SemesterSession extends EhallSession {
       "[PersonalInfoSession][getSemesterInfoYjspt] "
       "Location is $location",
     );
-    var response = await dio.get(location);
-    while (response.headers[HttpHeaders.locationHeader] != null) {
-      location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info(
-        '[PersonalInfoSession][getSemesterInfoYjspt] Following login redirect.',
-      );
-      response = await dio.get(location);
-    }
+    await followIDSRedirects(initialLocation: location, client: dio);
 
     log.info(
       "[PersonalInfoSession][getSemesterInfoYjspt] "

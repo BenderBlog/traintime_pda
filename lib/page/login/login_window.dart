@@ -141,6 +141,20 @@ class _LoginWindowState extends State<LoginWindow> {
     }
 
     try {
+      Future<Uri> reAuthHandler(IDSReAuthClient client) async {
+        if (pd.isOpen()) pd.close();
+        if (!mounted) throw const IDSReAuthCancelledException();
+        final result = await showIDSReAuthDialog(context, client);
+        if (mounted && !pd.isOpen()) {
+          pd.show(
+            msg: FlutterI18n.translate(context, 'login_process.after_process'),
+            max: 100,
+            hideValue: true,
+          );
+        }
+        return result;
+      }
+
       await ses.loginEhall(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
@@ -152,7 +166,7 @@ class _LoginWindowState extends State<LoginWindow> {
             );
           }
         },
-        reAuthHandler: (client) async {
+        reAuthHandler: (IDSReAuthClient client) async {
           if (pd.isOpen()) pd.close();
           if (!mounted) throw const IDSReAuthCancelledException();
           final result = await showIDSReAuthDialog(context, client);
@@ -187,7 +201,9 @@ class _LoginWindowState extends State<LoginWindow> {
           _idsPasswordController.text,
         );
 
-        bool isPostGraduate = await ses.checkWhetherPostgraduate();
+        bool isPostGraduate = await ses.checkWhetherPostgraduate(
+          reAuthHandler: reAuthHandler,
+        );
         String semesterInfo = isPostGraduate
             ? await SemesterSession().getSemesterInfoYjspt()
             : await SemesterSession().getSemesterInfoEhall();

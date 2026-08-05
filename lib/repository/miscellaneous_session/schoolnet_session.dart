@@ -25,11 +25,7 @@ class SchoolnetSession with NetworkClient {
   static GeneralNetworkUsage? _generalUsageCache;
   static DateTime _generalUsageCacheFetchTime = DateTime.now();
 
-  Dio get _dio => dio
-    ..options.baseUrl = "https://zfw.xidian.edu.cn"
-    ..options.headers = {"Host": "zfw.xidian.edu.cn"}
-    ..options.contentType = Headers.formUrlEncodedContentType
-    ..options.followRedirects = true;
+  Dio get _dio => NetworkClients.schoolnetDio;
 
   Future<CurrentUserNetInfo> getCurrentUserNetInfo() async {
     final networkInfoResponse = await dio

@@ -566,7 +566,6 @@ class LibrarySession extends IDSSession {
     return toAppend;
   }
 
-  @override
   Future<void> initSession() async {
     log.info("[LibrarySession][initSession] Initalizing Library Session");
     try {
@@ -595,7 +594,11 @@ class LibrarySession extends IDSSession {
 
   Future<void> _resolveOpacLogin(String firstLocation) async {
     String location = firstLocation;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < IDSSession.maxAuthRedirects; i++) {
+      location = (await resolveIDSReAuthIfNeeded(
+        Uri.parse(location),
+        service: _opacLoginTarget,
+      )).toString();
       _throwIfWechatLocation(location);
       _tryLoadJwtFromLocation(location);
       if (token.isNotEmpty) return;
@@ -615,6 +618,7 @@ class LibrarySession extends IDSSession {
       }
       location = next;
     }
+    throw const LoginFailedException(msg: '图书馆认证跳转次数超过 30 次');
   }
 
   Future<String?> _tryChaoxingCasLogin(String html) async {

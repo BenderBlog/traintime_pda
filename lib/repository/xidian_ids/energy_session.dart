@@ -241,7 +241,7 @@ class EnergySession extends IDSSession {
   Future<EnergyInfo> requestNewEnergyInfo({
     required Future<String> Function(List<int>)? captchaFunction,
   }) async {
-    String location = await checkAndLogin(
+    final location = await checkAndLogin(
       target:
           "https://xxcapp.xidian.edu.cn/uc/api/oauth/index?"
           "redirect=https://ignypt.xidian.edu.cn/revenueH5/login?"
@@ -250,15 +250,12 @@ class EnergySession extends IDSSession {
           SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
-    var response = await dio.get(location);
-    while (response.headers[HttpHeaders.locationHeader] != null) {
-      location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info('[PaymentSession][getOwe] Following login redirect.');
-      response = await dio.get(location);
-    }
-    String code = Uri.parse(location).queryParameters["code"]!;
+    var response = await followIDSRedirects(
+      initialLocation: location,
+      client: dio,
+    );
+    final code = response.realUri.queryParameters["code"]!;
     log.info('[ElectricitySession][loginEnergy] Login redirect received.');
-    response = await dio.get(location);
 
     response = await _request(
       "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/OauthGetUserInfo",

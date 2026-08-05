@@ -5,10 +5,9 @@
 // E-hall class, which get lots of useful data here.
 // Thanks xidian-script and libxdauth!
 
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/xidian_ids/ids_session.dart';
@@ -17,25 +16,9 @@ import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 class EhallSession extends IDSSession {
   static final _ehallLock = Lock();
 
-  /// This header shall only be used in the ehall related stuff...
-  Map<String, String> refererHeader = {
-    HttpHeaders.refererHeader: "http://ehall.xidian.edu.cn/new/index_xd.html",
-    HttpHeaders.hostHeader: "ehall.xidian.edu.cn",
-    HttpHeaders.acceptHeader:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-    HttpHeaders.acceptLanguageHeader:
-        'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-    HttpHeaders.acceptEncodingHeader: 'identity',
-    HttpHeaders.connectionHeader: 'Keep-Alive',
-    HttpHeaders.contentTypeHeader:
-        "application/x-www-form-urlencoded; charset=UTF-8",
-  };
-
-  Dio get dioEhall {
-    final client = super.dioNoOfflineCheck;
-    client.options.headers.addAll(refererHeader);
-    return client;
-  }
+  /// A distinct Dio from IDS. It shares only the process-wide IDS cookie jar;
+  /// eHall-specific headers are scoped by request host in NetworkClients.
+  Dio get dioEhall => NetworkClients.ehallDio;
 
   Future<bool> isLoggedIn() async {
     var response = await dioEhall.get(
@@ -55,29 +38,23 @@ class EhallSession extends IDSSession {
     required void Function(int, String) onResponse,
     IDSReAuthHandler? reAuthHandler,
   }) async {
-    String location = await super.login(
-      target:
-          "https://ehall.xidian.edu.cn/login?service=https://ehall.xidian.edu.cn/new/index.html",
+    const target =
+        "https://ehall.xidian.edu.cn/login?"
+        "service=https://ehall.xidian.edu.cn/new/index.html";
+    final location = await super.login(
+      target: target,
       username: username,
       password: password,
       sliderCaptcha: sliderCaptcha,
       onResponse: onResponse,
       reAuthHandler: reAuthHandler,
     );
-    var response = await dioEhall.get(location);
-    for (
-      var redirectCount = 0;
-      response.headers.value(HttpHeaders.locationHeader) != null;
-      redirectCount++
-    ) {
-      if (redirectCount >= 10) {
-        throw const LoginFailedException(msg: '一站式登录跳转次数过多');
-      }
-      final next = response.headers.value(HttpHeaders.locationHeader)!;
-      location = Uri.parse(location).resolve(next).toString();
-      log.info('[ehall_session][loginEhall] Following login redirect.');
-      response = await dioEhall.get(location);
-    }
+    await followIDSRedirects(
+      initialLocation: location,
+      service: target,
+      username: username,
+      reAuthHandler: reAuthHandler,
+    );
     if (!await isLoggedIn()) {
       throw const LoginFailedException(msg: '统一认证成功，但一站式大厅登录状态校验失败');
     }
@@ -90,19 +67,15 @@ class EhallSession extends IDSSession {
         "Ready to use the app $appID. Try to Login.",
       );
       if (!await isLoggedIn()) {
-        String location = await super.checkAndLogin(
-          target:
-              "https://ehall.xidian.edu.cn/login?"
-              "service=https://ehall.xidian.edu.cn/new/index.html",
+        const target =
+            "https://ehall.xidian.edu.cn/login?"
+            "service=https://ehall.xidian.edu.cn/new/index.html";
+        final location = await super.checkAndLogin(
+          target: target,
           sliderCaptcha: (String cookieStr) =>
               SliderCaptchaClientProvider(cookie: cookieStr).solve(),
         );
-        var response = await dio.get(location);
-        while (response.headers[HttpHeaders.locationHeader] != null) {
-          location = response.headers[HttpHeaders.locationHeader]![0];
-          log.info('[ehall_session][useApp] Following login redirect.');
-          response = await dioEhall.get(location);
-        }
+        await followIDSRedirects(initialLocation: location, service: target);
       }
       log.info(
         "[ehall_session][useApp] "

@@ -14,6 +14,9 @@ import 'dart:io' show Platform;
 class DormWaterSession with NetworkClient {
   static const String apiBaseUrl = 'https://i.ilife798.com';
 
+  @override
+  Dio get dio => NetworkClients.tokenDio;
+
   /// Store current session ID for sending SMS code
   String? _currentSessionId;
 

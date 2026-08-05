@@ -119,7 +119,7 @@ class ClassTableSession extends EhallSession {
         "https://yjspt.xidian.edu.cn/gsapp/sys/wdkbapp/modules/xskcb/xswsckbkc.do";
 
     log.info("[getClasstable][getYjspt] Login the system.");
-    String? location = await checkAndLogin(
+    final location = await checkAndLogin(
       target:
           "https://yjspt.xidian.edu.cn/gsapp/"
           "sys/wdkbapp/*default/index.do#/xskcb",
@@ -127,11 +127,7 @@ class ClassTableSession extends EhallSession {
           SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
-    while (location != null) {
-      var response = await dio.get(location);
-      log.info('[getClasstable][getYjspt] Following login redirect.');
-      location = response.headers[HttpHeaders.locationHeader]?[0];
-    }
+    await followIDSRedirects(initialLocation: location, client: dio);
 
     DateTime now = DateTime.now();
     var currentWeek = await dio

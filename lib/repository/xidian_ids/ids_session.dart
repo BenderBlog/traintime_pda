@@ -22,7 +22,6 @@ import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
 enum IDSLoginState {
   none,
   requesting,
-  awaitingSecondFactor,
   success,
   fail,
   passwordWrong,
@@ -39,31 +38,23 @@ bool get offline =>
 
 class IDSSession with NetworkClient {
   static final _idslock = Lock();
+  static const maxAuthRedirects = 30;
 
   @override
-  Dio get dio => super.dio
-    ..interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          log.info(
-            "[IDSSession][OfflineCheckInspector]"
-            "Offline status: $offline",
-          );
-          if (offline) {
-            handler.reject(
-              DioException.requestCancelled(
-                reason: "Offline mode, all ids function unuseable.",
-                requestOptions: options,
-              ),
-            );
-          } else {
-            handler.next(options);
-          }
-        },
-      ),
-    );
+  Dio get dio {
+    log.info('[IDSSession][OfflineCheck] Offline status: $offline');
+    if (offline) {
+      throw DioException.requestCancelled(
+        reason: 'Offline mode, all IDS functions are unavailable.',
+        requestOptions: RequestOptions(path: ''),
+      );
+    }
+    return NetworkClients.idsDio;
+  }
 
-  Dio get dioNoOfflineCheck => super.dio;
+  /// Authentication and SSO requests bypass the business offline guard while
+  /// still using the one process-wide IDS client and cookie store.
+  Dio get dioNoOfflineCheck => NetworkClients.idsDio;
 
   /// Get base64 encoded data. Which is aes encrypted [toEnc] encoded string using [key].
   /// Padding part is libxduauth's idea.
@@ -378,30 +369,45 @@ class IDSSession with NetworkClient {
     if (location == null) {
       throw const IDSProtocolException('统一认证跳转响应缺少 Location');
     }
-    final result = classifyIDSRedirect(
-      location,
-      serviceRequested: target != null,
+    final uri = response.realUri.resolve(location);
+    final resolved = await resolveIDSReAuthIfNeeded(
+      uri,
+      service: target,
+      username: username,
+      reAuthHandler: reAuthHandler,
+      onResponse: onResponse,
     );
-    if (result.kind != IDSRedirectKind.reAuthentication) {
-      onResponse?.call(80, 'login_process.after_process');
-      return result.uri.toString();
-    }
+    onResponse?.call(80, 'login_process.after_process');
+    return resolved.toString();
+  }
+
+  Future<Uri> resolveIDSReAuthIfNeeded(
+    Uri uri, {
+    String? service,
+    String? username,
+    IDSReAuthHandler? reAuthHandler,
+    void Function(int, String)? onResponse,
+  }) async {
+    if (!isIDSReAuthLocation(uri.toString())) return uri;
 
     final previousLoginState = loginState;
-    loginState = IDSLoginState.awaitingSecondFactor;
+    loginState = IDSLoginState.requesting;
     final handler = reAuthHandler ?? activeIDSReAuthHandler;
     if (handler == null) {
+      loginState = IDSLoginState.fail;
       throw const IDSReAuthRequiredException();
     }
 
     try {
       onResponse?.call(55, 'login_process.second_factor');
-      final uri = await handler(
+      final resumedUri = await handler(
         IDSReAuthClient(
           dio: dioNoOfflineCheck,
-          challengeUri: result.uri,
-          username: username,
-          service: target,
+          challengeUri: uri,
+          username:
+              username ??
+              preference.getString(preference.Preference.idsAccount),
+          service: uri.queryParameters['service'] ?? service,
           registerBrowserFingerprint: _registerBrowserFingerprint,
         ),
       );
@@ -410,8 +416,7 @@ class IDSSession with NetworkClient {
         IDSLoginState.manual => IDSLoginState.manual,
         _ => IDSLoginState.requesting,
       };
-      onResponse?.call(80, 'login_process.after_process');
-      return uri.toString();
+      return resumedUri;
     } on IDSReAuthCancelledException {
       await clearCookieJar();
       loginState = IDSLoginState.cancelled;
@@ -423,7 +428,87 @@ class IDSSession with NetworkClient {
     }
   }
 
-  Future<bool> checkWhetherPostgraduate() async {
+  Future<Response<dynamic>> followIDSRedirects({
+    required String initialLocation,
+    Dio? client,
+    String? service,
+    String? username,
+    IDSReAuthHandler? reAuthHandler,
+  }) async {
+    final requestClient = client ?? dioNoOfflineCheck;
+    var currentUri = Uri.parse(
+      'https://ids.xidian.edu.cn',
+    ).resolve(initialLocation);
+    var currentService = service;
+    var redirectCount = 0;
+
+    while (true) {
+      currentService = _idsLoginService(currentUri) ?? currentService;
+      currentUri = await resolveIDSReAuthIfNeeded(
+        currentUri,
+        service: currentService,
+        username: username,
+        reAuthHandler: reAuthHandler,
+      );
+      currentService = _idsLoginService(currentUri) ?? currentService;
+
+      final response = await requestClient.getUri(currentUri);
+      final location = response.headers.value(HttpHeaders.locationHeader);
+      if (location == null) return response;
+
+      redirectCount++;
+      final sourceUri = response.realUri;
+      final nextUri = sourceUri.resolve(location);
+      log.info(
+        '[IDSSession][followIDSRedirects] Redirect #$redirectCount: '
+        '${_redirectLogUri(sourceUri)} -> ${_redirectLogUri(nextUri)}',
+      );
+      if (redirectCount > maxAuthRedirects) {
+        throw const LoginFailedException(msg: '统一认证跳转次数超过 30 次');
+      }
+      currentUri = nextUri;
+    }
+  }
+
+  String _redirectLogUri(Uri uri) {
+    final queryKeys = uri.queryParametersAll.keys.toList()..sort();
+    final baseUri = _redirectLogBaseUri(uri);
+    if (queryKeys.isEmpty) return baseUri;
+
+    final queryLabels = queryKeys.map((key) {
+      if (key != 'service') return key;
+      final values = uri.queryParametersAll[key];
+      final serviceUri = values == null || values.isEmpty
+          ? null
+          : Uri.tryParse(values.first);
+      if (serviceUri == null ||
+          !serviceUri.hasScheme ||
+          serviceUri.host.isEmpty) {
+        return key;
+      }
+      return '$key=${_redirectLogBaseUri(serviceUri)}';
+    });
+    return '$baseUri?${queryLabels.join('&')}';
+  }
+
+  String _redirectLogBaseUri(Uri uri) => Uri(
+    scheme: uri.scheme,
+    host: uri.host,
+    port: uri.hasPort ? uri.port : null,
+    path: uri.path,
+  ).toString();
+
+  String? _idsLoginService(Uri uri) {
+    if (uri.host != 'ids.xidian.edu.cn' || uri.path != '/authserver/login') {
+      return null;
+    }
+    final service = uri.queryParameters['service'];
+    return service == null || service.isEmpty ? null : service;
+  }
+
+  Future<bool> checkWhetherPostgraduate({
+    IDSReAuthHandler? reAuthHandler,
+  }) async {
     String location = await checkAndLogin(
       target:
           "https://yjspt.xidian.edu.cn/gsapp"
@@ -431,12 +516,10 @@ class IDSSession with NetworkClient {
       sliderCaptcha: (cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
-    var response = await dio.get(location);
-    while (response.headers[HttpHeaders.locationHeader] != null) {
-      location = response.headers[HttpHeaders.locationHeader]![0];
-      log.info('[checkWhetherPostgraduate] Following login redirect.');
-      response = await dio.get(location);
-    }
+    await followIDSRedirects(
+      initialLocation: location,
+      reAuthHandler: reAuthHandler,
+    );
 
     bool toReturn = await dio
         .post(

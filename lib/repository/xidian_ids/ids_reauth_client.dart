@@ -117,14 +117,10 @@ class IDSReAuthClient {
         location == null) {
       throw const IDSProtocolException('二次认证成功，但没有收到业务系统登录票据');
     }
-    final redirect = classifyIDSRedirect(
-      location,
-      serviceRequested: service != null,
-    );
-    if (redirect.kind == IDSRedirectKind.reAuthentication) {
+    if (isIDSReAuthLocation(location, baseUri: loginResponse.realUri)) {
       throw const IDSReAuthExpiredException('二次认证未完成，请重新登录');
     }
-    return redirect.uri;
+    return loginResponse.realUri.resolve(location);
   }
 }
 

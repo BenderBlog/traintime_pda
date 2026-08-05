@@ -188,7 +188,7 @@ class SysjSession extends IDSSession {
 
       log.info(hrefIds);
 
-      String? location;
+      late String location;
 
       if (!hrefIds.authority.contains("sysj")) {
         log.info(
@@ -203,11 +203,7 @@ class SysjSession extends IDSSession {
         location = hrefIds.toString();
       }
 
-      while (location != null) {
-        var response = await dio.get(location);
-        log.info('[SysjSession][getDataFromSysj] Following login redirect.');
-        location = response.headers[HttpHeaders.locationHeader]?[0];
-      }
+      await followIDSRedirects(initialLocation: location, client: dio);
 
       location = await dio
           .getUri(
@@ -220,7 +216,7 @@ class SysjSession extends IDSSession {
             }),
           )
           .then((value) => value.data.toString());
-      final match = RegExp(r'\?code=(?<code>.*)\\u0026').firstMatch(location!);
+      final match = RegExp(r'\?code=(?<code>.*)\\u0026').firstMatch(location);
       String code = match!.namedGroup("code")!;
 
       String loginLastTime = await dio

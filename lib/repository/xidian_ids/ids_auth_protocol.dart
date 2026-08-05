@@ -3,37 +3,11 @@
 
 const _idsOrigin = 'https://ids.xidian.edu.cn';
 
-enum IDSRedirectKind { reAuthentication, serviceTicket, directIDSHome }
-
-class IDSRedirectResult {
-  const IDSRedirectResult({required this.kind, required this.uri});
-
-  final IDSRedirectKind kind;
-  final Uri uri;
-}
-
-IDSRedirectResult classifyIDSRedirect(
-  String location, {
-  required bool serviceRequested,
-}) {
-  final uri = Uri.parse(_idsOrigin).resolve(location);
-  if (uri.host == 'ids.xidian.edu.cn' &&
-      uri.path == '/authserver/reAuthCheck/reAuthLoginView.do') {
-    return IDSRedirectResult(kind: IDSRedirectKind.reAuthentication, uri: uri);
-  }
-
-  final ticket = uri.queryParameters['ticket'];
-  if (serviceRequested && ticket != null && ticket.startsWith('ST-')) {
-    return IDSRedirectResult(kind: IDSRedirectKind.serviceTicket, uri: uri);
-  }
-
-  if (!serviceRequested &&
+bool isIDSReAuthLocation(String location, {Uri? baseUri}) {
+  final uri = (baseUri ?? Uri.parse(_idsOrigin)).resolve(location);
+  return uri.scheme == 'https' &&
       uri.host == 'ids.xidian.edu.cn' &&
-      uri.path == '/authserver/index.do') {
-    return IDSRedirectResult(kind: IDSRedirectKind.directIDSHome, uri: uri);
-  }
-
-  throw const IDSProtocolException('统一认证返回了无法识别的登录跳转');
+      uri.path == '/authserver/reAuthCheck/reAuthLoginView.do';
 }
 
 enum IDSReAuthSubmitStatus { success, failed, unauthorized }

@@ -64,8 +64,8 @@ class EmptyClassroomSession extends EhallSession {
     List<EmptyClassroomPlace> toReturn = [];
     developer.log("Ready to login the system.", name: "Ehall emptyClassroom");
     var firstPost = await useApp("4768402106681759");
-    await dio.get(firstPost);
-    var data = await dio
+    await dioEhall.get(firstPost);
+    var data = await dioEhall
         .post("$baseUrl/jxlcx.do", data: {"*order": "+XXXQDM,+PX,+JXLDM"})
         .then((value) => value.data["datas"]["jxlcx"]["rows"]);
     for (var i in data) {
@@ -86,7 +86,7 @@ class EmptyClassroomSession extends EhallSession {
     required String semesterRange,
     required String semesterPart,
   }) async {
-    (dynamic, dynamic) dateData = await dio
+    (dynamic, dynamic) dateData = await dioEhall
         .post(
           "$baseUrl/rqzhzcjc.do",
           data: {"RQ": date, "XN": semesterRange, "XQ": semesterPart},
@@ -100,7 +100,7 @@ class EmptyClassroomSession extends EhallSession {
 
     List<EmptyClassroomData> toReturn = [];
 
-    await dio
+    await dioEhall
         .post(
           "$baseUrl/cxjsqk.do",
           data: {

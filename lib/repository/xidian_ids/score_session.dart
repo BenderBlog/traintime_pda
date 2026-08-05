@@ -62,7 +62,7 @@ class ScoreSession extends EhallSession {
         await dioEhall.get(firstPost);
       }
 
-      var response = await dio
+      var response = await dioEhall
           .post(
             "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkckgcxlrcj.do",
             data: {
@@ -123,17 +123,13 @@ class ScoreSession extends EhallSession {
     List<Score> toReturn = [];
 
     log.info("[ScoreSession][getScoreFromYjspt] Ready to login the system.");
-    String? location = await checkAndLogin(
+    final location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdcjapp/*default/index.do",
       sliderCaptcha: (String cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
-    while (location != null) {
-      var response = await dio.get(location);
-      log.info('[ExamFile][getScoreFromYjspt] Following login redirect.');
-      location = response.headers[HttpHeaders.locationHeader]?[0];
-    }
+    await followIDSRedirects(initialLocation: location, client: dio);
 
     log.info("[ScoreSession][getScoreFromYjspt] Getting the score data.");
     var getData = await dio

@@ -103,17 +103,13 @@ class ExamSession extends EhallSession {
   }
 
   Future<ExamData> getExamYjspt(String semester) async {
-    String? location = await checkAndLogin(
+    final location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/gsapp/sys/wdksapp/*default/index.do",
       sliderCaptcha: (String cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(),
     );
 
-    while (location != null) {
-      var response = await dio.get(location);
-      log.info('[ExamFile][getExamYjspt] Following login redirect.');
-      location = response.headers[HttpHeaders.locationHeader]?[0];
-    }
+    await followIDSRedirects(initialLocation: location, client: dio);
 
     /// wdksap 我的考试安排
     log.info("[ExamFile][getExamYjspt] My exam arrangemet $semester");
@@ -153,12 +149,8 @@ class ExamSession extends EhallSession {
   }
 
   Future<ExamData> getExamEhall(String semester) async {
-    String? location = await useApp("4768687067472349");
-    while (location != null) {
-      var response = await dio.get(location);
-      log.info('[ExamFile][getExamEhall] Following login redirect.');
-      location = response.headers[HttpHeaders.locationHeader]?[0];
-    }
+    final location = await useApp("4768687067472349");
+    await followIDSRedirects(initialLocation: location, client: dio);
 
     /// wdksap 我的考试安排
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)
