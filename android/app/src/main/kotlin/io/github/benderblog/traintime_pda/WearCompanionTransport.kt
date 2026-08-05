@@ -8,6 +8,7 @@ import com.google.android.gms.wearable.WearableListenerService
 internal object WearCompanionTransport {
     const val CHANNEL = "io.github.benderblog.traintime_pda/wear_companion_phone"
     const val SYNC_PATH = "/traintime_pda_wear_os/sync/v1"
+    const val SYNC_ACK_PATH = "/traintime_pda_wear_os/sync/ack/v1"
     const val REQUEST_PATH = "/traintime_pda_wear_os/request/v1"
     const val PAYMENT_REQUEST_PATH = "/traintime_pda_wear_os/payment/request/v1"
     const val PAYMENT_RESPONSE_PATH = "/traintime_pda_wear_os/payment/response/v1"

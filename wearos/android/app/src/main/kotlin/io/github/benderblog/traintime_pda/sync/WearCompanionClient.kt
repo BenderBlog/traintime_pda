@@ -121,7 +121,16 @@ class WearCompanionClient(
         try {
             val envelope = WearCompanionSyncEnvelope.decode(payload)
             importer.importEnvelope(envelope, payload)
-            sourceNodeId?.let { rememberPairedPhone(it) }
+            sourceNodeId?.let { nodeId ->
+                rememberPairedPhone(nodeId)
+                messageClient.sendMessage(
+                    nodeId,
+                    WearCompanionPaths.SYNC_ACK,
+                    envelope.sessionId.toByteArray(Charsets.UTF_8),
+                ).addOnFailureListener { error ->
+                    Log.w(TAG, "Failed to acknowledge sync", error)
+                }
+            }
             clearActiveSyncSession()
             _imports.tryEmit(envelope)
         } catch (e: Exception) {
@@ -137,8 +146,8 @@ class WearCompanionClient(
             if (json.optInt("schemaVersion") != WearCompanionPaths.SCHEMA_VERSION) return false
             val paired = pairedPhoneNodeId()
             if (paired != null) return paired == sourceNodeId
-            System.currentTimeMillis() <= directPairingExpiresAtEpochMs &&
-                json.optBoolean("directPairing", false)
+            json.optBoolean("directPairing", false) &&
+                (listening.get() || System.currentTimeMillis() <= directPairingExpiresAtEpochMs)
         } catch (_: Exception) {
             false
         }

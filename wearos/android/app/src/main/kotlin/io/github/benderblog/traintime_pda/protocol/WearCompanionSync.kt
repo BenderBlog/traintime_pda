@@ -11,6 +11,7 @@ import java.util.Base64
 /** Message paths shared with the phone companion (must stay stable). */
 object WearCompanionPaths {
     const val SYNC = "/traintime_pda_wear_os/sync/v1"
+    const val SYNC_ACK = "/traintime_pda_wear_os/sync/ack/v1"
     const val REQUEST = "/traintime_pda_wear_os/request/v1"
     const val PAYMENT_REQUEST = "/traintime_pda_wear_os/payment/request/v1"
     const val PAYMENT_RESPONSE = "/traintime_pda_wear_os/payment/response/v1"

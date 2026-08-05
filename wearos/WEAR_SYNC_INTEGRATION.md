@@ -9,18 +9,22 @@ The phone app lives at the repository root. The Wear OS target lives in
 
 ## Direct pairing
 
-1. Open the watch app while unpaired. The watch accepts a first pairing for five
-   minutes.
+1. Open the watch app while unpaired. The watch accepts a first pairing while
+   the pairing page is in the foreground.
 2. Open `设置 > XDYou Wear` on the Android phone.
 3. The phone obtains connected watches from `NodeClient.connectedNodes`.
 4. Select a watch and tap `配对`.
 5. The phone sends the cached credential/schedule envelope through
    `MessageClient` to `/traintime_pda_wear_os/sync/v1`.
-6. After a successful import, the watch remembers the source phone node.
+6. After a successful import, the watch remembers the source phone node and
+   acknowledges the matching session on
+   `/traintime_pda_wear_os/sync/ack/v1`.
+7. The phone records the watch as paired only after receiving that
+   acknowledgement. A Data Layer enqueue alone is not treated as success.
 
 Wear OS Data Layer only transports messages between applications with the same
-package name and signing identity. The explicit five-minute window prevents an
-unexpected first import even from another matching development installation.
+package name and signing identity. Requiring the unpaired watch app to be open
+prevents an unexpected first import from a background installation.
 
 The watch registers its `MessageClient` listener only while the activity is in
 the foreground (no resident / background polling service).
