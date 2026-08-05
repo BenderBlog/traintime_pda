@@ -46,7 +46,6 @@ data class WearUiState(
     val pairingStarting: Boolean = true,
     val pairingStatus: String = "请在手机端打开“设置 > XDYou Wear”，选择这块手表",
     val qrLoading: Boolean = false,
-    val qrUsingWatchAuth: Boolean = false,
     val qrResult: PaymentQrResult? = null,
     val qrError: String? = null,
     val reAuthClient: WearIDSReAuthClient? = null,
@@ -209,12 +208,11 @@ class WearViewModel(
             it.copy(
                 screen = WearScreen.QR,
                 qrLoading = true,
-                qrUsingWatchAuth = false,
                 qrResult = null,
                 qrError = null,
             )
         }
-        loadQr(forceRefresh = false, preferWatchAuth = false)
+        loadQr()
     }
 
     fun closeQr() {
@@ -226,7 +224,6 @@ class WearViewModel(
                 qrLoading = false,
                 qrResult = null,
                 qrError = null,
-                qrUsingWatchAuth = false,
             )
         }
     }
@@ -235,33 +232,18 @@ class WearViewModel(
         _state.update {
             it.copy(
                 qrLoading = true,
-                qrUsingWatchAuth = false,
                 qrResult = null,
                 qrError = null,
             )
         }
-        loadQr(forceRefresh = true, preferWatchAuth = false)
+        loadQr()
     }
 
-    fun authenticateOnWatch() {
-        _state.update {
-            it.copy(
-                qrLoading = true,
-                qrUsingWatchAuth = true,
-                qrResult = null,
-                qrError = null,
-            )
-        }
-        loadQr(forceRefresh = true, preferWatchAuth = true)
-    }
-
-    private fun loadQr(forceRefresh: Boolean, preferWatchAuth: Boolean) {
+    private fun loadQr() {
         qrJob?.cancel()
         qrJob = viewModelScope.launch {
             try {
                 val result = paymentRepo.load(
-                    forceRefresh = forceRefresh,
-                    preferWatchAuth = preferWatchAuth,
                     reAuthHandler = { client -> awaitReAuth(client) },
                 )
                 _state.update {

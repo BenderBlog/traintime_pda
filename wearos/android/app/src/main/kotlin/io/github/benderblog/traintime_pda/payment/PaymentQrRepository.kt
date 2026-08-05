@@ -35,7 +35,7 @@ data class PaymentQrResult(
 }
 
 /**
- * Payment QR: prefer phone proxy, then watch IDS auth, then offline cache.
+ * Payment QR: prefer watch IDS auth, then phone proxy, then offline cache.
  */
 class PaymentQrRepository(
     private val preferences: WearPreferences,
@@ -43,33 +43,17 @@ class PaymentQrRepository(
     private val companionClient: WearCompanionClient,
 ) {
     suspend fun load(
-        forceRefresh: Boolean = false,
-        preferWatchAuth: Boolean = false,
         reAuthHandler: (suspend (WearIDSReAuthClient) -> URI)? = null,
     ): PaymentQrResult {
-        if (!forceRefresh && !preferWatchAuth) {
-            cache.readPaymentQr()?.let { (bytes, fetchedAt) ->
-                return PaymentQrResult(bytes, fromCache = true, fetchedAtEpochMs = fetchedAt)
-            }
-        }
-        if (preferWatchAuth) {
-            return try {
-                requestDirectly(reAuthHandler)
-            } catch (primary: Exception) {
-                cache.readPaymentQr()?.let { (bytes, fetchedAt) ->
-                    PaymentQrResult(bytes, fromCache = true, fetchedAtEpochMs = fetchedAt)
-                } ?: throw primary
-            }
-        }
         return try {
-            requestFromPhone()
+            requestDirectly(reAuthHandler)
         } catch (_: Exception) {
             try {
-                requestDirectly(reAuthHandler)
-            } catch (direct: Exception) {
+                requestFromPhone()
+            } catch (phone: Exception) {
                 cache.readPaymentQr()?.let { (bytes, fetchedAt) ->
                     PaymentQrResult(bytes, fromCache = true, fetchedAtEpochMs = fetchedAt)
-                } ?: throw direct
+                } ?: throw phone
             }
         }
     }

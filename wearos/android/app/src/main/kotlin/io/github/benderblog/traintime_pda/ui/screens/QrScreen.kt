@@ -6,6 +6,7 @@ package io.github.benderblog.traintime_pda.ui.screens
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -27,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,17 +42,15 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-private val CacheFmt: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd HH:mm")
+private val CacheFmt: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @Composable
 fun QrScreen(
     loading: Boolean,
-    usingWatchAuth: Boolean,
     result: PaymentQrResult?,
     error: String?,
     onBack: () -> Unit,
     onRetry: () -> Unit,
-    onWatchAuth: () -> Unit,
 ) {
     when {
         loading -> {
@@ -65,19 +65,10 @@ fun QrScreen(
                 CircularProgressIndicator()
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = if (usingWatchAuth) "正在由手表认证" else "正在向手机请求付款码",
+                    text = "正在由手表认证",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.body2,
                 )
-                if (!usingWatchAuth) {
-                    Spacer(Modifier.height(10.dp))
-                    Button(
-                        onClick = onWatchAuth,
-                        colors = ButtonDefaults.secondaryButtonColors(),
-                    ) {
-                        Text("改用手表认证")
-                    }
-                }
             }
         }
         error != null && result == null -> {
@@ -108,26 +99,30 @@ fun QrScreen(
             }
         }
         result != null -> {
-            Column(Modifier.fillMaxSize()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(46.dp)
-                        .padding(horizontal = 34.dp, vertical = 5.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Button(
-                        onClick = onBack,
-                        modifier = Modifier.size(36.dp),
-                        colors = ButtonDefaults.secondaryButtonColors(),
-                    ) { Text("←", fontSize = 17.sp) }
-                    Button(
-                        onClick = onRetry,
-                        modifier = Modifier.size(36.dp),
-                        colors = ButtonDefaults.secondaryButtonColors(),
-                    ) { Text("↻", fontSize = 17.sp) }
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(onRetry) {
+                        var downwardDrag = 0f
+                        val refreshThreshold = 48.dp.toPx()
+                        detectVerticalDragGestures(
+                            onDragStart = { downwardDrag = 0f },
+                            onVerticalDrag = { change, dragAmount ->
+                                downwardDrag = if (dragAmount > 0f) {
+                                    downwardDrag + dragAmount
+                                } else {
+                                    (downwardDrag + dragAmount).coerceAtLeast(0f)
+                                }
+                                change.consume()
+                            },
+                            onDragEnd = {
+                                if (downwardDrag >= refreshThreshold) onRetry()
+                                downwardDrag = 0f
+                            },
+                            onDragCancel = { downwardDrag = 0f },
+                        )
+                    },
+            ) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -140,7 +135,8 @@ fun QrScreen(
                         Box(
                             modifier = Modifier
                                 .align(Alignment.Center)
-                                .padding(horizontal = 44.dp, vertical = 2.dp)
+                                .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 0.dp)
+                                .aspectRatio(1f)
                                 .clip(RoundedCornerShape(18.dp))
                                 .background(Color.White)
                                 .padding(12.dp),
@@ -159,7 +155,7 @@ fun QrScreen(
                         val time = Instant.ofEpochMilli(result.fetchedAtEpochMs)
                             .atZone(ZoneId.systemDefault())
                             .toLocalDateTime()
-                        "缓存 ${CacheFmt.format(time)}，可能失效"
+                        "缓存 ${CacheFmt.format(time)} · 可能失效"
                     }
                     Text(
                         text = label,
@@ -167,7 +163,7 @@ fun QrScreen(
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 34.dp, vertical = 8.dp)
+                            .padding(horizontal = 48.dp, vertical = 6.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(Color(0xFF7A3E00))
                             .padding(horizontal = 8.dp, vertical = 6.dp),

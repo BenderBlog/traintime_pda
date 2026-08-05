@@ -70,12 +70,10 @@ fun WearApp(viewModel: WearViewModel) {
                 )
                 WearScreen.QR -> QrScreen(
                     loading = state.qrLoading,
-                    usingWatchAuth = state.qrUsingWatchAuth,
                     result = state.qrResult,
                     error = state.qrError,
                     onBack = viewModel::closeQr,
                     onRetry = viewModel::retryQr,
-                    onWatchAuth = viewModel::authenticateOnWatch,
                 )
                 WearScreen.REAUTH -> ReAuthScreen(
                     notice = state.reAuthNotice,

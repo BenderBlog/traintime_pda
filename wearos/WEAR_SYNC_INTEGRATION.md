@@ -36,11 +36,10 @@ The phone's `WearCompanionListenerService` responds with the last snapshot even
 when the Flutter activity is not running. A normal phone homepage refresh
 updates that native snapshot.
 
-For a payment QR, the watch first asks the foreground phone app to use the
-phone's current IDS session. The user can immediately choose `改用手表认证`;
-the watch then uses the synchronized account/password and its own persistent
-cookie store. Automatic slider verification and an on-watch SMS MFA page are
-supported.
+For a payment QR, the watch first uses the synchronized account/password and
+its own persistent cookie store. Automatic slider verification and an on-watch
+SMS MFA page are supported. The phone proxy and the last cached QR are fallback
+paths. Pulling down on a displayed QR requests a fresh code from the watch.
 
 If the phone is disconnected, the watch continues to use its local class-table
 and experiment caches. A successfully fetched payment QR is also cached on the
