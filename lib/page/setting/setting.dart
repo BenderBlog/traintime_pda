@@ -22,6 +22,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
+import 'package:watermeter/page/setting/font_size_page.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
@@ -50,6 +51,7 @@ import 'package:watermeter/repository/custom_class_service.dart';
 import 'package:watermeter/repository/ids_session/score_session.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/themes/font_setting.dart';
 import 'package:watermeter/routing/routes.dart';
 
 class SettingWindow extends StatefulWidget {
@@ -369,6 +371,34 @@ class _SettingWindowState extends State<SettingWindow> {
                       Icon(Icons.dark_mode_rounded),
                     ],
                   ),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.font_size_setting",
+                    ),
+                  ),
+                  subtitle: SignalBuilder(
+                    builder: (context) => Text(
+                      FlutterI18n.translate(
+                        context,
+                        "setting.font_size_page.summary",
+                        translationParams: {
+                          "scale": "${(ThemeController.i.fontScaleSignal.value * 100).round()}",
+                          "weight": FlutterI18n.translate(
+                            context,
+                            "setting.font_size_page.weight_${fontWeightLabels[fontWeightLabelIndex(ThemeController.i.fontWeightSignal.value)]}",
+                          ),
+                        },
+                      ),
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    context.push(const FontSizePage());
+                  },
                 ),
                 const Divider(),
                 ListTile(

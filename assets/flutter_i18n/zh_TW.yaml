@@ -789,6 +789,17 @@ setting:
   ui_setting: 界面設置
   brightness_setting: 設置深淺色
   color_setting: 顏色設置
+  font_size_setting: 字體大小與粗細
+  font_size_page:
+    size_title: 字體大小
+    weight_title: 字體粗細
+    preview_title: 預覽
+    weight_thin: 細
+    weight_regular: 常規
+    weight_medium: 中等
+    weight_semibold: 半粗
+    weight_bold: 加粗
+    summary: "{scale}% · {weight}"
   simplify_timeline: 簡化日程時間軸
   simplify_timeline_description: 沒有日程時 減少空間佔用
   low_electricity_warning: 低電量卡片變色提醒

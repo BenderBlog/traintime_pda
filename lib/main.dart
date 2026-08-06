@@ -27,6 +27,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/themes/font_setting.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {
@@ -139,6 +140,8 @@ class _MyAppState extends State<MyApp> {
       builder: (context) {
         final color = appTheme.colorSignal.value;
         final themeMode = appTheme.colorStateSignal.value;
+        final fontScale = appTheme.fontScaleSignal.value;
+        final fontWeight = appTheme.fontWeightSignal.value;
         final i18nDelegate = appTheme.i18nDelegateSignal.value;
 
         return MaterialApp(
@@ -235,7 +238,9 @@ class _MyAppState extends State<MyApp> {
             cupertinoOverrideTheme: const CupertinoThemeData(
               applyThemeToAll: true,
             ),
-          ).useSystemChineseFont(Brightness.light),
+          )
+              .useSystemChineseFont(Brightness.light)
+              .applyFontWeight(fontWeightFromSlider(fontWeight)),
           darkTheme: FlexThemeData.dark(
             colors: color.last,
             usedColors: 1,
@@ -311,7 +316,9 @@ class _MyAppState extends State<MyApp> {
             cupertinoOverrideTheme: const CupertinoThemeData(
               applyThemeToAll: true,
             ),
-          ).useSystemChineseFont(Brightness.dark),
+          )
+              .useSystemChineseFont(Brightness.dark)
+              .applyFontWeight(fontWeightFromSlider(fontWeight)),
           themeMode: themeMode,
           home: DefaultTextStyle.merge(
             style: const TextStyle(textBaseline: TextBaseline.ideographic),
@@ -324,7 +331,14 @@ class _MyAppState extends State<MyApp> {
               description: "An unexpected behaviour occured!",
               maxWidthForSmallMode: 150,
             );
-            if (widget != null) return widget;
+            if (widget != null) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(fontScale),
+                ),
+                child: widget,
+              );
+            }
             throw StateError('widget is null');
           },
         );
