@@ -380,10 +380,19 @@ class _SettingWindowState extends State<SettingWindow> {
                       "setting.font_size_setting",
                     ),
                   ),
-                  subtitle: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.font_size_page.weight_${fontWeightLabels[fontWeightLabelIndex(preference.contains(preference.Preference.fontWeight) ? preference.getDouble(preference.Preference.fontWeight) : defaultFontWeight)]}",
+                  subtitle: SignalBuilder(
+                    builder: (context) => Text(
+                      FlutterI18n.translate(
+                        context,
+                        "setting.font_size_page.summary",
+                        translationParams: {
+                          "scale": "${(ThemeController.i.fontScaleSignal.value * 100).round()}",
+                          "weight": FlutterI18n.translate(
+                            context,
+                            "setting.font_size_page.weight_${fontWeightLabels[fontWeightLabelIndex(ThemeController.i.fontWeightSignal.value)]}",
+                          ),
+                        },
+                      ),
                     ),
                   ),
                   trailing: const Icon(Icons.navigate_next),

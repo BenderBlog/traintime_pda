@@ -20,24 +20,15 @@ class FontSizePage extends StatefulWidget {
 }
 
 class _FontSizePageState extends State<FontSizePage> {
-  double get _fontScale => preference.contains(preference.Preference.fontScale)
-      ? preference
-            .getDouble(preference.Preference.fontScale)
-            .clamp(minFontScale, maxFontScale)
-            .toDouble()
-      : defaultFontScale;
+  double get _fontScale => ThemeController.i.fontScaleSignal.value;
 
-  double get _fontWeight =>
-      preference.contains(preference.Preference.fontWeight)
-      ? preference
-            .getDouble(preference.Preference.fontWeight)
-            .clamp(minFontWeight, maxFontWeight)
-            .toDouble()
-      : defaultFontWeight;
+  double get _fontWeight => ThemeController.i.fontWeightSignal.value;
 
-  void _apply() {
-    setState(() {
-      ThemeController.i.updateTheme();
+  void _persist(double value, preference.Preference key) {
+    preference.setDouble(key, value).then((_) {
+      if (mounted) {
+        ThemeController.i.updateTheme();
+      }
     });
   }
 
@@ -66,17 +57,20 @@ class _FontSizePageState extends State<FontSizePage> {
                     "${(_fontScale * 100).round()}%",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  Slider(
-                    value: _fontScale,
-                    min: minFontScale,
-                    max: maxFontScale,
-                    divisions: 12,
-                    onChanged: (value) {
-                      preference
-                          .setDouble(preference.Preference.fontScale, value)
-                          .then((_) => _apply());
-                    },
-                  ),
+                Slider(
+                  value: _fontScale,
+                  min: minFontScale,
+                  max: maxFontScale,
+                  divisions: 12,
+                  onChanged: (value) {
+                    setState(() {
+                      ThemeController.i.fontScaleSignal.value = value;
+                    });
+                  },
+                  onChangeEnd: (value) {
+                    _persist(value, preference.Preference.fontScale);
+                  },
+                ),
                 ],
               ),
             ),
@@ -101,17 +95,20 @@ class _FontSizePageState extends State<FontSizePage> {
                     ),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  Slider(
-                    value: _fontWeight,
-                    min: minFontWeight,
-                    max: maxFontWeight,
-                    divisions: fontWeightSliderDivisions,
-                    onChanged: (value) {
-                      preference
-                          .setDouble(preference.Preference.fontWeight, value)
-                          .then((_) => _apply());
-                    },
-                  ),
+                Slider(
+                  value: _fontWeight,
+                  min: minFontWeight,
+                  max: maxFontWeight,
+                  divisions: fontWeightSliderDivisions,
+                  onChanged: (value) {
+                    setState(() {
+                      ThemeController.i.fontWeightSignal.value = value;
+                    });
+                  },
+                  onChangeEnd: (value) {
+                    _persist(value, preference.Preference.fontWeight);
+                  },
+                ),
                 ],
               ),
             ),
