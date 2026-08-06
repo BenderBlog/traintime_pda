@@ -305,13 +305,13 @@ club_promotion:
   picture_preview: 圖片預覽
 electricity:
   title: 水電信息
-  power_title: 餘額信息
+  power_title: 電量信息
   cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
   cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
   cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
   cache_notice: 獲取時間
   account: 電費賬號
-  remain_power: 電量信息
+  remain_power: 電量額度
   owe_info: 欠費信息
   history: 歷史記錄
   daily_usage: 平均每日用量
@@ -335,7 +335,7 @@ electricity:
   not_school_network: 非校園網訪問
   aircon_title: 空調用電
   aircon_imei: 空調 IMEI
-  aircon_amount: 平台用電量
+  aircon_amount: 平臺用電量
   aircon_update_time: 更新時間
   aircon_waiting: 等待獲取空調用電信息
   aircon_error: 空調用電獲取失敗
@@ -654,7 +654,7 @@ login:
     code: 短信驗證碼
     empty_code: 請輸入短信驗證碼
     send_code: 獲取驗證碼
-    resend_countdown: "{seconds} 秒後可重新獲取"
+    resend_countdown: '{seconds} 秒後可重新獲取'
     trust_device: 信任此設備
     trust_device_hint: 開啟後學校可能在一段時間內不再要求本設備二次認證
     network_error: 二次認證請求失敗，請檢查網絡後重試
@@ -773,6 +773,7 @@ score:
     CET-4: 國家英語四級
     CET-6: 國家英語六級
 setting:
+  about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 關於
   about_this_program: 關於本程序
@@ -794,7 +795,7 @@ setting:
   low_electricity_warning: 低電量卡片變色提醒
   low_electricity_warning_description: 電量小於閾值時 電量卡片變色提醒
   low_electricity_threshold: 低電量閾值
-  low_electricity_threshold_description: 目前為 {threshold} 度
+  low_electricity_threshold_description: 當前為 {threshold} 度
   low_electricity_threshold_dialog:
     title: 設置低電量閾值
     input_hint: 請輸入電量度數
@@ -816,7 +817,7 @@ setting:
   aircon_imei_clear: 清除
   scan_aircon_qr: 掃描空調二維碼
   pick_aircon_qr_image: 從相冊選擇二維碼圖片
-  aircon_camera_unavailable: 當前平台不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI
+  aircon_camera_unavailable: 當前平臺不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI
   notification_setting: 通知設置
   course_reminder_setting: 課前通知設置
   course_reminder_description: 設置課前提醒通知
@@ -1207,7 +1208,7 @@ easter_egg_apple: '=== 帶我飛向月亮吧 ===
 
   不想失去這種感覺，被你的愛撫摸的舒適
 
-  你讓我感到好自在，被你的愛託舉的堅強
+  你讓我感到好自在，被你的愛托舉的堅強
 
   想一直在你懷中，沉浸在你的愛意中
 
@@ -1226,7 +1227,7 @@ easter_egg_others: '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===
 
   我的世界有夢想、熱愛與躊躇
 
-  但有些東西，我依舊無法想象
+  但有些東西，我依舊無法想像
 
   我想向著廣闊的天空，尋求自己的方向
 
@@ -1254,7 +1255,7 @@ easter_egg_others: '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===
 
   不想失去這種感覺，被你的愛撫摸的舒適
 
-  你讓我感到好自在，被你的愛託舉的堅強
+  你讓我感到好自在，被你的愛托舉的堅強
 
   想躺在你的懷中，沉浸在你的愛意
 

@@ -775,6 +775,7 @@ score:
     CET-4: 国家英语四级
     CET-6: 国家英语六级
 setting:
+  about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 关于
   about_this_program: 关于本程序

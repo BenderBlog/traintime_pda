@@ -118,6 +118,16 @@ class EnergyController {
     historyElectricityInfoList.addAll(newHistoryInfo);
   }
 
+  late final electricityThreshold = computed(() {
+    return electricityWarning.value > 0
+        ? electricityWarning.value
+        : defaultLowElectricityWarningThreshold;
+  });
+
+  late final lowElectricityWarningEnabled = computed(() {
+    return electricityWarning.value >= 0;
+  });
+
   /// ==================
   ///  Electricity Info
   /// ==================

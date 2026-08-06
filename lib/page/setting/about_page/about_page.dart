@@ -10,6 +10,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
+import 'package:watermeter/page/setting/about_page/film_component.dart';
 import 'package:watermeter/model/about_page.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -159,14 +160,7 @@ class _AboutPageState extends State<AboutPage> {
               eggVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
             ),
           ),
-          if (eggVisible) ...[
-            Image.asset("assets/art/lucky_star_1.jpg"),
-            SizedBox(height: 8),
-            Image.asset("assets/art/lucky_star_2.jpg"),
-            SizedBox(height: 8),
-            Image.asset("assets/art/lucky_star_3.jpg"),
-            SizedBox(height: 8),
-          ],
+          if (eggVisible) const FilmComponent(),
         ].map((e) => e.constrained(maxWidth: 800).center()).toList(),
       ),
     );
