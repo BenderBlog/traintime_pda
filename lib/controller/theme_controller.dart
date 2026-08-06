@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+// TODO: Add logic related to writing to preference.
+
 import 'dart:io';
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';

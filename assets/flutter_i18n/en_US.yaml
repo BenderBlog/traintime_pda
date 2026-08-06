@@ -852,6 +852,7 @@ score:
     CET-4: College English Test Band 4
     CET-6: College English Test Band 6
 setting:
+  about_info: APP info
   acknowledgement: Made With Love From {developers} People
   about: About
   about_this_program: About this APP
