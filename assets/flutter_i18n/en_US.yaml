@@ -868,6 +868,16 @@ setting:
   ui_setting: UI Settings
   brightness_setting: Light/Dark mode
   color_setting: Color theme
+  font_size_setting: Font size
+  font_size_page:
+    size_title: Font size
+    weight_title: Font weight
+    preview_title: Preview
+    weight_thin: Thin
+    weight_regular: Regular
+    weight_medium: Medium
+    weight_semibold: Semi bold
+    weight_bold: Bold
   simplify_timeline: Simplify schedule timeline
   simplify_timeline_description: Reduce space occupation while no schedule
   low_electricity_warning: Low electricity card color warning
