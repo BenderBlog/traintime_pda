@@ -6,13 +6,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/page/homepage/homepage_edit_mode.dart';
 import 'package:watermeter/page/homepage/homepage_widget_registry.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/staggered_grid.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
@@ -208,8 +208,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             context: context,
             msg: FlutterI18n.translate(context, "homepage.loading_message"),
           );
-          await update(
-            context: context,
+          await HomepageController.i.refresh(
             sliderCaptcha: (String cookieStr) {
               return SliderCaptchaClientProvider(cookie: cookieStr).solve(
                 manualSolver: (provider) =>
