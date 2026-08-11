@@ -31,7 +31,7 @@ class ClassTableSession extends EhallSession {
 
   bool get isCacheExist => _schoolClassDataCache.existsSync();
 
-  void deleteCache() async {
+  void deleteCache() {
     if (_schoolClassDataCache.existsSync()) {
       _schoolClassDataCache.deleteSync();
     }

@@ -29,7 +29,9 @@ class ScoreSession extends EhallSession {
   // Use static since it is not a global function, which is not controller-based.
   static bool get isCacheExist => _file.existsSync();
   static void deleteCache() {
-    _file.deleteSync();
+    if (_file.existsSync()) {
+      _file.deleteSync();
+    }
   }
 
   Future<FetchResult<List<Score>>> getScore(UserRole role) async {

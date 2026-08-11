@@ -100,7 +100,7 @@ class EnergySession extends IDSSession {
     }
 
     _fileHistory.deleteSync();
-    _fileHistory.createSync();
+    _fileHistory.writeAsStringSync("[]");
   }
 
   String _cacheHintFromError(Object error) {

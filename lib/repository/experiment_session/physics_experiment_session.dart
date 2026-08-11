@@ -28,7 +28,7 @@ class ExperimentSession {
   );
   bool get isCacheExist => physicsExperimentCacheFile.existsSync();
 
-  void deleteCache() async {
+  void deleteCache() {
     if (physicsExperimentCacheFile.existsSync()) {
       physicsExperimentCacheFile.deleteSync();
     }
