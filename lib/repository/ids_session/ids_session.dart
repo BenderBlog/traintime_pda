@@ -37,7 +37,14 @@ bool get offline =>
     loginState != IDSLoginState.success && loginState != IDSLoginState.manual;
 
 class IDSSession {
-  static final _idslock = Lock();
+  // CAS service tickets are target-bound and normally single-use. Serialize
+  // authentication flows so each caller receives its own ticket instead of
+  // sharing one result through SingleFlight.
+  static final _idsLock = Lock();
+
+  // A later redirect can independently request second-factor authentication.
+  // Keep those challenges sequential so only one verification UI is active.
+  static final _reAuthLock = Lock();
   static const maxAuthRedirects = 30;
 
   Dio get dio {
@@ -108,52 +115,70 @@ class IDSSession {
     required String target,
     required Future<void> Function(String) sliderCaptcha,
     IDSReAuthHandler? reAuthHandler,
-  }) async {
-    return await _idslock.synchronized(() async {
-      try {
-        log.info('[IDSSession][checkAndLogin] Checking IDS session.');
-        var response = await dioNoOfflineCheck.get(
-          'https://ids.xidian.edu.cn/authserver/login',
-          queryParameters: {'service': target},
-        );
-        if (_isRedirect(response)) {
-          return _completeRedirect(
-            response: response,
-            target: target,
-            username: preference.getString(preference.Preference.idsAccount),
-            reAuthHandler: reAuthHandler,
-          );
-        }
-
-        final continued = await _submitContinueForm(response.data);
-        if (continued != null && _isRedirect(continued)) {
-          return _completeRedirect(
-            response: continued,
-            target: target,
-            username: preference.getString(preference.Preference.idsAccount),
-            reAuthHandler: reAuthHandler,
-          );
-        }
-
-        return login(
-          username: preference.getString(preference.Preference.idsAccount),
-          password: preference.getString(preference.Preference.idsPassword),
-          sliderCaptcha: sliderCaptcha,
+  }) => _idsLock.synchronized(() async {
+    try {
+      log.info('[IDSSession][checkAndLogin] Checking IDS session.');
+      var response = await dioNoOfflineCheck.get(
+        'https://ids.xidian.edu.cn/authserver/login',
+        queryParameters: {'service': target},
+      );
+      if (_isRedirect(response)) {
+        return _completeRedirect(
+          response: response,
           target: target,
+          username: preference.getString(preference.Preference.idsAccount),
           reAuthHandler: reAuthHandler,
         );
-      } on DioException catch (e) {
-        if (e.response?.statusCode == HttpStatus.unauthorized) {
-          throw PasswordWrongException(
-            msg: _parsePasswordWrongMsg(e.response?.data?.toString() ?? ''),
-          );
-        }
-        rethrow;
       }
-    });
-  }
+
+      final continued = await _submitContinueForm(response.data);
+      if (continued != null && _isRedirect(continued)) {
+        return _completeRedirect(
+          response: continued,
+          target: target,
+          username: preference.getString(preference.Preference.idsAccount),
+          reAuthHandler: reAuthHandler,
+        );
+      }
+
+      return _loginOnce(
+        username: preference.getString(preference.Preference.idsAccount),
+        password: preference.getString(preference.Preference.idsPassword),
+        sliderCaptcha: sliderCaptcha,
+        target: target,
+        reAuthHandler: reAuthHandler,
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == HttpStatus.unauthorized) {
+        throw PasswordWrongException(
+          msg: _parsePasswordWrongMsg(e.response?.data?.toString() ?? ''),
+        );
+      }
+      rethrow;
+    }
+  });
 
   Future<String> login({
+    required String username,
+    required String password,
+    required Future<void> Function(String) sliderCaptcha,
+    bool forceReLogin = false,
+    void Function(int, String)? onResponse,
+    String? target,
+    IDSReAuthHandler? reAuthHandler,
+  }) => _idsLock.synchronized(
+    () => _loginOnce(
+      username: username,
+      password: password,
+      sliderCaptcha: sliderCaptcha,
+      forceReLogin: forceReLogin,
+      onResponse: onResponse,
+      target: target,
+      reAuthHandler: reAuthHandler,
+    ),
+  );
+
+  Future<String> _loginOnce({
     required String username,
     required String password,
     required Future<void> Function(String) sliderCaptcha,
@@ -386,45 +411,46 @@ class IDSSession {
     String? username,
     IDSReAuthHandler? reAuthHandler,
     void Function(int, String)? onResponse,
-  }) async {
-    if (!isIDSReAuthLocation(uri.toString())) return uri;
+  }) {
+    if (!isIDSReAuthLocation(uri.toString())) return Future.value(uri);
+    return _reAuthLock.synchronized(() async {
+      final previousLoginState = loginState;
+      loginState = IDSLoginState.requesting;
+      final handler = reAuthHandler ?? activeIDSReAuthHandler;
+      if (handler == null) {
+        loginState = IDSLoginState.fail;
+        throw const IDSReAuthRequiredException();
+      }
 
-    final previousLoginState = loginState;
-    loginState = IDSLoginState.requesting;
-    final handler = reAuthHandler ?? activeIDSReAuthHandler;
-    if (handler == null) {
-      loginState = IDSLoginState.fail;
-      throw const IDSReAuthRequiredException();
-    }
-
-    try {
-      onResponse?.call(55, 'login_process.second_factor');
-      final resumedUri = await handler(
-        IDSReAuthClient(
-          dio: dioNoOfflineCheck,
-          challengeUri: uri,
-          username:
-              username ??
-              preference.getString(preference.Preference.idsAccount),
-          service: uri.queryParameters['service'] ?? service,
-          registerBrowserFingerprint: _registerBrowserFingerprint,
-        ),
-      );
-      loginState = switch (previousLoginState) {
-        IDSLoginState.success => IDSLoginState.success,
-        IDSLoginState.manual => IDSLoginState.manual,
-        _ => IDSLoginState.requesting,
-      };
-      return resumedUri;
-    } on IDSReAuthCancelledException {
-      await NetworkCookieJars.ids.deleteAll();
-      loginState = IDSLoginState.cancelled;
-      rethrow;
-    } on IDSReAuthExpiredException {
-      await NetworkCookieJars.ids.deleteAll();
-      loginState = IDSLoginState.fail;
-      rethrow;
-    }
+      try {
+        onResponse?.call(55, 'login_process.second_factor');
+        final resumedUri = await handler(
+          IDSReAuthClient(
+            dio: dioNoOfflineCheck,
+            challengeUri: uri,
+            username:
+                username ??
+                preference.getString(preference.Preference.idsAccount),
+            service: uri.queryParameters['service'] ?? service,
+            registerBrowserFingerprint: _registerBrowserFingerprint,
+          ),
+        );
+        loginState = switch (previousLoginState) {
+          IDSLoginState.success => IDSLoginState.success,
+          IDSLoginState.manual => IDSLoginState.manual,
+          _ => IDSLoginState.requesting,
+        };
+        return resumedUri;
+      } on IDSReAuthCancelledException {
+        await NetworkCookieJars.ids.deleteAll();
+        loginState = IDSLoginState.cancelled;
+        rethrow;
+      } on IDSReAuthExpiredException {
+        await NetworkCookieJars.ids.deleteAll();
+        loginState = IDSLoginState.fail;
+        rethrow;
+      }
+    });
   }
 
   Future<Response<dynamic>> followIDSRedirects({
