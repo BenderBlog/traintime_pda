@@ -19,9 +19,9 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
-import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
@@ -93,8 +93,7 @@ class _HomePageMasterState extends State<HomePageMaster>
     );
 
     try {
-      await update(
-        context: context,
+      await HomepageController.i.refresh(
         forceRetryLogin: true,
         sliderCaptcha: (String cookieStr) {
           return SliderCaptchaClientProvider(cookie: cookieStr).solve(
@@ -213,8 +212,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       if (loginState == IDSLoginState.none) {
         _loginAsync();
       } else {
-        update(
-          context: context,
+        HomepageController.i.refresh(
           forceRetryLogin: true,
           sliderCaptcha: (String cookieStr) {
             return SliderCaptchaClientProvider(cookie: cookieStr).solve(
