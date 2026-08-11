@@ -18,6 +18,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 /// New energy management system
 /// Online since 2026-4-22
@@ -30,6 +31,7 @@ class EnergySession extends IDSSession {
   static final File _fileHistory = File(
     "${supportPath.path}/$_electricityHistory",
   );
+  final _electricityInfoFlight = SingleFlight<FetchResult<EnergyInfo>>();
 
   bool get isCacheExist => _fileCache.existsSync();
 
@@ -138,6 +140,12 @@ class EnergySession extends IDSSession {
   }
 
   Future<FetchResult<EnergyInfo>> getElectricityInfo({
+    Future<String> Function(List<int>)? captchaFunction,
+  }) => _electricityInfoFlight.run(
+    () => _getElectricityInfoOnce(captchaFunction: captchaFunction),
+  );
+
+  Future<FetchResult<EnergyInfo>> _getElectricityInfoOnce({
     Future<String> Function(List<int>)? captchaFunction,
   }) async {
     log.info("[EletricitySession][update] Ready to update electricity info. ");

@@ -16,7 +16,6 @@ import 'package:watermeter/repository/ids_session/sysj_session.dart';
 
 class OtherExperimentController {
   static final OtherExperimentController i = OtherExperimentController._();
-  bool _isReloading = false;
   final session = SysjSession();
 
   OtherExperimentController._() {
@@ -58,14 +57,12 @@ class OtherExperimentController {
   }
 
   Future<void> reloadOtherExperiment() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = _lastValidOtherExperiment.value;
     otherExperimentStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await SysjSession().getOtherExperimentData();
+      final result = await session.getOtherExperimentData();
       _lastValidOtherExperiment.value = result;
       otherExperimentStateSignal.value = AsyncState.data(result);
     } catch (e, s) {
@@ -75,8 +72,6 @@ class OtherExperimentController {
         s,
         "[OtherExperimentController][reloadOtherExperiment] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 

@@ -12,6 +12,7 @@ import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 class LibrarySession extends IDSSession {
   static const String _opacBaseUrl = "https://mfindxidian.libsp.cn";
@@ -25,6 +26,7 @@ class LibrarySession extends IDSSession {
   static int userId = 0;
   static String token = "";
   static String groupCode = "";
+  final _borrowListFlight = SingleFlight<List<BorrowData>>();
 
   /*
     Note 1:
@@ -426,7 +428,10 @@ class LibrarySession extends IDSSession {
     }
   }
 
-  Future<List<BorrowData>> getBorrowList() async {
+  Future<List<BorrowData>> getBorrowList() =>
+      _borrowListFlight.run(_getBorrowListOnce);
+
+  Future<List<BorrowData>> _getBorrowListOnce() async {
     log.info(
       "[LibrarySession][getBorrowList] "
       "Getting borrow list",

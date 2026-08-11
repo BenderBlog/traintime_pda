@@ -21,6 +21,7 @@ import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/ids_session/ehall_session.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 /// 课程表 4770397878132218
 class ClassTableSession extends EhallSession {
@@ -28,6 +29,9 @@ class ClassTableSession extends EhallSession {
   static final File _schoolClassDataCache = File(
     "${supportPath.path}/$_schoolClassName",
   );
+  final _classTableFlight = SingleFlight<FetchResult<ClassTableData>>();
+  String? _requestedSemesterCode;
+  UserRole? _requestedRole;
 
   bool get isCacheExist => _schoolClassDataCache.existsSync();
 
@@ -77,27 +81,52 @@ class ClassTableSession extends EhallSession {
   Future<FetchResult<ClassTableData>> getClassTable(
     String semesterCode,
     UserRole role,
-  ) async {
-    try {
-      ClassTableData data = role == UserRole.postgraduate
-          ? await _getYjspt(semesterCode)
-          : await _getEhall(semesterCode);
-      DateTime fetchTime = DateTime.now();
-      await updateCacheAndGroup(data);
-      return FetchResult.fresh(fetchTime: fetchTime, data: data);
-    } catch (e, s) {
-      log.handle(e, s, "[getClassTable] Have issue");
-      (DateTime, ClassTableData)? cache = getCache();
-      if (cache != null) {
-        return FetchResult.cache(
-          fetchTime: cache.$1,
-          data: cache.$2,
-          hintKey: _cacheHintFromError(e),
-        );
+  ) {
+    _requestedSemesterCode = semesterCode;
+    _requestedRole = role;
+    return _classTableFlight.run(_getLatestClassTable);
+  }
+
+  Future<FetchResult<ClassTableData>> _getLatestClassTable() async {
+    while (true) {
+      final semesterCode = _requestedSemesterCode!;
+      final role = _requestedRole!;
+
+      try {
+        final data = role == UserRole.postgraduate
+            ? await _getYjspt(semesterCode)
+            : await _getEhall(semesterCode);
+
+        if (!_isLatestRequest(semesterCode, role)) continue;
+
+        final fetchTime = DateTime.now();
+        await updateCacheAndGroup(data);
+
+        if (!_isLatestRequest(semesterCode, role)) {
+          deleteCache();
+          continue;
+        }
+
+        return FetchResult.fresh(fetchTime: fetchTime, data: data);
+      } catch (e, s) {
+        if (!_isLatestRequest(semesterCode, role)) continue;
+
+        log.handle(e, s, "[getClassTable] Have issue");
+        final cache = getCache();
+        if (cache != null) {
+          return FetchResult.cache(
+            fetchTime: cache.$1,
+            data: cache.$2,
+            hintKey: _cacheHintFromError(e),
+          );
+        }
+        rethrow;
       }
-      rethrow;
     }
   }
+
+  bool _isLatestRequest(String semesterCode, UserRole role) =>
+      semesterCode == _requestedSemesterCode && role == _requestedRole;
 
   String _cacheHintFromError(Object error) {
     if (error is PasswordWrongException) {

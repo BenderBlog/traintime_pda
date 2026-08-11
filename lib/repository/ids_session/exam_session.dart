@@ -19,6 +19,7 @@ import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/ids_session/ehall_session.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 /// 考试安排 4768687067472349
 class ExamSession extends EhallSession {
@@ -27,6 +28,9 @@ class ExamSession extends EhallSession {
   static final File _examDataCache = File(
     "${supportPath.path}/$_examDataCacheName",
   );
+  final _examInfoFlight = SingleFlight<FetchResult<ExamData>>();
+  String? _requestedSemester;
+  UserRole? _requestedRole;
 
   bool get isCacheExist => _examDataCache.existsSync();
 
@@ -71,30 +75,52 @@ class ExamSession extends EhallSession {
     }
   }
 
-  Future<FetchResult<ExamData>> getScoreInfo(
-    String semester,
-    UserRole role,
-  ) async {
-    try {
-      ExamData data = role == UserRole.postgraduate
-          ? await _getExamYjspt(semester)
-          : await _getExamEhall(semester);
-      DateTime fetchTime = DateTime.now();
-      await updateCacheAndGroup(data);
-      return FetchResult.fresh(fetchTime: fetchTime, data: data);
-    } catch (e, s) {
-      log.handle(e, s, "[getScoreInfo] Have issue");
-      (DateTime, ExamData)? cache = getCache();
-      if (cache != null) {
-        return FetchResult.cache(
-          fetchTime: cache.$1,
-          data: cache.$2,
-          hintKey: _cacheHintFromError(e),
-        );
+  Future<FetchResult<ExamData>> getScoreInfo(String semester, UserRole role) {
+    _requestedSemester = semester;
+    _requestedRole = role;
+    return _examInfoFlight.run(_getLatestExamInfo);
+  }
+
+  Future<FetchResult<ExamData>> _getLatestExamInfo() async {
+    while (true) {
+      final semester = _requestedSemester!;
+      final role = _requestedRole!;
+
+      try {
+        final data = role == UserRole.postgraduate
+            ? await _getExamYjspt(semester)
+            : await _getExamEhall(semester);
+
+        if (!_isLatestRequest(semester, role)) continue;
+
+        final fetchTime = DateTime.now();
+        await updateCacheAndGroup(data);
+
+        if (!_isLatestRequest(semester, role)) {
+          deleteCache();
+          continue;
+        }
+
+        return FetchResult.fresh(fetchTime: fetchTime, data: data);
+      } catch (e, s) {
+        if (!_isLatestRequest(semester, role)) continue;
+
+        log.handle(e, s, "[getScoreInfo] Have issue");
+        final cache = getCache();
+        if (cache != null) {
+          return FetchResult.cache(
+            fetchTime: cache.$1,
+            data: cache.$2,
+            hintKey: _cacheHintFromError(e),
+          );
+        }
+        rethrow;
       }
-      rethrow;
     }
   }
+
+  bool _isLatestRequest(String semester, UserRole role) =>
+      semester == _requestedSemester && role == _requestedRole;
 
   String _cacheHintFromError(Object error) {
     if (error is PasswordWrongException) {

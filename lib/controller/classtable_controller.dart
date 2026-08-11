@@ -20,7 +20,6 @@ import 'package:watermeter/repository/ids_session/classtable_session.dart';
 class ClassTableController {
   static const decorationName = "decoration.jpg";
   static final ClassTableController i = ClassTableController._();
-  bool _isReloading = false;
 
   final ClassTableSession session = ClassTableSession();
 
@@ -66,8 +65,6 @@ class ClassTableController {
   }
 
   Future<void> reloadClassTable() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = _lastValidSchoolClassTable.value;
     schoolClassTableStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
@@ -86,8 +83,6 @@ class ClassTableController {
         s,
         "[ClassTableControllerNew][reloadClassTable] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 

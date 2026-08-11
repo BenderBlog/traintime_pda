@@ -11,11 +11,13 @@ import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 class SchoolCardSession extends IDSSession {
   static String openid = "";
   static DateTime? _openidFetchedAt;
   static const Duration _openidValidDuration = Duration(minutes: 5);
+  final _overviewFlight = SingleFlight<String>();
 
   bool get _isOpenIdValid =>
       openid.isNotEmpty &&
@@ -81,7 +83,9 @@ class SchoolCardSession extends IDSSession {
         "school_card_status.failed_to_query";
   }
 
-  Future<String> getOverview() async {
+  Future<String> getOverview() => _overviewFlight.run(_getOverviewOnce);
+
+  Future<String> _getOverviewOnce() async {
     log.info(
       "[SchoolCardSession][getOverview] "
       "Try to fetch school card overview.",
