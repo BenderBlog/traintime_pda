@@ -17,7 +17,6 @@ import 'package:watermeter/repository/preference.dart';
 
 class ExamController {
   static final ExamController i = ExamController._();
-  bool _isReloading = false;
   final session = ExamSession();
 
   ExamController._() {
@@ -55,8 +54,6 @@ class ExamController {
   }
 
   Future<void> reloadExamInfo() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = _lastValidExamInfo.value;
     examInfoStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
@@ -71,8 +68,6 @@ class ExamController {
     } catch (e, s) {
       examInfoStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[ExamController][reloadExamInfo] Have issue");
-    } finally {
-      _isReloading = false;
     }
   }
 

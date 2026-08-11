@@ -19,6 +19,7 @@ import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 /// For physics experiment
 class ExperimentSession {
@@ -26,6 +27,7 @@ class ExperimentSession {
   static File physicsExperimentCacheFile = File(
     "${supportPath.path}/$physicsExperimentCacheName",
   );
+  final _dataFlight = SingleFlight<FetchResult<List<ExperimentData>>>();
   bool get isCacheExist => physicsExperimentCacheFile.existsSync();
 
   void deleteCache() {
@@ -403,7 +405,10 @@ class ExperimentSession {
     return "experiment.physics_cache_hint_unknown_error";
   }
 
-  Future<FetchResult<List<ExperimentData>>> getData() async {
+  Future<FetchResult<List<ExperimentData>>> getData() =>
+      _dataFlight.run(_getDataOnce);
+
+  Future<FetchResult<List<ExperimentData>>> _getDataOnce() async {
     try {
       List<ExperimentData> data = await _getExperimentData();
       DateTime fetchTime = DateTime.now();

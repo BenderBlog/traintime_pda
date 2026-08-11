@@ -18,7 +18,6 @@ import 'package:watermeter/repository/experiment_session/physics_experiment_sess
 class PhysicsExperimentController {
   final ExperimentSession session = ExperimentSession();
   static final PhysicsExperimentController i = PhysicsExperimentController._();
-  bool _isReloading = false;
 
   PhysicsExperimentController._() {
     /// Load from cache at the beginning
@@ -64,8 +63,6 @@ class PhysicsExperimentController {
   }
 
   Future<void> reloadPhysicsExperiment() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = _lastValidPhysicsExperiment.value;
     physicsExperimentStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
@@ -81,8 +78,6 @@ class PhysicsExperimentController {
         s,
         "[PhysicsExperimentController][reloadPhysicsExperiment] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 

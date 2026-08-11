@@ -12,7 +12,6 @@ import 'package:watermeter/repository/preference.dart' as pref;
 class UpdateNoticeController {
   static final PdaServiceSession session = PdaServiceSession();
   static UpdateNoticeController i = UpdateNoticeController._();
-  bool _isReloading = false;
 
   UpdateNoticeController._();
 
@@ -21,8 +20,6 @@ class UpdateNoticeController {
   );
 
   Future<void> reloadUpdateNoticeInfo() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = updateMessageStateSignal.peek().value;
     updateMessageStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
@@ -37,8 +34,6 @@ class UpdateNoticeController {
         s,
         "[UpdateNoticeController][reloadUpdateNoticeInfo] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 

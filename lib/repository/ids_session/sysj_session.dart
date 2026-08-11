@@ -18,12 +18,15 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 class SysjSession extends IDSSession {
   static const otherExperimentCacheName = "OtherExperiment.json";
   static File otherExperimentCacheFile = File(
     "${supportPath.path}/$otherExperimentCacheName",
   );
+  final _otherExperimentFlight =
+      SingleFlight<FetchResult<List<ExperimentData>>>();
   bool get isCacheExist => otherExperimentCacheFile.existsSync();
 
   void deleteCache() {
@@ -99,7 +102,11 @@ class SysjSession extends IDSSession {
     }
   }
 
-  Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() async {
+  Future<FetchResult<List<ExperimentData>>> getOtherExperimentData() =>
+      _otherExperimentFlight.run(_getOtherExperimentDataOnce);
+
+  Future<FetchResult<List<ExperimentData>>>
+  _getOtherExperimentDataOnce() async {
     try {
       List<ExperimentData> data = await _getDataFromSysj();
       DateTime fetchTime = DateTime.now();
