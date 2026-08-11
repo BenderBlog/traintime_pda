@@ -1,6 +1,7 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -147,6 +148,57 @@ void main() {
       ),
     );
     expect(adapter.requestedUris, hasLength(31));
+  });
+
+  test('serializes concurrent IDS re-authentication challenges', () async {
+    final session = IDSSession();
+    final releaseFirst = Completer<void>();
+    var handlerCalls = 0;
+    var activeHandlers = 0;
+    var maxActiveHandlers = 0;
+
+    Future<Uri> handler(IDSReAuthClient client) async {
+      handlerCalls++;
+      final callNumber = handlerCalls;
+      activeHandlers++;
+      if (activeHandlers > maxActiveHandlers) {
+        maxActiveHandlers = activeHandlers;
+      }
+      if (callNumber == 1) {
+        await releaseFirst.future;
+      }
+      activeHandlers--;
+      return Uri.parse('https://service.example/resumed/$callNumber');
+    }
+
+    final first = session.resolveIDSReAuthIfNeeded(
+      Uri.parse(
+        'https://ids.xidian.edu.cn/authserver/'
+        'reAuthCheck/reAuthLoginView.do?service=first',
+      ),
+      username: 'test-user',
+      reAuthHandler: handler,
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    final second = session.resolveIDSReAuthIfNeeded(
+      Uri.parse(
+        'https://ids.xidian.edu.cn/authserver/'
+        'reAuthCheck/reAuthLoginView.do?service=second',
+      ),
+      username: 'test-user',
+      reAuthHandler: handler,
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    expect(handlerCalls, 1);
+    expect(maxActiveHandlers, 1);
+
+    releaseFirst.complete();
+    await Future.wait([first, second]);
+
+    expect(handlerCalls, 2);
+    expect(maxActiveHandlers, 1);
   });
 }
 
