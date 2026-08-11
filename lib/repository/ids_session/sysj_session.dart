@@ -26,9 +26,9 @@ class SysjSession extends IDSSession {
   );
   bool get isCacheExist => otherExperimentCacheFile.existsSync();
 
-  Future<void> deleteCache() async {
-    if (await otherExperimentCacheFile.exists()) {
-      await otherExperimentCacheFile.delete();
+  void deleteCache() {
+    if (otherExperimentCacheFile.existsSync()) {
+      otherExperimentCacheFile.deleteSync();
     }
   }
 
@@ -110,7 +110,7 @@ class SysjSession extends IDSSession {
         "[SysjSession][getExperimentData] "
         "Password changed, remove cache",
       );
-      await deleteCache();
+      deleteCache();
       rethrow;
     } catch (e, s) {
       log.handle(e, s, "[ExperimentSession][getExperimentData] Have issue");
