@@ -21,7 +21,7 @@ class SchoolCardController {
         : AsyncState.loading();
     try {
       final result = await session.getOverview();
-      moneyStateSignal.value = AsyncState.data(result);
+      moneyStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       moneyStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[SchoolCardController][reloadOverview] Have issue");

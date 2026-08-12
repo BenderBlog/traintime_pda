@@ -70,7 +70,7 @@ class PhysicsExperimentController {
     try {
       final result = await session.getData();
       _lastValidPhysicsExperiment.value = result;
-      physicsExperimentStateSignal.value = AsyncState.data(result);
+      physicsExperimentStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       physicsExperimentStateSignal.value = AsyncState.error(e, s);
       log.handle(

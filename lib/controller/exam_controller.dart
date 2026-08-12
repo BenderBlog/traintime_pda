@@ -64,7 +64,7 @@ class ExamController {
         getUserRole(),
       );
       _lastValidExamInfo.value = result;
-      examInfoStateSignal.value = AsyncState.data(result);
+      examInfoStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       examInfoStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[ExamController][reloadExamInfo] Have issue");
