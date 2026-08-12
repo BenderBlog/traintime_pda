@@ -17,7 +17,6 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
-import 'package:watermeter/repository/ids_session/ehall_session.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
@@ -126,7 +125,7 @@ class _LoginWindowState extends State<LoginWindow> {
         completedMsg: FlutterI18n.translate(context, "login.complete_login"),
       ),
     );
-    EhallSession ses = EhallSession();
+    IDSSession ses = IDSSession();
 
     try {
       await NetworkCookieJars.ids.deleteAll();
@@ -156,7 +155,7 @@ class _LoginWindowState extends State<LoginWindow> {
         return result;
       }
 
-      await ses.loginEhall(
+      await ses.login(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
         onResponse: (int number, String status) {

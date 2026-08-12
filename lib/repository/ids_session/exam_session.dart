@@ -17,12 +17,13 @@ import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:watermeter/repository/ids_session/ehall_session.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
 
+// TODO: Concept prove: whether remove EhallSession is OK
+
 /// 考试安排 4768687067472349
-class ExamSession extends EhallSession {
+class ExamSession extends IDSSession {
   static const _examDataCacheName = "exam.json";
   static const _examDataGroupFileName = "ExamFile.json";
   static final File _examDataCache = File(
@@ -182,8 +183,13 @@ class ExamSession extends EhallSession {
   }
 
   Future<ExamData> _getExamEhall(String semester) async {
-    final location = await useApp("4768687067472349");
-    await followIDSRedirects(initialLocation: location, client: dio);
+    await checkAndLogin(
+      target: "https://ehall.xidian.edu.cn/appShow?appId=4768687067472349",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
+    ).then((location) async {
+      await followIDSRedirects(initialLocation: location, client: dio);
+    });
 
     /// wdksap 我的考试安排
     /// cxyxkwapkwdkc 查询已选课未安排考务的课程(正在安排中，不抓)
@@ -192,7 +198,7 @@ class ExamSession extends EhallSession {
       "[ExamFile][getExam] "
       "My exam arrangemet $semester",
     );
-    List<Subject> subject = await dioEhall
+    List<Subject> subject = await dio
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys"
           "/studentWdksapApp/modules/wdksap/wdksap.do",
@@ -224,7 +230,7 @@ class ExamSession extends EhallSession {
           );
         });
 
-    List<ToBeArranged> toBeArrangedData = await dioEhall
+    List<ToBeArranged> toBeArrangedData = await dio
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys"
           "/studentWdksapApp/modules/wdksap/cxyxkwapkwdkc.do",

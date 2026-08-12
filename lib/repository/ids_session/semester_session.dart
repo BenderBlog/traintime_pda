@@ -2,11 +2,11 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/ids_session/ehall_session.dart';
 
-class SemesterSession extends EhallSession {
+class SemesterSession extends IDSSession {
   Future<String> getSemesterInfoYjspt() async {
     final location = await checkAndLogin(
       target: "https://yjspt.xidian.edu.cn/",
@@ -40,13 +40,30 @@ class SemesterSession extends EhallSession {
       "[ehall_session][getSemesterInfoEhall] "
       "Get the semester information.",
     );
-    String get = await useApp("4770397878132218");
-    await dioEhall.post(get);
-    String semesterCode = await dioEhall
+
+    // TODO: Concept prove: whether remove EhallSession is OK
+
+    await checkAndLogin(
+      target: "https://ehall.xidian.edu.cn/appShow?appId=4770397878132218",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
+    ).then((location) async {
+      await followIDSRedirects(initialLocation: location, client: dio);
+    });
+
+    String semesterCode = await dio
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/dqxnxq.do",
         )
         .then((value) => value.data['datas']['dqxnxq']['rows'][0]['DM']);
     return semesterCode;
   }
+}
+
+class GetInformationFailedException implements Exception {
+  final String msg;
+  const GetInformationFailedException(this.msg);
+
+  @override
+  String toString() => msg;
 }

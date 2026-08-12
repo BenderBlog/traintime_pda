@@ -19,12 +19,13 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/ids_session/ehall_session.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
 
+// TODO: Concept prove: whether remove EhallSession is OK
+
 /// 课程表 4770397878132218
-class ClassTableSession extends EhallSession {
+class ClassTableSession extends IDSSession {
   static const _schoolClassName = "ClassTable.json";
   static final File _schoolClassDataCache = File(
     "${supportPath.path}/$_schoolClassName",
@@ -326,9 +327,14 @@ class ClassTableSession extends EhallSession {
   Future<ClassTableData> _getEhall(String semesterCode) async {
     Map<String, dynamic> qResult = {};
     log.info("[getClasstable][getEhall] Login the system.");
-    String get = await useApp("4770397878132218");
-    log.info("[getClasstable][getEhall] Location: $get");
-    await dioEhall.post(get);
+    await checkAndLogin(
+      target: "https://ehall.xidian.edu.cn/appShow?appId=4770397878132218",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
+    ).then((location) async {
+      log.info("[getClasstable][getEhall] Location: $location");
+      await followIDSRedirects(initialLocation: location, client: dio);
+    });
 
     log.info(
       "[getClasstable][getEhall] "
@@ -339,7 +345,7 @@ class ClassTableSession extends EhallSession {
       "[getClasstable][getEhall] "
       "Fetch the day the semester begin.",
     );
-    String termStartDay = await dioEhall
+    String termStartDay = await dio
         .post(
           'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
           data: {
@@ -353,7 +359,7 @@ class ClassTableSession extends EhallSession {
       "Will get $semesterCode which start at $termStartDay.",
     );
 
-    qResult = await dioEhall
+    qResult = await dio
         .post(
           'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
           data: {
@@ -390,7 +396,7 @@ class ClassTableSession extends EhallSession {
     qResult["semesterCode"] = semesterCode;
     qResult["termStartDay"] = termStartDay;
 
-    var notOnTable = await dioEhall
+    var notOnTable = await dio
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
           data: {
@@ -460,7 +466,7 @@ class ClassTableSession extends EhallSession {
       "Deal with the class change...",
     );
 
-    qResult = await dioEhall
+    qResult = await dio
         .post(
           'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xsdkkc.do',
           data: {
