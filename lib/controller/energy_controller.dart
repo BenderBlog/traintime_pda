@@ -139,7 +139,7 @@ class EnergyController {
     try {
       final result = await session.getElectricityInfo();
       _syncLastValidElectricity(result);
-      energyInfoStateSignal.value = AsyncState.data(result);
+      energyInfoStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       energyInfoStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[EnergyController][refreshElectricityInfo] Have issue");

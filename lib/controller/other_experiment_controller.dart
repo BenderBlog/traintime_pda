@@ -64,7 +64,7 @@ class OtherExperimentController {
     try {
       final result = await session.getOtherExperimentData();
       _lastValidOtherExperiment.value = result;
-      otherExperimentStateSignal.value = AsyncState.data(result);
+      otherExperimentStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       otherExperimentStateSignal.value = AsyncState.error(e, s);
       log.handle(

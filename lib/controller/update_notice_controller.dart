@@ -26,7 +26,7 @@ class UpdateNoticeController {
         : AsyncState.loading();
     try {
       final result = await session.checkUpdate();
-      updateMessageStateSignal.value = AsyncState.data(result);
+      updateMessageStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       updateMessageStateSignal.value = AsyncState.error(e, s);
       log.handle(

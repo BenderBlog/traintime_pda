@@ -75,7 +75,7 @@ class ClassTableController {
         preference.getUserRole(),
       );
       _lastValidSchoolClassTable.value = result;
-      schoolClassTableStateSignal.value = AsyncState.data(result);
+      schoolClassTableStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       schoolClassTableStateSignal.value = AsyncState.error(e, s);
       log.handle(

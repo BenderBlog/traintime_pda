@@ -23,9 +23,9 @@ class LibrarySession extends IDSSession {
       "isLogout=0&refer=https%3A%2F%2Fmfindxidian.libsp.cn"
       "%2Ffind%2Fsso%2Flogin%2Fxidian%2F1";
 
-  static int userId = 0;
-  static String token = "";
-  static String groupCode = "";
+  String _token = "";
+  String _groupCode = "";
+  Future<void>? _initFuture;
   final _borrowListFlight = SingleFlight<List<BorrowData>>();
 
   /*
@@ -44,12 +44,12 @@ class LibrarySession extends IDSSession {
   Options get _opacOptions => Options(
     contentType: "application/json;charset=utf-8",
     headers: {
-      HttpHeaders.cookieHeader: "jwt=$token; jwtHeader=$_opacJwtHeader",
+      HttpHeaders.cookieHeader: "jwt=$_token; jwtHeader=$_opacJwtHeader",
       HttpHeaders.refererHeader: "$_opacBaseUrl/",
       HttpHeaders.hostHeader: "mfindxidian.libsp.cn",
-      "groupCode": groupCode.isEmpty ? _defaultGroupCode : groupCode,
+      "groupCode": _groupCode.isEmpty ? _defaultGroupCode : _groupCode,
       "mappingPath": "",
-      _opacJwtHeader: token,
+      _opacJwtHeader: _token,
     },
   );
 
@@ -393,9 +393,7 @@ class LibrarySession extends IDSSession {
 
   Future<String> renew(BorrowData toUse) async {
     try {
-      if (token.isEmpty) {
-        await initSession();
-      }
+      await _ensureInitialized();
 
       final response = await dioNoOfflineCheck.post(
         "$_opacBaseUrl/find/lendbook/reNew",
@@ -437,9 +435,7 @@ class LibrarySession extends IDSSession {
       "Getting borrow list",
     );
 
-    if (token.isEmpty) {
-      await initSession();
-    }
+    await _ensureInitialized();
 
     final List<Map<String, dynamic>> rawData = await dioNoOfflineCheck
         .post(
@@ -494,12 +490,26 @@ class LibrarySession extends IDSSession {
     return toAppend;
   }
 
-  Future<void> initSession() async {
+  Future<void> _ensureInitialized() {
+    final initializing = _initFuture;
+    if (initializing != null) return initializing;
+    if (_token.isNotEmpty) return Future.value();
+
+    late final Future<void> future;
+    future = _initSessionOnce().whenComplete(() {
+      if (identical(_initFuture, future)) {
+        _initFuture = null;
+      }
+    });
+    _initFuture = future;
+    return future;
+  }
+
+  Future<void> _initSessionOnce() async {
     log.info("[LibrarySession][initSession] Initalizing Library Session");
     try {
-      token = "";
-      groupCode = "";
-      userId = 0;
+      _token = "";
+      _groupCode = "";
 
       final location = await checkAndLogin(
         target: _opacLoginTarget,
@@ -508,13 +518,15 @@ class LibrarySession extends IDSSession {
       );
 
       await _resolveOpacLogin(location);
-      if (token.isEmpty) {
+      if (_token.isEmpty) {
         throw NotFetchLibraryException(message: "Can not find OPAC JWT.");
       }
 
-      _loadJwtInfo(token);
+      _loadJwtInfo(_token);
       await _warmUpOpacSession();
     } catch (e, s) {
+      _token = "";
+      _groupCode = "";
       log.handle(e, s);
       throw NotFetchLibraryException(message: e.toString());
     }
@@ -529,7 +541,7 @@ class LibrarySession extends IDSSession {
       )).toString();
       _throwIfWechatLocation(location);
       _tryLoadJwtFromLocation(location);
-      if (token.isNotEmpty) return;
+      if (_token.isNotEmpty) return;
 
       final response = await dioNoOfflineCheck.get(location);
       log.info('[LibrarySession][initSession] Following login redirect.');
@@ -617,12 +629,12 @@ class LibrarySession extends IDSSession {
 
   void _tryLoadJwtFromLocation(String location) {
     final uri = Uri.parse(location);
-    token = uri.queryParameters["jwt"] ?? token;
+    _token = uri.queryParameters["jwt"] ?? _token;
 
     final fragment = uri.fragment;
     final queryIndex = fragment.indexOf("?");
-    if (token.isEmpty && queryIndex >= 0) {
-      token =
+    if (_token.isEmpty && queryIndex >= 0) {
+      _token =
           Uri.splitQueryString(fragment.substring(queryIndex + 1))["jwt"] ?? "";
     }
   }
@@ -636,15 +648,14 @@ class LibrarySession extends IDSSession {
     );
     if (payload is! Map<String, dynamic>) return;
 
-    userId = int.tryParse(payload["sub"]?.toString() ?? "") ?? 0;
-    groupCode = payload["groupCode"]?.toString() ?? _defaultGroupCode;
+    _groupCode = payload["groupCode"]?.toString() ?? _defaultGroupCode;
   }
 
   Future<void> _warmUpOpacSession() async {
     try {
       await dioNoOfflineCheck.get(
         "$_opacBaseUrl/oga/userinfo",
-        queryParameters: {"jwtHeader": _opacJwtHeader, "jwt": token},
+        queryParameters: {"jwtHeader": _opacJwtHeader, "jwt": _token},
         options: _opacOptions,
       );
     } catch (e, s) {
@@ -662,7 +673,7 @@ class LibrarySession extends IDSSession {
           log.handle(e, s, "[LibrarySession] Fetch group code failed");
           return null;
         });
-    groupCode = fetchedGroupCode ?? groupCode;
+    _groupCode = fetchedGroupCode ?? _groupCode;
   }
 
   String _resolveLocation(String currentLocation, String location) {

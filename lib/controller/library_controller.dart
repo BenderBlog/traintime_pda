@@ -24,7 +24,7 @@ class LibraryController {
         : AsyncState.loading();
     try {
       final result = await session.getBorrowList();
-      libraryBorrowStateSignal.value = AsyncState.data(result);
+      libraryBorrowStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       libraryBorrowStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[LibraryController][reloadBorrowList] Have issue");
