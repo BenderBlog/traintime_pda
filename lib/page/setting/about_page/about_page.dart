@@ -94,6 +94,16 @@ class _AboutPageState extends State<AboutPage> {
             ),
           ),
           ListTile(
+            leading: const Icon(Icons.copyright),
+            title: Text(
+              FlutterI18n.translate(
+                context,
+                "setting.about_page.copyright_register_code",
+              ),
+            ),
+            subtitle: const Text("2026SR0738647"),
+          ),
+          ListTile(
             leading: const Icon(Icons.code),
             title: Text(
               FlutterI18n.translate(context, "setting.about_page.beian"),
