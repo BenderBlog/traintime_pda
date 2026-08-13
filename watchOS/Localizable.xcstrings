@@ -20,6 +20,16 @@
         }
       }
     },
+    "%@ · %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
     "%1$@，第%2$lld到第%3$lld节" : {
       "comment" : "VoiceOver 对课程名称和节次范围的描述",
       "extractionState" : "stale",
@@ -58,6 +68,22 @@
         }
       }
     },
+    "XDYou 课表" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XDYou Schedule"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XDYou 課表"
+          }
+        }
+      }
+    },
     "上一步" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -87,6 +113,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "上一項"
+          }
+        }
+      }
+    },
+    "上课地点" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Class Location"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上課地點"
           }
         }
       }
@@ -137,6 +180,73 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下一項"
+          }
+        }
+      }
+    },
+    "今日 %d 节" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d classes today"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日 %d 節"
+          }
+        }
+      }
+    },
+    "今日节次分布" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's period distribution"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日節次分佈"
+          }
+        }
+      }
+    },
+    "今日课程" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classes Today"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日課程"
+          }
+        }
+      }
+    },
+    "今日课表" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's Schedule"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日課表"
           }
         }
       }
@@ -241,6 +351,23 @@
         }
       }
     },
+    "分钟" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "min"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分鐘"
+          }
+        }
+      }
+    },
     "切换当前与下一节课" : {
       "localizations" : {
         "en" : {
@@ -325,6 +452,105 @@
         }
       }
     },
+    "剩余 %d 分钟" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d min remaining"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "剩餘 %d 分鐘"
+          }
+        }
+      }
+    },
+    "只显示今日课程数量与节次占用。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only show today's class count and occupied periods."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只顯示今日課程數量與節次佔用。"
+          }
+        }
+      }
+    },
+    "只显示当前或下一节课程的名称。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only show the name of the current or next class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只顯示目前或下一節課程的名稱。"
+          }
+        }
+      }
+    },
+    "只显示当前或下一节课程的地点。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only show the location of the current or next class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只顯示目前或下一節課程的地點。"
+          }
+        }
+      }
+    },
+    "只显示当前或下一节课程的时间。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only show the time of the current or next class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只顯示目前或下一節課程的時間。"
+          }
+        }
+      }
+    },
+    "只显示正在进行课程的进度和剩余时间。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only show progress and remaining time for the current class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只顯示正在進行課程的進度和剩餘時間。"
+          }
+        }
+      }
+    },
     "同步失败：%@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -404,6 +630,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在當前課程和下一節課程之間切換。"
+          }
+        }
+      }
+    },
+    "在表盘或智能叠放中查看当前和下一节课程。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View the current and next class on the watch face or in the Smart Stack."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在錶面或智慧型堆疊中查看目前和下一節課程。"
           }
         }
       }
@@ -525,7 +767,25 @@
         }
       }
     },
+    "当前无课" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No class now"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前無課"
+          }
+        }
+      }
+    },
     "当前课程" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -642,6 +902,7 @@
       }
     },
     "打开手表应用同步课表" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -844,6 +1105,38 @@
         }
       }
     },
+    "时间地点" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time & Location"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間地點"
+          }
+        }
+      }
+    },
+    "显示当前或下一节课程的开始时间与地点。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the start time and location of the current or next class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示目前或下一節課程的開始時間與地點。"
+          }
+        }
+      }
+    },
     "暂无课程" : {
       "localizations" : {
         "en" : {
@@ -926,6 +1219,56 @@
         }
       }
     },
+    "本周 %d 节" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d classes this week"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本週 %d 節"
+          }
+        }
+      }
+    },
+    "本周分布" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly Distribution"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本週分佈"
+          }
+        }
+      }
+    },
+    "本周课程" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classes This Week"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本週課程"
+          }
+        }
+      }
+    },
     "本周课程点阵" : {
       "localizations" : {
         "en" : {
@@ -942,7 +1285,25 @@
         }
       }
     },
+    "查看今日课程数量和最近一节课程。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View today's class count and the nearest class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看今日課程數量和最近一節課程。"
+          }
+        }
+      }
+    },
     "查看当前或下一节课程与本周课程分布。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -954,6 +1315,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "查看當前或下一節課程與本週課程分佈。"
+          }
+        }
+      }
+    },
+    "查看当前课程进度或下一节课程时间。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View current class progress or the next class time."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看目前課程進度或下一節課程時間。"
+          }
+        }
+      }
+    },
+    "查看本周课程数量与节次分布。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View this week's class count and period distribution."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看本週課程數量與節次分佈。"
           }
         }
       }
@@ -1517,6 +1911,40 @@
         }
       }
     },
+    "突出显示当前或下一节课程的地点。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Highlight the location of the current or next class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "突出顯示目前或下一節課程的地點。"
+          }
+        }
+      }
+    },
+    "突出显示当前或下一节课程的时间。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Highlight the time of the current or next class."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "突出顯示目前或下一節課程的時間。"
+          }
+        }
+      }
+    },
     "第%lld周" : {
       "comment" : "学期周次标题",
       "extractionState" : "stale",
@@ -1653,6 +2081,39 @@
         }
       }
     },
+    "课程名称" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Class Name"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "課程名稱"
+          }
+        }
+      }
+    },
+    "课程时间" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Class Time"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "課程時間"
+          }
+        }
+      }
+    },
     "课程详情" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1666,6 +2127,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "課程詳情"
+          }
+        }
+      }
+    },
+    "课程进度" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Class Progress"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "課程進度"
           }
         }
       }

@@ -67,7 +67,7 @@ flowchart LR
 | `watchOS/Views/InteractionAwareScrollView.swift` | 列表滚动观察和顶部保护 |
 | `watchOS/Views/WatchInteractionSupport.swift` | 触觉反馈和表冠连续会话 |
 | `watchOS/Views/WatchOnboardingView.swift` | 新手引导步骤、顶层遮罩和动作动画 |
-| `watchOS/Widget/` | Smart Stack 小组件 |
+| `watchOS/Widget/` | 表盘 Complication、Smart Stack 与时间线 |
 
 通信层不保存 SwiftUI 页面状态，View 不直接解析 WatchConnectivity 字典；
 Store 不持有页面手势和动画状态。
@@ -448,16 +448,28 @@ App 与 Widget 共用。目录、状态和周次通过 `watchLocalizedString` �
 Catalog；日期与星期使用注入的 Locale。课程、教师和地点属于用户或学校数据，
 保持原文。
 
-## Smart Stack 小组件
+## 表盘 Complication 与 Smart Stack 小组件
 
 Widget 只读取 App Group，不访问手机或校园接口：
 
 - 有正在进行的课程时显示当前课程；
 - 否则显示下一节课程；
-- 当前和下一节同时存在时提供切换按钮；
-- 显示 24 小时制时间和地点；
-- 右侧显示包含周六、周日的 5×7 点阵，最多占宽度四分之一；
+- 支持单行、圆形、表角和长方形四种表盘 Complication；
+- 表盘下一节课程优先显示 24 小时制开始时间和地点，当前课程显示结束时间；
+- 圆形版本用外圈表示当前课程进度，表角版本沿表角显示地点；
+- 另有课程名称、时间地点、课程进度、今日课表、本周分布五种专用组件；
+- 五种专用组件均支持单行、圆形、表角和长方形，便于在同一表盘组合；
+- 时间地点组件只显示开始时间与地点，其余组件隔离名称、进度与分布职责；
+- Smart Stack 中当前和下一节同时存在时提供切换按钮；
+- 长方形组件右侧显示包含周六、周日的 5×7 分布矩阵，约占宽度三成；
+- 长方形组件在 Smart Stack 与表盘强调色模式中使用同一布局，仅由系统调整配色；
 - 在课程开始和结束时间生成 Timeline 节点。
+
+Timeline Provider 从共享快照生成不可变条目。每个条目已经包含当前课程、
+下一节课程、当天课程和本周课程，SwiftUI `body` 不再筛选完整快照。周分布矩阵
+建立时把本周课程转换为 35 格颜色索引，Canvas 每帧只读取索引并绘制圆角单元。
+进度、剩余分钟、24 小时时间和地点占位由统一格式化工具提供，所有 family 使用
+同一套边界与文本语义。
 
 ## 通知职责
 
@@ -500,9 +512,9 @@ xcodebuild \
 Watch Companion Bundle Identifier 正确指向 Runner，并在手机和手表上启用
 开发者模式。
 
-## 维护规则
+## 开发约束
 
-修改同步协议时：
+同步协议保持以下不变量：
 
 1. 同步更新 Dart、iPhone Swift、Watch Swift 与 schema；
 2. 验证版本一致、版本变化、分页中途版本变化三条路径；
@@ -510,7 +522,7 @@ Watch Companion Bundle Identifier 正确指向 Runner，并在手机和手表上
 4. 只在完整学期安装后保存版本；
 5. 不因失败、超时或坏分页清空旧缓存。
 
-修改缓存时：
+缓存实现保持以下不变量：
 
 1. 新缓存必须有 schema 或来源签名；
 2. 可重建派生数据不要复制完整课程模型；
@@ -518,7 +530,7 @@ Watch Companion Bundle Identifier 正确指向 Runner，并在手机和手表上
 4. App Group 键、语言和 schema 范围只在共享层定义；
 5. 单项缓存损坏必须可以独立回退或重建。
 
-修改界面交互时：
+界面交互保持以下不变量：
 
 1. 复用分页纯函数和表冠协调器，不复制停止计时逻辑；
 2. 保持触摸、表冠和顶部箭头经过同一页面提交入口；

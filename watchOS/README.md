@@ -54,9 +54,21 @@ Store 初始化会恢复课程列表派生索引、教学日期，并预热当�
 重复重建。首次数据尚未准备完成时，课程列表纯黑章节页会显示渲染提示，完成
 后给出触觉与文字确认再继续。
 
-`Widget/` 提供 Smart Stack 课程小组件，显示当前/下一节课程、地点、时间和
-一周 5×7 点阵。小组件通过 App Group 读取手表 App 已校验并完整写入的缓存，
-不自行发起网络或校园系统请求。
+`Widget/` 提供 Smart Stack 与表盘课程组件。表盘支持单行、圆形、表角和
+长方形四种 Complication：下一节课程优先保留开始时间与地点，当前课程显示
+结束时间与地点。长方形组件在 Smart Stack 和表盘中保持相同结构，均显示
+当前/下一节课程、完整时间、地点和一周 5×7 分布矩阵；矩阵约占组件宽度
+三成并保留小幅边距。系统按表盘样式调整配色，组件结构保持一致。
+
+Widget 只从 App Group 读取手表 App 已校验并完整写入的缓存，不访问手机或
+校园系统。Timeline Provider 一次计算当前课程、下一节课程、当天课程和本周
+课程；5×7 矩阵在建立视图时生成颜色索引，Canvas 绘制阶段不扫描完整课表。
+
+除综合课表组件外，组件库还提供“课程名称、时间地点、课程进度、今日课表、
+本周分布”五种专用组件；每种专用组件均支持单行、圆形、表角和长方形。
+“时间地点”始终显示开始时间与地点，其余组件分别负责名称、进度和分布，适合
+在同一个表盘组合使用而不重复信息。所有组件共用一份 Timeline Provider 和
+App Group 课表缓存。
 
 课程提醒由 iPhone 本地通知转发，Watch App 不重复调度同一提醒。
 
@@ -68,7 +80,7 @@ Store 初始化会恢复课程列表派生索引、教学日期，并预热当�
 - `Connectivity/`：三阶段请求、版本判断、分页队列和超时处理；
 - `Storage/WatchScheduleStore.swift`：快照安装、缓存恢复、派生索引与预热；
 - `Shared/`：Watch App 与 Widget 共用的 App Group、语言、schema 和缓存编码；
-- `Widget/`：Smart Stack 时间线、课程切换和 5×7 点阵；
+- `Widget/`：表盘 Complication、Smart Stack 时间线、课程切换和 5×7 矩阵；
 - `Views/`：页面、交互基础设施和新手引导。
 
 `Views/` 中页面文件只保存自己的浏览状态与布局：
@@ -81,7 +93,7 @@ Store 初始化会恢复课程列表派生索引、教学日期，并预热当�
 - `CourseViews.swift`：课程卡片和课程详情；
 - `CalendarPagingSupport.swift`：三个日历页面共用的横向分页、表冠和吸附算法；
 - `InteractionAwareScrollView.swift`：列表与详情使用的原生滚动阶段观察桥；
-- `WatchInteractionSupport.swift`：统一触觉反馈和表冠连续会话语义。
+- `WatchInteractionSupport.swift`：统一触觉反馈和表冠连续会话语义；
 - `WatchOnboardingView.swift`：新手引导步骤状态机、遮罩和动作提示动画。
 
 `RootScheduleView` 把可取消任务分为悬浮控件、引导和月视图预热三组；页面退出、

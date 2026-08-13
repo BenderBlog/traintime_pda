@@ -81,6 +81,23 @@ enum WatchWidgetShared {
     /// WidgetKit 注册和刷新时间线时使用的唯一类型标识。
     static let widgetKind = "TraintimeScheduleWidget"
 
+    /// 专用表盘组件各自使用独立 kind，系统组件库才能把它们作为不同选项展示。
+    static let courseNameWidgetKind = "TraintimeCourseNameWidget"
+    static let courseTimeLocationWidgetKind = "TraintimeCourseTimeLocationWidget"
+    static let courseProgressWidgetKind = "TraintimeCourseProgressWidget"
+    static let todayScheduleWidgetKind = "TraintimeTodayScheduleWidget"
+    static let weekDistributionWidgetKind = "TraintimeWeekDistributionWidget"
+
+    /// 课表或语言变化时需要一起刷新的全部 Widget 类型。
+    static let allWidgetKinds = [
+        widgetKind,
+        courseNameWidgetKind,
+        courseTimeLocationWidgetKind,
+        courseProgressWidgetKind,
+        todayScheduleWidgetKind,
+        weekDistributionWidgetKind,
+    ]
+
     /// 三阶段同步各自独立保存，只有阶段完整完成后才覆盖对应缓存。
     static let semesterCacheKey = "watchScheduleSnapshot"
     static let fourteenDayCacheKey = "watchScheduleSnapshot.fourteenDays"
@@ -289,7 +306,9 @@ enum WatchWidgetShared {
 
     /// 只刷新本项目的课程组件，避免影响其他 Widget。
     private static func reloadWidgetTimelines() {
-        WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
+        for kind in allWidgetKinds {
+            WidgetCenter.shared.reloadTimelines(ofKind: kind)
+        }
     }
 }
 

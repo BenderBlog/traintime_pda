@@ -79,7 +79,6 @@ struct Provider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        print("getSnapshot")
         getTimeline(in: context, completion: { (timeLine) in
             completion(timeLine.entries.first!)
         })
@@ -458,7 +457,6 @@ struct Provider: TimelineProvider {
                     errorType: .none,
                     error: nil
                 ))
-                print("\(entries)")
             }
         }
         
