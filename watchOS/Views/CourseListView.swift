@@ -14,6 +14,8 @@ struct CourseListView: View {
     let onCrownInput: () -> Void
     let onTouchInput: () -> Void
     var alwaysAllowsTeachingBounce = false
+    /// 只在“课程列表·上下滑动”教学步骤中启用程序化原生滚动。
+    var drivesTeachingTouchScroll = false
     /// 正常打开列表时定位到今天或最近日程；新手教学只需要演示滚动，
     /// 跳过这次跨整学期的 ScrollViewReader 定位，避免实体表为了寻找
     /// 目标 ID 在首帧同步展开大量 LazyVStack 布局。
@@ -39,6 +41,9 @@ struct CourseListView: View {
                 // 交给原生 ScrollView。实体表即使跳过 `.tracking`、直接进入
                 // `.interacting`，结束后也不会被误判成表冠旋转。
                 usesShortContentTouchFallback: alwaysAllowsTeachingBounce,
+                teachingTouchScrollEffect: drivesTeachingTouchScroll
+                    ? .nativePosition
+                    : .disabled,
                 protectsInitialTopEdge: true
             ) {
                 if groups.isEmpty {

@@ -73,6 +73,14 @@ enum RootScheduleLayout {
     static let cachedScheduleNoticeBottomInset: CGFloat = 42
     static let onboardingNoticeBottomInset: CGFloat = 42
 
+    /// 过期提示固定在整个表盘底部，并避开圆角裁切区域。
+    ///
+    /// 仅保留约半行安全距离，避免提示紧贴下沿；提示位置不再受概览
+    /// 内容高度影响。
+    static func staleScheduleNoticeBottomInset(for height: CGFloat) -> CGFloat {
+        max(14, height * 0.055)
+    }
+
     /// 顶部安全距离由各滚动内容内部负责；根容器保持全屏。
     static let contentTopInset: CGFloat = 0
 
@@ -123,6 +131,7 @@ struct RootScheduleView: View {
     @State private var mode = WatchCalendarMode.overview
     @State private var showsModePicker = false
     @State private var showsSyncCompletion = false
+    @State private var dismissesStaleScheduleNotice = false
     @State private var showsCachedScheduleNotice = false
     @State private var refreshRotation = 0.0
     @State private var controlsVisible = true
@@ -295,6 +304,29 @@ struct RootScheduleView: View {
                                 .zIndex(90)
                         }
 
+                        // 过期提示使用整块表盘作为坐标系，固定在底部安全区
+                        // 上方，不再参与概览课程内容的纵向排版。
+                        if mode == .overview,
+                           store.isStale,
+                           !dismissesStaleScheduleNotice
+                        {
+                            staleScheduleNotice
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: .infinity,
+                                    alignment: .bottom
+                                )
+                                .padding(.horizontal, edgeInset + 6)
+                                .padding(
+                                    .bottom,
+                                    RootScheduleLayout
+                                        .staleScheduleNoticeBottomInset(
+                                            for: proxy.size.height
+                                        )
+                                )
+                                .zIndex(80)
+                        }
+
                         // 首次引导完成后的说明复用缓存提示的紧凑玻璃形态。
                         // 它可单击关闭，并在 15 秒后自动退出，不阻塞课表操作。
                         if showsOnboardingNotice {
@@ -461,6 +493,10 @@ struct RootScheduleView: View {
         .onChange(of: store.completedRefreshCount) { _, count in
             guard count > 0 else { return }
             showCompletion(for: count)
+        }
+        .onChange(of: store.isStale) { wasStale, isStale in
+            guard wasStale != isStale else { return }
+            dismissesStaleScheduleNotice = false
         }
         .onChange(of: store.allCourses.isEmpty) { _, isEmpty in
             handleOnboardingScheduleAvailability(isEmpty: isEmpty)
@@ -677,7 +713,9 @@ struct RootScheduleView: View {
                     onTouchInput: handleOnboardingVerticalSwipeInput,
                     alwaysAllowsTeachingBounce:
                         onboardingStep == .overviewSwipe
-                            || onboardingStep == .overviewCrown
+                            || onboardingStep == .overviewCrown,
+                    drivesTeachingTouchScroll:
+                        onboardingStep == .overviewSwipe
                 )
                 .id(
                     onboardingStep == nil
@@ -692,6 +730,8 @@ struct RootScheduleView: View {
                     alwaysAllowsTeachingBounce:
                         onboardingStep == .courseListSwipe
                             || onboardingStep == .courseListCrown,
+                    drivesTeachingTouchScroll:
+                        onboardingStep == .courseListSwipe,
                     positionsInitialDate: onboardingStep == nil
                 )
                 .id(
@@ -1730,6 +1770,45 @@ struct RootScheduleView: View {
             .font(.caption2.weight(.semibold))
             .padding(.horizontal, 9)
             .padding(.vertical, 5)
+    }
+
+    /// 整块表盘底部的过期提示；不属于课程内容布局。
+    @ViewBuilder
+    private var staleScheduleNotice: some View {
+        Group {
+            if #available(watchOS 26.0, *) {
+                staleScheduleNoticeLabel
+                    .glassEffect(.regular, in: Capsule())
+                    .glassEffectTransition(.materialize)
+            } else {
+                staleScheduleNoticeLabel
+                    .background(.ultraThinMaterial, in: Capsule())
+            }
+        }
+        .contentShape(Capsule())
+        .onTapGesture {
+            WatchHaptics.selection()
+            withAnimation(.easeInOut(duration: 0.18)) {
+                dismissesStaleScheduleNotice = true
+            }
+        }
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(
+            watchLocalizedString("关闭课表过期提示")
+        )
+    }
+
+    private var staleScheduleNoticeLabel: some View {
+        Label(
+            "课表可能已过期",
+            systemImage: "exclamationmark.triangle"
+        )
+        .font(.caption2.weight(.semibold))
+        .foregroundStyle(.orange)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 5)
     }
 
     /// 有缓存时的超时提示，压缩成两行以尽量少遮挡课表内容。

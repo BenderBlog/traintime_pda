@@ -10,6 +10,8 @@ struct OverviewScheduleView: View {
     let onCrownInput: () -> Void
     let onTouchInput: () -> Void
     var alwaysAllowsTeachingBounce = false
+    /// 只在“概览·上下滑动”教学步骤中让触摸实际带动短内容。
+    var drivesTeachingTouchScroll = false
 
     var body: some View {
         InteractionAwareScrollView(
@@ -19,19 +21,12 @@ struct OverviewScheduleView: View {
             centersShortContent: true,
             alwaysAllowsBounce: alwaysAllowsTeachingBounce,
             usesShortContentTouchFallback: alwaysAllowsTeachingBounce,
+            teachingTouchScrollEffect: drivesTeachingTouchScroll
+                ? .elastic
+                : .disabled,
             protectsInitialTopEdge: true
         ) {
             VStack(alignment: .leading, spacing: 8) {
-                if store.isStale {
-                    Label(
-                        "课表可能已过期",
-                        systemImage: "exclamationmark.triangle"
-                    )
-                    .font(.caption2)
-                    .foregroundStyle(.orange)
-                    .padding(.trailing, 34)
-                }
-
                 if let course = store.nextCourse {
                     timeline(for: course)
                         .padding(.trailing, 34)

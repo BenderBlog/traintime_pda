@@ -3,6 +3,22 @@
 
 import SwiftUI
 
+/// 新手教学中由手指直接驱动内容的视觉方式。
+///
+/// 它只补足“教学已经识别拖动、原生 ScrollView 却没有建立滚动会话”的
+/// 情况，不参与教学结果判断，也不会把触摸伪装成表冠输入。
+enum TeachingTouchScrollEffect {
+    case disabled
+    /// 短内容没有真实滚动范围时，显示有限的橡皮筋位移并在抬手后归位。
+    case elastic
+    /// 长列表把触摸位移映射为原生 ScrollView 的绝对滚动位置。
+    case nativePosition
+
+    var isEnabled: Bool {
+        self != .disabled
+    }
+}
+
 /// 能检测触摸/表冠导致的滚动，并通知根页面隐藏悬浮按钮。
 struct InteractionAwareScrollView<Content: View>: View {
     let onScroll: () -> Void
@@ -20,10 +36,11 @@ struct InteractionAwareScrollView<Content: View>: View {
     var alwaysAllowsBounce = false
     /// 需要可靠区分触摸与表冠、且实体表可能不发送 `.tracking` 时挂载兜底。
     ///
-    /// 该手势只记录输入来源，不修改内容位移；实际滚动仍由原生 ScrollView
-    /// 完成。课程列表同时使用原生 LazyVStack 尺寸提案，因而不会再出现
-    /// “教学检测到了拖动，但列表本身不移动”的旧问题。
+    /// 默认只记录输入来源；仅当调用方明确打开教学视觉代理时，同一份手势
+    /// 数据才会额外推动内容。教学判定入口与原生表冠来源判断保持不变。
     var usesShortContentTouchFallback = false
+    /// 教学专用视觉滚动。正常使用与其他教学步骤始终保持 `.disabled`。
+    var teachingTouchScrollEffect: TeachingTouchScrollEffect = .disabled
     /// 顶层详情覆盖周视图时，由内部原生 ScrollView 主动接管表冠焦点。
     var requestsCrownFocus = false
     var protectsInitialTopEdge = false
@@ -48,6 +65,11 @@ struct InteractionAwareScrollView<Content: View>: View {
     /// 同一次拖动可能同时经过 DragGesture 兜底和系统 `.idle`。使用代次
     /// 去重，确保教学只收到一次完成事件，不会自动跨过相邻步骤。
     @State private var nativeTouchCompletionGeneration = -1
+    /// 教学触摸的起点与显示状态。检测结果仍由上面的原有状态负责；这些值
+    /// 只改变内容的可见位置，避免视觉驱动反过来影响操作类型判断。
+    @State private var teachingDragStartScrollOffset: CGFloat = 0
+    @State private var teachingRequestedScrollOffset: CGFloat = 0
+    @State private var teachingElasticOffset: CGFloat = 0
     @FocusState private var nativeScrollFocused: Bool
 
     var body: some View {
@@ -90,9 +112,14 @@ struct InteractionAwareScrollView<Content: View>: View {
                 alwaysAllowsBounce ? .always : .basedOnSize,
                 axes: .vertical
             )
+            // 教学视觉代理启用时由同一份 DragGesture 数据唯一驱动位置，
+            // 避免系统滚动与代理同时响应而产生双倍位移。程序化定位仍可用。
+            .scrollDisabled(disablesNativeScrollForTeaching)
 
             crownFocusedScrollView(
-                touchObservedScrollView(nativeScrollView)
+                touchObservedScrollView(
+                    teachingPositionedScrollView(nativeScrollView)
+                )
             )
             .watchNativeCrownInputDetection(
                 sawTouchTracking: $nativeScrollSawTouchTracking,
@@ -136,10 +163,49 @@ struct InteractionAwareScrollView<Content: View>: View {
         }
     }
 
+    /// 仅在当前系统确实具备对应视觉代理时禁用系统手势滚动。
+    ///
+    /// `.elastic` 完全由本视图的偏移实现；`.nativePosition` 则依赖
+    /// watchOS 11 的 `ScrollPosition`。watchOS 10 没有该 API，必须保留
+    /// 原生滚动，否则会出现教学能识别手势但课程列表完全不移动的问题。
+    private var disablesNativeScrollForTeaching: Bool {
+        switch teachingTouchScrollEffect {
+        case .disabled:
+            return false
+        case .elastic:
+            return true
+        case .nativePosition:
+            if #available(watchOS 11.0, *) {
+                return true
+            }
+            return false
+        }
+    }
+
+    /// watchOS 11 起使用 `ScrollPosition` 连续推动原生滚动容器。
+    ///
+    /// 可用性分支保证工程仍可部署到 watchOS 10；旧系统继续使用原生
+    /// ScrollView，不会影响正常页面和已有表冠操作。
+    @ViewBuilder
+    private func teachingPositionedScrollView<ScrollContent: View>(
+        _ scrollView: ScrollContent
+    ) -> some View {
+        if #available(watchOS 11.0, *),
+           teachingTouchScrollEffect == .nativePosition
+        {
+            TeachingNativeScrollPositionBridge(
+                requestedOffset: $teachingRequestedScrollOffset,
+                content: scrollView
+            )
+        } else {
+            scrollView
+        }
+    }
+
     /// 仅给明确需要可靠来源判定的教学页面添加触摸来源兜底。
     ///
-    /// 条件分支发生在整个 ScrollView 外侧。手势使用 simultaneous 旁路，
-    /// 只写入来源标记；系统滚动的位移、惯性和皮筋仍然保持原生。
+    /// 条件分支发生在整个 ScrollView 外侧。手势使用 simultaneous 旁路；
+    /// 正常页面只写入来源标记，指定教学步骤会把同一份位移交给视觉代理。
     @ViewBuilder
     private func touchObservedScrollView<ScrollContent: View>(
         _ scrollView: ScrollContent
@@ -206,6 +272,11 @@ struct InteractionAwareScrollView<Content: View>: View {
                 // 长内容首次打开时从状态栏下方开始；这段 padding 位于
                 // ScrollView 内，用户转动表冠或上滑后仍可进入顶部虚化区。
                 .padding(.top, initialTopInset)
+                .offset(
+                    y: teachingTouchScrollEffect == .elastic
+                        ? teachingElasticOffset
+                        : 0
+                )
         }
     }
 
@@ -224,11 +295,14 @@ struct InteractionAwareScrollView<Content: View>: View {
                     nativeTouchGestureMovedVertically = false
                     nativeScrollSawTouchTracking = true
                     onScroll()
+                    beginTeachingTouchScroll()
                 }
 
-                // 这里只确认用户确实做了纵向拖动，不接管 ScrollView 的
-                // 偏移。较小阈值适配表盘行程，同时用轴向占优过滤轻点抖动
-                // 和明显的横向动作。
+                updateTeachingTouchScroll(using: value)
+
+                // 原有判定仍只确认用户确实做了纵向拖动。较小阈值适配表盘
+                // 行程，同时用轴向占优过滤轻点抖动和明显的横向动作；上方
+                // 的视觉代理更新不会改变这里的判断结果。
                 let verticalDistance = abs(value.translation.height)
                 let horizontalDistance = abs(value.translation.width)
                 if verticalDistance >= 8,
@@ -239,6 +313,7 @@ struct InteractionAwareScrollView<Content: View>: View {
             }
             .onEnded { value in
                 nativeTouchGestureIsActive = false
+                finishTeachingTouchScroll()
                 let generation = nativeTouchMarkerGeneration
                 let endedVertically = abs(value.translation.height) >= 8
                     && abs(value.translation.height)
@@ -269,6 +344,48 @@ struct InteractionAwareScrollView<Content: View>: View {
             }
     }
 
+    /// 记录本轮拖动开始时的真实滚动位置。
+    private func beginTeachingTouchScroll() {
+        guard teachingTouchScrollEffect.isEnabled else { return }
+        let currentOffset = max(0, -(offsetTracker.previousOffset ?? 0))
+        teachingDragStartScrollOffset = currentOffset
+        teachingRequestedScrollOffset = currentOffset
+    }
+
+    /// 使用手指总位移更新教学视觉位置，不改变已有的方向/阈值判定。
+    private func updateTeachingTouchScroll(
+        using value: DragGesture.Value
+    ) {
+        switch teachingTouchScrollEffect {
+        case .disabled:
+            return
+        case .elastic:
+            // 短内容没有可滚动区间，使用递减增益形成系统风格皮筋效果。
+            // 最大位移受限，避免教学层下方的布局被拖出表盘。
+            let translation = value.translation.height
+            let magnitude = min(abs(translation), 80)
+            let resistedMagnitude = min(26, magnitude * 0.34)
+            teachingElasticOffset = translation < 0
+                ? -resistedMagnitude
+                : resistedMagnitude
+        case .nativePosition:
+            guard #available(watchOS 11.0, *) else { return }
+            // 上滑（负 translation）对应增大内容偏移，下滑则减小。
+            teachingRequestedScrollOffset = max(
+                0,
+                teachingDragStartScrollOffset - value.translation.height
+            )
+        }
+    }
+
+    /// 短内容抬手后柔和归位；长列表停在手指实际拖到的位置。
+    private func finishTeachingTouchScroll() {
+        guard teachingTouchScrollEffect == .elastic else { return }
+        withAnimation(.interactiveSpring(response: 0.3, dampingFraction: 0.8)) {
+            teachingElasticOffset = 0
+        }
+    }
+
     /// 合并系统 ScrollPhase 与短内容拖动兜底的唯一完成入口。
     private func reportNativeTouchCompletion() {
         let generation = nativeTouchMarkerGeneration
@@ -283,6 +400,30 @@ struct InteractionAwareScrollView<Content: View>: View {
             nativeTouchCompletionGeneration = generation
         }
         onTouchInput()
+    }
+}
+
+/// 把教学层给出的绝对偏移写入 SwiftUI 原生 ScrollView。
+///
+/// 单独放进 watchOS 11 可用性类型中，避免 `ScrollPosition` 抬高整个 App
+/// 的最低系统版本。每个拖动采样关闭隐式动画，使列表逐帧贴合手指，而不是
+/// 累积一串尚未完成的吸附动画。
+@available(watchOS 11.0, *)
+private struct TeachingNativeScrollPositionBridge<Content: View>: View {
+    @Binding var requestedOffset: CGFloat
+    @State private var position = ScrollPosition(y: 0)
+    let content: Content
+
+    var body: some View {
+        content
+            .scrollPosition($position)
+            .onChange(of: requestedOffset) { _, offset in
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    position.scrollTo(y: max(0, offset))
+                }
+            }
     }
 }
 
