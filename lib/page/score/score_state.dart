@@ -9,7 +9,8 @@ import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/score/score_statics.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/score_session.dart';
+import 'package:watermeter/repository/ids_session/score_session.dart';
+import 'package:watermeter/repository/preference.dart';
 
 class ScoreState extends ChangeNotifier {
   /// Hack on notifyListeners, do not fire when the widget is disposed.
@@ -85,7 +86,9 @@ class ScoreState extends ChangeNotifier {
 
     try {
       /// Fetch the data.
-      FetchResult<List<Score>> scoreDataFetchResult = await session.getScore();
+      FetchResult<List<Score>> scoreDataFetchResult = await session.getScore(
+        getUserRole(),
+      );
 
       /// Reset data.
       isCache = false;

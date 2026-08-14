@@ -8,7 +8,7 @@ import 'dart:io';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 
 class CustomClassRepository {

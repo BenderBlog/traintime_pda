@@ -5,6 +5,7 @@
 import 'dart:math';
 
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/search_book_constant.dart';
 import 'package:watermeter/page/library/search_fields.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
@@ -12,8 +13,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart'
-    as search_book;
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_detail_card.dart';
 import 'package:watermeter/page/library/book_info_card.dart';
@@ -51,7 +50,7 @@ class _SearchBookWindowState extends State<SearchBookWindow>
     final query = _searchQuery;
     if (query == null) return Future.value(const []);
 
-    final session = search_book.LibrarySession();
+    final session = LibraryController.i.session;
     if (query.isAdvanced) {
       return session.advancedSearchBook(
         query.keyword,

@@ -17,7 +17,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 class ExperimentWindow extends StatefulWidget {
   const ExperimentWindow({super.key});

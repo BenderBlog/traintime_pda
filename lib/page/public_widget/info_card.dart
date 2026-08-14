@@ -92,18 +92,22 @@ class InfoItem extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: Colors.grey[600]),
           const SizedBox(width: 12),
-          Text(
-            "$label${value == null ? "" : "："}",
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+          Flexible(
+            child: Text(
+              "$label${value == null ? "" : "："}",
+              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            ),
           ),
           if (value != null) ...[
             const SizedBox(width: 4),
-            Text(
-              value!,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: valueColor ?? Theme.of(context).primaryColor,
+            Flexible(
+              child: Text(
+                value!,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: valueColor ?? Theme.of(context).primaryColor,
+                ),
               ),
             ),
           ],

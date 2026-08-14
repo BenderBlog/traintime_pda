@@ -13,7 +13,7 @@ import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/model/xidian_sport/sport_score.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
-import 'package:watermeter/repository/xidian_sport_session.dart';
+import 'package:watermeter/repository/miscellaneous_session/xidian_sport_session.dart';
 
 // 常量定义
 const double _textBackgroundAlpha = 0.3;

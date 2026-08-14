@@ -97,12 +97,22 @@ class ElectricityUsageGraph extends StatefulWidget {
     final rawBiggestValue = data.values.reduce((a, b) => a > b ? a : b);
     final rawSmallestValue = data.values.reduce((a, b) => a > b ? b : a);
     final isFlatData = rawBiggestValue == rawSmallestValue;
+    final containsNegativeValue = rawSmallestValue < 0;
     // Flat data still needs a non-zero range so the single horizontal line can
     // be placed around the visual middle instead of collapsing to the bottom.
-    double biggestValue = isFlatData
+    // Negative balances also need room above zero so that the zero reference
+    // line and every data point remain inside the plot area.
+    final double biggestValue = containsNegativeValue
+        ? max(
+            rawBiggestValue + _GraphMetrics.yAxisPaddingValue,
+            _GraphMetrics.yAxisPaddingValue,
+          )
+        : isFlatData
         ? rawBiggestValue + _GraphMetrics.flatDataExtraValue
         : rawBiggestValue + _GraphMetrics.yAxisPaddingValue;
-    double smallestValue = isFlatData
+    final double smallestValue = containsNegativeValue
+        ? rawSmallestValue - _GraphMetrics.yAxisPaddingValue
+        : isFlatData
         ? max(rawSmallestValue - _GraphMetrics.flatDataExtraValue, 0)
         : max(rawSmallestValue - _GraphMetrics.yAxisPaddingValue, 0);
     final verticalStep = plotHeight / (biggestValue - smallestValue);
@@ -140,16 +150,25 @@ class ElectricityUsageGraph extends StatefulWidget {
       "$points",
     );
 
-    if (isFlatData) {
+    if (isFlatData && !containsNegativeValue) {
       lines = {rawBiggestValue.toInt(): plotTop + plotHeight / 2};
       return;
     }
     final verticalkeyStep =
         (biggestValue - smallestValue) / _GraphMetrics.defaultYAxisSegmentCount;
-    final List<double> keys = List.generate(
+    final keys = List.generate(
       _GraphMetrics.defaultYAxisLabelCount,
       (i) => biggestValue - (i + 1) * verticalkeyStep,
     );
+    if (containsNegativeValue) {
+      var closestToZero = 0;
+      for (var i = 1; i < keys.length; i++) {
+        if (keys[i].abs() < keys[closestToZero].abs()) {
+          closestToZero = i;
+        }
+      }
+      keys[closestToZero] = 0;
+    }
     lines = {
       for (final value in keys)
         value.toInt(): plotBottom - (value - smallestValue) * verticalStep,

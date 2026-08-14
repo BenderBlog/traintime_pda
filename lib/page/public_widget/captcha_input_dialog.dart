@@ -1,7 +1,5 @@
-// Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
-// SPDX-License-Identifier: MPL-2.0
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
-// Copyright 2025 Traintime PDA authors.
+// Copyright 2025-2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
 // A captcha input dialog.
@@ -83,7 +81,10 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Image.memory(_currentImageBytes),
+                Container(
+                  color: Colors.white,
+                  child: Image.memory(_currentImageBytes),
+                ),
                 if (_isLoading)
                   const CircularProgressIndicator(),
               ],

@@ -8,6 +8,7 @@ import 'package:catcher_2/catcher_2.dart';
 import 'package:flutter/widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watermeter/model/user_role.dart';
 import 'package:watermeter/repository/logger.dart';
 
 late SharedPreferencesWithCache prefs;
@@ -49,6 +50,10 @@ enum Preference {
   //electricityAccount(key: "electricityAccount", type: "String"), // 电费账号
   idsAccount(key: "idsAccount", type: "String"), // 一站式帐号
   idsPassword(key: "idsPassword", type: "String"), // 一站式密码
+  idsBrowserFingerprint(
+    key: "idsBrowserFingerprint",
+    type: "String",
+  ), // IDS 信任设备指纹（独立于 Cookie 保存）
   sportPassword(key: "sportPassword", type: "String"), // 体育系统密码
   experimentPassword(key: "experimentPassword", type: "String"), // 物理实验密码
   //electricityPassword(key: "electricityPassword", type: "String"), // 电费密码
@@ -159,22 +164,10 @@ enum Preference {
     key: "lowElectricityWarningThreshold",
     type: "int",
   ), // 首页低电量卡片变色提醒阈值
-  homepageInfoOrder(
-    key: "homepageInfoOrder",
-    type: "String",
-  ), // 主页信息卡片顺序
-  homepageSmallOrder(
-    key: "homepageSmallOrder",
-    type: "String",
-  ), // 主页功能格子顺序
-  homepageAllOrder(
-    key: "homepageAllOrder",
-    type: "String",
-  ), // 主页卡片统一顺序
-  homepageHiddenIds(
-    key: "homepageHiddenIds",
-    type: "String",
-  ), // 主页隐藏卡片
+  homepageInfoOrder(key: "homepageInfoOrder", type: "String"), // 主页信息卡片顺序
+  homepageSmallOrder(key: "homepageSmallOrder", type: "String"), // 主页功能格子顺序
+  homepageAllOrder(key: "homepageAllOrder", type: "String"), // 主页卡片统一顺序
+  homepageHiddenIds(key: "homepageHiddenIds", type: "String"), // 主页隐藏卡片
   airconImei(key: "aircon_imei", type: "String"); // 空调 IMEI
 
   const Preference({required this.key, this.type = "String"});
@@ -182,6 +175,9 @@ enum Preference {
   final String key;
   final String type;
 }
+
+UserRole getUserRole() =>
+    getBool(Preference.role) ? UserRole.postgraduate : UserRole.undergraduate;
 
 String getString(Preference key) {
   if (key.type != 'String') {

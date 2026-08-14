@@ -27,6 +27,10 @@ subprojects {
                 }
             }
         }
+        // Fix: camera_android_camerax -> camera-core 1.5.3 needs concurrent-futures
+        project.dependencies {
+            implementation 'androidx.concurrent:concurrent-futures:1.1.0'
+        }
     }
     
     project.buildDir = "${rootProject.buildDir}/${project.name}"

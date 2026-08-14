@@ -1,0 +1,115 @@
+// Copyright 2023-2025 BenderBlog Rodriguez and contributors
+// Copyright 2025 Traintime PDA authors.
+// SPDX-License-Identifier: MPL-2.0
+
+import 'dart:math' as math;
+
+import 'package:watermeter/model/pda_service/message.dart';
+import 'package:watermeter/repository/network_client.dart';
+import 'package:watermeter/repository/preference.dart' as pref;
+import 'package:watermeter/repository/single_flight.dart';
+
+class PdaServiceSession {
+  static final url = "https://legacy.superbart.top/traintime_pda_backend";
+  final _checkUpdateFlight = SingleFlight<UpdateMessage>();
+
+  /// Version comparsion function
+  ///
+  /// true: new version avaliable
+  ///
+  /// false: latest version
+  ///
+  /// null: testing version
+  static bool? isNewVersionAvaliable(UpdateMessage updateMessage) {
+    List<int> versionCode = updateMessage.code
+        .split('.')
+        .map((value) => int.parse(value))
+        .toList();
+    List<int> localCode = pref.packageInfo.version
+        .split('.')
+        .map((value) => int.parse(value))
+        .toList();
+    bool? isNewAvaliable = false;
+    for (int i = 0; i < math.min(versionCode.length, localCode.length); i++) {
+      if (versionCode[i] > localCode[i]) {
+        isNewAvaliable = true;
+        break;
+      } else if (versionCode[i] < localCode[i]) {
+        isNewAvaliable = null;
+        break;
+      }
+    }
+    return isNewAvaliable;
+  }
+
+  Future<UpdateMessage> checkUpdate() =>
+      _checkUpdateFlight.run(_checkUpdateOnce);
+
+  Future<UpdateMessage> _checkUpdateOnce() => NetworkClients.otherDio
+      .get("$url/version.json")
+      .then((data) => UpdateMessage.fromJson(data.data));
+}
+
+//final messageLock = Lock(reentrant: false);
+//final clubLock = Lock(reentrant: false);
+
+/*
+Future<void> getClubList() => clubLock.synchronized(() async {
+  clubState.value = SessionState.fetching;
+  clubError.value = null;
+
+  return dio
+      .get("$url/club.json")
+      .then((data) {
+        clubList.clear();
+        try {
+          for (var i in data.data) {
+            clubList.add(ClubInfo.fromJson(i));
+          }
+          clubState.value = SessionState.fetched;
+        } catch (e, s) {
+          log.error("[getClubList] Error occured!", e, s);
+          clubError.value = e;
+          clubState.value = SessionState.error;
+        }
+      })
+      .onError((e, s) {
+        log.error("[getClubList] Error occured!", e, s);
+        clubError.value = e;
+        clubState.value = SessionState.error;
+      });
+});
+
+// Future<String> getClubArticle(String code) => clubLock.synchronized<String>(
+//   () => dio
+//       .get("$url/club_introduction/$code/index.html")
+//       .then(
+//         (value) => (value.data as String).replaceAll(
+//           "<img src=\"",
+//           "<img src=\"$url/club_introduction/$code/",
+//         ),
+//       ),
+// );
+// 
+// String getClubAvatar(String code) => "$url/poster/$code.jpg";
+// 
+// String getClubImage(String code, int index) => "$url/poster/$code-$index.jpg";
+// 
+// Future<ResultDart<ClubInfo, Exception>> getClubInfo(String code) async {
+//   try {
+//     var data = await dio.get("$url/club.json").then((value) => value.data);
+//     return (data as List<dynamic>)
+//         .map<ClubInfo>((value) => ClubInfo.fromJson(value))
+//         .toList()
+//         .firstWhere((value) => value.code == code)
+//         .toSuccess();
+//   } on Exception catch (e, s) {
+//     log.error("[getClubInfo] Error occured!", e, s);
+//     return failureOf(e);
+//   } catch (e, s) {
+//     log.error("[getClubInfo] Error occured!", e, s);
+//     return failureOf(Exception(e.toString()));
+//   }
+// }
+// 
+*/

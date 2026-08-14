@@ -12,7 +12,7 @@ import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/schoolnet/net_data_row.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
-import 'package:watermeter/repository/schoolnet_session.dart';
+import 'package:watermeter/repository/miscellaneous_session/schoolnet_session.dart';
 
 class CurrentNetInfoPage extends StatefulWidget {
   const CurrentNetInfoPage({super.key});
@@ -28,15 +28,17 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
 
   late Future<CurrentUserNetInfo> _currentUserNetInfoFuture;
 
+  final session = SchoolnetSession();
+
   @override
   void initState() {
     super.initState();
-    _currentUserNetInfoFuture = SchoolnetSession().getCurrentUserNetInfo();
+    _currentUserNetInfoFuture = session.getCurrentUserNetInfo();
   }
 
   void _reload() {
     setState(() {
-      _currentUserNetInfoFuture = SchoolnetSession().getCurrentUserNetInfo();
+      _currentUserNetInfoFuture = session.getCurrentUserNetInfo();
     });
   }
 

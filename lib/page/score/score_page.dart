@@ -57,6 +57,10 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isSelectMode = context.select<ScoreState, bool>(
+      (state) => state.isSelectMode,
+    );
+
     return Scaffold(
       body: Column(
         children: [
@@ -208,99 +212,101 @@ class _ScorePageState extends State<ScorePage> {
                 );
               }
             },
-          ).safeArea().expanded(),
+          ).expanded(),
         ],
-      ),
+      ).safeArea(),
       floatingActionButton: scoreInfoDialog(context),
-      bottomNavigationBar: Consumer<ScoreState>(
-        builder: (context, state, _) => Visibility(
-          visible: state.isSelectMode,
-          child: BottomAppBar(
-            height: 136,
-            elevation: 5.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
+      bottomNavigationBar: isSelectMode
+          ? Consumer<ScoreState>(
+              builder: (context, state, _) => BottomAppBar(
+                height: 136,
+                elevation: 5.0,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.all),
-                      child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "score.score_page.select_all",
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.none),
-                      child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "score.score_page.select_nothing",
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.original),
-                      child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "score.score_page.reset_select",
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(state.bottomInfo(context)),
-                    IconButton(
-                      onPressed: () => pushSumDialog(
-                        context,
-                        FlutterI18n.translate(
-                          context,
-                          "score.score_choice.sum_dialog_content",
-                          translationParams: {
-                            "gpa_all": state
-                                .evalAvg(true, isGPA: true)
-                                .toStringAsFixed(3),
-                            "avg_all": state.evalAvg(true).toStringAsFixed(2),
-                            "credit_all": state
-                                .evalCredit(true)
-                                .toStringAsFixed(2),
-                            "unpassed": state.unPassed.isEmpty
-                                ? FlutterI18n.translate(
-                                    context,
-                                    "score.all_passed",
-                                  )
-                                : state.unPassed,
-                            "not_core_credit": state.notCoreClass.toString(),
-                            "not_core_type": FlutterI18n.translate(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.all),
+                          child: Text(
+                            FlutterI18n.translate(
                               context,
-                              state.notCoreClassTypeList,
+                              "score.score_page.select_all",
                             ),
-                          },
+                          ),
                         ),
-                      ),
-                      icon: const Icon(Icons.info),
+                        const SizedBox(width: 12),
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.none),
+                          child: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "score.score_page.select_nothing",
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.original),
+                          child: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "score.score_page.reset_select",
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(state.bottomInfo(context)),
+                        IconButton(
+                          onPressed: () => pushSumDialog(
+                            context,
+                            FlutterI18n.translate(
+                              context,
+                              "score.score_choice.sum_dialog_content",
+                              translationParams: {
+                                "gpa_all": state
+                                    .evalAvg(true, isGPA: true)
+                                    .toStringAsFixed(3),
+                                "avg_all": state
+                                    .evalAvg(true)
+                                    .toStringAsFixed(2),
+                                "credit_all": state
+                                    .evalCredit(true)
+                                    .toStringAsFixed(2),
+                                "unpassed": state.unPassed.isEmpty
+                                    ? FlutterI18n.translate(
+                                        context,
+                                        "score.all_passed",
+                                      )
+                                    : state.unPassed,
+                                "not_core_credit": state.notCoreClass
+                                    .toString(),
+                                "not_core_type": FlutterI18n.translate(
+                                  context,
+                                  state.notCoreClassTypeList,
+                                ),
+                              },
+                            ),
+                          ),
+                          icon: const Icon(Icons.info),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            )
+          : null,
     );
   }
 }

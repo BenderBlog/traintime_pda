@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/network_session.dart' show supportPath;
+import 'package:watermeter/repository/network_client.dart' show supportPath;
 import 'package:watermeter/repository/preference.dart' as preference;
 
 /// Delete all widget data files from the iOS App Group container.
@@ -64,17 +64,29 @@ Future<void> syncWidgetLoginState(bool loggedIn) async {
           data: state,
         ),
       );
-      log.info("[widget_state_sync] iOS wrote WidgetState.json loggedIn=$loggedIn");
+      log.info(
+        "[widget_state_sync] iOS wrote WidgetState.json loggedIn=$loggedIn",
+      );
     } catch (e, s) {
-      log.handle(e, s, "[widget_state_sync] iOS failed to write WidgetState.json");
+      log.handle(
+        e,
+        s,
+        "[widget_state_sync] iOS failed to write WidgetState.json",
+      );
     }
   } else if (Platform.isAndroid) {
     try {
       final file = File("${supportPath.path}/WidgetState.json");
       await file.writeAsString(state);
-      log.info("[widget_state_sync] Android wrote WidgetState.json loggedIn=$loggedIn");
+      log.info(
+        "[widget_state_sync] Android wrote WidgetState.json loggedIn=$loggedIn",
+      );
     } catch (e, s) {
-      log.handle(e, s, "[widget_state_sync] Android failed to write WidgetState.json");
+      log.handle(
+        e,
+        s,
+        "[widget_state_sync] Android failed to write WidgetState.json",
+      );
     }
   }
 }

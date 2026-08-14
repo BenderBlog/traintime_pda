@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:watermeter/repository/experiment_score/image_recognition.dart';
+import 'package:watermeter/repository/experiment_session/image_recognition.dart';
 
 part 'experiment.g.dart';
 
@@ -67,21 +67,21 @@ class ExperimentData {
 // Supports migration from old String? format to new RecognitionResult? format
 RecognitionResult? _recognitionResultFromJson(dynamic json) {
   if (json == null) return null;
-  
+
   // Handle old format: score was a String
   // Return null to trigger data refresh in ExperimentController
   if (json is String) {
     // Mark as old format by returning null
-    // This will be detected in ExperimentController.onInit() 
+    // This will be detected in ExperimentController.onInit()
     // and trigger a refresh to fetch new data with proper RecognitionResult
     return null;
   }
-  
+
   // Handle new format: score is a Map (RecognitionResult)
   if (json is Map<String, dynamic>) {
     return RecognitionResult.fromJson(json);
   }
-  
+
   // Invalid format
   return null;
 }

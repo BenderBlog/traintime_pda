@@ -15,15 +15,16 @@ import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
+import 'package:watermeter/repository/ids_session/classtable_session.dart';
 
 class ClassTableController {
   static const decorationName = "decoration.jpg";
   static final ClassTableController i = ClassTableController._();
-  bool _isReloading = false;
+
+  final ClassTableSession session = ClassTableSession();
 
   ClassTableController._() {
-    final cache = ClassTableSession.getCache();
+    final cache = session.getCache();
     if (cache != null) {
       final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
       _lastValidSchoolClassTable.value = cached;
@@ -50,7 +51,7 @@ class ClassTableController {
       _lastHandledSemesterSyncEvent = semesterChangeEvent;
       if (semesterChangeEvent.didChange) {
         _lastValidSchoolClassTable.value = null;
-        ClassTableSession.deleteCache();
+        session.deleteCache();
         unawaited(CustomClassController.i.clearAll());
       }
       unawaited(reloadClassTable());
@@ -64,18 +65,17 @@ class ClassTableController {
   }
 
   Future<void> reloadClassTable() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = _lastValidSchoolClassTable.value;
     schoolClassTableStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getClassTable(
+      final result = await session.getClassTable(
         SemesterController.i.semesterSignal.value,
+        preference.getUserRole(),
       );
       _lastValidSchoolClassTable.value = result;
-      schoolClassTableStateSignal.value = AsyncState.data(result);
+      schoolClassTableStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       schoolClassTableStateSignal.value = AsyncState.error(e, s);
       log.handle(
@@ -83,8 +83,6 @@ class ClassTableController {
         s,
         "[ClassTableControllerNew][reloadClassTable] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 

@@ -11,7 +11,7 @@ import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/empty_classroom_session.dart';
+import 'package:watermeter/repository/ids_session/empty_classroom_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class EmptyClassroomSearchWindow extends StatefulWidget {

@@ -13,7 +13,7 @@ import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/schoolcard/qr_code_view.dart';
 import 'package:watermeter/routing/routes.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 

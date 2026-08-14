@@ -1,0 +1,307 @@
+// Copyright 2023-2025 BenderBlog Rodriguez and contributors
+// Copyright 2025 Traintime PDA authors.
+// SPDX-License-Identifier: MPL-2.0
+
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:encrypter_plus/encrypter_plus.dart';
+import 'package:html/dom.dart';
+import 'package:html/parser.dart';
+import 'package:pointycastle/asymmetric/api.dart';
+import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/model/network_usage.dart';
+import 'package:watermeter/model/password_exceptions.dart';
+import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/network_client.dart';
+import 'package:watermeter/repository/preference.dart' as prefs;
+
+class SchoolnetSession {
+  static const _cacheHintCaptchaFailedKey =
+      "school_net.cache_hint_captcha_failed";
+  static const _cacheHintRequestFailedKey =
+      "school_net.cache_hint_request_failed";
+
+  static GeneralNetworkUsage? _generalUsageCache;
+  static DateTime _generalUsageCacheFetchTime = DateTime.now();
+
+  Future<CurrentUserNetInfo> getCurrentUserNetInfo() async {
+    final networkInfoResponse = await NetworkClients.otherDio
+        .get(
+          'https://w.xidian.edu.cn/cgi-bin/rad_user_info',
+          queryParameters: {
+            'callback': 'jsonp',
+            '_': DateTime.now().millisecondsSinceEpoch.toString(),
+          },
+          options: Options(responseType: ResponseType.plain),
+        )
+        .then((value) => value.data);
+    final jsonString = networkInfoResponse.substring(
+      6,
+      networkInfoResponse.length - 1,
+    );
+    return CurrentUserNetInfo.fromJson(jsonDecode(jsonString));
+  }
+
+  String _getPostStringBody(Map<String, dynamic> toPost) {
+    String toPostStr = "";
+    for (var i in toPost.keys) {
+      toPostStr +=
+          "${Uri.encodeQueryComponent(i)}=${Uri.encodeQueryComponent(toPost[i]!)}";
+      if (i != toPost.keys.last) {
+        toPostStr += "&";
+      }
+    }
+    return toPostStr;
+  }
+
+  Future<GeneralNetworkUsage> _getNetworkUsage() async {
+    try {
+      final page = await NetworkClients.schoolnetDio
+          .get("/home")
+          .then((page) => page.data);
+
+      List<(String, String, String)> ipList = [];
+      String used = "";
+      String rest = "";
+      String charged = "";
+      parse(page).getElementsByTagName("tr").forEach((value) {
+        var tdList = value.getElementsByTagName("td");
+        if (tdList.length == 7) {
+          String usedT = tdList[2].innerHtml;
+          if (usedT.isNotEmpty) {
+            ipList.add((tdList[1].innerHtml, tdList[3].innerHtml, usedT));
+          }
+        } else if (tdList.length == 4) {
+          // 改为排除法：当 productName 中不包含运营商关键词（联通/移动/电信）时才保存，
+          // 以保证泛用性并避免把运营商类产品的结算日期写入 charged。
+          final productName = tdList[0].text.trim();
+          final lowerName = productName.toLowerCase();
+          final isOperator =
+              lowerName.contains('联通') ||
+              lowerName.contains('移动') ||
+              lowerName.contains('电信');
+          if (!isOperator) {
+            used = tdList[1].text.trim();
+            rest = tdList[2].text.trim();
+            charged = tdList[3].text.trim();
+          }
+        }
+      });
+      return GeneralNetworkUsage(
+        ipList: ipList,
+        used: used,
+        rest: rest,
+        charged: charged,
+      );
+    } catch (_) {
+      throw "homepage.school_net.failed";
+    }
+  }
+
+  bool _canUseCacheForGeneralUsageError(Object error) {
+    if (error is DioException) {
+      return true;
+    }
+    return error == "school_net.captcha_failed" ||
+        error == "homepage.school_net.failed";
+  }
+
+  String? _cacheHintFromError(Object error) {
+    if (error == "school_net.captcha_failed") {
+      return _cacheHintCaptchaFailedKey;
+    }
+    if (error is DioException || error == "homepage.school_net.failed") {
+      return _cacheHintRequestFailedKey;
+    }
+    return null;
+  }
+
+  Future<FetchResult<GeneralNetworkUsage>> getGeneralNetworkUsage({
+    required Future<String> Function(
+      List<int> initialImage,
+      Future<List<int>> Function() onRefresh,
+    )
+    captchaFunction,
+  }) async {
+    try {
+      // Get username and password
+      log.info(
+        "[SchoolnetSession][getGeneralNetworkUsage] Get Username and Password",
+      );
+      String password = prefs.getString(
+        prefs.Preference.schoolNetQueryPassword,
+      );
+      if (password.isEmpty) {
+        throw const NoPasswordException(type: PasswordType.schoolnet);
+      }
+      String username = prefs.getString(prefs.Preference.idsAccount);
+
+      // Check whether fetch directly
+      log.info(
+        "[SchoolnetSession][getGeneralNetworkUsage] Check whether fetch directly",
+      );
+      var page = await NetworkClients.schoolnetDio.get("/home");
+      if (!page.isRedirect) {
+        final usage = await _getNetworkUsage();
+        _generalUsageCache = usage;
+        _generalUsageCacheFetchTime = DateTime.now();
+        return FetchResult.fresh(
+          fetchTime: _generalUsageCacheFetchTime,
+          data: usage,
+        );
+      }
+
+      // Get login page
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Get login page");
+      page = await NetworkClients.schoolnetDio.get("/login");
+
+      // Get csrf and key
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Get cerf and key");
+      List<Element> inputs = parse(
+        page.data.toString(),
+      ).getElementsByTagName("input");
+      String csrf = "";
+      String key = "";
+      for (var i in inputs) {
+        if (i.attributes["name"]?.contains("csrf") ?? false) {
+          csrf = i.attributes["value"] ?? "";
+        }
+        if (i.attributes["id"]?.contains("public") ?? false) {
+          key = i.attributes["value"] ?? "";
+        }
+        if (csrf.isNotEmpty && key.isNotEmpty) break;
+      }
+      if (csrf.isEmpty || key.isEmpty) {
+        throw "school_net.not_initalized";
+      }
+
+      String lastErrorMessage = "";
+
+      // Refresh and fetch captcha helper
+      Future<List<int>> refreshCaptcha() async {
+        log.info(
+          "[SchoolnetSession][getGeneralNetworkUsage] Refreshing captcha via API",
+        );
+        await NetworkClients.schoolnetDio.get(
+          'https://zfw.xidian.edu.cn/site/captcha',
+          queryParameters: {
+            'refresh': 1,
+            '_': DateTime.now().millisecondsSinceEpoch,
+          },
+        );
+        var picture = await NetworkClients.schoolnetDio
+            .get(
+              "https://zfw.xidian.edu.cn/site/captcha",
+              options: Options(responseType: ResponseType.bytes),
+            )
+            .then((data) => data.data);
+
+        if (picture is List<int>) {
+          return picture;
+        }
+        throw Exception("Failed to load captcha image bytes");
+      }
+
+      var picture = await refreshCaptcha();
+      String failedmsg = "school_net.captcha_failed";
+      String? verifycode = await captchaFunction(picture, refreshCaptcha);
+
+      // If failed too much time, set error state.
+      if (verifycode == failedmsg || verifycode == "") {
+        log.info(
+          "[SchoolnetSession][getGeneralNetworkUsage] Failed with msg $failedmsg",
+        );
+        throw failedmsg;
+      }
+
+      log.info(
+        "[SchoolnetSession][getGeneralNetworkUsage] verifycode is $verifycode",
+      );
+
+      // Encrypt the password
+      var rsaKey = RSAKeyParser().parse(key);
+      String encryptedPassword = Encrypter(
+        RSA(publicKey: RSAPublicKey(rsaKey.modulus!, rsaKey.exponent!)),
+      ).encrypt(password).base64;
+
+      // Pre-login post
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Pre-login post");
+      page = await NetworkClients.schoolnetDio.post(
+        "/site/validate-user",
+        data: _getPostStringBody({
+          "LoginForm[username]": username, //prefs.getString("idsAccount"),
+          "LoginForm[password]": encryptedPassword,
+          "LoginForm[verifyCode]": verifycode,
+        }),
+        options: Options(
+          headers: {
+            "X-CSRF-Token": csrf,
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        ),
+      );
+
+      // Check success or not?
+      log.info(
+        "[SchoolnetSession][getGeneralNetworkUsage] Check success or not?",
+      );
+      if (!jsonDecode(page.data)["success"]) {
+        lastErrorMessage = jsonDecode(page.data)["message"] ?? "unknown";
+        log.info(
+          "[SchoolNetSession][getGeneralNetworkUsage] Captcha failed: $lastErrorMessage",
+        );
+
+        // No need to retry if the error is about username or password
+        if (lastErrorMessage.contains("用户名") ||
+            lastErrorMessage.contains("密码")) {
+          throw const WrongPasswordException(type: PasswordType.schoolnet);
+        }
+
+        // Else throw other info
+        throw Exception(lastErrorMessage);
+      }
+
+      // Login post
+      log.info("[SchoolnetSession][getGeneralNetworkUsage] Login post");
+      page = await NetworkClients.schoolnetDio.post(
+        "/",
+        data: _getPostStringBody({
+          "_csrf-8800": csrf,
+          "LoginForm[username]": username, //prefs.getString("idsAccount"),
+          "LoginForm[password]": encryptedPassword,
+          "LoginForm[smsCode]": "",
+          "LoginForm[verifyCode]": verifycode,
+        }),
+        options: Options(
+          headers: {
+            "X-CSRF-Token": csrf,
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        ),
+      );
+
+      final usage = await _getNetworkUsage();
+      _generalUsageCache = usage;
+      _generalUsageCacheFetchTime = DateTime.now();
+      return FetchResult.fresh(
+        fetchTime: _generalUsageCacheFetchTime,
+        data: usage,
+      );
+    } catch (e, s) {
+      log.handle(e, s, "[SchoolnetSession][getGeneralNetworkUsage] Have issue");
+      if (_generalUsageCache != null && _canUseCacheForGeneralUsageError(e)) {
+        return FetchResult.cache(
+          fetchTime: _generalUsageCacheFetchTime,
+          data: _generalUsageCache!,
+          hintKey: _cacheHintFromError(e),
+        );
+      }
+      rethrow;
+    }
+  }
+}
