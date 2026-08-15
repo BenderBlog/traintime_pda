@@ -92,7 +92,7 @@ class _SmileyPickerState extends State<SmileyPicker>
                       borderRadius: BorderRadius.circular(6),
                       child: s.isImage
                           ? Image.asset(
-                              'assets/ruisi_flutter/smiley/${s.path}.png',
+                              'assets/ruisi_flutter/smiley/${s.path}.webp',
                               fit: BoxFit.contain,
                             )
                           : Center(
