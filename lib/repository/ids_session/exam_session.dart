@@ -20,8 +20,6 @@ import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
 
-// TODO: Concept prove: whether remove EhallSession is OK
-
 /// 考试安排 4768687067472349
 class ExamSession extends IDSSession {
   static const _examDataCacheName = "exam.json";

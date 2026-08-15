@@ -21,42 +21,37 @@ class TimelineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-          alignment: AlignmentDirectional.center,
-          fit: StackFit.loose,
-          children: <Widget>[
-            Positioned(
-              left: isPhone(context) ? 15 : 19,
-              top: 0,
-              bottom: 0,
-              child: Container(
-                width: 2,
-                height: double.infinity,
-                color: Theme.of(context).dividerColor,
+    final timeline = Stack(
+      alignment: AlignmentDirectional.center,
+      fit: StackFit.loose,
+      children: <Widget>[
+        Positioned(
+          left: isPhone(context) ? 15 : 19,
+          top: 0,
+          bottom: 0,
+          child: Container(
+            width: 2,
+            height: double.infinity,
+            color: Theme.of(context).dividerColor,
+          ),
+        ),
+        Column(
+          children: List.generate(children.length, (int index) {
+            return FlowEventRow(
+              isTitle: isTitle[index],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: sheetMaxWidth),
+                  child: children[index],
+                ),
               ),
-            ),
-            Column(
-              children: List.generate(children.length, (int index) {
-                return FlowEventRow(
-                  isTitle: isTitle[index],
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: sheetMaxWidth),
-                      child: children[index],
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ],
-        )
-        .width(double.infinity)
-        .constrained(maxWidth: sheetMaxWidth)
-        .center()
-        .scrollable();
+            );
+          }),
+        ),
+      ],
+    ).width(double.infinity).constrained(maxWidth: sheetMaxWidth).center();
+
+    return ListView(children: [timeline]);
   }
 }

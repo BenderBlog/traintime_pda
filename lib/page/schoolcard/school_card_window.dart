@@ -194,11 +194,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                       const Divider(
                         height: 1,
                       ).constrained(width: sheetMaxWidth),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(children: dataRows),
-                        ),
-                      ),
+                      Expanded(child: ListView(children: dataRows)),
                     ],
                   );
                 }

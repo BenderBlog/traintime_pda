@@ -7,6 +7,7 @@ import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:watermeter/model/dorm_water.dart';
 import 'dart:convert' show base64Decode;
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/repository/miscellaneous_session/dorm_water_session.dart';
 import 'package:watermeter/repository/preference.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -449,7 +450,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   /// Build login tab
   Widget _buildLoginTab(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16).withSafeBottom(context),
       children: [
         // Phone input
         TextField(
@@ -566,7 +567,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16).withSafeBottom(context),
       itemCount: _devices.length,
       itemBuilder: (context, index) {
         final device = _devices[index];
