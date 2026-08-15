@@ -9,7 +9,8 @@ class FilmComponent extends StatelessWidget {
   static const sideBoxRatio = 36 / 52;
   static const sidePaddingRatio = 8 / 52;
   static const sideRadiusRatio = 8 / 36;
-  static const imageVerticalPadding = 8.0;
+  static const imageVerticalPadding = 4.0;
+  static const imageRadius = 16.0;
 
   const FilmComponent({super.key});
 
@@ -35,29 +36,27 @@ class FilmComponent extends StatelessWidget {
               child: SizedBox(
                 width: middleWidth,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildImage("assets/art/lucky_star_1.jpg"),
-                    _buildImage("assets/art/lucky_star_2.jpg"),
-                    _buildImage("assets/art/lucky_star_3.jpg"),
-                  ],
+                  children: List.generate(
+                    6,
+                    (i) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: imageVerticalPadding,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(imageRadius),
+                        child: Image.asset(
+                          "assets/art/lucky_star_${i + 1}.jpg",
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildImage(String asset) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: imageVerticalPadding),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(imageVerticalPadding),
-        child: Image.asset(asset),
-      ),
     );
   }
 }
