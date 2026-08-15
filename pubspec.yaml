@@ -101,10 +101,10 @@ flutter:
     - assets/Icon-App-iTunes-Background.png
     - assets/Icon-App-iTunes.png
     - assets/art/pda_empty_cover.jpg
-    - assets/art/pda_classtable_empty.png
-    - assets/art/pda_girl_default.png
+    - assets/art/pda_classtable_empty.webp
+    - assets/art/pda_girl_default.webp
     # - assets/art/pda_girl_singing.png
-    - assets/art/pda_girl_reading.png
+    - assets/art/pda_girl_reading.webp
     - assets/art/lucky_star_1.jpg
     - assets/art/lucky_star_2.jpg
     - assets/art/lucky_star_3.jpg

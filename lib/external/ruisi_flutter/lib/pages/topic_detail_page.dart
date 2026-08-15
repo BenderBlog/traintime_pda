@@ -680,15 +680,22 @@ class _SmileyImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Extract the path after 'smiley/' from the forum URL.
-    // e.g. "static/image/smiley/jgz/jgz065.png" → "smiley/jgz/jgz065.png"
+    // e.g. "static/image/smiley/jgz/jgz065.png" → "smiley/jgz/jgz065.webp"
     final smileyIndex = src.indexOf('smiley/');
     if (smileyIndex < 0) return const SizedBox.shrink();
 
     String assetPath = src.substring(smileyIndex);
 
-    // Android parity: the 'default' category uses .gif in forum HTML
-    // but the bundled assets are .png files.
-    if (assetPath.contains('/default')) {
+    // The bundled acn/jgz/tieba categories use WebP assets.
+    final isBundledWebpCategory =
+        assetPath.contains('/acn/') ||
+        assetPath.contains('/jgz/') ||
+        assetPath.contains('/tieba/');
+    if (isBundledWebpCategory) {
+      assetPath = assetPath.replaceFirst(RegExp(r'\.(png|gif)$'), '.webp');
+    } else if (assetPath.contains('/default')) {
+      // The 'default' category uses .gif in forum HTML but the legacy
+      // fallback asset name is .png.
       assetPath = assetPath.replaceAll('.gif', '.png');
     }
 
