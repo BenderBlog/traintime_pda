@@ -76,7 +76,7 @@ void main() {
     expect(graph.lines, contains(0));
   });
 
-  test('merges multiple continuous readings on the same day', () {
+  test('sums multiple readings on the same day', () {
     final graph = ElectricityAverageUsageGraph(
       graphWidth: graphWidth,
       historyElectricityInfo: [
@@ -93,19 +93,19 @@ void main() {
     expect(result[1].usage, 3);
   });
 
-  test('does not double count duplicate or overlapping readings', () {
+  test('keeps signed corrections and ignores exact duplicate readings', () {
     final graph = ElectricityAverageUsageGraph(
       graphWidth: graphWidth,
       historyElectricityInfo: [
         meterRow(time: DateTime(2026, 8, 1, 2), start: 100, end: 103),
         meterRow(time: DateTime(2026, 8, 1, 3), start: 100, end: 103),
-        meterRow(time: DateTime(2026, 8, 1, 4), start: 102, end: 104),
+        meterRow(time: DateTime(2026, 8, 1, 4), start: 103, end: 100),
       ],
     );
     final result = graph.plotData;
 
     expect(result, hasLength(1));
-    expect(result.single.usage, 4);
+    expect(result.single.usage, 0);
   });
 
   test('keeps a zero-usage day and normalizes read time to a calendar day', () {
