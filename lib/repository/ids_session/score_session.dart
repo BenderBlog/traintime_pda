@@ -20,8 +20,6 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 
-// TODO: Concept prove: whether remove EhallSession is OK
-
 /// 考试成绩 4768574631264620
 class ScoreSession extends IDSSession {
   static const _scoreListCacheName = "scores.json";

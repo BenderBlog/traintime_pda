@@ -10,6 +10,7 @@ import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/repository/ids_session/learning_session.dart';
 
 class ClassAttendanceDetailView extends StatefulWidget {
@@ -170,7 +171,9 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(height: 4);
               },
-              padding: const EdgeInsets.symmetric(vertical: 9.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 9,
+              ).withSafeBottom(context, enabled: widget.showAppBar),
             ),
       ),
     );

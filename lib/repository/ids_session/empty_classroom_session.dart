@@ -2,8 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-// TODO: Concept prove: whether remove EhallSession is OK
-
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';

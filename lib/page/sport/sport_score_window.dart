@@ -13,6 +13,7 @@ import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/model/xidian_sport/sport_score.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/repository/miscellaneous_session/xidian_sport_session.dart';
 
 // 常量定义
@@ -243,8 +244,8 @@ class _SportScoreWindowState extends State<SportScoreWindow>
                         const SizedBox(height: 4),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12.5,
-                      vertical: 9.0,
-                    ),
+                      vertical: 9,
+                    ).withSafeBottom(context),
                   ),
                 ),
               ],

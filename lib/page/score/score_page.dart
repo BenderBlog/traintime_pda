@@ -13,6 +13,7 @@ import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
@@ -191,7 +192,9 @@ class _ScorePageState extends State<ScorePage> {
                   builder: (context, constraints) => AlignedGridView.count(
                     shrinkWrap: true,
                     itemCount: state.toShow.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                    ).withSafeBottom(context),
                     crossAxisCount: (constraints.maxWidth ~/ cardWidth).clamp(
                       1,
                       1000,
@@ -214,7 +217,7 @@ class _ScorePageState extends State<ScorePage> {
             },
           ).expanded(),
         ],
-      ).safeArea(),
+      ),
       floatingActionButton: scoreInfoDialog(context),
       bottomNavigationBar: isSelectMode
           ? Consumer<ScoreState>(

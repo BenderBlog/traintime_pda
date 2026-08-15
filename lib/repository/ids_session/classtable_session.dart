@@ -22,8 +22,6 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
 
-// TODO: Concept prove: whether remove EhallSession is OK
-
 /// 课程表 4770397878132218
 class ClassTableSession extends IDSSession {
   static const _schoolClassName = "ClassTable.json";
