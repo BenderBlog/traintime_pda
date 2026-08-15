@@ -21,8 +21,41 @@ class _GraphMetrics {
   static const horizontalLines = 5;
 }
 
+/// The usage of one calendar day after meter readings have been merged.
+class DailyElectricityUsage {
+  final DateTime date;
+  final double usage;
+
+  const DailyElectricityUsage({required this.date, required this.usage});
+
+  @override
+  bool operator ==(Object other) {
+    return other is DailyElectricityUsage &&
+        other.date == date &&
+        other.usage == usage;
+  }
+
+  @override
+  int get hashCode => Object.hash(date, usage);
+
+  @override
+  String toString() => '{date: $date, usage: $usage}';
+}
+
+class _UsageInterval {
+  final double start;
+  final double end;
+  final double usage;
+
+  const _UsageInterval({
+    required this.start,
+    required this.end,
+    required this.usage,
+  });
+}
+
 class ElectricityAverageUsageGraph extends StatefulWidget {
-  late final SplayTreeMap<(DateTime, DateTime), num> plotData;
+  late final List<DailyElectricityUsage> plotData;
   final double graphWidth;
   final double? preferredRowHeight;
 
@@ -32,26 +65,72 @@ class ElectricityAverageUsageGraph extends StatefulWidget {
     required this.graphWidth,
     this.preferredRowHeight,
   }) {
-    SplayTreeMap<DateTime, num> mergedData = SplayTreeMap();
-    for (var data in historyElectricityInfo) {
-      mergedData[data.ReadTime] =
-          (mergedData[data.ReadTime] ?? 0) + data.ReadNum;
+    final rowsByDay = SplayTreeMap<DateTime, List<MeterInfo>>();
+    for (final row in historyElectricityInfo) {
+      final day = DateTime(
+        row.ReadTime.year,
+        row.ReadTime.month,
+        row.ReadTime.day,
+      );
+      rowsByDay.putIfAbsent(day, () => []).add(row);
     }
 
-    plotData = SplayTreeMap((a, b) => a.$1.difference(b.$1).inDays);
+    final result = <DailyElectricityUsage>[];
+    for (final entry in rowsByDay.entries) {
+      final uniqueIntervals = <String, _UsageInterval>{};
 
-    // The history electricity info list is ordered descending by fetching date.
-    if (mergedData.length >= 2) {
-      List<DateTime> timeKeys = mergedData.keys.toList();
+      for (final row in entry.value) {
+        final start = row.StartNum.toDouble();
+        final end = row.EndNum.toDouble();
+        final usage = row.ReadNum.toDouble();
 
-      for (var i = 1; i < timeKeys.length; i++) {
-        DateTime startTime = timeKeys[i - 1];
-        DateTime endTime = timeKeys[i];
-        num usage = mergedData[endTime]!;
-        plotData[(startTime, endTime)] =
-            usage / endTime.difference(startTime).inDays;
+        if (!start.isFinite ||
+            !end.isFinite ||
+            !usage.isFinite ||
+            end < start ||
+            usage < 0) {
+          continue;
+        }
+
+        // The same interval can be returned more than once with a different
+        // read timestamp. It must not be counted twice.
+        final key = '$start|$end|$usage';
+        uniqueIntervals.putIfAbsent(
+          key,
+          () => _UsageInterval(start: start, end: end, usage: usage),
+        );
       }
+
+      final intervals = uniqueIntervals.values.toList()
+        ..sort((a, b) {
+          final byStart = a.start.compareTo(b.start);
+          return byStart == 0 ? a.end.compareTo(b.end) : byStart;
+        });
+
+      if (intervals.isEmpty) continue;
+
+      var totalUsage = intervals.first.usage;
+      var mergedEnd = intervals.first.end;
+
+      for (final interval in intervals.skip(1)) {
+        final overlaps = interval.start <= mergedEnd;
+        if (!overlaps) {
+          totalUsage += interval.usage;
+          mergedEnd = interval.end;
+          continue;
+        }
+
+        // For overlapping or adjacent rows, only add the newly covered meter
+        // range. This handles repeated API rows and partially overlapping rows.
+        if (interval.end > mergedEnd) {
+          totalUsage += interval.end - mergedEnd;
+          mergedEnd = interval.end;
+        }
+      }
+
+      result.add(DailyElectricityUsage(date: entry.key, usage: totalUsage));
     }
+    plotData = result;
 
     log.info("[ElectricityWindow][ElectricityUsageGraph] Based on $plotData");
   }
@@ -66,7 +145,7 @@ class _ElectricityAverageUsageGraphState
   double _estimateRowHeight(BuildContext context) {
     final testTitle = TextPainter(
       text: const TextSpan(
-        text: "12.31~01.15",
+        text: "12.31",
         style: TextStyle(
           fontSize: _GraphMetrics.tooltipFontSize,
           fontWeight: _GraphMetrics.axisLabelFontWeight,
@@ -98,8 +177,8 @@ class _ElectricityAverageUsageGraphState
       "[ElectricityAverageUsageGraph] Based on plotdata ${widget.plotData}",
     );
 
-    // If only one day, unable to parse.
-    if (widget.plotData.keys.isEmpty) {
+    // No rows means there is nothing to draw.
+    if (widget.plotData.isEmpty) {
       log.info("[ElectricityAverageUsageGraph] Not enough data, quit!");
 
       return Text(
@@ -135,7 +214,7 @@ class _ElectricityAverageUsageGraphState
 }
 
 class HistogramPainter extends CustomPainter {
-  final SplayTreeMap<(DateTime, DateTime), num> plotData;
+  final List<DailyElectricityUsage> plotData;
   final BuildContext context;
   final Color color;
   final double rowHeight;
@@ -160,10 +239,10 @@ class HistogramPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    List<TextPainter> titles = plotData.keys.map((v) {
+    List<TextPainter> titles = plotData.map((v) {
       return TextPainter(
         text: TextSpan(
-          text: "${v.$1.month}.${v.$1.day}~${v.$2.month}.${v.$2.day}",
+          text: "${v.date.month}.${v.date.day}",
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
             fontSize: _GraphMetrics.tooltipFontSize,
             fontWeight: _GraphMetrics.axisLabelFontWeight,
@@ -190,10 +269,10 @@ class HistogramPainter extends CustomPainter {
       "longestTitleHeight: $longestTitleHeight",
     );
 
-    List<TextPainter> values = plotData.values.map((v) {
+    List<TextPainter> values = plotData.map((v) {
       return TextPainter(
         text: TextSpan(
-          text: v.toStringAsFixed(2),
+          text: v.usage.toStringAsFixed(2),
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
             fontSize: _GraphMetrics.tooltipFontSize,
             fontWeight: _GraphMetrics.axisLabelFontWeight,
@@ -225,13 +304,15 @@ class HistogramPainter extends CustomPainter {
         longestTitleWidth -
         longestValueWidth -
         _GraphMetrics.lineWidth;
-    num maxNum = plotData.values.fold(
+    num maxNum = plotData.fold<num>(
       0.0,
-      (previous, current) => current > previous ? current : previous,
+      (previous, current) =>
+          current.usage > previous ? current.usage : previous,
     );
-    num minNum = plotData.values.fold(
+    num minNum = plotData.fold<num>(
       0.0,
-      (previous, current) => current < previous ? current : previous,
+      (previous, current) =>
+          current.usage < previous ? current.usage : previous,
     );
     log.info(
       "[HistogramPainter] paintRange: $paintRange; "
@@ -264,7 +345,7 @@ class HistogramPainter extends CustomPainter {
       final range = maxNum - minNum;
       final rectWidth = range == 0
           ? 0.0
-          : paintRange / range * (plotData.values.toList()[i] - minNum);
+          : paintRange / range * (plotData[i].usage - minNum);
       canvas.drawRect(
         Rect.fromLTWH(rectLeftStart, rectTopStart, rectWidth, rectHeight),
         _fillPaint,
@@ -279,7 +360,7 @@ class HistogramPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant HistogramPainter oldDelegate) {
-    return !mapEquals(oldDelegate.plotData, plotData) ||
+    return !listEquals(oldDelegate.plotData, plotData) ||
         oldDelegate.color != color ||
         oldDelegate.rowHeight != rowHeight;
   }
