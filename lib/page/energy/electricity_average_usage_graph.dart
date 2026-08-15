@@ -42,18 +42,6 @@ class DailyElectricityUsage {
   String toString() => '{date: $date, usage: $usage}';
 }
 
-class _UsageInterval {
-  final double start;
-  final double end;
-  final double usage;
-
-  const _UsageInterval({
-    required this.start,
-    required this.end,
-    required this.usage,
-  });
-}
-
 class ElectricityAverageUsageGraph extends StatefulWidget {
   late final List<DailyElectricityUsage> plotData;
   final double graphWidth;
@@ -77,56 +65,33 @@ class ElectricityAverageUsageGraph extends StatefulWidget {
 
     final result = <DailyElectricityUsage>[];
     for (final entry in rowsByDay.entries) {
-      final uniqueIntervals = <String, _UsageInterval>{};
+      final uniqueRows = <String, MeterInfo>{};
 
       for (final row in entry.value) {
         final start = row.StartNum.toDouble();
         final end = row.EndNum.toDouble();
         final usage = row.ReadNum.toDouble();
 
-        if (!start.isFinite ||
-            !end.isFinite ||
-            !usage.isFinite ||
-            end < start ||
-            usage < 0) {
+        if (!start.isFinite || !end.isFinite || !usage.isFinite) {
           continue;
         }
 
         // The same interval can be returned more than once with a different
-        // read timestamp. It must not be counted twice.
+        // read timestamp. It must not be counted twice. Negative usage is
+        // intentionally kept because it represents a meter-reading
+        // correction and offsets the positive reading on the same day.
         final key = '$start|$end|$usage';
-        uniqueIntervals.putIfAbsent(
-          key,
-          () => _UsageInterval(start: start, end: end, usage: usage),
-        );
+        uniqueRows.putIfAbsent(key, () => row);
       }
 
-      final intervals = uniqueIntervals.values.toList()
-        ..sort((a, b) {
-          final byStart = a.start.compareTo(b.start);
-          return byStart == 0 ? a.end.compareTo(b.end) : byStart;
-        });
+      if (uniqueRows.isEmpty) continue;
 
-      if (intervals.isEmpty) continue;
-
-      var totalUsage = intervals.first.usage;
-      var mergedEnd = intervals.first.end;
-
-      for (final interval in intervals.skip(1)) {
-        final overlaps = interval.start <= mergedEnd;
-        if (!overlaps) {
-          totalUsage += interval.usage;
-          mergedEnd = interval.end;
-          continue;
-        }
-
-        // For overlapping or adjacent rows, only add the newly covered meter
-        // range. This handles repeated API rows and partially overlapping rows.
-        if (interval.end > mergedEnd) {
-          totalUsage += interval.end - mergedEnd;
-          mergedEnd = interval.end;
-        }
-      }
+      // Usage is a signed meter delta. A negative row is a correction and
+      // must offset the positive rows from the same calendar day.
+      final totalUsage = uniqueRows.values.fold<double>(
+        0.0,
+        (total, row) => total + row.ReadNum.toDouble(),
+      );
 
       result.add(DailyElectricityUsage(date: entry.key, usage: totalUsage));
     }
@@ -276,6 +241,7 @@ class HistogramPainter extends CustomPainter {
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
             fontSize: _GraphMetrics.tooltipFontSize,
             fontWeight: _GraphMetrics.axisLabelFontWeight,
+            color: v.usage < 0 ? Colors.red : null,
           ),
         ),
         textAlign: TextAlign.center,
@@ -348,7 +314,7 @@ class HistogramPainter extends CustomPainter {
           : paintRange / range * (plotData[i].usage - minNum);
       canvas.drawRect(
         Rect.fromLTWH(rectLeftStart, rectTopStart, rectWidth, rectHeight),
-        _fillPaint,
+        _fillPaint..color = plotData[i].usage < 0 ? Colors.red : color,
       );
 
       double valueLeftStart =
