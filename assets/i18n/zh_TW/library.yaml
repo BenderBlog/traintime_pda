@@ -31,7 +31,7 @@ empty_borrow_list: '目前沒有查詢到在借圖書
 
   不借書就要變成上面的小呆瓜咯'
 borrow_list_info: 在借 {borrow} 本，其中已過期 {dued} 本
-search_book_window: ""
+search_book_window: ''
 search_here: 在此搜索
 normal_search: 普通搜索
 advanced_search: 高級搜索

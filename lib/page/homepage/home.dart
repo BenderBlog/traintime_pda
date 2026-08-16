@@ -16,17 +16,19 @@ import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
-import 'package:watermeter/repository/network_session.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/homepage.dart';
-import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/page/setting/setting.dart';
 import 'package:watermeter/repository/preference.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/page/login/ids_reauth_dialog.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -71,11 +73,17 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   late StreamSubscription _intentSub;
   late PageController _controller;
+  late final IDSReAuthHandler _idsReAuthHandler;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController();
+    _idsReAuthHandler = (client) async {
+      if (!mounted) throw const IDSReAuthRequiredException();
+      return showIDSReAuthDialog(context, client);
+    };
+    activeIDSReAuthHandler = _idsReAuthHandler;
   }
 
   void _loginAsync() async {
@@ -85,8 +93,7 @@ class _HomePageMasterState extends State<HomePageMaster>
     );
 
     try {
-      await update(
-        context: context,
+      await HomepageController.i.refresh(
         forceRetryLogin: true,
         sliderCaptcha: (String cookieStr) {
           return SliderCaptchaClientProvider(cookie: cookieStr).solve(
@@ -150,7 +157,7 @@ class _HomePageMasterState extends State<HomePageMaster>
             ),
           );
         });
-      } else {
+      } else if (loginState != IDSLoginState.cancelled) {
         _showOfflineModeNotice();
       }
     }
@@ -190,8 +197,7 @@ class _HomePageMasterState extends State<HomePageMaster>
       if (loginState == IDSLoginState.none) {
         _loginAsync();
       } else {
-        update(
-          context: context,
+        HomepageController.i.refresh(
           forceRetryLogin: true,
           sliderCaptcha: (String cookieStr) {
             return SliderCaptchaClientProvider(cookie: cookieStr).solve(
@@ -207,6 +213,9 @@ class _HomePageMasterState extends State<HomePageMaster>
 
   @override
   void dispose() {
+    if (identical(activeIDSReAuthHandler, _idsReAuthHandler)) {
+      activeIDSReAuthHandler = null;
+    }
     if (Platform.isAndroid || Platform.isIOS) _intentSub.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();

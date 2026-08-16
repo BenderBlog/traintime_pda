@@ -22,12 +22,12 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/repository/network_session.dart' as repo_general;
+import 'package:watermeter/repository/network_client.dart' as repo_general;
 import 'package:watermeter/repository/notification/notification_registrar.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {

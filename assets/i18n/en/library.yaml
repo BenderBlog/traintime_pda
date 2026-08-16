@@ -28,7 +28,7 @@ cannot_be_renewable: Not renewable
 renewing: Renewing
 empty_borrow_list: No borrowed books found
 borrow_list_info: Borrowing {borrow} book(s), among which {dued} book(s) have expired
-search_book_window: ""
+search_book_window: ''
 search_here: Search here
 normal_search: Normal Search
 advanced_search: Advanced Search

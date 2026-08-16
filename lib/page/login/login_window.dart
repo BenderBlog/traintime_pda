@@ -15,13 +15,16 @@ import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
+import 'package:watermeter/page/login/ids_reauth_dialog.dart';
+import 'package:watermeter/repository/ids_session/semester_session.dart';
+import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class LoginWindow extends StatefulWidget {
@@ -109,6 +112,7 @@ class _LoginWindowState extends State<LoginWindow> {
 
   Future<void> login() async {
     bool isGood = true;
+    loginState = IDSLoginState.requesting;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
       msg: context.t.login.onLoginProgress,
@@ -118,10 +122,10 @@ class _LoginWindowState extends State<LoginWindow> {
         completedMsg: context.t.login.completeLogin,
       ),
     );
-    EhallSession ses = EhallSession();
+    IDSSession ses = IDSSession();
 
     try {
-      await ses.clearCookieJar();
+      await NetworkCookieJars.ids.deleteAll();
       log.warning(
         "[login_window][login] "
         "Have cleared login state.",
@@ -134,24 +138,57 @@ class _LoginWindowState extends State<LoginWindow> {
     }
 
     try {
-      await ses.loginEhall(
+      Future<Uri> reAuthHandler(IDSReAuthClient client) async {
+        if (pd.isOpen()) pd.close();
+        if (!mounted) throw const IDSReAuthCancelledException();
+        final result = await showIDSReAuthDialog(context, client);
+        if (mounted && !pd.isOpen()) {
+          pd.show(
+            msg: context.t.loginProcess.afterProcess,
+            max: 100,
+            hideValue: true,
+          );
+        }
+        return result;
+      }
+
+      await ses.login(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
-        onResponse: (int number, LoginProcessStep status) => pd.update(
-          msg: switch (status) {
-            LoginProcessStep.readyPage =>
-              context.t.loginProcess.readyPage,
-            LoginProcessStep.getEncrypt =>
-              context.t.loginProcess.getEncrypt,
-            LoginProcessStep.readyLogin =>
-              context.t.loginProcess.readyLogin,
-            LoginProcessStep.slider =>
-              context.t.loginProcess.slider,
-            LoginProcessStep.afterProcess =>
-              context.t.loginProcess.afterProcess,
-          },
-          value: number,
-        ),
+        onResponse: (int number, LoginProcessStep status) {
+          if (pd.isOpen()) {
+            pd.update(
+              msg: switch (status) {
+                LoginProcessStep.readyPage =>
+                  context.t.loginProcess.readyPage,
+                LoginProcessStep.getEncrypt =>
+                  context.t.loginProcess.getEncrypt,
+                LoginProcessStep.readyLogin =>
+                  context.t.loginProcess.readyLogin,
+                LoginProcessStep.slider =>
+                  context.t.loginProcess.slider,
+                LoginProcessStep.secondFactor =>
+                  context.t.loginProcess.secondFactor,
+                LoginProcessStep.afterProcess =>
+                  context.t.loginProcess.afterProcess,
+              },
+              value: number,
+            );
+          }
+        },
+        reAuthHandler: (IDSReAuthClient client) async {
+          if (pd.isOpen()) pd.close();
+          if (!mounted) throw const IDSReAuthCancelledException();
+          final result = await showIDSReAuthDialog(context, client);
+          if (mounted && !pd.isOpen()) {
+            pd.show(
+              msg: context.t.loginProcess.afterProcess,
+              max: 100,
+              hideValue: true,
+            );
+          }
+          return result;
+        },
         sliderCaptcha: (String cookieStr) {
           return SliderCaptchaClientProvider(cookie: cookieStr).solve(
             manualSolver: (provider) =>
@@ -161,19 +198,22 @@ class _LoginWindowState extends State<LoginWindow> {
       );
       if (!mounted) return;
       if (isGood == true) {
-        preference.setString(
+        loginState = IDSLoginState.success;
+        await preference.setString(
           preference.Preference.idsAccount,
           _idsAccountController.text,
         );
-        preference.setString(
+        await preference.setString(
           preference.Preference.idsPassword,
           _idsPasswordController.text,
         );
 
-        bool isPostGraduate = await ses.checkWhetherPostgraduate();
+        bool isPostGraduate = await ses.checkWhetherPostgraduate(
+          reAuthHandler: reAuthHandler,
+        );
         String semesterInfo = isPostGraduate
-            ? await PersonalInfoSession().getSemesterInfoYjspt()
-            : await PersonalInfoSession().getSemesterInfoEhall();
+            ? await SemesterSession().getSemesterInfoYjspt()
+            : await SemesterSession().getSemesterInfoEhall();
         preference.setString(
           preference.Preference.currentSemester,
           semesterInfo,
@@ -189,13 +229,31 @@ class _LoginWindowState extends State<LoginWindow> {
       }
     } catch (e, s) {
       isGood = false;
-      pd.close();
+      if (pd.isOpen()) pd.close();
       if (mounted) {
         if (e is PasswordWrongException) {
+          loginState = IDSLoginState.passwordWrong;
           showToast(context: context, msg: e.msg);
+        } else if (e is IDSReAuthCancelledException) {
+          loginState = IDSLoginState.cancelled;
+          showToast(
+            context: context,
+            msg: context.t.login.secondFactor.cancelled,
+          );
+        } else if (e is IDSReAuthExpiredException) {
+          loginState = IDSLoginState.fail;
+          showToast(
+            context: context,
+            msg: context.t.login.secondFactor.expired,
+          );
         } else if (e is LoginFailedException) {
+          loginState = IDSLoginState.fail;
           showToast(context: context, msg: e.msg);
+        } else if (e is IDSProtocolException) {
+          loginState = IDSLoginState.fail;
+          showToast(context: context, msg: e.message);
         } else if (e is DioException) {
+          loginState = IDSLoginState.fail;
           if (e.message == null) {
             if (e.response == null) {
               showToast(
@@ -215,6 +273,7 @@ class _LoginWindowState extends State<LoginWindow> {
             );
           }
         } else {
+          loginState = IDSLoginState.fail;
           log.warning(
             "[login_window][login] "
             "Login failed with error: \n$e\nStacktrace is:\n$s",
@@ -251,6 +310,7 @@ class _LoginWindowState extends State<LoginWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.only(
           left: width / height > 1.0 ? width * 0.25 : widthOfSquare,

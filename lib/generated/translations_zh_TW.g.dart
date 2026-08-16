@@ -11,7 +11,7 @@ import 'package:slang/generated.dart';
 import 'translations.g.dart';
 
 // Path: <root>
-class TranslationsZhTw with BaseTranslations<AppLocale, Translations> implements Translations {
+class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Translations> {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsZhTw({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
@@ -21,7 +21,9 @@ class TranslationsZhTw with BaseTranslations<AppLocale, Translations> implements
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ) {
+		  ),
+		  super(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
+		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
 		$meta.setFlatMapFunction(_flatMapFunction);
 	}
 
@@ -29,7 +31,7 @@ class TranslationsZhTw with BaseTranslations<AppLocale, Translations> implements
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
+	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
 
 	late final TranslationsZhTw _root = this; // ignore: unused_field
 
@@ -37,41 +39,41 @@ class TranslationsZhTw with BaseTranslations<AppLocale, Translations> implements
 	TranslationsZhTw $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsZhTw(meta: meta ?? this.$meta);
 
 	// Translations
-	@override late final Translations$classAttendance$zh_TW classAttendance = Translations$classAttendance$zh_TW.internal(_root);
-	@override late final Translations$classtable$zh_TW classtable = Translations$classtable$zh_TW.internal(_root);
-	@override late final Translations$clubPromotion$zh_TW clubPromotion = Translations$clubPromotion$zh_TW.internal(_root);
-	@override late final Translations$common$zh_TW common = Translations$common$zh_TW.internal(_root);
-	@override late final Translations$courseReminder$zh_TW courseReminder = Translations$courseReminder$zh_TW.internal(_root);
-	@override late final Translations$dormWater$zh_TW dormWater = Translations$dormWater$zh_TW.internal(_root);
-	@override late final Translations$easterEggRobot$zh_TW easterEggRobot = Translations$easterEggRobot$zh_TW.internal(_root);
-	@override late final Translations$electricity$zh_TW electricity = Translations$electricity$zh_TW.internal(_root);
-	@override late final Translations$electricityStatus$zh_TW electricityStatus = Translations$electricityStatus$zh_TW.internal(_root);
-	@override late final Translations$emptyClassroom$zh_TW emptyClassroom = Translations$emptyClassroom$zh_TW.internal(_root);
-	@override late final Translations$exam$zh_TW exam = Translations$exam$zh_TW.internal(_root);
-	@override late final Translations$experiment$zh_TW experiment = Translations$experiment$zh_TW.internal(_root);
-	@override late final Translations$experimentController$zh_TW experimentController = Translations$experimentController$zh_TW.internal(_root);
-	@override late final Translations$homepage$zh_TW homepage = Translations$homepage$zh_TW.internal(_root);
-	@override late final Translations$library$zh_TW library = Translations$library$zh_TW.internal(_root);
-	@override late final Translations$libraryCard$zh_TW libraryCard = Translations$libraryCard$zh_TW.internal(_root);
-	@override late final Translations$login$zh_TW login = Translations$login$zh_TW.internal(_root);
-	@override late final Translations$loginProcess$zh_TW loginProcess = Translations$loginProcess$zh_TW.internal(_root);
-	@override late final Translations$month$zh_TW month = Translations$month$zh_TW.internal(_root);
-	@override late final Translations$restartApp$zh_TW restartApp = Translations$restartApp$zh_TW.internal(_root);
-	@override late final Translations$ruisi$zh_TW ruisi = Translations$ruisi$zh_TW.internal(_root);
-	@override late final Translations$schoolCardStatus$zh_TW schoolCardStatus = Translations$schoolCardStatus$zh_TW.internal(_root);
-	@override late final Translations$schoolCardWindow$zh_TW schoolCardWindow = Translations$schoolCardWindow$zh_TW.internal(_root);
-	@override late final Translations$schoolNet$zh_TW schoolNet = Translations$schoolNet$zh_TW.internal(_root);
-	@override late final Translations$score$zh_TW score = Translations$score$zh_TW.internal(_root);
-	@override late final Translations$setting$zh_TW setting = Translations$setting$zh_TW.internal(_root);
-	@override late final Translations$sport$zh_TW sport = Translations$sport$zh_TW.internal(_root);
-	@override late final Translations$toolbox$zh_TW toolbox = Translations$toolbox$zh_TW.internal(_root);
-	@override late final Translations$weekday$zh_TW weekday = Translations$weekday$zh_TW.internal(_root);
-	@override late final Translations$xduPlanet$zh_TW xduPlanet = Translations$xduPlanet$zh_TW.internal(_root);
+	@override late final _Translations$classAttendance$zh_TW classAttendance = _Translations$classAttendance$zh_TW._(_root);
+	@override late final _Translations$classtable$zh_TW classtable = _Translations$classtable$zh_TW._(_root);
+	@override late final _Translations$clubPromotion$zh_TW clubPromotion = _Translations$clubPromotion$zh_TW._(_root);
+	@override late final _Translations$common$zh_TW common = _Translations$common$zh_TW._(_root);
+	@override late final _Translations$courseReminder$zh_TW courseReminder = _Translations$courseReminder$zh_TW._(_root);
+	@override late final _Translations$dormWater$zh_TW dormWater = _Translations$dormWater$zh_TW._(_root);
+	@override late final _Translations$easterEggRobot$zh_TW easterEggRobot = _Translations$easterEggRobot$zh_TW._(_root);
+	@override late final _Translations$electricity$zh_TW electricity = _Translations$electricity$zh_TW._(_root);
+	@override late final _Translations$electricityStatus$zh_TW electricityStatus = _Translations$electricityStatus$zh_TW._(_root);
+	@override late final _Translations$emptyClassroom$zh_TW emptyClassroom = _Translations$emptyClassroom$zh_TW._(_root);
+	@override late final _Translations$exam$zh_TW exam = _Translations$exam$zh_TW._(_root);
+	@override late final _Translations$experiment$zh_TW experiment = _Translations$experiment$zh_TW._(_root);
+	@override late final _Translations$experimentController$zh_TW experimentController = _Translations$experimentController$zh_TW._(_root);
+	@override late final _Translations$homepage$zh_TW homepage = _Translations$homepage$zh_TW._(_root);
+	@override late final _Translations$library$zh_TW library = _Translations$library$zh_TW._(_root);
+	@override late final _Translations$libraryCard$zh_TW libraryCard = _Translations$libraryCard$zh_TW._(_root);
+	@override late final _Translations$login$zh_TW login = _Translations$login$zh_TW._(_root);
+	@override late final _Translations$loginProcess$zh_TW loginProcess = _Translations$loginProcess$zh_TW._(_root);
+	@override late final _Translations$month$zh_TW month = _Translations$month$zh_TW._(_root);
+	@override late final _Translations$restartApp$zh_TW restartApp = _Translations$restartApp$zh_TW._(_root);
+	@override late final _Translations$ruisi$zh_TW ruisi = _Translations$ruisi$zh_TW._(_root);
+	@override late final _Translations$schoolCardStatus$zh_TW schoolCardStatus = _Translations$schoolCardStatus$zh_TW._(_root);
+	@override late final _Translations$schoolCardWindow$zh_TW schoolCardWindow = _Translations$schoolCardWindow$zh_TW._(_root);
+	@override late final _Translations$schoolNet$zh_TW schoolNet = _Translations$schoolNet$zh_TW._(_root);
+	@override late final _Translations$score$zh_TW score = _Translations$score$zh_TW._(_root);
+	@override late final _Translations$setting$zh_TW setting = _Translations$setting$zh_TW._(_root);
+	@override late final _Translations$sport$zh_TW sport = _Translations$sport$zh_TW._(_root);
+	@override late final _Translations$toolbox$zh_TW toolbox = _Translations$toolbox$zh_TW._(_root);
+	@override late final _Translations$weekday$zh_TW weekday = _Translations$weekday$zh_TW._(_root);
+	@override late final _Translations$xduPlanet$zh_TW xduPlanet = _Translations$xduPlanet$zh_TW._(_root);
 }
 
 // Path: classAttendance
-class Translations$classAttendance$zh_TW implements Translations$classAttendance$zh_CN {
-	Translations$classAttendance$zh_TW.internal(this._root);
+class _Translations$classAttendance$zh_TW extends Translations$classAttendance$zh {
+	_Translations$classAttendance$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -81,33 +83,33 @@ class Translations$classAttendance$zh_TW implements Translations$classAttendance
 	@override String get noData => '沒有找到課程數據';
 	@override String get noAttendanceRecord => '沒有簽到記錄';
 	@override String get longLoad => '考勤數據的加載時間約半分鐘，請耐心等待';
-	@override late final Translations$classAttendance$courseState$zh_TW courseState = Translations$classAttendance$courseState$zh_TW.internal(_root);
-	@override late final Translations$classAttendance$table$zh_TW table = Translations$classAttendance$table$zh_TW.internal(_root);
-	@override late final Translations$classAttendance$card$zh_TW card = Translations$classAttendance$card$zh_TW.internal(_root);
-	@override late final Translations$classAttendance$detailCard$zh_TW detailCard = Translations$classAttendance$detailCard$zh_TW.internal(_root);
-	@override late final Translations$classAttendance$signType$zh_TW signType = Translations$classAttendance$signType$zh_TW.internal(_root);
-	@override late final Translations$classAttendance$signStatus$zh_TW signStatus = Translations$classAttendance$signStatus$zh_TW.internal(_root);
+	@override late final _Translations$classAttendance$courseState$zh_TW courseState = _Translations$classAttendance$courseState$zh_TW._(_root);
+	@override late final _Translations$classAttendance$table$zh_TW table = _Translations$classAttendance$table$zh_TW._(_root);
+	@override late final _Translations$classAttendance$card$zh_TW card = _Translations$classAttendance$card$zh_TW._(_root);
+	@override late final _Translations$classAttendance$detailCard$zh_TW detailCard = _Translations$classAttendance$detailCard$zh_TW._(_root);
+	@override late final _Translations$classAttendance$signType$zh_TW signType = _Translations$classAttendance$signType$zh_TW._(_root);
+	@override late final _Translations$classAttendance$signStatus$zh_TW signStatus = _Translations$classAttendance$signStatus$zh_TW._(_root);
 }
 
 // Path: classtable
-class Translations$classtable$zh_TW implements Translations$classtable$zh_CN {
-	Translations$classtable$zh_TW.internal(this._root);
+class _Translations$classtable$zh_TW extends Translations$classtable$zh {
+	_Translations$classtable$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$classtable$partnerClasstable$zh_TW partnerClasstable = Translations$classtable$partnerClasstable$zh_TW.internal(_root);
+	@override late final _Translations$classtable$partnerClasstable$zh_TW partnerClasstable = _Translations$classtable$partnerClasstable$zh_TW._(_root);
 	@override String get pageTitle => '我的日程表';
 	@override String partnerPageTitle({required Object partner_name}) => '${partner_name}的日程表';
-	@override late final Translations$classtable$popupMenu$zh_TW popupMenu = Translations$classtable$popupMenu$zh_TW.internal(_root);
-	@override late final Translations$classtable$visualSettings$zh_TW visualSettings = Translations$classtable$visualSettings$zh_TW.internal(_root);
-	@override late final Translations$classtable$statusSource$zh_TW statusSource = Translations$classtable$statusSource$zh_TW.internal(_root);
+	@override late final _Translations$classtable$popupMenu$zh_TW popupMenu = _Translations$classtable$popupMenu$zh_TW._(_root);
+	@override late final _Translations$classtable$visualSettings$zh_TW visualSettings = _Translations$classtable$visualSettings$zh_TW._(_root);
+	@override late final _Translations$classtable$statusSource$zh_TW statusSource = _Translations$classtable$statusSource$zh_TW._(_root);
 	@override String get errorDialogTitle => '錯誤信息概覽';
-	@override late final Translations$classtable$statusBanner$zh_TW statusBanner = Translations$classtable$statusBanner$zh_TW.internal(_root);
-	@override late final Translations$classtable$emptyState$zh_TW emptyState = Translations$classtable$emptyState$zh_TW.internal(_root);
-	@override late final Translations$classtable$emptyAction$zh_TW emptyAction = Translations$classtable$emptyAction$zh_TW.internal(_root);
-	@override late final Translations$classtable$classChangePage$zh_TW classChangePage = Translations$classtable$classChangePage$zh_TW.internal(_root);
-	@override late final Translations$classtable$notArrangedPage$zh_TW notArrangedPage = Translations$classtable$notArrangedPage$zh_TW.internal(_root);
+	@override late final _Translations$classtable$statusBanner$zh_TW statusBanner = _Translations$classtable$statusBanner$zh_TW._(_root);
+	@override late final _Translations$classtable$emptyState$zh_TW emptyState = _Translations$classtable$emptyState$zh_TW._(_root);
+	@override late final _Translations$classtable$emptyAction$zh_TW emptyAction = _Translations$classtable$emptyAction$zh_TW._(_root);
+	@override late final _Translations$classtable$classChangePage$zh_TW classChangePage = _Translations$classtable$classChangePage$zh_TW._(_root);
+	@override late final _Translations$classtable$notArrangedPage$zh_TW notArrangedPage = _Translations$classtable$notArrangedPage$zh_TW._(_root);
 	@override String emptyClassMessage({required Object semester_code}) => '${semester_code} 學期沒有課程';
 	@override String emptyClassWithExam({required Object semester_code}) => '${semester_code} 學期沒有課程但是有考試安排！\n請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面';
 	@override String weekTitle({required Object week}) => '第${week}周';
@@ -115,26 +117,26 @@ class Translations$classtable$zh_TW implements Translations$classtable$zh_CN {
 	@override String get supperBreak => '晚休';
 	@override String month({required Object month}) => '${month}\n月';
 	@override String get noClass => '本週暫無安排，請不要在床上過於慵懶';
-	@override late final Translations$classtable$classCard$zh_TW classCard = Translations$classtable$classCard$zh_TW.internal(_root);
-	@override late final Translations$classtable$classAdd$zh_TW classAdd = Translations$classtable$classAdd$zh_TW.internal(_root);
-	@override late final Translations$classtable$courseDetailCard$zh_TW courseDetailCard = Translations$classtable$courseDetailCard$zh_TW.internal(_root);
-	@override late final Translations$classtable$outputToSystem$zh_TW outputToSystem = Translations$classtable$outputToSystem$zh_TW.internal(_root);
-	@override late final Translations$classtable$refreshClasstable$zh_TW refreshClasstable = Translations$classtable$refreshClasstable$zh_TW.internal(_root);
+	@override late final _Translations$classtable$classCard$zh_TW classCard = _Translations$classtable$classCard$zh_TW._(_root);
+	@override late final _Translations$classtable$classAdd$zh_TW classAdd = _Translations$classtable$classAdd$zh_TW._(_root);
+	@override late final _Translations$classtable$courseDetailCard$zh_TW courseDetailCard = _Translations$classtable$courseDetailCard$zh_TW._(_root);
+	@override late final _Translations$classtable$outputToSystem$zh_TW outputToSystem = _Translations$classtable$outputToSystem$zh_TW._(_root);
+	@override late final _Translations$classtable$refreshClasstable$zh_TW refreshClasstable = _Translations$classtable$refreshClasstable$zh_TW._(_root);
 	@override String get cacheHintPasswordWrong => '統一認證密碼錯誤或已失效。';
 	@override String get cacheHintLoginFailed => '登錄課表服務失敗。';
 	@override String get cacheHintNetworkFailed => '課表網絡請求失敗。';
 	@override String get cacheHintUnknownError => '在線獲取課表失敗。詳細錯誤請查看日誌。';
-	@override late final Translations$classtable$semesterSwitcher$zh_TW semesterSwitcher = Translations$classtable$semesterSwitcher$zh_TW.internal(_root);
+	@override late final _Translations$classtable$semesterSwitcher$zh_TW semesterSwitcher = _Translations$classtable$semesterSwitcher$zh_TW._(_root);
 }
 
 // Path: clubPromotion
-class Translations$clubPromotion$zh_TW implements Translations$clubPromotion$zh_CN {
-	Translations$clubPromotion$zh_TW.internal(this._root);
+class _Translations$clubPromotion$zh_TW extends Translations$clubPromotion$zh {
+	_Translations$clubPromotion$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$clubPromotion$type$zh_TW type = Translations$clubPromotion$type$zh_TW.internal(_root);
+	@override late final _Translations$clubPromotion$type$zh_TW type = _Translations$clubPromotion$type$zh_TW._(_root);
 	@override String get wrongParam => '錯誤參數';
 	@override String get noGroupInfo => '未傳入社團信息';
 	@override String get loading => '正在加載';
@@ -147,8 +149,8 @@ class Translations$clubPromotion$zh_TW implements Translations$clubPromotion$zh_
 }
 
 // Path: common
-class Translations$common$zh_TW implements Translations$common$zh_CN {
-	Translations$common$zh_TW.internal(this._root);
+class _Translations$common$zh_TW extends Translations$common$zh {
+	_Translations$common$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -183,8 +185,8 @@ class Translations$common$zh_TW implements Translations$common$zh_CN {
 }
 
 // Path: courseReminder
-class Translations$courseReminder$zh_TW implements Translations$courseReminder$zh_CN {
-	Translations$courseReminder$zh_TW.internal(this._root);
+class _Translations$courseReminder$zh_TW extends Translations$courseReminder$zh {
+	_Translations$courseReminder$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -196,8 +198,8 @@ class Translations$courseReminder$zh_TW implements Translations$courseReminder$z
 }
 
 // Path: dormWater
-class Translations$dormWater$zh_TW implements Translations$dormWater$zh_CN {
-	Translations$dormWater$zh_TW.internal(this._root);
+class _Translations$dormWater$zh_TW extends Translations$dormWater$zh {
+	_Translations$dormWater$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -244,8 +246,8 @@ class Translations$dormWater$zh_TW implements Translations$dormWater$zh_CN {
 }
 
 // Path: easterEggRobot
-class Translations$easterEggRobot$zh_TW implements Translations$easterEggRobot$zh_CN {
-	Translations$easterEggRobot$zh_TW.internal(this._root);
+class _Translations$easterEggRobot$zh_TW extends Translations$easterEggRobot$zh {
+	_Translations$easterEggRobot$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -259,8 +261,8 @@ class Translations$easterEggRobot$zh_TW implements Translations$easterEggRobot$z
 }
 
 // Path: electricity
-class Translations$electricity$zh_TW implements Translations$electricity$zh_CN {
-	Translations$electricity$zh_TW.internal(this._root);
+class _Translations$electricity$zh_TW extends Translations$electricity$zh {
+	_Translations$electricity$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -305,8 +307,8 @@ class Translations$electricity$zh_TW implements Translations$electricity$zh_CN {
 }
 
 // Path: electricityStatus
-class Translations$electricityStatus$zh_TW implements Translations$electricityStatus$zh_CN {
-	Translations$electricityStatus$zh_TW.internal(this._root);
+class _Translations$electricityStatus$zh_TW extends Translations$electricityStatus$zh {
+	_Translations$electricityStatus$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -329,8 +331,8 @@ class Translations$electricityStatus$zh_TW implements Translations$electricitySt
 }
 
 // Path: emptyClassroom
-class Translations$emptyClassroom$zh_TW implements Translations$emptyClassroom$zh_CN {
-	Translations$emptyClassroom$zh_TW.internal(this._root);
+class _Translations$emptyClassroom$zh_TW extends Translations$emptyClassroom$zh {
+	_Translations$emptyClassroom$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -345,8 +347,8 @@ class Translations$emptyClassroom$zh_TW implements Translations$emptyClassroom$z
 }
 
 // Path: exam
-class Translations$exam$zh_TW implements Translations$exam$zh_CN {
-	Translations$exam$zh_TW.internal(this._root);
+class _Translations$exam$zh_TW extends Translations$exam$zh {
+	_Translations$exam$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -364,12 +366,12 @@ class Translations$exam$zh_TW implements Translations$exam$zh_CN {
 	@override String get finished => '已完成考試';
 	@override String get noneFinished => '一門還沒考呢';
 	@override String get noExamArrangement => '目前沒有考試安排';
-	@override late final Translations$exam$noArrangement$zh_TW noArrangement = Translations$exam$noArrangement$zh_TW.internal(_root);
+	@override late final _Translations$exam$noArrangement$zh_TW noArrangement = _Translations$exam$noArrangement$zh_TW._(_root);
 }
 
 // Path: experiment
-class Translations$experiment$zh_TW implements Translations$experiment$zh_CN {
-	Translations$experiment$zh_TW.internal(this._root);
+class _Translations$experiment$zh_TW extends Translations$experiment$zh {
+	_Translations$experiment$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -414,8 +416,8 @@ class Translations$experiment$zh_TW implements Translations$experiment$zh_CN {
 }
 
 // Path: experimentController
-class Translations$experimentController$zh_TW implements Translations$experimentController$zh_CN {
-	Translations$experimentController$zh_TW.internal(this._root);
+class _Translations$experimentController$zh_TW extends Translations$experimentController$zh {
+	_Translations$experimentController$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -425,8 +427,8 @@ class Translations$experimentController$zh_TW implements Translations$experiment
 }
 
 // Path: homepage
-class Translations$homepage$zh_TW implements Translations$homepage$zh_CN {
-	Translations$homepage$zh_TW.internal(this._root);
+class _Translations$homepage$zh_TW extends Translations$homepage$zh {
+	_Translations$homepage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -454,7 +456,7 @@ class Translations$homepage$zh_TW implements Translations$homepage$zh_CN {
 	@override String get dashboard => '豬圖鑑賞';
 	@override String get planet => '博客星球';
 	@override String get setting => '設置';
-	@override late final Translations$homepage$inputPartnerData$zh_TW inputPartnerData = Translations$homepage$inputPartnerData$zh_TW.internal(_root);
+	@override late final _Translations$homepage$inputPartnerData$zh_TW inputPartnerData = _Translations$homepage$inputPartnerData$zh_TW._(_root);
 	@override String get loginMessage => '登錄中，暫時顯示緩存數據';
 	@override String get successfulLoginMessage => '登錄成功';
 	@override String get passwordWrongTitle => '用戶名或密碼有誤';
@@ -463,19 +465,19 @@ class Translations$homepage$zh_TW implements Translations$homepage$zh_CN {
 	@override String get offlineModeTitle => '統一認證服務離線模式開啟';
 	@override String get offlineModeContent => '無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。\n成績查詢，考試信息查詢，欠費查詢，校園卡查詢關閉。課表顯示緩存數據。其他功能暫不受影響。\n如有不便，敬請諒解。';
 	@override String get offlineMode => '脫機模式下，一站式相關功能全部禁止使用';
-	@override late final Translations$homepage$noticeCard$zh_TW noticeCard = Translations$homepage$noticeCard$zh_TW.internal(_root);
-	@override late final Translations$homepage$classTableCard$zh_TW classTableCard = Translations$homepage$classTableCard$zh_TW.internal(_root);
-	@override late final Translations$homepage$electricityCard$zh_TW electricityCard = Translations$homepage$electricityCard$zh_TW.internal(_root);
-	@override late final Translations$homepage$libraryCard$zh_TW libraryCard = Translations$homepage$libraryCard$zh_TW.internal(_root);
-	@override late final Translations$homepage$schoolCardInfoCard$zh_TW schoolCardInfoCard = Translations$homepage$schoolCardInfoCard$zh_TW.internal(_root);
-	@override late final Translations$homepage$toolbox$zh_TW toolbox = Translations$homepage$toolbox$zh_TW.internal(_root);
-	@override late final Translations$homepage$schoolNet$zh_TW schoolNet = Translations$homepage$schoolNet$zh_TW.internal(_root);
-	@override late final Translations$homepage$clubPromotion$zh_TW clubPromotion = Translations$homepage$clubPromotion$zh_TW.internal(_root);
+	@override late final _Translations$homepage$noticeCard$zh_TW noticeCard = _Translations$homepage$noticeCard$zh_TW._(_root);
+	@override late final _Translations$homepage$classTableCard$zh_TW classTableCard = _Translations$homepage$classTableCard$zh_TW._(_root);
+	@override late final _Translations$homepage$electricityCard$zh_TW electricityCard = _Translations$homepage$electricityCard$zh_TW._(_root);
+	@override late final _Translations$homepage$libraryCard$zh_TW libraryCard = _Translations$homepage$libraryCard$zh_TW._(_root);
+	@override late final _Translations$homepage$schoolCardInfoCard$zh_TW schoolCardInfoCard = _Translations$homepage$schoolCardInfoCard$zh_TW._(_root);
+	@override late final _Translations$homepage$toolbox$zh_TW toolbox = _Translations$homepage$toolbox$zh_TW._(_root);
+	@override late final _Translations$homepage$schoolNet$zh_TW schoolNet = _Translations$homepage$schoolNet$zh_TW._(_root);
+	@override late final _Translations$homepage$clubPromotion$zh_TW clubPromotion = _Translations$homepage$clubPromotion$zh_TW._(_root);
 }
 
 // Path: library
-class Translations$library$zh_TW implements Translations$library$zh_CN {
-	Translations$library$zh_TW.internal(this._root);
+class _Translations$library$zh_TW extends Translations$library$zh {
+	_Translations$library$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -530,8 +532,8 @@ class Translations$library$zh_TW implements Translations$library$zh_CN {
 }
 
 // Path: libraryCard
-class Translations$libraryCard$zh_TW implements Translations$libraryCard$zh_CN {
-	Translations$libraryCard$zh_TW.internal(this._root);
+class _Translations$libraryCard$zh_TW extends Translations$libraryCard$zh {
+	_Translations$libraryCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -545,8 +547,8 @@ class Translations$libraryCard$zh_TW implements Translations$libraryCard$zh_CN {
 }
 
 // Path: login
-class Translations$login$zh_TW implements Translations$login$zh_CN {
-	Translations$login$zh_TW.internal(this._root);
+class _Translations$login$zh_TW extends Translations$login$zh {
+	_Translations$login$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -564,13 +566,14 @@ class Translations$login$zh_TW implements Translations$login$zh_CN {
 	@override String get clearCache => '清除登錄緩存';
 	@override String get completeClearCache => '清理緩存成功';
 	@override String get seeInspector => '查看網絡交互';
-	@override late final Translations$login$captchaWindow$zh_TW captchaWindow = Translations$login$captchaWindow$zh_TW.internal(_root);
+	@override late final _Translations$login$captchaWindow$zh_TW captchaWindow = _Translations$login$captchaWindow$zh_TW._(_root);
 	@override String get sliderTitle => '服務器認證服務';
+	@override late final _Translations$login$secondFactor$zh_TW secondFactor = _Translations$login$secondFactor$zh_TW._(_root);
 }
 
 // Path: loginProcess
-class Translations$loginProcess$zh_TW implements Translations$loginProcess$zh_CN {
-	Translations$loginProcess$zh_TW.internal(this._root);
+class _Translations$loginProcess$zh_TW extends Translations$loginProcess$zh {
+	_Translations$loginProcess$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -579,13 +582,14 @@ class Translations$loginProcess$zh_TW implements Translations$loginProcess$zh_CN
 	@override String get getEncrypt => '獲取密碼加密密鑰';
 	@override String get readyLogin => '準備登錄';
 	@override String get slider => '登錄中';
+	@override String get secondFactor => '等待短信二次認證';
 	@override String get afterProcess => '登錄後處理';
 	@override String failed({required Object status_code}) => '登錄失敗，響應狀態碼：${status_code}';
 }
 
 // Path: month
-class Translations$month$zh_TW implements Translations$month$zh_CN {
-	Translations$month$zh_TW.internal(this._root);
+class _Translations$month$zh_TW extends Translations$month$zh {
+	_Translations$month$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -605,8 +609,8 @@ class Translations$month$zh_TW implements Translations$month$zh_CN {
 }
 
 // Path: restartApp
-class Translations$restartApp$zh_TW implements Translations$restartApp$zh_CN {
-	Translations$restartApp$zh_TW.internal(this._root);
+class _Translations$restartApp$zh_TW extends Translations$restartApp$zh {
+	_Translations$restartApp$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -618,30 +622,30 @@ class Translations$restartApp$zh_TW implements Translations$restartApp$zh_CN {
 }
 
 // Path: ruisi
-class Translations$ruisi$zh_TW implements Translations$ruisi$zh_CN {
-	Translations$ruisi$zh_TW.internal(this._root);
+class _Translations$ruisi$zh_TW extends Translations$ruisi$zh {
+	_Translations$ruisi$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override late final Translations$ruisi$common$zh_TW common = Translations$ruisi$common$zh_TW.internal(_root);
-	@override late final Translations$ruisi$about$zh_TW about = Translations$ruisi$about$zh_TW.internal(_root);
-	@override late final Translations$ruisi$home$zh_TW home = Translations$ruisi$home$zh_TW.internal(_root);
-	@override late final Translations$ruisi$login$zh_TW login = Translations$ruisi$login$zh_TW.internal(_root);
-	@override late final Translations$ruisi$post$zh_TW post = Translations$ruisi$post$zh_TW.internal(_root);
-	@override late final Translations$ruisi$topicDetail$zh_TW topicDetail = Translations$ruisi$topicDetail$zh_TW.internal(_root);
-	@override late final Translations$ruisi$topicListItem$zh_TW topicListItem = Translations$ruisi$topicListItem$zh_TW.internal(_root);
-	@override late final Translations$ruisi$forumList$zh_TW forumList = Translations$ruisi$forumList$zh_TW.internal(_root);
-	@override late final Translations$ruisi$favorites$zh_TW favorites = Translations$ruisi$favorites$zh_TW.internal(_root);
-	@override late final Translations$ruisi$messages$zh_TW messages = Translations$ruisi$messages$zh_TW.internal(_root);
-	@override late final Translations$ruisi$search$zh_TW search = Translations$ruisi$search$zh_TW.internal(_root);
-	@override late final Translations$ruisi$settings$zh_TW settings = Translations$ruisi$settings$zh_TW.internal(_root);
-	@override late final Translations$ruisi$user$zh_TW user = Translations$ruisi$user$zh_TW.internal(_root);
+	@override late final _Translations$ruisi$common$zh_TW common = _Translations$ruisi$common$zh_TW._(_root);
+	@override late final _Translations$ruisi$about$zh_TW about = _Translations$ruisi$about$zh_TW._(_root);
+	@override late final _Translations$ruisi$home$zh_TW home = _Translations$ruisi$home$zh_TW._(_root);
+	@override late final _Translations$ruisi$login$zh_TW login = _Translations$ruisi$login$zh_TW._(_root);
+	@override late final _Translations$ruisi$post$zh_TW post = _Translations$ruisi$post$zh_TW._(_root);
+	@override late final _Translations$ruisi$topicDetail$zh_TW topicDetail = _Translations$ruisi$topicDetail$zh_TW._(_root);
+	@override late final _Translations$ruisi$topicListItem$zh_TW topicListItem = _Translations$ruisi$topicListItem$zh_TW._(_root);
+	@override late final _Translations$ruisi$forumList$zh_TW forumList = _Translations$ruisi$forumList$zh_TW._(_root);
+	@override late final _Translations$ruisi$favorites$zh_TW favorites = _Translations$ruisi$favorites$zh_TW._(_root);
+	@override late final _Translations$ruisi$messages$zh_TW messages = _Translations$ruisi$messages$zh_TW._(_root);
+	@override late final _Translations$ruisi$search$zh_TW search = _Translations$ruisi$search$zh_TW._(_root);
+	@override late final _Translations$ruisi$settings$zh_TW settings = _Translations$ruisi$settings$zh_TW._(_root);
+	@override late final _Translations$ruisi$user$zh_TW user = _Translations$ruisi$user$zh_TW._(_root);
 }
 
 // Path: schoolCardStatus
-class Translations$schoolCardStatus$zh_TW implements Translations$schoolCardStatus$zh_CN {
-	Translations$schoolCardStatus$zh_TW.internal(this._root);
+class _Translations$schoolCardStatus$zh_TW extends Translations$schoolCardStatus$zh {
+	_Translations$schoolCardStatus$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -651,8 +655,8 @@ class Translations$schoolCardStatus$zh_TW implements Translations$schoolCardStat
 }
 
 // Path: schoolCardWindow
-class Translations$schoolCardWindow$zh_TW implements Translations$schoolCardWindow$zh_CN {
-	Translations$schoolCardWindow$zh_TW.internal(this._root);
+class _Translations$schoolCardWindow$zh_TW extends Translations$schoolCardWindow$zh {
+	_Translations$schoolCardWindow$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -671,16 +675,16 @@ class Translations$schoolCardWindow$zh_TW implements Translations$schoolCardWind
 }
 
 // Path: schoolNet
-class Translations$schoolNet$zh_TW implements Translations$schoolNet$zh_CN {
-	Translations$schoolNet$zh_TW.internal(this._root);
+class _Translations$schoolNet$zh_TW extends Translations$schoolNet$zh {
+	_Translations$schoolNet$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => '校園網使用詳情';
-	@override late final Translations$schoolNet$idsAccountNet$zh_TW idsAccountNet = Translations$schoolNet$idsAccountNet$zh_TW.internal(_root);
-	@override late final Translations$schoolNet$currentLoginNet$zh_TW currentLoginNet = Translations$schoolNet$currentLoginNet$zh_TW.internal(_root);
-	@override late final Translations$schoolNet$deviceList$zh_TW deviceList = Translations$schoolNet$deviceList$zh_TW.internal(_root);
+	@override late final _Translations$schoolNet$idsAccountNet$zh_TW idsAccountNet = _Translations$schoolNet$idsAccountNet$zh_TW._(_root);
+	@override late final _Translations$schoolNet$currentLoginNet$zh_TW currentLoginNet = _Translations$schoolNet$currentLoginNet$zh_TW._(_root);
+	@override late final _Translations$schoolNet$deviceList$zh_TW deviceList = _Translations$schoolNet$deviceList$zh_TW._(_root);
 	@override String get fetching => '正在獲取校園網信息';
 	@override String get emptyPassword => '您忘記輸入賬號密碼了';
 	@override String get notInitalized => '疑似查詢後端尚未開放查詢';
@@ -695,8 +699,8 @@ class Translations$schoolNet$zh_TW implements Translations$schoolNet$zh_CN {
 }
 
 // Path: score
-class Translations$score$zh_TW implements Translations$score$zh_CN {
-	Translations$score$zh_TW.internal(this._root);
+class _Translations$score$zh_TW extends Translations$score$zh {
+	_Translations$score$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -714,19 +718,20 @@ class Translations$score$zh_TW implements Translations$score$zh_CN {
 	@override String get allType => '所有類型';
 	@override String chosenType({required Object type}) => '類型 ${type}';
 	@override String get none => '暫無';
-	@override late final Translations$score$scoreChoice$zh_TW scoreChoice = Translations$score$scoreChoice$zh_TW.internal(_root);
-	@override late final Translations$score$scoreComposeCard$zh_TW scoreComposeCard = Translations$score$scoreComposeCard$zh_TW.internal(_root);
-	@override late final Translations$score$scoreInfoCard$zh_TW scoreInfoCard = Translations$score$scoreInfoCard$zh_TW.internal(_root);
-	@override late final Translations$score$scorePage$zh_TW scorePage = Translations$score$scorePage$zh_TW.internal(_root);
+	@override late final _Translations$score$scoreChoice$zh_TW scoreChoice = _Translations$score$scoreChoice$zh_TW._(_root);
+	@override late final _Translations$score$scoreComposeCard$zh_TW scoreComposeCard = _Translations$score$scoreComposeCard$zh_TW._(_root);
+	@override late final _Translations$score$scoreInfoCard$zh_TW scoreInfoCard = _Translations$score$scoreInfoCard$zh_TW._(_root);
+	@override late final _Translations$score$scorePage$zh_TW scorePage = _Translations$score$scorePage$zh_TW._(_root);
 }
 
 // Path: setting
-class Translations$setting$zh_TW implements Translations$setting$zh_CN {
-	Translations$setting$zh_TW.internal(this._root);
+class _Translations$setting$zh_TW extends Translations$setting$zh {
+	_Translations$setting$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
+	@override String get aboutInfo => '程序信息';
 	@override String acknowledgement({required Object developers}) => 'Made With Love From ${developers} People';
 	@override String get about => '關於';
 	@override String get aboutThisProgram => '關於本程序';
@@ -749,7 +754,7 @@ class Translations$setting$zh_TW implements Translations$setting$zh_CN {
 	@override String get lowElectricityWarningDescription => '電量小於閾值時 電量卡片變色提醒';
 	@override String get lowElectricityThreshold => '低電量閾值';
 	@override String lowElectricityThresholdDescription({required Object threshold}) => '當前為 ${threshold} 度';
-	@override late final Translations$setting$lowElectricityThresholdDialog$zh_TW lowElectricityThresholdDialog = Translations$setting$lowElectricityThresholdDialog$zh_TW.internal(_root);
+	@override late final _Translations$setting$lowElectricityThresholdDialog$zh_TW lowElectricityThresholdDialog = _Translations$setting$lowElectricityThresholdDialog$zh_TW._(_root);
 	@override String get accountSetting => '賬號設置';
 	@override String get sportPasswordSetting => '體育系統密碼設置';
 	@override String get experimentPasswordSetting => '物理實驗系統密碼設置';
@@ -772,7 +777,7 @@ class Translations$setting$zh_TW implements Translations$setting$zh_CN {
 	@override String get notificationSetting => '通知設置';
 	@override String get courseReminderSetting => '課前通知設置';
 	@override String get courseReminderDescription => '設置課前提醒通知';
-	@override late final Translations$setting$notificationPage$zh_TW notificationPage = Translations$setting$notificationPage$zh_TW.internal(_root);
+	@override late final _Translations$setting$notificationPage$zh_TW notificationPage = _Translations$setting$notificationPage$zh_TW._(_root);
 	@override String get notificationDebugPage => '通知服務調試頁面';
 	@override String get classtableSetting => '課表相關設置';
 	@override String get background => '開啟課表背景圖';
@@ -793,31 +798,31 @@ class Translations$setting$zh_TW implements Translations$setting$zh_CN {
 	@override String get coreSetting => '緩存登錄設置';
 	@override String get checkLogger => '查看網絡攔截器和日誌';
 	@override String get clearAndRestart => '清除緩存後重啟';
-	@override late final Translations$setting$clearAndRestartDialog$zh_TW clearAndRestartDialog = Translations$setting$clearAndRestartDialog$zh_TW.internal(_root);
+	@override late final _Translations$setting$clearAndRestartDialog$zh_TW clearAndRestartDialog = _Translations$setting$clearAndRestartDialog$zh_TW._(_root);
 	@override String get logout => '退出登錄並重啟應用';
-	@override late final Translations$setting$logoutDialog$zh_TW logoutDialog = Translations$setting$logoutDialog$zh_TW.internal(_root);
-	@override late final Translations$setting$needCloseDialog$zh_TW needCloseDialog = Translations$setting$needCloseDialog$zh_TW.internal(_root);
-	@override late final Translations$setting$changeColorDialog$zh_TW changeColorDialog = Translations$setting$changeColorDialog$zh_TW.internal(_root);
-	@override late final Translations$setting$changeBrightnessDialog$zh_TW changeBrightnessDialog = Translations$setting$changeBrightnessDialog$zh_TW.internal(_root);
-	@override late final Translations$setting$changeSwiftDialog$zh_TW changeSwiftDialog = Translations$setting$changeSwiftDialog$zh_TW.internal(_root);
+	@override late final _Translations$setting$logoutDialog$zh_TW logoutDialog = _Translations$setting$logoutDialog$zh_TW._(_root);
+	@override late final _Translations$setting$needCloseDialog$zh_TW needCloseDialog = _Translations$setting$needCloseDialog$zh_TW._(_root);
+	@override late final _Translations$setting$changeColorDialog$zh_TW changeColorDialog = _Translations$setting$changeColorDialog$zh_TW._(_root);
+	@override late final _Translations$setting$changeBrightnessDialog$zh_TW changeBrightnessDialog = _Translations$setting$changeBrightnessDialog$zh_TW._(_root);
+	@override late final _Translations$setting$changeSwiftDialog$zh_TW changeSwiftDialog = _Translations$setting$changeSwiftDialog$zh_TW._(_root);
 	@override String get changeElectricityTitle => '修改電費帳號';
-	@override late final Translations$setting$changeElectricityAccount$zh_TW changeElectricityAccount = Translations$setting$changeElectricityAccount$zh_TW.internal(_root);
+	@override late final _Translations$setting$changeElectricityAccount$zh_TW changeElectricityAccount = _Translations$setting$changeElectricityAccount$zh_TW._(_root);
 	@override String get changeExperimentTitle => '修改物理實驗賬號密碼';
 	@override String get changeSportTitle => '修改體育系統賬號密碼';
-	@override late final Translations$setting$changePasswordDialog$zh_TW changePasswordDialog = Translations$setting$changePasswordDialog$zh_TW.internal(_root);
+	@override late final _Translations$setting$changePasswordDialog$zh_TW changePasswordDialog = _Translations$setting$changePasswordDialog$zh_TW._(_root);
 	@override String get changeSchoolnetPasswordTitle => '修改校園網查詢帳號密碼';
-	@override late final Translations$setting$updateDialog$zh_TW updateDialog = Translations$setting$updateDialog$zh_TW.internal(_root);
-	@override late final Translations$setting$localizationDialog$zh_TW localizationDialog = Translations$setting$localizationDialog$zh_TW.internal(_root);
+	@override late final _Translations$setting$updateDialog$zh_TW updateDialog = _Translations$setting$updateDialog$zh_TW._(_root);
+	@override late final _Translations$setting$localizationDialog$zh_TW localizationDialog = _Translations$setting$localizationDialog$zh_TW._(_root);
 	@override String get semesterChange => '修改學期';
 	@override String semesterChangeDescription({required Object semester}) => '使用學期 ${semester}';
 	@override String get semesterUpdateData => '應用新學期設置中';
 	@override String get easterEggPage => '你找到了彩蛋';
-	@override late final Translations$setting$aboutPage$zh_TW aboutPage = Translations$setting$aboutPage$zh_TW.internal(_root);
+	@override late final _Translations$setting$aboutPage$zh_TW aboutPage = _Translations$setting$aboutPage$zh_TW._(_root);
 }
 
 // Path: sport
-class Translations$sport$zh_TW implements Translations$sport$zh_CN {
-	Translations$sport$zh_TW.internal(this._root);
+class _Translations$sport$zh_TW extends Translations$sport$zh {
+	_Translations$sport$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -857,8 +862,8 @@ class Translations$sport$zh_TW implements Translations$sport$zh_CN {
 }
 
 // Path: toolbox
-class Translations$toolbox$zh_TW implements Translations$toolbox$zh_CN {
-	Translations$toolbox$zh_TW.internal(this._root);
+class _Translations$toolbox$zh_TW extends Translations$toolbox$zh {
+	_Translations$toolbox$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -883,8 +888,8 @@ class Translations$toolbox$zh_TW implements Translations$toolbox$zh_CN {
 }
 
 // Path: weekday
-class Translations$weekday$zh_TW implements Translations$weekday$zh_CN {
-	Translations$weekday$zh_TW.internal(this._root);
+class _Translations$weekday$zh_TW extends Translations$weekday$zh {
+	_Translations$weekday$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -899,8 +904,8 @@ class Translations$weekday$zh_TW implements Translations$weekday$zh_CN {
 }
 
 // Path: xduPlanet
-class Translations$xduPlanet$zh_TW implements Translations$xduPlanet$zh_CN {
-	Translations$xduPlanet$zh_TW.internal(this._root);
+class _Translations$xduPlanet$zh_TW extends Translations$xduPlanet$zh {
+	_Translations$xduPlanet$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -915,7 +920,7 @@ class Translations$xduPlanet$zh_TW implements Translations$xduPlanet$zh_CN {
 	@override String reply({required Object reply_to, required Object content}) => '回覆評論 #${reply_to}：${content}';
 	@override String get haveBeenAudit => '本評論已經被舉報';
 	@override String get audit => '舉報';
-	@override late final Translations$xduPlanet$confirmAuditDialog$zh_TW confirmAuditDialog = Translations$xduPlanet$confirmAuditDialog$zh_TW.internal(_root);
+	@override late final _Translations$xduPlanet$confirmAuditDialog$zh_TW confirmAuditDialog = _Translations$xduPlanet$confirmAuditDialog$zh_TW._(_root);
 	@override String get comment => '回覆';
 	@override String get send => '發送';
 	@override String get sending => '正在發送評論';
@@ -932,8 +937,8 @@ class Translations$xduPlanet$zh_TW implements Translations$xduPlanet$zh_CN {
 }
 
 // Path: classAttendance.courseState
-class Translations$classAttendance$courseState$zh_TW implements Translations$classAttendance$courseState$zh_CN {
-	Translations$classAttendance$courseState$zh_TW.internal(this._root);
+class _Translations$classAttendance$courseState$zh_TW extends Translations$classAttendance$courseState$zh {
+	_Translations$classAttendance$courseState$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -945,8 +950,8 @@ class Translations$classAttendance$courseState$zh_TW implements Translations$cla
 }
 
 // Path: classAttendance.table
-class Translations$classAttendance$table$zh_TW implements Translations$classAttendance$table$zh_CN {
-	Translations$classAttendance$table$zh_TW.internal(this._root);
+class _Translations$classAttendance$table$zh_TW extends Translations$classAttendance$table$zh {
+	_Translations$classAttendance$table$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -964,8 +969,8 @@ class Translations$classAttendance$table$zh_TW implements Translations$classAtte
 }
 
 // Path: classAttendance.card
-class Translations$classAttendance$card$zh_TW implements Translations$classAttendance$card$zh_CN {
-	Translations$classAttendance$card$zh_TW.internal(this._root);
+class _Translations$classAttendance$card$zh_TW extends Translations$classAttendance$card$zh {
+	_Translations$classAttendance$card$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -982,8 +987,8 @@ class Translations$classAttendance$card$zh_TW implements Translations$classAtten
 }
 
 // Path: classAttendance.detailCard
-class Translations$classAttendance$detailCard$zh_TW implements Translations$classAttendance$detailCard$zh_CN {
-	Translations$classAttendance$detailCard$zh_TW.internal(this._root);
+class _Translations$classAttendance$detailCard$zh_TW extends Translations$classAttendance$detailCard$zh {
+	_Translations$classAttendance$detailCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -994,8 +999,8 @@ class Translations$classAttendance$detailCard$zh_TW implements Translations$clas
 }
 
 // Path: classAttendance.signType
-class Translations$classAttendance$signType$zh_TW implements Translations$classAttendance$signType$zh_CN {
-	Translations$classAttendance$signType$zh_TW.internal(this._root);
+class _Translations$classAttendance$signType$zh_TW extends Translations$classAttendance$signType$zh {
+	_Translations$classAttendance$signType$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1007,8 +1012,8 @@ class Translations$classAttendance$signType$zh_TW implements Translations$classA
 }
 
 // Path: classAttendance.signStatus
-class Translations$classAttendance$signStatus$zh_TW implements Translations$classAttendance$signStatus$zh_CN {
-	Translations$classAttendance$signStatus$zh_TW.internal(this._root);
+class _Translations$classAttendance$signStatus$zh_TW extends Translations$classAttendance$signStatus$zh {
+	_Translations$classAttendance$signStatus$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1027,8 +1032,8 @@ class Translations$classAttendance$signStatus$zh_TW implements Translations$clas
 }
 
 // Path: classtable.partnerClasstable
-class Translations$classtable$partnerClasstable$zh_TW implements Translations$classtable$partnerClasstable$zh_CN {
-	Translations$classtable$partnerClasstable$zh_TW.internal(this._root);
+class _Translations$classtable$partnerClasstable$zh_TW extends Translations$classtable$partnerClasstable$zh {
+	_Translations$classtable$partnerClasstable$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1038,15 +1043,15 @@ class Translations$classtable$partnerClasstable$zh_TW implements Translations$cl
 	@override String get noPermission => '未獲取存儲權限，無法讀取文件';
 	@override String get problem => '好像導入文件有點問題:P';
 	@override String get success => '導入成功';
-	@override late final Translations$classtable$partnerClasstable$shareDialog$zh_TW shareDialog = Translations$classtable$partnerClasstable$shareDialog$zh_TW.internal(_root);
-	@override late final Translations$classtable$partnerClasstable$saveDialog$zh_TW saveDialog = Translations$classtable$partnerClasstable$saveDialog$zh_TW.internal(_root);
-	@override late final Translations$classtable$partnerClasstable$deleteDialog$zh_TW deleteDialog = Translations$classtable$partnerClasstable$deleteDialog$zh_TW.internal(_root);
-	@override late final Translations$classtable$partnerClasstable$nameDialog$zh_TW nameDialog = Translations$classtable$partnerClasstable$nameDialog$zh_TW.internal(_root);
+	@override late final _Translations$classtable$partnerClasstable$shareDialog$zh_TW shareDialog = _Translations$classtable$partnerClasstable$shareDialog$zh_TW._(_root);
+	@override late final _Translations$classtable$partnerClasstable$saveDialog$zh_TW saveDialog = _Translations$classtable$partnerClasstable$saveDialog$zh_TW._(_root);
+	@override late final _Translations$classtable$partnerClasstable$deleteDialog$zh_TW deleteDialog = _Translations$classtable$partnerClasstable$deleteDialog$zh_TW._(_root);
+	@override late final _Translations$classtable$partnerClasstable$nameDialog$zh_TW nameDialog = _Translations$classtable$partnerClasstable$nameDialog$zh_TW._(_root);
 }
 
 // Path: classtable.popupMenu
-class Translations$classtable$popupMenu$zh_TW implements Translations$classtable$popupMenu$zh_CN {
-	Translations$classtable$popupMenu$zh_TW.internal(this._root);
+class _Translations$classtable$popupMenu$zh_TW extends Translations$classtable$popupMenu$zh {
+	_Translations$classtable$popupMenu$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1066,8 +1071,8 @@ class Translations$classtable$popupMenu$zh_TW implements Translations$classtable
 }
 
 // Path: classtable.visualSettings
-class Translations$classtable$visualSettings$zh_TW implements Translations$classtable$visualSettings$zh_CN {
-	Translations$classtable$visualSettings$zh_TW.internal(this._root);
+class _Translations$classtable$visualSettings$zh_TW extends Translations$classtable$visualSettings$zh {
+	_Translations$classtable$visualSettings$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1092,8 +1097,8 @@ class Translations$classtable$visualSettings$zh_TW implements Translations$class
 }
 
 // Path: classtable.statusSource
-class Translations$classtable$statusSource$zh_TW implements Translations$classtable$statusSource$zh_CN {
-	Translations$classtable$statusSource$zh_TW.internal(this._root);
+class _Translations$classtable$statusSource$zh_TW extends Translations$classtable$statusSource$zh {
+	_Translations$classtable$statusSource$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1105,8 +1110,8 @@ class Translations$classtable$statusSource$zh_TW implements Translations$classta
 }
 
 // Path: classtable.statusBanner
-class Translations$classtable$statusBanner$zh_TW implements Translations$classtable$statusBanner$zh_CN {
-	Translations$classtable$statusBanner$zh_TW.internal(this._root);
+class _Translations$classtable$statusBanner$zh_TW extends Translations$classtable$statusBanner$zh {
+	_Translations$classtable$statusBanner$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1117,8 +1122,8 @@ class Translations$classtable$statusBanner$zh_TW implements Translations$classta
 }
 
 // Path: classtable.emptyState
-class Translations$classtable$emptyState$zh_TW implements Translations$classtable$emptyState$zh_CN {
-	Translations$classtable$emptyState$zh_TW.internal(this._root);
+class _Translations$classtable$emptyState$zh_TW extends Translations$classtable$emptyState$zh {
+	_Translations$classtable$emptyState$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1130,8 +1135,8 @@ class Translations$classtable$emptyState$zh_TW implements Translations$classtabl
 }
 
 // Path: classtable.emptyAction
-class Translations$classtable$emptyAction$zh_TW implements Translations$classtable$emptyAction$zh_CN {
-	Translations$classtable$emptyAction$zh_TW.internal(this._root);
+class _Translations$classtable$emptyAction$zh_TW extends Translations$classtable$emptyAction$zh {
+	_Translations$classtable$emptyAction$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1141,8 +1146,8 @@ class Translations$classtable$emptyAction$zh_TW implements Translations$classtab
 }
 
 // Path: classtable.classChangePage
-class Translations$classtable$classChangePage$zh_TW implements Translations$classtable$classChangePage$zh_CN {
-	Translations$classtable$classChangePage$zh_TW.internal(this._root);
+class _Translations$classtable$classChangePage$zh_TW extends Translations$classtable$classChangePage$zh {
+	_Translations$classtable$classChangePage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1165,8 +1170,8 @@ class Translations$classtable$classChangePage$zh_TW implements Translations$clas
 }
 
 // Path: classtable.notArrangedPage
-class Translations$classtable$notArrangedPage$zh_TW implements Translations$classtable$notArrangedPage$zh_CN {
-	Translations$classtable$notArrangedPage$zh_TW.internal(this._root);
+class _Translations$classtable$notArrangedPage$zh_TW extends Translations$classtable$notArrangedPage$zh {
+	_Translations$classtable$notArrangedPage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1177,8 +1182,8 @@ class Translations$classtable$notArrangedPage$zh_TW implements Translations$clas
 }
 
 // Path: classtable.classCard
-class Translations$classtable$classCard$zh_TW implements Translations$classtable$classCard$zh_CN {
-	Translations$classtable$classCard$zh_TW.internal(this._root);
+class _Translations$classtable$classCard$zh_TW extends Translations$classtable$classCard$zh {
+	_Translations$classtable$classCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1189,8 +1194,8 @@ class Translations$classtable$classCard$zh_TW implements Translations$classtable
 }
 
 // Path: classtable.classAdd
-class Translations$classtable$classAdd$zh_TW implements Translations$classtable$classAdd$zh_CN {
-	Translations$classtable$classAdd$zh_TW.internal(this._root);
+class _Translations$classtable$classAdd$zh_TW extends Translations$classtable$classAdd$zh {
+	_Translations$classtable$classAdd$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1212,12 +1217,12 @@ class Translations$classtable$classAdd$zh_TW implements Translations$classtable$
 	@override String get chooseAtLeastOne => '請至少選擇一個上課日期和時間';
 	@override String get repeatWeekly => '按周重複';
 	@override String get freeTime => '自定義日期';
-	@override late final Translations$classtable$classAdd$dateSelectorFree$zh_TW dateSelectorFree = Translations$classtable$classAdd$dateSelectorFree$zh_TW.internal(_root);
+	@override late final _Translations$classtable$classAdd$dateSelectorFree$zh_TW dateSelectorFree = _Translations$classtable$classAdd$dateSelectorFree$zh_TW._(_root);
 }
 
 // Path: classtable.courseDetailCard
-class Translations$classtable$courseDetailCard$zh_TW implements Translations$classtable$courseDetailCard$zh_CN {
-	Translations$classtable$courseDetailCard$zh_TW.internal(this._root);
+class _Translations$classtable$courseDetailCard$zh_TW extends Translations$classtable$courseDetailCard$zh {
+	_Translations$classtable$courseDetailCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1236,8 +1241,8 @@ class Translations$classtable$courseDetailCard$zh_TW implements Translations$cla
 }
 
 // Path: classtable.outputToSystem
-class Translations$classtable$outputToSystem$zh_TW implements Translations$classtable$outputToSystem$zh_CN {
-	Translations$classtable$outputToSystem$zh_TW.internal(this._root);
+class _Translations$classtable$outputToSystem$zh_TW extends Translations$classtable$outputToSystem$zh {
+	_Translations$classtable$outputToSystem$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1249,8 +1254,8 @@ class Translations$classtable$outputToSystem$zh_TW implements Translations$class
 }
 
 // Path: classtable.refreshClasstable
-class Translations$classtable$refreshClasstable$zh_TW implements Translations$classtable$refreshClasstable$zh_CN {
-	Translations$classtable$refreshClasstable$zh_TW.internal(this._root);
+class _Translations$classtable$refreshClasstable$zh_TW extends Translations$classtable$refreshClasstable$zh {
+	_Translations$classtable$refreshClasstable$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1260,8 +1265,8 @@ class Translations$classtable$refreshClasstable$zh_TW implements Translations$cl
 }
 
 // Path: classtable.semesterSwitcher
-class Translations$classtable$semesterSwitcher$zh_TW implements Translations$classtable$semesterSwitcher$zh_CN {
-	Translations$classtable$semesterSwitcher$zh_TW.internal(this._root);
+class _Translations$classtable$semesterSwitcher$zh_TW extends Translations$classtable$semesterSwitcher$zh {
+	_Translations$classtable$semesterSwitcher$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1276,8 +1281,8 @@ class Translations$classtable$semesterSwitcher$zh_TW implements Translations$cla
 }
 
 // Path: clubPromotion.type
-class Translations$clubPromotion$type$zh_TW implements Translations$clubPromotion$type$zh_CN {
-	Translations$clubPromotion$type$zh_TW.internal(this._root);
+class _Translations$clubPromotion$type$zh_TW extends Translations$clubPromotion$type$zh {
+	_Translations$clubPromotion$type$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1294,8 +1299,8 @@ class Translations$clubPromotion$type$zh_TW implements Translations$clubPromotio
 }
 
 // Path: exam.noArrangement
-class Translations$exam$noArrangement$zh_TW implements Translations$exam$noArrangement$zh_CN {
-	Translations$exam$noArrangement$zh_TW.internal(this._root);
+class _Translations$exam$noArrangement$zh_TW extends Translations$exam$noArrangement$zh {
+	_Translations$exam$noArrangement$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1306,8 +1311,8 @@ class Translations$exam$noArrangement$zh_TW implements Translations$exam$noArran
 }
 
 // Path: homepage.inputPartnerData
-class Translations$homepage$inputPartnerData$zh_TW implements Translations$homepage$inputPartnerData$zh_CN {
-	Translations$homepage$inputPartnerData$zh_TW.internal(this._root);
+class _Translations$homepage$inputPartnerData$zh_TW extends Translations$homepage$inputPartnerData$zh {
+	_Translations$homepage$inputPartnerData$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1321,8 +1326,8 @@ class Translations$homepage$inputPartnerData$zh_TW implements Translations$homep
 }
 
 // Path: homepage.noticeCard
-class Translations$homepage$noticeCard$zh_TW implements Translations$homepage$noticeCard$zh_CN {
-	Translations$homepage$noticeCard$zh_TW.internal(this._root);
+class _Translations$homepage$noticeCard$zh_TW extends Translations$homepage$noticeCard$zh {
+	_Translations$homepage$noticeCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1335,8 +1340,8 @@ class Translations$homepage$noticeCard$zh_TW implements Translations$homepage$no
 }
 
 // Path: homepage.classTableCard
-class Translations$homepage$classTableCard$zh_TW implements Translations$homepage$classTableCard$zh_CN {
-	Translations$homepage$classTableCard$zh_TW.internal(this._root);
+class _Translations$homepage$classTableCard$zh_TW extends Translations$homepage$classTableCard$zh {
+	_Translations$homepage$classTableCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1372,8 +1377,8 @@ class Translations$homepage$classTableCard$zh_TW implements Translations$homepag
 }
 
 // Path: homepage.electricityCard
-class Translations$homepage$electricityCard$zh_TW implements Translations$homepage$electricityCard$zh_CN {
-	Translations$homepage$electricityCard$zh_TW.internal(this._root);
+class _Translations$homepage$electricityCard$zh_TW extends Translations$homepage$electricityCard$zh {
+	_Translations$homepage$electricityCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1384,8 +1389,8 @@ class Translations$homepage$electricityCard$zh_TW implements Translations$homepa
 }
 
 // Path: homepage.libraryCard
-class Translations$homepage$libraryCard$zh_TW implements Translations$homepage$libraryCard$zh_CN {
-	Translations$homepage$libraryCard$zh_TW.internal(this._root);
+class _Translations$homepage$libraryCard$zh_TW extends Translations$homepage$libraryCard$zh {
+	_Translations$homepage$libraryCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1401,8 +1406,8 @@ class Translations$homepage$libraryCard$zh_TW implements Translations$homepage$l
 }
 
 // Path: homepage.schoolCardInfoCard
-class Translations$homepage$schoolCardInfoCard$zh_TW implements Translations$homepage$schoolCardInfoCard$zh_CN {
-	Translations$homepage$schoolCardInfoCard$zh_TW.internal(this._root);
+class _Translations$homepage$schoolCardInfoCard$zh_TW extends Translations$homepage$schoolCardInfoCard$zh {
+	_Translations$homepage$schoolCardInfoCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1419,8 +1424,8 @@ class Translations$homepage$schoolCardInfoCard$zh_TW implements Translations$hom
 }
 
 // Path: homepage.toolbox
-class Translations$homepage$toolbox$zh_TW implements Translations$homepage$toolbox$zh_CN {
-	Translations$homepage$toolbox$zh_TW.internal(this._root);
+class _Translations$homepage$toolbox$zh_TW extends Translations$homepage$toolbox$zh {
+	_Translations$homepage$toolbox$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1441,8 +1446,8 @@ class Translations$homepage$toolbox$zh_TW implements Translations$homepage$toolb
 }
 
 // Path: homepage.schoolNet
-class Translations$homepage$schoolNet$zh_TW implements Translations$homepage$schoolNet$zh_CN {
-	Translations$homepage$schoolNet$zh_TW.internal(this._root);
+class _Translations$homepage$schoolNet$zh_TW extends Translations$homepage$schoolNet$zh {
+	_Translations$homepage$schoolNet$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1455,8 +1460,8 @@ class Translations$homepage$schoolNet$zh_TW implements Translations$homepage$sch
 }
 
 // Path: homepage.clubPromotion
-class Translations$homepage$clubPromotion$zh_TW implements Translations$homepage$clubPromotion$zh_CN {
-	Translations$homepage$clubPromotion$zh_TW.internal(this._root);
+class _Translations$homepage$clubPromotion$zh_TW extends Translations$homepage$clubPromotion$zh {
+	_Translations$homepage$clubPromotion$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1466,8 +1471,8 @@ class Translations$homepage$clubPromotion$zh_TW implements Translations$homepage
 }
 
 // Path: login.captchaWindow
-class Translations$login$captchaWindow$zh_TW implements Translations$login$captchaWindow$zh_CN {
-	Translations$login$captchaWindow$zh_TW.internal(this._root);
+class _Translations$login$captchaWindow$zh_TW extends Translations$login$captchaWindow$zh {
+	_Translations$login$captchaWindow$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1478,9 +1483,29 @@ class Translations$login$captchaWindow$zh_TW implements Translations$login$captc
 	@override String refreshFailed({required Object error}) => '刷新驗證碼失敗: ${error}';
 }
 
+// Path: login.secondFactor
+class _Translations$login$secondFactor$zh_TW extends Translations$login$secondFactor$zh {
+	_Translations$login$secondFactor$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '短信二次認證';
+	@override String get description => '學校要求完成二次認證。請先獲取短信驗證碼，再輸入驗證碼繼續登錄。';
+	@override String get code => '短信驗證碼';
+	@override String get emptyCode => '請輸入短信驗證碼';
+	@override String get sendCode => '獲取驗證碼';
+	@override String resendCountdown({required Object seconds}) => '${seconds} 秒後可重新獲取';
+	@override String get trustDevice => '信任此設備';
+	@override String get trustDeviceHint => '開啟後學校可能在一段時間內不再要求本設備二次認證';
+	@override String get networkError => '二次認證請求失敗，請檢查網絡後重試';
+	@override String get cancelled => '已取消短信二次認證';
+	@override String get expired => '二次認證已失效，請重新登錄';
+}
+
 // Path: ruisi.common
-class Translations$ruisi$common$zh_TW implements Translations$ruisi$common$zh_CN {
-	Translations$ruisi$common$zh_TW.internal(this._root);
+class _Translations$ruisi$common$zh_TW extends Translations$ruisi$common$zh {
+	_Translations$ruisi$common$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1501,8 +1526,8 @@ class Translations$ruisi$common$zh_TW implements Translations$ruisi$common$zh_CN
 }
 
 // Path: ruisi.about
-class Translations$ruisi$about$zh_TW implements Translations$ruisi$about$zh_CN {
-	Translations$ruisi$about$zh_TW.internal(this._root);
+class _Translations$ruisi$about$zh_TW extends Translations$ruisi$about$zh {
+	_Translations$ruisi$about$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1521,8 +1546,8 @@ class Translations$ruisi$about$zh_TW implements Translations$ruisi$about$zh_CN {
 }
 
 // Path: ruisi.home
-class Translations$ruisi$home$zh_TW implements Translations$ruisi$home$zh_CN {
-	Translations$ruisi$home$zh_TW.internal(this._root);
+class _Translations$ruisi$home$zh_TW extends Translations$ruisi$home$zh {
+	_Translations$ruisi$home$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1551,8 +1576,8 @@ class Translations$ruisi$home$zh_TW implements Translations$ruisi$home$zh_CN {
 }
 
 // Path: ruisi.login
-class Translations$ruisi$login$zh_TW implements Translations$ruisi$login$zh_CN {
-	Translations$ruisi$login$zh_TW.internal(this._root);
+class _Translations$ruisi$login$zh_TW extends Translations$ruisi$login$zh {
+	_Translations$ruisi$login$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1573,8 +1598,8 @@ class Translations$ruisi$login$zh_TW implements Translations$ruisi$login$zh_CN {
 }
 
 // Path: ruisi.post
-class Translations$ruisi$post$zh_TW implements Translations$ruisi$post$zh_CN {
-	Translations$ruisi$post$zh_TW.internal(this._root);
+class _Translations$ruisi$post$zh_TW extends Translations$ruisi$post$zh {
+	_Translations$ruisi$post$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1593,8 +1618,8 @@ class Translations$ruisi$post$zh_TW implements Translations$ruisi$post$zh_CN {
 }
 
 // Path: ruisi.topicDetail
-class Translations$ruisi$topicDetail$zh_TW implements Translations$ruisi$topicDetail$zh_CN {
-	Translations$ruisi$topicDetail$zh_TW.internal(this._root);
+class _Translations$ruisi$topicDetail$zh_TW extends Translations$ruisi$topicDetail$zh {
+	_Translations$ruisi$topicDetail$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1607,12 +1632,12 @@ class Translations$ruisi$topicDetail$zh_TW implements Translations$ruisi$topicDe
 	@override String get favoriteFailure => '收藏失敗';
 	@override String get noData => '無數據';
 	@override String get replyHint => '寫回復...';
-	@override late final Translations$ruisi$topicDetail$vote$zh_TW vote = Translations$ruisi$topicDetail$vote$zh_TW.internal(_root);
+	@override late final _Translations$ruisi$topicDetail$vote$zh_TW vote = _Translations$ruisi$topicDetail$vote$zh_TW._(_root);
 }
 
 // Path: ruisi.topicListItem
-class Translations$ruisi$topicListItem$zh_TW implements Translations$ruisi$topicListItem$zh_CN {
-	Translations$ruisi$topicListItem$zh_TW.internal(this._root);
+class _Translations$ruisi$topicListItem$zh_TW extends Translations$ruisi$topicListItem$zh {
+	_Translations$ruisi$topicListItem$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1621,8 +1646,8 @@ class Translations$ruisi$topicListItem$zh_TW implements Translations$ruisi$topic
 }
 
 // Path: ruisi.forumList
-class Translations$ruisi$forumList$zh_TW implements Translations$ruisi$forumList$zh_CN {
-	Translations$ruisi$forumList$zh_TW.internal(this._root);
+class _Translations$ruisi$forumList$zh_TW extends Translations$ruisi$forumList$zh {
+	_Translations$ruisi$forumList$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1632,8 +1657,8 @@ class Translations$ruisi$forumList$zh_TW implements Translations$ruisi$forumList
 }
 
 // Path: ruisi.favorites
-class Translations$ruisi$favorites$zh_TW implements Translations$ruisi$favorites$zh_CN {
-	Translations$ruisi$favorites$zh_TW.internal(this._root);
+class _Translations$ruisi$favorites$zh_TW extends Translations$ruisi$favorites$zh {
+	_Translations$ruisi$favorites$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1643,8 +1668,8 @@ class Translations$ruisi$favorites$zh_TW implements Translations$ruisi$favorites
 }
 
 // Path: ruisi.messages
-class Translations$ruisi$messages$zh_TW implements Translations$ruisi$messages$zh_CN {
-	Translations$ruisi$messages$zh_TW.internal(this._root);
+class _Translations$ruisi$messages$zh_TW extends Translations$ruisi$messages$zh {
+	_Translations$ruisi$messages$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1656,8 +1681,8 @@ class Translations$ruisi$messages$zh_TW implements Translations$ruisi$messages$z
 }
 
 // Path: ruisi.search
-class Translations$ruisi$search$zh_TW implements Translations$ruisi$search$zh_CN {
-	Translations$ruisi$search$zh_TW.internal(this._root);
+class _Translations$ruisi$search$zh_TW extends Translations$ruisi$search$zh {
+	_Translations$ruisi$search$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1668,8 +1693,8 @@ class Translations$ruisi$search$zh_TW implements Translations$ruisi$search$zh_CN
 }
 
 // Path: ruisi.settings
-class Translations$ruisi$settings$zh_TW implements Translations$ruisi$settings$zh_CN {
-	Translations$ruisi$settings$zh_TW.internal(this._root);
+class _Translations$ruisi$settings$zh_TW extends Translations$ruisi$settings$zh {
+	_Translations$ruisi$settings$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1689,8 +1714,8 @@ class Translations$ruisi$settings$zh_TW implements Translations$ruisi$settings$z
 }
 
 // Path: ruisi.user
-class Translations$ruisi$user$zh_TW implements Translations$ruisi$user$zh_CN {
-	Translations$ruisi$user$zh_TW.internal(this._root);
+class _Translations$ruisi$user$zh_TW extends Translations$ruisi$user$zh {
+	_Translations$ruisi$user$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1701,8 +1726,8 @@ class Translations$ruisi$user$zh_TW implements Translations$ruisi$user$zh_CN {
 }
 
 // Path: schoolNet.idsAccountNet
-class Translations$schoolNet$idsAccountNet$zh_TW implements Translations$schoolNet$idsAccountNet$zh_CN {
-	Translations$schoolNet$idsAccountNet$zh_TW.internal(this._root);
+class _Translations$schoolNet$idsAccountNet$zh_TW extends Translations$schoolNet$idsAccountNet$zh {
+	_Translations$schoolNet$idsAccountNet$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1718,8 +1743,8 @@ class Translations$schoolNet$idsAccountNet$zh_TW implements Translations$schoolN
 }
 
 // Path: schoolNet.currentLoginNet
-class Translations$schoolNet$currentLoginNet$zh_TW implements Translations$schoolNet$currentLoginNet$zh_CN {
-	Translations$schoolNet$currentLoginNet$zh_TW.internal(this._root);
+class _Translations$schoolNet$currentLoginNet$zh_TW extends Translations$schoolNet$currentLoginNet$zh {
+	_Translations$schoolNet$currentLoginNet$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1739,8 +1764,8 @@ class Translations$schoolNet$currentLoginNet$zh_TW implements Translations$schoo
 }
 
 // Path: schoolNet.deviceList
-class Translations$schoolNet$deviceList$zh_TW implements Translations$schoolNet$deviceList$zh_CN {
-	Translations$schoolNet$deviceList$zh_TW.internal(this._root);
+class _Translations$schoolNet$deviceList$zh_TW extends Translations$schoolNet$deviceList$zh {
+	_Translations$schoolNet$deviceList$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1751,8 +1776,8 @@ class Translations$schoolNet$deviceList$zh_TW implements Translations$schoolNet$
 }
 
 // Path: score.scoreChoice
-class Translations$score$scoreChoice$zh_TW implements Translations$score$scoreChoice$zh_CN {
-	Translations$score$scoreChoice$zh_TW.internal(this._root);
+class _Translations$score$scoreChoice$zh_TW extends Translations$score$scoreChoice$zh {
+	_Translations$score$scoreChoice$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1765,8 +1790,8 @@ class Translations$score$scoreChoice$zh_TW implements Translations$score$scoreCh
 }
 
 // Path: score.scoreComposeCard
-class Translations$score$scoreComposeCard$zh_TW implements Translations$score$scoreComposeCard$zh_CN {
-	Translations$score$scoreComposeCard$zh_TW.internal(this._root);
+class _Translations$score$scoreComposeCard$zh_TW extends Translations$score$scoreComposeCard$zh {
+	_Translations$score$scoreComposeCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1779,8 +1804,8 @@ class Translations$score$scoreComposeCard$zh_TW implements Translations$score$sc
 }
 
 // Path: score.scoreInfoCard
-class Translations$score$scoreInfoCard$zh_TW implements Translations$score$scoreInfoCard$zh_CN {
-	Translations$score$scoreInfoCard$zh_TW.internal(this._root);
+class _Translations$score$scoreInfoCard$zh_TW extends Translations$score$scoreInfoCard$zh {
+	_Translations$score$scoreInfoCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1794,8 +1819,8 @@ class Translations$score$scoreInfoCard$zh_TW implements Translations$score$score
 }
 
 // Path: score.scorePage
-class Translations$score$scorePage$zh_TW implements Translations$score$scorePage$zh_CN {
-	Translations$score$scorePage$zh_TW.internal(this._root);
+class _Translations$score$scorePage$zh_TW extends Translations$score$scorePage$zh {
+	_Translations$score$scorePage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1812,8 +1837,8 @@ class Translations$score$scorePage$zh_TW implements Translations$score$scorePage
 }
 
 // Path: setting.lowElectricityThresholdDialog
-class Translations$setting$lowElectricityThresholdDialog$zh_TW implements Translations$setting$lowElectricityThresholdDialog$zh_CN {
-	Translations$setting$lowElectricityThresholdDialog$zh_TW.internal(this._root);
+class _Translations$setting$lowElectricityThresholdDialog$zh_TW extends Translations$setting$lowElectricityThresholdDialog$zh {
+	_Translations$setting$lowElectricityThresholdDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1823,8 +1848,8 @@ class Translations$setting$lowElectricityThresholdDialog$zh_TW implements Transl
 }
 
 // Path: setting.notificationPage
-class Translations$setting$notificationPage$zh_TW implements Translations$setting$notificationPage$zh_CN {
-	Translations$setting$notificationPage$zh_TW.internal(this._root);
+class _Translations$setting$notificationPage$zh_TW extends Translations$setting$notificationPage$zh {
+	_Translations$setting$notificationPage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1875,8 +1900,8 @@ class Translations$setting$notificationPage$zh_TW implements Translations$settin
 }
 
 // Path: setting.clearAndRestartDialog
-class Translations$setting$clearAndRestartDialog$zh_TW implements Translations$setting$clearAndRestartDialog$zh_CN {
-	Translations$setting$clearAndRestartDialog$zh_TW.internal(this._root);
+class _Translations$setting$clearAndRestartDialog$zh_TW extends Translations$setting$clearAndRestartDialog$zh {
+	_Translations$setting$clearAndRestartDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1888,8 +1913,8 @@ class Translations$setting$clearAndRestartDialog$zh_TW implements Translations$s
 }
 
 // Path: setting.logoutDialog
-class Translations$setting$logoutDialog$zh_TW implements Translations$setting$logoutDialog$zh_CN {
-	Translations$setting$logoutDialog$zh_TW.internal(this._root);
+class _Translations$setting$logoutDialog$zh_TW extends Translations$setting$logoutDialog$zh {
+	_Translations$setting$logoutDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1900,8 +1925,8 @@ class Translations$setting$logoutDialog$zh_TW implements Translations$setting$lo
 }
 
 // Path: setting.needCloseDialog
-class Translations$setting$needCloseDialog$zh_TW implements Translations$setting$needCloseDialog$zh_CN {
-	Translations$setting$needCloseDialog$zh_TW.internal(this._root);
+class _Translations$setting$needCloseDialog$zh_TW extends Translations$setting$needCloseDialog$zh {
+	_Translations$setting$needCloseDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1911,8 +1936,8 @@ class Translations$setting$needCloseDialog$zh_TW implements Translations$setting
 }
 
 // Path: setting.changeColorDialog
-class Translations$setting$changeColorDialog$zh_TW implements Translations$setting$changeColorDialog$zh_CN {
-	Translations$setting$changeColorDialog$zh_TW.internal(this._root);
+class _Translations$setting$changeColorDialog$zh_TW extends Translations$setting$changeColorDialog$zh {
+	_Translations$setting$changeColorDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1927,8 +1952,8 @@ class Translations$setting$changeColorDialog$zh_TW implements Translations$setti
 }
 
 // Path: setting.changeBrightnessDialog
-class Translations$setting$changeBrightnessDialog$zh_TW implements Translations$setting$changeBrightnessDialog$zh_CN {
-	Translations$setting$changeBrightnessDialog$zh_TW.internal(this._root);
+class _Translations$setting$changeBrightnessDialog$zh_TW extends Translations$setting$changeBrightnessDialog$zh {
+	_Translations$setting$changeBrightnessDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1940,8 +1965,8 @@ class Translations$setting$changeBrightnessDialog$zh_TW implements Translations$
 }
 
 // Path: setting.changeSwiftDialog
-class Translations$setting$changeSwiftDialog$zh_TW implements Translations$setting$changeSwiftDialog$zh_CN {
-	Translations$setting$changeSwiftDialog$zh_TW.internal(this._root);
+class _Translations$setting$changeSwiftDialog$zh_TW extends Translations$setting$changeSwiftDialog$zh {
+	_Translations$setting$changeSwiftDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -1951,8 +1976,8 @@ class Translations$setting$changeSwiftDialog$zh_TW implements Translations$setti
 }
 
 // Path: setting.changeElectricityAccount
-class Translations$setting$changeElectricityAccount$zh_TW implements Translations$setting$changeElectricityAccount$zh_CN {
-	Translations$setting$changeElectricityAccount$zh_TW.internal(this._root);
+class _Translations$setting$changeElectricityAccount$zh_TW extends Translations$setting$changeElectricityAccount$zh {
+	_Translations$setting$changeElectricityAccount$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2011,8 +2036,8 @@ class Translations$setting$changeElectricityAccount$zh_TW implements Translation
 }
 
 // Path: setting.changePasswordDialog
-class Translations$setting$changePasswordDialog$zh_TW implements Translations$setting$changePasswordDialog$zh_CN {
-	Translations$setting$changePasswordDialog$zh_TW.internal(this._root);
+class _Translations$setting$changePasswordDialog$zh_TW extends Translations$setting$changePasswordDialog$zh {
+	_Translations$setting$changePasswordDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2022,8 +2047,8 @@ class Translations$setting$changePasswordDialog$zh_TW implements Translations$se
 }
 
 // Path: setting.updateDialog
-class Translations$setting$updateDialog$zh_TW implements Translations$setting$updateDialog$zh_CN {
-	Translations$setting$updateDialog$zh_TW.internal(this._root);
+class _Translations$setting$updateDialog$zh_TW extends Translations$setting$updateDialog$zh {
+	_Translations$setting$updateDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2037,8 +2062,8 @@ class Translations$setting$updateDialog$zh_TW implements Translations$setting$up
 }
 
 // Path: setting.localizationDialog
-class Translations$setting$localizationDialog$zh_TW implements Translations$setting$localizationDialog$zh_CN {
-	Translations$setting$localizationDialog$zh_TW.internal(this._root);
+class _Translations$setting$localizationDialog$zh_TW extends Translations$setting$localizationDialog$zh {
+	_Translations$setting$localizationDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2051,8 +2076,8 @@ class Translations$setting$localizationDialog$zh_TW implements Translations$sett
 }
 
 // Path: setting.aboutPage
-class Translations$setting$aboutPage$zh_TW implements Translations$setting$aboutPage$zh_CN {
-	Translations$setting$aboutPage$zh_TW.internal(this._root);
+class _Translations$setting$aboutPage$zh_TW extends Translations$setting$aboutPage$zh {
+	_Translations$setting$aboutPage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2102,15 +2127,16 @@ class Translations$setting$aboutPage$zh_TW implements Translations$setting$about
 	@override String get homepage => '主頁';
 	@override String get code => '開源代碼';
 	@override String get knowMore => '知道更多';
-	@override String get copyrightNotice => '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla Public License, v. 2.0 授權。\n本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。\n\nCopyright 2023-2025 BenderBlog Rodriguez and contributors.\nCopyright 2025-present Traintime PDA authors.\n\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.';
+	@override String get copyrightNotice => '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla Public License, v. 2.0 授權。\n本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。\n本程序代碼版權受中國國家版權局保護，登記號2026SR0738647。\nCopyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present Traintime PDA authors.\nThe Copyright of the Software is protected by NCAC, register code is 2026SR0738647\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.';
 	@override String get beian => '備案號';
+	@override String get copyrightRegisterCode => '著作權登記號';
 	@override String get signAndroid => '安卓簽名';
 	@override String get title => '關於本軟件';
 }
 
 // Path: xduPlanet.confirmAuditDialog
-class Translations$xduPlanet$confirmAuditDialog$zh_TW implements Translations$xduPlanet$confirmAuditDialog$zh_CN {
-	Translations$xduPlanet$confirmAuditDialog$zh_TW.internal(this._root);
+class _Translations$xduPlanet$confirmAuditDialog$zh_TW extends Translations$xduPlanet$confirmAuditDialog$zh {
+	_Translations$xduPlanet$confirmAuditDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2124,8 +2150,8 @@ class Translations$xduPlanet$confirmAuditDialog$zh_TW implements Translations$xd
 }
 
 // Path: classtable.partnerClasstable.shareDialog
-class Translations$classtable$partnerClasstable$shareDialog$zh_TW implements Translations$classtable$partnerClasstable$shareDialog$zh_CN {
-	Translations$classtable$partnerClasstable$shareDialog$zh_TW.internal(this._root);
+class _Translations$classtable$partnerClasstable$shareDialog$zh_TW extends Translations$classtable$partnerClasstable$shareDialog$zh {
+	_Translations$classtable$partnerClasstable$shareDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2135,8 +2161,8 @@ class Translations$classtable$partnerClasstable$shareDialog$zh_TW implements Tra
 }
 
 // Path: classtable.partnerClasstable.saveDialog
-class Translations$classtable$partnerClasstable$saveDialog$zh_TW implements Translations$classtable$partnerClasstable$saveDialog$zh_CN {
-	Translations$classtable$partnerClasstable$saveDialog$zh_TW.internal(this._root);
+class _Translations$classtable$partnerClasstable$saveDialog$zh_TW extends Translations$classtable$partnerClasstable$saveDialog$zh {
+	_Translations$classtable$partnerClasstable$saveDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2147,8 +2173,8 @@ class Translations$classtable$partnerClasstable$saveDialog$zh_TW implements Tran
 }
 
 // Path: classtable.partnerClasstable.deleteDialog
-class Translations$classtable$partnerClasstable$deleteDialog$zh_TW implements Translations$classtable$partnerClasstable$deleteDialog$zh_CN {
-	Translations$classtable$partnerClasstable$deleteDialog$zh_TW.internal(this._root);
+class _Translations$classtable$partnerClasstable$deleteDialog$zh_TW extends Translations$classtable$partnerClasstable$deleteDialog$zh {
+	_Translations$classtable$partnerClasstable$deleteDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2159,8 +2185,8 @@ class Translations$classtable$partnerClasstable$deleteDialog$zh_TW implements Tr
 }
 
 // Path: classtable.partnerClasstable.nameDialog
-class Translations$classtable$partnerClasstable$nameDialog$zh_TW implements Translations$classtable$partnerClasstable$nameDialog$zh_CN {
-	Translations$classtable$partnerClasstable$nameDialog$zh_TW.internal(this._root);
+class _Translations$classtable$partnerClasstable$nameDialog$zh_TW extends Translations$classtable$partnerClasstable$nameDialog$zh {
+	_Translations$classtable$partnerClasstable$nameDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2173,8 +2199,8 @@ class Translations$classtable$partnerClasstable$nameDialog$zh_TW implements Tran
 }
 
 // Path: classtable.classAdd.dateSelectorFree
-class Translations$classtable$classAdd$dateSelectorFree$zh_TW implements Translations$classtable$classAdd$dateSelectorFree$zh_CN {
-	Translations$classtable$classAdd$dateSelectorFree$zh_TW.internal(this._root);
+class _Translations$classtable$classAdd$dateSelectorFree$zh_TW extends Translations$classtable$classAdd$dateSelectorFree$zh {
+	_Translations$classtable$classAdd$dateSelectorFree$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2188,8 +2214,8 @@ class Translations$classtable$classAdd$dateSelectorFree$zh_TW implements Transla
 }
 
 // Path: ruisi.topicDetail.vote
-class Translations$ruisi$topicDetail$vote$zh_TW implements Translations$ruisi$topicDetail$vote$zh_CN {
-	Translations$ruisi$topicDetail$vote$zh_TW.internal(this._root);
+class _Translations$ruisi$topicDetail$vote$zh_TW extends Translations$ruisi$topicDetail$vote$zh {
+	_Translations$ruisi$topicDetail$vote$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
 
 	final TranslationsZhTw _root; // ignore: unused_field
 
@@ -2797,10 +2823,22 @@ extension on TranslationsZhTw {
 			'login.captchaWindow.messageOnEmpty' => '請輸入驗證碼',
 			'login.captchaWindow.refreshFailed' => ({required Object error}) => '刷新驗證碼失敗: ${error}',
 			'login.sliderTitle' => '服務器認證服務',
+			'login.secondFactor.title' => '短信二次認證',
+			'login.secondFactor.description' => '學校要求完成二次認證。請先獲取短信驗證碼，再輸入驗證碼繼續登錄。',
+			'login.secondFactor.code' => '短信驗證碼',
+			'login.secondFactor.emptyCode' => '請輸入短信驗證碼',
+			'login.secondFactor.sendCode' => '獲取驗證碼',
+			'login.secondFactor.resendCountdown' => ({required Object seconds}) => '${seconds} 秒後可重新獲取',
+			'login.secondFactor.trustDevice' => '信任此設備',
+			'login.secondFactor.trustDeviceHint' => '開啟後學校可能在一段時間內不再要求本設備二次認證',
+			'login.secondFactor.networkError' => '二次認證請求失敗，請檢查網絡後重試',
+			'login.secondFactor.cancelled' => '已取消短信二次認證',
+			'login.secondFactor.expired' => '二次認證已失效，請重新登錄',
 			'loginProcess.readyPage' => '準備獲取登錄網頁',
 			'loginProcess.getEncrypt' => '獲取密碼加密密鑰',
 			'loginProcess.readyLogin' => '準備登錄',
 			'loginProcess.slider' => '登錄中',
+			'loginProcess.secondFactor' => '等待短信二次認證',
 			'loginProcess.afterProcess' => '登錄後處理',
 			'loginProcess.failed' => ({required Object status_code}) => '登錄失敗，響應狀態碼：${status_code}',
 			'month.january' => '一月',
@@ -3023,6 +3061,7 @@ extension on TranslationsZhTw {
 			'score.scorePage.summary' => '總結',
 			'score.scorePage.cet4' => '國家英語四級',
 			'score.scorePage.cet6' => '國家英語六級',
+			'setting.aboutInfo' => '程序信息',
 			'setting.acknowledgement' => ({required Object developers}) => 'Made With Love From ${developers} People',
 			'setting.about' => '關於',
 			'setting.aboutThisProgram' => '關於本程序',
@@ -3231,6 +3270,8 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.alnair' => '開發：圖書館搜索和封面',
 			'setting.aboutPage.aqqkad' => '開發：考勤歷史記錄',
 			'setting.aboutPage.bellssgit' => '支持：最佳&最久故障反饋者',
+			_ => null,
+		} ?? switch (path) {
 			'setting.aboutPage.brackrat' => '設計：主頁，登錄頁，配色，iOS 小部件等',
 			'setting.aboutPage.breezeline' => '支持：無價值無意義的產品經理(他自己的描述)',
 			'setting.aboutPage.cafebabe' => '支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配',
@@ -3244,8 +3285,6 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.hancl777' => '國際化：繁體中文轉換代碼',
 			'setting.aboutPage.hazukiKeatsu' => '開發：物理實驗成績查詢和識別',
 			'setting.aboutPage.hawa130' => '設計：課程詳情卡片',
-			_ => null,
-		} ?? switch (path) {
 			'setting.aboutPage.hhzm' => '開發：電費查詢賬號計算',
 			'setting.aboutPage.imaginary17' => '開發：睿思論壇路由修復',
 			'setting.aboutPage.imoscarz' => '開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI',
@@ -3274,8 +3313,9 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.homepage' => '主頁',
 			'setting.aboutPage.code' => '開源代碼',
 			'setting.aboutPage.knowMore' => '知道更多',
-			'setting.aboutPage.copyrightNotice' => '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla Public License, v. 2.0 授權。\n本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。\n\nCopyright 2023-2025 BenderBlog Rodriguez and contributors.\nCopyright 2025-present Traintime PDA authors.\n\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.',
+			'setting.aboutPage.copyrightNotice' => '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla Public License, v. 2.0 授權。\n本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。\n本程序代碼版權受中國國家版權局保護，登記號2026SR0738647。\nCopyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present Traintime PDA authors.\nThe Copyright of the Software is protected by NCAC, register code is 2026SR0738647\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.',
 			'setting.aboutPage.beian' => '備案號',
+			'setting.aboutPage.copyrightRegisterCode' => '著作權登記號',
 			'setting.aboutPage.signAndroid' => '安卓簽名',
 			'setting.aboutPage.title' => '關於本軟件',
 			'sport.title' => '體育查詢',

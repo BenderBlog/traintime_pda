@@ -11,7 +11,7 @@ import 'package:slang/generated.dart';
 import 'translations.g.dart';
 
 // Path: <root>
-class TranslationsEn with BaseTranslations<AppLocale, Translations> implements Translations {
+class TranslationsEn extends Translations with BaseTranslations<AppLocale, Translations> {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsEn({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
@@ -21,7 +21,9 @@ class TranslationsEn with BaseTranslations<AppLocale, Translations> implements T
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ) {
+		  ),
+		  super(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
+		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
 		$meta.setFlatMapFunction(_flatMapFunction);
 	}
 
@@ -29,7 +31,7 @@ class TranslationsEn with BaseTranslations<AppLocale, Translations> implements T
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
+	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
 
 	late final TranslationsEn _root = this; // ignore: unused_field
 
@@ -70,8 +72,8 @@ class TranslationsEn with BaseTranslations<AppLocale, Translations> implements T
 }
 
 // Path: classAttendance
-class _Translations$classAttendance$en implements Translations$classAttendance$zh_CN {
-	_Translations$classAttendance$en._(this._root);
+class _Translations$classAttendance$en extends Translations$classAttendance$zh {
+	_Translations$classAttendance$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -90,8 +92,8 @@ class _Translations$classAttendance$en implements Translations$classAttendance$z
 }
 
 // Path: classtable
-class _Translations$classtable$en implements Translations$classtable$zh_CN {
-	_Translations$classtable$en._(this._root);
+class _Translations$classtable$en extends Translations$classtable$zh {
+	_Translations$classtable$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -128,8 +130,8 @@ class _Translations$classtable$en implements Translations$classtable$zh_CN {
 }
 
 // Path: clubPromotion
-class _Translations$clubPromotion$en implements Translations$clubPromotion$zh_CN {
-	_Translations$clubPromotion$en._(this._root);
+class _Translations$clubPromotion$en extends Translations$clubPromotion$zh {
+	_Translations$clubPromotion$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -147,8 +149,8 @@ class _Translations$clubPromotion$en implements Translations$clubPromotion$zh_CN
 }
 
 // Path: common
-class _Translations$common$en implements Translations$common$zh_CN {
-	_Translations$common$en._(this._root);
+class _Translations$common$en extends Translations$common$zh {
+	_Translations$common$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -183,8 +185,8 @@ class _Translations$common$en implements Translations$common$zh_CN {
 }
 
 // Path: courseReminder
-class _Translations$courseReminder$en implements Translations$courseReminder$zh_CN {
-	_Translations$courseReminder$en._(this._root);
+class _Translations$courseReminder$en extends Translations$courseReminder$zh {
+	_Translations$courseReminder$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -196,8 +198,8 @@ class _Translations$courseReminder$en implements Translations$courseReminder$zh_
 }
 
 // Path: dormWater
-class _Translations$dormWater$en implements Translations$dormWater$zh_CN {
-	_Translations$dormWater$en._(this._root);
+class _Translations$dormWater$en extends Translations$dormWater$zh {
+	_Translations$dormWater$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -244,8 +246,8 @@ class _Translations$dormWater$en implements Translations$dormWater$zh_CN {
 }
 
 // Path: easterEggRobot
-class _Translations$easterEggRobot$en implements Translations$easterEggRobot$zh_CN {
-	_Translations$easterEggRobot$en._(this._root);
+class _Translations$easterEggRobot$en extends Translations$easterEggRobot$zh {
+	_Translations$easterEggRobot$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -259,8 +261,8 @@ class _Translations$easterEggRobot$en implements Translations$easterEggRobot$zh_
 }
 
 // Path: electricity
-class _Translations$electricity$en implements Translations$electricity$zh_CN {
-	_Translations$electricity$en._(this._root);
+class _Translations$electricity$en extends Translations$electricity$zh {
+	_Translations$electricity$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -305,8 +307,8 @@ class _Translations$electricity$en implements Translations$electricity$zh_CN {
 }
 
 // Path: electricityStatus
-class _Translations$electricityStatus$en implements Translations$electricityStatus$zh_CN {
-	_Translations$electricityStatus$en._(this._root);
+class _Translations$electricityStatus$en extends Translations$electricityStatus$zh {
+	_Translations$electricityStatus$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -329,8 +331,8 @@ class _Translations$electricityStatus$en implements Translations$electricityStat
 }
 
 // Path: emptyClassroom
-class _Translations$emptyClassroom$en implements Translations$emptyClassroom$zh_CN {
-	_Translations$emptyClassroom$en._(this._root);
+class _Translations$emptyClassroom$en extends Translations$emptyClassroom$zh {
+	_Translations$emptyClassroom$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -345,8 +347,8 @@ class _Translations$emptyClassroom$en implements Translations$emptyClassroom$zh_
 }
 
 // Path: exam
-class _Translations$exam$en implements Translations$exam$zh_CN {
-	_Translations$exam$en._(this._root);
+class _Translations$exam$en extends Translations$exam$zh {
+	_Translations$exam$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -368,8 +370,8 @@ class _Translations$exam$en implements Translations$exam$zh_CN {
 }
 
 // Path: experiment
-class _Translations$experiment$en implements Translations$experiment$zh_CN {
-	_Translations$experiment$en._(this._root);
+class _Translations$experiment$en extends Translations$experiment$zh {
+	_Translations$experiment$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -414,8 +416,8 @@ class _Translations$experiment$en implements Translations$experiment$zh_CN {
 }
 
 // Path: experimentController
-class _Translations$experimentController$en implements Translations$experimentController$zh_CN {
-	_Translations$experimentController$en._(this._root);
+class _Translations$experimentController$en extends Translations$experimentController$zh {
+	_Translations$experimentController$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -425,8 +427,8 @@ class _Translations$experimentController$en implements Translations$experimentCo
 }
 
 // Path: homepage
-class _Translations$homepage$en implements Translations$homepage$zh_CN {
-	_Translations$homepage$en._(this._root);
+class _Translations$homepage$en extends Translations$homepage$zh {
+	_Translations$homepage$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -474,8 +476,8 @@ class _Translations$homepage$en implements Translations$homepage$zh_CN {
 }
 
 // Path: library
-class _Translations$library$en implements Translations$library$zh_CN {
-	_Translations$library$en._(this._root);
+class _Translations$library$en extends Translations$library$zh {
+	_Translations$library$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -530,8 +532,8 @@ class _Translations$library$en implements Translations$library$zh_CN {
 }
 
 // Path: libraryCard
-class _Translations$libraryCard$en implements Translations$libraryCard$zh_CN {
-	_Translations$libraryCard$en._(this._root);
+class _Translations$libraryCard$en extends Translations$libraryCard$zh {
+	_Translations$libraryCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -545,8 +547,8 @@ class _Translations$libraryCard$en implements Translations$libraryCard$zh_CN {
 }
 
 // Path: login
-class _Translations$login$en implements Translations$login$zh_CN {
-	_Translations$login$en._(this._root);
+class _Translations$login$en extends Translations$login$zh {
+	_Translations$login$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -566,11 +568,12 @@ class _Translations$login$en implements Translations$login$zh_CN {
 	@override String get seeInspector => 'View network interaction';
 	@override late final _Translations$login$captchaWindow$en captchaWindow = _Translations$login$captchaWindow$en._(_root);
 	@override String get sliderTitle => 'Server authentication service';
+	@override late final _Translations$login$secondFactor$en secondFactor = _Translations$login$secondFactor$en._(_root);
 }
 
 // Path: loginProcess
-class _Translations$loginProcess$en implements Translations$loginProcess$zh_CN {
-	_Translations$loginProcess$en._(this._root);
+class _Translations$loginProcess$en extends Translations$loginProcess$zh {
+	_Translations$loginProcess$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -579,13 +582,14 @@ class _Translations$loginProcess$en implements Translations$loginProcess$zh_CN {
 	@override String get getEncrypt => 'Obtain password encryption key';
 	@override String get readyLogin => 'Prepare to login';
 	@override String get slider => 'Logging in';
+	@override String get secondFactor => 'Waiting for SMS verification';
 	@override String get afterProcess => 'Post-login processing';
 	@override String failed({required Object status_code}) => 'Login failed, response status code: ${status_code}';
 }
 
 // Path: month
-class _Translations$month$en implements Translations$month$zh_CN {
-	_Translations$month$en._(this._root);
+class _Translations$month$en extends Translations$month$zh {
+	_Translations$month$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -605,8 +609,8 @@ class _Translations$month$en implements Translations$month$zh_CN {
 }
 
 // Path: restartApp
-class _Translations$restartApp$en implements Translations$restartApp$zh_CN {
-	_Translations$restartApp$en._(this._root);
+class _Translations$restartApp$en extends Translations$restartApp$zh {
+	_Translations$restartApp$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -618,8 +622,8 @@ class _Translations$restartApp$en implements Translations$restartApp$zh_CN {
 }
 
 // Path: ruisi
-class _Translations$ruisi$en implements Translations$ruisi$zh_CN {
-	_Translations$ruisi$en._(this._root);
+class _Translations$ruisi$en extends Translations$ruisi$zh {
+	_Translations$ruisi$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -640,8 +644,8 @@ class _Translations$ruisi$en implements Translations$ruisi$zh_CN {
 }
 
 // Path: schoolCardStatus
-class _Translations$schoolCardStatus$en implements Translations$schoolCardStatus$zh_CN {
-	_Translations$schoolCardStatus$en._(this._root);
+class _Translations$schoolCardStatus$en extends Translations$schoolCardStatus$zh {
+	_Translations$schoolCardStatus$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -651,8 +655,8 @@ class _Translations$schoolCardStatus$en implements Translations$schoolCardStatus
 }
 
 // Path: schoolCardWindow
-class _Translations$schoolCardWindow$en implements Translations$schoolCardWindow$zh_CN {
-	_Translations$schoolCardWindow$en._(this._root);
+class _Translations$schoolCardWindow$en extends Translations$schoolCardWindow$zh {
+	_Translations$schoolCardWindow$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -671,8 +675,8 @@ class _Translations$schoolCardWindow$en implements Translations$schoolCardWindow
 }
 
 // Path: schoolNet
-class _Translations$schoolNet$en implements Translations$schoolNet$zh_CN {
-	_Translations$schoolNet$en._(this._root);
+class _Translations$schoolNet$en extends Translations$schoolNet$zh {
+	_Translations$schoolNet$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -695,8 +699,8 @@ class _Translations$schoolNet$en implements Translations$schoolNet$zh_CN {
 }
 
 // Path: score
-class _Translations$score$en implements Translations$score$zh_CN {
-	_Translations$score$en._(this._root);
+class _Translations$score$en extends Translations$score$zh {
+	_Translations$score$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -721,12 +725,13 @@ class _Translations$score$en implements Translations$score$zh_CN {
 }
 
 // Path: setting
-class _Translations$setting$en implements Translations$setting$zh_CN {
-	_Translations$setting$en._(this._root);
+class _Translations$setting$en extends Translations$setting$zh {
+	_Translations$setting$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
+	@override String get aboutInfo => 'APP info';
 	@override String acknowledgement({required Object developers}) => 'Made With Love From ${developers} People';
 	@override String get about => 'About';
 	@override String get aboutThisProgram => 'About this APP';
@@ -816,8 +821,8 @@ class _Translations$setting$en implements Translations$setting$zh_CN {
 }
 
 // Path: sport
-class _Translations$sport$en implements Translations$sport$zh_CN {
-	_Translations$sport$en._(this._root);
+class _Translations$sport$en extends Translations$sport$zh {
+	_Translations$sport$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -857,8 +862,8 @@ class _Translations$sport$en implements Translations$sport$zh_CN {
 }
 
 // Path: toolbox
-class _Translations$toolbox$en implements Translations$toolbox$zh_CN {
-	_Translations$toolbox$en._(this._root);
+class _Translations$toolbox$en extends Translations$toolbox$zh {
+	_Translations$toolbox$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -883,8 +888,8 @@ class _Translations$toolbox$en implements Translations$toolbox$zh_CN {
 }
 
 // Path: weekday
-class _Translations$weekday$en implements Translations$weekday$zh_CN {
-	_Translations$weekday$en._(this._root);
+class _Translations$weekday$en extends Translations$weekday$zh {
+	_Translations$weekday$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -899,8 +904,8 @@ class _Translations$weekday$en implements Translations$weekday$zh_CN {
 }
 
 // Path: xduPlanet
-class _Translations$xduPlanet$en implements Translations$xduPlanet$zh_CN {
-	_Translations$xduPlanet$en._(this._root);
+class _Translations$xduPlanet$en extends Translations$xduPlanet$zh {
+	_Translations$xduPlanet$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -932,8 +937,8 @@ class _Translations$xduPlanet$en implements Translations$xduPlanet$zh_CN {
 }
 
 // Path: classAttendance.courseState
-class _Translations$classAttendance$courseState$en implements Translations$classAttendance$courseState$zh_CN {
-	_Translations$classAttendance$courseState$en._(this._root);
+class _Translations$classAttendance$courseState$en extends Translations$classAttendance$courseState$zh {
+	_Translations$classAttendance$courseState$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -945,8 +950,8 @@ class _Translations$classAttendance$courseState$en implements Translations$class
 }
 
 // Path: classAttendance.table
-class _Translations$classAttendance$table$en implements Translations$classAttendance$table$zh_CN {
-	_Translations$classAttendance$table$en._(this._root);
+class _Translations$classAttendance$table$en extends Translations$classAttendance$table$zh {
+	_Translations$classAttendance$table$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -964,8 +969,8 @@ class _Translations$classAttendance$table$en implements Translations$classAttend
 }
 
 // Path: classAttendance.card
-class _Translations$classAttendance$card$en implements Translations$classAttendance$card$zh_CN {
-	_Translations$classAttendance$card$en._(this._root);
+class _Translations$classAttendance$card$en extends Translations$classAttendance$card$zh {
+	_Translations$classAttendance$card$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -982,8 +987,8 @@ class _Translations$classAttendance$card$en implements Translations$classAttenda
 }
 
 // Path: classAttendance.detailCard
-class _Translations$classAttendance$detailCard$en implements Translations$classAttendance$detailCard$zh_CN {
-	_Translations$classAttendance$detailCard$en._(this._root);
+class _Translations$classAttendance$detailCard$en extends Translations$classAttendance$detailCard$zh {
+	_Translations$classAttendance$detailCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -994,8 +999,8 @@ class _Translations$classAttendance$detailCard$en implements Translations$classA
 }
 
 // Path: classAttendance.signType
-class _Translations$classAttendance$signType$en implements Translations$classAttendance$signType$zh_CN {
-	_Translations$classAttendance$signType$en._(this._root);
+class _Translations$classAttendance$signType$en extends Translations$classAttendance$signType$zh {
+	_Translations$classAttendance$signType$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1007,8 +1012,8 @@ class _Translations$classAttendance$signType$en implements Translations$classAtt
 }
 
 // Path: classAttendance.signStatus
-class _Translations$classAttendance$signStatus$en implements Translations$classAttendance$signStatus$zh_CN {
-	_Translations$classAttendance$signStatus$en._(this._root);
+class _Translations$classAttendance$signStatus$en extends Translations$classAttendance$signStatus$zh {
+	_Translations$classAttendance$signStatus$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1027,8 +1032,8 @@ class _Translations$classAttendance$signStatus$en implements Translations$classA
 }
 
 // Path: classtable.partnerClasstable
-class _Translations$classtable$partnerClasstable$en implements Translations$classtable$partnerClasstable$zh_CN {
-	_Translations$classtable$partnerClasstable$en._(this._root);
+class _Translations$classtable$partnerClasstable$en extends Translations$classtable$partnerClasstable$zh {
+	_Translations$classtable$partnerClasstable$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1045,8 +1050,8 @@ class _Translations$classtable$partnerClasstable$en implements Translations$clas
 }
 
 // Path: classtable.popupMenu
-class _Translations$classtable$popupMenu$en implements Translations$classtable$popupMenu$zh_CN {
-	_Translations$classtable$popupMenu$en._(this._root);
+class _Translations$classtable$popupMenu$en extends Translations$classtable$popupMenu$zh {
+	_Translations$classtable$popupMenu$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1066,8 +1071,8 @@ class _Translations$classtable$popupMenu$en implements Translations$classtable$p
 }
 
 // Path: classtable.visualSettings
-class _Translations$classtable$visualSettings$en implements Translations$classtable$visualSettings$zh_CN {
-	_Translations$classtable$visualSettings$en._(this._root);
+class _Translations$classtable$visualSettings$en extends Translations$classtable$visualSettings$zh {
+	_Translations$classtable$visualSettings$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1092,8 +1097,8 @@ class _Translations$classtable$visualSettings$en implements Translations$classta
 }
 
 // Path: classtable.statusSource
-class _Translations$classtable$statusSource$en implements Translations$classtable$statusSource$zh_CN {
-	_Translations$classtable$statusSource$en._(this._root);
+class _Translations$classtable$statusSource$en extends Translations$classtable$statusSource$zh {
+	_Translations$classtable$statusSource$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1105,8 +1110,8 @@ class _Translations$classtable$statusSource$en implements Translations$classtabl
 }
 
 // Path: classtable.statusBanner
-class _Translations$classtable$statusBanner$en implements Translations$classtable$statusBanner$zh_CN {
-	_Translations$classtable$statusBanner$en._(this._root);
+class _Translations$classtable$statusBanner$en extends Translations$classtable$statusBanner$zh {
+	_Translations$classtable$statusBanner$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1117,8 +1122,8 @@ class _Translations$classtable$statusBanner$en implements Translations$classtabl
 }
 
 // Path: classtable.emptyState
-class _Translations$classtable$emptyState$en implements Translations$classtable$emptyState$zh_CN {
-	_Translations$classtable$emptyState$en._(this._root);
+class _Translations$classtable$emptyState$en extends Translations$classtable$emptyState$zh {
+	_Translations$classtable$emptyState$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1130,8 +1135,8 @@ class _Translations$classtable$emptyState$en implements Translations$classtable$
 }
 
 // Path: classtable.emptyAction
-class _Translations$classtable$emptyAction$en implements Translations$classtable$emptyAction$zh_CN {
-	_Translations$classtable$emptyAction$en._(this._root);
+class _Translations$classtable$emptyAction$en extends Translations$classtable$emptyAction$zh {
+	_Translations$classtable$emptyAction$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1141,8 +1146,8 @@ class _Translations$classtable$emptyAction$en implements Translations$classtable
 }
 
 // Path: classtable.classChangePage
-class _Translations$classtable$classChangePage$en implements Translations$classtable$classChangePage$zh_CN {
-	_Translations$classtable$classChangePage$en._(this._root);
+class _Translations$classtable$classChangePage$en extends Translations$classtable$classChangePage$zh {
+	_Translations$classtable$classChangePage$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1165,8 +1170,8 @@ class _Translations$classtable$classChangePage$en implements Translations$classt
 }
 
 // Path: classtable.notArrangedPage
-class _Translations$classtable$notArrangedPage$en implements Translations$classtable$notArrangedPage$zh_CN {
-	_Translations$classtable$notArrangedPage$en._(this._root);
+class _Translations$classtable$notArrangedPage$en extends Translations$classtable$notArrangedPage$zh {
+	_Translations$classtable$notArrangedPage$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1177,8 +1182,8 @@ class _Translations$classtable$notArrangedPage$en implements Translations$classt
 }
 
 // Path: classtable.classCard
-class _Translations$classtable$classCard$en implements Translations$classtable$classCard$zh_CN {
-	_Translations$classtable$classCard$en._(this._root);
+class _Translations$classtable$classCard$en extends Translations$classtable$classCard$zh {
+	_Translations$classtable$classCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1189,8 +1194,8 @@ class _Translations$classtable$classCard$en implements Translations$classtable$c
 }
 
 // Path: classtable.classAdd
-class _Translations$classtable$classAdd$en implements Translations$classtable$classAdd$zh_CN {
-	_Translations$classtable$classAdd$en._(this._root);
+class _Translations$classtable$classAdd$en extends Translations$classtable$classAdd$zh {
+	_Translations$classtable$classAdd$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1216,8 +1221,8 @@ class _Translations$classtable$classAdd$en implements Translations$classtable$cl
 }
 
 // Path: classtable.courseDetailCard
-class _Translations$classtable$courseDetailCard$en implements Translations$classtable$courseDetailCard$zh_CN {
-	_Translations$classtable$courseDetailCard$en._(this._root);
+class _Translations$classtable$courseDetailCard$en extends Translations$classtable$courseDetailCard$zh {
+	_Translations$classtable$courseDetailCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1236,8 +1241,8 @@ class _Translations$classtable$courseDetailCard$en implements Translations$class
 }
 
 // Path: classtable.outputToSystem
-class _Translations$classtable$outputToSystem$en implements Translations$classtable$outputToSystem$zh_CN {
-	_Translations$classtable$outputToSystem$en._(this._root);
+class _Translations$classtable$outputToSystem$en extends Translations$classtable$outputToSystem$zh {
+	_Translations$classtable$outputToSystem$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1249,8 +1254,8 @@ class _Translations$classtable$outputToSystem$en implements Translations$classta
 }
 
 // Path: classtable.refreshClasstable
-class _Translations$classtable$refreshClasstable$en implements Translations$classtable$refreshClasstable$zh_CN {
-	_Translations$classtable$refreshClasstable$en._(this._root);
+class _Translations$classtable$refreshClasstable$en extends Translations$classtable$refreshClasstable$zh {
+	_Translations$classtable$refreshClasstable$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1260,8 +1265,8 @@ class _Translations$classtable$refreshClasstable$en implements Translations$clas
 }
 
 // Path: classtable.semesterSwitcher
-class _Translations$classtable$semesterSwitcher$en implements Translations$classtable$semesterSwitcher$zh_CN {
-	_Translations$classtable$semesterSwitcher$en._(this._root);
+class _Translations$classtable$semesterSwitcher$en extends Translations$classtable$semesterSwitcher$zh {
+	_Translations$classtable$semesterSwitcher$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1276,8 +1281,8 @@ class _Translations$classtable$semesterSwitcher$en implements Translations$class
 }
 
 // Path: clubPromotion.type
-class _Translations$clubPromotion$type$en implements Translations$clubPromotion$type$zh_CN {
-	_Translations$clubPromotion$type$en._(this._root);
+class _Translations$clubPromotion$type$en extends Translations$clubPromotion$type$zh {
+	_Translations$clubPromotion$type$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1294,8 +1299,8 @@ class _Translations$clubPromotion$type$en implements Translations$clubPromotion$
 }
 
 // Path: exam.noArrangement
-class _Translations$exam$noArrangement$en implements Translations$exam$noArrangement$zh_CN {
-	_Translations$exam$noArrangement$en._(this._root);
+class _Translations$exam$noArrangement$en extends Translations$exam$noArrangement$zh {
+	_Translations$exam$noArrangement$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1306,8 +1311,8 @@ class _Translations$exam$noArrangement$en implements Translations$exam$noArrange
 }
 
 // Path: homepage.inputPartnerData
-class _Translations$homepage$inputPartnerData$en implements Translations$homepage$inputPartnerData$zh_CN {
-	_Translations$homepage$inputPartnerData$en._(this._root);
+class _Translations$homepage$inputPartnerData$en extends Translations$homepage$inputPartnerData$zh {
+	_Translations$homepage$inputPartnerData$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1321,8 +1326,8 @@ class _Translations$homepage$inputPartnerData$en implements Translations$homepag
 }
 
 // Path: homepage.noticeCard
-class _Translations$homepage$noticeCard$en implements Translations$homepage$noticeCard$zh_CN {
-	_Translations$homepage$noticeCard$en._(this._root);
+class _Translations$homepage$noticeCard$en extends Translations$homepage$noticeCard$zh {
+	_Translations$homepage$noticeCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1335,8 +1340,8 @@ class _Translations$homepage$noticeCard$en implements Translations$homepage$noti
 }
 
 // Path: homepage.classTableCard
-class _Translations$homepage$classTableCard$en implements Translations$homepage$classTableCard$zh_CN {
-	_Translations$homepage$classTableCard$en._(this._root);
+class _Translations$homepage$classTableCard$en extends Translations$homepage$classTableCard$zh {
+	_Translations$homepage$classTableCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1372,8 +1377,8 @@ class _Translations$homepage$classTableCard$en implements Translations$homepage$
 }
 
 // Path: homepage.electricityCard
-class _Translations$homepage$electricityCard$en implements Translations$homepage$electricityCard$zh_CN {
-	_Translations$homepage$electricityCard$en._(this._root);
+class _Translations$homepage$electricityCard$en extends Translations$homepage$electricityCard$zh {
+	_Translations$homepage$electricityCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1384,8 +1389,8 @@ class _Translations$homepage$electricityCard$en implements Translations$homepage
 }
 
 // Path: homepage.libraryCard
-class _Translations$homepage$libraryCard$en implements Translations$homepage$libraryCard$zh_CN {
-	_Translations$homepage$libraryCard$en._(this._root);
+class _Translations$homepage$libraryCard$en extends Translations$homepage$libraryCard$zh {
+	_Translations$homepage$libraryCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1401,8 +1406,8 @@ class _Translations$homepage$libraryCard$en implements Translations$homepage$lib
 }
 
 // Path: homepage.schoolCardInfoCard
-class _Translations$homepage$schoolCardInfoCard$en implements Translations$homepage$schoolCardInfoCard$zh_CN {
-	_Translations$homepage$schoolCardInfoCard$en._(this._root);
+class _Translations$homepage$schoolCardInfoCard$en extends Translations$homepage$schoolCardInfoCard$zh {
+	_Translations$homepage$schoolCardInfoCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1419,8 +1424,8 @@ class _Translations$homepage$schoolCardInfoCard$en implements Translations$homep
 }
 
 // Path: homepage.toolbox
-class _Translations$homepage$toolbox$en implements Translations$homepage$toolbox$zh_CN {
-	_Translations$homepage$toolbox$en._(this._root);
+class _Translations$homepage$toolbox$en extends Translations$homepage$toolbox$zh {
+	_Translations$homepage$toolbox$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1441,8 +1446,8 @@ class _Translations$homepage$toolbox$en implements Translations$homepage$toolbox
 }
 
 // Path: homepage.schoolNet
-class _Translations$homepage$schoolNet$en implements Translations$homepage$schoolNet$zh_CN {
-	_Translations$homepage$schoolNet$en._(this._root);
+class _Translations$homepage$schoolNet$en extends Translations$homepage$schoolNet$zh {
+	_Translations$homepage$schoolNet$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1455,8 +1460,8 @@ class _Translations$homepage$schoolNet$en implements Translations$homepage$schoo
 }
 
 // Path: homepage.clubPromotion
-class _Translations$homepage$clubPromotion$en implements Translations$homepage$clubPromotion$zh_CN {
-	_Translations$homepage$clubPromotion$en._(this._root);
+class _Translations$homepage$clubPromotion$en extends Translations$homepage$clubPromotion$zh {
+	_Translations$homepage$clubPromotion$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1466,8 +1471,8 @@ class _Translations$homepage$clubPromotion$en implements Translations$homepage$c
 }
 
 // Path: login.captchaWindow
-class _Translations$login$captchaWindow$en implements Translations$login$captchaWindow$zh_CN {
-	_Translations$login$captchaWindow$en._(this._root);
+class _Translations$login$captchaWindow$en extends Translations$login$captchaWindow$zh {
+	_Translations$login$captchaWindow$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1478,9 +1483,29 @@ class _Translations$login$captchaWindow$en implements Translations$login$captcha
 	@override String refreshFailed({required Object error}) => 'Failed to refresh captcha: ${error}';
 }
 
+// Path: login.secondFactor
+class _Translations$login$secondFactor$en extends Translations$login$secondFactor$zh {
+	_Translations$login$secondFactor$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'SMS verification';
+	@override String get description => 'The school requires an additional verification step. Request and enter the SMS code to continue.';
+	@override String get code => 'SMS code';
+	@override String get emptyCode => 'Enter the SMS code';
+	@override String get sendCode => 'Send code';
+	@override String resendCountdown({required Object seconds}) => 'Resend in ${seconds}s';
+	@override String get trustDevice => 'Trust this device';
+	@override String get trustDeviceHint => 'The school may skip verification on this device for a limited time';
+	@override String get networkError => 'Verification request failed. Check your connection and retry.';
+	@override String get cancelled => 'SMS verification cancelled';
+	@override String get expired => 'Verification expired. Please log in again.';
+}
+
 // Path: ruisi.common
-class _Translations$ruisi$common$en implements Translations$ruisi$common$zh_CN {
-	_Translations$ruisi$common$en._(this._root);
+class _Translations$ruisi$common$en extends Translations$ruisi$common$zh {
+	_Translations$ruisi$common$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1501,8 +1526,8 @@ class _Translations$ruisi$common$en implements Translations$ruisi$common$zh_CN {
 }
 
 // Path: ruisi.about
-class _Translations$ruisi$about$en implements Translations$ruisi$about$zh_CN {
-	_Translations$ruisi$about$en._(this._root);
+class _Translations$ruisi$about$en extends Translations$ruisi$about$zh {
+	_Translations$ruisi$about$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1521,8 +1546,8 @@ class _Translations$ruisi$about$en implements Translations$ruisi$about$zh_CN {
 }
 
 // Path: ruisi.home
-class _Translations$ruisi$home$en implements Translations$ruisi$home$zh_CN {
-	_Translations$ruisi$home$en._(this._root);
+class _Translations$ruisi$home$en extends Translations$ruisi$home$zh {
+	_Translations$ruisi$home$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1551,8 +1576,8 @@ class _Translations$ruisi$home$en implements Translations$ruisi$home$zh_CN {
 }
 
 // Path: ruisi.login
-class _Translations$ruisi$login$en implements Translations$ruisi$login$zh_CN {
-	_Translations$ruisi$login$en._(this._root);
+class _Translations$ruisi$login$en extends Translations$ruisi$login$zh {
+	_Translations$ruisi$login$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1573,8 +1598,8 @@ class _Translations$ruisi$login$en implements Translations$ruisi$login$zh_CN {
 }
 
 // Path: ruisi.post
-class _Translations$ruisi$post$en implements Translations$ruisi$post$zh_CN {
-	_Translations$ruisi$post$en._(this._root);
+class _Translations$ruisi$post$en extends Translations$ruisi$post$zh {
+	_Translations$ruisi$post$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1593,8 +1618,8 @@ class _Translations$ruisi$post$en implements Translations$ruisi$post$zh_CN {
 }
 
 // Path: ruisi.topicDetail
-class _Translations$ruisi$topicDetail$en implements Translations$ruisi$topicDetail$zh_CN {
-	_Translations$ruisi$topicDetail$en._(this._root);
+class _Translations$ruisi$topicDetail$en extends Translations$ruisi$topicDetail$zh {
+	_Translations$ruisi$topicDetail$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1611,8 +1636,8 @@ class _Translations$ruisi$topicDetail$en implements Translations$ruisi$topicDeta
 }
 
 // Path: ruisi.topicListItem
-class _Translations$ruisi$topicListItem$en implements Translations$ruisi$topicListItem$zh_CN {
-	_Translations$ruisi$topicListItem$en._(this._root);
+class _Translations$ruisi$topicListItem$en extends Translations$ruisi$topicListItem$zh {
+	_Translations$ruisi$topicListItem$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1621,8 +1646,8 @@ class _Translations$ruisi$topicListItem$en implements Translations$ruisi$topicLi
 }
 
 // Path: ruisi.forumList
-class _Translations$ruisi$forumList$en implements Translations$ruisi$forumList$zh_CN {
-	_Translations$ruisi$forumList$en._(this._root);
+class _Translations$ruisi$forumList$en extends Translations$ruisi$forumList$zh {
+	_Translations$ruisi$forumList$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1632,8 +1657,8 @@ class _Translations$ruisi$forumList$en implements Translations$ruisi$forumList$z
 }
 
 // Path: ruisi.favorites
-class _Translations$ruisi$favorites$en implements Translations$ruisi$favorites$zh_CN {
-	_Translations$ruisi$favorites$en._(this._root);
+class _Translations$ruisi$favorites$en extends Translations$ruisi$favorites$zh {
+	_Translations$ruisi$favorites$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1643,8 +1668,8 @@ class _Translations$ruisi$favorites$en implements Translations$ruisi$favorites$z
 }
 
 // Path: ruisi.messages
-class _Translations$ruisi$messages$en implements Translations$ruisi$messages$zh_CN {
-	_Translations$ruisi$messages$en._(this._root);
+class _Translations$ruisi$messages$en extends Translations$ruisi$messages$zh {
+	_Translations$ruisi$messages$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1656,8 +1681,8 @@ class _Translations$ruisi$messages$en implements Translations$ruisi$messages$zh_
 }
 
 // Path: ruisi.search
-class _Translations$ruisi$search$en implements Translations$ruisi$search$zh_CN {
-	_Translations$ruisi$search$en._(this._root);
+class _Translations$ruisi$search$en extends Translations$ruisi$search$zh {
+	_Translations$ruisi$search$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1668,8 +1693,8 @@ class _Translations$ruisi$search$en implements Translations$ruisi$search$zh_CN {
 }
 
 // Path: ruisi.settings
-class _Translations$ruisi$settings$en implements Translations$ruisi$settings$zh_CN {
-	_Translations$ruisi$settings$en._(this._root);
+class _Translations$ruisi$settings$en extends Translations$ruisi$settings$zh {
+	_Translations$ruisi$settings$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1689,8 +1714,8 @@ class _Translations$ruisi$settings$en implements Translations$ruisi$settings$zh_
 }
 
 // Path: ruisi.user
-class _Translations$ruisi$user$en implements Translations$ruisi$user$zh_CN {
-	_Translations$ruisi$user$en._(this._root);
+class _Translations$ruisi$user$en extends Translations$ruisi$user$zh {
+	_Translations$ruisi$user$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1701,8 +1726,8 @@ class _Translations$ruisi$user$en implements Translations$ruisi$user$zh_CN {
 }
 
 // Path: schoolNet.idsAccountNet
-class _Translations$schoolNet$idsAccountNet$en implements Translations$schoolNet$idsAccountNet$zh_CN {
-	_Translations$schoolNet$idsAccountNet$en._(this._root);
+class _Translations$schoolNet$idsAccountNet$en extends Translations$schoolNet$idsAccountNet$zh {
+	_Translations$schoolNet$idsAccountNet$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1718,8 +1743,8 @@ class _Translations$schoolNet$idsAccountNet$en implements Translations$schoolNet
 }
 
 // Path: schoolNet.currentLoginNet
-class _Translations$schoolNet$currentLoginNet$en implements Translations$schoolNet$currentLoginNet$zh_CN {
-	_Translations$schoolNet$currentLoginNet$en._(this._root);
+class _Translations$schoolNet$currentLoginNet$en extends Translations$schoolNet$currentLoginNet$zh {
+	_Translations$schoolNet$currentLoginNet$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1739,8 +1764,8 @@ class _Translations$schoolNet$currentLoginNet$en implements Translations$schoolN
 }
 
 // Path: schoolNet.deviceList
-class _Translations$schoolNet$deviceList$en implements Translations$schoolNet$deviceList$zh_CN {
-	_Translations$schoolNet$deviceList$en._(this._root);
+class _Translations$schoolNet$deviceList$en extends Translations$schoolNet$deviceList$zh {
+	_Translations$schoolNet$deviceList$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1751,8 +1776,8 @@ class _Translations$schoolNet$deviceList$en implements Translations$schoolNet$de
 }
 
 // Path: score.scoreChoice
-class _Translations$score$scoreChoice$en implements Translations$score$scoreChoice$zh_CN {
-	_Translations$score$scoreChoice$en._(this._root);
+class _Translations$score$scoreChoice$en extends Translations$score$scoreChoice$zh {
+	_Translations$score$scoreChoice$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1765,8 +1790,8 @@ class _Translations$score$scoreChoice$en implements Translations$score$scoreChoi
 }
 
 // Path: score.scoreComposeCard
-class _Translations$score$scoreComposeCard$en implements Translations$score$scoreComposeCard$zh_CN {
-	_Translations$score$scoreComposeCard$en._(this._root);
+class _Translations$score$scoreComposeCard$en extends Translations$score$scoreComposeCard$zh {
+	_Translations$score$scoreComposeCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1779,8 +1804,8 @@ class _Translations$score$scoreComposeCard$en implements Translations$score$scor
 }
 
 // Path: score.scoreInfoCard
-class _Translations$score$scoreInfoCard$en implements Translations$score$scoreInfoCard$zh_CN {
-	_Translations$score$scoreInfoCard$en._(this._root);
+class _Translations$score$scoreInfoCard$en extends Translations$score$scoreInfoCard$zh {
+	_Translations$score$scoreInfoCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1794,8 +1819,8 @@ class _Translations$score$scoreInfoCard$en implements Translations$score$scoreIn
 }
 
 // Path: score.scorePage
-class _Translations$score$scorePage$en implements Translations$score$scorePage$zh_CN {
-	_Translations$score$scorePage$en._(this._root);
+class _Translations$score$scorePage$en extends Translations$score$scorePage$zh {
+	_Translations$score$scorePage$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1812,8 +1837,8 @@ class _Translations$score$scorePage$en implements Translations$score$scorePage$z
 }
 
 // Path: setting.lowElectricityThresholdDialog
-class _Translations$setting$lowElectricityThresholdDialog$en implements Translations$setting$lowElectricityThresholdDialog$zh_CN {
-	_Translations$setting$lowElectricityThresholdDialog$en._(this._root);
+class _Translations$setting$lowElectricityThresholdDialog$en extends Translations$setting$lowElectricityThresholdDialog$zh {
+	_Translations$setting$lowElectricityThresholdDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1823,8 +1848,8 @@ class _Translations$setting$lowElectricityThresholdDialog$en implements Translat
 }
 
 // Path: setting.notificationPage
-class _Translations$setting$notificationPage$en implements Translations$setting$notificationPage$zh_CN {
-	_Translations$setting$notificationPage$en._(this._root);
+class _Translations$setting$notificationPage$en extends Translations$setting$notificationPage$zh {
+	_Translations$setting$notificationPage$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1875,8 +1900,8 @@ class _Translations$setting$notificationPage$en implements Translations$setting$
 }
 
 // Path: setting.clearAndRestartDialog
-class _Translations$setting$clearAndRestartDialog$en implements Translations$setting$clearAndRestartDialog$zh_CN {
-	_Translations$setting$clearAndRestartDialog$en._(this._root);
+class _Translations$setting$clearAndRestartDialog$en extends Translations$setting$clearAndRestartDialog$zh {
+	_Translations$setting$clearAndRestartDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1888,8 +1913,8 @@ class _Translations$setting$clearAndRestartDialog$en implements Translations$set
 }
 
 // Path: setting.logoutDialog
-class _Translations$setting$logoutDialog$en implements Translations$setting$logoutDialog$zh_CN {
-	_Translations$setting$logoutDialog$en._(this._root);
+class _Translations$setting$logoutDialog$en extends Translations$setting$logoutDialog$zh {
+	_Translations$setting$logoutDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1900,8 +1925,8 @@ class _Translations$setting$logoutDialog$en implements Translations$setting$logo
 }
 
 // Path: setting.needCloseDialog
-class _Translations$setting$needCloseDialog$en implements Translations$setting$needCloseDialog$zh_CN {
-	_Translations$setting$needCloseDialog$en._(this._root);
+class _Translations$setting$needCloseDialog$en extends Translations$setting$needCloseDialog$zh {
+	_Translations$setting$needCloseDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1911,8 +1936,8 @@ class _Translations$setting$needCloseDialog$en implements Translations$setting$n
 }
 
 // Path: setting.changeColorDialog
-class _Translations$setting$changeColorDialog$en implements Translations$setting$changeColorDialog$zh_CN {
-	_Translations$setting$changeColorDialog$en._(this._root);
+class _Translations$setting$changeColorDialog$en extends Translations$setting$changeColorDialog$zh {
+	_Translations$setting$changeColorDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1927,8 +1952,8 @@ class _Translations$setting$changeColorDialog$en implements Translations$setting
 }
 
 // Path: setting.changeBrightnessDialog
-class _Translations$setting$changeBrightnessDialog$en implements Translations$setting$changeBrightnessDialog$zh_CN {
-	_Translations$setting$changeBrightnessDialog$en._(this._root);
+class _Translations$setting$changeBrightnessDialog$en extends Translations$setting$changeBrightnessDialog$zh {
+	_Translations$setting$changeBrightnessDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1940,8 +1965,8 @@ class _Translations$setting$changeBrightnessDialog$en implements Translations$se
 }
 
 // Path: setting.changeSwiftDialog
-class _Translations$setting$changeSwiftDialog$en implements Translations$setting$changeSwiftDialog$zh_CN {
-	_Translations$setting$changeSwiftDialog$en._(this._root);
+class _Translations$setting$changeSwiftDialog$en extends Translations$setting$changeSwiftDialog$zh {
+	_Translations$setting$changeSwiftDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -1951,8 +1976,8 @@ class _Translations$setting$changeSwiftDialog$en implements Translations$setting
 }
 
 // Path: setting.changeElectricityAccount
-class _Translations$setting$changeElectricityAccount$en implements Translations$setting$changeElectricityAccount$zh_CN {
-	_Translations$setting$changeElectricityAccount$en._(this._root);
+class _Translations$setting$changeElectricityAccount$en extends Translations$setting$changeElectricityAccount$zh {
+	_Translations$setting$changeElectricityAccount$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2011,8 +2036,8 @@ class _Translations$setting$changeElectricityAccount$en implements Translations$
 }
 
 // Path: setting.changePasswordDialog
-class _Translations$setting$changePasswordDialog$en implements Translations$setting$changePasswordDialog$zh_CN {
-	_Translations$setting$changePasswordDialog$en._(this._root);
+class _Translations$setting$changePasswordDialog$en extends Translations$setting$changePasswordDialog$zh {
+	_Translations$setting$changePasswordDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2022,8 +2047,8 @@ class _Translations$setting$changePasswordDialog$en implements Translations$sett
 }
 
 // Path: setting.updateDialog
-class _Translations$setting$updateDialog$en implements Translations$setting$updateDialog$zh_CN {
-	_Translations$setting$updateDialog$en._(this._root);
+class _Translations$setting$updateDialog$en extends Translations$setting$updateDialog$zh {
+	_Translations$setting$updateDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2037,8 +2062,8 @@ class _Translations$setting$updateDialog$en implements Translations$setting$upda
 }
 
 // Path: setting.localizationDialog
-class _Translations$setting$localizationDialog$en implements Translations$setting$localizationDialog$zh_CN {
-	_Translations$setting$localizationDialog$en._(this._root);
+class _Translations$setting$localizationDialog$en extends Translations$setting$localizationDialog$zh {
+	_Translations$setting$localizationDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2051,8 +2076,8 @@ class _Translations$setting$localizationDialog$en implements Translations$settin
 }
 
 // Path: setting.aboutPage
-class _Translations$setting$aboutPage$en implements Translations$setting$aboutPage$zh_CN {
-	_Translations$setting$aboutPage$en._(this._root);
+class _Translations$setting$aboutPage$en extends Translations$setting$aboutPage$zh {
+	_Translations$setting$aboutPage$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2102,15 +2127,16 @@ class _Translations$setting$aboutPage$en implements Translations$setting$aboutPa
 	@override String get homepage => 'Homepage';
 	@override String get code => 'Source code';
 	@override String get knowMore => 'Learn more';
-	@override String get copyrightNotice => 'This software is compiled, or derived from the traintime_pda (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.\n\nThis APP has no relation to Xidian University, Tishineng Service, Shuwow and other services.\n\nCopyright 2023-2025 BenderBlog Rodriguez and contributors.\nCopyright 2025-present Traintime PDA authors.\n\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.';
+	@override String get copyrightNotice => 'This software is compiled, or derived from the traintime_pda (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.\nThis APP has no relation to Xidian University, Tishineng Service, Shuwow and other services.\nCopyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present Traintime PDA authors.\nThe Copyright of the Software is protected by NCAC, register code is 2026SR0738647\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.';
 	@override String get beian => 'ICP record code';
+	@override String get copyrightRegisterCode => 'Copyright register code';
 	@override String get signAndroid => 'Android signature';
 	@override String get title => 'About this APP';
 }
 
 // Path: xduPlanet.confirmAuditDialog
-class _Translations$xduPlanet$confirmAuditDialog$en implements Translations$xduPlanet$confirmAuditDialog$zh_CN {
-	_Translations$xduPlanet$confirmAuditDialog$en._(this._root);
+class _Translations$xduPlanet$confirmAuditDialog$en extends Translations$xduPlanet$confirmAuditDialog$zh {
+	_Translations$xduPlanet$confirmAuditDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2124,8 +2150,8 @@ class _Translations$xduPlanet$confirmAuditDialog$en implements Translations$xduP
 }
 
 // Path: classtable.partnerClasstable.shareDialog
-class _Translations$classtable$partnerClasstable$shareDialog$en implements Translations$classtable$partnerClasstable$shareDialog$zh_CN {
-	_Translations$classtable$partnerClasstable$shareDialog$en._(this._root);
+class _Translations$classtable$partnerClasstable$shareDialog$en extends Translations$classtable$partnerClasstable$shareDialog$zh {
+	_Translations$classtable$partnerClasstable$shareDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2135,8 +2161,8 @@ class _Translations$classtable$partnerClasstable$shareDialog$en implements Trans
 }
 
 // Path: classtable.partnerClasstable.saveDialog
-class _Translations$classtable$partnerClasstable$saveDialog$en implements Translations$classtable$partnerClasstable$saveDialog$zh_CN {
-	_Translations$classtable$partnerClasstable$saveDialog$en._(this._root);
+class _Translations$classtable$partnerClasstable$saveDialog$en extends Translations$classtable$partnerClasstable$saveDialog$zh {
+	_Translations$classtable$partnerClasstable$saveDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2147,8 +2173,8 @@ class _Translations$classtable$partnerClasstable$saveDialog$en implements Transl
 }
 
 // Path: classtable.partnerClasstable.deleteDialog
-class _Translations$classtable$partnerClasstable$deleteDialog$en implements Translations$classtable$partnerClasstable$deleteDialog$zh_CN {
-	_Translations$classtable$partnerClasstable$deleteDialog$en._(this._root);
+class _Translations$classtable$partnerClasstable$deleteDialog$en extends Translations$classtable$partnerClasstable$deleteDialog$zh {
+	_Translations$classtable$partnerClasstable$deleteDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2159,8 +2185,8 @@ class _Translations$classtable$partnerClasstable$deleteDialog$en implements Tran
 }
 
 // Path: classtable.partnerClasstable.nameDialog
-class _Translations$classtable$partnerClasstable$nameDialog$en implements Translations$classtable$partnerClasstable$nameDialog$zh_CN {
-	_Translations$classtable$partnerClasstable$nameDialog$en._(this._root);
+class _Translations$classtable$partnerClasstable$nameDialog$en extends Translations$classtable$partnerClasstable$nameDialog$zh {
+	_Translations$classtable$partnerClasstable$nameDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2173,8 +2199,8 @@ class _Translations$classtable$partnerClasstable$nameDialog$en implements Transl
 }
 
 // Path: classtable.classAdd.dateSelectorFree
-class _Translations$classtable$classAdd$dateSelectorFree$en implements Translations$classtable$classAdd$dateSelectorFree$zh_CN {
-	_Translations$classtable$classAdd$dateSelectorFree$en._(this._root);
+class _Translations$classtable$classAdd$dateSelectorFree$en extends Translations$classtable$classAdd$dateSelectorFree$zh {
+	_Translations$classtable$classAdd$dateSelectorFree$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2188,8 +2214,8 @@ class _Translations$classtable$classAdd$dateSelectorFree$en implements Translati
 }
 
 // Path: ruisi.topicDetail.vote
-class _Translations$ruisi$topicDetail$vote$en implements Translations$ruisi$topicDetail$vote$zh_CN {
-	_Translations$ruisi$topicDetail$vote$en._(this._root);
+class _Translations$ruisi$topicDetail$vote$en extends Translations$ruisi$topicDetail$vote$zh {
+	_Translations$ruisi$topicDetail$vote$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -2797,10 +2823,22 @@ extension on TranslationsEn {
 			'login.captchaWindow.messageOnEmpty' => 'Please enter captcha',
 			'login.captchaWindow.refreshFailed' => ({required Object error}) => 'Failed to refresh captcha: ${error}',
 			'login.sliderTitle' => 'Server authentication service',
+			'login.secondFactor.title' => 'SMS verification',
+			'login.secondFactor.description' => 'The school requires an additional verification step. Request and enter the SMS code to continue.',
+			'login.secondFactor.code' => 'SMS code',
+			'login.secondFactor.emptyCode' => 'Enter the SMS code',
+			'login.secondFactor.sendCode' => 'Send code',
+			'login.secondFactor.resendCountdown' => ({required Object seconds}) => 'Resend in ${seconds}s',
+			'login.secondFactor.trustDevice' => 'Trust this device',
+			'login.secondFactor.trustDeviceHint' => 'The school may skip verification on this device for a limited time',
+			'login.secondFactor.networkError' => 'Verification request failed. Check your connection and retry.',
+			'login.secondFactor.cancelled' => 'SMS verification cancelled',
+			'login.secondFactor.expired' => 'Verification expired. Please log in again.',
 			'loginProcess.readyPage' => 'Prepare to obtain login environment',
 			'loginProcess.getEncrypt' => 'Obtain password encryption key',
 			'loginProcess.readyLogin' => 'Prepare to login',
 			'loginProcess.slider' => 'Logging in',
+			'loginProcess.secondFactor' => 'Waiting for SMS verification',
 			'loginProcess.afterProcess' => 'Post-login processing',
 			'loginProcess.failed' => ({required Object status_code}) => 'Login failed, response status code: ${status_code}',
 			'month.january' => 'Jan.',
@@ -3023,6 +3061,7 @@ extension on TranslationsEn {
 			'score.scorePage.summary' => 'Summary',
 			'score.scorePage.cet4' => 'College English Test Band 4',
 			'score.scorePage.cet6' => 'College English Test Band 6',
+			'setting.aboutInfo' => 'APP info',
 			'setting.acknowledgement' => ({required Object developers}) => 'Made With Love From ${developers} People',
 			'setting.about' => 'About',
 			'setting.aboutThisProgram' => 'About this APP',
@@ -3231,6 +3270,8 @@ extension on TranslationsEn {
 			'setting.aboutPage.alnair' => 'Development: Library search and cover',
 			'setting.aboutPage.aqqkad' => 'Development: Class attandance history',
 			'setting.aboutPage.bellssgit' => 'Support: best and longest feedback source',
+			_ => null,
+		} ?? switch (path) {
 			'setting.aboutPage.brackrat' => 'Design: homepage, login page, color scheme, iOS widgets, etc.',
 			'setting.aboutPage.breezeline' => 'Support: valueless and meaningless product manager (from his own description)',
 			'setting.aboutPage.cafebabe' => 'Support: provide Easter egg code / Development: Development: New Slider \'26',
@@ -3244,8 +3285,6 @@ extension on TranslationsEn {
 			'setting.aboutPage.hancl777' => 'Internationalization: Traditional Chinese conversion code',
 			'setting.aboutPage.hazukiKeatsu' => 'Development: Physics experiment score query and recognization',
 			'setting.aboutPage.hawa130' => 'Design: Class info card',
-			_ => null,
-		} ?? switch (path) {
 			'setting.aboutPage.hhzm' => 'Development: electricity fee inquiry account calculation',
 			'setting.aboutPage.imaginary17' => 'Developement: Ruisi navigator stack fix',
 			'setting.aboutPage.imoscarz' => 'Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change',
@@ -3274,8 +3313,9 @@ extension on TranslationsEn {
 			'setting.aboutPage.homepage' => 'Homepage',
 			'setting.aboutPage.code' => 'Source code',
 			'setting.aboutPage.knowMore' => 'Learn more',
-			'setting.aboutPage.copyrightNotice' => 'This software is compiled, or derived from the traintime_pda (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.\n\nThis APP has no relation to Xidian University, Tishineng Service, Shuwow and other services.\n\nCopyright 2023-2025 BenderBlog Rodriguez and contributors.\nCopyright 2025-present Traintime PDA authors.\n\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.',
+			'setting.aboutPage.copyrightNotice' => 'This software is compiled, or derived from the traintime_pda (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.\nThis APP has no relation to Xidian University, Tishineng Service, Shuwow and other services.\nCopyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present Traintime PDA authors.\nThe Copyright of the Software is protected by NCAC, register code is 2026SR0738647\nThe Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.',
 			'setting.aboutPage.beian' => 'ICP record code',
+			'setting.aboutPage.copyrightRegisterCode' => 'Copyright register code',
 			'setting.aboutPage.signAndroid' => 'Android signature',
 			'setting.aboutPage.title' => 'About this APP',
 			'sport.title' => 'Sport Query',

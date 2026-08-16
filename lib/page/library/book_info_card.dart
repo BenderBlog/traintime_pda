@@ -8,9 +8,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class BookInfoCard extends StatelessWidget {
@@ -205,7 +205,7 @@ class _BookCoverState extends State<BookCover> {
     if (imageUrl != null && imageUrl.isNotEmpty) {
       return Future.value(imageUrl);
     }
-    return LibrarySession().bookCover(
+    return LibraryController.i.session.bookCover(
       widget.toUse.bookName,
       widget.toUse.isbn ?? "",
       widget.toUse.docNumber,

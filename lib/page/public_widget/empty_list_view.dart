@@ -13,11 +13,11 @@ class EmptyListView extends StatelessWidget {
   static String _getAssets(EmptyListViewType type) {
     switch (type) {
       case EmptyListViewType.reading:
-        return "assets/art/pda_girl_reading.png";
+        return "assets/art/pda_girl_reading.webp";
       case EmptyListViewType.rolling:
-        return "assets/art/pda_classtable_empty.png";
+        return "assets/art/pda_classtable_empty.webp";
       default:
-        return "assets/art/pda_girl_default.png";
+        return "assets/art/pda_girl_default.webp";
     }
   }
 

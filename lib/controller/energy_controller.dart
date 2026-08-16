@@ -7,18 +7,19 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/energy_session.dart';
+import 'package:watermeter/repository/ids_session/energy_session.dart';
 
 class EnergyController {
   static final EnergyController i = EnergyController._();
   static const int defaultLowElectricityWarningThreshold = 20;
-  bool _isReloading = false;
+
+  final EnergySession session = EnergySession();
 
   EnergyController._() {
     updateElectricityWarning();
 
     // Load last successful fetched electricity info
-    final cache = EnergySession.getCache();
+    final cache = session.getCache();
     if (cache != null) {
       _lastValidEnergyInfo.value = cache;
       energyInfoStateSignal.value = AsyncState.data(cache);
@@ -27,7 +28,7 @@ class EnergyController {
     // Load last updated electricity info
     historyElectricityInfoList
       ..clear()
-      ..addAll(EnergySession.getElectricityHistory());
+      ..addAll(session.getElectricityHistory());
   }
 
   final _lastValidEnergyInfo = signal<FetchResult<EnergyInfo>?>(null);
@@ -111,36 +112,42 @@ class EnergyController {
         remain: info.electricityRemain.toString(),
       ),
     );
-    EnergySession.saveElectricityHistory(newHistoryInfo);
+    session.saveElectricityHistory(newHistoryInfo);
     historyElectricityInfoList.clear();
     historyElectricityInfoList.addAll(newHistoryInfo);
   }
+
+  late final electricityThreshold = computed(() {
+    return electricityWarning.value > 0
+        ? electricityWarning.value
+        : defaultLowElectricityWarningThreshold;
+  });
+
+  late final lowElectricityWarningEnabled = computed(() {
+    return electricityWarning.value >= 0;
+  });
 
   /// ==================
   ///  Electricity Info
   /// ==================
 
   Future<void> refreshElectricityInfo({bool force = false}) async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = _lastValidEnergyInfo.value;
     energyInfoStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getElectricityInfo();
+      final result = await session.getElectricityInfo();
       _syncLastValidElectricity(result);
-      energyInfoStateSignal.value = AsyncState.data(result);
+      energyInfoStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       energyInfoStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[EnergyController][refreshElectricityInfo] Have issue");
-    } finally {
-      _isReloading = false;
     }
   }
 
   void clearElectricityHistory() {
-    EnergySession.clearElectricityHistory();
+    session.clearElectricityHistory();
     historyElectricityInfoList.clear();
   }
 

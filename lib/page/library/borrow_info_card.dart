@@ -8,12 +8,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class BorrowInfoCard extends StatelessWidget {
@@ -178,7 +178,7 @@ class BorrowInfoCard extends StatelessWidget {
                       pd.show(
                         msg: context.t.library.renewing,
                       );
-                      LibrarySession().renew(toUse).then((value) {
+                      LibraryController.i.session.renew(toUse).then((value) {
                         if (context.mounted) {
                           pd.close();
                           showToast(context: context, msg: value);

@@ -1,4 +1,4 @@
-base_locale: zh_CN
+base_locale: zh
 input_directory: assets/i18n
 input_file_pattern: .yaml
 string_interpolation: braces

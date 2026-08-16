@@ -1,12 +1,13 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+/*
 import 'package:signals/signals.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/model/aircon_energy.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
-import 'package:watermeter/repository/aircon_session.dart';
+import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -105,7 +106,7 @@ class AirconController {
       final result = await getAirconEnergyInfo(imei);
       _lastValidInfo.value = result;
       _syncEnergyHistory(result);
-      energyInfoStateSignal.value = AsyncState.data(result);
+      energyInfoStateSignal.value = AsyncState.data(result，force: true,);
     } catch (e, s) {
       energyInfoStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[AirconController][refreshEnergyInfo] Have issue");
@@ -152,3 +153,4 @@ class AirconImeiInvalidException implements Exception {
   @override
   String toString() => "Invalid aircon IMEI: $raw";
 }
+*/

@@ -1,6 +1,6 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
-
+/*
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
@@ -205,3 +205,4 @@ class AirconEnergyCard extends StatelessWidget {
     return data;
   }
 }
+*/

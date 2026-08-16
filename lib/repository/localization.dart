@@ -28,7 +28,7 @@ enum Localization {
     Localization.undefined => throw StateError(
       'Cannot resolve undefined to AppLocale',
     ),
-    Localization.simplifiedChinese => AppLocale.zhCn,
+    Localization.simplifiedChinese => AppLocale.zh,
     Localization.traditionalChinese => AppLocale.zhTw,
     Localization.english => AppLocale.en,
   };

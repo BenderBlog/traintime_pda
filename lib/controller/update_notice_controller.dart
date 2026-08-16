@@ -6,12 +6,12 @@ import 'dart:math' as math;
 import 'package:signals/signals.dart';
 import 'package:watermeter/model/pda_service/message.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/pda_service_session.dart';
+import 'package:watermeter/repository/miscellaneous_session/pda_service_session.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 
 class UpdateNoticeController {
+  static final PdaServiceSession session = PdaServiceSession();
   static UpdateNoticeController i = UpdateNoticeController._();
-  bool _isReloading = false;
 
   UpdateNoticeController._();
 
@@ -20,15 +20,13 @@ class UpdateNoticeController {
   );
 
   Future<void> reloadUpdateNoticeInfo() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = updateMessageStateSignal.peek().value;
     updateMessageStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await checkUpdate();
-      updateMessageStateSignal.value = AsyncState.data(result);
+      final result = await session.checkUpdate();
+      updateMessageStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       updateMessageStateSignal.value = AsyncState.error(e, s);
       log.handle(
@@ -36,8 +34,6 @@ class UpdateNoticeController {
         s,
         "[UpdateNoticeController][reloadUpdateNoticeInfo] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 

@@ -43,7 +43,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
                 title: Row(
                   children: [
                     Text(
-                      _colorSeedToI18n(context, ColorSeed.values[index]),
+                      colorSeedToI18n(context, ColorSeed.values[index]),
                     ),
                     const SizedBox(width: 10),
                     ClipOval(
@@ -76,7 +76,7 @@ class _ChangeColorDialogState extends State<ChangeColorDialog> {
   }
 }
 
-String _colorSeedToI18n(BuildContext context, ColorSeed seed) {
+String colorSeedToI18n(BuildContext context, ColorSeed seed) {
   return switch (seed) {
     ColorSeed.indigo => context.t.setting.changeColorDialog.kDefault,
     ColorSeed.blue => context.t.setting.changeColorDialog.blue,

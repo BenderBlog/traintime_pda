@@ -25,6 +25,7 @@ login_process:
   get_encrypt: Obtain password encryption key
   ready_login: Prepare to login
   slider: Logging in
+  second_factor: Waiting for SMS verification
   after_process: Post-login processing
   failed: "Login failed, response status code: {statusCode}"
 no_info: No information
@@ -721,6 +722,18 @@ login:
     message_on_empty: Please enter captcha
     refresh_failed: "Failed to refresh captcha: {error}"
   slider_title: Server authentication service
+  second_factor:
+    title: SMS verification
+    description: The school requires an additional verification step. Request and enter the SMS code to continue.
+    code: SMS code
+    empty_code: Enter the SMS code
+    send_code: Send code
+    resend_countdown: "Resend in {seconds}s"
+    trust_device: Trust this device
+    trust_device_hint: The school may skip verification on this device for a limited time
+    network_error: Verification request failed. Check your connection and retry.
+    cancelled: SMS verification cancelled
+    expired: Verification expired. Please log in again.
 school_net:
   title: School Net Usage Query
   ids_account_net:
@@ -839,6 +852,7 @@ score:
     CET-4: College English Test Band 4
     CET-6: College English Test Band 6
 setting:
+  about_info: APP info
   acknowledgement: Made With Love From {developers} People
   about: About
   about_this_program: About this APP
@@ -1186,20 +1200,19 @@ setting:
       (a.k.a watermeter) codebase, which is licensed under Mozilla Public License
       v2.0.
 
-
       This APP has no relation to Xidian University, Tishineng Service, Shuwow and
       other services.
 
-
       Copyright 2023-2025 BenderBlog Rodriguez and contributors.
-
       Copyright 2025-present Traintime PDA authors.
 
+      The Copyright of the Software is protected by NCAC, register code is 2026SR0738647
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
       v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
       one at https://mozilla.org/MPL/2.0/."
     beian: ICP record code
+    copyright_register_code: Copyright register code
     sign_android: Android signature
     title: About this APP
 sport:

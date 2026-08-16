@@ -168,12 +168,15 @@ class ReloadWidget extends StatelessWidget {
               .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
               .scrollable()
               .expanded(),
-          FilledButton(
-            onPressed: function,
-            child: Text(
-              buttonName ?? context.t.common.clickToRefresh,
-            ),
-          ).padding(top: 8),
+          SafeArea(
+            top: false,
+            left: false,
+            right: false,
+            child: FilledButton(
+              onPressed: function,
+              child: Text(buttonName ?? context.t.common.clickToRefresh),
+            ).padding(top: 8),
+          ),
         ]
         .toColumn(mainAxisAlignment: MainAxisAlignment.center)
         .padding(horizontal: 20, vertical: 8)

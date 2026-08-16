@@ -1,4 +1,5 @@
 # Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+about_info: 程序信息
 acknowledgement: Made With Love From {developers} People
 about: 關於
 about_this_program: 關於本程序
@@ -284,15 +285,17 @@ about_page:
 
     本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
 
+    本程序代碼版權受中國國家版權局保護，登記號2026SR0738647。
 
-    Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+    Copyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present
+    Traintime PDA authors.
 
-    Copyright 2025-present Traintime PDA authors.
-
+    The Copyright of the Software is protected by NCAC, register code is 2026SR0738647
 
     The Source Code Form is subject to the terms of the Mozilla Public License, v.
     2.0. If a copy of the MPL was not distributed with this file, you can obtain one
     at https://mozilla.org/MPL/2.0/.'
   beian: 備案號
+  copyright_register_code: 著作權登記號
   sign_android: 安卓簽名
   title: 關於本軟件

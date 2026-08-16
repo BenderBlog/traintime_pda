@@ -9,16 +9,40 @@ import 'package:talker_dio_logger/talker_dio_logger.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 final log = TalkerFlutter.init();
+
+bool _isSensitiveNetworkRequest(Uri uri) {
+  if (uri.host == 'ids.xidian.edu.cn') return true;
+  final lowerQuery = uri.query.toLowerCase();
+  return uri.queryParameters.keys.any(
+        (key) => const {
+          'ticket',
+          'password',
+          'dynamiccode',
+          'authorization',
+          'bfp',
+        }.contains(key.toLowerCase()),
+      ) ||
+      lowerQuery.contains('ticket=st-');
+}
+
 final logDioAdapter = TalkerDioLogger(
   talker: log,
   settings: TalkerDioLoggerSettings(
     printRequestHeaders: true,
     printResponseHeaders: true,
     printResponseMessage: true,
+    hiddenHeaders: const {
+      'authorization',
+      'cookie',
+      'set-cookie',
+      'proxy-authorization',
+    },
+    requestFilter: (request) => !_isSensitiveNetworkRequest(request.uri),
     responseFilter: (response) {
       // 1. 忽略特定 URL
       final url = response.requestOptions.uri.toString();
-      if (url.contains('openSliderCaptcha.htl')) {
+      if (_isSensitiveNetworkRequest(response.requestOptions.uri) ||
+          url.contains('openSliderCaptcha.htl')) {
         return false;
       }
 
@@ -30,6 +54,8 @@ final logDioAdapter = TalkerDioLogger(
 
       return true;
     },
+    errorFilter: (error) =>
+        !_isSensitiveNetworkRequest(error.requestOptions.uri),
   ),
 );
 

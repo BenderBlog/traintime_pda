@@ -1,3 +1,4 @@
+about_info: APP info
 acknowledgement: Made With Love From {developers} People
 about: About
 about_this_program: About this APP
@@ -314,19 +315,18 @@ about_page:
   copyright_notice: 'This software is compiled, or derived from the traintime_pda
     (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.
 
-
     This APP has no relation to Xidian University, Tishineng Service, Shuwow and other
     services.
 
+    Copyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present
+    Traintime PDA authors.
 
-    Copyright 2023-2025 BenderBlog Rodriguez and contributors.
-
-    Copyright 2025-present Traintime PDA authors.
-
+    The Copyright of the Software is protected by NCAC, register code is 2026SR0738647
 
     The Source Code Form is subject to the terms of the Mozilla Public License, v.
     2.0. If a copy of the MPL was not distributed with this file, you can obtain one
     at https://mozilla.org/MPL/2.0/.'
   beian: ICP record code
+  copyright_register_code: Copyright register code
   sign_android: Android signature
   title: About this APP

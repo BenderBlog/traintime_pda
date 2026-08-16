@@ -14,8 +14,8 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:watermeter/repository/schoolnet_session.dart';
 import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/repository/miscellaneous_session/schoolnet_session.dart';
 
 class GeneralNetworkUsagePage extends StatefulWidget {
   const GeneralNetworkUsagePage({super.key});
@@ -31,17 +31,15 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
   bool get wantKeepAlive => true;
 
   late Future<FetchResult<GeneralNetworkUsage>> state;
-  final SchoolnetSession session = SchoolnetSession();
+  final session = SchoolnetSession();
   bool _initialized = false;
 
   Future<void> _reload(BuildContext context) =>
       state = session.getGeneralNetworkUsage(
         captchaFunction: (image, onRefresh) => showDialog<String>(
           context: context,
-          builder: (context) => CaptchaInputDialog(
-            image: image,
-            onRefresh: onRefresh,
-          ),
+          builder: (context) =>
+              CaptchaInputDialog(image: image, onRefresh: onRefresh),
         ).then((value) => value ?? ""),
       );
 
@@ -62,84 +60,86 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
         if (result.isCache)
           CacheAlerter(
             dataType: context.t.schoolNet.title,
-            hint: result.cacheHint?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
+            hint:
+                result.cacheHint?.resolve(context.t) ??
+                context.t.common.cacheReasonDefault,
             placeOfCache: PlaceOfCache.inapp,
             fetchTime: result.fetchTime,
           ).center(),
-        [
-              // 注意事项
-              Text(
-                    context.t.schoolNet.idsAccountNet.notice,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.orange[800],
-                      height: 1.4,
-                    ),
-                  )
-                  .padding(all: 16)
-                  .decorated(
-                    color: Colors.orange[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange[200]!),
-                  )
-                  .padding(vertical: 8, horizontal: 4)
-                  .width(double.infinity)
-                  .constrained(maxWidth: sheetMaxWidth)
-                  .center(),
+        ListView(
+          children: [
+            [
+                  // 注意事项
+                  Text(
+                        context.t.schoolNet.idsAccountNet.notice,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.orange[800],
+                          height: 1.4,
+                        ),
+                      )
+                      .padding(all: 16)
+                      .decorated(
+                        color: Colors.orange[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.orange[200]!),
+                      )
+                      .padding(vertical: 8, horizontal: 4)
+                      .width(double.infinity)
+                      .constrained(maxWidth: sheetMaxWidth)
+                      .center(),
 
-              // 用户信息卡片
-              InfoCard(
-                    iconData: Icons.info,
-                    title: context.t.schoolNet.idsAccountNet.overview,
-                    children: [
-                      InfoItem(
-                        icon: Icons.person,
-                        label: context.t.schoolNet.idsAccountNet.account,
-                        value: pref.getString(pref.Preference.idsAccount),
-                      ),
-                      InfoItem(
-                        icon: Icons.data_usage,
-                        label: context.t.schoolNet.idsAccountNet.used,
-                        value: result.data.used,
-                        valueColor: Colors.green,
-                      ),
-                      InfoItem(
-                        icon: Icons.account_balance_wallet,
-                        label: context.t.schoolNet.idsAccountNet.remain,
-                        value: result.data.rest,
-                        valueColor: Colors.green,
-                      ),
-                    ],
-                  )
-                  .padding(vertical: 4)
-                  .constrained(maxWidth: sheetMaxWidth)
-                  .center(),
+                  // 用户信息卡片
+                  InfoCard(
+                        iconData: Icons.info,
+                        title: context.t.schoolNet.idsAccountNet.overview,
+                        children: [
+                          InfoItem(
+                            icon: Icons.person,
+                            label: context.t.schoolNet.idsAccountNet.account,
+                            value: pref.getString(pref.Preference.idsAccount),
+                          ),
+                          InfoItem(
+                            icon: Icons.data_usage,
+                            label: context.t.schoolNet.idsAccountNet.used,
+                            value: result.data.used,
+                            valueColor: Colors.green,
+                          ),
+                          InfoItem(
+                            icon: Icons.account_balance_wallet,
+                            label: context.t.schoolNet.idsAccountNet.remain,
+                            value: result.data.rest,
+                            valueColor: Colors.green,
+                          ),
+                        ],
+                      )
+                      .padding(vertical: 4)
+                      .constrained(maxWidth: sheetMaxWidth)
+                      .center(),
+                  if (result.data.ipList.isNotEmpty)
+                    _DeviceListLite(devices: result.data.ipList)
+                        .padding(vertical: 4)
+                        .constrained(maxWidth: sheetMaxWidth)
+                        .center(),
 
-              if (result.data.ipList.isNotEmpty)
-                _DeviceListLite(devices: result.data.ipList)
-                    .padding(vertical: 4)
-                    .constrained(maxWidth: sheetMaxWidth)
-                    .center(),
-
-              FilledButton(
-                    onPressed: () => setState(() {
-                      _reload(context);
-                    }),
-                    child: Text(
-                      context.t.schoolNet.refresh,
-                    ),
-                  )
-                  .padding(horizontal: 4, vertical: 8)
-                  .width(double.infinity)
-                  .constrained(maxWidth: sheetMaxWidth)
-                  .center(),
-            ]
-            .toColumn(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-            )
-            .scrollable(padding: EdgeInsets.symmetric(horizontal: 12))
-            .expanded(),
+                  FilledButton(
+                        onPressed: () => setState(() {
+                          _reload(context);
+                        }),
+                        child: Text(context.t.schoolNet.refresh),
+                      )
+                      .padding(horizontal: 4, vertical: 8)
+                      .width(double.infinity)
+                      .constrained(maxWidth: sheetMaxWidth)
+                      .center(),
+                ]
+                .toColumn(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                )
+                .padding(horizontal: 12),
+          ],
+        ).expanded(),
       ].toColumn(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -302,4 +302,3 @@ class _DeviceListLite extends StatelessWidget {
     ].toColumn().card(elevation: 0);
   }
 }
-

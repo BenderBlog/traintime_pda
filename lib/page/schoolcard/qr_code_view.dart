@@ -5,8 +5,8 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
 import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/controller/school_card_controller.dart';
 
 class QRCodeView extends StatefulWidget {
   const QRCodeView({super.key});
@@ -16,7 +16,7 @@ class QRCodeView extends StatefulWidget {
 }
 
 class _QRCodeViewState extends State<QRCodeView> {
-  Future<Uint8List> qrCode = SchoolCardSession().getQRCode();
+  Future<Uint8List> qrCode = SchoolCardController.i.session.getQRCode();
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class _QRCodeViewState extends State<QRCodeView> {
         TextButton(
           onPressed: () {
             setState(() {
-              qrCode = SchoolCardSession().getQRCode();
+              qrCode = SchoolCardController.i.session.getQRCode();
             });
           },
           child: Text(

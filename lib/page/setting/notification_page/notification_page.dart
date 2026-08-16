@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -368,7 +369,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16).withSafeBottom(context),
         children: [
           // Function switch
           ReXCard(

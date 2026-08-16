@@ -12,6 +12,7 @@ import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
@@ -55,6 +56,10 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isSelectMode = context.select<ScoreState, bool>(
+      (state) => state.isSelectMode,
+    );
+
     return Scaffold(
       body: Column(
         children: [
@@ -164,7 +169,9 @@ class _ScorePageState extends State<ScorePage> {
                   builder: (context, constraints) => AlignedGridView.count(
                     shrinkWrap: true,
                     itemCount: state.toShow.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                    ).withSafeBottom(context),
                     crossAxisCount: (constraints.maxWidth ~/ cardWidth).clamp(
                       1,
                       1000,
@@ -182,65 +189,82 @@ class _ScorePageState extends State<ScorePage> {
                 );
               }
             },
-          ).safeArea().expanded(),
+          ).expanded(),
         ],
       ),
       floatingActionButton: scoreInfoDialog(context),
-      bottomNavigationBar: Consumer<ScoreState>(
-        builder: (context, state, _) => Visibility(
-          visible: state.isSelectMode,
-          child: BottomAppBar(
-            height: 136,
-            elevation: 5.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
+      bottomNavigationBar: isSelectMode
+          ? Consumer<ScoreState>(
+              builder: (context, state, _) => BottomAppBar(
+                height: 136,
+                elevation: 5.0,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.all),
-                      child: Text(context.t.score.scorePage.selectAll),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.all),
+                          child: Text(
+                            context.t.score.scorePage.selectAll,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.none),
+                          child: Text(
+                            context.t.score.scorePage.selectNothing,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.original),
+                          child: Text(
+                            context.t.score.scorePage.resetSelect,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.none),
-                      child: Text(
-                        context.t.score.scorePage.selectNothing,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.original),
-                      child: Text(context.t.score.scorePage.resetSelect),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(state.bottomInfo(context)),
+                        IconButton(
+                          onPressed: () => pushSumDialog(
+                            context,
+                            context.t.score.scoreChoice.sumDialogContent(
+                              gpa_all: state
+                                  .evalAvg(true, isGPA: true)
+                                  .toStringAsFixed(3),
+                              avg_all: state
+                                  .evalAvg(true)
+                                  .toStringAsFixed(2),
+                              credit_all: state
+                                  .evalCredit(true)
+                                  .toStringAsFixed(2),
+                              unpassed: state.unPassed.isEmpty
+                                  ? context.t.score.allPassed
+                                  : state.unPassed,
+                              not_core_type: state.notCoreClassTypeList == null
+                                  ? context.t.score.none
+                                  : state.notCoreClassTypeList!,
+                            ),
+                          ),
+                          icon: const Icon(Icons.info),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(state.bottomInfo(context)),
-                    IconButton(
-                      onPressed: () => pushSumDialog(
-                        context,
-                        context.t.score.scoreChoice.sumDialogContent(gpa_all: state.evalAvg(true, isGPA: true).toStringAsFixed(2), avg_all: state.evalAvg(true).toStringAsFixed(2), credit_all: state.evalCredit(true).toStringAsFixed(2), unpassed: state.unPassed, not_core_type: state.notCoreClassTypeList == null
-                              ? context.t.score.none
-                              : state.notCoreClassTypeList!),
-                      ),
-                      icon: const Icon(Icons.info),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            )
+          : null,
     );
   }
 }

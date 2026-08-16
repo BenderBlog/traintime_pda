@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/page/energy/aircon_energy_card.dart';
 import 'package:watermeter/page/energy/electricity_energy_card.dart';
 import 'package:watermeter/page/energy/water_energy_card.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -39,17 +38,16 @@ class ElectricityReadyView extends StatelessWidget {
               .constrained(maxWidth: sheetMaxWidth)
               .center(),
 
-          const AirconEnergyCard()
-              .padding(vertical: 4)
-              .constrained(maxWidth: sheetMaxWidth)
-              .center(),
-
+          //  const AirconEnergyCard()
+          //      .padding(vertical: 4)
+          //      .constrained(maxWidth: sheetMaxWidth)
+          //      .center(),
           const WaterEnergyCard()
               .padding(vertical: 4)
               .constrained(maxWidth: sheetMaxWidth)
               .center(),
 
-          Image.asset("assets/art/pda_girl_default.png").padding(bottom: 16),
+          Image.asset("assets/art/pda_girl_default.webp").padding(bottom: 16),
         ]
         .toColumn(
           crossAxisAlignment: CrossAxisAlignment.center,

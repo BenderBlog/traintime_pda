@@ -8,8 +8,8 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:time/time.dart';
+import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
-import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -39,7 +39,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
   }
 
   void refreshPaidStatus() => setState(() {
-    getPaid = SchoolCardSession().getPaidStatus(
+    getPaid = SchoolCardController.i.session.getPaidStatus(
       formatter.format(timeRange[0]!),
       formatter.format(timeRange[1]!),
     );
@@ -166,11 +166,7 @@ class _SchoolCardWindowState extends State<SchoolCardWindow> {
                       const Divider(
                         height: 1,
                       ).constrained(width: sheetMaxWidth),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(children: dataRows),
-                        ),
-                      ),
+                      Expanded(child: ListView(children: dataRows)),
                     ],
                   );
                 }
