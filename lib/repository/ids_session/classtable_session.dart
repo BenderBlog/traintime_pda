@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/user_role.dart';
 import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
@@ -21,6 +22,35 @@ import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
+
+enum ClasstableCacheHint implements CacheHint {
+  passwordWrong,
+  loginFailed,
+  networkFailed,
+  unknownError;
+
+  String resolve(Translations t) {
+    switch (this) {
+      case passwordWrong: return t.classtable.cacheHintPasswordWrong;
+      case loginFailed: return t.classtable.cacheHintLoginFailed;
+      case networkFailed: return t.classtable.cacheHintNetworkFailed;
+      case unknownError: return t.classtable.cacheHintUnknownError;
+    }
+  }
+}
+
+ClasstableCacheHint _cacheHintFromError(Object error) {
+  if (error is PasswordWrongException) {
+    return ClasstableCacheHint.passwordWrong;
+  }
+  if (error is LoginFailedException) {
+    return ClasstableCacheHint.loginFailed;
+  }
+  if (error is DioException) {
+    return ClasstableCacheHint.networkFailed;
+  }
+  return ClasstableCacheHint.unknownError;
+}
 
 /// 课程表 4770397878132218
 class ClassTableSession extends IDSSession {
@@ -116,7 +146,7 @@ class ClassTableSession extends IDSSession {
           return FetchResult.cache(
             fetchTime: cache.$1,
             data: cache.$2,
-            hintKey: _cacheHintFromError(e),
+            cacheHint: _cacheHintFromError(e),
           );
         }
         rethrow;
@@ -126,19 +156,6 @@ class ClassTableSession extends IDSSession {
 
   bool _isLatestRequest(String semesterCode, UserRole role) =>
       semesterCode == _requestedSemesterCode && role == _requestedRole;
-
-  String _cacheHintFromError(Object error) {
-    if (error is PasswordWrongException) {
-      return "classtable.cache_hint_password_wrong";
-    }
-    if (error is LoginFailedException) {
-      return "classtable.cache_hint_login_failed";
-    }
-    if (error is DioException) {
-      return "classtable.cache_hint_network_failed";
-    }
-    return "classtable.cache_hint_unknown_error";
-  }
 
   // Fetch directly form ids
   Future<ClassTableData> _getYjspt(String semesterCode) async {

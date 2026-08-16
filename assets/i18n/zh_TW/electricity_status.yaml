@@ -1,0 +1,16 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+pending: 等待獲取
+remain_fetching: 正在獲取電量
+remain_network_issue: 電量查詢網絡故障
+remain_not_found: 電量查詢失敗
+remain_other_issue: 電量查詢故障
+owe_fetching: 正在獲取欠費
+owe_issue: 欠費查詢網絡故障
+owe_not_found: 目前欠款無法查詢，請看日誌窗口查找報錯詳情
+owe_no_need: 目前無需清繳欠費
+owe_need_pay: 待清繳 {due} 元欠費
+owe_issue_unable: 目前欠款無法查詢
+need_more_info: 需要在繳費平臺完善信息
+need_account: 需要填寫電費賬號
+captcha_failed: 驗證碼識別失敗
+other_issue: 程序故障

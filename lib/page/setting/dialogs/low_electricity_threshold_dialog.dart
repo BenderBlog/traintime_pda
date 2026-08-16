@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/energy_controller.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class LowElectricityThresholdDialog extends StatelessWidget {
   final TextEditingController _inputTextController =
@@ -28,12 +28,7 @@ class LowElectricityThresholdDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        FlutterI18n.translate(
-          context,
-          "setting.low_electricity_threshold_dialog.title",
-        ),
-      ),
+      title: Text(context.t.setting.lowElectricityThresholdDialog.title),
       content: TextFormField(
         autofocus: true,
         controller: _inputTextController,
@@ -41,16 +36,13 @@ class LowElectricityThresholdDialog extends StatelessWidget {
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         maxLines: 1,
         decoration: InputDecoration(
-          hintText: FlutterI18n.translate(
-            context,
-            "setting.low_electricity_threshold_dialog.input_hint",
-          ),
+          hintText: context.t.setting.lowElectricityThresholdDialog.inputHint,
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(context.t.common.cancel),
         ),
         TextButton(
           onPressed: () async {
@@ -63,7 +55,7 @@ class LowElectricityThresholdDialog extends StatelessWidget {
               Navigator.of(context).pop();
             }
           },
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(context.t.common.confirm),
         ),
       ],
     );

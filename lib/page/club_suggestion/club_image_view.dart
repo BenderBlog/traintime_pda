@@ -6,7 +6,7 @@
 /*
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ClubImageView extends StatefulWidget {
   final List<ImageProvider> images;
@@ -36,7 +36,7 @@ class _ClubImageViewState extends State<ClubImageView> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            FlutterI18n.translate(context, "club_promotion.picture_preview"),
+            context.t.clubPromotion.picturePreview,
           ),
         ),
         body: ExtendedImageGesturePageView.builder(

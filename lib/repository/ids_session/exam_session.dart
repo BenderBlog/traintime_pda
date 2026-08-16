@@ -10,6 +10,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/user_role.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
@@ -19,6 +20,34 @@ import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
+
+enum ExamCacheHint implements CacheHint {
+  passwordWrong,
+  loginFailed,
+  networkFailed,
+  unknownError;
+
+  @override
+  String resolve(Translations tr) => switch (this) {
+    passwordWrong => tr.exam.cacheHintPasswordWrong,
+    loginFailed  => tr.exam.cacheHintLoginFailed,
+    networkFailed => tr.exam.cacheHintNetworkFailed,
+    unknownError => tr.exam.cacheHintUnknownError,
+  };
+}
+
+ExamCacheHint _cacheHintFromError(Object error) {
+  if (error is PasswordWrongException) {
+    return ExamCacheHint.passwordWrong;
+  }
+  if (error is LoginFailedException) {
+    return ExamCacheHint.loginFailed;
+  }
+  if (error is DioException) {
+    return ExamCacheHint.networkFailed;
+  }
+  return ExamCacheHint.unknownError;
+}
 
 /// 考试安排 4768687067472349
 class ExamSession extends IDSSession {
@@ -110,7 +139,7 @@ class ExamSession extends IDSSession {
           return FetchResult.cache(
             fetchTime: cache.$1,
             data: cache.$2,
-            hintKey: _cacheHintFromError(e),
+            cacheHint: _cacheHintFromError(e),
           );
         }
         rethrow;
@@ -120,19 +149,6 @@ class ExamSession extends IDSSession {
 
   bool _isLatestRequest(String semester, UserRole role) =>
       semester == _requestedSemester && role == _requestedRole;
-
-  String _cacheHintFromError(Object error) {
-    if (error is PasswordWrongException) {
-      return "exam.cache_hint_password_wrong";
-    }
-    if (error is LoginFailedException) {
-      return "exam.cache_hint_login_failed";
-    }
-    if (error is DioException) {
-      return "exam.cache_hint_network_failed";
-    }
-    return "exam.cache_hint_unknown_error";
-  }
 
   Future<ExamData> _getExamYjspt(String semester) async {
     final location = await checkAndLogin(

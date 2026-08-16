@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/search_book_constant.dart';
@@ -289,17 +289,17 @@ class _SearchFieldsState extends State<SearchFields> {
   List<_SearchOption> _matchModeOptions(BuildContext context) => [
     LibrarySearchOption(
       "1",
-      FlutterI18n.translate(context, "library.match_exact"),
+      context.t.library.matchExact,
       "精确",
     ),
     LibrarySearchOption(
       "2",
-      FlutterI18n.translate(context, "library.match_fuzzy"),
+      context.t.library.matchFuzzy,
       "模糊",
     ),
     LibrarySearchOption(
       "3",
-      FlutterI18n.translate(context, "library.match_prefix"),
+      context.t.library.matchPrefix,
       "前方",
     ),
   ];
@@ -327,7 +327,7 @@ class _SearchFieldsState extends State<SearchFields> {
             controller: _textController,
             decoration: _inputDecoration(
               context,
-              FlutterI18n.translate(context, "library.search_here"),
+              context.t.library.searchHere,
               prefixIcon: Icons.search,
             ),
             onFieldSubmitted: (_) => _submitSearch(),
@@ -349,7 +349,7 @@ class _SearchFieldsState extends State<SearchFields> {
         children: [
           _buildOptionDropdown(
             context,
-            label: FlutterI18n.translate(context, "library.match_mode"),
+            label: context.t.library.matchMode,
             value: _advancedMatchMode,
             options: _matchModeOptions(context),
             onChanged: (value) => setState(() => _advancedMatchMode = value),
@@ -459,7 +459,7 @@ class _SearchFieldsState extends State<SearchFields> {
         FilledButton.icon(
           onPressed: _submitSearch,
           icon: const Icon(Icons.manage_search),
-          label: Text(FlutterI18n.translate(context, "library.search")),
+          label: Text(context.t.library.search,),
         ),
       ],
     );
@@ -474,7 +474,7 @@ class _SearchFieldsState extends State<SearchFields> {
   }) {
     return _buildOptionDropdown(
       context,
-      label: FlutterI18n.translate(context, "library.search_field_title"),
+      label: context.t.library.searchFieldTitle,
       value: value,
       options: options,
       selectedMaxLines: selectedMaxLines,

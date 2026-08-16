@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ScoreComposeCard extends Dialog {
   final Score score;
@@ -29,10 +29,7 @@ class ScoreComposeCard extends Dialog {
             info = InfoDetailBox(
               child: Center(
                 child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "score.score_compose_card.no_detail",
-                  ),
+                  context.t.score.scoreComposeCard.noDetail,
                 ),
               ),
             );
@@ -70,10 +67,7 @@ class ScoreComposeCard extends Dialog {
           info = InfoDetailBox(
             child: Center(
               child: Text(
-                FlutterI18n.translate(
-                  context,
-                  "score.score_compose_card.no_detail",
-                ),
+                context.t.score.scoreComposeCard.noDetail,
               ),
             ),
           );
@@ -81,10 +75,7 @@ class ScoreComposeCard extends Dialog {
           info = InfoDetailBox(
             child: Center(
               child: Text(
-                FlutterI18n.translate(
-                  context,
-                  "score.score_compose_card.fetching",
-                ),
+                context.t.score.scoreComposeCard.fetching,
               ),
             ),
           );
@@ -97,13 +88,13 @@ class ScoreComposeCard extends Dialog {
             bottomRow: [
               [
                 Text(
-                  "${FlutterI18n.translate(context, "score.score_compose_card.credit")}: ${score.credit}",
+                  "${context.t.score.scoreComposeCard.credit}: ${score.credit}",
                 ).expanded(flex: 2),
                 Text(
-                  "${FlutterI18n.translate(context, "score.score_compose_card.gpa")}: ${score.gpa}",
+                  "${context.t.score.scoreComposeCard.gpa}: ${score.gpa}",
                 ).expanded(flex: 3),
                 Text(
-                  "${FlutterI18n.translate(context, "score.score_compose_card.score")}: ${score.scoreStr}",
+                  "${context.t.score.scoreComposeCard.score}: ${score.scoreStr}",
                 ).expanded(flex: 3),
               ].toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween),
               const SizedBox(height: 8),

@@ -1,0 +1,19 @@
+type:
+  tech: Tech
+  acg: ACG
+  union: Official
+  profit: Commercial
+  sport: Sport
+  art: Culture
+  unknown: Unknown
+  game: Game
+  all: All
+wrong_param: Wrong Parameter
+no_group_info: No Club info
+loading: Loading
+error_outside: Error detected at the outside
+error: Error detected
+qq_copied: QQ Group Number have been copied to the clipboard
+no_link: No group invite link provided
+loading_problem: Error on loading page
+picture_preview: Picture

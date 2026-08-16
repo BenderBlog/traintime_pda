@@ -5,9 +5,9 @@
 // SchoolNet password dialog.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/translations.g.dart';
 
 class SchoolNetPasswordDialog extends StatefulWidget {
   const SchoolNetPasswordDialog({super.key});
@@ -46,10 +46,7 @@ class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        FlutterI18n.translate(
-          context,
-          "setting.change_schoolnet_password_title",
-        ),
+        context.t.setting.changeSchoolnetPasswordTitle,
       ),
       titleTextStyle: TextStyle(
         fontSize: 20,
@@ -60,10 +57,7 @@ class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
         controller: _schoolNetPasswordController,
         obscureText: _couldView,
         decoration: InputDecoration(
-          hintText: FlutterI18n.translate(
-            context,
-            "setting.change_password_dialog.input_hint",
-          ),
+          hintText: context.t.setting.changePasswordDialog.inputHint,
           suffixIcon: IconButton(
             icon: Icon(_couldView ? Icons.visibility : Icons.visibility_off),
             onPressed: () {
@@ -76,13 +70,13 @@ class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(context.t.common.cancel),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(context.t.common.confirm),
           onPressed: () async {
             if (_schoolNetPasswordController.text.isNotEmpty) {
               preference.setString(
@@ -93,10 +87,7 @@ class _SchoolNetPasswordDialogState extends State<SchoolNetPasswordDialog> {
             } else {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "setting.change_password_dialog.blank_input",
-                ),
+                msg: context.t.setting.changePasswordDialog.blankInput,
               );
             }
           },

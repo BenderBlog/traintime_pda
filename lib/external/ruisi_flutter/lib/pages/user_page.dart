@@ -3,9 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/pages/my_posts_page.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 import '../constants/urls.dart';
 import '../controller/ruisi_controller.dart';
@@ -24,7 +24,7 @@ class UserPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, 'ruisi.user.title')),
+        title: Text(context.t.ruisi.user.title),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -49,7 +49,7 @@ class UserPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     c.username ??
-                        FlutterI18n.translate(context, 'ruisi.user.unknown'),
+                        context.t.ruisi.user.unknown,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 4),
@@ -64,14 +64,14 @@ class UserPage extends StatelessWidget {
           const SizedBox(height: 8),
           ListTile(
             leading: const Icon(Icons.book),
-            title: Text(FlutterI18n.translate(context, 'ruisi.home.my_posts')),
+            title: Text(context.t.ruisi.home.myPosts),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(const MyPostsPage()),
           ),
           ListTile(
             leading: const Icon(Icons.bookmark),
             title: Text(
-              FlutterI18n.translate(context, 'ruisi.home.my_favorites'),
+              context.t.ruisi.home.myFavorites,
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(const FavoritesPage()),
@@ -79,13 +79,13 @@ class UserPage extends StatelessWidget {
           _CheckInListTile(onCheckIn: c.api.sign),
           ListTile(
             leading: const Icon(Icons.settings),
-            title: Text(FlutterI18n.translate(context, 'ruisi.home.settings')),
+            title: Text(context.t.ruisi.home.settings),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(SettingsPage(talker: c.talker)),
           ),
           ListTile(
             leading: const Icon(Icons.info_outline),
-            title: Text(FlutterI18n.translate(context, 'ruisi.home.about')),
+            title: Text(context.t.ruisi.home.about),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(const AboutPage()),
           ),
@@ -96,7 +96,7 @@ class UserPage extends StatelessWidget {
               color: Theme.of(context).colorScheme.error,
             ),
             title: Text(
-              FlutterI18n.translate(context, 'ruisi.common.logout'),
+              context.t.ruisi.common.logout,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
             onTap: () async {
@@ -106,7 +106,7 @@ class UserPage extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    FlutterI18n.translate(context, 'ruisi.common.logged_out'),
+                    context.t.ruisi.common.loggedOut,
                   ),
                 ),
               );
@@ -134,7 +134,7 @@ class __CheckInListTileState extends State<_CheckInListTile> {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.check_circle_outline),
-      title: Text(FlutterI18n.translate(context, 'ruisi.home.daily_checkin')),
+      title: Text(context.t.ruisi.home.dailyCheckin),
       trailing: signLoading
           ? const SizedBox(
               width: 24,

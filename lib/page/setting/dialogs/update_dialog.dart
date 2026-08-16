@@ -5,9 +5,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/pda_service/message.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class UpdateDialog extends StatelessWidget {
   final UpdateMessage updateMessage;
@@ -15,51 +15,41 @@ class UpdateDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String text = FlutterI18n.translate(
-      context,
-      "setting.update_dialog.new_content",
-      translationParams: {"code": updateMessage.code},
-    );
+    String text = context.t.setting.updateDialog.newContent(code: updateMessage.code);
     for (int i = 0; i < updateMessage.update.length; ++i) {
       text += "${i + 1}.${updateMessage.update[i]}\n";
     }
     return AlertDialog(
       title: Text(
-        FlutterI18n.translate(context, "setting.update_dialog.new_version"),
+        context.t.setting.updateDialog.newVersion,
       ),
       content: Text(text),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
-            FlutterI18n.translate(context, "setting.update_dialog.not_now"),
+            context.t.setting.updateDialog.notNow,
           ),
         ),
         if (Platform.isIOS)
           TextButton(
             onPressed: () => launchUrlString(updateMessage.ioslink),
             child: Text(
-              FlutterI18n.translate(context, "setting.update_dialog.app_store"),
+              context.t.setting.updateDialog.appStore,
             ),
           )
         else if (Platform.isAndroid)
           TextButton(
             onPressed: () => launchUrlString(updateMessage.fdroid),
             child: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.update_dialog.download_apk",
-              ),
+              context.t.setting.updateDialog.downloadApk,
             ),
           )
         else
           TextButton(
             onPressed: () => launchUrlString(updateMessage.github),
             child: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.update_dialog.github_release",
-              ),
+              context.t.setting.updateDialog.githubRelease,
             ),
           ),
       ],

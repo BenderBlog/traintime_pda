@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/setting/groups/section_setting_scaffold.dart';
 import 'package:watermeter/page/setting/notification_page/notification_debug_page.dart';
 import 'package:watermeter/page/setting/notification_page/notification_page.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class NotificationSection extends StatelessWidget {
   const NotificationSection({super.key});
@@ -14,17 +14,14 @@ class NotificationSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.notification_setting"),
+      title: context.t.setting.notificationSetting,
       items: [
         ListTile(
           title: Text(
-            FlutterI18n.translate(context, "setting.course_reminder_setting"),
+            context.t.setting.courseReminderSetting,
           ),
           subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.course_reminder_description",
-            ),
+            context.t.setting.courseReminderDescription,
           ),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
@@ -33,7 +30,7 @@ class NotificationSection extends StatelessWidget {
         ),
         ListTile(
           title: Text(
-            FlutterI18n.translate(context, "setting.notification_debug_page"),
+            context.t.setting.notificationDebugPage,
           ),
           trailing: const Icon(Icons.navigate_next),
           onTap: () => context.push(NotificationDebugPage()),

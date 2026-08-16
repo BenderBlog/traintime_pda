@@ -1,0 +1,44 @@
+title: Power Info
+power_title: Infomation
+cache_hint_login_failed: Failed to log in to the electricity service, showing cached
+  data.
+cache_hint_network_failed: Electricity service network request failed, showing cached
+  data.
+cache_hint_unknown_error: Failed to fetch the latest electricity data online, showing
+  cached data. Check logs for details.
+cache_notice: Last fetched
+account: Account
+remain_power: Remain power
+owe_info: Arrears
+history: Billing History
+daily_usage: Average usage per day
+not_enough_data: Not enough data for rendering graph
+info: 'Energy system can be only be accessed at schoolnet, do contact developers if
+  have issue.
+
+  History will be recorded locally while average usage is based on the electric meter''s
+  record.'
+fetching_hint: Fetching the latest electricity info.
+fetch_error: Failed to fetch electricity information. Please retry.
+date: Date
+power: Remaining
+update: Refresh
+water_usage_fetch_date: Fetch time
+water_usage_read_before: Last time
+water_usage_read_now: This time
+water_usage: Bath water usage
+water_title: Water usage
+water_loading: Loading water usage information
+water_unavailable: Water usage is unavailable. Retry from the electricity card.
+water_empty: No water usage information
+not_school_network: Not school network
+aircon_title: Aircon Electricity
+aircon_imei: Aircon IMEI
+aircon_amount: Platform usage
+aircon_update_time: Updated at
+aircon_waiting: Waiting to fetch aircon electricity data
+aircon_error: Failed to fetch aircon electricity data
+aircon_retry: Retry
+aircon_imei_missing: Add the aircon IMEI to view its electricity usage.
+aircon_add_imei: Add aircon IMEI
+aircon_cache_notice: Showing cached aircon data from {time}

@@ -255,7 +255,7 @@ class _RecordingIDSSession extends IDSSession {
     String? service,
     String? username,
     IDSReAuthHandler? reAuthHandler,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
   }) async {
     if (!isIDSReAuthLocation(uri.toString())) return uri;
     reAuthLocations.add(uri);

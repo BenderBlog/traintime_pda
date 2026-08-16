@@ -5,9 +5,9 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
 import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 Future<Uri> showIDSReAuthDialog(
   BuildContext context,
@@ -42,8 +42,6 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
   String? _notice;
   String? _error;
 
-  String _t(String key) => FlutterI18n.translate(context, key);
-
   Future<void> _sendCode() async {
     setState(() {
       _sending = true;
@@ -62,7 +60,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
       _startCountdown(delivery.retryAfter.inSeconds);
     } on DioException {
       if (mounted) {
-        setState(() => _error = _t('login.second_factor.network_error'));
+        setState(() => _error = context.t.login.secondFactor.networkError);
       }
     } on IDSReAuthExpiredException catch (error) {
       if (mounted) Navigator.of(context).pop(error);
@@ -89,7 +87,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
 
   Future<void> _submit() async {
     if (_codeController.text.trim().isEmpty) {
-      setState(() => _error = _t('login.second_factor.empty_code'));
+      setState(() => _error = context.t.login.secondFactor.emptyCode);
       return;
     }
     setState(() {
@@ -109,7 +107,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
       if (mounted) Navigator.of(context).pop(error);
     } on DioException {
       if (mounted) {
-        setState(() => _error = _t('login.second_factor.network_error'));
+        setState(() => _error = context.t.login.secondFactor.networkError);
       }
     } on IDSProtocolException catch (error) {
       if (mounted) setState(() => _error = error.message);
@@ -131,14 +129,14 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
     return PopScope(
       canPop: false,
       child: AlertDialog(
-        title: Text(_t('login.second_factor.title')),
+        title: Text(context.t.login.secondFactor.title),
         content: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(_t('login.second_factor.description')),
+              Text(context.t.login.secondFactor.description),
               const SizedBox(height: 16),
               TextField(
                 controller: _codeController,
@@ -147,7 +145,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
                 keyboardType: TextInputType.number,
                 autofillHints: const [AutofillHints.oneTimeCode],
                 decoration: InputDecoration(
-                  labelText: _t('login.second_factor.code'),
+                  labelText: context.t.login.secondFactor.code,
                   errorText: _error,
                 ),
                 onSubmitted: (_) => busy ? null : _submit(),
@@ -157,11 +155,8 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
                 onPressed: busy || _secondsRemaining > 0 ? null : _sendCode,
                 child: Text(
                   _secondsRemaining > 0
-                      ? _t('login.second_factor.resend_countdown').replaceFirst(
-                          '{seconds}',
-                          _secondsRemaining.toString(),
-                        )
-                      : _t('login.second_factor.send_code'),
+                      ? context.t.login.secondFactor.resendCountdown(seconds: _secondsRemaining.toString())
+                      : context.t.login.secondFactor.sendCode,
                 ),
               ),
               if (_notice != null) ...[
@@ -174,8 +169,8 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
                 onChanged: busy
                     ? null
                     : (value) => setState(() => _trustDevice = value ?? false),
-                title: Text(_t('login.second_factor.trust_device')),
-                subtitle: Text(_t('login.second_factor.trust_device_hint')),
+                title: Text(context.t.login.secondFactor.trustDevice),
+                subtitle: Text(context.t.login.secondFactor.trustDeviceHint),
                 controlAffinity: ListTileControlAffinity.leading,
               ),
             ],
@@ -188,7 +183,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
                 : () => Navigator.of(
                     context,
                   ).pop(const IDSReAuthCancelledException()),
-            child: Text(_t('cancel')),
+            child: Text(context.t.common.cancel),
           ),
           FilledButton(
             onPressed: busy ? null : _submit,
@@ -197,7 +192,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
                     dimension: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(_t('confirm')),
+                : Text(context.t.common.confirm),
           ),
         ],
       ),

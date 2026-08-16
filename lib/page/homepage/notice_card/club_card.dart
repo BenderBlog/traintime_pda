@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 /*
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/pda_service/club_info.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -12,6 +11,7 @@ import 'package:watermeter/repository/network_session.dart';
 import 'package:watermeter/repository/pda_service_session.dart';
 import 'package:watermeter/page/homepage/notice_card/marquee_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ClubPromotionCard extends StatelessWidget {
   final Function()? onTap;
@@ -44,17 +44,11 @@ class ClubPromotionCard extends StatelessWidget {
 
             case SessionState.error:
               return Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.club_promotion.failed",
-                ),
+                context.t.homepage.clubPromotion.failed,
               ).center();
             default:
               return Text(
-                FlutterI18n.translate(
-                  context,
-                  "homepage.club_promotion.fetching",
-                ),
+                context.t.homepage.clubPromotion.fetching,
               ).center();
           }
         })

@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/page/setting/groups/section_setting_scaffold.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/translations.g.dart';
 
 class AccountSection extends StatelessWidget {
   const AccountSection({super.key});
@@ -15,12 +15,12 @@ class AccountSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.account_setting"),
+      title: context.t.setting.accountSetting,
       items: [
         if (!preference.getBool(preference.Preference.role)) ...[
           ListTile(
             title: Text(
-              FlutterI18n.translate(context, "setting.sport_password_setting"),
+              context.t.setting.sportPasswordSetting
             ),
             trailing: const Icon(Icons.navigate_next),
             onTap: () {
@@ -33,10 +33,7 @@ class AccountSection extends StatelessWidget {
           ),
           ListTile(
             title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.experiment_password_setting",
-              ),
+              context.t.setting.experimentPasswordSetting
             ),
             trailing: const Icon(Icons.navigate_next),
             onTap: () {
@@ -51,16 +48,10 @@ class AccountSection extends StatelessWidget {
 
         ListTile(
           title: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.schoolnet_password_setting",
-            ),
+            context.t.setting.schoolnetPasswordSetting
           ),
           subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.schoolnet_password_description",
-            ),
+            context.t.setting.schoolnetPasswordDescription
           ),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {

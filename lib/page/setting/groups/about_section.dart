@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -11,6 +10,7 @@ import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/setting/groups/section_setting_scaffold.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class AboutSection extends StatelessWidget {
   const AboutSection({super.key});
@@ -18,41 +18,29 @@ class AboutSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.about_info"),
+      title: context.t.setting.about,
       items: [
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.about_this_program"),
-          ),
+          title: Text(context.t.setting.aboutThisProgram),
           subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.version",
-              translationParams: {
-                "version":
-                    "${preference.packageInfo.version}+"
-                    "${preference.packageInfo.buildNumber}",
-              },
+            context.t.setting.version(
+              version:
+                  "${preference.packageInfo.version}+"
+                  "${preference.packageInfo.buildNumber}",
             ),
           ),
           onTap: () => context.pushReplacementNamed(Routes.about),
           trailing: const Icon(Icons.navigate_next),
         ),
         ListTile(
-          title: Text(FlutterI18n.translate(context, "setting.check_update")),
+          title: Text(context.t.setting.checkUpdate),
           subtitle: SignalBuilder(
             builder: (context) {
               final updateState =
                   UpdateNoticeController.i.updateMessageStateSignal.value;
               return Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.latest_version",
-                  translationParams: {
-                    "latest":
-                        updateState.value?.code ??
-                        FlutterI18n.translate(context, "setting.waiting"),
-                  },
+                context.t.setting.latestVersion(
+                  latest: updateState.value?.code ?? context.t.setting.waiting,
                 ),
               );
             },
@@ -60,7 +48,7 @@ class AboutSection extends StatelessWidget {
           onTap: () {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(context, "setting.fetching_update"),
+              msg: context.t.setting.fetchingUpdate,
             );
             UpdateNoticeController.i.reloadUpdateNoticeInfo().then((
               value,
@@ -73,7 +61,7 @@ class AboutSection extends StatelessWidget {
                     .hasError) {
                   showToast(
                     context: context,
-                    msg: FlutterI18n.translate(context, "setting.fetch_failed"),
+                    msg: context.t.setting.fetchFailed,
                   );
                   return;
                 }
@@ -84,11 +72,7 @@ class AboutSection extends StatelessWidget {
                   case null:
                     showToast(
                       context: context,
-                      msg: FlutterI18n.translate(
-                        context,
-
-                        "setting.current_testing",
-                      ),
+                      msg: context.t.setting.currentTesting,
                     );
                   case true:
                     await showDialog(
@@ -106,10 +90,7 @@ class AboutSection extends StatelessWidget {
                   case false:
                     showToast(
                       context: context,
-                      msg: FlutterI18n.translate(
-                        context,
-                        "setting.current_stable",
-                      ),
+                      msg: context.t.setting.currentStable,
                     );
                 }
               }

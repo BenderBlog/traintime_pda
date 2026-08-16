@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
@@ -18,6 +17,7 @@ import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ClasstableSection extends StatefulWidget {
   const ClasstableSection({super.key});
@@ -50,10 +50,10 @@ class _ClasstableSectionState extends State<ClasstableSection> {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.classtable_setting"),
+      title: context.t.setting.classtableSetting,
       items: [
         ListTile(
-          title: Text(FlutterI18n.translate(context, "setting.background")),
+          title: Text(context.t.setting.background),
           trailing: Switch(
             value: preference.getBool(preference.Preference.decorated),
             onChanged: (bool value) {
@@ -61,7 +61,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                   !preference.getBool(preference.Preference.decoration)) {
                 showToast(
                   context: context,
-                  msg: FlutterI18n.translate(context, "setting.no_background"),
+                  msg: context.t.setting.noBackground,
                 );
               } else {
                 /// TODO: Check whether need setState
@@ -73,9 +73,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
           ),
         ),
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.choose_background"),
-          ),
+          title: Text(context.t.setting.chooseBackground),
           trailing: const Icon(Icons.navigate_next),
           onTap: () async {
             PlatformFile? result;
@@ -85,7 +83,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
               if (context.mounted) {
                 showToast(
                   context: context,
-                  msg: FlutterI18n.translate(context, "setting.no_permission"),
+                  msg: context.t.setting.noPermission,
                 );
               }
             }
@@ -98,20 +96,14 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                 if (context.mounted) {
                   showToast(
                     context: context,
-                    msg: FlutterI18n.translate(
-                      context,
-                      "setting.successful_setting",
-                    ),
+                    msg: context.t.setting.successfulSetting,
                   );
                 }
               } else {
                 if (context.mounted) {
                   showToast(
                     context: context,
-                    msg: FlutterI18n.translate(
-                      context,
-                      "setting.failure_setting",
-                    ),
+                    msg: context.t.setting.failureSetting,
                   );
                 }
               }
@@ -119,25 +111,13 @@ class _ClasstableSectionState extends State<ClasstableSection> {
           },
         ),
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.clear_user_class"),
-          ),
+          title: Text(context.t.setting.clearUserClass),
           trailing: const Icon(Icons.navigate_next),
           onTap: () => showDialog<String>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-              title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.clear_user_class_title",
-                ),
-              ),
-              content: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.clear_user_class_content",
-                ),
-              ),
+              title: Text(context.t.setting.clearUserClassTitle),
+              content: Text(context.t.setting.clearUserClassContent),
               actions: [
                 TextButton(
                   style: TextButton.styleFrom(
@@ -145,7 +125,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: Text(FlutterI18n.translate(context, "cancel")),
+                  child: Text(context.t.common.cancel),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -155,31 +135,24 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                     }
                     showToast(
                       context: context,
-                      msg: FlutterI18n.translate(
-                        context,
-                        "setting.clear_user_class_clear",
-                      ),
+                      msg: context.t.setting.clearUserClassClear,
                     );
                     Navigator.pop(context);
                   },
-                  child: Text(FlutterI18n.translate(context, "confirm")),
+                  child: Text(context.t.common.confirm),
                 ),
               ],
             ),
           ),
         ),
         ListTile(
-          title: Text(FlutterI18n.translate(context, "setting.class_refresh")),
+          title: Text(context.t.setting.classRefresh),
           trailing: const Icon(Icons.navigate_next),
           onTap: () => showDialog<String>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-              title: Text(
-                FlutterI18n.translate(context, "setting.class_refresh_title"),
-              ),
-              content: Text(
-                FlutterI18n.translate(context, "setting.class_refresh_content"),
-              ),
+              title: Text(context.t.setting.classRefreshTitle),
+              content: Text(context.t.setting.classRefreshContent),
               actions: [
                 TextButton(
                   style: TextButton.styleFrom(
@@ -187,7 +160,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: Text(FlutterI18n.translate(context, "cancel")),
+                  child: Text(context.t.common.cancel),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -205,7 +178,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                       Navigator.pop(context);
                     }
                   },
-                  child: Text(FlutterI18n.translate(context, "confirm")),
+                  child: Text(context.t.common.confirm),
                 ),
               ],
             ),
@@ -214,16 +187,10 @@ class _ClasstableSectionState extends State<ClasstableSection> {
 
         /// TODO: Refactor class swift, explain goes to dialog, show current state
         ListTile(
-          title: Text(FlutterI18n.translate(context, "setting.class_swift")),
+          title: Text(context.t.setting.classSwift),
           subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.class_swift_description",
-              translationParams: {
-                "swift": preference
-                    .getInt(preference.Preference.swift)
-                    .toString(),
-              },
+            context.t.setting.classSwiftDescription(
+              swift: preference.getInt(preference.Preference.swift).toString(),
             ),
           ),
           trailing: const Icon(Icons.navigate_next),
@@ -238,18 +205,12 @@ class _ClasstableSectionState extends State<ClasstableSection> {
           },
         ),
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.semester_change"),
-          ),
+          title: Text(context.t.setting.semesterChange),
           subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.semester_change_description",
-              translationParams: {
-                "semester": preference.getString(
-                  preference.Preference.currentSemester,
-                ),
-              },
+            context.t.setting.semesterChangeDescription(
+              semester: preference.getString(
+                preference.Preference.currentSemester,
+              ),
             ),
           ),
           trailing: const Icon(Icons.navigate_next),
@@ -262,7 +223,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
               if (value == true) {
                 setState(() {});
                 if (context.mounted) {
-                  showToast(context: context, msg: "Updating data");
+                  showToast(context: context, msg: context.t.setting.semesterUpdateData);
                 }
                 await _waitForSemesterAwareReloads();
                 await maybeAutoSyncSystemCalendar();

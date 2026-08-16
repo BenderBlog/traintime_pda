@@ -6,13 +6,13 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
 import 'package:watermeter/page/setting/about_page/film_component.dart';
 import 'package:watermeter/model/about_page.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/translations.g.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -28,9 +28,7 @@ class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "setting.about_page.title")),
-      ),
+      appBar: AppBar(title: Text(context.t.setting.aboutPage.title)),
       body: ListView(
         children: [
           [
@@ -65,7 +63,7 @@ class _AboutPageState extends State<AboutPage> {
           ...linkData.map(
             (e) => ListTile(
               leading: Icon(e.icon),
-              title: Text(FlutterI18n.translate(context, e.nameKey)),
+              title: Text(e.resolve(context.t)),
               onTap: () => launchUrl(
                 Uri.parse(e.url),
                 mode: LaunchMode.externalApplication,
@@ -74,9 +72,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
           ListTile(
             leading: const Icon(Icons.balance),
-            title: Text(
-              FlutterI18n.translate(context, "setting.about_page.know_more"),
-            ),
+            title: Text(context.t.setting.aboutPage.knowMore),
             onTap: () => showLicensePage(
               context: context,
               applicationName:
@@ -87,50 +83,31 @@ class _AboutPageState extends State<AboutPage> {
                   "v${preference.packageInfo.version}+"
                   "${preference.packageInfo.buildNumber}",
               applicationIcon: const AppIconWidget().padding(vertical: 16),
-              applicationLegalese: FlutterI18n.translate(
-                context,
-                "setting.about_page.copyright_notice",
-              ),
+              applicationLegalese: context.t.setting.aboutPage.copyrightNotice,
             ),
           ),
           ListTile(
             leading: const Icon(Icons.copyright),
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.about_page.copyright_register_code",
-              ),
-            ),
+            title: Text(context.t.setting.aboutPage.copyrightRegisterCode),
             subtitle: const Text("2026SR0738647"),
           ),
           ListTile(
             leading: const Icon(Icons.code),
-            title: Text(
-              FlutterI18n.translate(context, "setting.about_page.beian"),
-            ),
+            title: Text(context.t.setting.aboutPage.beian),
             subtitle: const Text("陕ICP备2024026116号-1A"),
           ),
           if (Platform.isAndroid)
             ListTile(
               leading: const Icon(Icons.code),
-              title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.about_page.sign_android",
-                ),
-              ),
+              title: Text(context.t.setting.aboutPage.signAndroid),
               subtitle: Text(preference.packageInfo.buildSignature),
             ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.person),
             title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.acknowledgement",
-                translationParams: {
-                  "developers": getDevelopers.length.toString(),
-                },
+              context.t.setting.acknowledgement(
+                developers: getDevelopers.length.toString(),
               ),
             ),
             onTap: () => setState(() {
@@ -150,7 +127,7 @@ class _AboutPageState extends State<AboutPage> {
                 ).clipOval().constrained(width: 24, height: 24),
                 title: Text(developer.name),
                 subtitle: Text(
-                  FlutterI18n.translate(context, developer.descriptionI18nKey),
+                  developer.description(context.t),
                 ),
                 trailing: Icon(Icons.open_in_new),
                 onTap: () => launchUrl(

@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:pool/pool.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/password_exceptions.dart';
@@ -20,6 +21,41 @@ import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
+
+enum PhysicsCacheHint implements CacheHint {
+  missingPassword,
+  loginFailed,
+  notSchoolNetwork,
+  networkFailed,
+  unknownError;
+
+  String resolve(Translations t) {
+    switch (this) {
+      case missingPassword: return t.experiment.physicsCacheHintMissingPassword;
+      case loginFailed: return t.experiment.physicsCacheHintLoginFailed;
+      case notSchoolNetwork: return t.experiment.physicsCacheHintNotSchoolNetwork;
+      case networkFailed: return t.experiment.physicsCacheHintNetworkFailed;
+      case unknownError: return t.experiment.physicsCacheHintUnknownError;
+    }
+  }
+}
+
+PhysicsCacheHint _cacheHintFromError(Object error) {
+  if (error is NoPasswordException &&
+      error.type == PasswordType.physicsExperiment) {
+    return PhysicsCacheHint.missingPassword;
+  }
+  if (error is LoginFailedException) {
+    return PhysicsCacheHint.loginFailed;
+  }
+  if (error is NotSchoolNetworkException) {
+    return PhysicsCacheHint.notSchoolNetwork;
+  }
+  if (error is DioException) {
+    return PhysicsCacheHint.networkFailed;
+  }
+  return PhysicsCacheHint.unknownError;
+}
 
 /// For physics experiment
 class ExperimentSession {
@@ -388,23 +424,6 @@ class ExperimentSession {
     return toReturn;
   }
 
-  String _cacheHintFromError(Object error) {
-    if (error is NoPasswordException &&
-        error.type == PasswordType.physicsExperiment) {
-      return "experiment.physics_cache_hint_missing_password";
-    }
-    if (error is LoginFailedException) {
-      return "experiment.physics_cache_hint_login_failed";
-    }
-    if (error is NotSchoolNetworkException) {
-      return "experiment.physics_cache_hint_not_school_network";
-    }
-    if (error is DioException) {
-      return "experiment.physics_cache_hint_network_failed";
-    }
-    return "experiment.physics_cache_hint_unknown_error";
-  }
-
   Future<FetchResult<List<ExperimentData>>> getData() =>
       _dataFlight.run(_getDataOnce);
 
@@ -428,7 +447,7 @@ class ExperimentSession {
         return FetchResult.cache(
           fetchTime: cache.$1,
           data: cache.$2,
-          hintKey: _cacheHintFromError(e),
+          cacheHint: _cacheHintFromError(e),
         );
       }
       rethrow;

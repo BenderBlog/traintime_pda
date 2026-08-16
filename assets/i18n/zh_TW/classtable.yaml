@@ -1,0 +1,173 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+partner_classtable:
+  override_dialog: 目前有搭子課表數據，是否要覆蓋？
+  no_file: 未發現導入文件
+  no_permission: 未獲取存儲權限，無法讀取文件
+  problem: 好像導入文件有點問題:P
+  success: 導入成功
+  share_dialog:
+    title: 請不要隨意分享
+    content: 導出文件包括你的個人信息，請不要隨意跟別人分享，或者發在大群裡。
+  save_dialog:
+    title: 保存日曆文件到...
+    success_message: 應該保存成功
+    failure_message: 文件創建失敗，保存取消
+  delete_dialog:
+    title: 確認對話框
+    message: 確定要清除搭子課表嗎？
+    success_message: 刪除搭子課表成功
+  name_dialog:
+    title: 輸入對方顯示該課表的名稱
+    hint: 在此輸入，否則為 Sweetie
+    cancel: 我就這一個甜心
+    accept: 提交
+    blank_input: 輸入空白!
+page_title: 我的日程表
+partner_page_title: '{partner_name}的日程表'
+popup_menu:
+  not_arranged: 查看未安排課程信息
+  class_changed: 查看課程安排調整信息
+  add_class: 添加課程信息
+  generate_ical: 生成日曆文件
+  generate_partner_file: 生成共享課表文件
+  import_partner_file: 導入共享課表文件
+  delete_partner_file: 刪除共享課表文件
+  output_to_system: 導出到系統日曆
+  refresh_classtable: 刷新日程表
+  switch_semester: 切換課程表學期
+  current_time_settings: 時間指示設置
+  class_color_settings: 課表樣式設置
+visual_settings:
+  current_time_settings_title: 時間指示設置
+  class_color_settings_title: 課表樣式設置
+  completed_style_enabled: 已結束課程樣式區分
+  current_time_section: 時間指示
+  show_current_time_indicator: 顯示當前時間指示線
+  show_current_time_label: 顯示迷你數字時鐘
+  show_today_column_highlight: 強調顯示今天的縱列
+  unfinished_section: 課程樣式
+  active_brightness_factor: '亮度: {value}'
+  active_border_alpha: '邊框透明度: {value}'
+  active_inner_alpha: '底色透明度: {value}'
+  completed_section: 已結束課程樣式
+  completed_saturation_factor: '底色飽和度: {value}'
+  completed_brightness_factor: '亮度: {value}'
+  completed_text_saturation_factor: '文字飽和度: {value}'
+  completed_border_alpha: '邊框透明度: {value}'
+  completed_inner_alpha: '底色透明度: {value}'
+status_source:
+  class_table: 課表
+  exam: 考試
+  physics_experiment: 物理實驗
+  other_experiment: 其他實驗
+error_dialog_title: 錯誤信息概覽
+status_banner:
+  loading: 正在更新：{sources}
+  cache: 當前使用緩存：{sources}
+  error_summary: 以下信息加載失敗：{sources}
+empty_state:
+  no_course: '{semester_code} 學期沒有課程安排。'
+  with_exam: '{semester_code} 學期沒有課程安排，但有考試安排。'
+  with_experiment: '{semester_code} 學期沒有課程安排，但有實驗安排。'
+  with_exam_and_experiment: '{semester_code} 學期沒有課程安排，但有考試和實驗安排。'
+empty_action:
+  view_exam: 查看考試安排
+  view_experiment: 查看實驗安排
+class_change_page:
+  title: 課程調整
+  empty_message: 目前沒有調課信息
+  teacher_change: 教師變更：從{previous_teacher}變為{new_teacher}
+  no_teacher_change: 教師信息沒有改變
+  '1': 一
+  '2': 二
+  '3': 三
+  '4': 四
+  '5': 五
+  '6': 六
+  '7': 日
+  change_class_message: 調課信息，從第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節
+    調整為第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，{newClassroom}教室上課
+  patch_class_message: 補課信息，第{newAffectedWeeksListStr}周 星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}節，
+    {newClassroom}補課
+  stop_class_message: 停課信息，第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}節停課
+  class_info: '編號: {classCode} | {classNumber} 班
+
+    安排變更：{classChange}{teacherChange}'
+not_arranged_page:
+  title: 沒有時間安排的科目
+  empty_message: 目前全部課程均有時間安排
+  content: '編號: {classCode} | {classNumber} 班
+
+    老師: {teacher}'
+empty_class_message: '{semester_code} 學期沒有課程'
+empty_class_with_exam: '{semester_code} 學期沒有課程但是有考試安排！
+
+  請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面'
+week_title: 第{week}周
+noon_break: 午休
+supper_break: 晚休
+month: '{month}
+
+  月'
+no_class: 本週暫無安排，請不要在床上過於慵懶
+class_card:
+  title: 日程信息
+  unknown_classroom: 未知教室
+  remains_hint: 還有{remain_count}個日程
+class_add:
+  add_class_title: 添加課程
+  change_class_title: 修改課程
+  class_name_empty_message: 必須輸入課程名
+  wrong_time_message: 輸入的時間不對
+  save_button: 保存
+  input_classname_hint: 課程名字(必填)
+  input_teacher_hint: 老師姓名(選填)
+  input_classroom_hint: 教室位置(選填)
+  input_week_hint: 選擇上課周次
+  input_time_hint: 選擇上課時間
+  input_time_weekday_hint: 上課周次
+  input_start_time_hint: 上課時間
+  input_end_time_hint: 下課時間
+  wheel_choose_hint: 第 {index} 節
+  choose_at_least_one: 請至少選擇一個上課日期和時間
+  repeat_weekly: 按周重複
+  free_time: 自定義日期
+  date_selector_free:
+    rule: 時間必須在 08:30-21:25 之間
+    rule_2: 下課時間必須晚於上課時間
+    class_start_time: 上課時間
+    class_end_time: 下課時間
+    edit_class_time: 編輯課程時間
+    choose_class_time: 選擇課程時間
+course_detail_card:
+  class_number_string: '{number} 班'
+  unknown_teacher: 老師未定
+  unknown_place: 地點未定
+  class_period: '{start}-{stop}節'
+  edit: 編輯
+  delete: 刪除
+  delete_single: 刪除本次
+  delete_all: 刪除全部
+  delete_content: 所有關於這個課的信息都會被刪除，課表上關於這門課的信息將不復存在！
+  delete_content_single: 關於這個課的信息只有這個時間段都會被刪除，其他的時間段會被保留。
+  delete_title: 是否刪除課程信息？
+output_to_system:
+  success: 成功導出到系統日曆
+  failure: 導出到系統日曆過程中發生了問題:P
+  request_all_title: 權限需求說明
+  request_all: 因導出插件限制，用戶必須同時授予本軟件讀取日曆和寫入日曆權限，才能正常導出日程。不過，本軟件不會讀取日曆。
+refresh_classtable:
+  ready: 準備刷新日程信息
+  success: 成功刷新日程信息
+cache_hint_password_wrong: 統一認證密碼錯誤或已失效。
+cache_hint_login_failed: 登錄課表服務失敗。
+cache_hint_network_failed: 課表網絡請求失敗。
+cache_hint_unknown_error: 在線獲取課表失敗。詳細錯誤請查看日誌。
+semester_switcher:
+  choose_semester: 選擇學期
+  first_academic_year: 第一學年
+  second_academic_year: 第二學年
+  fetch_remote_semester: 獲取當前學期
+  fetching_remote_semester: 正在獲取...
+  year: '{year}年'
+  only_future_hint: 本程序僅允許查看未來學期的課程安排。

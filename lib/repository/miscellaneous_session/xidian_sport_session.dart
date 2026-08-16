@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypter_plus/encrypter_plus.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/password_exceptions.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
@@ -15,22 +16,31 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
+enum SportCacheHint implements CacheHint {
+  missingPassword,
+  credentialInvalid,
+  maintain,
+  loginFailed,
+  queryFailed,
+  networkFailed,
+  unknownError;
+
+  @override
+  String resolve(Translations tr) => switch (this) {
+    missingPassword    => tr.sport.cacheHintMissingPassword,
+    credentialInvalid  => tr.sport.cacheHintCredentialInvalid,
+    maintain           => tr.sport.cacheHintMaintain,
+    loginFailed        => tr.sport.cacheHintLoginFailed,
+    queryFailed        => tr.sport.cacheHintQueryFailed,
+    networkFailed      => tr.sport.cacheHintNetwork,
+    unknownError       => tr.sport.cacheHintUnknown,
+  };
+}
+
 /// Get data from Xidian Sport.
 /// Notice that it use separate cookie jar
 class SportSession {
   static final _lock = Lock();
-  static const _cacheHintMissingPasswordKey =
-      "sport.cache_hint_missing_password";
-  static const _cacheHintCredentialInvalidKey =
-      "sport.cache_hint_credential_invalid";
-  static const _cacheHintMaintainKey = "sport.cache_hint_maintain";
-  static const _cacheHintLoginFailedKey = "sport.cache_hint_login_failed";
-  static const _cacheHintQueryFailedKey = "sport.cache_hint_query_failed";
-  static const _cacheHintNetworkKey = "sport.cache_hint_network";
-  static const _cacheHintUnknownKey = "sport.cache_hint_unknown";
-  static const _authExpiredMessageKey = "sport.error_auth_expired";
-  static const _credentialInvalidMessageKey = "sport.error_credential_invalid";
-  static const _credentialMissingMessageKey = "sport.error_missing_password";
   static const _wrongPasswordKeywords = {"用户名", "账号", "密码"};
   static const _authFailureKeywords = {
     "未登录",
@@ -110,7 +120,7 @@ class SportSession {
         return FetchResult.cache(
           fetchTime: _scoreCacheFetchTime,
           data: _scoreCache!,
-          hintKey: _cacheHintFromError(e),
+          cacheHint: _cacheHintFromError(e),
         );
       } else {
         rethrow;
@@ -191,7 +201,7 @@ class SportSession {
         return FetchResult.cache(
           fetchTime: _classCacheFetchTime,
           data: _classCache!,
-          hintKey: _cacheHintFromError(e),
+          cacheHint: _cacheHintFromError(e),
         );
       } else {
         rethrow;
@@ -295,25 +305,25 @@ awb4B45zUwIDAQAB
     return _wrongPasswordKeywords.any(message.contains);
   }
 
-  String? _cacheHintFromError(Object error) {
+SportCacheHint? _cacheHintFromError(Object error) {
     if (error is SportCredentialMissingException) {
-      return _cacheHintMissingPasswordKey;
+      return SportCacheHint.missingPassword;
     }
     if (error is SportCredentialInvalidException) {
-      return _cacheHintCredentialInvalidKey;
+      return SportCacheHint.credentialInvalid;
     }
     if (error is LoginFailedException) {
       return error.msg == "系统维护"
-          ? _cacheHintMaintainKey
-          : _cacheHintLoginFailedKey;
+          ? SportCacheHint.maintain
+          : SportCacheHint.loginFailed;
     }
     if (error is SemesterFailedException) {
-      return _cacheHintQueryFailedKey;
+      return SportCacheHint.queryFailed;
     }
     if (error is DioException) {
-      return _cacheHintNetworkKey;
+      return SportCacheHint.networkFailed;
     }
-    return _cacheHintUnknownKey;
+    return SportCacheHint.unknownError;
   }
 
   Future<Map<String, dynamic>> _authenticatedRequire({
@@ -490,21 +500,12 @@ class SemesterFailedException implements Exception {
 
 class SportAuthExpiredException implements Exception {
   const SportAuthExpiredException();
-
-  @override
-  String toString() => SportSession._authExpiredMessageKey;
 }
 
 class SportCredentialMissingException implements Exception {
   const SportCredentialMissingException();
-
-  @override
-  String toString() => SportSession._credentialMissingMessageKey;
 }
 
 class SportCredentialInvalidException implements Exception {
   const SportCredentialInvalidException();
-
-  @override
-  String toString() => SportSession._credentialInvalidMessageKey;
 }

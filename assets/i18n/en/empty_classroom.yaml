@@ -1,0 +1,7 @@
+title: Empty Classrooms
+date: Date {date}
+building: Building {building}
+search_hint: Classroom name or code
+classroom: Classroom
+empty: Available
+occupied: Occupied

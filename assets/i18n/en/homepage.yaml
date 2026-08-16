@@ -1,0 +1,130 @@
+title: School Info Center
+loading: Loading
+loaded: Message updated
+load_error: Something wrong
+on_holiday: Currently on holiday
+on_weekday: Currently week {current}
+loading_message: Refreshing information...
+postgraduate_notice: Postgraduate features activated!
+linux_notice: Linux version is under testing, feel free to feedback!
+edit_mode: Edit Layout
+edit_done: Done
+edit_reset: Reset Layout
+edit_hint: Schedule and update cards cannot be edited
+manage_hidden: Manage hidden cards
+hidden_title: Hidden cards
+hidden_label: Hidden
+hide_empty: No hidden cards
+homepage: Info
+ruisi: Forum
+club: Club
+planet: Blog
+dashboard: Pighub
+setting: Settings
+input_partner_data:
+  route_not_exist: Import path does not exist:P
+  failed_get_file: Failed to import file
+  failed_import: Maybe there is a problem with the import file:P
+  success_message: Import successful, if the class schedule page is open, please reopen
+    it
+  not_loaded: Class schedule has not been loaded yet, please try again later...
+  confirm_content: There is currently partner class schedule data, do you want to
+    overwrite?
+login_message: Logging in, currently displaying cached data
+successful_login_message: Login successful
+password_wrong_title: Wrong username or password
+password_wrong_content: Restart the app and log in manually?
+password_wrong_denial: No, enter offline mode
+offline_mode_title: Uniform Authentication Service offline mode activated
+offline_mode_content: '"Unable to connect to the Unified Authentication Service server,
+  all related services are temporarily unavailable.
+
+  Score inquiry, exam information inquiry, overdue fee inquiry, campus card inquiry
+  are closed. The schedule displays cached data. Other functions are temporarily not
+  affected.
+
+  We apologize for any inconvenience caused."
+
+  '
+offline_mode: In offline mode, all one-stop related functions are disabled
+notice_card:
+  empty_notice: No application announcements retrieved, please refresh
+  no_notice_avaliable: Failed to fetch the application announcements
+  notice_list_title: Notifications
+  open_url: Open link
+  notice_page_title: Notification List
+class_table_card:
+  title: Timetable
+  today: '{remain} arrangment(s) today'
+  today_finished: Arrangements all done today
+  tomorrow: '{remain} arrangment(s) tomorrow'
+  tomorrow_none: No arrangement tomorrow
+  week_info: Week {weekinfo}
+  on_holiday: On vacation
+  error_message: 'An error occurred: {error}'
+  fetching_message: Fetching class schedule
+  error_infoText: An error occurred
+  fetching_infoText: Loading
+  no_arrangement_infoText: No schedule at the moment
+  schedule_fetching_message: Schedule is loading, please check again soon
+  schedule_error_message: Failed to load schedule, please try again later
+  schedule_fetching_infoText: Loading schedule
+  schedule_error_infoText: Failed to load schedule
+  schedule_none_infoText: No schedule available
+  updating_infoText: Updating
+  all_loading_infoText: All sources loading
+  partial_loading_infoText: Partially loading
+  partial_error_infoText: Some data failed to load
+  failed_chip: '{source} failed'
+  failed_source_class_info: Class info
+  failed_source_exam_info: Exam info
+  failed_source_physics_experiment: Physics experiment
+  failed_source_other_experiment: Other experiment
+  unknown_place: Unknown place
+  seat: Seat {seatnum}
+electricity_card:
+  title: Electricity and Hydroenergy Information
+  current_electricity: '{amount} kWh remains'
+  cache_notice: 'Last fetch date: {date}'
+library_card:
+  title: Library Info
+  current_borrow: Borrowing {count} book(s)
+  error_occured: Error occurred while retrieving borrowing information
+  fetching: Fetching borrowing information
+  no_return: Currently there's no book to be returned
+  need_return: Need to return {dued} books
+  no_info: Cannot retrieve information at the moment
+  fetching_info: Fetching information...
+school_card_info_card:
+  error_toast: An error occurred, please contact the developer
+  fetching_toast: Fetching information, please check later
+  bill: Bill
+  balance: Remain {amount} RMB
+  error_occured: Error occurred while retrieving campus card information
+  fetching: Fetching campus card information
+  bottom_text_success: Query campus card bill
+  no_info: Cannot retrieve information currently
+  fetching_info: Fetching information...
+toolbox:
+  class_attendance: Attendances
+  creative: Innovation and Entrepreneurship Competition
+  empty_classroom: Classrooms
+  exam: Exams
+  experiment: Experiments
+  score: Grades
+  sport: PE Info
+  dorm_water: Dorm Water
+  schoolnet: Schoolnet Usage
+  toolbox: Others
+  score_cannot_reach: Offline mode with no cached score data, unable to access
+  exam_fetching: Fetching exam information, please wait
+  exam_error: An error occurred, please contact the developer
+school_net:
+  title: Used {usage}
+  no_password: The query password is not set, click to set up
+  failed: Failed to get the school net usage info
+  fetching: Fetching the school net usage info
+  remaining: Clearing at {remaining}
+club_promotion:
+  failed: Failed to fetch club info
+  fetching: Fetching club info

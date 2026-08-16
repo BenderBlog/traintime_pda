@@ -1,0 +1,124 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+title: 校園信息查詢
+loading: 正在加載
+loaded: 加載成功
+load_error: 加載錯誤
+on_holiday: 當前在假期中
+on_weekday: 當前為第 {current} 周
+loading_message: 請稍候，正在刷新信息
+postgraduate_notice: 研究生功能已經激活！
+linux_notice: Linux 版本正在測試，歡迎反饋！
+edit_mode: 編輯佈局
+edit_done: 完成
+edit_reset: 恢復默認佈局
+edit_hint: 日程信息和軟件升級信息不允許編輯
+manage_hidden: 管理隱藏卡片
+hidden_title: 已隱藏的卡片
+hidden_label: 已隱藏
+hide_empty: 沒有隱藏的卡片
+homepage: 校園信息
+ruisi: 睿思論壇
+club: 社團推薦
+dashboard: 豬圖鑑賞
+planet: 博客星球
+setting: 設置
+input_partner_data:
+  route_not_exist: 導入路徑不存在:P
+  failed_get_file: 導入文件失敗
+  failed_import: 好像導入文件有點問題:P
+  success_message: 導入成功，如果打開了課表頁面請重新打開
+  not_loaded: 還沒加載課程表，等會再來吧……
+  confirm_content: 目前有搭子課表數據，是否要覆蓋？
+login_message: 登錄中，暫時顯示緩存數據
+successful_login_message: 登錄成功
+password_wrong_title: 用戶名或密碼有誤
+password_wrong_content: 是否重啟應用後手動登錄？
+password_wrong_denial: 否，進入離線模式
+offline_mode_title: 統一認證服務離線模式開啟
+offline_mode_content: '無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。
+
+  成績查詢，考試信息查詢，欠費查詢，校園卡查詢關閉。課表顯示緩存數據。其他功能暫不受影響。
+
+  如有不便，敬請諒解。'
+offline_mode: 脫機模式下，一站式相關功能全部禁止使用
+notice_card:
+  empty_notice: 目前沒有獲取應用公告，請刷新
+  no_notice_avaliable: 沒有獲取應用公告
+  notice_list_title: 應用信息
+  open_url: 訪問該鏈接
+  notice_page_title: 通知列表
+class_table_card:
+  title: 課程表
+  today: 今日還有 {remain} 個日程
+  today_finished: 今日安排完成
+  tomorrow: 明日有 {remain} 個安排
+  tomorrow_none: 明日沒有安排
+  week_info: 第 {weekinfo} 周
+  on_holiday: 假期中
+  error_message: 遇到錯誤：{error}
+  fetching_message: 正在獲取課表
+  error_infoText: 遇到錯誤
+  fetching_infoText: 正在加載
+  no_arrangement_infoText: 暫無日程
+  schedule_fetching_message: 日程正在加載，請稍後查看
+  schedule_error_message: 日程加載失敗，請稍後重試
+  schedule_fetching_infoText: 正在加載日程
+  schedule_error_infoText: 日程加載失敗
+  schedule_none_infoText: 暫無日程
+  updating_infoText: 正在更新
+  all_loading_infoText: 全部加載中
+  partial_loading_infoText: 部分加載中
+  partial_error_infoText: 部分數據加載失敗
+  failed_chip: '{source}加載失敗'
+  failed_source_class_info: 課程信息
+  failed_source_exam_info: 考試信息
+  failed_source_physics_experiment: 物理實驗
+  failed_source_other_experiment: 其他實驗
+  unknown_place: 未知位置
+  seat: 座位號{seatnum}
+electricity_card:
+  title: 水電信息
+  current_electricity: 餘額 {amount} 度
+  cache_notice: 最後一次讀表：{date}
+library_card:
+  title: 圖書借閱
+  current_borrow: 借書 {count} 本
+  error_occured: 獲取借書信息發生錯誤
+  fetching: 正在獲取借書信息
+  no_return: 目前沒有待歸還書籍
+  need_return: 待歸還 {dued} 本書籍
+  no_info: 目前無法獲取信息
+  fetching_info: 正在查詢信息中
+school_card_info_card:
+  error_toast: 遇到錯誤，請聯繫開發者
+  fetching_toast: 正在獲取信息，請稍後再來看
+  bill: 流水
+  balance: 卡里 {amount} 元
+  error_occured: 獲取校園卡信息發生錯誤
+  fetching: 正在獲取校園卡信息
+  bottom_text_success: 查詢一卡通流水
+  no_info: 目前無法獲取信息
+  fetching_info: 正在查詢信息中
+toolbox:
+  class_attendance: 考勤查詢
+  creative: 雙創競賽
+  empty_classroom: 空閒教室
+  exam: 考試安排
+  experiment: 實驗信息
+  score: 成績查詢
+  sport: 體育信息
+  dorm_water: 宿舍水機
+  schoolnet: 網絡查詢
+  toolbox: 其他功能
+  score_cannot_reach: 脫機狀態且無緩存成績數據，無法訪問
+  exam_fetching: 請稍候，正在獲取考試信息
+  exam_error: 遇到錯誤，請聯繫開發者
+school_net:
+  title: 已用 {usage}
+  no_password: 無校園網密碼，點擊設置
+  failed: 獲取校園網流量信息失敗
+  fetching: 正在獲取校園網流量信息
+  remaining: 下次結算 {remaining}
+club_promotion:
+  failed: 社團信息獲取失敗
+  fetching: 社團信息清單正在加載

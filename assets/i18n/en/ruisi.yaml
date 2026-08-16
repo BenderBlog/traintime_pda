@@ -1,0 +1,151 @@
+common:
+  refresh: Refresh
+  confirm: OK
+  cancel: Cancel
+  retry: Retry
+  no_topics: No topics
+  no_content: No content
+  reply: Reply
+  favorite: Favorite
+  not_implemented: Not implemented
+  login: Login
+  logout: Log out
+  logged_out: Logged out
+  submit: Submit
+about:
+  title: About
+  app_name: Ruisi
+  subtitle: Xidian University Campus Forum Client
+  version: Version
+  version_number: 2.0.0 (Bundled with XDYou 1.6.0)
+  source_code: Source Code
+  bug_report: Report Issue
+  bug_report_subtitle: Submit an issue on GitHub
+  privacy_policy: Privacy Policy
+  license: Open-sourced under the BSD-3-Clause License Reimplemented based on Ruisi-iOS
+    and Ruisi-Android with AI assistant
+  privacy_policy_content: 'This app only operates on the Xidian University campus
+    network, accessing data from the Ruisi Forum (rs.xidian.edu.cn).
+
+
+    This app does not collect, store, or transmit any personal information to third-party
+    servers.
+
+
+    User login credentials are stored only on the local device, used for authentication
+    with the Ruisi Forum server.
+
+
+    This app uses cookies to communicate with the Ruisi Forum server. All data exchange
+    occurs directly between the user''s device and the Ruisi Forum server.
+
+
+    If you have any questions, please contact the developer by submitting an issue
+    on GitHub.'
+home:
+  title: Ruisi Forum
+  new_post: New Post
+  forum_list: Forum List
+  tab_hot: Hot
+  tab_new_reply: Latest Replies
+  tab_new_post: Latest Posts
+  tab_my: Me
+  tab_trade: Trading
+  tab_water: Water Bar
+  tab_lost_found: Lost & Found
+  tab_employment: Employment
+  tab_photography: Photography
+  please_login: Please log in first
+  my_profile: My Profile
+  my_posts: My Posts
+  my_favorites: My Favorites
+  message_center: Messages
+  daily_checkin: Daily Check-in
+  settings: Settings
+  about: About
+  search: Search
+login:
+  title: Login to Ruisi
+  username: Username
+  username_hint: Please enter username
+  password: Password
+  password_hint: Please enter password
+  captcha: Captcha
+  captcha_hint: Please enter captcha
+  back: Back
+  reset_login_state: Reset Login State
+  reset_confirm_title: Confirm Reset
+  reset_confirm_content: Are you sure you want to reset the login state? This will
+    clear all login information.
+  reset_success: Login state has been reset
+  view_logs: View Logs
+post:
+  title: New Post
+  publish: Publish
+  select_forum: Select Forum
+  select_forum_hint: Please select a forum
+  subject: Title
+  subject_hint: Please enter a title
+  content: Content
+  content_hint: Please enter content
+  success: Post published
+  failure: Failed to publish
+  smiley: Smileys
+topic_detail:
+  title: Topic Detail
+  reply_too_short: Reply must be at least 13 characters
+  reply_success: Reply sent
+  reply_failure: Failed to reply
+  favorite_success: Added to favorites
+  favorite_failure: Failed to add to favorites
+  no_data: No data
+  reply_hint: Write a reply...
+  vote:
+    single_select: Single choice
+    multi_select: Multiple choice, up to {count}
+    title_prefix: Vote
+    count: '{count} people voted'
+    open: Vote
+    sheet_title: Vote
+    max_selection: You can select up to {count}
+    not_selected: Please select an option
+    success: Vote submitted
+    failure: Vote failed
+    param_error: 'Vote failed: invalid parameters'
+    already_voted: You have already voted. Thank you!
+    expired: This poll has expired or been closed
+    ended: This poll has ended
+topic_list_item:
+  sticky: Pinned
+forum_list:
+  title: Forum List
+  empty: Ruisi Forum section grouping is empty
+favorites:
+  title: My Favorites
+  empty: No favorites
+messages:
+  title: Messages
+  tab_at: '@Me'
+  no_reply: No reply notifications
+  no_at: No @ notifications
+search:
+  hint: Search topics...
+  input_hint: Enter keywords to search
+  no_results: No results
+settings:
+  title: Settings
+  section_proxy: Proxy
+  proxy_enable: Enable Proxy
+  proxy_disabled: Disabled
+  proxy_address: Proxy Address
+  section_debug: Debug
+  view_logs: View Logs
+  proxy_dialog_title: Proxy Settings
+  proxy_host: Host
+  proxy_host_hint: e.g. 127.0.0.1
+  proxy_port: Port
+  proxy_port_hint: e.g. 7890
+user:
+  title: Me
+  tab_profile: Profile
+  unknown: Unknown User

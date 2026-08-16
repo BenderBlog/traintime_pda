@@ -1,0 +1,38 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+title: 實驗信息
+ongoing: 正在進行實驗
+not_finished: 未完成實驗
+all_finished: 所有實驗全部完成
+finished: 已完成實驗
+score_info: '{score} (推測)'
+score_sum: 目前分數總和：{sum}
+none_finished: 目前沒有已經完成的實驗
+not_provided: 未提供
+error_physics: 獲取物理實驗信息時發生錯誤：{info}
+error_other: 獲取其他實驗信息時發生錯誤：{info}
+cache_hint: 目前加載緩存狀況：{info}
+physics_cache_hint_missing_password: 未填寫物理實驗密碼。
+physics_cache_hint_login_failed: 物理實驗登錄失敗。
+physics_cache_hint_not_school_network: 當前不在校園網環境。
+physics_cache_hint_network_failed: 物理實驗網絡請求失敗。
+physics_cache_hint_unknown_error: 在線獲取物理實驗失敗。詳細錯誤請查看日誌。
+other_cache_hint_login_failed: 其他實驗登錄失敗。
+other_cache_hint_not_school_network: 當前不在校園網環境。
+other_cache_hint_network_failed: 其他實驗網絡請求失敗。
+other_cache_hint_unknown_error: 在線獲取其他實驗失敗。詳細錯誤請查看日誌。
+physics_experiment: 物理實驗
+other_experiment: 其他實驗
+tap_for_score: 成績未識別出來
+your_score: 您的分數：
+predict_score: 推測分數：{score}
+send_mail: 發送郵件
+fetching_hint: 您現在看到的是緩存數據。正在後臺獲取更新數據中...
+fetching_hint_both: 物理實驗和其他實驗正在加載
+fetching_hint_physics: 物理實驗正在加載
+fetching_hint_other: 其他實驗正在加載
+fetching_hint_physics_with_other_failed: 物理實驗正在加載，其他實驗加載失敗
+fetching_hint_other_with_physics_failed: 其他實驗正在加載，物理實驗加載失敗
+score_hint_0: 您可點擊卡片上的成績字段來查看原始成績數據
+score_hint_1: 您的分數不在 XDYou 分數識別庫中，因此它沒有被正常識別。
+score_hint_2: 如果您希望為 XDYou 的發展貢獻一份自己的力量，您可以點擊發送郵件按鈕，我們將您的分數加入識別庫！
+score_hint_3: 目前識別庫數據不全，請您務必核對一下。

@@ -16,20 +16,21 @@ import 'package:watermeter/page/homepage/toolbox/schoolnet_card.dart';
 import 'package:watermeter/page/homepage/toolbox/score_card.dart';
 import 'package:watermeter/page/homepage/toolbox/sport_card.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
+import 'package:watermeter/generated/translations.g.dart';
 
 typedef HomepageWidgetBuilder =
     Widget Function(BuildContext context, bool editMode);
 
 class HomepageWidgetEntry {
   final String id;
-  final String titleKey;
+  final String Function(BuildContext) titleBuilder;
   final HomepageWidgetBuilder builder;
   final bool Function()? visible;
   final int gridSpan;
 
   const HomepageWidgetEntry({
     required this.id,
-    required this.titleKey,
+    required this.titleBuilder,
     required this.builder,
     required this.gridSpan,
     this.visible,
@@ -54,69 +55,69 @@ final homepageRegistry = <HomepageWidgetEntry>[
   // ---- 大卡片 ----
   HomepageWidgetEntry(
     id: 'energy',
-    titleKey: 'homepage.electricity_card.title',
+    titleBuilder: (ctx) => ctx.t.homepage.electricityCard.title,
     gridSpan: 4,
     builder: (_, _) => EnergyCard(),
   ),
   HomepageWidgetEntry(
     id: 'library',
-    titleKey: 'homepage.library_card.title',
+    titleBuilder: (ctx) => ctx.t.homepage.libraryCard.title,
     gridSpan: 4,
     builder: (_, _) => const LibraryCard(),
   ),
   HomepageWidgetEntry(
     id: 'schoolcard',
-    titleKey: 'homepage.school_card_info_card.bill',
+    titleBuilder: (ctx) => ctx.t.homepage.schoolCardInfoCard.bill,
     gridSpan: 4,
     builder: (_, _) => SchoolCardInfoCard(),
   ),
   // ---- 小格子 ----
   HomepageWidgetEntry(
     id: 'score',
-    titleKey: 'homepage.toolbox.score',
+    titleBuilder: (ctx) => ctx.t.homepage.toolbox.score,
     gridSpan: 1,
     builder: (_, _) => const ScoreCard(),
   ),
   HomepageWidgetEntry(
     id: 'exam',
-    titleKey: 'homepage.toolbox.exam',
+    titleBuilder: (ctx) =>ctx.t.homepage.toolbox.exam,
     gridSpan: 1,
     builder: (_, _) => const ExamCard(),
   ),
   HomepageWidgetEntry(
     id: 'empty_classroom',
-    titleKey: 'homepage.toolbox.empty_classroom',
+    titleBuilder: (ctx) => ctx.t.homepage.toolbox.emptyClassroom,
     gridSpan: 1,
     builder: (_, _) => const EmptyClassroomCard(),
   ),
   HomepageWidgetEntry(
     id: 'class_attendance',
-    titleKey: 'homepage.toolbox.class_attendance',
+    titleBuilder: (ctx) => ctx.t.homepage.toolbox.classAttendance,
     gridSpan: 1,
     builder: (_, _) => const ClassAttendanceCard(),
   ),
   HomepageWidgetEntry(
     id: 'schoolnet',
-    titleKey: 'homepage.toolbox.schoolnet',
+    titleBuilder: (ctx) => ctx.t.homepage.toolbox.schoolnet,
     gridSpan: 1,
     builder: (_, _) => const SchoolnetCard(),
   ),
   HomepageWidgetEntry(
     id: 'dorm_water',
-    titleKey: 'homepage.toolbox.dorm_water',
+    titleBuilder: (ctx) => ctx.t.homepage.toolbox.dormWater,
     gridSpan: 1,
     builder: (_, _) => const DormWaterCard(),
   ),
   HomepageWidgetEntry(
     id: 'experiment',
-    titleKey: 'homepage.toolbox.experiment',
+    titleBuilder: (ctx) => ctx.t.homepage.toolbox.experiment,
     gridSpan: 1,
     builder: (_, _) => const ExperimentCard(),
     visible: () => prefs.getBool(prefs.Preference.role) == false,
   ),
   HomepageWidgetEntry(
     id: 'sport',
-    titleKey: 'homepage.toolbox.sport',
+    titleBuilder: (ctx) => ctx.t.homepage.toolbox.sport,
     gridSpan: 1,
     builder: (_, _) => const SportCard(),
     visible: () => prefs.getBool(prefs.Preference.role) == false,

@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 /// A new page to show the class without time arrangement.
 
@@ -18,19 +18,14 @@ class NotArrangedClassList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          FlutterI18n.translate(context, "classtable.not_arranged_page.title"),
-        ),
+        title: Text(context.t.classtable.notArrangedPage.title),
       ),
       body: Builder(
         builder: (context) {
           if (notArranged.isEmpty) {
             return EmptyListView(
               type: EmptyListViewType.defaultimg,
-              text: FlutterI18n.translate(
-                context,
-                "classtable.not_arranged_page.empty_message",
-              ),
+              text: context.t.classtable.notArrangedPage.emptyMessage,
             );
           }
           return ListView.builder(
@@ -38,17 +33,7 @@ class NotArrangedClassList extends StatelessWidget {
             itemBuilder: (context, index) => ListTile(
               title: Text(notArranged[index].name),
               subtitle: Text(
-                FlutterI18n.translate(
-                  context,
-                  "classtable.not_arranged_page.content",
-                  translationParams: {
-                    "classCode": notArranged[index].code ?? "",
-                    "classNumber": notArranged[index].number ?? "",
-                    "teacher":
-                        notArranged[index].teacher ??
-                        FlutterI18n.translate(context, "no_info"),
-                  },
-                ),
+                context.t.classtable.notArrangedPage.content(class_code: notArranged[index].code ?? "", class_number: notArranged[index].number ?? "", teacher: notArranged[index].teacher ?? context.t.common.noInfo),
               ),
             ),
           ).constrained(maxWidth: 600);

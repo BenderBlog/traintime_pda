@@ -1,0 +1,118 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+drag_text: 上拉獲取更多數據
+ready_text: 正在加載......
+processing_text: 正在處理......
+processed_text: 請求成功
+no_more_text: 沒有更多數據
+failed_text: 數據獲取失敗
+choose_semester: 選擇學期
+error_detected: Ouch! 發生錯誤啦
+click_to_refresh: 點我刷新
+confirm_title: 確認？
+cancel: 取消
+confirm: 確定
+network_error: 網絡錯誤，可能是沒聯網，可能是學校服務器出現了故障:-P
+error_detect: 遇到錯誤，請查看日誌
+query_failed: 查詢失敗
+not_school_network: 沒有在校園網環境
+cancel_exam: 取消考試資格:P
+no_info: 沒有信息
+catcher_detected: 發生錯誤
+catcher_description: 詳情如下
+new_homepage_hint: 本程序將開發一個新主頁，目前先用豬圖秀佔位，玩得愉快
+local_cache_hint: 本地緩存獲取於 {datetime}
+inapp_cache_hint: '程序內緩存獲取於 {datetime}
+
+  緩存退出程序後失效！'
+cache_reason_default: 當前顯示緩存數據。
+easter_egg_apple: '=== 帶我飛向月亮吧 ===
+
+  歌聲演繹：Frank Sintara, 1964
+
+
+  帶我飛向月亮吧
+
+  讓我和星星共舞嬉戲
+
+
+  我好想知道
+
+  木星和火星上的春天
+
+  是什麼顏色的
+
+
+  讓你的歌聲溫暖我的心
+
+  我會一直歌唱下去
+
+
+  我日夜都在想你和牽掛你
+
+  請你真心接受我 我愛你
+
+
+  === 沉浸在你的愛意中 ===
+
+  吉他演奏：Earl Klugh, 1976
+
+
+  無法忘懷這種感覺，被你的愛包裹的溫暖
+
+  不想失去這種感覺，被你的愛撫摸的舒適
+
+  你讓我感到好自在，被你的愛託舉的堅強
+
+  想一直在你懷中，沉浸在你的愛意中
+
+  我不敢向你說出，我對你的心意和愛
+
+  '
+easter_egg_others: '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===
+
+  歌聲演繹：Maaya Sakamoto, 2000
+
+  （原歌詞為日文，按照英語翻譯二翻）
+
+
+  I am a dreamer, 有無限的力量
+
+
+  我的世界有夢想、熱愛與躊躇
+
+  但有些東西，我依舊無法想象
+
+  我想向著廣闊的天空，尋求自己的方向
+
+
+  我要追求自己的夢想
+
+  努力讓自己的心願成真
+
+  雖困難重重也要繼續前行
+
+
+  等待奇蹟 等待美好
+
+  用心感受這個世界
+
+  最終 一定會出乎意料
+
+
+  === 沉浸在你的愛意中 ===
+
+  吉他演奏：Earl Klugh, 1976
+
+
+  無法忘懷這種感覺，被你的愛包裹的溫暖
+
+  不想失去這種感覺，被你的愛撫摸的舒適
+
+  你讓我感到好自在，被你的愛託舉的堅強
+
+  想躺在你的懷中，沉浸在你的愛意
+
+  而且，我不敢想你說出，我現在的心意
+
+  '
+loadError: 加載錯誤

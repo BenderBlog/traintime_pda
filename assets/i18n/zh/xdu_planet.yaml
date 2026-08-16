@@ -1,0 +1,30 @@
+all: 全部
+loading: 加载中，请稍等 <(=ω=)>
+unknown_author: 未知作者
+load_failed_title: 加载失败
+load_failed_bottom: 文章加载失败，如有需要可以点击右上方的按钮在浏览器里打开。
+no_comment: 暂无评论
+reply_audit: '回复评论 #{reply_to} 已被举报或删除'
+reply: '回复评论 #{reply_to}：{content}'
+have_been_audit: 本评论已经被举报
+audit: 举报
+confirm_audit_dialog:
+  title: 确认是否举报
+  content: 三思而后行，确定您想举报吗？举报后该评论会有标签，不一定会删除。
+  cancel: 不举报了
+  ongoing: 正在举报评论
+  failed: 举报失败
+  success: 举报成功
+comment: 回复
+send: 发送
+sending: 正在发送评论
+empty_send: 发送信息空白
+hint_send_comment: 发表您的高见:)
+comment_title: 评论该篇文章
+comment_success: 评论成功
+comment_failed: 评论失败，请去网络查看器和日志查看器查看报错
+comment_canceled: 没想好要说啥嘛
+comment_loading: 加载评论中……
+block: 被屏蔽
+delete: 被删除
+audio: 被删除

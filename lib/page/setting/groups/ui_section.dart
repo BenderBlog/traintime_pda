@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
@@ -14,6 +13,7 @@ import 'package:watermeter/page/setting/groups/section_setting_scaffold.dart';
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class UiSection extends StatefulWidget {
   const UiSection({super.key});
@@ -26,15 +26,14 @@ class _UiSectionState extends State<UiSection> {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.ui_setting"),
+      title: context.t.setting.uiSetting,
       items: [
         ListTile(
-          title: Text(FlutterI18n.translate(context, "setting.color_setting")),
+          title: Text(context.t.setting.colorSetting),
           subtitle: Text(
-            FlutterI18n.translate(
+            colorSeedToI18n(
               context,
-              "setting.change_color_dialog."
-              "${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
+              ColorSeed.values[preference.getInt(preference.Preference.color)],
             ),
           ),
           trailing: const Icon(Icons.navigate_next),
@@ -46,18 +45,13 @@ class _UiSectionState extends State<UiSection> {
           },
         ),
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.brightness_setting"),
-          ),
+          title: Text(context.t.setting.brightnessSetting),
           subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              [
-                "setting.change_brightness_dialog.follow_setting",
-                "setting.change_brightness_dialog.day_mode",
-                "setting.change_brightness_dialog.night_mode",
-              ][preference.getInt(preference.Preference.brightness)],
-            ),
+            [
+              context.t.setting.changeBrightnessDialog.followSetting,
+              context.t.setting.changeBrightnessDialog.dayMode,
+              context.t.setting.changeBrightnessDialog.nightMode,
+            ][preference.getInt(preference.Preference.brightness)],
           ),
           trailing: ToggleButtons(
             isSelected: List<bool>.generate(
@@ -81,15 +75,8 @@ class _UiSectionState extends State<UiSection> {
           ),
         ),
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.simplify_timeline"),
-          ),
-          subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.simplify_timeline_description",
-            ),
-          ),
+          title: Text(context.t.setting.simplifyTimeline),
+          subtitle: Text(context.t.setting.simplifyTimelineDescription),
           trailing: Switch(
             value: preference.getBool(
               preference.Preference.simplifiedClassTimeline,
@@ -108,15 +95,8 @@ class _UiSectionState extends State<UiSection> {
           ),
         ),
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.low_electricity_warning"),
-          ),
-          subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.low_electricity_warning_description",
-            ),
-          ),
+          title: Text(context.t.setting.lowElectricityWarning),
+          subtitle: Text(context.t.setting.lowElectricityWarningDescription),
           trailing: SignalBuilder(
             builder: (context) {
               return Switch(
@@ -134,20 +114,10 @@ class _UiSectionState extends State<UiSection> {
           builder: (context) {
             return ListTile(
               enabled: EnergyController.i.lowElectricityWarningEnabled.value,
-              title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.low_electricity_threshold",
-                ),
-              ),
+              title: Text(context.t.setting.lowElectricityThreshold),
               subtitle: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.low_electricity_threshold_description",
-                  translationParams: {
-                    "threshold": EnergyController.i.electricityThreshold
-                        .toString(),
-                  },
+                context.t.setting.lowElectricityThresholdDescription(
+                  threshold: EnergyController.i.electricityThreshold.toString(),
                 ),
               ),
               trailing: const Icon(Icons.navigate_next),
@@ -163,22 +133,17 @@ class _UiSectionState extends State<UiSection> {
           },
         ),
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.localization_dialog.title"),
-          ),
+          title: Text(context.t.setting.localizationDialog.title),
           subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              Localization.values
-                  .firstWhere(
-                    (value) =>
-                        value.string ==
-                        preference.getString(
-                          preference.Preference.localization,
-                        ),
-                  )
-                  .toShow,
-            ),
+            Localization.values
+                .firstWhere(
+                  (value) =>
+                      value.string ==
+                      preference.getString(
+                        preference.Preference.localization,
+                      ),
+                )
+                .displayName(context.t),
           ),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {

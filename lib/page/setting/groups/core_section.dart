@@ -4,7 +4,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
@@ -25,6 +24,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class CoreSection extends StatelessWidget {
   const CoreSection({super.key});
@@ -32,35 +32,23 @@ class CoreSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.core_setting"),
+      title: context.t.setting.coreSetting,
       items: [
         ListTile(
-          title: Text(FlutterI18n.translate(context, "setting.check_logger")),
+          title: Text(context.t.setting.checkLogger),
           trailing: const Icon(Icons.navigate_next),
           onTap: () => context.pushReplacement(TalkerScreen(talker: log)),
         ),
 
         ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.clear_and_restart"),
-          ),
+          title: Text(context.t.setting.clearAndRestart),
           trailing: const Icon(Icons.navigate_next),
           onTap: () => showDialog<String>(
             context: context,
             barrierDismissible: false,
             builder: (BuildContext context) => AlertDialog(
-              title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.clear_and_restart_dialog.title",
-                ),
-              ),
-              content: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.clear_and_restart_dialog.content",
-                ),
-              ),
+              title: Text(context.t.setting.clearAndRestartDialog.title),
+              content: Text(context.t.setting.clearAndRestartDialog.content),
               actions: [
                 TextButton(
                   style: TextButton.styleFrom(
@@ -68,16 +56,13 @@ class CoreSection extends StatelessWidget {
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: Text(FlutterI18n.translate(context, "cancel")),
+                  child: Text(context.t.common.cancel),
                 ),
                 TextButton(
                   onPressed: () async {
                     ProgressDialog pd = ProgressDialog(context: context);
                     pd.show(
-                      msg: FlutterI18n.translate(
-                        context,
-                        "setting.clear_and_restart_dialog.cleaning",
-                      ),
+                      msg: context.t.setting.clearAndRestartDialog.cleaning,
                     );
 
                     /// Clean Cookie
@@ -101,47 +86,34 @@ class CoreSection extends StatelessWidget {
                     if (context.mounted) {
                       showToast(
                         context: context,
-                        msg: FlutterI18n.translate(
-                          context,
-                          "setting.clear_and_restart_dialog.clear",
-                        ),
+                        msg: context.t.setting.clearAndRestartDialog.clear,
                       );
                       if (Platform.isIOS) {
                         Restart.restartApp(
                           mode: RestartMode.notificationFallback,
-                          notificationTitle: FlutterI18n.translate(
-                            context,
-                            "restart_app.title_cache_cleared",
-                          ),
-                          notificationBody: FlutterI18n.translate(
-                            context,
-                            "restart_app.content",
-                          ),
+                          notificationTitle: context.t.restartApp.titleCacheCleared,
+                          notificationBody: context.t.restartApp.content,
                         );
                       } else {
                         Restart.restartApp();
                       }
                     }
                   },
-                  child: Text(FlutterI18n.translate(context, "confirm")),
+                  child: Text(context.t.common.confirm),
                 ),
               ],
             ),
           ),
         ),
         ListTile(
-          title: Text(FlutterI18n.translate(context, "setting.logout")),
+          title: Text(context.t.setting.logout),
           trailing: const Icon(Icons.navigate_next),
           onTap: () => showDialog<String>(
             context: context,
             barrierDismissible: false,
             builder: (BuildContext context) => AlertDialog(
-              title: Text(
-                FlutterI18n.translate(context, "setting.logout_dialog.title"),
-              ),
-              content: Text(
-                FlutterI18n.translate(context, "setting.logout_dialog.content"),
-              ),
+              title: Text(context.t.setting.logoutDialog.title),
+              content: Text(context.t.setting.logoutDialog.content),
               actions: [
                 TextButton(
                   style: TextButton.styleFrom(
@@ -149,16 +121,13 @@ class CoreSection extends StatelessWidget {
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: Text(FlutterI18n.translate(context, "cancel")),
+                  child: Text(context.t.common.cancel),
                 ),
                 TextButton(
                   onPressed: () async {
                     ProgressDialog pd = ProgressDialog(context: context);
                     pd.show(
-                      msg: FlutterI18n.translate(
-                        context,
-                        "setting.logout_dialog.logging_out",
-                      ),
+                      msg: context.t.setting.logoutDialog.loggingOut,
                     );
 
                     /// Clean Cookie
@@ -212,21 +181,15 @@ class CoreSection extends StatelessWidget {
                       if (Platform.isIOS) {
                         Restart.restartApp(
                           mode: RestartMode.notificationFallback,
-                          notificationTitle: FlutterI18n.translate(
-                            context,
-                            "restart_app.title_logged_out",
-                          ),
-                          notificationBody: FlutterI18n.translate(
-                            context,
-                            "restart_app.content",
-                          ),
+                          notificationTitle: context.t.restartApp.titleLoggedOut,
+                          notificationBody: context.t.restartApp.content,
                         );
                       } else {
                         Restart.restartApp();
                       }
                     }
                   },
-                  child: Text(FlutterI18n.translate(context, "confirm")),
+                  child: Text(context.t.common.confirm),
                 ),
               ],
             ),

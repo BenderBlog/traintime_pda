@@ -97,8 +97,8 @@ class PhysicsExperimentController {
     () => _lastValidPhysicsExperiment.value?.fetchTime,
   );
 
-  late final physicsExperimentCacheHintKey = computed<String?>(
-    () => _lastValidPhysicsExperiment.value?.hintKey,
+  late final physicsExperimentCacheHintKey = computed<CacheHint?>(
+    () => _lastValidPhysicsExperiment.value?.cacheHint,
   );
 
   late final hasPhysicsExperimentArrangement = computed(

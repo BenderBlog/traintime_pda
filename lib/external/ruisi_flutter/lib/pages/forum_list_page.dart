@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 import '../controller/ruisi_controller.dart';
 import 'forum_topics_page.dart';
@@ -30,7 +30,7 @@ class _ForumListPageState extends State<ForumListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final title = FlutterI18n.translate(context, 'ruisi.forum_list.title');
+    final title = context.t.ruisi.forumList.title;
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -76,7 +76,7 @@ class _ForumListPageState extends State<ForumListPage> {
           if (state.groups.isEmpty) {
             return Center(
               child: Text(
-                FlutterI18n.translate(context, 'ruisi.forum_list.empty'),
+                context.t.ruisi.forumList.empty,
               ),
             );
           }

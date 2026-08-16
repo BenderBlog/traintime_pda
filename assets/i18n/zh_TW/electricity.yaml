@@ -1,0 +1,40 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+title: 水電信息
+power_title: 電量信息
+cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
+cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
+cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
+cache_notice: 獲取時間
+account: 電費賬號
+remain_power: 電量額度
+owe_info: 欠費信息
+history: 歷史記錄
+daily_usage: 平均每日用量
+not_enough_data: 數據量不足以用於渲染
+info: '新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。
+
+  歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。'
+fetching_hint: 正在獲取最新電費信息
+fetch_error: 電費信息獲取失敗，請重試。
+date: 日期
+power: 該日0點電量
+update: 刷新信息
+water_usage_fetch_date: 獲取時間
+water_usage_read_before: 上次讀數
+water_usage_read_now: 本次讀數
+water_usage: 洗澡水用量
+water_title: 水費信息
+water_loading: 正在加載水費信息
+water_unavailable: 水費信息暫不可用，請在電費卡片重試。
+water_empty: 暫無水費信息
+not_school_network: 非校園網訪問
+aircon_title: 空調用電
+aircon_imei: 空調 IMEI
+aircon_amount: 平臺用電量
+aircon_update_time: 更新時間
+aircon_waiting: 等待獲取空調用電信息
+aircon_error: 空調用電獲取失敗
+aircon_retry: 重試
+aircon_imei_missing: 尚未添加空調 IMEI，添加後即可查看空調用電信息。
+aircon_add_imei: 添加空調 IMEI
+aircon_cache_notice: 當前顯示空調緩存數據，緩存時間：{time}

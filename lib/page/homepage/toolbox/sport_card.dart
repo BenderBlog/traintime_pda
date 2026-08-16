@@ -9,6 +9,7 @@ import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class SportCard extends StatelessWidget {
   const SportCard({super.key});
@@ -31,7 +32,7 @@ class SportCard extends StatelessWidget {
         }
       },
       icon: MingCuteIcons.mgc_run_fill,
-      nameKey: "homepage.toolbox.sport",
+      name: context.t.homepage.toolbox.sport,
     );
   }
 }

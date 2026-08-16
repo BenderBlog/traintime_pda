@@ -4,7 +4,6 @@
 
 // Exam Infomation Interface.
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -17,6 +16,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/exam/not_arranged_info.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ExamInfoWindow extends StatefulWidget {
   const ExamInfoWindow({super.key});
@@ -45,7 +45,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(FlutterI18n.translate(context, "exam.title")),
+            title: Text(context.t.exam.title),
             actions: [
               if (hasValidExamInfo)
                 IconButton(
@@ -79,10 +79,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     children: [
                       if (isDisQualified.isNotEmpty) ...[
                         TimelineTitle(
-                          title: FlutterI18n.translate(
-                            context,
-                            "exam.unable_to_exam",
-                          ),
+                          title: context.t.exam.unableToExam,
                         ),
                         isDisQualified
                             .map((e) => ExamInfoCard(toUse: e))
@@ -90,34 +87,25 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                             .toColumn(),
                       ],
                       TimelineTitle(
-                        title: FlutterI18n.translate(
-                          context,
-                          "exam.not_finished",
-                        ),
+                        title: context.t.exam.notFinished,
                       ),
                       [
                         if (isNotFinished.isNotEmpty)
                           ...isNotFinished.map((e) => ExamInfoCard(toUse: e))
                         else
                           ExamInfoCard(
-                            title: FlutterI18n.translate(
-                              context,
-                              "exam.all_finished",
-                            ),
+                            title: context.t.exam.allFinished,
                           ),
                       ].toColumn(),
                       TimelineTitle(
-                        title: FlutterI18n.translate(context, "exam.finished"),
+                        title: context.t.exam.finished,
                       ),
                       [
                         if (isFinished.isNotEmpty)
                           ...isFinished.map((e) => ExamInfoCard(toUse: e))
                         else
                           ExamInfoCard(
-                            title: FlutterI18n.translate(
-                              context,
-                              "exam.none_finished",
-                            ),
+                            title: context.t.exam.noneFinished,
                           ),
                       ].toColumn(),
                     ],
@@ -125,10 +113,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                 } else {
                   content = EmptyListView(
                     type: EmptyListViewType.defaultimg,
-                    text: FlutterI18n.translate(
-                      context,
-                      "exam.no_exam_arrangement",
-                    ),
+                    text: context.t.exam.noExamArrangement,
                   );
                 }
 
@@ -136,14 +121,8 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                   children: [
                     if (isFromCache && fetchTime != null)
                       CacheAlerter(
-                        dataType: FlutterI18n.translate(context, "exam.title"),
-                        hint: FlutterI18n.translate(
-                          context,
-                          cacheHintKey == null ||
-                                  cacheHintKey == "local_cache_hint"
-                              ? "cache_reason_default"
-                              : cacheHintKey,
-                        ),
+                        dataType: context.t.exam.title,
+                        hint: cacheHintKey?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
                         placeOfCache: PlaceOfCache.device,
                         fetchTime: fetchTime,
                       ),
@@ -167,10 +146,7 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     ),
                     LoadingAlerter(
                       isLoading: true,
-                      hint: FlutterI18n.translate(
-                        context,
-                        "exam.fetching_hint",
-                      ),
+                      hint: context.t.exam.fetchingHint,
                       opacity: 0.15,
                       showOverlay: true,
                     ),
@@ -192,3 +168,4 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
     );
   }
 }
+

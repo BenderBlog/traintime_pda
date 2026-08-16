@@ -1,0 +1,18 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+title: 考試安排
+cache_hint: 已顯示緩存考試安排信息
+cache_hint_password_wrong: 統一認證密碼錯誤或已失效
+cache_hint_login_failed: 登錄考試服務失敗
+cache_hint_network_failed: 網絡連接失敗
+cache_hint_unknown_error: 在線獲取考試安排失敗，詳細錯誤請查看日誌
+fetching_hint: 正在獲取最新考試安排
+not_finished: 未完成考試
+all_finished: 所有考試全部完成
+unable_to_exam: 無法完成考試
+finished: 已完成考試
+none_finished: 一門還沒考呢
+no_exam_arrangement: 目前沒有考試安排
+no_arrangement:
+  title: 目前無安排考試的科目
+  all_arranged: 目前所有科目均已安排考試
+  subtitle: '編號: {id}'

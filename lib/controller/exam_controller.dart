@@ -91,8 +91,8 @@ class ExamController {
     () => _lastValidExamInfo.value?.fetchTime,
   );
 
-  late final examCacheHintKey = computed<String?>(
-    () => _lastValidExamInfo.value?.hintKey,
+  late final examCacheHintKey = computed<CacheHint?>(
+    () => _lastValidExamInfo.value?.cacheHint,
   );
 
   late final hasExamArrangement = computed(

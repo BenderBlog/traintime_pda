@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Change app brightness.
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/generated/translations.g.dart';
 
 class ChangeLanguageDialog extends StatefulWidget {
   const ChangeLanguageDialog({super.key});
@@ -23,7 +23,7 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        FlutterI18n.translate(context, "setting.localization_dialog.title"),
+        context.t.setting.localizationDialog.title,
       ),
       titleTextStyle: TextStyle(
         fontSize: 20,
@@ -31,23 +31,12 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
       ),
       content: SingleChildScrollView(
         child: RadioGroup(
-          groupValue: Localization.values
-              .firstWhere(
-                (index) =>
-                    index.string ==
-                    preference.getString(preference.Preference.localization),
-              )
-              .index,
+          groupValue: ThemeController.i.savedLocale.value.index,
           onChanged: (int? value) async {
             if (value == null) return;
-            await preference
-                .setString(
-                  preference.Preference.localization,
-                  Localization.values[value].string,
-                )
-                .then((value) {
-                  ThemeController.i.updateTheme();
-                });
+            await ThemeController.i.setLocale(
+              Localization.values[value],
+            );
 
             // To update course reminders according to new localization
             await CourseReminderService().cancelAllCourseNotifications();
@@ -62,12 +51,7 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
             children: List<Widget>.generate(
               Localization.values.length,
               (index) => RadioListTile<int>(
-                title: Text(
-                  FlutterI18n.translate(
-                    context,
-                    Localization.values[index].toShow,
-                  ),
-                ),
+                title: Text(Localization.values[index].displayName(context.t)),
                 value: index,
               ),
             ),
@@ -76,7 +60,7 @@ class _ChangeLanguageDialogState extends State<ChangeLanguageDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(context.t.common.confirm),
           onPressed: () => Navigator.pop(context),
         ),
       ],
