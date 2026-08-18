@@ -64,10 +64,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                   msg: FlutterI18n.translate(context, "setting.no_background"),
                 );
               } else {
-                /// TODO: Check whether need setState
-                setState(() {
-                  preference.setBool(preference.Preference.decorated, value);
-                });
+                preference.setBool(preference.Preference.decorated, value);
               }
             },
           ),
@@ -150,17 +147,17 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                 TextButton(
                   onPressed: () async {
                     await CustomClassController.i.clearAll();
-                    if (mounted) {
+                    if (context.mounted) {
                       setState(() {});
+                      showToast(
+                        context: context,
+                        msg: FlutterI18n.translate(
+                          context,
+                          "setting.clear_user_class_clear",
+                        ),
+                      );
+                      Navigator.pop(context);
                     }
-                    showToast(
-                      context: context,
-                      msg: FlutterI18n.translate(
-                        context,
-                        "setting.clear_user_class_clear",
-                      ),
-                    );
-                    Navigator.pop(context);
                   },
                   child: Text(FlutterI18n.translate(context, "confirm")),
                 ),
