@@ -623,6 +623,7 @@ library:
   publish_year_end: 出版年止
   book_detail: 书籍详细信息
   no_result: 没有结果，请修改搜索参数或者开始你的搜索
+  no_more_data: 没有更多结果了
 library_card:
   title: 图书馆当前状况
   fetching: 正在获取图书馆信息

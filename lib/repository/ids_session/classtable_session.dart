@@ -43,7 +43,6 @@ class ClassTableSession extends IDSSession {
   Future<void> updateCacheAndGroup(ClassTableData data) async {
     await _schoolClassDataCache.writeAsString(jsonEncode(data.toJson()));
 
-    /// TODO: Change ios widgitkit code to parse user defined classtable.
     if (Platform.isIOS) {
       final api = SaveToGroupIdSwiftApi();
       try {

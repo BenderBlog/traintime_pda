@@ -693,6 +693,7 @@ library:
   publish_year_end: Publish year to
   book_detail: Book details
   no_result: No result, change parameter or start your search
+  no_more_data: No more data
 library_card:
   title: Library status
   fetching: Fetching
