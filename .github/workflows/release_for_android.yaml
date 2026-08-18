@@ -32,7 +32,9 @@ jobs:
           .flutter/bin/flutter pub get
 
       - name: Remove build id
-        run: sed -i -e 's/-Wl,/-Wl,--build-id=none,/' ~/.pub-cache/hosted/pub.dev/jni-*/src/CMakeLists.txt
+        run: |
+          sed -i -e 's/-Wl,/-Wl,--build-id=none,/' ~/.pub-cache/hosted/pub.dev/jni-*/src/CMakeLists.txt
+          sed -i -e 's/-Wl,/-Wl,--build-id=none,/' ~/.pub-cache/hosted/pub.dev/flutter_zxing-*/src/CMakeLists.txt
 
       - name: Signing APK
         run: |
