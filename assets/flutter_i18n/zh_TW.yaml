@@ -621,6 +621,7 @@ library:
   publish_year_end: 出版年止
   book_detail: 書籍詳細信息
   no_result: 沒有結果，請修改搜索參數或者開始你的搜索
+  no_more_data: 沒有更多結果了
 library_card:
   title: 圖書館當前狀況
   fetching: 正在獲取圖書館信息

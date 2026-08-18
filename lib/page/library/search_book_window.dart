@@ -143,17 +143,16 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                 ),
               ),
 
-              // TODO: 致 Codex
-              // 1. 文字需要国际化
-              // 2. 文字大小和图标大小需要修改
-              // 3. 图标是不是可以换一个
               noMoreItemsIndicatorBuilder: (context) =>
                   [
                         Icon(Icons.sentiment_very_satisfied, size: 24),
                         SizedBox(width: 8),
                         Text(
-                          "没有更多数据了",
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          FlutterI18n.translate(
+                            context,
+                            "library.no_more_data",
+                          ),
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ]
                       .toRow(mainAxisAlignment: MainAxisAlignment.center)
