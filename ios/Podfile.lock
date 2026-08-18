@@ -1,21 +1,15 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_mailer (0.0.1):
-    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  flutter_mailer:
-    :path: ".symlinks/plugins/flutter_mailer/ios"
 
 SPEC CHECKSUMS:
   Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
-  flutter_mailer: 3a8cd4f36c960fb04528d5471097270c19fec1c4
 
 PODFILE CHECKSUM: 1342988504d3d426cb451316eec1176b756f038b
 
