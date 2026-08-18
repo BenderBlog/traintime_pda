@@ -31,8 +31,8 @@ dependencies:
   charset_converter: ^2.2.1
   # Homepage
   infinite_scroll_pagination: ^5.1.1
-  sn_progress_dialog: ^1.1.3
-  fluttertoast: ^9.0.0
+  sn_progress_dialog: ^2.0.0
+  fluttertoast: ^10.0.0
   flex_color_scheme: ^8.3.0
   # Others
   url_launcher: ^6.1.6
@@ -53,10 +53,10 @@ dependencies:
   ming_cute_icons: ^0.0.7
   remixicon: ^4.9.1
   based_split_view: ^1.2.0
-  permission_handler: ^12.0.1
+  permission_handler: ^13.0.1
   # QR code scanner
   # Output to system calendar
-  device_calendar_plus: ^0.7.1
+  device_calendar_plus: ^0.8.0
   # Homepage Widget
   home_widget: ^0.9.3
   image: ^4.2.0
