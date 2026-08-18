@@ -10,7 +10,15 @@ class FilmComponent extends StatelessWidget {
   static const sidePaddingRatio = 8 / 52;
   static const sideRadiusRatio = 8 / 36;
   static const imageVerticalPadding = 4.0;
-  static const imageRadius = 16.0;
+
+  static List<String> description = [
+    "去这种咖啡厅等于给自己找妈？",
+    "每一个呆唯的背后都有一个当妈的妹妹",
+    "只能说女孩子之间的感情真好啊",
+    "看牙医的你",
+    "但是现实的可能更可爱，萌萌哒哒",
+    "大学定律：越到期末考试，好玩的事情越多",
+  ];
 
   const FilmComponent({super.key});
 
@@ -39,15 +47,15 @@ class FilmComponent extends StatelessWidget {
                   children: List.generate(
                     6,
                     (i) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: imageVerticalPadding,
+                      padding: const EdgeInsets.only(
+                        bottom: imageVerticalPadding,
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(imageRadius),
-                        child: Image.asset(
+                      child: FilmFrame(
+                        image: Image.asset(
                           "assets/art/lucky_star_${i + 1}.jpg",
                           fit: BoxFit.fill,
                         ),
+                        text: description[i],
                       ),
                     ),
                   ),
@@ -98,5 +106,39 @@ class _FilmPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _FilmPainter oldDelegate) {
     return oldDelegate.color != color || oldDelegate.sideWidth != sideWidth;
+  }
+}
+
+class FilmFrame extends StatelessWidget {
+  static const _imageRadius = 16.0;
+
+  final String? text;
+  final Image image;
+  const FilmFrame({super.key, required this.image, this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(_imageRadius),
+      child: Stack(
+        alignment: AlignmentGeometry.topCenter,
+        children: [
+          image,
+
+          if (text != null)
+            Container(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.6),
+              width: double.infinity,
+              child: Text(
+                text!,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
