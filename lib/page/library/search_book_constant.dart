@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 const double searchPanelMaxWidth = 800;
-const double resultCardMaxWidth = 180;
+const double resultCardMaxWidth = 160;
