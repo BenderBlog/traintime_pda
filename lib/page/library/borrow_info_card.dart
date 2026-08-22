@@ -22,7 +22,9 @@ class BorrowInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return [
+    return SizedBox(
+      height: 140,
+      child: [
       CachedNetworkImage(
         imageUrl: toUse.imageUrl ?? "",
         placeholder: (context, url) => Image.asset(
@@ -219,6 +221,7 @@ class BorrowInfoCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
           )
           .expanded(),
-    ].toRow().padding(horizontal: 12, vertical: 4).card(elevation: 0);
+    ].toRow(),
+    ).padding(horizontal: 12, vertical: 4).card(elevation: 0);
   }
 }
