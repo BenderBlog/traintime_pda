@@ -6,6 +6,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/borrow_info_card.dart';
+import 'package:watermeter/page/library/search_book_constant.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/repository/preference.dart';
 
@@ -17,28 +18,32 @@ class BorrowListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final crossAxisCount = max(1, MediaQuery.of(context).size.width ~/ 360);
     return Scaffold(
       body: Stack(
         children: <Widget>[
           if (borrowList.isEmpty)
             EmptyListView(
               type: EmptyListViewType.reading,
-              text: FlutterI18n.translate(
-                context,
-                "library.empty_borrow_list",
+              text: FlutterI18n.translate(context, "library.empty_borrow_list"),
+            ),
+          LayoutBuilder(
+            builder: (context, constraints) => AlignedGridView.count(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: borrowList.length,
+              padding: const EdgeInsets.all(4),
+              crossAxisCount: max(
+                1,
+                constraints.maxWidth ~/ resultCardMaxWidth,
+              ),
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              itemBuilder: (context, index) => LayoutBuilder(
+                builder: (context, constraints) => BorrowInfoCard(
+                  toUse: borrowList[index],
+                  constraints: constraints,
+                ),
               ),
             ),
-
-          AlignedGridView.count(
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: borrowList.length,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
-            itemBuilder: (context, index) =>
-                BorrowInfoCard(toUse: borrowList[index]),
           ),
         ],
       ),
