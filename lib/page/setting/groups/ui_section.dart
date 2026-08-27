@@ -7,13 +7,16 @@ import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/setting/dialogs/change_color_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/change_localization_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/low_electricity_threshold_dialog.dart';
+import 'package:watermeter/page/setting/font_size_page.dart';
 import 'package:watermeter/page/setting/groups/section_setting_scaffold.dart';
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/themes/font_setting.dart';
 
 class UiSection extends StatefulWidget {
   const UiSection({super.key});
@@ -79,6 +82,32 @@ class _UiSectionState extends State<UiSection> {
               Icon(Icons.dark_mode_rounded),
             ],
           ),
+        ),
+        ListTile(
+          title: Text(
+            FlutterI18n.translate(context, "setting.font_size_setting"),
+          ),
+          subtitle: SignalBuilder(
+            builder: (context) => Text(
+              FlutterI18n.translate(
+                context,
+                "setting.font_size_page.summary",
+                translationParams: {
+                  "scale":
+                      "${(ThemeController.i.fontScaleSignal.value * 100).round()}",
+                  "weight": FlutterI18n.translate(
+                    context,
+                    "setting.font_size_page.weight_"
+                    "${fontWeightLabels[fontWeightLabelIndex(ThemeController.i.fontWeightSignal.value)]}",
+                  ),
+                },
+              ),
+            ),
+          ),
+          trailing: const Icon(Icons.navigate_next),
+          onTap: () {
+            context.push(const FontSizePage());
+          },
         ),
         ListTile(
           title: Text(
