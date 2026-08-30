@@ -1,24 +1,20 @@
 <div align="center">
-<img src="./assets/icon.png" style="border-radius:10px; margin:10px; width:120px" alt="XDYou">
+<img src="./assets/icon.png" style="border-radius:16px; margin:10px; width:120px" alt="XDYou">
 <h1>Traintime PDA / XDYou</h1>
 
 [![Release downloads](https://img.shields.io/github/downloads/BenderBlog/traintime_pda/total.svg)](https://GitHub.com/BenderBlog/traintime_pda/releases/) ![Android Version](https://img.shields.io/badge/Android%20API-23%2B-green)
 
 XDYou，代码名称为 Traintime PDA，是为西电学生设计的开源信息查询软件。
 
-[临时主页地址](https://legacy.superbart.top/xdyou.html) 
+[主页地址](https://xdyou.superbart.top)
+[苹果商店下载](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)
+[安卓版本下载](https://mirror.tuna.tsinghua.edu.cn/fdroid/repo/io.github.benderblog.traintime_pda_483.apk)
 
+[F-Droid商店链接](https://f-droid.org/zh_Hans/packages/io.github.benderblog.traintime_pda)
+[Github Release](https://github.com/BenderBlog/traintime_pda/releases)
+
+![](XDYou-Poster.jpg)
 </div>
-
-[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-    alt="Get it on App Store"
-    height="60px">](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)
-[<img src="https://raw.githubusercontent.com/f-droid/artwork/master/badge/get-it-on-zh-cn.svg"
-    alt="Get it on F-Droid"
-    height="60px">](https://f-droid.org/zh_Hans/packages/io.github.benderblog.traintime_pda/)
-
-</div>
-
 ## 特性概览
 
 1. 支持查看本科生和研究生的课程信息，成绩信息，考试信息。
