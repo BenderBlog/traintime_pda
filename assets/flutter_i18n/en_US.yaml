@@ -359,12 +359,7 @@ electricity:
   history: Billing History
   daily_usage: Average usage per day
   not_enough_data: Not enough data for rendering graph
-  info:
-    "Energy system can be only be accessed at schoolnet, do contact developers
-    if have issue.
-
-    History will be recorded locally while average usage is based on the electric
-    meter's record."
+  info: History will be recorded locally while average usage is based on the electric meter's record.
   fetching_hint: Fetching the latest electricity info.
   fetch_error: Failed to fetch electricity information. Please retry.
   date: Date

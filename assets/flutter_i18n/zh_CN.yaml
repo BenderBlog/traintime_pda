@@ -317,9 +317,7 @@ electricity:
   history: 历史记录
   daily_usage: 平均每日用量
   not_enough_data: 数据量不足以用于渲染
-  info: "新能源系统获取仅校园网内访问，获取过程中有问题请向开发者报告。
-
-    历史记录依旧为本地记录，平均日用量基于抄表记录计算。"
+  info: "历史记录依旧为本地记录，平均日用量基于抄表记录计算。"
   fetching_hint: 正在获取最新电费信息
   fetch_error: 电费信息获取失败，请重试。
   date: 日期

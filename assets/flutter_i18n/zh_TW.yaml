@@ -316,9 +316,7 @@ electricity:
   history: 歷史記錄
   daily_usage: 平均每日用量
   not_enough_data: 數據量不足以用於渲染
-  info: '新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。
-
-    歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。'
+  info: 歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。
   fetching_hint: 正在獲取最新電費信息
   fetch_error: 電費信息獲取失敗，請重試。
   date: 日期
@@ -801,7 +799,7 @@ setting:
     weight_medium: 中等
     weight_semibold: 半粗
     weight_bold: 加粗
-    summary: "{scale}% · {weight}"
+    summary: '{scale}% · {weight}'
   simplify_timeline: 簡化日程時間軸
   simplify_timeline_description: 沒有日程時 減少空間佔用
   low_electricity_warning: 低電量卡片變色提醒
