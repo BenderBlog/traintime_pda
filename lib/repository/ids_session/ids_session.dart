@@ -123,7 +123,7 @@ class IDSSession {
         queryParameters: {'service': target},
       );
       if (_isRedirect(response)) {
-        return _completeRedirect(
+        return await _completeRedirect(
           response: response,
           target: target,
           username: preference.getString(preference.Preference.idsAccount),
@@ -133,7 +133,7 @@ class IDSSession {
 
       final continued = await _submitContinueForm(response.data);
       if (continued != null && _isRedirect(continued)) {
-        return _completeRedirect(
+        return await _completeRedirect(
           response: continued,
           target: target,
           username: preference.getString(preference.Preference.idsAccount),
@@ -141,7 +141,7 @@ class IDSSession {
         );
       }
 
-      return _loginOnce(
+      return await _loginOnce(
         username: preference.getString(preference.Preference.idsAccount),
         password: preference.getString(preference.Preference.idsPassword),
         sliderCaptcha: sliderCaptcha,
@@ -296,7 +296,7 @@ class IDSSession {
         ),
       );
       if (_isRedirect(data)) {
-        return _completeRedirect(
+        return await _completeRedirect(
           response: data,
           target: target,
           username: username,
@@ -328,7 +328,7 @@ class IDSSession {
             ),
           );
           if (_isRedirect(data)) {
-            return _completeRedirect(
+            return await _completeRedirect(
               response: data,
               target: target,
               username: username,

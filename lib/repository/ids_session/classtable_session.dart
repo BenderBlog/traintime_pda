@@ -159,26 +159,17 @@ class ClassTableSession extends IDSSession {
 
     await followIDSRedirects(initialLocation: location, client: dio);
 
-    DateTime now = DateTime.now();
-    var currentWeek = await dio
-        .post(
-          'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
-          data: {'day': DateFormat("yyyyMMdd").format(now)},
-        )
-        .then((value) => value.data);
-    if (!currentWeek.toString().contains("xnxq")) {
-      return ClassTableData(semesterCode: semesterCode);
-    }
-    currentWeek =
-        RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])?[0] ?? "null";
+    final calendarResponse = await dio.post(
+      'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/homeAppend/getSchoolCalendar.do',
+      data: {'xnxqdm': semesterCode},
+    );
 
-    log.info(
-      "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
-    );
-    int weekDay = now.weekday - 1;
-    String termStartDay = DateFormat("yyyy-MM-dd HH:mm:ss").format(
-      now.add(Duration(days: (1 - int.parse(currentWeek)) * 7 - weekDay)).date,
-    );
+    final rawCalendar = calendarResponse.data['msg'];
+    final calendar = rawCalendar is String
+        ? jsonDecode(rawCalendar)
+        : rawCalendar;
+
+    final termStartDay = calendar['QSRQ'] as String;
 
     Map<String, dynamic> data = await dio
         .post(classInfoURL, data: {"XNXQDM": semesterCode})
