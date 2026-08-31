@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
@@ -108,14 +106,6 @@ class EmptyClassTablePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(FlutterI18n.translate(context, "classtable.page_title")),
-        leading: IconButton(
-          icon: Icon(
-            Platform.isIOS || Platform.isMacOS
-                ? Icons.arrow_back_ios
-                : Icons.arrow_back,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
         actions: [
           if (hasError)
             IconButton(
@@ -130,79 +120,81 @@ class EmptyClassTablePage extends StatelessWidget {
           loadingSources: state.loadingSources,
           cacheSources: state.cacheSources,
         ),
-        [
-          EmptyListView(
-            type: EmptyListViewType.rolling,
-            text: FlutterI18n.translate(
-              context,
-              emptyMessageKey,
-              translationParams: {
-                "semester_code": ClassTableState.of(
-                  context,
-                )!.controllers.semesterCode,
-              },
-            ),
-          ),
-          if (hasExamArrangement)
-            TextButton.icon(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const ExamInfoWindow()),
-              ),
-              icon: const Icon(Icons.assignment_outlined),
-              label: Text(
-                FlutterI18n.translate(
-                  context,
-                  "classtable.empty_action.view_exam",
-                ),
-              ),
-            ),
-          if (hasExperimentArrangement)
-            TextButton.icon(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ExperimentWindow(),
-                ),
-              ),
-              icon: const Icon(Icons.science_outlined),
-              label: Text(
-                FlutterI18n.translate(
-                  context,
-                  "classtable.empty_action.view_experiment",
-                ),
-              ),
-            ),
-          TextButton.icon(
-            onPressed: () async {
-              showToast(
-                context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "classtable.refresh_classtable.ready",
-                ),
-              );
-              await ClassTableState.of(
+        EmptyListView(
+          type: EmptyListViewType.rolling,
+          text: FlutterI18n.translate(
+            context,
+            emptyMessageKey,
+            translationParams: {
+              "semester_code": ClassTableState.of(
                 context,
-              )!.controllers.updateClasstable(context).then((data) {
-                if (context.mounted) {
-                  showToast(
-                    context: context,
-                    msg: FlutterI18n.translate(
-                      context,
-                      "classtable.refresh_classtable.success",
-                    ),
-                  );
-                }
-              });
+              )!.controllers.semesterCode,
             },
-            icon: const Icon(Icons.update),
-            label: Text(
-              FlutterI18n.translate(
-                context,
-                "classtable.popup_menu.refresh_classtable",
+          ),
+          buttons: [
+            if (hasExamArrangement)
+              TextButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ExamInfoWindow(),
+                  ),
+                ),
+                icon: const Icon(Icons.assignment_outlined),
+                label: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.empty_action.view_exam",
+                  ),
+                ),
+              ),
+            if (hasExperimentArrangement)
+              TextButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ExperimentWindow(),
+                  ),
+                ),
+                icon: const Icon(Icons.science_outlined),
+                label: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "classtable.empty_action.view_experiment",
+                  ),
+                ),
+              ),
+            TextButton.icon(
+              onPressed: () async {
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(
+                    context,
+                    "classtable.refresh_classtable.ready",
+                  ),
+                );
+                await ClassTableState.of(
+                  context,
+                )!.controllers.updateClasstable(context).then((data) {
+                  if (context.mounted) {
+                    showToast(
+                      context: context,
+                      msg: FlutterI18n.translate(
+                        context,
+                        "classtable.refresh_classtable.success",
+                      ),
+                    );
+                  }
+                });
+              },
+              icon: const Icon(Icons.update),
+              label: Text(
+                FlutterI18n.translate(
+                  context,
+                  "classtable.popup_menu.refresh_classtable",
+                ),
               ),
             ),
-          ),
-        ].toColumn(mainAxisAlignment: MainAxisAlignment.center).expanded(),
+          ],
+        ).expanded(),
       ].toColumn(),
     );
   }

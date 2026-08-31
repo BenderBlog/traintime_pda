@@ -9,6 +9,7 @@ enum EmptyListViewType { reading, singing, rolling, defaultimg }
 class EmptyListView extends StatelessWidget {
   final String text;
   final String assets;
+  final List<Widget> buttons;
 
   static String _getAssets(EmptyListViewType type) {
     switch (type) {
@@ -25,6 +26,7 @@ class EmptyListView extends StatelessWidget {
     super.key,
     required this.text,
     required EmptyListViewType type,
+    this.buttons = const [],
   }) : assets = _getAssets(type);
 
   @override
@@ -50,6 +52,10 @@ class EmptyListView extends StatelessWidget {
           ),
           const Divider(color: Colors.transparent),
           Text(text, textAlign: TextAlign.center),
+          if (buttons.isNotEmpty) ...[
+            const Divider(color: Colors.transparent),
+            ...buttons,
+          ],
         ],
       ),
     );

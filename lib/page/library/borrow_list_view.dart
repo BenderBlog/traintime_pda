@@ -19,33 +19,34 @@ class BorrowListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          if (borrowList.isEmpty)
-            EmptyListView(
-              type: EmptyListViewType.reading,
-              text: FlutterI18n.translate(context, "library.empty_borrow_list"),
-            ),
-          LayoutBuilder(
-            builder: (context, constraints) => AlignedGridView.count(
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: borrowList.length,
-              padding: const EdgeInsets.all(4),
-              crossAxisCount: max(
-                1,
-                constraints.maxWidth ~/ resultCardMaxWidth,
-              ),
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              itemBuilder: (context, index) => LayoutBuilder(
-                builder: (context, constraints) => BorrowInfoCard(
-                  toUse: borrowList[index],
-                  constraints: constraints,
+      body: Builder(
+        builder: (context) => (borrowList.isEmpty)
+            ? EmptyListView(
+                type: EmptyListViewType.reading,
+                text: FlutterI18n.translate(
+                  context,
+                  "library.empty_borrow_list",
+                ),
+              )
+            : LayoutBuilder(
+                builder: (context, constraints) => AlignedGridView.count(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: borrowList.length,
+                  padding: const EdgeInsets.all(4),
+                  crossAxisCount: max(
+                    1,
+                    constraints.maxWidth ~/ resultCardMaxWidth,
+                  ),
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                  itemBuilder: (context, index) => LayoutBuilder(
+                    builder: (context, constraints) => BorrowInfoCard(
+                      toUse: borrowList[index],
+                      constraints: constraints,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ],
       ),
       bottomNavigationBar: BottomAppBar(
         height: prefs.getString(Preference.localization.key) == "en_US"
