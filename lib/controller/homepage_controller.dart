@@ -74,7 +74,7 @@ class HomepageController {
       loginState = IDSLoginState.cancelled;
       log.info(
         '[HomepageController][_comboLogin] '
-        'SMS verification was cancelled by the user.',
+        'Additional verification was cancelled by the user.',
       );
     } catch (e, s) {
       loginState = IDSLoginState.fail;
