@@ -79,6 +79,7 @@ struct Provider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+        print("getSnapshot")
         getTimeline(in: context, completion: { (timeLine) in
             completion(timeLine.entries.first!)
         })
@@ -418,6 +419,19 @@ struct Provider: TimelineProvider {
         // Order
         arrangement.sort(by: {$0.start_time < $1.start_time})
         logger.info("Successfully fetcn arrangement data, it have \(arrangement.count) item(s)")
+
+        // 保留作者各分支的诊断日志，时间线仍统一按新的边界规则生成。
+        let logsGeneratedEntries: Bool
+        if #available(iOSApplicationExtension 17.0, *), IsTomorrowManager.value == true {
+            logger.info("User wants tomorrow's arrangements")
+            logsGeneratedEntries = false
+        } else if arrangement.isEmpty {
+            logger.info("Arrangement data have no items")
+            logsGeneratedEntries = false
+        } else {
+            logger.info("User wants today's arrangements, will remove occured arrangements")
+            logsGeneratedEntries = true
+        }
         
         // 排序后只预生成本日尚未发生的边界，并始终包含当前状态。
         let now = Date()
@@ -426,11 +440,16 @@ struct Provider: TimelineProvider {
         for item in arrangement {
             entryDates.formUnion([item.start_time, item.end_time].filter { $0 > now && $0 < midnight })
         }
-        let entries = entryDates.sorted().map { date in
-            SimpleEntry(date: date, currentWeek: currentWeekToStore,
-                        arrangement: arrangement.filter { $0.end_time > date }, errorType: .none, error: nil)
+        var entries: [SimpleEntry] = []
+        for date in entryDates.sorted() {
+            entries.append(SimpleEntry(date: date, currentWeek: currentWeekToStore,
+                        arrangement: arrangement.filter { $0.end_time > date }, errorType: .none, error: nil))
+            if logsGeneratedEntries {
+                print("\(entries)")
+            }
         }
         // 即使今日无课也在零点请求新数据，避免空状态停留到下一天。
+        logger.info("Updating timeline")
         let timeline = Timeline(entries: entries, policy: .after(midnight))
         completion(timeline)
     }
