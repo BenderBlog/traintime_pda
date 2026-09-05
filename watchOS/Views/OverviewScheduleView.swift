@@ -26,41 +26,52 @@ struct OverviewScheduleView: View {
                 : .disabled,
             protectsInitialTopEdge: true
         ) {
-            VStack(alignment: .leading, spacing: 8) {
-                if let course = store.nextCourse {
-                    timeline(for: course)
-                        .padding(.trailing, 34)
-                    CourseRow(
-                        course: course,
-                        showsDate: true,
-                        isProminent: true
-                    )
-                } else {
-                    ContentUnavailableView(
-                        "没有下一节课",
-                        systemImage: "checkmark.circle"
-                    )
-                    .frame(maxWidth: .infinity)
+            TimelineView(.explicit(store.presentationTimelineDates)) { context in
+                let presentation = store.presentation(at: context.date)
+                VStack(alignment: .leading, spacing: 8) {
+                    if let course = presentation.focus {
+                        timeline(for: presentation)
+                            .padding(.trailing, 34)
+                        CourseRow(
+                            course: course,
+                            showsDate: true,
+                            isProminent: true
+                        )
+                    } else {
+                        ContentUnavailableView(
+                            presentation.title,
+                            systemImage: presentation.emptySymbol
+                        )
+                        .frame(maxWidth: .infinity)
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 2)
+                .padding(.top, 2)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 2)
-            .padding(.top, 2)
         }
     }
 
     /// 显示当前状态或距下一节课的相对时间。
-    private func timeline(for course: WatchCourse) -> some View {
+    private func timeline(for presentation: WatchSchedulePresentation) -> some View {
         VStack(alignment: .leading, spacing: 1) {
-            if course.startAt <= Date(), course.endAt > Date() {
-                Text("正在上课")
-                    .foregroundStyle(course.color)
-            } else {
-                Text("距离上课")
+            Text(presentation.title)
+                .foregroundStyle(presentation.focus?.color ?? .secondary)
+            if let target = presentation.timeTarget,
+                presentation.state != .finishing && !presentation.isAboutToStart
+            {
+                Text(presentation.timeLabel)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                Text(course.startAt, style: .relative)
-                    .foregroundStyle(course.color)
+                if presentation.usesCountdown {
+                    Text(
+                        timerInterval: presentation.date...max(presentation.date, target),
+                        countsDown: true
+                    )
+                    .monospacedDigit()
+                } else {
+                    Text(presentation.dayLabel(for: target) + " " + presentation.clockText(target))
+                }
             }
         }
         .font(.headline)

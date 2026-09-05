@@ -64,6 +64,10 @@ class WatchScheduleSyncService {
 
   Timer? _debounce;
   bool _started = false;
+  bool _suspended = false;
+  int _sessionRevision = 0;
+  int get sessionRevision => _sessionRevision;
+  Future<void> _pendingWrite = Future.value();
 
   /// 每次数据源变化都会递增；旧定时任务和旧构建任务会主动放弃发送。
   int _generation = 0;
@@ -72,17 +76,31 @@ class WatchScheduleSyncService {
   void start() {
     if (!_shouldStart()) return;
     _started = true;
+    if (preference.getString(preference.Preference.idsAccount).isEmpty ||
+        preference.getString(preference.Preference.idsPassword).isEmpty) {
+      unawaited(clear(signedOut: true));
+    }
     _startReactiveSync();
   }
 
   /// 主动清空手机和手表端课表。
   ///
   /// 递增代次并取消防抖，防止排队中的旧快照在清空后重新写回。
-  Future<void> clear() async {
+  Future<void> clear({bool signedOut = false}) async {
     if (!Platform.isIOS) return;
+    _suspended = true;
+    _sessionRevision += 1;
     _debounce?.cancel();
     final generation = _nextGeneration();
-    await _clearIfCurrent(generation);
+    await _clearIfCurrent(generation, signedOut: signedOut);
+  }
+
+  void resume({required int sessionRevision}) {
+    if (!Platform.isIOS || sessionRevision != _sessionRevision) return;
+    if (!_started) start();
+    if (!_suspended) return;
+    _suspended = false;
+    _scheduleUpdate(_readSourceState());
   }
 
   /// 判断服务是否允许启动。
@@ -126,6 +144,7 @@ class WatchScheduleSyncService {
 
   /// 替换上一轮防抖任务，只保留最新数据状态。
   void _scheduleUpdate(_WatchScheduleSourceState state) {
+    if (_suspended) return;
     _debounce?.cancel();
     final generation = _nextGeneration();
     _debounce = Timer(
@@ -152,10 +171,8 @@ class WatchScheduleSyncService {
     if (!_isCurrentGeneration(generation)) return;
 
     final termStart = state.effectiveTermStart;
-    if (termStart == null) {
-      await _clearIfCurrent(generation);
-      return;
-    }
+    // 初始化和临时获取失败不具有删除语义；只在用户明确清理/退出时发送清除。
+    if (termStart == null) return;
     await _sync(
       state: state,
       effectiveTermStart: termStart,
@@ -197,7 +214,7 @@ class WatchScheduleSyncService {
       );
       if (!_isCurrentGeneration(generation)) return;
 
-      final accepted = await _sendSnapshot(snapshot);
+      final accepted = await _sendSnapshot(snapshot, generation);
       if (!_isCurrentGeneration(generation)) return;
       _logSuccessfulSync(snapshot: snapshot, accepted: accepted);
     } catch (error, stackTrace) {
@@ -226,16 +243,32 @@ class WatchScheduleSyncService {
   }
 
   /// 通过 Pigeon 调用原生 Swift 层。
-  Future<bool> _sendSnapshot(WatchScheduleSnapshot snapshot) {
-    return _api.syncSchedule(WatchSchedulePayload(json: snapshot.encode()));
+  Future<bool> _sendSnapshot(WatchScheduleSnapshot snapshot, int generation) {
+    return _serializeWrite(() async {
+      if (!_isCurrentGeneration(generation)) return false;
+      return _api.syncSchedule(WatchSchedulePayload(json: snapshot.encode()));
+    });
+  }
+
+  // 跨 Pigeon 通道串行写入，清理必须排在已经发出的旧同步之后。
+  Future<T> _serializeWrite<T>(Future<T> Function() write) {
+    final result = _pendingWrite.then((_) => write());
+    _pendingWrite = result.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return result;
   }
 
   /// 仅当清空任务仍属于最新代次时调用原生层。
-  Future<void> _clearIfCurrent(int generation) async {
+  Future<void> _clearIfCurrent(
+    int generation, {
+    required bool signedOut,
+  }) async {
     if (!_isCurrentGeneration(generation)) return;
 
     try {
-      await _api.clearSchedule();
+      await _serializeWrite(() => _api.clearSchedule(signedOut));
     } catch (error, stackTrace) {
       if (!_isCurrentGeneration(generation)) return;
       log.handle(

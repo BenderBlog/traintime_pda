@@ -105,6 +105,10 @@ enum WatchWidgetShared {
 
     /// 小组件交互按钮使用的轻量状态键。
     static let selectedCurrentCourseKey = "watchWidget.selectedCurrentCourse"
+    static let previewExpiresKey = "watchWidget.previewExpires"
+    static let signedOutKey = "watchSchedule.signedOut"
+    static let stateRevisionKey = "watchSchedule.stateRevision"
+    static let accountGenerationKey = "watchSchedule.accountGeneration"
 
     /// 手机同步过来的实际语言。App 与 Widget 共用，避免两个界面语言不一致。
     static let preferredLanguageKey = "watchPreferredLanguage"
@@ -112,9 +116,7 @@ enum WatchWidgetShared {
     /// Watch App 与 Widget 当前共同支持的课表 schema。
     static let supportedScheduleSchemaVersions = 1...4
 
-    /// 缓存选择优先级：完整学期 > 近 14 天 > 当天。
-    ///
-    /// 完整学期通常覆盖范围最大；若它已经过期，则继续尝试较小但更新的缓存。
+    /// 稳定的缓存读取顺序；最终选择由修订号与明确覆盖范围共同决定。
     static let scheduleCacheScopesByPriority: [WatchScheduleScope] = [
         .semester,
         .fourteenDays,
@@ -225,18 +227,28 @@ enum WatchWidgetShared {
 
     /// 读取当前最适合展示的课表快照。
     ///
-    /// 先按覆盖范围寻找尚未过期的缓存；若全部过期，则退回到生成时间最新的
-    /// 快照，使手机离线时手表仍能展示最后一次同步的数据。
+    /// 按修订号合并同学期的完整阶段；各段有效期由展示层分别判断。
     static func loadPreferredSnapshot(
         now: Date = Date()
     ) -> WatchScheduleSnapshot? {
-        guard let defaults else { return nil }
+        loadResolvedSchedule()?.snapshot
+    }
 
-        let cachedSnapshots = loadCachedSnapshots(from: defaults)
-        return firstUnexpiredSnapshot(
-            in: cachedSnapshots,
-            now: now
-        ) ?? newestSnapshot(in: cachedSnapshots)
+    static func loadResolvedSchedule() -> WatchResolvedSchedule? {
+        guard let defaults else { return nil }
+        return WatchScheduleResolver.resolve(loadCachedSnapshots(from: defaults))
+    }
+
+    static func clearSchedule(in defaults: UserDefaults) {
+        for scope in scheduleCacheScopesByPriority {
+            defaults.removeObject(forKey: cacheKey(for: scope))
+        }
+        for key in [selectedCurrentCourseKey, previewExpiresKey,
+                    WatchPersistentCacheKey.installedSemesterVersion,
+                    WatchPersistentCacheKey.scheduleRenderIndex,
+                    WatchPersistentCacheKey.dayCourseLayout] {
+            defaults.removeObject(forKey: key)
+        }
     }
 
     /// 写入一个键值。单独封装后便于未来替换为文件级原子存储。
@@ -280,32 +292,8 @@ enum WatchWidgetShared {
         return snapshot
     }
 
-    /// 按范围优先级返回第一份仍有效的缓存。
-    private static func firstUnexpiredSnapshot(
-        in snapshots: [WatchScheduleScope: WatchScheduleSnapshot],
-        now: Date
-    ) -> WatchScheduleSnapshot? {
-        for scope in scheduleCacheScopesByPriority {
-            if let snapshot = snapshots[scope],
-               snapshot.validThrough >= now
-            {
-                return snapshot
-            }
-        }
-        return nil
-    }
-
-    /// 所有缓存均过期时，选择最后生成的一份作为离线回退。
-    private static func newestSnapshot(
-        in snapshots: [WatchScheduleScope: WatchScheduleSnapshot]
-    ) -> WatchScheduleSnapshot? {
-        snapshots.values.max {
-            $0.generatedAt < $1.generatedAt
-        }
-    }
-
     /// 只刷新本项目的课程组件，避免影响其他 Widget。
-    private static func reloadWidgetTimelines() {
+    static func reloadWidgetTimelines() {
         for kind in allWidgetKinds {
             WidgetCenter.shared.reloadTimelines(ofKind: kind)
         }

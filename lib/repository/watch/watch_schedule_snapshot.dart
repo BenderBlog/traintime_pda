@@ -76,6 +76,7 @@ class WatchScheduleSnapshot {
     required this.rangeEnd,
     required this.reminderMinutes,
     required this.courses,
+    this.semesterEnd,
   });
 
   /// 每次修改 JSON 字段语义时必须递增，并同步更新 Swift 支持范围。
@@ -83,6 +84,7 @@ class WatchScheduleSnapshot {
 
   final DateTime generatedAt;
   final DateTime semesterStart;
+  final DateTime? semesterEnd;
   final int currentWeekIndex;
   final DateTime validThrough;
   final DateTime rangeStart;
@@ -99,6 +101,7 @@ class WatchScheduleSnapshot {
     'validThroughEpochMs': validThrough.millisecondsSinceEpoch,
     'rangeStartEpochMs': rangeStart.millisecondsSinceEpoch,
     'rangeEndEpochMs': rangeEnd.millisecondsSinceEpoch,
+    'semesterEndEpochMs': (semesterEnd ?? rangeEnd).millisecondsSinceEpoch,
     'timeZoneOffsetMinutes': generatedAt.timeZoneOffset.inMinutes,
     'reminderMinutes': reminderMinutes,
     'courses': courses.map((course) => course.toJson()).toList(),
@@ -181,6 +184,11 @@ class WatchScheduleSnapshotBuilder {
     return WatchScheduleSnapshot(
       generatedAt: now,
       semesterStart: semesterStart,
+      semesterEnd: DateTime(
+        semesterStart.year,
+        semesterStart.month,
+        semesterStart.day + classTable.semesterLength * DateTime.daysPerWeek,
+      ),
       currentWeekIndex: currentWeekIndex,
       validThrough: window.end,
       rangeStart: window.start,

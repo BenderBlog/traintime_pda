@@ -35,6 +35,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         static let preferredLanguage = "preferredLanguage"
         static let scheduleVersion = "scheduleVersion"
         static let scheduleUnchanged = "scheduleUnchanged"
+        static let scheduleCleared = "scheduleCleared"
+        static let signedOut = "signedOut"
+        static let stateRevision = "stateRevision"
+        static let accountGeneration = "accountGeneration"
         static let messageType = "messageType"
         static let refreshID = "refreshID"
         static let requestID = "requestID"
@@ -234,8 +238,8 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             self.receiveCurrentPhoneReply()
             let requiresFullSync =
                 self.applicationContextRequiresFullSync(applicationContext)
-            _ = self.consumeApplicationContext(applicationContext)
-            if requiresFullSync {
+            let accepted = self.consumeApplicationContext(applicationContext)
+            if accepted && requiresFullSync {
                 self.beginProgressiveRefresh()
             }
         }
@@ -247,7 +251,11 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         didReceiveMessage message: [String: Any]
     ) {
         Task { @MainActor [weak self] in
-            self?.consumePreferredLanguage(from: message)
+            if message[Key.scheduleCleared] as? Bool == true {
+                _ = self?.consumeApplicationContext(message)
+            } else {
+                self?.consumePreferredLanguage(from: message)
+            }
         }
     }
 
@@ -382,6 +390,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         if let installedScheduleVersion {
             message[Key.scheduleVersion] = installedScheduleVersion
         }
+        message[Key.accountGeneration] = WatchWidgetShared.defaults?.string(forKey: WatchWidgetShared.accountGenerationKey)
         return message
     }
 
@@ -509,6 +518,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         else {
             return
         }
+
+        guard acceptStateEnvelope(reply) else { return }
+        if consumeClearIfNeeded(reply) { return }
 
         // 每个课表请求的回复都携带语言，手表错过实时消息时也能自动修正。
         consumePreferredLanguage(from: reply)
@@ -682,8 +694,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     private func consumeApplicationContext(
         _ context: [String: Any]
     ) -> Bool {
-        // 语言上下文可以独立存在，因此必须在检查课表字段之前安装。
+        guard acceptStateEnvelope(context) else { return false }
         consumePreferredLanguage(from: context)
+        if consumeClearIfNeeded(context) { return true }
 
         // 相同的完整版本直接复用本地缓存，避免重复解码和页面重新分组。
         if let version = context[Key.scheduleVersion] as? String,
@@ -702,6 +715,46 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             rawValue: context[Key.scope] as? String ?? ""
         ) ?? .fourteenDays
         return store?.replaceSchedule(json: json, scope: scope) ?? false
+    }
+
+    /// 修订号跨 iPhone 重启持久化；退出后的旧上下文和旧分页均不能复活课表。
+    @MainActor
+    private func acceptStateEnvelope(_ payload: [String: Any]) -> Bool {
+        let defaults = WatchWidgetShared.defaults ?? .standard
+        let installed = defaults.integer(forKey: WatchWidgetShared.stateRevisionKey)
+        let revision = payload[Key.stateRevision] as? Int
+        guard WatchScheduleStateOrder.accepts(
+            revision: revision, generation: payload[Key.accountGeneration] as? String,
+            installedRevision: installed,
+            installedGeneration: defaults.string(forKey: WatchWidgetShared.accountGenerationKey),
+            carriesSchedule: payload[Key.scheduleJSON] != nil || payload[Key.scheduleUnchanged] != nil || payload[Key.scheduleCleared] != nil
+        ) else { return false }
+        guard let revision else { return true }
+        if let generation = payload[Key.accountGeneration] as? String {
+            let previous = defaults.string(forKey: WatchWidgetShared.accountGenerationKey)
+            if revision == installed, let previous, previous != generation { return false }
+            if previous != nil && previous != generation {
+                activeIncomingScheduleVersion = nil
+                store?.clearSchedule(signedOut: false)
+            }
+            defaults.set(generation, forKey: WatchWidgetShared.accountGenerationKey)
+        }
+        defaults.set(revision, forKey: WatchWidgetShared.stateRevisionKey)
+        return true
+    }
+
+    @MainActor
+    private func consumeClearIfNeeded(_ payload: [String: Any]) -> Bool {
+        guard payload[Key.scheduleCleared] as? Bool == true else { return false }
+        refreshID = UUID()
+        activeIncomingScheduleVersion = nil
+        launchAttemptID = nil
+        launchAttemptRefreshID = nil
+        processedQueuedRequestIDs.removeAll()
+        processedQueuedRequestOrder.removeAll()
+        for transfer in WCSession.default.outstandingUserInfoTransfers { transfer.cancel() }
+        store?.clearSchedule(signedOut: payload[Key.signedOut] as? Bool ?? false)
+        return true
     }
 
     /// 判断手机主动推送的轻量上下文是否代表一份尚未完整安装的新课表。

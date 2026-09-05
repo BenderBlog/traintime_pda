@@ -9,6 +9,29 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/watch/watch_schedule_snapshot.dart';
 
 void main() {
+  test('partial ranges retain the actual semester ending boundary', () {
+    final table = ClassTableData(
+      semesterLength: 20,
+      semesterCode: '2026-1',
+      termStartDay: '2026-09-07 00:00:00',
+      classDetail: [],
+      timeArrangement: [],
+    );
+    final snapshot = const WatchScheduleSnapshotBuilder().build(
+      classTable: table,
+      effectiveTermStart: DateTime(2026, 9, 7),
+      currentWeekIndex: 0,
+      now: DateTime(2026, 9, 8),
+      days: 1,
+    );
+    expect(snapshot.rangeEnd, DateTime(2026, 9, 9));
+    expect(
+      snapshot.toJson()['semesterEndEpochMs'],
+      DateTime(2027, 1, 25).millisecondsSinceEpoch,
+    );
+    expect(snapshot.courses, isEmpty);
+  });
+
   test('expands only active course weeks into concrete watch events', () {
     final classTable = ClassTableData(
       semesterLength: 2,

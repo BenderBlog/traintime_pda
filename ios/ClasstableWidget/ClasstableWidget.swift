@@ -419,49 +419,19 @@ struct Provider: TimelineProvider {
         arrangement.sort(by: {$0.start_time < $1.start_time})
         logger.info("Successfully fetcn arrangement data, it have \(arrangement.count) item(s)")
         
-        // Generate timelines
-        var entryDates : Set<Date> = []
-        var entries: [SimpleEntry] = []
-        for todayItem in arrangement {
-            entryDates.insert(todayItem.start_time)
-            entryDates.insert(todayItem.end_time)
+        // 排序后只预生成本日尚未发生的边界，并始终包含当前状态。
+        let now = Date()
+        let midnight = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now))!
+        var entryDates: Set<Date> = [now]
+        for item in arrangement {
+            entryDates.formUnion([item.start_time, item.end_time].filter { $0 > now && $0 < midnight })
         }
-        if #available(iOSApplicationExtension 17.0, *), IsTomorrowManager.value == true {
-            logger.info("User wants tomorrow's arrangements")
-            entries.append(SimpleEntry(
-                date: Date(),
-                currentWeek: currentWeekToStore,
-                arrangement: arrangement,
-                errorType: .none,
-                error: nil
-            ))
-        } else if arrangement.isEmpty {
-            logger.info("Arrangement data have no items")
-            entries.append(SimpleEntry(
-                date: Date(),
-                currentWeek: currentWeekToStore,
-                arrangement: arrangement,
-                errorType: .none,
-                error: nil
-
-            ))
-        } else {
-            logger.info("User wants today's arrangements, will remove occured arrangements")
-            for entryDate in entryDates {
-                entries.append(SimpleEntry(
-                    date: entryDate,
-                    currentWeek: currentWeekToStore,
-                    arrangement: arrangement.filter{
-                        element in return element.end_time > entryDate
-                    },
-                    errorType: .none,
-                    error: nil
-                ))
-            }
+        let entries = entryDates.sorted().map { date in
+            SimpleEntry(date: date, currentWeek: currentWeekToStore,
+                        arrangement: arrangement.filter { $0.end_time > date }, errorType: .none, error: nil)
         }
-        
-        logger.info("Updating timeline")
-        let timeline = Timeline(entries: entries, policy: .atEnd)
+        // 即使今日无课也在零点请求新数据，避免空状态停留到下一天。
+        let timeline = Timeline(entries: entries, policy: .after(midnight))
         completion(timeline)
     }
 }
@@ -527,7 +497,7 @@ struct ClasstableWidgetEntryView : View {
     private func normalContentView() -> some View {
                 
         // Calculate the date arrangements will show
-        var day = Date()
+        var day = entry.date
         let calendar = Calendar.current
         
         if #available(iOS 17.0, macOS 13.0, tvOS 17.0, watchOS 10.0, *), IsTomorrowManager.value {

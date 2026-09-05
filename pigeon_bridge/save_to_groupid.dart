@@ -61,5 +61,5 @@ abstract class WatchSyncSwiftApi {
 
   /// 清除手机端持久化课表并向手表发布空上下文。
   @async
-  bool clearSchedule();
+  bool clearSchedule(bool signedOut);
 }

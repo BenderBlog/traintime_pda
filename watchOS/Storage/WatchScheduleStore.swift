@@ -102,11 +102,6 @@ final class WatchScheduleStore: ObservableObject {
     @Published private(set) var renderCacheRevision = 0
     private(set) var installedScheduleVersion: String?
 
-    /// 整学期缓存不存在时，短范围缓存的恢复优先级。
-    private static let partialCacheScopes = Array(
-        WatchWidgetShared.scheduleCacheScopesByPriority.dropFirst()
-    )
-
     /// 手表 App 自身的标准缓存，用于不依赖 Widget 的离线恢复。
     private let defaults: UserDefaults
 
@@ -264,17 +259,38 @@ final class WatchScheduleStore: ObservableObject {
     /// 日程仍属于本学期课表，因此不按结束时间或有效期排除。整学期缓存一旦
     /// 存在便是权威结果：若它为空，不得再被旧的当天/14 天缓存误判为有课。
     var hasCachedScheduleContent: Bool {
-        if let semester = cachedSnapshots[.semester] {
-            return containsScheduleContent(semester)
-        }
-        return cachedSnapshots.values.contains(where: containsScheduleContent)
+        !(snapshot?.courses.isEmpty ?? true)
     }
 
-    /// 空快照仍可携带周次与范围元数据，但不能代表存在可展示课表。
-    private func containsScheduleContent(
-        _ snapshot: WatchScheduleSnapshot
-    ) -> Bool {
-        !snapshot.courses.isEmpty
+    var presentationTimelineDates: [Date] {
+        WatchSchedulePresentation.timelineDates(resolved: WatchScheduleResolver.resolve(cachedSnapshots), now: Date())
+    }
+
+    func presentation(at date: Date) -> WatchSchedulePresentation {
+        WatchSchedulePresentation(resolved: WatchScheduleResolver.resolve(cachedSnapshots), at: date,
+            signedOut: defaults.bool(forKey: WatchWidgetShared.signedOutKey))
+    }
+
+    func clearSchedule(signedOut: Bool) {
+        renderCachePersistenceGeneration &+= 1
+        renderCachePersistenceTask?.cancel()
+        renderCachePersistenceTask = nil
+        clearSemesterBuffer(keepingCapacity: false)
+        cachedSnapshots.removeAll()
+        snapshot = nil
+        loadedScope = nil
+        installedScheduleVersion = nil
+        WatchWidgetShared.clearSchedule(in: defaults)
+        defaults.set(signedOut, forKey: WatchWidgetShared.signedOutKey)
+        if let shared = WatchWidgetShared.defaults {
+            WatchWidgetShared.clearSchedule(in: shared)
+            shared.set(signedOut, forKey: WatchWidgetShared.signedOutKey)
+        }
+        rebuildVisibleScheduleIndex(persisting: false)
+        renderCacheNeedsPersistence = false
+        receiveLaunchSyncReply()
+        finishRefresh()
+        WatchWidgetShared.reloadWidgetTimelines()
     }
 
     /// 计算周次时使用的学期起点。
@@ -454,8 +470,15 @@ final class WatchScheduleStore: ObservableObject {
     /// 已经合入页面的临时内容。
     func finishRefreshWithoutScheduleChanges() {
         if let semester = cachedSnapshots[.semester] {
+            for scope in [WatchScheduleScope.today, .fourteenDays] {
+                cachedSnapshots.removeValue(forKey: scope)
+                let key = WatchWidgetShared.cacheKey(for: scope)
+                defaults.removeObject(forKey: key)
+                WatchWidgetShared.defaults?.removeObject(forKey: key)
+            }
             snapshot = semester
             loadedScope = .semester
+            WatchWidgetShared.reloadWidgetTimelines()
             syncError = nil
             prepareVisibleScheduleIndex(
                 preferringPersistentCache: true,
@@ -588,126 +611,27 @@ final class WatchScheduleStore: ObservableObject {
         try WatchCacheCoding.encodeJSON(snapshot)
     }
 
-    /// 将新快照安装到页面、内存缓存、标准缓存和 App Group。
-    private func installCompletedSnapshot(
-        _ completedSnapshot: WatchScheduleSnapshot,
-        json: String,
-        scope: WatchScheduleScope
-    ) {
-        snapshot = completedSnapshot
-        loadedScope = scope
-        syncError = nil
-        rebuildVisibleScheduleIndex(persisting: true)
-        persistCompletedStage(
-            snapshot: completedSnapshot,
-            json: json,
-            scope: scope
-        )
-    }
-
-    /// 安装渐进同步阶段，同时保留该阶段日期范围外的现有课程。
-    ///
-    /// 当天和 14 天阶段完成后会立刻反映到页面，但只替换新快照明确覆盖的
-    /// `[rangeStart, rangeEnd)` 日期范围。整学期阶段是一份完整数据，直接
-    /// 整体替换。这样既能逐步显示新内容，又不会让其他日期突然消失。
+    /// 与 Widget 采用同一合并规则，空的局部快照也会删除对应范围的旧课程。
     private func installProgressiveSnapshot(
         _ completedSnapshot: WatchScheduleSnapshot,
         json: String,
         scope: WatchScheduleScope
     ) {
-        guard scope != .semester, snapshot != nil else {
-            installCompletedSnapshot(
-                completedSnapshot,
-                json: json,
-                scope: scope
-            )
-            return
+        if let newest = cachedSnapshots.values.max(by: { $0.freshnessStamp < $1.freshnessStamp }),
+           newest.semesterStartEpochMs != completedSnapshot.semesterStartEpochMs {
+            guard completedSnapshot.freshnessStamp >= newest.freshnessStamp else { return }
+            clearSchedule(signedOut: false)
         }
-
-        snapshot = mergeVisibleSnapshot(
-            replacing: completedSnapshot
-        )
+        if let existing = cachedSnapshots[scope], existing.freshnessStamp > completedSnapshot.freshnessStamp { return }
+        persistCompletedStage(snapshot: completedSnapshot, json: json, scope: scope)
+        defaults.set(false, forKey: WatchWidgetShared.signedOutKey)
+        WatchWidgetShared.defaults?.set(false, forKey: WatchWidgetShared.signedOutKey)
+        if let resolved = WatchScheduleResolver.resolve(cachedSnapshots) {
+            snapshot = resolved.snapshot
+            loadedScope = resolved.scope
+        }
         syncError = nil
         rebuildVisibleScheduleIndex(persisting: true)
-
-        // 阶段缓存保存手机发来的原始范围，而不是混合后的页面快照，便于
-        // Widget 与离线回退准确识别该缓存实际覆盖的日期。
-        persistCompletedStage(
-            snapshot: completedSnapshot,
-            json: json,
-            scope: scope
-        )
-        if loadedScope == nil {
-            loadedScope = scope
-        }
-    }
-
-    /// 将局部快照合入当前页面，范围内以新数据为准，范围外完整保留。
-    private func mergeVisibleSnapshot(
-        replacing incoming: WatchScheduleSnapshot
-    ) -> WatchScheduleSnapshot {
-        guard let current = snapshot else { return incoming }
-
-        let lowerBound = incoming.rangeStart
-        let upperBound = incoming.rangeEnd
-        var mergedByID: [String: WatchCourse] = [:]
-
-        for course in current.courses
-        where course.startAt < lowerBound || course.startAt >= upperBound {
-            mergedByID[course.id] = course
-        }
-        for course in incoming.courses {
-            mergedByID[course.id] = course
-        }
-
-        return WatchScheduleSnapshot(
-            schemaVersion: max(
-                current.schemaVersion,
-                incoming.schemaVersion
-            ),
-            generatedAtEpochMs: incoming.generatedAtEpochMs,
-            semesterStartEpochMs:
-                incoming.semesterStartEpochMs
-                ?? current.semesterStartEpochMs,
-            currentWeekIndex:
-                incoming.currentWeekIndex
-                ?? current.currentWeekIndex,
-            validThroughEpochMs: max(
-                current.validThroughEpochMs,
-                incoming.validThroughEpochMs
-            ),
-            rangeStartEpochMs: minimumEpoch(
-                current.rangeStartEpochMs,
-                incoming.rangeStartEpochMs
-            ),
-            rangeEndEpochMs: maximumEpoch(
-                current.rangeEndEpochMs,
-                incoming.rangeEndEpochMs
-            ),
-            timeZoneOffsetMinutes: incoming.timeZoneOffsetMinutes,
-            reminderMinutes: incoming.reminderMinutes,
-            courses: sortedCourses(Array(mergedByID.values))
-        )
-    }
-
-    /// 返回两个可选毫秒时间戳中的较小值。
-    private func minimumEpoch(_ lhs: Int64?, _ rhs: Int64?) -> Int64? {
-        switch (lhs, rhs) {
-        case let (lhs?, rhs?): min(lhs, rhs)
-        case let (lhs?, nil): lhs
-        case let (nil, rhs?): rhs
-        case (nil, nil): nil
-        }
-    }
-
-    /// 返回两个可选毫秒时间戳中的较大值。
-    private func maximumEpoch(_ lhs: Int64?, _ rhs: Int64?) -> Int64? {
-        switch (lhs, rhs) {
-        case let (lhs?, rhs?): max(lhs, rhs)
-        case let (lhs?, nil): lhs
-        case let (nil, rhs?): rhs
-        case (nil, nil): nil
-        }
     }
 
     /// 把分块中的日程按 ID 合并；后到的记录覆盖先到的同 ID 记录。
@@ -733,7 +657,9 @@ final class WatchScheduleStore: ObservableObject {
             rangeEndEpochMs: metadata.rangeEndEpochMs,
             timeZoneOffsetMinutes: metadata.timeZoneOffsetMinutes,
             reminderMinutes: metadata.reminderMinutes,
-            courses: sortedCourses(Array(semesterBuffer.values))
+            courses: sortedCourses(Array(semesterBuffer.values)),
+            semesterEndEpochMs: metadata.semesterEndEpochMs,
+            sourceRevision: metadata.sourceRevision
         )
     }
 
@@ -829,14 +755,11 @@ final class WatchScheduleStore: ObservableObject {
             WatchWidgetShared.defaults?.string(forKey: key),
         ].compactMap { $0 }
 
-        for json in candidates {
-            do {
-                return (try decode(json), json)
-            } catch {
-                logFailure(.invalidCache(scope), error: error)
-            }
-        }
-        return nil
+        return candidates.compactMap { json -> (snapshot: WatchScheduleSnapshot, json: String)? in
+            guard let snapshot = try? decode(json) else { return nil }
+            return (snapshot, json)
+        }.max { $0.snapshot.freshnessStamp < $1.snapshot.freshnessStamp }
+
     }
 
     /// 旧版本只有标准缓存时，将有效数据迁移到 Widget 可读的 App Group。
@@ -844,9 +767,6 @@ final class WatchScheduleStore: ObservableObject {
         json: String,
         key: String
     ) {
-        guard WatchWidgetShared.defaults?.string(forKey: key) == nil else {
-            return
-        }
         WatchWidgetShared.defaults?.set(json, forKey: key)
     }
 
@@ -876,62 +796,10 @@ final class WatchScheduleStore: ObservableObject {
         )
     }
 
-    /// 优先恢复权威的整学期缓存，历史课程也必须保持可浏览。
-    ///
-    /// 只有尚未完成过整学期同步时，才在当天/14 天缓存中选择。此时优先
-    /// 非空快照，防止一个较新的空当天快照把实际有内容的缓存遮住。
     private func preferredCachedSnapshot() -> CachedScheduleSelection? {
-        if let semester = cachedSelection(for: .semester) {
-            return semester
+        WatchScheduleResolver.resolve(cachedSnapshots).map {
+            CachedScheduleSelection(scope: $0.scope, snapshot: $0.snapshot)
         }
-
-        let now = Date()
-        if let fresh = firstFreshPartialCache(comparedWith: now) {
-            return fresh
-        }
-        if let nonempty = newestPartialCache(requiringContent: true) {
-            return nonempty
-        }
-        return newestPartialCache(requiringContent: false)
-    }
-
-    /// 返回指定阶段的命名缓存对象。
-    private func cachedSelection(
-        for scope: WatchScheduleScope
-    ) -> CachedScheduleSelection? {
-        cachedSnapshots[scope].map {
-            CachedScheduleSelection(scope: scope, snapshot: $0)
-        }
-    }
-
-    /// 按 14 天、当天的既定优先级寻找仍有效且包含日程的缓存。
-    private func firstFreshPartialCache(
-        comparedWith date: Date
-    ) -> CachedScheduleSelection? {
-        for scope in Self.partialCacheScopes {
-            guard let selection = cachedSelection(for: scope),
-                  containsScheduleContent(selection.snapshot),
-                  !isExpired(selection.snapshot, comparedWith: date)
-            else {
-                continue
-            }
-            return selection
-        }
-        return nil
-    }
-
-    /// 从短范围缓存中选择生成时间最新的一份。
-    private func newestPartialCache(
-        requiringContent: Bool
-    ) -> CachedScheduleSelection? {
-        Self.partialCacheScopes
-            .compactMap { cachedSelection(for: $0) }
-            .filter {
-                !requiringContent || containsScheduleContent($0.snapshot)
-            }
-            .max {
-                $0.snapshot.generatedAt < $1.snapshot.generatedAt
-            }
     }
 
     /// 判断快照是否已经过期。

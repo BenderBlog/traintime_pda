@@ -175,7 +175,7 @@ struct WatchCourse: Codable, Hashable, Identifiable {
 
     /// 将可能缺失的 ARGB 值转为无符号位图，默认使用 Material 蓝色。
     private func unsignedARGBValue() -> UInt64 {
-        UInt64(colorARGB ?? Int64(0xFF2196F3))
+        UInt64(bitPattern: colorARGB ?? Int64(0xFF2196F3))
     }
 
     /// 从 ARGB 位图中提取并归一化单个 RGB 通道。
@@ -202,6 +202,11 @@ struct WatchScheduleSnapshot: Codable, Equatable {
     let timeZoneOffsetMinutes: Int
     let reminderMinutes: Int
     let courses: [WatchCourse]
+    /// 完整学期边界，在当天/14 天切片中也保留。旧协议缺少时由学期缓存补齐。
+    var semesterEndEpochMs: Int64? = nil
+    /// 手机单调递增的状态修订号，用于时钟调整后的缓存排序。
+    var sourceRevision: Int64? = nil
+    var freshnessStamp: Int64 { sourceRevision ?? generatedAtEpochMs }
 
     /// 快照在手机端生成的时间。
     var generatedAt: Date {

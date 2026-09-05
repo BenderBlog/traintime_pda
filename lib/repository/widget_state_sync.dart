@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/watch/watch_schedule_sync_service.dart';
 import 'package:watermeter/repository/network_client.dart' show supportPath;
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -22,7 +23,8 @@ Future<void> clearWidgetFiles() async {
   // Files written to the iOS App Group container by the main app.
   for (final fileName in [
     'ClassTable.json',
-    'UserClass.json',
+    'UserClass.json', // Legacy cache.
+    'CustomClassesV2.json',
     'ExamFile.json',
     'WeekSwift.txt',
     'PhysicsExperiment.json',
@@ -48,7 +50,21 @@ Future<void> clearWidgetFiles() async {
 ///
 /// - iOS: writes to the App Group container via Pigeon.
 /// - Android: writes to [supportPath] (same directory as widget data files).
-Future<void> syncWidgetLoginState(bool loggedIn) async {
+Future<void> syncWidgetLoginState(
+  bool loggedIn, {
+  int? expectedWatchSession,
+}) async {
+  final service = WatchScheduleSyncService.instance;
+  // 退出过程中迟到的首页刷新不得恢复登录标记或重新启用旧账户同步。
+  if (expectedWatchSession != null &&
+      expectedWatchSession != service.sessionRevision) {
+    return;
+  }
+  if (loggedIn && expectedWatchSession != null) {
+    service.resume(sessionRevision: expectedWatchSession);
+  } else if (!loggedIn) {
+    await service.clear(signedOut: true);
+  }
   final state = jsonEncode({
     "loggedIn": loggedIn,
     "updatedAt": DateTime.now().toIso8601String(),
