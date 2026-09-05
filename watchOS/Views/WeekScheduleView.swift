@@ -92,7 +92,10 @@ struct WeekScheduleView: View {
                 onVerticalDragChanged: { _ in },
                 onVerticalDragEnded: { _ in },
                 onDragAxisLocked: { _ in onTouchInputBegan() },
-                onDragFinished: {}
+                onDragCancelled: { axis in
+                    guard !pageTransitionInFlight else { return }
+                    if axis == .horizontal { settleWeekPage(direction: 0, velocity: 0) }
+                }
             )
 
             crownObserver
@@ -131,6 +134,7 @@ struct WeekScheduleView: View {
             scheduleCrownFocusRestore(afterClosing: courseID == nil)
         }
         .onDisappear {
+            crownFocused = false
             restoreCrownFocusTask?.cancel()
             crownIdleCoordinator.cancel()
             pageTransitionTask?.cancel()
@@ -500,16 +504,17 @@ struct WeekScheduleView: View {
     private func handleWeekCrownChange(
         _ event: DigitalCrownEvent
     ) {
-        onCrownInput()
-        guard selectedCourse == nil else { return }
-        // 连续旋转的新刻度立即撤销尚未开始的吸附确认任务。
-        crownIdleCoordinator.cancel()
+        guard selectedCourse == nil, !pageTransitionInFlight,
+              event.offset.isFinite, event.velocity.isFinite else { return }
         let delta = frameBoundCrownDelta(
             from: lastCrownEventOffset,
             to: event.offset
         )
         lastCrownEventOffset = event.offset
         guard let update = crownSession.register(delta: delta) else { return }
+        // 只有有效新刻度才撤销停止确认；零事件不能吞掉实体表的兜底吸附。
+        crownIdleCoordinator.cancel()
+        onCrownInput()
         crownPageRamp.register(update)
 
         onCrownInteraction()

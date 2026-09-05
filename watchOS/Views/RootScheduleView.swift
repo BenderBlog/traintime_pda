@@ -167,8 +167,11 @@ struct RootScheduleView: View {
     @State private var onboardingPageResetToken = 0
     /// 长按完成后 watchOS 可能补发一次普通 Button 点击；只抑制这一笔。
     @State private var suppressesModeTapAfterLongPress = false
-    @State private var modeButtonPressIsActive = false
+    @State private var modeButtonPress = WatchPressSession()
+    @GestureState private var modeButtonGestureIsActive = false
     @State private var modeButtonLongPressTask: Task<Void, Never>?
+    @State private var modeButtonTapReleaseTask: Task<Void, Never>?
+    @State private var syncCompletionTask: Task<Void, Never>?
     @State private var showsOnboardingNotice = false
     /// 首次教学必须使用真实课程示范；无课表时停在教学外。
     @State private var onboardingWaitsForSchedule = false
@@ -498,8 +501,15 @@ struct RootScheduleView: View {
             guard wasStale != isStale else { return }
             dismissesStaleScheduleNotice = false
         }
-        .onChange(of: store.allCourses.isEmpty) { _, isEmpty in
-            handleOnboardingScheduleAvailability(isEmpty: isEmpty)
+        .onChange(of: store.renderCacheRevision) { _, _ in
+            handleScheduleReplacement()
+        }
+        .onChange(of: modeButtonGestureIsActive) { _, isActive in
+            // 系统取消手势时不会调用 onEnded；此时只清理，绝不补发单击。
+            if !isActive, modeButtonPress.isActive || modeButtonPress.isCancelled {
+                cancelModeButtonPress()
+                resetModeButtonPressState()
+            }
         }
         .onChange(of: daySelectedDate) { _, date in
             // 用户浏览日视图时同步准备对应月份；以后从标题进入月视图不会
@@ -539,6 +549,9 @@ struct RootScheduleView: View {
     /// 每个引用都在取消后立即置空，后续 `onAppear` 可以准确判断是否需要
     /// 重新创建任务，也不会把已经完成的 Task 当成仍在运行。
     private func cancelFloatingControlTasks() {
+        syncCompletionTask?.cancel()
+        syncCompletionTask = nil
+        showsSyncCompletion = false
         hideControlsTask?.cancel()
         hideControlsTask = nil
         cachedScheduleNoticeTask?.cancel()
@@ -576,7 +589,9 @@ struct RootScheduleView: View {
     private func resetModeButtonPressState() {
         modeButtonLongPressTask?.cancel()
         modeButtonLongPressTask = nil
-        modeButtonPressIsActive = false
+        modeButtonTapReleaseTask?.cancel()
+        modeButtonTapReleaseTask = nil
+        modeButtonPress.reset()
         suppressesModeTapAfterLongPress = false
     }
 
@@ -715,7 +730,8 @@ struct RootScheduleView: View {
                         onboardingStep == .overviewSwipe
                             || onboardingStep == .overviewCrown,
                     drivesTeachingTouchScroll:
-                        onboardingStep == .overviewSwipe
+                        onboardingStep == .overviewSwipe,
+                    inputContext: onboardingStep?.rawValue ?? -1
                 )
                 .id(
                     onboardingStep == nil
@@ -732,6 +748,7 @@ struct RootScheduleView: View {
                             || onboardingStep == .courseListCrown,
                     drivesTeachingTouchScroll:
                         onboardingStep == .courseListSwipe,
+                    inputContext: onboardingStep?.rawValue ?? -1,
                     positionsInitialDate: onboardingStep == nil
                 )
                 .id(
@@ -1111,7 +1128,7 @@ struct RootScheduleView: View {
 
     /// 教学需要用真实课程展示列表、日视图卡片和周视图色块。
     /// 无任何日程时不创建欢迎页，保留在手机同步页面并给出一次
-    /// 明确提示。课表到达后由 `handleOnboardingScheduleAvailability`
+    /// 明确提示。课表到达后由 `handleScheduleReplacement`
     /// 自动续上，用户不需要再次长按。
     private func requestOnboardingStart() {
         guard store.recommendedOnboardingDate != nil else {
@@ -1131,17 +1148,38 @@ struct RootScheduleView: View {
 
     /// 无课表阻断期间，手机每完成一个同步阶段都可能安装新快照。
     /// 第一条可用日程一出现就撤下弹窗，再进入正常的欢迎与预热流程。
-    private func handleOnboardingScheduleAvailability(isEmpty: Bool) {
-        guard onboardingWaitsForSchedule, !isEmpty else { return }
-        onboardingWaitsForSchedule = false
-        showsOnboardingScheduleAlert = false
-        startOnboarding()
+    private func handleScheduleReplacement() {
+        // 数据清空或课程被删除时，详情与教学不能继续引用旧快照中的课程。
+        if let selectedCourse {
+            self.selectedCourse = store.allCourses.first { $0.id == selectedCourse.id }
+        }
+        let targetBecameInvalid = onboardingWeekTargetCourse.map { target in
+            store.allCourses.first { $0.id == target.id } != target
+        } ?? false
+        let teachingDateBecameEmpty = onboardingTeachingDate.map {
+            store.courses(on: $0).isEmpty
+        } ?? false
+        if onboardingStep != nil,
+           store.recommendedOnboardingDate == nil || targetBecameInvalid || teachingDateBecameEmpty
+        {
+            cancelOnboardingTasks()
+            onboardingInput.clear()
+            resetOnboardingTargets()
+            onboardingStep = nil
+            onboardingShowsCompletion = false
+            dismissCourseDetailImmediately()
+            dismissDayDatePickerImmediately()
+            requestOnboardingStart()
+        } else if onboardingWaitsForSchedule, store.recommendedOnboardingDate != nil {
+            requestOnboardingStart()
+        }
     }
 
     /// 零距离拖动负责精确记录按下和松开；按住满三秒的任务会立即触发，
     /// 不需要等待手指抬起。三秒内松手则统一走普通单击逻辑。
     private var modeButtonPressGesture: some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .local)
+        .updating($modeButtonGestureIsActive) { _, active, _ in active = true }
         .onChanged { value in
             guard hypot(value.translation.width, value.translation.height) <= 36
             else {
@@ -1157,8 +1195,9 @@ struct RootScheduleView: View {
 
     /// 首个触摸刻度立即暂停按钮自动隐藏，并启动独立三秒计时。
     private func beginModeButtonPressIfNeeded() {
-        guard !modeButtonPressIsActive else { return }
-        modeButtonPressIsActive = true
+        guard modeButtonPress.begin() else { return }
+        modeButtonTapReleaseTask?.cancel()
+        modeButtonTapReleaseTask = nil
         suppressesModeTapAfterLongPress = false
         handleModeButtonPressing(true)
         modeButtonLongPressTask?.cancel()
@@ -1168,7 +1207,7 @@ struct RootScheduleView: View {
             } catch {
                 return
             }
-            guard modeButtonPressIsActive else { return }
+            guard !Task.isCancelled, modeButtonPress.isActive else { return }
             suppressesModeTapAfterLongPress = true
             modeButtonLongPressTask = nil
             restartOnboarding()
@@ -1178,22 +1217,27 @@ struct RootScheduleView: View {
     /// 松手时根据三秒任务是否已经触发，二选一执行单击或长按结果。
     private func finishModeButtonPress() {
         let didTriggerLongPress = suppressesModeTapAfterLongPress
-        modeButtonPressIsActive = false
+        let shouldTap = modeButtonPress.finish(didTriggerLongPress: didTriggerLongPress)
         modeButtonLongPressTask?.cancel()
         modeButtonLongPressTask = nil
         handleModeButtonPressing(false)
-        if !didTriggerLongPress {
+        if shouldTap {
             performModeButtonTap()
         }
         // 让系统 Button 可能补发的空动作先结束，再释放抑制标记。
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+        modeButtonTapReleaseTask?.cancel()
+        modeButtonTapReleaseTask = makeWatchAutoDismissTask(after: 0.18) {
             suppressesModeTapAfterLongPress = false
+            modeButtonTapReleaseTask = nil
         }
     }
 
     private func cancelModeButtonPress() {
-        guard modeButtonPressIsActive else { return }
-        resetModeButtonPressState()
+        let wasActive = modeButtonPress.isActive
+        modeButtonPress.cancel()
+        modeButtonLongPressTask?.cancel()
+        modeButtonLongPressTask = nil
+        guard wasActive else { return }
         handleModeButtonPressing(false)
     }
 
@@ -1378,7 +1422,7 @@ struct RootScheduleView: View {
 
         onboardingSectionIntroTask = Task { @MainActor in
             await Task.yield()
-            guard onboardingStep == step,
+            guard !Task.isCancelled, onboardingStep == step,
                   onboardingSectionIntro == section
             else { return }
 
@@ -1610,8 +1654,8 @@ struct RootScheduleView: View {
 
     /// 原生 ScrollView 的偏移回调只用来管理悬浮按钮。
     ///
-    /// 表冠教学不再用偏移和超时猜测，而是由 ScrollView 的系统
-    /// 滚动阶段通过 `handleOnboardingCrownInput` 明确报告。
+    /// watchOS 11 起由系统滚动阶段报告完成；watchOS 10 的兼容判定集中在
+    /// InteractionAwareScrollView 内，根容器不另建输入来源推断。
     private func handlePassiveScrollInteraction() {
         hideControls()
         // 滚动内容一发生真实位移就隐去教学说明；对错仍等待系统 idle。
@@ -1943,8 +1987,8 @@ struct RootScheduleView: View {
         ) {
             showsSyncCompletion = true
         }
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 1_800_000_000)
+        syncCompletionTask?.cancel()
+        syncCompletionTask = makeWatchAutoDismissTask(after: 1.8) {
             guard count == store.completedRefreshCount else { return }
             withAnimation(.easeInOut(duration: 0.28)) {
                 showsSyncCompletion = false

@@ -3,6 +3,17 @@
 
 import SwiftUI
 
+private struct WatchOnboardingAnimationsPausedKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+private extension EnvironmentValues {
+    var watchOnboardingAnimationsPaused: Bool {
+        get { self[WatchOnboardingAnimationsPausedKey.self] }
+        set { self[WatchOnboardingAnimationsPausedKey.self] = newValue }
+    }
+}
+
 /// 新手引导统一采用接近 watchOS 系统控件的短促响应节奏。
 ///
 /// 动画参数集中在这里，避免各页面分别累积固定等待时间。结果绘制允许圆环和
@@ -1055,6 +1066,8 @@ struct WatchOnboardingOverlay: View {
                 .padding(.horizontal, WatchOnboardingOverlayLayout.horizontalInset)
                 .padding(.bottom, WatchOnboardingOverlayLayout.instructionBottomInset)
         }
+        // 预热只需提交首帧材质与字形；黑场背后的提示不应持续运行动画。
+        .environment(\.watchOnboardingAnimationsPaused, true)
     }
 
     /// 欢迎页背后的真实首屏预热内容。
@@ -1079,6 +1092,7 @@ struct WatchOnboardingOverlay: View {
         }
         .opacity(0.001)
         .allowsHitTesting(false)
+        .environment(\.watchOnboardingAnimationsPaused, true)
         .task {
             await Task.yield()
             await Task.yield()
@@ -1436,6 +1450,7 @@ private struct WatchOnboardingSectionProgressView: View {
 /// 系统表冠方向贴近左侧或右侧实体表冠。它只负责绘制且由父层禁用命中，
 /// 不会抢走底层输入。
 private struct WatchOnboardingOperationCue: View {
+    @Environment(\.watchOnboardingAnimationsPaused) private var animationsPaused
     let operation: WatchOnboardingOperation
     let viewportSize: CGSize
     let controlCenters: WatchOnboardingControlCenters
@@ -1473,7 +1488,7 @@ private struct WatchOnboardingOperationCue: View {
     private func phaseAnimation<Content: View>(
         @ViewBuilder content: @escaping (Bool) -> Content
     ) -> some View {
-        PhaseAnimator([false, true]) { phase in
+        PhaseAnimator(animationsPaused ? [false] : [false, true]) { phase in
             content(phase)
                 .compositingGroup()
         } animation: { _ in
@@ -1488,7 +1503,7 @@ private struct WatchOnboardingOperationCue: View {
     ) -> some View {
         Group {
             if let lockedTapPoint {
-                PhaseAnimator([false, true]) { phase in
+                PhaseAnimator(animationsPaused ? [false] : [false, true]) { phase in
                     tapCue(holds: holds, phase: phase)
                 } animation: { _ in
                     WatchOnboardingMotion.operationHint
@@ -1793,6 +1808,7 @@ private struct WatchOnboardingLoadingBar: View {
 /// 扫光进度使用单调的正弦速度修正：运动会自然加速、减速，但不会反向；
 /// 循环复位发生在光带完全离开文字以后，因此不会出现可见跳帧。
 private struct WatchOnboardingSweepingLightText: View {
+    @Environment(\.watchOnboardingAnimationsPaused) private var animationsPaused
     let text: String
     let font: Font
     let baseOpacity: Double
@@ -1807,7 +1823,7 @@ private struct WatchOnboardingSweepingLightText: View {
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
             .overlay {
-                TimelineView(.animation(minimumInterval: 1 / 30)) { timeline in
+                TimelineView(.animation(minimumInterval: 1 / 30, paused: animationsPaused)) { timeline in
                     GeometryReader { proxy in
                         let width = proxy.size.width
                         let height = proxy.size.height

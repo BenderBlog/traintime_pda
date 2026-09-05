@@ -41,6 +41,10 @@ struct MonthCalendarWindow {
 /// 周期全部由该类型管理。日期模型不依赖课表，可以跨同步复用；五段标记引用
 /// 当前课表中的课程，因此课表索引替换时必须单独失效。
 struct MonthCalendarCache {
+    /// 八个最近访问的中心月足以复用相邻窗口，任意远期浏览也不会无限持有课程。
+    static let maximumWindowCount = 8
+    private var recentCenters: [Date] = []
+    private var calendar = Calendar.current
     private var models: [Date: MonthCalendarPageModel] = [:]
     private var periodMarkers: [Date: [Int: MonthPeriodMarker]] = [:]
     /// 以中心月为键保存已经组装好的三页原子窗口。
@@ -54,7 +58,7 @@ struct MonthCalendarCache {
     /// 新手引导进入课程列表前会查询这一状态。只有三页完整就绪才允许
     /// 黑色章节页淡出，避免第一次进入月视图时才在动画帧内组装网格。
     func isPrepared(around date: Date) -> Bool {
-        windows[monthCalendarStart(for: date)] != nil
+        calendar == Calendar.current && windows[monthCalendarStart(for: date)] != nil
     }
 
     /// 预生成目标月份前、中、后三页所需的全部轻量数据。
@@ -63,7 +67,9 @@ struct MonthCalendarCache {
         periodCourseIDsByDay: [Date: [String?]],
         coursesByID: [String: WatchCourse]
     ) {
+        resetForCalendarChangeIfNeeded()
         let center = monthCalendarStart(for: date)
+        recordAccess(to: center)
         guard windows[center] == nil else { return }
         let starts = monthCalendarPageStarts(centeredOn: center)
         for month in starts {
@@ -76,6 +82,7 @@ struct MonthCalendarCache {
             )
         }
         windows[center] = makeWindow(for: starts)
+        trimCachedWindows()
     }
 
     /// 返回已成组准备好的三页窗口，确保日期和颜色标记来自同一批缓存。
@@ -85,9 +92,6 @@ struct MonthCalendarCache {
         coursesByID: [String: WatchCourse]
     ) -> MonthCalendarWindow {
         let center = monthCalendarStart(for: date)
-        if let cached = windows[center] {
-            return cached
-        }
         prewarm(
             around: center,
             periodCourseIDsByDay: periodCourseIDsByDay,
@@ -123,6 +127,29 @@ struct MonthCalendarCache {
     mutating func invalidateScheduleMarkers() {
         periodMarkers.removeAll(keepingCapacity: true)
         windows.removeAll(keepingCapacity: true)
+        recentCenters.removeAll(keepingCapacity: true)
+    }
+
+    private mutating func resetForCalendarChangeIfNeeded() {
+        guard calendar != Calendar.current else { return }
+        calendar = .current
+        models.removeAll(keepingCapacity: true)
+        invalidateScheduleMarkers()
+    }
+
+    private mutating func recordAccess(to center: Date) {
+        recentCenters.removeAll { $0 == center }
+        recentCenters.append(center)
+    }
+
+    /// 窗口淘汰后同步释放无人引用的网格和色段，三份缓存共用同一生命周期。
+    private mutating func trimCachedWindows() {
+        while recentCenters.count > Self.maximumWindowCount {
+            windows.removeValue(forKey: recentCenters.removeFirst())
+        }
+        let retainedMonths = Set(windows.values.flatMap { $0.models.keys })
+        models = models.filter { retainedMonths.contains($0.key) }
+        periodMarkers = periodMarkers.filter { retainedMonths.contains($0.key) }
     }
 
     /// 返回已有模型；缺失时只计算一次并存入缓存。

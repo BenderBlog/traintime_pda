@@ -64,8 +64,9 @@ struct CalendarHorizontalPager<Page: View>: View {
     let onVerticalDragChanged: (CGFloat) -> Void
     let onVerticalDragEnded: (DragGesture.Value) -> Void
     let onDragAxisLocked: (CalendarPagingDragAxis) -> Void
-    let onDragFinished: () -> Void
+    let onDragCancelled: (CalendarPagingDragAxis) -> Void
 
+    @GestureState private var dragIsRecognized = false
     @State private var dragAxis: CalendarPagingDragAxis?
     @State private var horizontalDragStarted = false
     @State private var verticalDragStarted = false
@@ -91,7 +92,7 @@ struct CalendarHorizontalPager<Page: View>: View {
         onVerticalDragChanged: @escaping (CGFloat) -> Void,
         onVerticalDragEnded: @escaping (DragGesture.Value) -> Void,
         onDragAxisLocked: @escaping (CalendarPagingDragAxis) -> Void,
-        onDragFinished: @escaping () -> Void
+        onDragCancelled: @escaping (CalendarPagingDragAxis) -> Void = { _ in }
     ) {
         self.pageOffset = pageOffset
         self.interactionResetToken = interactionResetToken
@@ -106,7 +107,7 @@ struct CalendarHorizontalPager<Page: View>: View {
         self.onVerticalDragChanged = onVerticalDragChanged
         self.onVerticalDragEnded = onVerticalDragEnded
         self.onDragAxisLocked = onDragAxisLocked
-        self.onDragFinished = onDragFinished
+        self.onDragCancelled = onDragCancelled
     }
 
     var body: some View {
@@ -152,6 +153,14 @@ struct CalendarHorizontalPager<Page: View>: View {
             .onChange(of: interactionResetToken) { _, _ in
                 resetTouchRecognition()
             }
+            .onChange(of: dragIsRecognized) { _, isRecognized in
+                guard !isRecognized, let cancelledAxis = dragAxis else { return }
+                // 页面复用或系统抢占可能取消 DragGesture，不会经过 onEnded。
+                // 只把当前位移收口，不把取消当成教学操作或额外翻页。
+                resetTouchRecognition()
+                onDragCancelled(cancelledAxis)
+            }
+            .onDisappear { resetTouchRecognition() }
         }
         // 页面中的 DragGesture 统一引用这个固定坐标系；页面视觉平移不会
         // 改变下一帧 translation 的测量原点。
@@ -161,14 +170,13 @@ struct CalendarHorizontalPager<Page: View>: View {
 
     /// 吸附开始时清空本次触摸的轴判断和累计状态。
     ///
-    /// 当前手势稍后即使补发 `onEnded`，父视图已经进入 transition 状态，
-    /// 不会再次创建吸附；这里仍调用结束回调以恢复纵向 ScrollView 开关。
+    /// 当前手势稍后即使补发 onEnded，也没有轴和起始标记可供提交；
+    /// 系统取消则通过单独回调恢复父视图位移，不报告一次成功操作。
     private func resetTouchRecognition() {
         dragAxis = nil
         horizontalDragStarted = false
         verticalDragStarted = false
         dragStartTime = nil
-        onDragFinished()
     }
 
     private var pagingGesture: some Gesture {
@@ -176,6 +184,7 @@ struct CalendarHorizontalPager<Page: View>: View {
             minimumDistance: 2,
             coordinateSpace: .named("calendarPagingInput")
         )
+            .updating($dragIsRecognized) { _, active, _ in active = true }
             .onChanged { value in
                 if dragStartTime == nil {
                     dragStartTime = value.time
@@ -233,11 +242,7 @@ struct CalendarHorizontalPager<Page: View>: View {
                 if dragAxis == .vertical, verticalDragStarted {
                     onVerticalDragEnded(value)
                 }
-                dragAxis = nil
-                horizontalDragStarted = false
-                verticalDragStarted = false
-                dragStartTime = nil
-                onDragFinished()
+                resetTouchRecognition()
             }
     }
 }
@@ -355,63 +360,6 @@ extension View {
     }
 }
 
-/// 日、周、月分页共用的表冠停止协调器。
-///
-/// watchOS 正常会在停止旋转后发送 `onIdle`，但实体表在焦点切换或系统
-/// ScrollView 参与时偶尔会漏发。协调器同时维护两种互斥计时：
-///
-/// - 每个有效刻度重置 360ms 兜底；
-/// - 收到 `onIdle` 后改用 90ms 短确认窗。
-///
-/// 新刻度、页面吸附或视图退出都会调用 `cancel()`，因此同一页面永远只有
-/// 一个待执行任务。三种视图不再分别维护相同的 Task 生命周期代码。
-final class CalendarCrownIdleCoordinator {
-    private static let fallbackDelay: UInt64 = 360_000_000
-    private static let idleConfirmationDelay: UInt64 = 90_000_000
-    private var task: Task<Void, Never>?
-
-    /// 安装实体表漏发 `onIdle` 时使用的较长兜底计时。
-    func scheduleFallback(
-        action: @escaping @MainActor () -> Void
-    ) {
-        schedule(afterNanoseconds: Self.fallbackDelay, action: action)
-    }
-
-    /// 系统已报告空闲时，用短窗口确认期间没有新刻度。
-    func scheduleIdleConfirmation(
-        action: @escaping @MainActor () -> Void
-    ) {
-        schedule(
-            afterNanoseconds: Self.idleConfirmationDelay,
-            action: action
-        )
-    }
-
-    /// 取消旧任务后安装唯一的新停止检测任务。
-    private func schedule(
-        afterNanoseconds: UInt64,
-        action: @escaping @MainActor () -> Void
-    ) {
-        cancel()
-        task = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: afterNanoseconds)
-            guard !Task.isCancelled else { return }
-            self?.task = nil
-            action()
-        }
-    }
-
-    /// 新输入和页面生命周期变化共用的取消入口。
-    func cancel() {
-        task?.cancel()
-        task = nil
-    }
-
-    deinit {
-        task?.cancel()
-    }
-}
-
 /// 丢弃掉帧期间积压的旧表冠位移，只消费当前绘制周期内合理的输入量。
 ///
 /// `DigitalCrownEvent.offset` 可能在主线程繁忙后一次跳过很多 detent。如果把
@@ -421,7 +369,8 @@ func frameBoundCrownDelta(
     from previousOffset: Double,
     to currentOffset: Double
 ) -> Double {
-    min(0.5, max(-0.5, currentOffset - previousOffset))
+    guard previousOffset.isFinite, currentOffset.isFinite else { return 0 }
+    return min(0.5, max(-0.5, currentOffset - previousOffset))
 }
 
 /// 根据页面的交互目标，把系统报告的表冠速度映射为像素位移倍率。

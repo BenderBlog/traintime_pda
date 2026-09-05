@@ -31,7 +31,7 @@ private struct CachedScheduleSelection {
 /// Watch 端的来源字段只用于确认落盘索引与当前原始快照属于同一次安装，避免
 /// App 在写盘中途退出后错误复用一份旧索引。
 private enum WatchScheduleRenderCacheLayout {
-    static let schemaVersion = 1
+    static let schemaVersion = 2
     static let periodRanges = [
         1...2,
         3...4,
@@ -45,6 +45,9 @@ private enum WatchScheduleRenderCacheLayout {
 private struct PersistedScheduleRenderSource: Codable, Equatable, Sendable {
     let snapshotSchemaVersion: Int
     let generatedAtEpochMs: Int64
+    let sourceRevision: Int64?
+    let calendarIdentifier: String
+    let timeZoneIdentifier: String
     let rangeStartEpochMs: Int64?
     let rangeEndEpochMs: Int64?
     let courseCount: Int
@@ -104,11 +107,15 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 手表 App 自身的标准缓存，用于不依赖 Widget 的离线恢复。
     private let defaults: UserDefaults
+    private let sharedDefaults: UserDefaults?
+    private let reloadWidgets: () -> Void
 
     /// 每个同步阶段保留一份独立快照，方便按有效期回退。
     private var cachedSnapshots: [
         WatchScheduleScope: WatchScheduleSnapshot
     ] = [:]
+    /// 覆盖范围合并只在快照安装时执行；概览时钟更新不重复排序整学期。
+    private var resolvedPresentation: WatchResolvedSchedule?
 
     /// 整学期数据可能分多个消息传输，先按课程 ID 合并到临时缓冲区。
     private var semesterBuffer: [String: WatchCourse] = [:]
@@ -130,6 +137,7 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 月视图的日期模型和课程标记由独立缓存管理，Store 不持有其组装细节。
     private var monthCalendarCache = MonthCalendarCache()
+    private var indexedCalendar = Calendar.current
 
     /// 安装派生索引时一次算好的教学日期。
     ///
@@ -152,8 +160,14 @@ final class WatchScheduleStore: ObservableObject {
     private var renderCachePersistenceGeneration = 0
 
     /// 初始化时立即恢复缓存，让界面在连接手机之前就可以显示。
-    init(defaults: UserDefaults = .standard) {
+    init(
+        defaults: UserDefaults = .standard,
+        sharedDefaults: UserDefaults? = WatchWidgetShared.defaults,
+        reloadWidgets: @escaping () -> Void = WatchWidgetShared.reloadWidgetTimelines
+    ) {
         self.defaults = defaults
+        self.sharedDefaults = sharedDefaults
+        self.reloadWidgets = reloadWidgets
         // Swift 要求所有无默认值的存储属性在调用实例方法前完成初始化。
         // 语言只需读取一次，后续缓存恢复和预热便可安全使用完整的 Store。
         self.preferredLanguageIdentifier =
@@ -194,7 +208,8 @@ final class WatchScheduleStore: ObservableObject {
         }
 
         let changed = preferredLanguageIdentifier != normalized
-        _ = WatchWidgetShared.updatePreferredLanguage(normalized)
+        _ = WatchWidgetShared.updatePreferredLanguage(
+            normalized, in: sharedDefaults, reloadWidgets: reloadWidgets)
         preferredLanguageIdentifier = normalized
         if changed {
             // 错误文本是在产生时本地化的；语言切换后清除旧文本，空状态会用
@@ -238,6 +253,7 @@ final class WatchScheduleStore: ObservableObject {
     /// 但课程分组、列表定位和月历标记不会再推迟到首次进入页面时计算。
     func prepareOnboardingRenderData(around date: Date) async {
         await Task.yield()
+        guard !Task.isCancelled else { return }
 
         let sourceCount = snapshot?.courses.count ?? 0
         if indexedCourseCount != sourceCount {
@@ -245,6 +261,7 @@ final class WatchScheduleStore: ObservableObject {
         }
 
         await Task.yield()
+        guard !Task.isCancelled else { return }
         prewarmMonthCalendar(around: date)
         // 不在教学动画期间编码和写入 UserDefaults。缺失索引已经标记为
         // `renderCacheNeedsPersistence`，启动同步回复或三秒等待结束后会走
@@ -263,11 +280,11 @@ final class WatchScheduleStore: ObservableObject {
     }
 
     var presentationTimelineDates: [Date] {
-        WatchSchedulePresentation.timelineDates(resolved: WatchScheduleResolver.resolve(cachedSnapshots), now: Date())
+        WatchSchedulePresentation.timelineDates(resolved: resolvedPresentation, now: Date())
     }
 
     func presentation(at date: Date) -> WatchSchedulePresentation {
-        WatchSchedulePresentation(resolved: WatchScheduleResolver.resolve(cachedSnapshots), at: date,
+        WatchSchedulePresentation(resolved: resolvedPresentation, at: date,
             signedOut: defaults.bool(forKey: WatchWidgetShared.signedOutKey))
     }
 
@@ -282,7 +299,7 @@ final class WatchScheduleStore: ObservableObject {
         installedScheduleVersion = nil
         WatchWidgetShared.clearSchedule(in: defaults)
         defaults.set(signedOut, forKey: WatchWidgetShared.signedOutKey)
-        if let shared = WatchWidgetShared.defaults {
+        if let shared = sharedDefaults {
             WatchWidgetShared.clearSchedule(in: shared)
             shared.set(signedOut, forKey: WatchWidgetShared.signedOutKey)
         }
@@ -290,7 +307,15 @@ final class WatchScheduleStore: ObservableObject {
         renderCacheNeedsPersistence = false
         receiveLaunchSyncReply()
         finishRefresh()
-        WatchWidgetShared.reloadWidgetTimelines()
+        reloadWidgets()
+    }
+
+    /// 系统日历或时区变化时，原时间戳不变，但自然日分组需要重新建立。
+    /// 前台恢复和系统通知共用此入口；普通激活只做一次常量时间比较。
+    func refreshCalendarEnvironmentIfNeeded() {
+        guard indexedCalendar != Calendar.current else { return }
+        indexedCalendar = .current
+        rebuildVisibleScheduleIndex(persisting: true)
     }
 
     /// 计算周次时使用的学期起点。
@@ -474,11 +499,11 @@ final class WatchScheduleStore: ObservableObject {
                 cachedSnapshots.removeValue(forKey: scope)
                 let key = WatchWidgetShared.cacheKey(for: scope)
                 defaults.removeObject(forKey: key)
-                WatchWidgetShared.defaults?.removeObject(forKey: key)
+                sharedDefaults?.removeObject(forKey: key)
             }
             snapshot = semester
             loadedScope = .semester
-            WatchWidgetShared.reloadWidgetTimelines()
+            reloadWidgets()
             syncError = nil
             prepareVisibleScheduleIndex(
                 preferringPersistentCache: true,
@@ -625,7 +650,7 @@ final class WatchScheduleStore: ObservableObject {
         if let existing = cachedSnapshots[scope], existing.freshnessStamp > completedSnapshot.freshnessStamp { return }
         persistCompletedStage(snapshot: completedSnapshot, json: json, scope: scope)
         defaults.set(false, forKey: WatchWidgetShared.signedOutKey)
-        WatchWidgetShared.defaults?.set(false, forKey: WatchWidgetShared.signedOutKey)
+        sharedDefaults?.set(false, forKey: WatchWidgetShared.signedOutKey)
         if let resolved = WatchScheduleResolver.resolve(cachedSnapshots) {
             snapshot = resolved.snapshot
             loadedScope = resolved.scope
@@ -752,7 +777,7 @@ final class WatchScheduleStore: ObservableObject {
     ) -> (snapshot: WatchScheduleSnapshot, json: String)? {
         let candidates = [
             defaults.string(forKey: key),
-            WatchWidgetShared.defaults?.string(forKey: key),
+            sharedDefaults?.string(forKey: key),
         ].compactMap { $0 }
 
         return candidates.compactMap { json -> (snapshot: WatchScheduleSnapshot, json: String)? in
@@ -767,7 +792,7 @@ final class WatchScheduleStore: ObservableObject {
         json: String,
         key: String
     ) {
-        WatchWidgetShared.defaults?.set(json, forKey: key)
+        sharedDefaults?.set(json, forKey: key)
     }
 
     /// 写入一个已经完整完成的同步阶段。
@@ -778,7 +803,8 @@ final class WatchScheduleStore: ObservableObject {
     ) {
         cachedSnapshots[scope] = snapshot
         defaults.set(json, forKey: WatchWidgetShared.cacheKey(for: scope))
-        WatchWidgetShared.persist(json: json, scope: scope)
+        sharedDefaults?.set(json, forKey: WatchWidgetShared.cacheKey(for: scope))
+        reloadWidgets()
     }
 
     /// 当前没有页面数据时，恢复优先级最高的缓存。
@@ -877,6 +903,8 @@ final class WatchScheduleStore: ObservableObject {
         restoredPeriodCourseIDs: [Date: [String?]]? = nil
     ) {
         sortedVisibleCourses = sorted
+        resolvedPresentation = WatchScheduleResolver.resolve(cachedSnapshots)
+        indexedCalendar = .current
         coursesByDay = grouped
         courseListGroups = groups
         courseListInitialDate = initialDate
@@ -1136,13 +1164,15 @@ final class WatchScheduleStore: ObservableObject {
             }
             let date = date(fromEpochMilliseconds: day.dayStartEpochMs)
             let courses = day.courseIDs.compactMap { courseMap[$0] }
-            guard courses.count == day.courseIDs.count,
+            let dayCourseIDs = Set(day.courseIDs)
+            guard grouped[date] == nil,
+                  courses.count == day.courseIDs.count,
                   courses.allSatisfy({
                       calendar.startOfDay(for: $0.startAt) == date
                   }),
                   day.periodCourseIDs.allSatisfy({ courseID in
                       guard let courseID else { return true }
-                      return courseMap[courseID] != nil
+                      return dayCourseIDs.contains(courseID)
                   })
             else {
                 return nil
@@ -1199,6 +1229,9 @@ final class WatchScheduleStore: ObservableObject {
         PersistedScheduleRenderSource(
             snapshotSchemaVersion: snapshot.schemaVersion,
             generatedAtEpochMs: snapshot.generatedAtEpochMs,
+            sourceRevision: snapshot.sourceRevision,
+            calendarIdentifier: String(describing: Calendar.current.identifier),
+            timeZoneIdentifier: Calendar.current.timeZone.identifier,
             rangeStartEpochMs: snapshot.rangeStartEpochMs,
             rangeEndEpochMs: snapshot.rangeEndEpochMs,
             courseCount: snapshot.courses.count

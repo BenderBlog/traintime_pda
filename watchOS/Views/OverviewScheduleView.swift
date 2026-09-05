@@ -12,6 +12,7 @@ struct OverviewScheduleView: View {
     var alwaysAllowsTeachingBounce = false
     /// 只在“概览·上下滑动”教学步骤中让触摸实际带动短内容。
     var drivesTeachingTouchScroll = false
+    var inputContext = 0
 
     var body: some View {
         InteractionAwareScrollView(
@@ -21,6 +22,7 @@ struct OverviewScheduleView: View {
             centersShortContent: true,
             alwaysAllowsBounce: alwaysAllowsTeachingBounce,
             usesShortContentTouchFallback: alwaysAllowsTeachingBounce,
+            inputContext: inputContext,
             teachingTouchScrollEffect: drivesTeachingTouchScroll
                 ? .elastic
                 : .disabled,

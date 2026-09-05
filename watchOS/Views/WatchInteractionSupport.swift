@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import Foundation
+#if canImport(WatchKit)
 import WatchKit
+#endif
 
 /// 创建一个可取消的界面自动收起任务。
 ///
@@ -25,6 +27,7 @@ func makeWatchAutoDismissTask(
 ///
 /// 只在用户完成明确操作或跨越一个导航刻度时播放，避免表冠连续转动期间
 /// 高频触发导致触觉含义变得模糊。
+#if canImport(WatchKit)
 @MainActor
 enum WatchHaptics {
     static func selection() {
@@ -67,6 +70,113 @@ enum WatchHaptics {
         WKInterfaceDevice.current().play(.failure)
     }
 }
+#endif
+
+/// 拖出按钮后，本轮触摸始终取消；手指移回也不能重启长按或补发点击。
+/// 状态机不保存计时任务，页面离开时由调用方取消任务并 reset。
+struct WatchPressSession {
+    private(set) var isActive = false
+    private(set) var isCancelled = false
+
+    mutating func begin() -> Bool {
+        guard !isActive, !isCancelled else { return false }
+        isActive = true
+        return true
+    }
+
+    mutating func cancel() {
+        isActive = false
+        isCancelled = true
+    }
+
+    mutating func finish(didTriggerLongPress: Bool) -> Bool {
+        let shouldTap = isActive && !isCancelled && !didTriggerLongPress
+        reset()
+        return shouldTap
+    }
+
+    mutating func reset() {
+        isActive = false
+        isCancelled = false
+    }
+}
+
+/// 系统 idle 与触摸兜底共用一次性完成门。步骤切换或手势取消会推进代次，
+/// 因而旧回调即使已排入主线程，也不能完成新步骤。
+struct WatchInputCompletionGate {
+    private(set) var generation = 0
+    private var completedGeneration: Int?
+
+    var hasCompletedTouch: Bool { completedGeneration == generation }
+
+    mutating func begin() {
+        generation &+= 1
+    }
+
+    mutating func completeTouch(for expectedGeneration: Int) -> Bool {
+        guard expectedGeneration == generation, !hasCompletedTouch else { return false }
+        completedGeneration = generation
+        return true
+    }
+}
+
+/// 日、周、月分页共用的表冠停止协调器。
+///
+/// watchOS 正常会在停止旋转后发送 `onIdle`，但实体表在焦点切换或系统
+/// ScrollView 参与时偶尔会漏发。协调器同时维护两种互斥计时：
+///
+/// - 每个有效刻度重置 360ms 兜底；
+/// - 收到 `onIdle` 后改用 90ms 短确认窗。
+///
+/// 新刻度、页面吸附或视图退出都会调用 `cancel()`，因此同一页面永远只有
+/// 一个待执行任务。三种视图不再分别维护相同的 Task 生命周期代码。
+@MainActor
+final class CalendarCrownIdleCoordinator {
+    private static let fallbackDelay: UInt64 = 360_000_000
+    private static let idleConfirmationDelay: UInt64 = 90_000_000
+    private var task: Task<Void, Never>?
+
+    /// 安装实体表漏发 `onIdle` 时使用的较长兜底计时。
+    func scheduleFallback(
+        action: @escaping @MainActor () -> Void
+    ) {
+        schedule(afterNanoseconds: Self.fallbackDelay, action: action)
+    }
+
+    /// 系统已报告空闲时，用短窗口确认期间没有新刻度。
+    func scheduleIdleConfirmation(
+        action: @escaping @MainActor () -> Void
+    ) {
+        schedule(
+            afterNanoseconds: Self.idleConfirmationDelay,
+            action: action
+        )
+    }
+
+    /// 取消旧任务后安装唯一的新停止检测任务。
+    private func schedule(
+        afterNanoseconds: UInt64,
+        action: @escaping @MainActor () -> Void
+    ) {
+        cancel()
+        task = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: afterNanoseconds)
+            guard !Task.isCancelled else { return }
+            self?.task = nil
+            action()
+        }
+    }
+
+    /// 新输入和页面生命周期变化共用的取消入口。
+    func cancel() {
+        task?.cancel()
+        task = nil
+    }
+
+    deinit {
+        task?.cancel()
+    }
+}
 
 /// 一次表冠输入更新的语义结果。
 ///
@@ -89,18 +199,20 @@ struct WatchCrownTurnUpdate {
 struct WatchCrownTurnSession {
     private static let inactivityTimeout: TimeInterval = 0.35
 
-    private var lastEventTime = 0.0
+    private var lastEventTime: TimeInterval?
     private var direction = 0
 
     /// 接收一次非零表冠变化，并返回本次输入对应的会话语义。
     mutating func register(
         delta: Double,
-        now: TimeInterval = Date.timeIntervalSinceReferenceDate
+        now: TimeInterval = ProcessInfo.processInfo.systemUptime
     ) -> WatchCrownTurnUpdate? {
-        guard abs(delta) > .ulpOfOne else { return nil }
+        guard delta.isFinite, now.isFinite, abs(delta) > .ulpOfOne else { return nil }
 
-        let startsNewSession = lastEventTime == 0
-            || now - lastEventTime > Self.inactivityTimeout
+        // 使用单调时钟，手机校时不会把两次独立旋转合并为同一轮。
+        let startsNewSession = lastEventTime.map {
+            now < $0 || now - $0 > Self.inactivityTimeout
+        } ?? true
         let newDirection = delta > 0 ? 1 : -1
         let reversesDirection = !startsNewSession
             && direction != 0
@@ -120,7 +232,7 @@ struct WatchCrownTurnSession {
     ///
     /// 吸附完成后清空旧时间和方向，下一个刻度会作为新会话处理。
     mutating func reset() {
-        lastEventTime = 0
+        lastEventTime = nil
         direction = 0
     }
 }

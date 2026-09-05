@@ -38,239 +38,6 @@ private struct DayScrollTopTarget: Hashable {
     let date: Date
 }
 
-/// 当前日期的卡片布局采样。
-///
-/// 只记录不随滚动位置变化的高度，表冠每帧不需要重新传递 frame。
-private struct DayCourseLayoutMetrics: Equatable {
-    var cardHeights: [String: CGFloat] = [:]
-}
-
-/// 日视图卡片高度持久化格式。
-private struct PersistedDayCourseLayoutCache: Codable, Sendable {
-    let schemaVersion: Int
-    let signature: String
-    let cardHeights: [String: Double]
-}
-
-private enum DayCourseLayoutCacheConfiguration {
-    static let schemaVersion = 1
-    static let persistenceDelayNanoseconds: UInt64 = 1_500_000_000
-}
-
-/// 保存日视图已经测量的卡片高度，但不发布变化，避免重绘父页面。
-///
-/// 相邻页在进入屏幕前就完成采样；横向跨页时只切换当前日期指针，不再临时
-/// 挂载一组测量视图。缓存是普通引用状态，不会让表冠每个像素都触发父页面
-/// 更新。高度以“课表版本 + 语言 + 表盘内容宽度”为签名持久化；这些条件任
-/// 一变化都会自动舍弃旧值，避免跨设备或切换语言后复用错误高度。
-@MainActor
-private final class DayCourseLayoutTracker {
-    private var metrics = DayCourseLayoutMetrics()
-    private var activeSignature: String?
-    private var persistenceTask: Task<Void, Never>?
-    private var persistenceDirty = false
-
-    func update(metrics: DayCourseLayoutMetrics) {
-        var changed = false
-        for (courseID, height) in metrics.cardHeights {
-            let normalizedHeight = max(1, height)
-            if let oldHeight = self.metrics.cardHeights[courseID],
-               abs(oldHeight - normalizedHeight) <= 0.25
-            {
-                continue
-            }
-            self.metrics.cardHeights[courseID] = normalizedHeight
-            changed = true
-        }
-        if changed {
-            persistenceDirty = true
-            schedulePersistence()
-        }
-    }
-
-    /// 按当前课表和布局环境恢复磁盘缓存；签名相同的重复调用没有开销。
-    func configure(signature: String) {
-        guard activeSignature != signature else { return }
-        persistenceTask?.cancel()
-        persistenceTask = nil
-        persistenceDirty = false
-        activeSignature = signature
-        metrics = DayCourseLayoutMetrics()
-
-        guard let cache = try? WatchCacheCoding.load(
-                  PersistedDayCourseLayoutCache.self,
-                  key: WatchPersistentCacheKey.dayCourseLayout
-              ),
-              cache.schemaVersion
-                  == DayCourseLayoutCacheConfiguration.schemaVersion,
-              cache.signature == signature
-        else {
-            return
-        }
-        metrics.cardHeights = cache.cardHeights.mapValues { value in
-            CGFloat(value)
-        }
-    }
-
-    /// 手指或表冠正在逐帧更新页面时暂停 JSON 编码和 UserDefaults 写盘。
-    func suspendPersistence() {
-        persistenceTask?.cancel()
-        persistenceTask = nil
-    }
-
-    /// 页面停止交互后再补写尚未落盘的测量值。
-    func resumePersistence() {
-        guard persistenceDirty else { return }
-        schedulePersistence()
-    }
-
-    /// 合并相邻三页测量结果后延迟写盘，连续翻页期间绝不执行磁盘编码。
-    private func schedulePersistence() {
-        persistenceTask?.cancel()
-        persistenceTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(
-                nanoseconds: DayCourseLayoutCacheConfiguration
-                    .persistenceDelayNanoseconds
-            )
-            guard !Task.isCancelled else { return }
-            await self?.persist()
-        }
-    }
-
-    /// 在后台编码高度缓存，回到主线程后再原子写入最新签名的数据。
-    private func persist() async {
-        guard let activeSignature, !metrics.cardHeights.isEmpty else { return }
-        let cache = PersistedDayCourseLayoutCache(
-            schemaVersion: DayCourseLayoutCacheConfiguration.schemaVersion,
-            signature: activeSignature,
-            cardHeights: metrics.cardHeights.mapValues { value in
-                Double(value)
-            }
-        )
-        do {
-            let data = try await Task.detached(priority: .utility) {
-                try WatchCacheCoding.encode(cache)
-            }.value
-            guard !Task.isCancelled,
-                  self.activeSignature == activeSignature
-            else { return }
-            WatchCacheCoding.persist(
-                data,
-                key: WatchPersistentCacheKey.dayCourseLayout
-            )
-        } catch {
-            return
-        }
-        persistenceDirty = false
-        persistenceTask = nil
-    }
-
-    /// 将连续的“课程索引”插值成内容纵向位移。
-    ///
-    /// 使用每张卡片的真实高度而不是猜测固定高度，课程名换行、
-    /// 考试座位等内容导致卡片高度不同时也不会在提交下一项时跳动。
-    func contentOffset(
-        for position: Double,
-        courses: [WatchCourse],
-        spacing: CGFloat
-    ) -> CGFloat {
-        guard courses.count > 1 else { return 0 }
-        let boundedPosition = min(
-            Double(courses.count - 1),
-            max(0, position)
-        )
-        let lowerIndex = Int(floor(boundedPosition))
-        let upperIndex = min(courses.count - 1, lowerIndex + 1)
-        let fraction = CGFloat(boundedPosition - Double(lowerIndex))
-        let fallbackHeight = averageMeasuredHeight ?? 72
-        let offsets = courseTopOffsets(
-            courses: courses,
-            spacing: spacing,
-            fallbackHeight: fallbackHeight
-        )
-        return offsets[lowerIndex]
-            + (offsets[upperIndex] - offsets[lowerIndex]) * fraction
-    }
-
-    /// 把统一的内容纵向偏移反算成连续课程位置。
-    ///
-    /// 手指和表冠都通过这一坐标互相接续：手指拖动不再维护一套独立的
-    /// ScrollView 锚点，放手后表冠会从屏幕当前所见位置继续移动。
-    func position(
-        forContentOffset contentOffset: CGFloat,
-        courses: [WatchCourse],
-        spacing: CGFloat
-    ) -> Double {
-        guard courses.count > 1 else { return 0 }
-        let offsets = courseTopOffsets(
-            courses: courses,
-            spacing: spacing,
-            fallbackHeight: averageMeasuredHeight ?? 72
-        )
-        guard let first = offsets.first,
-              let last = offsets.last
-        else {
-            return 0
-        }
-        if contentOffset >= first { return 0 }
-        if contentOffset <= last { return Double(courses.count - 1) }
-
-        for lowerIndex in 0..<(offsets.count - 1) {
-            let upperOffset = offsets[lowerIndex]
-            let lowerOffset = offsets[lowerIndex + 1]
-            guard contentOffset <= upperOffset,
-                  contentOffset >= lowerOffset
-            else {
-                continue
-            }
-            let distance = upperOffset - lowerOffset
-            let fraction = distance > 0
-                ? (upperOffset - contentOffset) / distance
-                : 0
-            return Double(lowerIndex) + Double(fraction)
-        }
-        return 0
-    }
-
-    /// 当前卡片栈的真实内容高度，用于触摸结束后的底边贴合。
-    func contentHeight(
-        courses: [WatchCourse],
-        spacing: CGFloat
-    ) -> CGFloat {
-        guard !courses.isEmpty else { return 0 }
-        let fallbackHeight = averageMeasuredHeight ?? 72
-        let cardHeight = courses.reduce(CGFloat.zero) { partial, course in
-            partial + (metrics.cardHeights[course.id] ?? fallbackHeight)
-        }
-        return cardHeight + CGFloat(max(0, courses.count - 1)) * spacing
-    }
-
-    /// 以第一张卡片为原点，计算每张卡片顶边对应的内容偏移。
-    private func courseTopOffsets(
-        courses: [WatchCourse],
-        spacing: CGFloat,
-        fallbackHeight: CGFloat
-    ) -> [CGFloat] {
-        var result = [CGFloat]()
-        result.reserveCapacity(courses.count)
-        var accumulatedHeight: CGFloat = 0
-        for course in courses {
-            result.append(-accumulatedHeight)
-            accumulatedHeight += (
-                metrics.cardHeights[course.id] ?? fallbackHeight
-            ) + spacing
-        }
-        return result
-    }
-
-    /// 首帧采样未完成时使用已有卡片的平均高度作为短暂回退。
-    private var averageMeasuredHeight: CGFloat? {
-        guard !metrics.cardHeights.isEmpty else { return nil }
-        return metrics.cardHeights.values.reduce(0, +)
-            / CGFloat(metrics.cardHeights.count)
-    }
-}
-
 /// 日分页器实际挂载的一张轻量页面数据。
 ///
 /// 这里只保存日期和已经索引好的日程，不包含任何 SwiftUI 视图。横向移动
@@ -348,6 +115,8 @@ private final class DayPagePredictionCache {
 
 struct DayScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.legibilityWeight) private var legibilityWeight
     @Binding var selectedDate: Date
     @State private var crownValue = 0.0
     @State private var lastCrownEventOffset = 0.0
@@ -438,7 +207,15 @@ struct DayScheduleView: View {
             onVerticalDragChanged: updateDayVerticalDrag,
             onVerticalDragEnded: finishDayVerticalDrag,
             onDragAxisLocked: { _ in onTouchInputBegan() },
-            onDragFinished: {}
+            onDragCancelled: { axis in
+                guard !pageTransitionInFlight else { return }
+                if axis == .horizontal {
+                    cancelHorizontalFrameSmoothing()
+                    settleDayPage(direction: 0, velocity: 0)
+                } else {
+                    settleDayContentAfterTouch()
+                }
+            }
         )
         // 表冠一旦接管横向分页，三页内容子树进入“分页独占”事务：卡片补间、
         // 边界回弹和数据替换附带的隐式动画全部关闭，只保留停止旋转后由
@@ -455,9 +232,12 @@ struct DayScheduleView: View {
             lastCrownEventOffset = crownValue
             feedbackCourseIndex = 0
             configureDayCourseLayoutCache()
+            courseLayoutTracker.resumePersistence()
             updateDayNavigationTitle()
         }
         .onDisappear {
+            crownFocused = false
+            courseLayoutTracker.suspendPersistence()
             crownIdleCoordinator.cancel()
             pageTransitionTask?.cancel()
             cancelHorizontalFrameSmoothing()
@@ -484,6 +264,12 @@ struct DayScheduleView: View {
         .onChange(of: store.preferredLanguageIdentifier) { _, _ in
             configureDayCourseLayoutCache()
             updateDayNavigationTitle()
+        }
+        .onChange(of: dynamicTypeSize) { _, _ in
+            configureDayCourseLayoutCache()
+        }
+        .onChange(of: legibilityWeight) { _, _ in
+            configureDayCourseLayoutCache()
         }
         .onChange(of: selectedDate) { _, _ in
             prepareDayPageWindow()
@@ -537,11 +323,11 @@ struct DayScheduleView: View {
             max(1, width ?? horizontalPageWidth).rounded()
         )
         let scheduleIdentity: String
-        if let installedVersion = store.installedScheduleVersion {
-            scheduleIdentity = installedVersion
-        } else if let snapshot = store.snapshot {
+        if let snapshot = store.snapshot {
+            // 当天/14 天覆盖已经可以改变卡片，不能继续只用旧整学期版本。
             scheduleIdentity = [
                 String(snapshot.schemaVersion),
+                String(snapshot.freshnessStamp),
                 String(snapshot.generatedAtEpochMs),
                 String(snapshot.courses.count),
             ].joined(separator: "-")
@@ -553,6 +339,8 @@ struct DayScheduleView: View {
             scheduleIdentity,
             store.preferredLanguageIdentifier,
             String(contentWidth),
+            String(describing: dynamicTypeSize),
+            String(describing: legibilityWeight),
         ].joined(separator: "|")
         courseLayoutTracker.configure(signature: signature)
     }
@@ -789,7 +577,10 @@ struct DayScheduleView: View {
     /// 数值增加先向后浏览课程，到达最后一项便进入下一日横向分页；数值
     /// 减少先向前浏览课程，到达第一项后直接进入前一日横向分页。
     private func handleDayCrownChange(_ event: DigitalCrownEvent) {
-        onCrownInput()
+        guard !isDatePickerPresented, event.offset.isFinite, event.velocity.isFinite else { return }
+        let delta = frameBoundCrownDelta(from: lastCrownEventOffset, to: event.offset)
+        lastCrownEventOffset = event.offset
+        guard abs(delta) > .ulpOfOne else { return }
         // 新刻度是“仍在旋转”的唯一可靠信号；先取消可能由短暂 onIdle
         // 排队的吸附，保证连续翻页期间绝不会撞上收口动画。
         crownIdleCoordinator.cancel()
@@ -797,11 +588,6 @@ struct DayScheduleView: View {
         // 表冠接管时立即停止手指松开后的惯性，避免两种输入同时修改
         // `courseContentOffset` 而造成位置跳动。
         cancelDayVerticalMomentum()
-        let delta = frameBoundCrownDelta(
-            from: lastCrownEventOffset,
-            to: event.offset
-        )
-        lastCrownEventOffset = event.offset
 
         // `onIdle` 在实体表很慢的连续旋转中偶尔会过早到达。若它已经启动
         // 表冠吸附，新刻度必须先原子完成那一页并解除动画锁，再继续消费本次
@@ -809,6 +595,7 @@ struct DayScheduleView: View {
         guard resumeDayCrownFromPendingSnapIfNeeded() else { return }
         guard let update = crownSession.register(delta: delta) else { return }
 
+        onCrownInput()
         onCrownInteraction()
         crownFocused = true
         prepareDayCrownSession(update)
@@ -852,11 +639,6 @@ struct DayScheduleView: View {
             }
         }
 
-        guard update.reversesDirection,
-              !continuousDayNavigation
-        else {
-            return
-        }
     }
 
     /// 根据当前页面状态选择本次表冠事件的处理路径。

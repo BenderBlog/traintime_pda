@@ -14,6 +14,8 @@ enum WatchPersistentCacheKey {
         "TraintimeWatchInstalledSemesterScheduleVersion"
     static let scheduleRenderIndex = "XDYouWatchScheduleRenderCache"
     static let dayCourseLayout = "XDYouWatchDayCourseLayoutCache"
+    /// 清空课表后使尚在后台编码的派生缓存失效，防止旧任务重新写回。
+    static let invalidationGeneration = "XDYouWatchCacheInvalidationGeneration"
     static let completedOnboarding = "XDYouWatchCompletedOnboardingV1"
 }
 
@@ -84,18 +86,14 @@ enum WatchWidgetShared {
     /// 专用表盘组件各自使用独立 kind，系统组件库才能把它们作为不同选项展示。
     static let courseNameWidgetKind = "TraintimeCourseNameWidget"
     static let courseTimeLocationWidgetKind = "TraintimeCourseTimeLocationWidget"
-    static let courseProgressWidgetKind = "TraintimeCourseProgressWidget"
     static let todayScheduleWidgetKind = "TraintimeTodayScheduleWidget"
-    static let weekDistributionWidgetKind = "TraintimeWeekDistributionWidget"
 
     /// 课表或语言变化时需要一起刷新的全部 Widget 类型。
     static let allWidgetKinds = [
         widgetKind,
         courseNameWidgetKind,
         courseTimeLocationWidgetKind,
-        courseProgressWidgetKind,
         todayScheduleWidgetKind,
-        weekDistributionWidgetKind,
     ]
 
     /// 三阶段同步各自独立保存，只有阶段完整完成后才覆盖对应缓存。
@@ -184,7 +182,11 @@ enum WatchWidgetShared {
 
     /// 保存新语言并刷新 Widget；返回值表示语言是否实际发生变化。
     @discardableResult
-    static func updatePreferredLanguage(_ value: String) -> Bool {
+    static func updatePreferredLanguage(
+        _ value: String,
+        in defaults: UserDefaults? = Self.defaults,
+        reloadWidgets: () -> Void = Self.reloadWidgetTimelines
+    ) -> Bool {
         guard let normalized = normalizedPreferredLanguage(value),
               let defaults
         else {
@@ -195,7 +197,7 @@ enum WatchWidgetShared {
             defaults.string(forKey: preferredLanguageKey) != normalized
         defaults.set(normalized, forKey: preferredLanguageKey)
         if changed {
-            reloadWidgetTimelines()
+            reloadWidgets()
         }
         return changed
     }
@@ -240,6 +242,8 @@ enum WatchWidgetShared {
     }
 
     static func clearSchedule(in defaults: UserDefaults) {
+        defaults.set(defaults.integer(forKey: WatchPersistentCacheKey.invalidationGeneration) &+ 1,
+            forKey: WatchPersistentCacheKey.invalidationGeneration)
         for scope in scheduleCacheScopesByPriority {
             defaults.removeObject(forKey: cacheKey(for: scope))
         }

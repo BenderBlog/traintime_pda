@@ -26,9 +26,13 @@ struct TraintimeWatchApp: App {
                 }
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }
+                    store.refreshCalendarEnvironmentIfNeeded()
                     // 每次回到前台都建立新的实时回复等待窗口。旧缓存保持可见；
                     // 超时后根视图会按“有缓存提示、无缓存整页”分别处理。
                     WatchConnectivityManager.shared.beginLaunchRefresh()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
+                    store.refreshCalendarEnvironmentIfNeeded()
                 }
         }
     }

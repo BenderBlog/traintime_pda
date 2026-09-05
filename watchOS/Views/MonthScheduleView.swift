@@ -108,7 +108,10 @@ struct MonthScheduleView: View {
                             onSwipeInput(.vertical)
                         },
                         onDragAxisLocked: { _ in onTouchInputBegan() },
-                        onDragFinished: {}
+                        onDragCancelled: { axis in
+                            guard !pageTransitionInFlight else { return }
+                            if axis == .horizontal { settleMonthPage(direction: 0, velocity: 0) }
+                        }
                     )
                 }
                 // 星期栏和网格作为一个整体靠近系统月份标题；只改变视觉位置，
@@ -139,6 +142,7 @@ struct MonthScheduleView: View {
             }
             .onDisappear {
                 guard !prewarmingOnly else { return }
+                crownFocused = false
                 crownIdleCoordinator.cancel()
                 pageTransitionTask?.cancel()
             }
@@ -315,15 +319,15 @@ struct MonthScheduleView: View {
 
     /// 从第一个有效表冠刻度起就直接横向移动月份，不经过纵向滚动或阈值路由。
     private func handleMonthCrownChange(_ event: DigitalCrownEvent) {
-        onCrownInput()
-        guard !pageTransitionInFlight else { return }
-        crownIdleCoordinator.cancel()
+        guard !pageTransitionInFlight, event.offset.isFinite, event.velocity.isFinite else { return }
         let delta = frameBoundCrownDelta(
             from: lastCrownEventOffset,
             to: event.offset
         )
         lastCrownEventOffset = event.offset
         guard let update = crownSession.register(delta: delta) else { return }
+        crownIdleCoordinator.cancel()
+        onCrownInput()
         crownPageRamp.register(update)
 
         applyMonthCrownDelta(delta, velocity: event.velocity)

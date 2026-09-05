@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A27B00000000000000000031 /* DayCourseLayoutCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000030 /* DayCourseLayoutCache.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		262B016C2B58FED30094B372 /* SaveToGroupID.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B016B2B58FED30094B372 /* SaveToGroupID.g.swift */; };
 		262B01702B5905FA0094B372 /* ApiImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262B016F2B5905FA0094B372 /* ApiImplementation.swift */; };
@@ -146,6 +147,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A27B00000000000000000030 /* DayCourseLayoutCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage/DayCourseLayoutCache.swift; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		262B016B2B58FED30094B372 /* SaveToGroupID.g.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveToGroupID.g.swift; sourceTree = "<group>"; };
@@ -362,6 +364,7 @@
 				A17A00000000000000000010 /* WeekScheduleView.swift */,
 				A27B00000000000000000003 /* MonthScheduleView.swift */,
 				A27B00000000000000000008 /* MonthCalendarData.swift */,
+				A27B00000000000000000030 /* DayCourseLayoutCache.swift */,
 				A27B00000000000000000004 /* CalendarPagingSupport.swift */,
 				A27B00000000000000000005 /* InteractionAwareScrollView.swift */,
 				A27B00000000000000000006 /* WatchInteractionSupport.swift */,
@@ -686,6 +689,7 @@
 				A17A00000000000000000018 /* WeekScheduleView.swift in Sources */,
 				A27B00000000000000000013 /* MonthScheduleView.swift in Sources */,
 				A27B00000000000000000018 /* MonthCalendarData.swift in Sources */,
+				A27B00000000000000000031 /* DayCourseLayoutCache.swift in Sources */,
 				A27B00000000000000000014 /* CalendarPagingSupport.swift in Sources */,
 				A27B00000000000000000015 /* InteractionAwareScrollView.swift in Sources */,
 				A27B00000000000000000016 /* WatchInteractionSupport.swift in Sources */,

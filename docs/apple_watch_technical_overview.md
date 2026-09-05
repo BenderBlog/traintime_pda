@@ -54,6 +54,7 @@ flowchart LR
 | `ios/Runner/PhoneWatchQueuedScheduleTransport.swift` | 后台队列请求转发与关联 |
 | `watchOS/Connectivity/WatchConnectivityManager.swift` | Watch 三阶段同步状态机 |
 | `watchOS/Storage/WatchScheduleStore.swift` | 快照安装、缓存、索引和公开状态 |
+| `watchOS/Storage/DayCourseLayoutCache.swift` | 卡片高度采样、双向位移换算和可暂停持久化 |
 | `watchOS/Shared/WatchWidgetShared.swift` | App Group、语言、缓存键和通用编码 |
 | `watchOS/Views/RootScheduleView.swift` | 顶层路由、提示、悬浮控件和详情层 |
 | `watchOS/Views/OverviewScheduleView.swift` | 当前或下一节课程概览 |
@@ -65,7 +66,7 @@ flowchart LR
 | `watchOS/Views/CourseViews.swift` | 共用课程卡片和顶层详情页 |
 | `watchOS/Views/CalendarPagingSupport.swift` | 日/周/月共用分页、吸附和表冠桥接 |
 | `watchOS/Views/InteractionAwareScrollView.swift` | 列表滚动观察和顶部保护 |
-| `watchOS/Views/WatchInteractionSupport.swift` | 触觉反馈和表冠连续会话 |
+| `watchOS/Views/WatchInteractionSupport.swift` | 可取消任务、按压状态、完成去重、触觉和表冠连续会话 |
 | `watchOS/Views/WatchOnboardingView.swift` | 新手引导步骤、顶层遮罩和动作动画 |
 | `watchOS/Widget/` | 表盘 Complication、Smart Stack 与时间线 |
 
@@ -216,24 +217,28 @@ Store 初始化或新课表安装时准备。只有依赖真实 SwiftUI 几何�
 | 完整学期课表 | Standard + App Group | 权威学期快照 | 学期全部分页完成 |
 | 已安装版本 | Standard | iPhone 语义版本 | 完整学期缺失或新学期安装 |
 | 展示派生索引 | Standard | 排序 ID、自然日分组、五段标记、列表入口 | 来源快照不匹配或 schema 变化 |
-| 日卡片布局 | Standard | 课程 ID 到实测卡片高度 | 课表版本、语言或表盘宽度变化 |
-| 月份预热窗口 | 运行时内存 | 当前月前、中、后三页网格与标记 | 课表索引变化或浏览到新月份 |
-| Widget 交互状态 | App Group | 当前/下一节切换状态 | 用户操作或时间线更新 |
+| 日卡片布局 | Standard | 课程 ID 到实测卡片高度 | 当前快照修订、语言、宽度、动态字体或粗体设置变化 |
+| 月份预热窗口 | 运行时内存 | 最多八个中心月的三页网格与标记 | 课表、系统日历或时区变化；超限淘汰最近最少访问窗口 |
+| Widget 交互状态 | App Group | 综合组件当前课程 ID 与下一节预览截止时间 | 五分钟、当前下课、下一项上课或当前 ID 改变 |
 
 私有缓存键统一定义在 `WatchPersistentCacheKey`；Codable Data 的编码和读取统一
-经过 `WatchCacheCoding`。课表正文的三个共享键及其优先级由
+经过 `WatchCacheCoding`。课表正文的三个共享键及其稳定读取顺序由
 `WatchWidgetShared` 唯一维护，Store 与 Widget 读取同一组键名和 schema 范围。
 
 ### 原始课表恢复
 
-启动时 Store 按“学期 → 14 天 → 当天”读取缓存。每个范围会依次尝试 Watch
-标准 Defaults 与 App Group：
+启动时每个范围分别解码 Standard 与 App Group 两份候选，选择修订较新的有效
+副本；坏数据只影响自身。`WatchScheduleResolver` 按 `sourceRevision` 排序，旧
+协议缺少修订号时才用生成时间。同一修订号中完整学期具有最终权威性。
 
-1. 任一来源解码失败只忽略该条，继续检查另一个来源；
-2. 标准缓存有效且 App Group 尚无副本时，会把 JSON 写入 App Group；
-3. 完整学期存在时始终优先，包括已经结束的历史课程；
-4. 尚无完整学期时，优先仍有效且包含日程的短范围缓存，再回退到最新缓存；
-5. 存在版本号但完整学期缓存丢失时清除孤立版本，防止误报“无需更新”。
+同学期的新当天或 14 天快照只覆盖自己的明确范围，保留范围之外的课程；范围
+内空数组也代表取消全部日程。不同学期不拼接。每段覆盖范围保留自己的有效期，
+局部更新不能延长其他日期旧数据的有效期。概览复用索引安装时计算好的合并结果。
+
+清空和退出通过独立协议传递 `scheduleCleared`、`signedOut`、`stateRevision`
+和 `accountGeneration`。旧修订或旧账号回复不能恢复已清空课表；本地索引、卡片
+高度、Widget 预览和教学目标同时失效。完整学期缺失时会清除孤立版本号，防止
+只有版本、没有正文却向手机误报“无需更新”。
 
 ### 持久化派生索引
 
@@ -246,12 +251,13 @@ Store 初始化或新课表安装时准备。只有依赖真实 SwiftUI 几何�
 - 每日五个两节区间对应的课程 ID。
 
 新建和恢复最终都经过 `installVisibleScheduleIndex`，确保所有派生字段原子安装。
-持久化索引包含来源快照身份，只有 schema、生成时间、范围和课程数量全部匹配
-才会复用；否则由原始快照重建。iPhone 的语义版本仍是“课表是否变化”的唯一
+派生索引 schema 为 2，来源身份包含原快照 schema、生成时间、单调修订号、范围、
+课程数量、系统日历和时区。全部匹配才复用；旧版索引会自动从原始快照重建。iPhone 的语义版本仍是“课表是否变化”的唯一
 依据，来源身份仅防止本地文件错配。
 
 恢复流程按职责拆分：先校验缓存与原始快照身份，再恢复课程 ID 和自然日索引，
-最后恢复课程列表入口。跨自然日时只重算列表入口；任一结构校验失败则整体回退
+最后恢复课程列表入口。重复日期和跨日课程标记均会被拒绝。跨自然日时只重算
+列表入口；任一结构校验失败则整体回退
 到原始课表重建，不安装部分索引。
 
 课程列表入口、教学示例日期和索引课程数量也在安装入口中一次更新，后续完整性
@@ -262,7 +268,7 @@ Store 初始化或新课表安装时准备。只有依赖真实 SwiftUI 几何�
 
 `MonthCalendarCache` 管理两类生命周期不同的数据：
 
-- 日期网格只由年月决定，可跨课表版本复用；
+- 日期网格依赖年月、系统日历和时区，可跨课表版本复用；
 - 五段标记引用当前课表课程，课表索引变化时单独失效。
 
 Store 恢复派生索引后立即预热当前月及前后两月。日视图选择日期变化时预热该
@@ -270,17 +276,24 @@ Store 恢复派生索引后立即预热当前月及前后两月。日视图选�
 入场、横向拖动和表冠逐帧路径因此只读取内存，不执行整学期扫描、颜色转换或
 持久化编码。
 
+缓存保留最近访问的八个中心月。淘汰窗口时，同时释放不再被窗口引用的单月网格
+和课程标记，最多保留 24 份单月数据。前台恢复或系统时区通知会校验日历环境，
+变化后重建自然日索引和月份窗口，不改动原始课程时间戳。
+
 ### 日视图布局缓存
 
 日视图使用课程真实卡片高度把连续课程索引换算成像素位移。高度缓存签名包含：
 
-- 已安装课表版本；没有版本时使用当前快照结构身份；
+- 当前可见快照 schema、修订号、生成时间和数量，不能只依赖旧完整学期版本；
 - 手机同步的界面语言；
-- 当前表盘内容宽度；
+- 当前表盘内容宽度、Dynamic Type 大小和文字粗细；
 - 布局缓存 schema。
 
 相邻三页预先测量卡片，测量结果先合并到内存。手指或表冠逐帧操作期间暂停
-JSON 编码，停止交互后延迟合并写盘，避免磁盘工作占用动画帧。
+新的 JSON 编码，暂停期间新增测量也不能重新排队写盘；已开始的后台编码允许
+完成计算，但取消检查会阻止提交。停止交互后仍按原有 1.5 秒
+延迟合并写盘。页面离开取消任务，清空代次阻止后台编码结果重新写回。恢复高度
+时过滤非法数值。实现独立于 View，可以使用临时 Defaults 直接运行回归测试。
 
 ## Watch App 界面
 
@@ -341,14 +354,26 @@ JSON 编码，停止交互后延迟合并写盘，避免磁盘工作占用动画
 采样。`RootScheduleView` 将动态目标的 frame 中心转换为引导视口坐标，保证
 提示与控件中心一致，表冠输入不会被当成色块点击。
 
-真实页面负责执行操作，引导层在实操步骤中不截获触摸。页面通过回调把点击、
-拖动结束、滚动阶段和表冠事件上报给 `WatchOnboardingInputBridge`。原生列表以
-系统 `.tracking` / `.interacting` / `.idle` 阶段作为滚动会话和停止时机；短内容
-教学按需使用一个不修改偏移的轻量 `DragGesture` 补记触摸来源。这是因为短内容
-只产生橡皮筋位移时，部分实体表会跳过 `.tracking`，甚至不会形成完整 ScrollPhase。
-正常滚动仍在系统 `.idle` 提交；明确的纵向拖动若没有进入系统滚动会话，则在
-抬手后通过同一完成入口兜底提交。两条路径用拖动代次去重，未形成滚动会话的
-触摸标记也会自动过期，因此不会重复推进教学或污染下一次表冠输入。
+真实页面负责执行操作，实操说明、动作提示和结果层使用 `allowsHitTesting(false)`。
+欢迎、章节和完成页保留原本的轻点入口。旁路回调把真实输入交给
+`WatchOnboardingInputBridge`，不会使用覆盖层模拟一次成功操作。
+
+| 系统版本 | 原生滚动完成判定 | 教学触摸视觉 |
+| --- | --- | --- |
+| watchOS 11 及以上 | `ScrollPhase` 区分 tracking/interacting/idle；手指标记防止短内容被误认成表冠 | 概览使用弹性偏移；列表通过 `ScrollPosition` 连续定位 |
+| watchOS 10 | 触摸结束兜底；开启来源标记且没有程序化视觉代理的教学中，用真实位移和 0.35 秒静止补报表冠；惯性尾段继续保留触摸来源 | 概览保留弹性偏移；列表保留系统滚动，不调用不可用的 `ScrollPosition` |
+
+正常浏览的原生滚动物理不变。教学触摸代理沿用现有参数，只有指定步骤禁用原生
+位移，避免系统与代理双重推动。`WatchInputCompletionGate` 使系统 idle 和 0.08 秒
+触摸兜底只能完成同一次操作一次；教学上下文变化、页面离开和系统取消均取消
+旧任务并推进代次。watchOS 10 的来源判定是兼容推断，仍需要实体表验证。
+
+`GestureState` 会在系统取消手势时自动复位，因此分页器和模式按钮都能处理没有
+`onEnded` 的取消路径。取消分页只收回当前位移，不提交教学或额外翻页；模式
+按钮拖出 36pt 后整轮作废，移回也不重启三秒长按。有效表冠事件才会提交教学，
+会话间隔使用单调时钟，避免手机校时污染方向判断。API 行为参考
+[Apple 手势回调说明](https://developer.apple.com/documentation/SwiftUI/Adding-Interactivity-with-Gestures)
+与 [ScrollPhase](https://developer.apple.com/documentation/swiftui/scrollphase)。
 
 用户开始滑动或转动表冠时，说明和暗层淡出；触摸抬起、滚动停止或表冠停止后
 判定结果。成功反馈使用纯黑背景、绿色圆环和对号；错误反馈保留当前页面并
@@ -357,7 +382,7 @@ JSON 编码，停止交互后延迟合并写盘，避免磁盘工作占用动画
 引导会使用 Store 在索引安装阶段选出的教学日期：优先日程较多的日期，并在
 数量相同时选择距离今天较近的一天。完成后写入
 `XDYouWatchCompletedOnboardingV1`，完成页等待轻点退出。右下角切换按钮按住
-3 秒可重新开始引导；提前松开则打开视图列表。
+3 秒可重新开始引导；有效按压提前松开则打开视图列表。
 
 引导入口先检查 Store 是否能给出本学期教学日期。没有任何可用日程时不创建
 欢迎页和教学状态机，而是停留在手机同步页面并提示用户在 iPhone 的 XDYou 中
@@ -372,7 +397,9 @@ JSON 编码，停止交互后延迟合并写盘，避免磁盘工作占用动画
 
 欢迎页的“可开始”同时依赖数据准备和首屏渲染准备。加载期间会在纯黑欢迎页
 背后以不可交互方式建立首个提示需要的材质和动作动画管线；两者都完成后才
-显示“轻点屏幕以开始”。
+显示“轻点屏幕以开始”。不可见预热树只提交首帧，不在黑场后循环播放提示或扫光。
+同步变更教学目标、移除示范日期全部课程或清空课表时，旧详情与目标坐标会失效，
+并重新检查教学可用性。
 
 ### 共用分页基础设施
 
@@ -384,7 +411,8 @@ JSON 编码，停止交互后延迟合并写盘，避免磁盘工作占用动画
 - `normalizedContinuousPageOffset`：完整跨页后的无动画换底；
 - `horizontalPageSnap`：生成目标位置和吸附时间；
 - `CalendarPagingCrownInputModifier`：统一表冠范围、步长、灵敏度和系统声音；
-- `CalendarCrownIdleCoordinator`：统一 `onIdle` 确认与实体表漏回调兜底。
+- `CalendarCrownIdleCoordinator`：位于 `WatchInteractionSupport.swift`，统一 `onIdle`
+  确认与实体表漏回调兜底，可独立运行状态机测试。
 
 页面只保留自己的业务差异：日视图的纵向卡片阶段、周视图的学期边界、月视图
 的月份模型和日期提交。共享组件不包含课程数据，也不改变页面布局。
@@ -450,26 +478,30 @@ Catalog；日期与星期使用注入的 Locale。课程、教师和地点属于
 
 ## 表盘 Complication 与 Smart Stack 小组件
 
-Widget 只读取 App Group，不访问手机或校园接口：
+四个组件共用 `WatchSchedulePresentation` 和同一缓存范围判定：
 
-- 有正在进行的课程时显示当前课程；
-- 否则显示下一节课程；
-- 支持单行、圆形、表角和长方形四种表盘 Complication；
-- 表盘下一节课程优先显示 24 小时制开始时间和地点，当前课程显示结束时间；
-- 圆形版本用外圈表示当前课程进度，表角版本沿表角显示地点；
-- 另有课程名称、时间地点、课程进度、今日课表、本周分布五种专用组件；
-- 五种专用组件均支持单行、圆形、表角和长方形，便于在同一表盘组合；
-- 时间地点组件只显示开始时间与地点，其余组件隔离名称、进度与分布职责；
-- Smart Stack 中当前和下一节同时存在时提供切换按钮；
-- 长方形组件右侧显示包含周六、周日的 5×7 分布矩阵，约占宽度三成；
-- 长方形组件在 Smart Stack 与表盘强调色模式中使用同一布局，仅由系统调整配色；
-- 在课程开始和结束时间生成 Timeline 节点。
+| 组件 | 内容职责 |
+| --- | --- |
+| 综合课表 | 根据当前状态显示时间、地点和课程；小尺寸优先时间与地点，圆环或条形进度辅助表达 |
+| 课程名称 | 当前焦点课程名称与状态 |
+| 时间地点 | 与名称组件保持同一课程，显示“距上课”“距下课”、时间、地点和进度 |
+| 日程概览 | 当日或下一有课日的数量、完成情况及日周分布，不重复主课程详情 |
 
-Timeline Provider 从共享快照生成不可变条目。每个条目已经包含当前课程、
-下一节课程、当天课程和本周课程，SwiftUI `body` 不再筛选完整快照。周分布矩阵
-建立时把本周课程转换为 35 格颜色索引，Canvas 每帧只读取索引并绘制圆角单元。
-进度、剩余分钟、24 小时时间和地点占位由统一格式化工具提供，所有 family 使用
-同一套边界与文本语义。
+四种组件支持单行、圆形、表角和长方形。综合组件正常显示当前课程，当前无课则
+选择下一项。距上课超过 15 分钟显示明确开始时间；进入 15 分钟内使用倒计时；
+上课中显示“距下课”，不足一分钟显示“即将下课”。没有 60 分钟档、首课等待档
+或固定 20:00 明日切换。实际末课结束后才显示下一有课日，使用“明日”或日期
+明确标注。本学期结束显示“本学期结束，开心玩耍吧！”。
+
+综合组件的下一节预览只影响自身：绑定当前课程 ID，并在五分钟、当前课程下课
+或下一项上课中最早的时刻失效。名称和时间地点组件始终共享正常焦点，避免分
+组件互相矛盾。原独立进度和本周分布组件已移出 bundle，刷新列表只包含四个仍
+注册的 kind。
+
+Timeline 节点覆盖 15 分钟阈值、上课、最后一分钟、下课、自然日和缓存失效边界。
+无课、没有完整覆盖、过期、未同步及退出登录分别呈现。周矩阵仍为包括周末的
+5×7 网格；Canvas 读取预计算的色格，不在每帧扫描完整课表。本次交互审计没有
+调整 Widget 布局或状态阈值。
 
 ## 通知职责
 
@@ -478,39 +510,50 @@ Timeline Provider 从共享快照生成不可变条目。每个条目已经包�
 
 ## 构建与验证
 
-### Swift 语法和差异检查
+在仓库根目录运行。无签名构建验证编译、链接、资源与嵌入关系，不证明实体设备
+上的触觉手感、系统手势竞争或配对传输结果。
 
 ```bash
-xcrun swiftc -parse \
-  watchOS/Shared/WatchWidgetShared.swift \
-  watchOS/Storage/WatchScheduleStore.swift \
-  watchOS/Connectivity/WatchConnectivityManager.swift \
-  watchOS/Views/*.swift
+# 共享状态和缓存回归：直接编译生产 Swift 文件，使用临时 Defaults。
+bash tools/test_watch_regressions.sh
 
+# Flutter 与签名脚本回归。
+CI=true .flutter/bin/flutter test --no-pub
+python3 -m unittest test/signing_scripts_test.py
 git diff --check
+
+# Watch App 与 Widget；deployment target 保持 watchOS 10。
+xcodebuild -project ios/Runner.xcodeproj -scheme TraintimeWatch \
+  -configuration Debug -destination 'generic/platform=watchOS Simulator' \
+  -derivedDataPath /tmp/xdyou-watch-validation CODE_SIGNING_ALLOWED=NO build
+
+# iPhone 主工程，包含两个平台的小组件与 Watch App。
+xcodebuild -project ios/Runner.xcodeproj -scheme Runner \
+  -configuration Debug -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath /tmp/xdyou-ios-validation CODE_SIGNING_ALLOWED=NO build
 ```
 
-### watchOS 无签名构建
+回归覆盖按钮取消与长按互斥、有效表冠与会话反转、完成去重、取消任务、触摸和
+表冠位移接续、月缓存淘汰、卡片持久化暂停、清空竞态、修订变化与跨日标记
+校验。界面实测重点是短概览、长课程列表、连续跨日/周/月、系统中断拖动、章节
+切换期间旧输入、旋转期间同步替换，以及在 watchOS 10 与 11 以上分别确认来源。
+
+### 签名切换
+
+继续维护两个 Python 脚本。提交文件使用作者配置，本机调试使用个人配置：
 
 ```bash
-xcodebuild \
-  -project ios/Runner.xcodeproj \
-  -scheme TraintimeWatch \
-  -configuration Debug \
-  -destination 'generic/platform=watchOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  build
+python3 tools/signing_for_upstream.py
+# 暂存本次改动后，检查真正提交的索引内容。
+python3 tools/signing_for_upstream.py --check --staged
+# 提交完成后恢复本地配置。
+python3 tools/signing_for_local.py
+python3 tools/signing_for_local.py --check
 ```
 
-### Flutter 快照测试
-
-```bash
-.flutter/bin/flutter test test/watch_schedule_snapshot_test.dart
-```
-
-真机安装还要求 iPhone、Watch App 和 Widget 使用同一开发团队与 App Group，
-Watch Companion Bundle Identifier 正确指向 Runner，并在手机和手表上启用
-开发者模式。
+切换前会完整校验所有受管文件，异常时不留下部分切换。`--check --staged` 读取
+Git 索引，因此可在工作区已经恢复个人签名后再次检查提交内容。真机安装要求
+iPhone、Watch App 和 Widget 的 Team、App Group 与 Companion 标识一致。
 
 ## 开发约束
 

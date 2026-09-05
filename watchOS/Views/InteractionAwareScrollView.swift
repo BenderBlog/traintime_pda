@@ -39,6 +39,8 @@ struct InteractionAwareScrollView<Content: View>: View {
     /// 默认只记录输入来源；仅当调用方明确打开教学视觉代理时，同一份手势
     /// 数据才会额外推动内容。教学判定入口与原生表冠来源判断保持不变。
     var usesShortContentTouchFallback = false
+    /// 教学步骤切换时使旧输入及延迟回调失效，不重建或重定位实际列表。
+    var inputContext: Int = 0
     /// 教学专用视觉滚动。正常使用与其他教学步骤始终保持 `.disabled`。
     var teachingTouchScrollEffect: TeachingTouchScrollEffect = .disabled
     /// 顶层详情覆盖周视图时，由内部原生 ScrollView 主动接管表冠焦点。
@@ -57,14 +59,17 @@ struct InteractionAwareScrollView<Content: View>: View {
     /// 部分实体表在短内容橡皮筋滚动时会跳过 `.tracking`，直接进入
     /// `.interacting`。这两个状态只补记“手指正在接触”，不接管滚动。
     @State private var nativeTouchGestureIsActive = false
-    @State private var nativeTouchMarkerGeneration = 0
+    @State private var touchCompletionGate = WatchInputCompletionGate()
     /// 记录当前手指是否已经形成明确的纵向拖动。短内容只发生橡皮筋
     /// 位移时，watchOS 偶尔不会建立完整 ScrollPhase，会由它在抬手后
     /// 兜底提交一次真实触摸滚动。
     @State private var nativeTouchGestureMovedVertically = false
     /// 同一次拖动可能同时经过 DragGesture 兜底和系统 `.idle`。使用代次
     /// 去重，确保教学只收到一次完成事件，不会自动跨过相邻步骤。
-    @State private var nativeTouchCompletionGeneration = -1
+    @GestureState private var touchMarkerIsRecognized = false
+    @State private var touchCompletionTask: Task<Void, Never>?
+    @State private var touchResetTask: Task<Void, Never>?
+    @State private var legacyCrownCompletionTask: Task<Void, Never>?
     /// 教学触摸的起点与显示状态。检测结果仍由上面的原有状态负责；这些值
     /// 只改变内容的可见位置，避免视觉驱动反过来影响操作类型判断。
     @State private var teachingDragStartScrollOffset: CGFloat = 0
@@ -136,6 +141,7 @@ struct InteractionAwareScrollView<Content: View>: View {
                 offsetTracker.previousOffset = offset
                 guard abs(offset - previousOffset) > 0.25 else { return }
                 onScroll()
+                observeLegacyCrownScroll()
             }
             .onPreferenceChange(
                 ScrollContentHeightPreferenceKey.self
@@ -159,6 +165,17 @@ struct InteractionAwareScrollView<Content: View>: View {
             }
             .onDisappear {
                 nativeScrollFocused = false
+                resetInputObservation()
+                offsetTracker.previousOffset = nil
+            }
+            .onChange(of: inputContext) { _, _ in resetInputObservation() }
+            .onChange(of: teachingTouchScrollEffect) { _, _ in resetInputObservation() }
+            .onChange(of: usesShortContentTouchFallback) { _, _ in resetInputObservation() }
+            .onChange(of: touchMarkerIsRecognized) { _, isRecognized in
+                if !isRecognized, nativeTouchGestureIsActive {
+                    // onEnded 不处理系统取消；取消只复位视觉和来源，不提交教学。
+                    resetInputObservation()
+                }
             }
         }
     }
@@ -288,10 +305,12 @@ struct InteractionAwareScrollView<Content: View>: View {
     /// 触摸没有形成滚动会话，则在抬手后兜底提交并自动清除来源标记。
     private var nativeTouchSourceMarker: some Gesture {
         DragGesture(minimumDistance: 2, coordinateSpace: .local)
+            .updating($touchMarkerIsRecognized) { _, active, _ in active = true }
             .onChanged { value in
                 if !nativeTouchGestureIsActive {
+                    cancelInputCompletionTasks()
                     nativeTouchGestureIsActive = true
-                    nativeTouchMarkerGeneration &+= 1
+                    touchCompletionGate.begin()
                     nativeTouchGestureMovedVertically = false
                     nativeScrollSawTouchTracking = true
                     onScroll()
@@ -314,7 +333,7 @@ struct InteractionAwareScrollView<Content: View>: View {
             .onEnded { value in
                 nativeTouchGestureIsActive = false
                 finishTeachingTouchScroll()
-                let generation = nativeTouchMarkerGeneration
+                let generation = touchCompletionGate.generation
                 let endedVertically = abs(value.translation.height) >= 8
                     && abs(value.translation.height)
                         >= abs(value.translation.width)
@@ -325,23 +344,79 @@ struct InteractionAwareScrollView<Content: View>: View {
                 // 没有形成系统滚动会话，则在抬手后补交。等待一帧附近的短
                 // 延迟，优先让系统阶段取得所有权，避免触摸/表冠来源竞争。
                 if completedVerticalDrag {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
-                        guard generation == nativeTouchMarkerGeneration,
-                              nativeTouchCompletionGeneration != generation,
+                    touchCompletionTask?.cancel()
+                    touchCompletionTask = makeWatchAutoDismissTask(after: 0.08) {
+                        guard generation == touchCompletionGate.generation,
+                              !touchCompletionGate.hasCompletedTouch,
                               !nativeScrollReportedInput
                         else { return }
                         reportNativeTouchCompletion()
-                        nativeScrollSawTouchTracking = false
+                        touchCompletionTask = nil
                     }
                 }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    guard generation == nativeTouchMarkerGeneration,
-                          !nativeScrollReportedInput
-                    else { return }
-                    nativeScrollSawTouchTracking = false
-                }
+                scheduleTouchSourceReset(generation: generation)
             }
+    }
+
+    /// watchOS 10 没有 ScrollPhase。仅在教学开启来源标记且没有程序化视觉
+    /// 代理时，使用实际滚动位移与 0.35 秒静止窗口补报表冠。教学列表不执行
+    /// 首次 scrollTo，手指及其惯性始终被来源标记排除；普通浏览不走推断路径。
+    private func observeLegacyCrownScroll() {
+        if #available(watchOS 11.0, *) { return }
+        if nativeScrollSawTouchTracking {
+            // 旧系统没有减速阶段回调。惯性仍在移动时延后来源清理，不能把
+            // 手指松开 0.35 秒以后的惯性尾段错认成下一轮表冠。
+            if !nativeTouchGestureIsActive {
+                scheduleTouchSourceReset(generation: touchCompletionGate.generation)
+            }
+            return
+        }
+        guard usesShortContentTouchFallback,
+              !teachingTouchScrollEffect.isEnabled,
+              !nativeTouchGestureIsActive,
+              !nativeScrollSawTouchTracking
+        else { return }
+        let generation = touchCompletionGate.generation
+        legacyCrownCompletionTask?.cancel()
+        legacyCrownCompletionTask = makeWatchAutoDismissTask(after: 0.35) {
+            guard generation == touchCompletionGate.generation,
+                  !nativeTouchGestureIsActive, !nativeScrollSawTouchTracking
+            else { return }
+            legacyCrownCompletionTask = nil
+            onCrownInput()
+        }
+    }
+
+    private func scheduleTouchSourceReset(generation: Int) {
+        touchResetTask?.cancel()
+        touchResetTask = makeWatchAutoDismissTask(after: 0.35) {
+            guard generation == touchCompletionGate.generation,
+                  !nativeScrollReportedInput else { return }
+            nativeScrollSawTouchTracking = false
+            touchResetTask = nil
+        }
+    }
+
+    private func cancelInputCompletionTasks() {
+        touchCompletionTask?.cancel()
+        touchCompletionTask = nil
+        touchResetTask?.cancel()
+        touchResetTask = nil
+        legacyCrownCompletionTask?.cancel()
+        legacyCrownCompletionTask = nil
+    }
+
+    /// 页面退出、步骤变化和系统取消共用一个失效入口。
+    private func resetInputObservation() {
+        cancelInputCompletionTasks()
+        touchCompletionGate.begin()
+        nativeTouchGestureIsActive = false
+        nativeTouchGestureMovedVertically = false
+        nativeScrollSawTouchTracking = false
+        nativeScrollReportedInput = false
+        offsetTracker.previousOffset = nil
+        finishTeachingTouchScroll()
     }
 
     /// 记录本轮拖动开始时的真实滚动位置。
@@ -388,16 +463,15 @@ struct InteractionAwareScrollView<Content: View>: View {
 
     /// 合并系统 ScrollPhase 与短内容拖动兜底的唯一完成入口。
     private func reportNativeTouchCompletion() {
-        let generation = nativeTouchMarkerGeneration
+        let generation = touchCompletionGate.generation
         // 安装了触摸标记的页面可能同时从 DragGesture 兜底与 ScrollPhase
         // 收到完成事件，需要按代次去重。未安装标记的普通长列表没有手势
         // 代次（永远为 0），其每一轮原生 `.idle` 本身已经唯一，不能用同一
         // 个 0 去重，否则首轮异常事件会吃掉后续所有真实触摸。
         if usesShortContentTouchFallback {
-            guard nativeTouchCompletionGeneration != generation else {
+            guard touchCompletionGate.completeTouch(for: generation) else {
                 return
             }
-            nativeTouchCompletionGeneration = generation
         }
         onTouchInput()
     }
