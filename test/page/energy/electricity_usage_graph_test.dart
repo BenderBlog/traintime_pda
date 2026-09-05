@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
+import 'package:watermeter/page/energy/electricity_average_usage_graph.dart';
 import 'package:watermeter/page/energy/electricity_usage_graph.dart';
 
 void main() {
@@ -15,6 +16,19 @@ void main() {
     return ElectricityHistoryInfo(
       fetchDay: DateTime(2026, 8, day),
       remain: remain.toString(),
+    );
+  }
+
+  MeterInfo meterRow({
+    required DateTime time,
+    required double start,
+    required double end,
+  }) {
+    return MeterInfo(
+      ReadTime: time,
+      ReadNum: end - start,
+      StartNum: start,
+      EndNum: end,
     );
   }
 
@@ -60,5 +74,51 @@ void main() {
       everyElement(inInclusiveRange(plotTop, plotBottom)),
     );
     expect(graph.lines, contains(0));
+  });
+
+  test('sums multiple readings on the same day', () {
+    final graph = ElectricityAverageUsageGraph(
+      graphWidth: graphWidth,
+      historyElectricityInfo: [
+        meterRow(time: DateTime(2026, 8, 1, 2), start: 100, end: 103),
+        meterRow(time: DateTime(2026, 8, 1, 14), start: 103, end: 105),
+        meterRow(time: DateTime(2026, 8, 2, 2), start: 105, end: 108),
+      ],
+    );
+    final result = graph.plotData;
+
+    expect(result, hasLength(2));
+    expect(result[0].date, DateTime(2026, 8, 1));
+    expect(result[0].usage, 5);
+    expect(result[1].usage, 3);
+  });
+
+  test('keeps signed corrections and ignores exact duplicate readings', () {
+    final graph = ElectricityAverageUsageGraph(
+      graphWidth: graphWidth,
+      historyElectricityInfo: [
+        meterRow(time: DateTime(2026, 8, 1, 2), start: 100, end: 103),
+        meterRow(time: DateTime(2026, 8, 1, 3), start: 100, end: 103),
+        meterRow(time: DateTime(2026, 8, 1, 4), start: 103, end: 100),
+      ],
+    );
+    final result = graph.plotData;
+
+    expect(result, hasLength(1));
+    expect(result.single.usage, 0);
+  });
+
+  test('keeps a zero-usage day and normalizes read time to a calendar day', () {
+    final graph = ElectricityAverageUsageGraph(
+      graphWidth: graphWidth,
+      historyElectricityInfo: [
+        meterRow(time: DateTime(2026, 8, 1, 2, 10), start: 100, end: 100),
+      ],
+    );
+    final result = graph.plotData;
+
+    expect(result, hasLength(1));
+    expect(result.single.date, DateTime(2026, 8, 1));
+    expect(result.single.usage, 0);
   });
 }

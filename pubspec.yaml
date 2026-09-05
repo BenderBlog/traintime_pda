@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.6.3+47
+version: 1.6.5+49
 
 environment:
   sdk: ^3.8.0
@@ -31,8 +31,8 @@ dependencies:
   charset_converter: ^2.2.1
   # Homepage
   infinite_scroll_pagination: ^5.1.1
-  sn_progress_dialog: ^1.1.3
-  fluttertoast: ^9.0.0
+  sn_progress_dialog: ^2.0.0
+  fluttertoast: ^10.0.0
   flex_color_scheme: ^8.3.0
   # Others
   url_launcher: ^6.1.6
@@ -53,10 +53,11 @@ dependencies:
   ming_cute_icons: ^0.0.7
   remixicon: ^4.9.1
   based_split_view: ^1.2.0
-  permission_handler: ^12.0.1
+  permission_handler: ^13.0.1
   # QR code scanner
+  flutter_zxing: ^2.3.0
   # Output to system calendar
-  device_calendar_plus: ^0.7.1
+  device_calendar_plus: ^0.8.0
   # Homepage Widget
   home_widget: ^0.9.3
   image: ^4.2.0
@@ -70,7 +71,6 @@ dependencies:
   intl:
   timezone: ^0.11.0
   flutter_local_notifications: ^22.0.1
-  flutter_zxing: ^2.3.0
   flutter_html: ^3.0.0
 
 dev_dependencies:
@@ -101,13 +101,16 @@ flutter:
     - assets/Icon-App-iTunes-Background.png
     - assets/Icon-App-iTunes.png
     - assets/art/pda_empty_cover.jpg
-    - assets/art/pda_classtable_empty.png
-    - assets/art/pda_girl_default.png
+    - assets/art/pda_classtable_empty.webp
+    - assets/art/pda_girl_default.webp
     # - assets/art/pda_girl_singing.png
-    - assets/art/pda_girl_reading.png
+    - assets/art/pda_girl_reading.webp
     - assets/art/lucky_star_1.jpg
     - assets/art/lucky_star_2.jpg
     - assets/art/lucky_star_3.jpg
+    - assets/art/lucky_star_4.jpg
+    - assets/art/lucky_star_5.jpg
+    - assets/art/lucky_star_6.jpg
     # - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
     # - assets/art/anan_christmas.png
     # - assets/art/Sakura_and_Tomoyo_Kimono.jpg

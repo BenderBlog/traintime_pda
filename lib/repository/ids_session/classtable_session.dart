@@ -9,8 +9,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
-import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/user_role.dart';
@@ -21,8 +19,6 @@ import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
-
-// TODO: Concept prove: whether remove EhallSession is OK
 
 /// 课程表 4770397878132218
 class ClassTableSession extends IDSSession {
@@ -45,7 +41,6 @@ class ClassTableSession extends IDSSession {
   Future<void> updateCacheAndGroup(ClassTableData data) async {
     await _schoolClassDataCache.writeAsString(jsonEncode(data.toJson()));
 
-    /// TODO: Change ios widgitkit code to parse user defined classtable.
     if (Platform.isIOS) {
       final api = SaveToGroupIdSwiftApi();
       try {
@@ -162,26 +157,17 @@ class ClassTableSession extends IDSSession {
 
     await followIDSRedirects(initialLocation: location, client: dio);
 
-    DateTime now = DateTime.now();
-    var currentWeek = await dio
-        .post(
-          'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
-          data: {'day': DateFormat("yyyyMMdd").format(now)},
-        )
-        .then((value) => value.data);
-    if (!currentWeek.toString().contains("xnxq")) {
-      return ClassTableData(semesterCode: semesterCode);
-    }
-    currentWeek =
-        RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])?[0] ?? "null";
+    final calendarResponse = await dio.post(
+      'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/homeAppend/getSchoolCalendar.do',
+      data: {'xnxqdm': semesterCode},
+    );
 
-    log.info(
-      "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
-    );
-    int weekDay = now.weekday - 1;
-    String termStartDay = DateFormat("yyyy-MM-dd HH:mm:ss").format(
-      now.add(Duration(days: (1 - int.parse(currentWeek)) * 7 - weekDay)).date,
-    );
+    final rawCalendar = calendarResponse.data['msg'];
+    final calendar = rawCalendar is String
+        ? jsonDecode(rawCalendar)
+        : rawCalendar;
+
+    final termStartDay = calendar['QSRQ'] as String;
 
     Map<String, dynamic> data = await dio
         .post(classInfoURL, data: {"XNXQDM": semesterCode})

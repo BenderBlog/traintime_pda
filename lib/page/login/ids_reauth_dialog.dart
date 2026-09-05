@@ -39,6 +39,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
   bool _trustDevice = false;
   bool _sending = false;
   bool _submitting = false;
+  IDSReAuthCodeType _codeType = IDSReAuthCodeType.sms;
   String? _notice;
   String? _error;
 
@@ -50,7 +51,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
       _error = null;
     });
     try {
-      final delivery = await widget.client.sendSms();
+      final delivery = await widget.client.sendCode(codeType: _codeType);
       if (!mounted) return;
       final recipient =
           delivery.maskedMobile ?? widget.client.recipientDescription;
@@ -97,7 +98,8 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
       _error = null;
     });
     try {
-      final uri = await widget.client.submitSms(
+      final uri = await widget.client.submitCode(
+        codeType: _codeType,
         code: _codeController.text,
         trustDevice: _trustDevice,
       );
@@ -125,6 +127,25 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
     super.dispose();
   }
 
+  void _changeCodeType(IDSReAuthCodeType? value) {
+    if (value == null || value == _codeType) return;
+    _timer?.cancel();
+    _codeController.clear();
+    setState(() {
+      _codeType = value;
+      _secondsRemaining = 0;
+      _notice = null;
+      _error = null;
+    });
+  }
+
+  String _codeTypeName(IDSReAuthCodeType type) => switch (type) {
+    IDSReAuthCodeType.sms => _t('login.second_factor.sms'),
+    IDSReAuthCodeType.enterpriseWechat => _t(
+      'login.second_factor.enterprise_wechat',
+    ),
+  };
+
   @override
   Widget build(BuildContext context) {
     final busy = _sending || _submitting;
@@ -138,8 +159,24 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(_t('login.second_factor.description')),
-              const SizedBox(height: 16),
+              //Text(_t('login.second_factor.description')),
+              //const SizedBox(height: 16),
+              DropdownButtonFormField<IDSReAuthCodeType>(
+                initialValue: _codeType,
+                decoration: InputDecoration(
+                  labelText: _t('login.second_factor.method'),
+                ),
+                items: IDSReAuthCodeType.values
+                    .map(
+                      (type) => DropdownMenuItem(
+                        value: type,
+                        child: Text(_codeTypeName(type)),
+                      ),
+                    )
+                    .toList(),
+                onChanged: busy ? null : _changeCodeType,
+              ),
+              const SizedBox(height: 12),
               TextField(
                 controller: _codeController,
                 enabled: !busy,
@@ -147,7 +184,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
                 keyboardType: TextInputType.number,
                 autofillHints: const [AutofillHints.oneTimeCode],
                 decoration: InputDecoration(
-                  labelText: _t('login.second_factor.code'),
+                  labelText: _codeTypeName(_codeType),
                   errorText: _error,
                 ),
                 onSubmitted: (_) => busy ? null : _submit(),

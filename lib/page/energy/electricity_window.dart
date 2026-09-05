@@ -51,7 +51,7 @@ class ElectricityWindow extends StatelessWidget {
                     .constrained(maxWidth: sheetMaxWidth)
                     .center(),
                 Image.asset(
-                  "assets/art/pda_girl_default.png",
+                  "assets/art/pda_girl_default.webp",
                 ).padding(bottom: 16),
               ]
               .toColumn(crossAxisAlignment: CrossAxisAlignment.center)

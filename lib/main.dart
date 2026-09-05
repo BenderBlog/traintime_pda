@@ -28,6 +28,7 @@ import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:watermeter/repository/watch/watch_schedule_sync_service.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/themes/font_setting.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {
@@ -115,11 +116,6 @@ class _MyAppState extends State<MyApp> {
 
     if (widget.isFirst) {
       loginState = IDSLoginState.manual;
-      try {
-        IDSSession().dio.get("https://www.xidian.edu.cn");
-        // Should the permission request be sent on iOS
-        // ignore: empty_catches
-      } catch (e) {}
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -144,6 +140,8 @@ class _MyAppState extends State<MyApp> {
       builder: (context) {
         final color = appTheme.colorSignal.value;
         final themeMode = appTheme.colorStateSignal.value;
+        final fontScale = appTheme.fontScaleSignal.value;
+        final fontWeight = appTheme.fontWeightSignal.value;
         final i18nDelegate = appTheme.i18nDelegateSignal.value;
 
         return MaterialApp(
@@ -164,159 +162,169 @@ class _MyAppState extends State<MyApp> {
           title: Platform.isIOS || Platform.isMacOS || Platform.isAndroid
               ? "XDYou"
               : 'Traintime PDA',
-          theme: FlexThemeData.light(
-            colors: color.first,
-            usedColors: 1,
-            surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
-            blendLevel: 2,
-            tabBarStyle: FlexTabBarStyle.forAppBar,
-            subThemesData: const FlexSubThemesData(
-              interactionEffects: true,
-              tintedDisabledControls: true,
-              blendOnLevel: 8,
-              useM2StyleDividerInM3: true,
-              defaultRadius: 12.0,
-              elevatedButtonSchemeColor: SchemeColor.onPrimaryContainer,
-              elevatedButtonSecondarySchemeColor: SchemeColor.primaryContainer,
-              outlinedButtonOutlineSchemeColor: SchemeColor.primary,
-              toggleButtonsBorderSchemeColor: SchemeColor.primary,
-              segmentedButtonSchemeColor: SchemeColor.primary,
-              segmentedButtonBorderSchemeColor: SchemeColor.primary,
-              unselectedToggleIsColored: true,
-              sliderValueTinted: true,
-              inputDecoratorSchemeColor: SchemeColor.primary,
-              inputDecoratorIsFilled: true,
-              inputDecoratorContentPadding: EdgeInsetsDirectional.fromSTEB(
-                12,
-                16,
-                12,
-                12,
-              ),
-              inputDecoratorBackgroundAlpha: 7,
-              inputDecoratorBorderSchemeColor: SchemeColor.primary,
-              inputDecoratorBorderType: FlexInputBorderType.outline,
-              inputDecoratorRadius: 8.0,
-              inputDecoratorUnfocusedBorderIsColored: true,
-              inputDecoratorBorderWidth: 1.0,
-              inputDecoratorFocusedBorderWidth: 2.0,
-              inputDecoratorPrefixIconSchemeColor:
-                  SchemeColor.onPrimaryFixedVariant,
-              inputDecoratorSuffixIconSchemeColor: SchemeColor.primary,
-              fabUseShape: true,
-              fabAlwaysCircular: true,
-              fabSchemeColor: SchemeColor.secondary,
-              popupMenuRadius: 8.0,
-              popupMenuElevation: 3.0,
-              alignedDropdown: true,
-              dialogBackgroundSchemeColor: SchemeColor.secondaryContainer,
-              drawerIndicatorRadius: 12.0,
-              drawerIndicatorSchemeColor: SchemeColor.primary,
-              bottomNavigationBarMutedUnselectedLabel: false,
-              bottomNavigationBarMutedUnselectedIcon: false,
-              menuRadius: 8.0,
-              menuElevation: 3.0,
-              menuBarRadius: 0.0,
-              menuBarElevation: 2.0,
-              menuBarShadowColor: Color(0x00000000),
-              searchBarElevation: 1.0,
-              searchViewElevation: 1.0,
-              searchUseGlobalShape: true,
-              navigationBarSelectedLabelSchemeColor: SchemeColor.primary,
-              navigationBarSelectedIconSchemeColor: SchemeColor.onPrimary,
-              navigationBarIndicatorSchemeColor: SchemeColor.primary,
-              navigationBarIndicatorRadius: 12.0,
-              navigationRailSelectedLabelSchemeColor: SchemeColor.primary,
-              navigationRailSelectedIconSchemeColor: SchemeColor.onPrimary,
-              navigationRailUseIndicator: true,
-              navigationRailIndicatorSchemeColor: SchemeColor.primary,
-              navigationRailIndicatorOpacity: 1.00,
-              navigationRailIndicatorRadius: 12.0,
-              navigationRailBackgroundSchemeColor: SchemeColor.surface,
-              navigationRailLabelType: NavigationRailLabelType.all,
-            ),
-            keyColors: const FlexKeyColors(keepPrimary: true),
-            tones: FlexSchemeVariant.jolly.tones(Brightness.light),
-            visualDensity: FlexColorScheme.comfortablePlatformDensity,
-            cupertinoOverrideTheme: const CupertinoThemeData(
-              applyThemeToAll: true,
-            ),
-          ).useSystemChineseFont(Brightness.light),
-          darkTheme: FlexThemeData.dark(
-            colors: color.last,
-            usedColors: 1,
-            surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
-            blendLevel: 2,
-            tabBarStyle: FlexTabBarStyle.forAppBar,
-            subThemesData: const FlexSubThemesData(
-              interactionEffects: true,
-              tintedDisabledControls: true,
-              blendOnLevel: 10,
-              blendOnColors: true,
-              useM2StyleDividerInM3: true,
-              defaultRadius: 12.0,
-              elevatedButtonSchemeColor: SchemeColor.onPrimaryContainer,
-              elevatedButtonSecondarySchemeColor: SchemeColor.primaryContainer,
-              outlinedButtonOutlineSchemeColor: SchemeColor.primary,
-              toggleButtonsBorderSchemeColor: SchemeColor.primary,
-              segmentedButtonSchemeColor: SchemeColor.primary,
-              segmentedButtonBorderSchemeColor: SchemeColor.primary,
-              unselectedToggleIsColored: true,
-              sliderValueTinted: true,
-              inputDecoratorSchemeColor: SchemeColor.primary,
-              inputDecoratorIsFilled: true,
-              inputDecoratorContentPadding: EdgeInsetsDirectional.fromSTEB(
-                12,
-                16,
-                12,
-                12,
-              ),
-              inputDecoratorBackgroundAlpha: 40,
-              inputDecoratorBorderSchemeColor: SchemeColor.primary,
-              inputDecoratorBorderType: FlexInputBorderType.outline,
-              inputDecoratorRadius: 8.0,
-              inputDecoratorUnfocusedBorderIsColored: true,
-              inputDecoratorBorderWidth: 1.0,
-              inputDecoratorFocusedBorderWidth: 2.0,
-              inputDecoratorPrefixIconSchemeColor: SchemeColor.primaryFixed,
-              inputDecoratorSuffixIconSchemeColor: SchemeColor.primary,
-              fabUseShape: true,
-              fabAlwaysCircular: true,
-              fabSchemeColor: SchemeColor.secondary,
-              popupMenuRadius: 8.0,
-              popupMenuElevation: 3.0,
-              alignedDropdown: true,
-              drawerIndicatorRadius: 12.0,
-              drawerIndicatorSchemeColor: SchemeColor.primary,
-              bottomNavigationBarMutedUnselectedLabel: false,
-              bottomNavigationBarMutedUnselectedIcon: false,
-              menuRadius: 8.0,
-              menuElevation: 3.0,
-              menuBarRadius: 0.0,
-              menuBarElevation: 2.0,
-              menuBarShadowColor: Color(0x00000000),
-              searchBarElevation: 1.0,
-              searchViewElevation: 1.0,
-              searchUseGlobalShape: true,
-              navigationBarSelectedLabelSchemeColor: SchemeColor.primary,
-              navigationBarSelectedIconSchemeColor: SchemeColor.onPrimary,
-              navigationBarIndicatorSchemeColor: SchemeColor.primary,
-              navigationBarIndicatorRadius: 12.0,
-              navigationRailSelectedLabelSchemeColor: SchemeColor.primary,
-              navigationRailSelectedIconSchemeColor: SchemeColor.onPrimary,
-              navigationRailUseIndicator: true,
-              navigationRailIndicatorSchemeColor: SchemeColor.primary,
-              navigationRailIndicatorOpacity: 1.00,
-              navigationRailIndicatorRadius: 12.0,
-              navigationRailBackgroundSchemeColor: SchemeColor.surface,
-              navigationRailLabelType: NavigationRailLabelType.all,
-            ),
-            keyColors: const FlexKeyColors(),
-            tones: FlexSchemeVariant.jolly.tones(Brightness.dark),
-            visualDensity: FlexColorScheme.comfortablePlatformDensity,
-            cupertinoOverrideTheme: const CupertinoThemeData(
-              applyThemeToAll: true,
-            ),
-          ).useSystemChineseFont(Brightness.dark),
+          theme:
+              FlexThemeData.light(
+                    colors: color.first,
+                    usedColors: 1,
+                    surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
+                    blendLevel: 2,
+                    tabBarStyle: FlexTabBarStyle.forAppBar,
+                    subThemesData: const FlexSubThemesData(
+                      interactionEffects: true,
+                      tintedDisabledControls: true,
+                      blendOnLevel: 8,
+                      useM2StyleDividerInM3: true,
+                      defaultRadius: 12.0,
+                      elevatedButtonSchemeColor: SchemeColor.onPrimaryContainer,
+                      elevatedButtonSecondarySchemeColor:
+                          SchemeColor.primaryContainer,
+                      outlinedButtonOutlineSchemeColor: SchemeColor.primary,
+                      toggleButtonsBorderSchemeColor: SchemeColor.primary,
+                      segmentedButtonSchemeColor: SchemeColor.primary,
+                      segmentedButtonBorderSchemeColor: SchemeColor.primary,
+                      unselectedToggleIsColored: true,
+                      sliderValueTinted: true,
+                      inputDecoratorSchemeColor: SchemeColor.primary,
+                      inputDecoratorIsFilled: true,
+                      inputDecoratorContentPadding:
+                          EdgeInsetsDirectional.fromSTEB(12, 16, 12, 12),
+                      inputDecoratorBackgroundAlpha: 7,
+                      inputDecoratorBorderSchemeColor: SchemeColor.primary,
+                      inputDecoratorBorderType: FlexInputBorderType.outline,
+                      inputDecoratorRadius: 8.0,
+                      inputDecoratorUnfocusedBorderIsColored: true,
+                      inputDecoratorBorderWidth: 1.0,
+                      inputDecoratorFocusedBorderWidth: 2.0,
+                      inputDecoratorPrefixIconSchemeColor:
+                          SchemeColor.onPrimaryFixedVariant,
+                      inputDecoratorSuffixIconSchemeColor: SchemeColor.primary,
+                      fabUseShape: true,
+                      fabAlwaysCircular: true,
+                      fabSchemeColor: SchemeColor.secondary,
+                      popupMenuRadius: 8.0,
+                      popupMenuElevation: 3.0,
+                      alignedDropdown: true,
+                      dialogBackgroundSchemeColor:
+                          SchemeColor.secondaryContainer,
+                      drawerIndicatorRadius: 12.0,
+                      drawerIndicatorSchemeColor: SchemeColor.primary,
+                      bottomNavigationBarMutedUnselectedLabel: false,
+                      bottomNavigationBarMutedUnselectedIcon: false,
+                      menuRadius: 8.0,
+                      menuElevation: 3.0,
+                      menuBarRadius: 0.0,
+                      menuBarElevation: 2.0,
+                      menuBarShadowColor: Color(0x00000000),
+                      searchBarElevation: 1.0,
+                      searchViewElevation: 1.0,
+                      searchUseGlobalShape: true,
+                      navigationBarSelectedLabelSchemeColor:
+                          SchemeColor.primary,
+                      navigationBarSelectedIconSchemeColor:
+                          SchemeColor.onPrimary,
+                      navigationBarIndicatorSchemeColor: SchemeColor.primary,
+                      navigationBarIndicatorRadius: 12.0,
+                      navigationRailSelectedLabelSchemeColor:
+                          SchemeColor.primary,
+                      navigationRailSelectedIconSchemeColor:
+                          SchemeColor.onPrimary,
+                      navigationRailUseIndicator: true,
+                      navigationRailIndicatorSchemeColor: SchemeColor.primary,
+                      navigationRailIndicatorOpacity: 1.00,
+                      navigationRailIndicatorRadius: 12.0,
+                      navigationRailBackgroundSchemeColor: SchemeColor.surface,
+                      navigationRailLabelType: NavigationRailLabelType.all,
+                    ),
+                    keyColors: const FlexKeyColors(keepPrimary: true),
+                    tones: FlexSchemeVariant.jolly.tones(Brightness.light),
+                    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+                    cupertinoOverrideTheme: const CupertinoThemeData(
+                      applyThemeToAll: true,
+                    ),
+                  )
+                  .useSystemChineseFont(Brightness.light)
+                  .applyFontWeight(fontWeightFromSlider(fontWeight)),
+          darkTheme:
+              FlexThemeData.dark(
+                    colors: color.last,
+                    usedColors: 1,
+                    surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
+                    blendLevel: 2,
+                    tabBarStyle: FlexTabBarStyle.forAppBar,
+                    subThemesData: const FlexSubThemesData(
+                      interactionEffects: true,
+                      tintedDisabledControls: true,
+                      blendOnLevel: 10,
+                      blendOnColors: true,
+                      useM2StyleDividerInM3: true,
+                      defaultRadius: 12.0,
+                      elevatedButtonSchemeColor: SchemeColor.onPrimaryContainer,
+                      elevatedButtonSecondarySchemeColor:
+                          SchemeColor.primaryContainer,
+                      outlinedButtonOutlineSchemeColor: SchemeColor.primary,
+                      toggleButtonsBorderSchemeColor: SchemeColor.primary,
+                      segmentedButtonSchemeColor: SchemeColor.primary,
+                      segmentedButtonBorderSchemeColor: SchemeColor.primary,
+                      unselectedToggleIsColored: true,
+                      sliderValueTinted: true,
+                      inputDecoratorSchemeColor: SchemeColor.primary,
+                      inputDecoratorIsFilled: true,
+                      inputDecoratorContentPadding:
+                          EdgeInsetsDirectional.fromSTEB(12, 16, 12, 12),
+                      inputDecoratorBackgroundAlpha: 40,
+                      inputDecoratorBorderSchemeColor: SchemeColor.primary,
+                      inputDecoratorBorderType: FlexInputBorderType.outline,
+                      inputDecoratorRadius: 8.0,
+                      inputDecoratorUnfocusedBorderIsColored: true,
+                      inputDecoratorBorderWidth: 1.0,
+                      inputDecoratorFocusedBorderWidth: 2.0,
+                      inputDecoratorPrefixIconSchemeColor:
+                          SchemeColor.primaryFixed,
+                      inputDecoratorSuffixIconSchemeColor: SchemeColor.primary,
+                      fabUseShape: true,
+                      fabAlwaysCircular: true,
+                      fabSchemeColor: SchemeColor.secondary,
+                      popupMenuRadius: 8.0,
+                      popupMenuElevation: 3.0,
+                      alignedDropdown: true,
+                      drawerIndicatorRadius: 12.0,
+                      drawerIndicatorSchemeColor: SchemeColor.primary,
+                      bottomNavigationBarMutedUnselectedLabel: false,
+                      bottomNavigationBarMutedUnselectedIcon: false,
+                      menuRadius: 8.0,
+                      menuElevation: 3.0,
+                      menuBarRadius: 0.0,
+                      menuBarElevation: 2.0,
+                      menuBarShadowColor: Color(0x00000000),
+                      searchBarElevation: 1.0,
+                      searchViewElevation: 1.0,
+                      searchUseGlobalShape: true,
+                      navigationBarSelectedLabelSchemeColor:
+                          SchemeColor.primary,
+                      navigationBarSelectedIconSchemeColor:
+                          SchemeColor.onPrimary,
+                      navigationBarIndicatorSchemeColor: SchemeColor.primary,
+                      navigationBarIndicatorRadius: 12.0,
+                      navigationRailSelectedLabelSchemeColor:
+                          SchemeColor.primary,
+                      navigationRailSelectedIconSchemeColor:
+                          SchemeColor.onPrimary,
+                      navigationRailUseIndicator: true,
+                      navigationRailIndicatorSchemeColor: SchemeColor.primary,
+                      navigationRailIndicatorOpacity: 1.00,
+                      navigationRailIndicatorRadius: 12.0,
+                      navigationRailBackgroundSchemeColor: SchemeColor.surface,
+                      navigationRailLabelType: NavigationRailLabelType.all,
+                    ),
+                    keyColors: const FlexKeyColors(),
+                    tones: FlexSchemeVariant.jolly.tones(Brightness.dark),
+                    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+                    cupertinoOverrideTheme: const CupertinoThemeData(
+                      applyThemeToAll: true,
+                    ),
+                  )
+                  .useSystemChineseFont(Brightness.dark)
+                  .applyFontWeight(fontWeightFromSlider(fontWeight)),
           themeMode: themeMode,
           home: DefaultTextStyle.merge(
             style: const TextStyle(textBaseline: TextBaseline.ideographic),
@@ -329,7 +337,14 @@ class _MyAppState extends State<MyApp> {
               description: "An unexpected behaviour occured!",
               maxWidthForSmallMode: 150,
             );
-            if (widget != null) return widget;
+            if (widget != null) {
+              return MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: TextScaler.linear(fontScale)),
+                child: widget,
+              );
+            }
             throw StateError('widget is null');
           },
         );

@@ -23,7 +23,7 @@ login_process:
   get_encrypt: 获取密码加密密钥
   ready_login: 准备登录
   slider: 登录中
-  second_factor: 等待短信二次认证
+  second_factor: 等待二次认证
   after_process: 登录后处理
   failed: 登录失败，响应状态码：{statusCode}
 no_info: 没有信息
@@ -317,9 +317,7 @@ electricity:
   history: 历史记录
   daily_usage: 平均每日用量
   not_enough_data: 数据量不足以用于渲染
-  info: "新能源系统获取仅校园网内访问，获取过程中有问题请向开发者报告。
-
-    历史记录依旧为本地记录，平均日用量基于抄表记录计算。"
+  info: "历史记录依旧为本地记录，平均日用量基于抄表记录计算。"
   fetching_hint: 正在获取最新电费信息
   fetch_error: 电费信息获取失败，请重试。
   date: 日期
@@ -623,6 +621,7 @@ library:
   publish_year_end: 出版年止
   book_detail: 书籍详细信息
   no_result: 没有结果，请修改搜索参数或者开始你的搜索
+  no_more_data: 没有更多结果了
 library_card:
   title: 图书馆当前状况
   fetching: 正在获取图书馆信息
@@ -651,16 +650,18 @@ login:
     refresh_failed: "刷新验证码失败: {error}"
   slider_title: 服务器认证服务
   second_factor:
-    title: 短信二次认证
-    description: 学校要求完成二次认证。请先获取短信验证码，再输入验证码继续登录。
-    code: 短信验证码
-    empty_code: 请输入短信验证码
+    title: 二次认证
+    description: 学校要求完成二次认证。请选择验证码接收方式，获取并输入验证码后继续登录。
+    method: 验证码接收方式
+    sms: 短信验证码
+    enterprise_wechat: 企业微信验证码
+    empty_code: 请输入验证码
     send_code: 获取验证码
     resend_countdown: "{seconds} 秒后可重新获取"
     trust_device: 信任此设备
     trust_device_hint: 开启后学校可能在一段时间内不再要求本设备二次认证
     network_error: 二次认证请求失败，请检查网络后重试
-    cancelled: 已取消短信二次认证
+    cancelled: 已取消二次认证
     expired: 二次认证已失效，请重新登录
 school_net:
   title: 校园网使用详情
@@ -792,6 +793,17 @@ setting:
   ui_setting: 界面设置
   brightness_setting: 设置深浅色
   color_setting: 颜色设置
+  font_size_setting: 字体大小与粗细
+  font_size_page:
+    size_title: 字体大小
+    weight_title: 字体粗细
+    preview_title: 预览
+    weight_thin: 细
+    weight_regular: 常规
+    weight_medium: 中等
+    weight_semibold: 半粗
+    weight_bold: 加粗
+    summary: "{scale}% · {weight}"
   simplify_timeline: 简化日程时间轴
   simplify_timeline_description: 没有日程时 减少空间占用
   low_electricity_warning: 低电量卡片变色提醒

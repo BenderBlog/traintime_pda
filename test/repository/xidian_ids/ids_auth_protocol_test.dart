@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -74,6 +75,110 @@ void main() {
         isFalse,
       );
     });
+  });
+
+  test('parses an enterprise WeChat code delivery', () {
+    final delivery = parseIDSCodeDelivery({
+      'res': 'other_success',
+      'returnMessage': '验证码已发送成功',
+      'codeTime': 120,
+    });
+
+    expect(delivery.message, '验证码已发送成功');
+    expect(delivery.retryAfter, const Duration(seconds: 120));
+    expect(delivery.maskedMobile, isNull);
+    expect(delivery.wasAlreadySent, isFalse);
+
+    final legacyDelivery = parseIDSCodeDelivery({
+      'res': 'wechat_success',
+      'returnMessage': '验证码已发送成功',
+    });
+    expect(legacyDelivery.retryAfter, const Duration(seconds: 120));
+  });
+
+  test('uses the enterprise WeChat type for delivery and submission', () async {
+    var fingerprintRegistrations = 0;
+    final adapter = _RouteAdapter((request) {
+      switch (request.uri.path) {
+        case '/authserver/reAuthCheck/reAuthLoginView.do':
+          return ResponseBody.fromString(
+            '<script>var reAuthParams = {'
+            '"reAuthUserId":"canonical-user"};</script>',
+            HttpStatus.ok,
+          );
+        case '/authserver/reAuthCheck/changeReAuthType.do':
+          expect(
+            request.data,
+            containsPair(
+              'reAuthType',
+              IDSReAuthCodeType.enterpriseWechat.reAuthType,
+            ),
+          );
+          return _jsonResponse({
+            'code': '1',
+            'data': {'reAuthUserNameInput': '测试用户'},
+          });
+        case '/authserver/dynamicCode/getDynamicCodeByReauth.do':
+          expect(request.data, containsPair('userName', 'canonical-user'));
+          expect(
+            request.data,
+            containsPair(
+              'authCodeTypeName',
+              IDSReAuthCodeType.enterpriseWechat.authCodeTypeName,
+            ),
+          );
+          return _jsonResponse({
+            'res': 'other_success',
+            'returnMessage': '验证码已发送成功',
+            'codeTime': 120,
+          });
+        case '/authserver/reAuthCheck/reAuthSubmit.do':
+          expect(
+            request.data,
+            containsPair(
+              'reAuthType',
+              IDSReAuthCodeType.enterpriseWechat.reAuthType,
+            ),
+          );
+          expect(request.data, containsPair('dynamicCode', '123456'));
+          expect(request.data, containsPair('skipTmpReAuth', 'true'));
+          return _jsonResponse({'code': 'reAuth_success', 'msg': '认证成功'});
+        case '/authserver/login':
+          return _redirect('https://service.example/done');
+        default:
+          throw StateError('Unexpected request: ${request.uri}');
+      }
+    });
+    final client = IDSReAuthClient(
+      dio: _testDio(adapter),
+      challengeUri: Uri.parse(
+        'https://ids.xidian.edu.cn/authserver/'
+        'reAuthCheck/reAuthLoginView.do?isMultifactor=true',
+      ),
+      username: 'login-alias',
+      service: 'https://service.example/start',
+      registerBrowserFingerprint: () async => fingerprintRegistrations++,
+    );
+
+    final delivery = await client.sendCode(
+      codeType: IDSReAuthCodeType.enterpriseWechat,
+    );
+    final resumedUri = await client.submitCode(
+      codeType: IDSReAuthCodeType.enterpriseWechat,
+      code: ' 123456 ',
+      trustDevice: true,
+    );
+
+    expect(delivery.retryAfter, const Duration(seconds: 120));
+    expect(client.recipientDescription, '测试用户');
+    expect(resumedUri, Uri.parse('https://service.example/done'));
+    expect(fingerprintRegistrations, 1);
+    expect(
+      adapter.requestedUris
+          .where((uri) => uri.path.endsWith('/changeReAuthType.do'))
+          .length,
+      1,
+    );
   });
 
   test('checks re-authentication on a later redirect hop', () async {
@@ -218,6 +323,16 @@ ResponseBody _redirect(String location) {
     isRedirect: true,
     headers: {
       HttpHeaders.locationHeader: [location],
+    },
+  );
+}
+
+ResponseBody _jsonResponse(Map<String, dynamic> data) {
+  return ResponseBody.fromString(
+    jsonEncode(data),
+    HttpStatus.ok,
+    headers: {
+      Headers.contentTypeHeader: [Headers.jsonContentType],
     },
   );
 }

@@ -59,3 +59,5 @@ app.*.map.json
 /Ruisi-*
 *.csv
 docs/superpowers/plans/2026-07-26-aircon-meter-logger.md
+# Widget Preview related
+.widget_preview/

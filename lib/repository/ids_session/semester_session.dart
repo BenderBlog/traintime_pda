@@ -41,8 +41,6 @@ class SemesterSession extends IDSSession {
       "Get the semester information.",
     );
 
-    // TODO: Concept prove: whether remove EhallSession is OK
-
     await checkAndLogin(
       target: "https://ehall.xidian.edu.cn/appShow?appId=4770397878132218",
       sliderCaptcha: (String cookieStr) =>

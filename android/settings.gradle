@@ -19,9 +19,16 @@ pluginManagement {
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
     id "com.android.application" version '9.2.1' apply false
-    id "org.jetbrains.kotlin.android" version "2.2.20" apply false
+    id "org.jetbrains.kotlin.android" version "2.3.20" apply false
+}
+
+def sharedBuildDir = file("../build").canonicalFile
+gradle.beforeProject { project ->
+    def projectBuildDir = project == project.rootProject
+            ? sharedBuildDir
+            : new File(sharedBuildDir, project.name)
+    project.layout.buildDirectory.set(projectBuildDir)
 }
 
 include ":app"
-
 

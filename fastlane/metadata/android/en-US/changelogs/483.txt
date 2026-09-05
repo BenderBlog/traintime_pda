@@ -1,0 +1,12 @@
+Note: The air-conditioner usage query code provided by @aqqkad has been merged but still need debugging, so this feature is not included in this release.
+
+1. Optimize captcha input dialog refresh @littlestejan  
+2. Refactor custom course functionality @hazuki-keatsu  
+3. Add two-factor authentication support (SMS only) @BenderBlog  
+4. Optimize network code @BenderBlog  
+5. Adapt to the new library API @aqqkad
+6. New library search window @aqqkad @A1nair @BenderBlog
+7. Add a low-battery reminder to the homepage @aqqkad 
+8. Optimize and rewrite various pages @BenderBlog  
+9. Fix Android build issues @ZYar-er
+10. Fix rendering errors in the daily electricity usage chart @BenderBlog

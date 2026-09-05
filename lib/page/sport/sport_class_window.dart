@@ -11,6 +11,7 @@ import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/repository/miscellaneous_session/xidian_sport_session.dart';
 
 class SportClassWindow extends StatefulWidget {
@@ -69,36 +70,39 @@ class _SportClassWindowState extends State<SportClassWindow>
                     placeOfCache: PlaceOfCache.inapp,
                     fetchTime: result.fetchTime,
                   ),
-                if (toShow.isEmpty)
-                  EmptyListView(
-                    type: EmptyListViewType.singing,
-                    text: FlutterI18n.translate(
-                      context,
-                      "sport.empty_class_info",
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: toShow.length,
-                      itemBuilder: (context, index) {
-                        return Center(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: sheetMaxWidth,
+                Builder(
+                  builder: (context) {
+                    if (toShow.isEmpty) {
+                      return EmptyListView(
+                        type: EmptyListViewType.singing,
+                        text: FlutterI18n.translate(
+                          context,
+                          "sport.empty_class_info",
+                        ),
+                      );
+                    } else {
+                      return ListView.separated(
+                        itemCount: toShow.length,
+                        itemBuilder: (context, index) {
+                          return Center(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: sheetMaxWidth,
+                              ),
+                              child: toShow[index],
                             ),
-                            child: toShow[index],
-                          ),
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const SizedBox(height: 4),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12.5,
-                        vertical: 9.0,
-                      ),
-                    ),
-                  ),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const SizedBox(height: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12.5,
+                          vertical: 9,
+                        ).withSafeBottom(context),
+                      );
+                    }
+                  },
+                ).expanded(),
               ],
             );
           } else if (snapshot.connectionState == ConnectionState.done &&

@@ -25,7 +25,7 @@ login_process:
   get_encrypt: Obtain password encryption key
   ready_login: Prepare to login
   slider: Logging in
-  second_factor: Waiting for SMS verification
+  second_factor: Waiting for verification
   after_process: Post-login processing
   failed: "Login failed, response status code: {statusCode}"
 no_info: No information
@@ -359,12 +359,7 @@ electricity:
   history: Billing History
   daily_usage: Average usage per day
   not_enough_data: Not enough data for rendering graph
-  info:
-    "Energy system can be only be accessed at schoolnet, do contact developers
-    if have issue.
-
-    History will be recorded locally while average usage is based on the electric
-    meter's record."
+  info: History will be recorded locally while average usage is based on the electric meter's record.
   fetching_hint: Fetching the latest electricity info.
   fetch_error: Failed to fetch electricity information. Please retry.
   date: Date
@@ -693,6 +688,7 @@ library:
   publish_year_end: Publish year to
   book_detail: Book details
   no_result: No result, change parameter or start your search
+  no_more_data: No more data
 library_card:
   title: Library status
   fetching: Fetching
@@ -723,16 +719,18 @@ login:
     refresh_failed: "Failed to refresh captcha: {error}"
   slider_title: Server authentication service
   second_factor:
-    title: SMS verification
-    description: The school requires an additional verification step. Request and enter the SMS code to continue.
-    code: SMS code
-    empty_code: Enter the SMS code
+    title: Additional verification
+    description: Choose where to receive the code, then request and enter it to continue.
+    method: Code delivery
+    sms: SMS code
+    enterprise_wechat: WeCom code
+    empty_code: Enter the verification code
     send_code: Send code
     resend_countdown: "Resend in {seconds}s"
     trust_device: Trust this device
     trust_device_hint: The school may skip verification on this device for a limited time
     network_error: Verification request failed. Check your connection and retry.
-    cancelled: SMS verification cancelled
+    cancelled: Verification cancelled
     expired: Verification expired. Please log in again.
 school_net:
   title: School Net Usage Query
@@ -869,6 +867,17 @@ setting:
   ui_setting: UI Settings
   brightness_setting: Light/Dark mode
   color_setting: Color theme
+  font_size_setting: Font size & weight
+  font_size_page:
+    size_title: Font size
+    weight_title: Font weight
+    preview_title: Preview
+    weight_thin: Thin
+    weight_regular: Regular
+    weight_medium: Medium
+    weight_semibold: Semi bold
+    weight_bold: Bold
+    summary: "{scale}% · {weight}"
   simplify_timeline: Simplify schedule timeline
   simplify_timeline_description: Reduce space occupation while no schedule
   low_electricity_warning: Low electricity card color warning
