@@ -52,7 +52,7 @@ class _AboutPageState extends State<AboutPage> {
                         ),
                         TextSpan(text: " v${preference.packageInfo.version}\n"),
                         TextSpan(
-                          text: "Lucky Star Edition",
+                          text: "Studebaker Edition",
                           style: const TextStyle(fontSize: 16),
                         ),
                       ],
@@ -162,7 +162,7 @@ class _AboutPageState extends State<AboutPage> {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.star),
-            title: Text("Okaerinasaimase, goshujinsama"),
+            title: Text("Deep Sea Museum"),
             onTap: () => setState(() {
               eggVisible = !eggVisible;
             }),
