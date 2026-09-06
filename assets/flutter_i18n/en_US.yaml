@@ -1224,6 +1224,21 @@ setting:
     copyright_register_code: Copyright register code
     sign_android: Android signature
     title: About this APP
+sponsorship:
+  title: "This version is sponsored and released by Jichuang Studio and the Network Management Committee."
+  dialog_title: "Sponsorship Information"
+  dialog_content:
+    "Introduction to Jichuang Studio: Jichuang Studio is a tech innovation club supported and established by the Xidian University Innovation and Entrepreneurship College. It aims to walk alongside the campus's most outstanding innovation and entrepreneurship talent, focusing on technological innovation and product research and development in fields such as artificial intelligence. Currently, the studio collaborates with manufacturers like Huawei, deeply cultivating cutting-edge directions related to large language models, and has incubated over dozens of AI-related sci-tech innovation products, 8 of which have successfully achieved commercial deployment. The studio's best-known products include SwanLab, LLMOne, and NexusGate.
+
+
+    Introduction to the XDUNA: The XDUNA operates under the Xidian University Information Network Technology Center. It primarily assists in handling campus network usage issues for faculty and students, and participates in campus network maintenance, online consultation, offline processing, and technical support. We welcome responsible students who are eager to learn and interested in network and technical practices to join us in serving fellow students, improving abilities, and gaining experience.
+
+
+    Note from the XDYou Software Developer: Jichuang provided significant help during the early development of XDYou. I joined the Network Management Committee back in my admission year in 2020, though unfortunately they didn't accept me. As I've recently been looking for a job and consulted some of their members for information, this page has been created as a consultation fee in accordance with our agreement.
+
+    Bender Rodriguez 6/9/2026"
+  button_jichuang: "About Jichuang"
+  button_xduna: "About XDUNA"
 sport:
   title: Sport Query
   class_info: Class information

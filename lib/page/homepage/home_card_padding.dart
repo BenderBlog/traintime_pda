@@ -73,6 +73,6 @@ extension HomeCardPadding on Widget {
         ),
         child: this,
       ),
-    ).padding(all: 0);
+    ).padding(all: 4);
   }
 }

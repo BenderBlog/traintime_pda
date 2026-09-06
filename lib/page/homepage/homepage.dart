@@ -10,6 +10,7 @@ import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/page/homepage/homepage_edit_mode.dart';
 import 'package:watermeter/page/homepage/homepage_widget_registry.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
+import 'package:watermeter/page/homepage/notice_card/sponsorship_card.dart';
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/staggered_grid.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -227,6 +228,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           padding: const EdgeInsets.all(8),
           children: [
             const UpdateCard(),
+            const SponsorshipCard(),
             const ClassTableCard(),
             if (_editMode)
               Padding(
