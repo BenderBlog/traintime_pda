@@ -33,11 +33,15 @@ class UpdateCard extends StatelessWidget {
             case null:
               return Text(
                     FlutterI18n.translate(context, "setting.current_testing"),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   )
                   .paddingDirectional(horizontal: 16, vertical: 14)
-                  .withHomeCardStyle(context);
+                  .withHomeCardStyle(context, type: HomeCardType.warning);
             case true:
-              return Text(FlutterI18n.translate(context, "setting.new_version"))
+              return Text(
+                    FlutterI18n.translate(context, "setting.new_version"),
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
                   .paddingDirectional(horizontal: 16, vertical: 14)
                   .withHomeCardStyle(
                     context,
@@ -48,6 +52,7 @@ class UpdateCard extends StatelessWidget {
                             UpdateDialog(updateMessage: state.value!),
                       );
                     },
+                    type: HomeCardType.warning,
                   );
             case false:
               return SizedBox(height: 0);
