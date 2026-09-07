@@ -105,12 +105,14 @@ flutter:
     - assets/art/pda_girl_default.webp
     # - assets/art/pda_girl_singing.png
     - assets/art/pda_girl_reading.webp
-    - assets/art/lucky_star_1.jpg
-    - assets/art/lucky_star_2.jpg
-    - assets/art/lucky_star_3.jpg
-    - assets/art/lucky_star_4.jpg
-    - assets/art/lucky_star_5.jpg
-    - assets/art/lucky_star_6.jpg
+    - assets/art/qianfu_0.jpg
+    - assets/art/qianfu_1.jpg
+    - assets/art/qianfu_2.jpg
+    - assets/art/qianfu_3.jpg
+    - assets/art/qianfu_4.jpg
+    - assets/art/qianfu_5.jpg
+    - assets/art/qianfu_6.jpg
+    - assets/art/qianfu_7.jpg
     # - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
     # - assets/art/anan_christmas.png
     # - assets/art/Sakura_and_Tomoyo_Kimono.jpg
