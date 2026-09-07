@@ -5,9 +5,10 @@ import AppIntents
 import SwiftUI
 import WidgetKit
 
-private enum ScheduleWidgetLayout {
-    static let matrixCellAspectRatio: CGFloat = 0.68
-    static let matrixCellCornerRatio: CGFloat = 0.28
+private enum CircularScheduleTypography {
+    static let primary = Font.system(size: 12, weight: .semibold)
+    static let secondary = Font.system(size: 8, weight: .medium)
+    static let minimumScale: CGFloat = 0.85
 }
 
 struct TraintimeScheduleWidgetEntry: TimelineEntry {
@@ -122,49 +123,50 @@ private enum ScheduleWidgetRole {
     case integrated, name, timeLocation, overview
 }
 
-/// 始终由日期驱动，避免使用 entry.date 冻结剩余分钟数和进度。
+/// 长方形组件用一行时间范围呈现起止时刻，省去重复的上下课标签。
 private struct ScheduleTime: View {
     let schedule: WatchSchedulePresentation
-    var compact = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            Text(schedule.timeLabel)
-                .font(.system(size: compact ? 7 : 9, weight: .medium))
-                .lineLimit(1)
-            if schedule.state != .finishing && !schedule.isAboutToStart {
-                timeValue
-                    .font(.system(size: compact ? 12 : 17, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+        if let start = schedule.startTimeText, let end = schedule.endTimeText {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(start)
+                Spacer(minLength: 0)
+                Text("–")
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 0)
+                Text(end)
             }
-        }
-    }
-
-    @ViewBuilder var timeValue: some View {
-        if let target = schedule.timeTarget {
-            if schedule.usesCountdown {
-                Text(
-                    timerInterval: schedule.date...max(schedule.date, target), countsDown: true,
-                    showsHours: true)
-            } else {
-                Text(schedule.clockText(target))
-            }
+            .font(.system(size: 16, weight: .regular))
+            .foregroundStyle(.primary)
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(
+                watchLocalizedString("上课") + " " + start + "，"
+                    + watchLocalizedString("下课") + " " + end)
         }
     }
 }
 
 private struct ScheduleProgress: View {
-    let interval: ClosedRange<Date>
+    let progress: Double
+    let color: Color
+
     var body: some View {
-        ProgressView(timerInterval: interval, countsDown: false) {
-            EmptyView()
-        } currentValueLabel: {
-            EmptyView()
-        }
-        .progressViewStyle(.linear)
-        .accessibilityLabel(watchLocalizedString("课程进度"))
+        // 普通形状只接收模型校验后的有限进度值，不使用系统计时进度视图。
+        Capsule()
+            .fill(.secondary.opacity(0.25))
+            .overlay(alignment: .leading) {
+                Capsule()
+                    .fill(color)
+                    .scaleEffect(x: progress, y: 1, anchor: .leading)
+                    .widgetAccentable()
+            }
+            .frame(height: 3)
+            .accessibilityLabel(watchLocalizedString("课程进度"))
+            .accessibilityValue(Text(progress, format: .percent.precision(.fractionLength(0))))
     }
 }
 
@@ -176,6 +178,10 @@ private struct ScheduleWidgetView: View {
         role == .integrated ? entry.integrated : entry.schedule
     }
     private var color: Color { schedule.focus?.color ?? .secondary }
+    private var switchableCurrentCourse: WatchCourse? {
+        guard role == .integrated, entry.schedule.next != nil else { return nil }
+        return entry.schedule.current
+    }
 
     var body: some View {
         Group {
@@ -188,6 +194,7 @@ private struct ScheduleWidgetView: View {
         }
         .containerBackground(for: .widget) { Color.clear }
         .environment(\.locale, WatchWidgetShared.preferredLocale)
+        .widgetURL(WatchWidgetDestination.overview.url)
     }
 
     private var inline: some View {
@@ -198,7 +205,7 @@ private struct ScheduleWidgetView: View {
                 if role == .name {
                     Text(nameContext + " · " + course.name)
                 } else {
-                    inlineTime + Text(" · " + schedule.location)
+                    inlineTime + Text(" · " + schedule.compactLocation)
                 }
             } else {
                 Label(schedule.compactTitle, systemImage: schedule.emptySymbol)
@@ -207,49 +214,49 @@ private struct ScheduleWidgetView: View {
     }
 
     private var inlineTime: Text {
-        let day =
-            schedule.focus.map {
-                schedule.calendar.isDate($0.startAt, inSameDayAs: schedule.date)
-                    ? "" : schedule.dayLabel(for: $0.startAt) + " "
-            } ?? ""
-        let prefix = Text(day + schedule.timeLabel + " ")
-        guard schedule.state != .finishing, !schedule.isAboutToStart,
-            let target = schedule.timeTarget
-        else { return prefix }
-        if schedule.usesCountdown {
-            return prefix
-                + Text(
-                    timerInterval: schedule.date...max(schedule.date, target), countsDown: true,
-                    showsHours: true)
-        }
-        return prefix + Text(schedule.clockText(target))
+        guard let time = schedule.compactTime, let course = schedule.focus else { return Text("") }
+        let target = schedule.isCurrent ? course.endAt : course.startAt
+        let dayLabel = schedule.compactDayLabel(for: target)
+        let day = dayLabel.isEmpty ? "" : dayLabel + " "
+        return Text(day + time.label + " " + time.value)
     }
 
-    @ViewBuilder private var circular: some View {
+    private var circular: some View {
+        circularContent
+            // 所有类型和空状态都进入同一个表盘着色组。全彩模式统一使用
+            // 系统前景色，避免圆环单独使用课程色、文字却使用另一种颜色。
+            .foregroundStyle(.primary)
+            .tint(Color.primary)
+            .symbolRenderingMode(.monochrome)
+            .widgetAccentable()
+    }
+
+    @ViewBuilder private var circularContent: some View {
         if role == .overview {
             summaryCircle
         } else if let course = schedule.focus {
             if role == .name {
-                VStack(spacing: 1) {
-                    Image(systemName: course.kindSystemImage).font(.system(size: 10))
-                        .foregroundStyle(color)
-                    Text(nameContext).font(.system(size: 7))
-                    Text(course.name).font(.system(size: 11, weight: .semibold)).lineLimit(2)
-                        .minimumScaleFactor(0.75)
+                VStack(spacing: 2) {
+                    Text(nameContext).font(CircularScheduleTypography.secondary)
+                        .foregroundStyle(.secondary).lineLimit(1)
+                        .minimumScaleFactor(CircularScheduleTypography.minimumScale)
+                    circularTitle(course.name)
                 }
                 .multilineTextAlignment(.center)
-                .widgetAccentable()
-            } else if let interval = schedule.progressInterval {
-                ProgressView(timerInterval: interval, countsDown: false) {
-                    EmptyView()
-                } currentValueLabel: {
-                    compactTimeLocation
-                }
-                .progressViewStyle(.circular)
-                .tint(color)
             } else {
-                ZStack {
-                    AccessoryWidgetBackground()
+                if let progress = schedule.courseProgress {
+                    // 系统开口圆环负责轨道和进度圆点；底部开口放地点。
+                    Gauge(value: progress, in: 0...1) {
+                        compactLocation
+                    } currentValueLabel: {
+                        compactTimeValue
+                    }
+                    .gaugeStyle(.accessoryCircular)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(compactAccessibilityLabel)
+                    .accessibilityValue(
+                        Text(progress, format: .percent.precision(.fractionLength(0))))
+                } else {
                     compactTimeLocation
                 }
             }
@@ -259,40 +266,93 @@ private struct ScheduleWidgetView: View {
     }
 
     private var compactTimeLocation: some View {
-        VStack(spacing: 0) {
-            if let course = schedule.focus,
-                !schedule.calendar.isDate(course.startAt, inSameDayAs: schedule.date)
-            {
-                Text(schedule.dayLabel(for: course.startAt)).font(.system(size: 7)).lineLimit(1)
-            }
-            ScheduleTime(schedule: schedule, compact: true)
-            Text(schedule.location).font(.system(size: 9, weight: .semibold)).lineLimit(1)
-                .minimumScaleFactor(0.7)
+        VStack(spacing: 2) {
+            Text(compactTimeHeading)
+                .font(CircularScheduleTypography.secondary)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(CircularScheduleTypography.minimumScale)
+            circularTitle(schedule.compactTime?.value ?? "", lineLimit: 1)
+                .monospacedDigit()
+            compactLocation
         }
+        .padding(.horizontal, 4)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .multilineTextAlignment(.center)
-        .widgetAccentable()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(compactAccessibilityLabel)
+    }
+
+    private var compactTimeValue: some View {
+        VStack(spacing: 0) {
+            Text(compactTimeHeading)
+                .font(.system(size: 7, weight: .medium))
+                .foregroundStyle(.secondary)
+            Text(schedule.compactTime?.value ?? "")
+                .font(CircularScheduleTypography.primary)
+                .monospacedDigit()
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.85)
+        .multilineTextAlignment(.center)
+    }
+
+    private var compactLocation: some View {
+        // 有无圆环都把位置作为主要信息，与时刻共用字号、字重和前景色。
+        circularTitle(schedule.compactLocation, lineLimit: 1)
+            .foregroundStyle(.primary)
+    }
+
+    private var compactAccessibilityLabel: String {
+        [schedule.focus?.name, compactTimeHeading, schedule.compactTime?.value, schedule.location]
+            .compactMap { $0 }.joined(separator: "，")
+    }
+
+    private func cornerText(
+        _ value: String,
+        font: Font = .system(size: 12, weight: .bold, design: .rounded)
+    ) -> some View {
+        Text(value)
+            .font(font)
+            .lineLimit(1)
+            .truncationMode(.tail)
+            .foregroundStyle(color)
+            .widgetAccentable()
+    }
+
+    /// 跨日提示合并进第一行，内容始终保持“上/下课、时刻、地点”三行。
+    private var compactTimeHeading: String {
+        guard let time = schedule.compactTime, let course = schedule.focus else { return "" }
+        let target = schedule.isCurrent ? course.endAt : course.startAt
+        let day = schedule.compactDayLabel(for: target)
+        return day.isEmpty ? time.label : day + " " + time.label
     }
 
     @ViewBuilder private var corner: some View {
-        if role == .overview {
-            summaryCircle.widgetLabel { Text(summaryText) }
-        } else if let course = schedule.focus {
-            if role == .name {
-                Image(systemName: course.kindSystemImage)
-                    .foregroundStyle(color)
-                    .widgetLabel { Text(nameContext + " · " + course.name) }
-            } else {
-                ScheduleTime(schedule: schedule, compact: true)
+        if let course = schedule.focus {
+            // 位置置于开头，空间不足时从尾部省略课程名，优先保留完整教室号。
+            let courseLabel = [schedule.compactLocation, course.name]
+                .filter { !$0.isEmpty }.joined(separator: " · ")
+            if let progress = schedule.courseProgress {
+                cornerText(courseLabel)
+                    .widgetCurvesContent()
                     .widgetLabel {
-                        if let interval = schedule.progressInterval {
-                            ProgressView(timerInterval: interval, countsDown: false) {
-                                Text(schedule.location)
-                            } currentValueLabel: {
-                                EmptyView()
-                            }
-                        } else {
-                            Text(schedule.dayLabel(for: course.startAt) + " · " + schedule.location)
+                        // 数值 Gauge 由 WidgetKit 排成表角弧线，不展示百分比或时间。
+                        Gauge(value: progress, in: 0...1) {
+                            EmptyView()
                         }
+                        .gaugeStyle(.accessoryLinearCapacity)
+                        .tint(color)
+                        .accessibilityLabel(watchLocalizedString("课程进度"))
+                    }
+            } else {
+                cornerText(
+                    schedule.compactDateTimeText(for: course.startAt),
+                    font: .system(size: 10, weight: .regular, design: .rounded)
+                )
+                    .widgetCurvesContent()
+                    .widgetLabel {
+                        cornerText(courseLabel)
                     }
             }
         } else {
@@ -306,7 +366,7 @@ private struct ScheduleWidgetView: View {
         {
             overviewRectangle
         } else if let course = schedule.focus {
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 3) {
                     Text(
                         role == .name
@@ -314,22 +374,14 @@ private struct ScheduleWidgetView: View {
                             : (role == .integrated
                                 ? contextTitle + " · " + course.name : contextTitle)
                     )
-                    .font(.system(size: 10, weight: .medium)).lineLimit(1).minimumScaleFactor(0.8)
+                    .font(.system(size: role == .name ? 10 : 12, weight: .medium))
+                    .lineLimit(1).minimumScaleFactor(0.8)
                     Spacer(minLength: 0)
-                    if role == .integrated, let current = entry.schedule.current,
-                        entry.schedule.next != nil
-                    {
-                        Button(
-                            intent: ToggleScheduleWidgetCourseIntent(currentCourseID: current.id)
-                        ) {
-                            Image(
-                                systemName: schedule.isPreview
-                                    ? "arrow.uturn.backward" : "arrow.right"
-                            )
-                            .font(.system(size: 11, weight: .semibold)).frame(width: 20, height: 18)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(watchLocalizedString("切换当前与下一节课"))
+                    if switchableCurrentCourse != nil {
+                        // 标题为按钮留出横向空间；更高的触摸区域在卡片上叠放，
+                        // 不撑高标题行或挤压下面的时间、进度与地点。
+                        Color.clear.frame(width: 40, height: 16)
+                            .accessibilityHidden(true)
                     }
                 }
                 .foregroundStyle(color)
@@ -341,18 +393,36 @@ private struct ScheduleWidgetView: View {
                         Text(kind).font(.caption2).foregroundStyle(.secondary)
                     }
                 } else {
-                    HStack(alignment: .center, spacing: 8) {
-                        ScheduleTime(schedule: schedule)
-                            .fixedSize(horizontal: true, vertical: false)
-                        Text(schedule.location)
-                            .font(.system(size: 16, weight: .semibold)).lineLimit(1)
-                            .minimumScaleFactor(0.75)
+                    ScheduleTime(schedule: schedule)
+                    if let progress = schedule.courseProgress {
+                        ScheduleProgress(progress: progress, color: color)
+                            .padding(.vertical, 1)
                     }
-                    if let interval = schedule.progressInterval {
-                        ScheduleProgress(interval: interval).tint(color)
-                    }
+                    Label(schedule.locationSummary, systemImage: "mappin")
+                        .font(.system(size: 16, weight: .regular)).lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .truncationMode(.tail)
+                        .foregroundStyle(.primary)
                 }
             }
+            .overlay(alignment: .topTrailing) {
+                if let current = switchableCurrentCourse {
+                    Button(
+                        intent: ToggleScheduleWidgetCourseIntent(currentCourseID: current.id)
+                    ) {
+                        Image(systemName: schedule.isPreview ? "arrow.uturn.backward" : "arrow.right")
+                            .font(.system(size: 11, weight: .semibold))
+                            .frame(width: 20, height: 16)
+                            .frame(width: 40, height: 32, alignment: .topTrailing)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(color)
+                    .accessibilityLabel(watchLocalizedString("切换当前与下一节课"))
+                }
+            }
+            .padding(.horizontal, 2)
+            .padding(.vertical, 2)
         } else {
             HStack(spacing: 8) {
                 Image(systemName: schedule.emptySymbol).font(.title3).foregroundStyle(.secondary)
@@ -383,31 +453,51 @@ private struct ScheduleWidgetView: View {
             ? schedule.title : schedule.dayLabel(for: course.startAt)
     }
     private var emptyCompact: some View {
+        circularStatus(symbol: schedule.emptySymbol, title: schedule.compactTitle)
+            .accessibilityLabel(schedule.title)
+    }
+
+    /// 课程名称、时刻、位置和日程状态共用主要文字样式。
+    private func circularTitle(_ title: String, lineLimit: Int = 2) -> some View {
+        Text(title)
+            .font(CircularScheduleTypography.primary)
+            .lineLimit(lineLimit)
+            .minimumScaleFactor(CircularScheduleTypography.minimumScale)
+            .truncationMode(.tail)
+    }
+
+    private func circularStatus(symbol: String, title: String) -> some View {
         VStack(spacing: 2) {
-            Image(systemName: schedule.emptySymbol).font(.system(size: 14))
-            Text(schedule.compactTitle).font(.system(size: 9, weight: .medium)).lineLimit(2)
-                .minimumScaleFactor(0.8)
+            Image(systemName: symbol).font(.system(size: 14))
+            circularTitle(title)
         }
         .multilineTextAlignment(.center)
-        .accessibilityLabel(schedule.title)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
     }
     private var summaryRemaining: Int {
         schedule.summaryCourses.filter { $0.endAt > schedule.date }.count
     }
+    private var summaryIsAvailable: Bool {
+        ![.semesterEnded, .signedOut, .noData, .expired].contains(schedule.state)
+            && schedule.summaryIsComplete
+    }
     private var summaryText: String {
-        guard schedule.summaryIsComplete else {
+        guard summaryIsAvailable else {
             switch schedule.state {
             case .semesterEnded, .signedOut, .noData, .expired: return schedule.compactTitle
             default: return watchLocalizedString("日程概览待同步")
             }
         }
+        if schedule.summaryCourses.isEmpty { return watchLocalizedString("今日无课") }
+        if summaryRemaining == 0 { return watchLocalizedString("今日已下课") }
         return String(
             format: watchLocalizedString("%@ %d 项 · 还剩 %d 项"),
             schedule.dayLabel(for: schedule.summaryDate), schedule.summaryCourses.count,
             summaryRemaining)
     }
     @ViewBuilder private var summaryCircle: some View {
-        if schedule.summaryIsComplete && !schedule.summaryCourses.isEmpty {
+        if summaryIsAvailable && summaryRemaining > 0 {
             Gauge(
                 value: Double(schedule.summaryCourses.count - summaryRemaining),
                 in: 0...Double(schedule.summaryCourses.count)
@@ -422,41 +512,56 @@ private struct ScheduleWidgetView: View {
             }
             .gaugeStyle(.accessoryCircular)
             .accessibilityLabel(summaryText)
-        } else if schedule.summaryIsComplete {
-            VStack(spacing: 2) {
-                Image(systemName: "cup.and.saucer.fill")
-                Text(watchLocalizedString("今日无课")).font(.system(size: 9))
-            }
+        } else if summaryIsAvailable {
+            circularStatus(
+                symbol: schedule.summaryCourses.isEmpty ? "cup.and.saucer.fill" : "checkmark",
+                title: summaryText)
         } else {
-            VStack(spacing: 2) {
-                Image(systemName: schedule.emptySymbol)
-                Text(summaryText).font(.system(size: 9)).lineLimit(2)
-            }
+            circularStatus(symbol: schedule.emptySymbol, title: summaryText)
         }
     }
     private var overviewRectangle: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(summaryText).font(.system(size: 11, weight: .semibold)).lineLimit(1)
-                .minimumScaleFactor(0.8)
-            if schedule.summaryIsComplete {
-                TodayPeriodStrip(courses: schedule.summaryCourses, date: schedule.date).frame(
-                    height: 7)
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(watchLocalizedString("今日"))
+                Spacer(minLength: 0)
+                Text(schedule.weekIsComplete ? weekLabel : watchLocalizedString("本周日程待同步"))
+                    .minimumScaleFactor(0.85)
             }
-            if schedule.weekIsComplete {
-                HStack(spacing: 6) {
-                    Text(weekLabel).font(.system(size: 9)).lineLimit(2)
-                    WeekDotMatrix(
-                        courses: schedule.weekCourses, referenceDate: schedule.summaryDate,
-                        calendar: schedule.calendar
-                    )
-                    .frame(maxWidth: 75, maxHeight: 33)
+            .font(.system(size: 10, weight: .medium))
+            .foregroundStyle(.secondary)
+
+            Text(summaryIsAvailable && summaryRemaining > 0
+                ? String(format: watchLocalizedString("还剩 %d 项"), summaryRemaining)
+                : summaryText)
+                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .minimumScaleFactor(0.85)
+                .widgetAccentable()
+
+            if summaryIsAvailable {
+                if summaryRemaining > 0,
+                    let lastEnd = schedule.summaryCourses.map(\.endAt).max()
+                {
+                    Text(String(format: watchLocalizedString("%@ 全部结束"),
+                        schedule.compactDateTimeText(for: lastEnd)))
+                        .font(.system(size: 11, weight: .medium))
+                } else if let next = schedule.focus, next.startAt > schedule.date {
+                    Text(String(format: watchLocalizedString("下一次 %@"),
+                        schedule.compactDateTimeText(for: next.startAt)))
+                        .font(.system(size: 11, weight: .medium))
+                } else if [.unconfirmed, .todayFree, .todayFinished].contains(schedule.state) {
+                    Text(watchLocalizedString("后续课表待同步"))
+                        .font(.system(size: 11))
                 }
-                .foregroundStyle(.secondary)
             } else {
-                Text(watchLocalizedString("本周日程待同步")).font(.system(size: 9)).foregroundStyle(
-                    .secondary)
+                Text(watchLocalizedString("打开手机更新课表"))
+                    .font(.system(size: 11)).foregroundStyle(.secondary)
             }
         }
+        .lineLimit(1)
+        .padding(.horizontal, 2)
+        .padding(.vertical, 3)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     private var weekLabel: String {
         let currentWeek = schedule.calendar.dateInterval(of: .weekOfYear, for: schedule.date)!
@@ -464,215 +569,6 @@ private struct ScheduleWidgetView: View {
             currentWeek.start == schedule.weekInterval.start
             ? watchLocalizedString("本周") : schedule.dayLabel(for: schedule.weekInterval.start)
         return String(format: watchLocalizedString("%@ %d 项"), label, schedule.weekCourses.count)
-    }
-}
-
-private struct TodayPeriodStrip: View {
-    let courses: [WatchCourse]
-    let date: Date
-    private static let ranges = [1...2, 3...4, 5...6, 7...8, 9...10]
-    var body: some View {
-        HStack(spacing: 3) {
-            ForEach(Self.ranges.indices, id: \.self) { index in
-                let matching = courses.filter {
-                    $0.startPeriod <= Self.ranges[index].upperBound
-                        && $0.endPeriod >= Self.ranges[index].lowerBound
-                }
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(
-                        matching.first?.color.opacity(
-                            matching.allSatisfy { $0.endAt <= date } ? 0.35 : 1)
-                            ?? Color.secondary.opacity(0.2))
-            }
-        }
-        .accessibilityLabel(watchLocalizedString("今日节次分布"))
-    }
-}
-/// 点阵单元的几何参数。
-private struct DotMatrixMetrics {
-    let cellWidth: CGFloat
-    let cellHeight: CGFloat
-    let horizontalGap: CGFloat
-    let verticalGap: CGFloat
-    let xOffset: CGFloat
-    let yOffset: CGFloat
-
-    /// 返回指定行列的短圆角矩形区域。
-    func rect(row: Int, column: Int) -> CGRect {
-        CGRect(
-            x: xOffset
-                + CGFloat(column) * (cellWidth + horizontalGap),
-            y: yOffset
-                + CGFloat(row) * (cellHeight + verticalGap),
-            width: cellWidth,
-            height: cellHeight
-        )
-    }
-}
-
-/// 右侧 5×7 周课程点阵。
-///
-/// 7 列对应周一到周日；5 行分别对应 1–2、3–4、5–6、7–8、
-/// 9–10 节。短圆角矩形横向铺满可用宽度；有课程时直接使用同步的课程色，
-/// 否则保留低对比度占位色。
-private struct WeekDotMatrix: View {
-    let contentInset: CGFloat
-    let cellAspectRatio: CGFloat
-    let minimumVerticalGap: CGFloat
-    private let courseColors: [Int: Color]
-
-    init(
-        courses: [WatchCourse],
-        referenceDate: Date,
-        calendar: Calendar,
-        contentInset: CGFloat = 0,
-        cellAspectRatio: CGFloat = ScheduleWidgetLayout.matrixCellAspectRatio,
-        minimumVerticalGap: CGFloat = 1.2
-    ) {
-        self.contentInset = contentInset
-        self.cellAspectRatio = cellAspectRatio
-        self.minimumVerticalGap = minimumVerticalGap
-        self.courseColors = Self.makeCourseColorIndex(
-            courses: courses,
-            referenceDate: referenceDate,
-            calendar: calendar
-        )
-    }
-
-    private static let rowRanges = [
-        1...2,
-        3...4,
-        5...6,
-        7...8,
-        9...10,
-    ]
-
-    var body: some View {
-        Canvas { context, size in
-            let metrics = makeMetrics(for: size)
-
-            for row in Self.rowRanges.indices {
-                for column in 0..<7 {
-                    drawCell(
-                        context: &context,
-                        rect: metrics.rect(row: row, column: column),
-                        color: dotColor(row: row, weekday: column)
-                    )
-                }
-            }
-        }
-        .accessibilityLabel(watchLocalizedString("本周课程点阵"))
-    }
-
-    /// 根据可用宽高计算自适应短矩形。
-    ///
-    /// 宽度独立计算并完整占满七列，高度按固定比例收窄，
-    /// 在有限空间内维持清晰的课程节次标记。
-    private func makeMetrics(for size: CGSize) -> DotMatrixMetrics {
-        let availableWidth = max(0, size.width - contentInset * 2)
-        let availableHeight = max(0, size.height - contentInset * 2)
-        let horizontalGap = max(1, min(1.8, availableWidth * 0.018))
-        let verticalGap = max(
-            minimumVerticalGap,
-            min(3, availableHeight * 0.05)
-        )
-        let cellWidth = max(
-            0,
-            (availableWidth - horizontalGap * 6) / 7
-        )
-        let maximumCellHeight = max(
-            0,
-            (availableHeight - verticalGap * 4) / 5
-        )
-        let cellHeight = min(
-            maximumCellHeight,
-            cellWidth * cellAspectRatio
-        )
-        let gridHeight = cellHeight * 5 + verticalGap * 4
-
-        return DotMatrixMetrics(
-            cellWidth: cellWidth,
-            cellHeight: cellHeight,
-            horizontalGap: horizontalGap,
-            verticalGap: verticalGap,
-            xOffset: contentInset,
-            yOffset: contentInset + max(0, (availableHeight - gridHeight) / 2)
-        )
-    }
-
-    /// 绘制轻微圆角的课程单元；圆角不会达到胶囊形态。
-    private func drawCell(
-        context: inout GraphicsContext,
-        rect: CGRect,
-        color: Color
-    ) {
-        let cornerRadius = min(
-            rect.height * ScheduleWidgetLayout.matrixCellCornerRatio,
-            rect.width * ScheduleWidgetLayout.matrixCellCornerRatio
-        )
-        context.fill(
-            Path(
-                roundedRect: rect,
-                cornerSize: CGSize(
-                    width: cornerRadius,
-                    height: cornerRadius
-                )
-            ),
-            with: .color(color)
-        )
-    }
-
-    /// 课程存在时返回课程色，否则返回低对比度占位色。
-    private func dotColor(row: Int, weekday: Int) -> Color {
-        courseColors[Self.colorKey(row: row, weekday: weekday)]
-            ?? Color.secondary.opacity(0.22)
-    }
-
-    /// 把行列压缩为一个稳定键，Canvas 绘制阶段只进行 O(1) 查询。
-    private static func colorKey(row: Int, weekday: Int) -> Int {
-        row * 7 + weekday
-    }
-
-    /// 初始化时一次建立 5×7 颜色索引，避免 Canvas 每帧重复扫描完整课表。
-    private static func makeCourseColorIndex(
-        courses: [WatchCourse],
-        referenceDate: Date,
-        calendar: Calendar
-    ) -> [Int: Color] {
-        let startOfDay = calendar.startOfDay(for: referenceDate)
-        let systemWeekday = calendar.component(.weekday, from: startOfDay)
-        let daysSinceMonday = (systemWeekday + 5) % 7
-        let monday =
-            calendar.date(
-                byAdding: .day,
-                value: -daysSinceMonday,
-                to: startOfDay
-            ) ?? startOfDay
-
-        var result: [Int: Color] = [:]
-        for course in courses {
-            let courseDay = calendar.startOfDay(for: course.startAt)
-            guard
-                let weekday = calendar.dateComponents(
-                    [.day],
-                    from: monday,
-                    to: courseDay
-                ).day,
-                (0..<7).contains(weekday)
-            else { continue }
-
-            for row in rowRanges.indices {
-                let range = rowRanges[row]
-                guard course.startPeriod <= range.upperBound,
-                    course.endPeriod >= range.lowerBound
-                else { continue }
-                let key = colorKey(row: row, weekday: weekday)
-                if result[key] == nil {
-                    result[key] = course.color
-                }
-            }
-        }
-        return result
     }
 }
 
@@ -687,9 +583,9 @@ private struct ScheduleConfiguration {
         }
         .configurationDisplayName(name)
         .description(summary)
-        .supportedFamilies([
-            .accessoryInline, .accessoryCircular, .accessoryCorner, .accessoryRectangular,
-        ])
+        .supportedFamilies(role == .integrated
+            ? [.accessoryInline, .accessoryCircular, .accessoryCorner, .accessoryRectangular]
+            : [.accessoryInline, .accessoryCircular, .accessoryRectangular])
     }
 }
 
@@ -697,7 +593,7 @@ struct TraintimeScheduleWidget: Widget {
     var body: some WidgetConfiguration {
         ScheduleConfiguration(
             kind: WatchWidgetShared.widgetKind, role: .integrated, name: "综合课表",
-            summary: "按上课状态显示时间、地点和课程，小尺寸优先显示倒计时与地点。"
+            summary: "显示当前或下一节课，上课期间显示课程进度。"
         ).body
     }
 }
@@ -713,7 +609,7 @@ struct TraintimeCourseTimeLocationWidget: Widget {
     var body: some WidgetConfiguration {
         ScheduleConfiguration(
             kind: WatchWidgetShared.courseTimeLocationWidgetKind, role: .timeLocation, name: "时间地点",
-            summary: "显示距上课、距下课、地点和进度，与课程名称组件保持一致。"
+            summary: "显示上课、下课时间与地点，与课程名称组件保持一致。"
         ).body
     }
 }
@@ -721,7 +617,7 @@ struct TraintimeTodayScheduleWidget: Widget {
     var body: some WidgetConfiguration {
         ScheduleConfiguration(
             kind: WatchWidgetShared.todayScheduleWidgetKind, role: .overview, name: "日程概览",
-            summary: "显示日程数量、完成情况和日周分布，当天结束后预览下一次安排。"
+            summary: "显示今日剩余安排、结束时间和本周总数，轻点打开概览。"
         ).body
     }
 }

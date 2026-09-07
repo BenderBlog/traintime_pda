@@ -4,6 +4,24 @@
 import Foundation
 import WidgetKit
 
+/// 所有小组件都进入概览；旧时间线中的课程和日期链接也兼容到同一入口。
+enum WatchWidgetDestination: Equatable {
+    case overview
+
+    private static let scheme = "xdyou-watch"
+
+    var url: URL { URL(string: "\(Self.scheme)://overview")! }
+
+    init?(url: URL) {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            components.scheme == Self.scheme,
+            components.path.isEmpty,
+            let host = components.host, ["overview", "course", "day"].contains(host)
+        else { return nil }
+        self = .overview
+    }
+}
+
 /// Watch App 私有持久化缓存的稳定键名。
 ///
 /// 课表正文的三个 App Group 键仍由 `WatchWidgetShared` 管理；这里仅保存

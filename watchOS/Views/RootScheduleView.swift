@@ -178,6 +178,7 @@ struct RootScheduleView: View {
     @State private var showsOnboardingScheduleAlert = false
     @State private var didCheckOnboarding = false
     @State private var selectedCourse: WatchCourse?
+    @State private var overviewOpenRevision = 0
     @State private var daySelectedDate = Calendar.current.startOfDay(
         for: Date()
     )
@@ -484,6 +485,7 @@ struct RootScheduleView: View {
         }
         .onAppear(perform: handleAppear)
         .onDisappear(perform: handleDisappear)
+        .onOpenURL(perform: openWidgetDestination)
         .onChange(of: store.isRefreshing) { _, isRefreshing in
             handleRefreshStateChange(isRefreshing)
         }
@@ -532,6 +534,26 @@ struct RootScheduleView: View {
         updateCachedScheduleNotice(didTimeOut: store.launchSyncTimedOut)
         scheduleMonthPresentationPrewarm()
         scheduleOnboardingIfNeeded()
+    }
+
+    /// 从任意小组件回到概览顶部；不把本次跳过教学记为“已完成”。
+    private func openWidgetDestination(_ url: URL) {
+        guard WatchWidgetDestination(url: url) != nil else { return }
+        cancelOnboardingTasks()
+        onboardingInput.clear()
+        resetOnboardingTargets()
+        onboardingStep = nil
+        onboardingShowsCompletion = false
+        onboardingWaitsForSchedule = false
+        showsOnboardingScheduleAlert = false
+        showsOnboardingNotice = false
+        didCheckOnboarding = true
+        showsModePicker = false
+        dismissCourseDetailImmediately()
+        dismissDayDatePickerImmediately()
+        mode = .overview
+        overviewOpenRevision &+= 1
+        revealControls()
     }
 
     /// 页面离开时取消只服务于界面的延迟任务。
@@ -735,7 +757,7 @@ struct RootScheduleView: View {
                 )
                 .id(
                     onboardingStep == nil
-                        ? "overview-page"
+                        ? "overview-page-\(overviewOpenRevision)"
                         : "onboarding-overview-\(onboardingPageResetToken)"
                 )
             case .courseList:

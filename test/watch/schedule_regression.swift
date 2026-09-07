@@ -17,12 +17,14 @@ struct ScheduleRegression {
                 year: 2026, month: 9, day: day, hour: hour, minute: minute, second: second))!
     }
     static func ms(_ value: Date) -> Int64 { Int64(value.timeIntervalSince1970 * 1000) }
-    static func course(_ id: String, start: Date, end: Date, place: String = "B-302") -> WatchCourse
+    static func course(
+        _ id: String, start: Date, end: Date, place: String = "B-302", kind: String = "course"
+    ) -> WatchCourse
     {
         .init(
             id: id, name: id, teacher: nil, classroom: place, startAtEpochMs: ms(start),
             endAtEpochMs: ms(end),
-            startSection: 1, endSection: 2, colorARGB: -1, kind: "course", note: nil)
+            startSection: 1, endSection: 2, colorARGB: -1, kind: kind, note: nil)
     }
     static func snapshot(
         _ courses: [WatchCourse], generated: Date = date(6), start: Date = date(7),
@@ -34,7 +36,60 @@ struct ScheduleRegression {
             validThroughEpochMs: ms(valid), rangeStartEpochMs: ms(start), rangeEndEpochMs: ms(end),
             timeZoneOffsetMinutes: 480, reminderMinutes: 5, courses: courses)
     }
+    static func overviewRegressions() {
+        let first = course("A", start: date(7, 8, 30), end: date(7, 10, 5))
+        let exam = course("Exam", start: date(7, 11), end: date(7, 12), kind: "exam")
+        let second = course("B", start: date(7, 14), end: date(7, 15, 35))
+        let lab = course("Lab", start: date(7, 17), end: date(7, 18), kind: "physicsExperiment")
+        let tomorrow = course("Tomorrow", start: date(8, 8, 30), end: date(8, 10, 5))
+        let full = WatchScheduleResolver.resolve([
+            .semester: snapshot([first, exam, second, lab, tomorrow])
+        ])!
+        func overview(_ time: Date) -> WatchOverviewSummary {
+            WatchOverviewSummary(WatchSchedulePresentation(resolved: full, at: time))
+        }
+        let morning = overview(date(7, 9))
+        check(morning.current?.id == first.id && morning.next?.id == exam.id,
+            "Overview selects the ongoing and nearest upcoming events")
+        check(morning.today?.remaining.courses == 2 && morning.today?.remaining.exams == 1
+            && morning.today?.remaining.experiments == 1,
+            "Remaining events include ongoing classes and distinguish exams and labs")
+        check(morning.today?.additionalEndTime == lab.endAt,
+            "Overview supplies the final end beyond the two visible cards")
+        check(overview(date(7, 11)).week?.upcoming.exams == 0,
+            "An exam already in progress is not an upcoming exam")
+        let evening = overview(date(7, 18))
+        check(evening.current == nil && evening.next?.id == tomorrow.id,
+            "After today ends only the next event is shown")
+        check(evening.today?.remaining.total == 0 && evening.today?.completedCount == 4,
+            "Today's completed summary does not switch to tomorrow")
+
+        let twoEvents = WatchScheduleResolver.resolve([.semester: snapshot([first, second])])!
+        check(WatchOverviewSummary(.init(resolved: twoEvents, at: date(7, 9)))
+            .today?.additionalEndTime == nil,
+            "Do not repeat an end time already shown in a card")
+        let freshToday = WatchScheduleResolver.resolve([
+            .semester: snapshot([first, tomorrow], valid: date(7)),
+            .today: snapshot([first], generated: date(7, 7), end: date(8), valid: date(8)),
+        ])!
+        let partial = WatchOverviewSummary(.init(resolved: freshToday, at: date(7, 9)))
+        check(partial.current?.id == first.id && partial.next == nil && partial.week == nil,
+            "Fresh today data cannot make stale future events or weekly totals reliable")
+        check(WatchOverviewSummary(.init(resolved: nil, at: date(7))).today == nil,
+            "Missing overview data is not a confirmed zero")
+
+        for url in [WatchWidgetDestination.overview.url,
+                    URL(string: "xdyou-watch://course?id=A&date=0")!,
+                    URL(string: "xdyou-watch://day?date=0")!] {
+            check(WatchWidgetDestination(url: url) == .overview,
+                "Current and legacy widget links all open Overview")
+        }
+        check(WatchWidgetDestination(url: URL(string: "https://example.com/overview")!) == nil,
+            "Unrelated URLs do not change the current page")
+    }
+
     static func main() throws {
+        overviewRegressions()
         let first = course("A", start: date(7, 8, 30), end: date(7, 10, 5))
         let second = course("B", start: date(7, 14), end: date(7, 15, 35), place: "C-101")
         let tomorrow = course("C", start: date(8, 8, 30), end: date(8, 10, 5))
@@ -43,24 +98,34 @@ struct ScheduleRegression {
             .init(resolved: full, at: time, preview: preview)
         }
         check(state(date(7, 7)).state == .upcoming, "No first-class waiting tier")
-        check(!state(date(7, 7, 30)).usesCountdown, "No 60-minute tier")
         check(state(date(7, 8, 14, 59)).state == .upcoming, "15-minute lower boundary")
-        check(state(date(7, 8, 15)).timeLabel == "距上课", "Exactly 15 minutes begins countdown")
-        check(state(date(7, 8, 29)).timeLabel == "距上课", "Exactly one minute is still countdown")
-        check(state(date(7, 8, 29, 1)).timeLabel == "即将上课", "Less than a minute before class")
-        check(state(date(7, 8, 30)).timeLabel == "距下课", "At start select current course")
+        check(state(date(7, 8, 15)).state == .imminent, "Upcoming status at 15 minutes")
+        for time in [date(7, 7, 30), date(7, 8, 15), date(7, 8, 29, 1),
+                     date(7, 8, 30), date(7, 10, 4, 59)] {
+            check(state(time).startTimeText == "08:30", "Start time stays visible near boundaries")
+            check(state(time).endTimeText == "10:05", "End time stays visible near boundaries")
+            check(state(time).timeRangeText == "08:30–10:05", "Always display actual time range")
+        }
+        check(state(date(7, 8, 30)).state == .ongoing, "At start select current course")
         check(state(date(7, 10, 4)).state == .ongoing, "Exactly one minute until dismissal")
-        check(state(date(7, 10, 4, 1)).timeLabel == "即将下课", "Less than a minute until dismissal")
+        check(state(date(7, 10, 4, 59)).state == .ongoing, "Keep clock times until actual dismissal")
+        check(state(date(7, 8, 29, 59)).courseProgress == nil, "No progress before class")
+        check(state(date(7, 8, 30)).courseProgress == 0, "Progress begins at the start of class")
+        check(state(date(7, 9, 17, 30)).courseProgress == 0.5, "Halfway class progress is finite")
+        check(state(date(7, 10, 4, 59)).courseProgress! < 1, "Progress stays bounded before end")
+        check(state(date(7, 10, 5)).courseProgress == nil, "Hide progress at the end of class")
         check(state(date(7, 10, 5)).focus?.id == "B", "End is an exclusive boundary")
         check(
             state(date(7, 10, 5)).clockText(second.startAt) == "14:00",
             "Gap displays next start time")
         check(state(date(7, 9)).focus?.id == "A", "Split widgets keep current course")
         check(state(date(7, 9), preview: true).focus?.id == "B", "Integrated preview selects next")
-        check(state(date(7, 9), preview: true).title == "预览下一节", "Preview explicitly labeled")
+        check(state(date(7, 9), preview: true).title == "下一节", "Next course uses a concise title")
+        check(state(date(7, 9), preview: true).courseProgress == nil, "Next preview has no progress")
+        check(state(date(7, 9), preview: true).timeRangeText == "14:00–15:35", "Preview uses next times")
         check(state(date(7, 16)).state == .todayFinished, "Switch after actual final class")
         check(state(date(7, 16)).dayLabel(for: tomorrow.startAt) == "明日", "Tomorrow is labeled")
-        check(state(date(7, 16)).summaryDate == tomorrow.startAt, "Overview follows next day")
+        check(state(date(7, 16)).summaryDate == date(7, 16), "Overview stays on today after class")
         check(state(date(28)).title == "本学期结束，开心玩耍吧！", "Semester ending text")
         check(state(date(9)).state == .noMoreCourses, "No more courses differs from semester end")
         check(state(date(6)).state == .semesterUpcoming, "Term not started")
@@ -84,6 +149,17 @@ struct ScheduleRegression {
         check(
             onSunday.clockText(date(13, 9)) == "09:00",
             "School timezone preserved independently of host timezone")
+        let overnight = course("Night", start: date(7, 23, 30), end: date(8, 0, 30))
+        let overnightResolved = WatchScheduleResolver.resolve([.semester: snapshot([overnight])])!
+        check(
+            WatchSchedulePresentation(resolved: overnightResolved, at: date(7, 23, 45))
+                .timeRangeText == "23:30–明日 00:30", "Overnight dismissal has a day label")
+        check(
+            WatchSchedulePresentation(resolved: nil, at: date(7)).timeRangeText == nil,
+            "Missing data never invents class times")
+        check(
+            WatchSchedulePresentation(resolved: nil, at: date(7)).courseProgress == nil,
+            "Missing data never displays progress")
 
         let changed = course("A", start: date(7, 8, 30), end: date(7, 10, 5), place: "D-404")
         let today = snapshot([changed], generated: date(7, 7), end: date(8), valid: date(8))
@@ -155,9 +231,13 @@ struct ScheduleRegression {
         check(dates.contains(date(7, 8, 15)), "Timeline includes 15-minute boundary")
         check(dates.contains(date(8)), "Timeline includes midnight")
         check(dates.contains(date(7, 9, 5)), "Preview timeout is scheduled")
+        check(dates.contains(first.startAt) && dates.contains(first.endAt), "Exact class boundaries")
+        check(dates.contains(date(7, 8, 35)), "Refresh finite progress during class")
+        check(!dates.contains(date(7, 12, 5)), "Do not refresh progress between classes")
         check(
-            dates.contains(first.endAt.addingTimeInterval(-60 + 0.001)),
-            "Timeline includes finishing label boundary")
+            !dates.contains(first.endAt.addingTimeInterval(-60 + 0.001)),
+            "No obsolete countdown-only boundary")
+        check(dates.allSatisfy { $0 <= date(9) }, "Progress timeline stays within two-day horizon")
         _ = first.color  // Signed ARGB values do not trap.
 
         check(

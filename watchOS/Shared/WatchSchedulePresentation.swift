@@ -125,7 +125,7 @@ enum WatchScheduleResolver {
 enum WatchScheduleState: Equatable {
     case noData, signedOut, expired, unconfirmed
     case semesterUpcoming, semesterEnded, noMoreCourses
-    case todayFree, todayFinished, upcoming, imminent, ongoing, finishing
+    case todayFree, todayFinished, upcoming, imminent, ongoing
 }
 
 /// 所有组件共享的课程选择。仅综合组件的临时预览允许替换 focus。
@@ -178,7 +178,7 @@ struct WatchSchedulePresentation {
         } else if let candidate {
             focus = candidate
             if candidate.startAt <= date {
-                state = candidate.endAt.timeIntervalSince(date) < 60 ? .finishing : .ongoing
+                state = .ongoing
             } else if candidate.startAt.timeIntervalSince(date) <= 15 * 60 {
                 state = .imminent
             } else if !calendar.isDate(candidate.startAt, inSameDayAs: date) {
@@ -210,24 +210,35 @@ struct WatchSchedulePresentation {
     }
 
     var isCurrent: Bool { focus.map { $0.startAt <= date && date < $0.endAt } ?? false }
-    var usesCountdown: Bool { isCurrent || state == .imminent }
-    var isAboutToStart: Bool {
-        state == .imminent && (focus?.startAt.timeIntervalSince(date) ?? 60) < 60
-    }
-    var timeLabel: String {
-        if state == .finishing { return watchLocalizedString("即将下课") }
-        if isAboutToStart { return watchLocalizedString("即将上课") }
-        return watchLocalizedString(isCurrent ? "距下课" : (usesCountdown ? "距上课" : "上课"))
-    }
-    var timeTarget: Date? { isCurrent ? focus?.endAt : focus?.startAt }
-    var progressInterval: ClosedRange<Date>? {
+    var startTimeText: String? { focus.map { clockText($0.startAt) } }
+    var endTimeText: String? {
         guard let focus else { return nil }
-        if isCurrent { return focus.startAt...focus.endAt }
-        if state == .imminent { return focus.startAt.addingTimeInterval(-15 * 60)...focus.startAt }
-        return nil
+        let day = calendar.isDate(focus.startAt, inSameDayAs: focus.endAt)
+            ? "" : dayLabel(for: focus.endAt) + " "
+        return day + clockText(focus.endAt)
+    }
+    var timeRangeText: String? {
+        guard let startTimeText, let endTimeText else { return nil }
+        return startTimeText + "–" + endTimeText
+    }
+    /// 小尺寸只显示当前需要关注的一个时刻，日期由外围布局单独标注。
+    var compactTime: (label: String, value: String)? {
+        guard let focus else { return nil }
+        return (
+            watchLocalizedString(isCurrent ? "下课" : "上课"),
+            clockText(isCurrent ? focus.endAt : focus.startAt)
+        )
+    }
+    /// 只有焦点课程正在进行时才显示进度；预览下一节不会沿用当前课程的进度。
+    var courseProgress: Double? {
+        guard isCurrent, let focus else { return nil }
+        let duration = focus.endAt.timeIntervalSince(focus.startAt)
+        let elapsed = date.timeIntervalSince(focus.startAt)
+        guard duration.isFinite, duration > 0, elapsed.isFinite else { return nil }
+        return min(1, max(0, elapsed / duration))
     }
     var title: String {
-        if isPreview { return watchLocalizedString("预览下一节") }
+        if isPreview { return watchLocalizedString("下一节") }
         switch state {
         case .noData: return watchLocalizedString("请先同步课表")
         case .signedOut: return watchLocalizedString("请在手机登录")
@@ -241,7 +252,6 @@ struct WatchSchedulePresentation {
         case .upcoming: return watchLocalizedString("下一节")
         case .imminent: return watchLocalizedString("即将上课")
         case .ongoing: return watchLocalizedString("正在上课")
-        case .finishing: return watchLocalizedString("即将下课")
         }
     }
     var compactTitle: String {
@@ -276,16 +286,47 @@ struct WatchSchedulePresentation {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: target)
     }
+    /// 小组件的紧凑日期：今天省略、明天直写，其余固定为月/日。
+    func compactDayLabel(for target: Date) -> String {
+        let days = calendar.dateComponents(
+            [.day], from: calendar.startOfDay(for: date), to: calendar.startOfDay(for: target)
+        ).day ?? 0
+        if days == 0 { return "" }
+        if days == 1 { return watchLocalizedString("明天") }
+        let formatter = DateFormatter()
+        formatter.locale = WatchWidgetShared.preferredLocale
+        formatter.calendar = calendar
+        formatter.timeZone = calendar.timeZone
+        formatter.dateFormat = "M/d"
+        return formatter.string(from: target)
+    }
+    func compactDateTimeText(for target: Date) -> String {
+        let day = compactDayLabel(for: target)
+        let time = clockText(target)
+        if day.isEmpty { return time }
+        if day == watchLocalizedString("明天") {
+            return String(format: watchLocalizedString("明天%@"), time)
+        }
+        return day + " " + time
+    }
     var location: String {
         let value = focus?.classroom?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return value.isEmpty ? watchLocalizedString("地点待定") : value
     }
-    var summaryDate: Date {
-        if let focus, !calendar.isDate(focus.startAt, inSameDayAs: date), current == nil {
-            return focus.startAt
-        }
-        return date
+    /// 小尺寸组件省略信远楼名，保留原有分区编号和教室号。
+    var compactLocation: String {
+        location.replacingOccurrences(of: "信远", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
+    /// 长方形与 App 课程卡片一致：位置后补充教师，考试则补充座位等备注。
+    var locationSummary: String {
+        let rawDetails = focus?.kind == "exam" ? focus?.note : focus?.teacher
+        let details = rawDetails?.split(whereSeparator: { $0.isWhitespace })
+            .joined(separator: " ") ?? ""
+        return details.isEmpty ? location : location + " · " + details
+    }
+    /// 日程概览始终汇总今天；下一次安排只作为次要信息展示。
+    var summaryDate: Date { date }
     var summaryCourses: [WatchCourse] {
         (resolved?.snapshot.courses ?? []).filter {
             calendar.isDate($0.startAt, inSameDayAs: summaryDate)
@@ -316,10 +357,19 @@ struct WatchSchedulePresentation {
         var dates: Set<Date> = [now, horizon]
         for course in resolved?.snapshot.courses ?? [] {
             dates.formUnion([
-                course.startAt.addingTimeInterval(-900),
-                course.startAt.addingTimeInterval(-60 + 0.001), course.startAt,
-                course.endAt.addingTimeInterval(-60 + 0.001), course.endAt,
+                course.startAt.addingTimeInterval(-900), course.startAt, course.endAt,
             ])
+            // 使用有限数值绘制进度条，避免系统 timerInterval 布局在表盘渲染中
+            // 产生 NaN 坐标。仅在上课期间每五分钟更新，起止时刻仍精确切换。
+            let start = max(now, course.startAt)
+            let end = min(horizon, course.endAt)
+            guard start < end else { continue }
+            var progressDate = course.startAt.addingTimeInterval(
+                (floor(start.timeIntervalSince(course.startAt) / 300) + 1) * 300)
+            while progressDate < end {
+                dates.insert(progressDate)
+                progressDate = progressDate.addingTimeInterval(300)
+            }
         }
         for offset in 1...2 {
             dates.insert(
@@ -331,6 +381,87 @@ struct WatchSchedulePresentation {
         if let end = resolved?.semesterEnd { dates.insert(end) }
         if let previewExpiry { dates.insert(previewExpiry) }
         return dates.filter { $0 >= now && $0 <= horizon }.sorted()
+    }
+}
+
+/// 概览只保留当前与下一项的详情，其余安排以可靠的日/周统计呈现。
+struct WatchOverviewSummary {
+    struct Counts {
+        let courses: Int
+        let exams: Int
+        let experiments: Int
+        var total: Int { courses + exams + experiments }
+
+        init(_ items: [WatchCourse]) {
+            exams = items.filter { $0.kind == "exam" }.count
+            experiments = items.filter {
+                $0.kind == "physicsExperiment" || $0.kind == "otherExperiment"
+            }.count
+            courses = items.count - exams - experiments
+        }
+    }
+
+    struct Day {
+        let all: Counts
+        let remaining: Counts
+        let completedCount: Int
+        /// 只有末项时间未出现在两张卡片中时，才在摘要里补充今日结束时间。
+        let additionalEndTime: Date?
+    }
+
+    struct Week {
+        let remainingDays: Int
+        let upcoming: Counts
+    }
+
+    let current: WatchCourse?
+    let next: WatchCourse?
+    let today: Day?
+    let week: Week?
+
+    init(_ presentation: WatchSchedulePresentation) {
+        let usable = ![.noData, .signedOut, .expired, .semesterEnded].contains(presentation.state)
+        let current = usable && presentation.isCurrent ? presentation.focus : nil
+        let next = presentation.next.flatMap { candidate -> WatchCourse? in
+            guard usable else { return nil }
+            // 正在上课时也需要确认中间覆盖完整，不能把旧缓存中的某节课
+            // 当成下一节。当前无课时复用共享状态已选中的焦点课程。
+            guard presentation.focus?.id == candidate.id
+                || presentation.resolved?.covers(
+                    presentation.date, through: candidate.startAt.addingTimeInterval(1),
+                    at: presentation.date) == true
+            else { return nil }
+            return candidate
+        }
+        self.current = current
+        self.next = next
+
+        if usable && presentation.summaryIsComplete {
+            let all = presentation.summaryCourses
+            let remaining = all.filter { $0.endAt > presentation.date }
+            let lastEnd = remaining.map(\.endAt).max()
+            let displayedEnds = [current?.endAt, next?.endAt].compactMap { $0 }
+            today = Day(
+                all: Counts(all), remaining: Counts(remaining),
+                completedCount: all.count - remaining.count,
+                additionalEndTime: lastEnd.flatMap { displayedEnds.contains($0) ? nil : $0 })
+        } else {
+            today = nil
+        }
+
+        // 本周这里只展示未来安排；已过去的日期未同步，不影响这部分统计。
+        if usable && presentation.resolved?.covers(
+            presentation.date, through: presentation.weekInterval.end, at: presentation.date) == true
+        {
+            let remaining = presentation.weekCourses.filter { $0.endAt > presentation.date }
+            week = Week(
+                remainingDays: Set(remaining.map {
+                    presentation.calendar.startOfDay(for: $0.startAt)
+                }).count,
+                upcoming: Counts(remaining.filter { $0.startAt > presentation.date }))
+        } else {
+            week = nil
+        }
     }
 }
 
