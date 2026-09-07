@@ -784,7 +784,7 @@ setting:
   latest_version: '最新版本: {latest}'
   waiting: 等待獲取
   fetching_update: 正在獲取更新信息
-  new_version: 有新版本發佈！
+  new_version: 有新版本發佈，請立刻更新！
   current_stable: 目前您正在運行最新版
   current_testing: 目前您正在運行測試版
   fetch_failed: 獲取更新信息失敗

@@ -47,6 +47,57 @@ class _ClasstableSectionState extends State<ClasstableSection> {
     }
   }
 
+  static const _backgroundImageExtensions = <String>{
+    '.jpg',
+    '.jpeg',
+    '.heic',
+    '.heif',
+    '.png',
+  };
+
+  /// iOS may expose a Live Photo as a `.pvt` package directory.
+  Future<File?> _resolvePickedBackground(PlatformFile result) async {
+    final path = result.path;
+    if (path == null || path.isEmpty) {
+      return null;
+    }
+
+    final type = await FileSystemEntity.type(path, followLinks: true);
+    if (type == FileSystemEntityType.file) {
+      return File(path);
+    }
+    if (type != FileSystemEntityType.directory) {
+      return null;
+    }
+
+    await for (final entity in Directory(path).list(followLinks: false)) {
+      if (entity is! File) {
+        continue;
+      }
+      final lowerPath = entity.path.toLowerCase();
+      if (_backgroundImageExtensions.any(lowerPath.endsWith)) {
+        return entity;
+      }
+    }
+    return null;
+  }
+
+  Future<bool> _saveBackground(PlatformFile result) async {
+    try {
+      final source = await _resolvePickedBackground(result);
+      if (source == null) {
+        return false;
+      }
+
+      await source.copy(
+        "${supportPath.path}/${ClassTableController.decorationName}",
+      );
+      return true;
+    } on FileSystemException {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
@@ -87,10 +138,10 @@ class _ClasstableSectionState extends State<ClasstableSection> {
               }
             }
             if (mounted) {
-              if (result != null) {
-                File(result.path!).copySync(
-                  "${supportPath.path}/${ClassTableController.decorationName}",
-                );
+              final selectedFile = result;
+              final saved =
+                  selectedFile != null && await _saveBackground(selectedFile);
+              if (saved) {
                 preference.setBool(preference.Preference.decoration, true);
                 if (context.mounted) {
                   showToast(

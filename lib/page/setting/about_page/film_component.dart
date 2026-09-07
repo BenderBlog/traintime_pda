@@ -12,12 +12,14 @@ class FilmComponent extends StatelessWidget {
   static const imageVerticalPadding = 4.0;
 
   static List<String> description = [
-    "去这种咖啡厅等于给自己找妈？",
-    "每一个呆唯的背后都有一个当妈的妹妹",
-    "只能说女孩子之间的感情真好啊",
-    "看牙医的你",
-    "但是现实的可能更可爱，萌萌哒哒",
-    "大学定律：越到期末考试，好玩的事情越多",
+    "先到咸阳为王上，后到咸阳……你马上问问你弟弟，一辆新的斯蒂庞克牌轿车值多少钱？你连这个都不懂，就是陈纳德坐的那种啊～",
+    "峨眉峰，还TM独照。颇具浪漫主义气质啊。",
+    "我就是看不惯李涯那种……（咬牙切齿）我要是不扳倒他，我在这里算是白混了！",
+    "你看看现在，不管保密局还是党通局当官的，嘴上都是主义，那心里都是生意。",
+    "余则成赶地主的事情，就这样吧。农民和地主的事情，委员长都管不了，你管得了啊？",
+    "现在两根金条放在这里，你能告诉我哪根是高尚的，哪根是龌龊的？别来这套。",
+    "把你的脑袋从脑后跟拿出来再用一下吧，想清楚了再告诉我，为啥从箱里面爬出来的是一个叫刘闪的，比你还愚蠢的家伙！",
+    "你就是不懂得录音的基本原理，睁开眼睛看看世界吧，就这书《远东情报站》，俩16岁白俄孩子就能搞出来，不是啥复杂的戏法。",
   ];
 
   const FilmComponent({super.key});
@@ -45,17 +47,18 @@ class FilmComponent extends StatelessWidget {
                 width: middleWidth,
                 child: Column(
                   children: List.generate(
-                    6,
+                    8,
                     (i) => Padding(
                       padding: const EdgeInsets.only(
                         bottom: imageVerticalPadding,
                       ),
                       child: FilmFrame(
                         image: Image.asset(
-                          "assets/art/lucky_star_${i + 1}.jpg",
+                          "assets/art/qianfu_$i.jpg",
                           fit: BoxFit.fill,
                         ),
                         text: description[i],
+                        sideWidth: sideWidth,
                       ),
                     ),
                   ),
@@ -114,7 +117,13 @@ class FilmFrame extends StatelessWidget {
 
   final String? text;
   final Image image;
-  const FilmFrame({super.key, required this.image, this.text});
+  final double sideWidth;
+  const FilmFrame({
+    super.key,
+    required this.image,
+    this.text,
+    required this.sideWidth,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -124,17 +133,21 @@ class FilmFrame extends StatelessWidget {
         alignment: AlignmentGeometry.topCenter,
         children: [
           image,
-
           if (text != null)
             Container(
               color: Theme.of(
                 context,
               ).colorScheme.primary.withValues(alpha: 0.6),
               width: double.infinity,
-              child: Text(
-                text!,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
+              child: Padding(
+                padding: EdgeInsets.all(
+                  sideWidth * FilmComponent.sideRadiusRatio,
+                ),
+                child: Text(
+                  text!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
         ],

@@ -8,6 +8,8 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/controller/update_notice_controller.dart';
+import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -52,6 +54,7 @@ class _LoginWindowState extends State<LoginWindow> {
     prefixIcon: Icon(iconData),
     hintText: hintText,
     suffixIcon: suffixIcon,
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
   );
 
   /// Can I see the password?
@@ -60,10 +63,16 @@ class _LoginWindowState extends State<LoginWindow> {
   Widget contentColumn() => Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
+      MediaQuery.removePadding(
+        context: context,
+        child: UpdateCard(),
+      ).constrained(width: double.infinity),
+      const SizedBox(height: 16.0),
       TextField(
         controller: _idsAccountController,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_user_3_fill,
+
           hintText: FlutterI18n.translate(context, "login.identity_number"),
         ),
       ).center(),
@@ -310,6 +319,7 @@ class _LoginWindowState extends State<LoginWindow> {
   void initState() {
     super.initState();
 
+    UpdateNoticeController.i.reloadUpdateNoticeInfo();
     var cachedAccount = preference.getString(preference.Preference.idsAccount);
     if (cachedAccount.isNotEmpty) {
       _idsAccountController.text = cachedAccount;
