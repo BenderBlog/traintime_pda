@@ -3,9 +3,6 @@
 
 import SwiftUI
 
-/// 单日课程视图。
-///
-/// 日视图只负责日期切换和列表展示；按需求禁止从这里打开详情页。
 /// 日视图收到表冠输入后要执行的唯一操作。
 ///
 /// 先计算路由、再执行视觉更新，可以保证“课程滚动、前一日直接分页、到达
@@ -41,7 +38,7 @@ private struct DayScrollTopTarget: Hashable {
 /// 日分页器实际挂载的一张轻量页面数据。
 ///
 /// 这里只保存日期和已经索引好的日程，不包含任何 SwiftUI 视图。横向移动
-/// 过程中因而不再反复调用 Calendar 和 Store，也不会提前创建第四张页面。
+/// 过程中直接读取已准备的数据，也不会提前创建第四张页面。
 private struct DayPageRenderModel: Equatable {
     let date: Date
     let courses: [WatchCourse]
@@ -113,6 +110,7 @@ private final class DayPagePredictionCache {
     }
 }
 
+/// 单日课程只负责日期切换和列表展示，课程详情入口由周视图提供。
 struct DayScheduleView: View {
     @EnvironmentObject private var store: WatchScheduleStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -237,6 +235,8 @@ struct DayScheduleView: View {
         }
         .onDisappear {
             crownFocused = false
+            // 同时废弃已排入主队列的聚焦回调；取消 Task 不能撤回 DispatchQueue 回调。
+            pageTransitionToken &+= 1
             courseLayoutTracker.suspendPersistence()
             crownIdleCoordinator.cancel()
             pageTransitionTask?.cancel()
@@ -255,8 +255,7 @@ struct DayScheduleView: View {
                 crownFocused = true
             }
         }
-        // 只在 Store 安装了新的课表索引时清理日内位置。此前监听当天课程 ID
-        // 会在每次横向翻日时重复执行 moveDay 已做过的状态重置。
+        // 课表索引变化时重新校正日内位置；普通跨日已经由 moveDay 完成重置。
         .onChange(of: store.renderCacheRevision) { _, _ in
             prepareDayPageWindow(force: true)
             recalculateCurrentDayCourseBounds()
@@ -860,7 +859,7 @@ struct DayScheduleView: View {
     /// 触摸结束后按松手末速度继续滑动，并逐帧减速。
     ///
     /// 末速度由系统的预测终点反推，惯性阶段仍然写入触摸与表冠共用的
-    /// `courseContentOffset`。速度较小则直接执行原来的边界收口。
+    /// `courseContentOffset`。速度较小则直接执行边界收口。
     private func finishDayVerticalDrag(_ value: DragGesture.Value) {
         guard !pageTransitionInFlight, !courses.isEmpty else { return }
         onSwipeInput(.vertical)
@@ -895,7 +894,8 @@ struct DayScheduleView: View {
         verticalMomentumTask = Task { @MainActor in
             var offset = initialOffset
             var velocity = initialVelocity
-            var previousFrame = Date().timeIntervalSinceReferenceDate
+            // 惯性只依赖经过时间，系统校时不应改变相邻帧的物理步长。
+            var previousFrame = ProcessInfo.processInfo.systemUptime
 
             while !Task.isCancelled, token == verticalMomentumToken {
                 try? await Task.sleep(nanoseconds: 16_000_000)
@@ -903,7 +903,7 @@ struct DayScheduleView: View {
                     return
                 }
 
-                let currentFrame = Date().timeIntervalSinceReferenceDate
+                let currentFrame = ProcessInfo.processInfo.systemUptime
                 let elapsed = currentFrame - previousFrame
                 previousFrame = currentFrame
                 // 实体表掉帧时只消费一帧上限，避免恢复后追赶积压位移。
@@ -1021,7 +1021,7 @@ struct DayScheduleView: View {
         lastCrownEventOffset = crownValue
         crownFocused = true
         courseLayoutTracker.resumePersistence()
-        // 这里只负责纵向内容收口，不再改变根页面按钮可见性。拖动路径在
+        // 这里只负责纵向内容收口，不改变根页面按钮可见性。拖动路径在
         // begin/update 阶段已经调用过 onCrownInteraction；轻点路径则会先
         // 调用 onContentTap 显示按钮。若在这里再次上报“滚动交互”，两项及
         // 以上课程的页面就会出现“刚显示又立即隐藏”的假性点击失效。
@@ -1365,7 +1365,8 @@ struct DayScheduleView: View {
 
         DispatchQueue.main.async {
             guard transitionToken == pageTransitionToken,
-                  !pageTransitionInFlight
+                  !pageTransitionInFlight,
+                  !isDatePickerPresented
             else {
                 return
             }
@@ -1436,13 +1437,11 @@ private struct DaySchedulePageContent: View, Equatable {
                 }
                 .padding(.horizontal, 2)
                 .padding(.top, 1)
-                // 表冠浏览只改变一个合成位移，不再每帧调用
-                // ScrollViewProxy.scrollTo；这是三项以上卡片仍能连续跟手的关键。
+                // 表冠浏览只更新合成位移，避免逐帧执行 scrollTo 触发布局定位。
                 .offset(y: courseOffset)
             }
             // 纵向触摸与表冠统一由外层分页手势修改 `courseOffset`。
-            // ScrollView 只保留既有的安全区、测量和裁剪布局，不再维护第二套
-            // 独立滚动锚点。
+            // ScrollView 只负责安全区、测量与裁剪，不维护独立滚动锚点。
             .scrollDisabled(true)
             .onPreferenceChange(DayCourseLayoutPreferenceKey.self) { metrics in
                 onCourseLayoutMetricsChange(metrics)

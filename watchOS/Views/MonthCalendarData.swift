@@ -250,10 +250,12 @@ func makeMonthCalendarPageModel(
     )
 }
 
+/// 用同一份系统日历解析并重建月初，供月页身份与缓存键共用。
 func monthCalendarStart(for date: Date) -> Date {
-    let components = Calendar.current.dateComponents(
+    let calendar = Calendar.current
+    let components = calendar.dateComponents(
         [.year, .month],
         from: date
     )
-    return Calendar.current.date(from: components) ?? date
+    return calendar.date(from: components) ?? date
 }

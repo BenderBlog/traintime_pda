@@ -12,8 +12,28 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PLACEHOLDER = re.compile(r"%(?:(\d+)\$)?(lld|ld|d|@)")
 LOCALIZED_LITERAL = re.compile(
-    r'(?:watchLocalizedString|watchLocalizedFormat)\(\s*"([^"\n]*)"'
+    r'(?:watchLocalizedString|watchLocalizedFormat)\(\s*"(?!"")((?:\\.|[^"\\\n])*)"'
 )
+# An odd run of backslashes opens interpolation; escaped pairs stay literal.
+SWIFT_INTERPOLATION = re.compile(r'(?<!\\)(?:\\\\)*\\\(')
+SWIFT_ESCAPE = re.compile(r'\\(u\{[0-9a-fA-F]{1,8}\}|[0tnr"\'\\])')
+SIMPLE_ESCAPES = {"0": "\0", "t": "\t", "n": "\n", "r": "\r",
+                  '"': '"', "'": "'", "\\": "\\"}
+
+
+def swift_literal_value(literal: str) -> str:
+    """Decode Swift escapes without re-decoding UTF-8 Chinese characters.
+
+    This scanner handles ordinary, non-interpolated single-line literals.
+    Raw and multiline Swift strings remain outside its source coverage.
+    """
+    def replace(match: re.Match[str]) -> str:
+        escape = match[1]
+        if escape.startswith("u{"):
+            return chr(int(escape[2:-1], 16))
+        return SIMPLE_ESCAPES[escape]
+
+    return SWIFT_ESCAPE.sub(replace, literal)
 
 
 def placeholders(value: str) -> list[tuple[int, str]]:
@@ -49,9 +69,10 @@ def source_errors(strings: dict) -> list[str]:
     for path in sorted((ROOT / "watchOS").rglob("*.swift")):
         source = path.read_text(encoding="utf-8")
         for match in LOCALIZED_LITERAL.finditer(source):
-            key = match[1]
-            if "\\(" in key:
+            literal = match[1]
+            if SWIFT_INTERPOLATION.search(literal):
                 continue
+            key = swift_literal_value(literal)
             if key not in strings:
                 line = source.count("\n", 0, match.start()) + 1
                 errors.append(f"{path.relative_to(ROOT)}:{line}: missing resource {key!r}")

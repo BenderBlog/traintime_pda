@@ -22,8 +22,8 @@ import 'package:watermeter/repository/watch/watch_schedule_snapshot.dart';
 
 /// 某一时刻从各个 Controller 读取到的完整同步输入。
 ///
-/// Signal effect 触发后立即生成不可变快照，防抖定时器执行时不会混用
-/// 不同时间点的课程、考试和学期状态。
+/// 在 Signal effect 中一次读取同步输入并固定列表成员；源模型仍由
+/// Controller 持有，后续依赖变化通过 generation 废弃待发送任务。
 final class _WatchScheduleSourceState {
   const _WatchScheduleSourceState({
     required this.classTable,
@@ -63,8 +63,10 @@ class WatchScheduleSyncService {
   Timer? _debounce;
   bool _started = false;
   bool _suspended = false;
+  /// 清空课表时递增；首页刷新只可恢复它启动时所见的同一登录会话。
   int _sessionRevision = 0;
   int get sessionRevision => _sessionRevision;
+  /// 课表、语言和清空共用此链，失败会被隔离，不会阻塞后续写入。
   Future<void> _pendingWrite = Future.value();
 
   /// 每次数据源变化都会递增；旧定时任务和旧构建任务会主动放弃发送。
@@ -92,9 +94,10 @@ class WatchScheduleSyncService {
     _sessionRevision += 1;
     _debounce?.cancel();
     final generation = _nextGeneration();
-    await _clearIfCurrent(generation, signedOut: signedOut);
+    await _enqueueClear(generation, signedOut: signedOut);
   }
 
+  /// 数据重新就绪后恢复同步；登录前或退出前启动的旧刷新不能解除暂停。
   void resume({required int sessionRevision}) {
     if (!Platform.isIOS || sessionRevision != _sessionRevision) return;
     if (!_started) start();
@@ -267,8 +270,10 @@ class WatchScheduleSyncService {
     return result;
   }
 
-  /// 仅当清空任务仍属于最新代次时调用原生层。
-  Future<void> _clearIfCurrent(
+  /// 清空一旦入队便必须执行，作为旧账户快照与后续恢复同步之间的屏障。
+  /// 不能在队列实际执行时再次按 generation 跳过它，否则 resume 发出的新
+  /// 快照可能沿用旧账户代次；快照和语言更新则可以直接丢弃被替代的任务。
+  Future<void> _enqueueClear(
     int generation, {
     required bool signedOut,
   }) async {

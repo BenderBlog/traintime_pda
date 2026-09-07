@@ -17,6 +17,14 @@ private struct ScheduleReplyPayload {
     let isUnchanged: Bool
 }
 
+/// 同步按顺序发出请求，因此只需保留当前一个请求的关联信息。
+/// 即时回复与后台回复共享此标识，先到者消费后，另一通道的迟到回复自动失效。
+private struct PendingScheduleRequest {
+    let id: String
+    let scope: WatchScheduleScope
+    let offset: Int
+}
+
 /// 管理 watchOS 与配对 iPhone 之间的课表同步。
 ///
 /// 同步顺序固定为：当天 → 近 14 天 → 整学期分页。当天和 14 天阶段完整
@@ -43,7 +51,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
     /// 当前三阶段响应必须全部属于同一个手机课表版本。
     private var activeIncomingScheduleVersion: String?
-    private var requestedOffset = 0
+    private var activeIncomingAccountGeneration: String?
+    private var pendingRequest: PendingScheduleRequest?
+    /// 超时失败会清空 Store 的学期缓冲；晚到的后半页只能触发重新同步。
+    private var semesterBufferWasDiscarded = false
     private var refreshTimeoutTask: Task<Void, Never>?
     private var launchReplyTimeoutTask: Task<Void, Never>?
 
@@ -53,11 +64,6 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     /// Application Context，而启动提示需要继续等待当轮手机新回复。
     private var launchAttemptID: UUID?
     private var launchAttemptRefreshID: UUID?
-
-    /// 防止系统极少数情况下重复投递同一条队列回复。
-    private var processedQueuedRequestIDs = Set<String>()
-    private var processedQueuedRequestOrder: [String] = []
-    private static let processedQueuedRequestLimit = 64
 
     private override init() {
         super.init()
@@ -119,7 +125,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
         let newRefreshID = UUID()
         refreshID = newRefreshID
-        resetIncomingTransfer(keepingCapacity: true)
+        resetIncomingTransfer()
         store.beginRefresh()
         request(
             scope: .today,
@@ -165,11 +171,16 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                 return
             }
 
-            if self.consumeLatestApplicationContext(
+            let restoredContext = self.consumeLatestApplicationContext(
                 from: WCSession.default
-            ) {
+            )
+            guard self.isActiveRefresh(expectedRefreshID) else { return }
+            if restoredContext {
                 self.store?.finishRefresh()
             } else {
+                self.semesterBufferWasDiscarded =
+                    self.pendingRequest?.scope == .semester
+                    && (self.pendingRequest?.offset ?? 0) > 0
                 self.store?.failRefresh(
                     watchLocalizedString("暂时无法连接 iPhone")
                 )
@@ -259,21 +270,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             return
         }
 
-        let expectedScope = WatchScheduleScope(
-            rawValue: userInfo[Key.scope] as? String ?? ""
-        ) ?? .fourteenDays
-
         Task { @MainActor [weak self] in
-            guard let self,
-                  self.isActiveRefresh(queuedRefreshID),
-                  self.registerQueuedReply(requestID)
-            else {
-                return
-            }
-            self.receiveCurrentPhoneReply(refreshID: queuedRefreshID)
-            self.handle(
+            self?.handle(
                 reply: userInfo,
-                expectedScope: expectedScope,
+                requestID: requestID,
                 refreshID: queuedRefreshID
             )
         }
@@ -344,7 +344,11 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         }
 
         let requestID = UUID().uuidString
-        requestedOffset = offset
+        pendingRequest = PendingScheduleRequest(
+            id: requestID,
+            scope: scope,
+            offset: offset
+        )
         sendRequest(
             through: session,
             scope: scope,
@@ -397,12 +401,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             ),
             replyHandler: { [weak self] reply in
                 Task { @MainActor in
-                    self?.receiveCurrentPhoneReply(
-                        refreshID: expectedRefreshID
-                    )
                     self?.handle(
                         reply: reply,
-                        expectedScope: scope,
+                        requestID: requestID,
                         refreshID: expectedRefreshID
                     )
                 }
@@ -438,7 +439,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         requestID: String,
         refreshID expectedRefreshID: UUID
     ) {
-        guard isActiveRefresh(expectedRefreshID) else { return }
+        guard isPendingRequest(requestID, refreshID: expectedRefreshID) else { return }
 
         let queued = queueRequest(
             through: session,
@@ -449,8 +450,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             refreshID: expectedRefreshID
         )
         let restoredContext = consumeLatestApplicationContext(from: session)
+        guard isActiveRefresh(expectedRefreshID) else { return }
         guard !queued else { return }
 
+        pendingRequest = nil
         if restoredContext {
             store?.finishRefresh()
         } else {
@@ -495,25 +498,40 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     @MainActor
     private func handle(
         reply: [String: Any],
-        expectedScope: WatchScheduleScope,
+        requestID: String,
         refreshID expectedRefreshID: UUID
     ) {
-        guard isActiveRefresh(expectedRefreshID),
+        guard isPendingRequest(requestID, refreshID: expectedRefreshID),
+              let request = pendingRequest,
               let store
         else {
             return
         }
+        // 先认领回复再解析正文；后续阶段即使已发出，也不会再次消费本页。
+        pendingRequest = nil
+        receiveCurrentPhoneReply(refreshID: expectedRefreshID)
         defer {
-            if !store.isRefreshing { cancelRefreshTimeout() }
+            if isActiveRefresh(expectedRefreshID), !store.isRefreshing {
+                cancelRefreshTimeout()
+            }
         }
 
         guard consumeResponseMetadata(reply) else { return }
         if consumeClearIfNeeded(reply) { return }
+        guard !semesterBufferWasDiscarded else {
+            beginProgressiveRefresh(force: true)
+            return
+        }
 
         let payload = parseReply(
             reply,
-            fallbackScope: expectedScope
+            fallbackScope: request.scope
         )
+
+        guard payload.scope == request.scope else {
+            store.failRefresh(watchLocalizedString("课表分页数据无效，请重新刷新"))
+            return
+        }
 
         // 版本一致时手机不会附带 JSON；直接结束刷新，现有本地课表不变。
         guard !finishUnchangedRefreshIfNeeded(payload, store: store) else {
@@ -522,15 +540,20 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
         // 三阶段中途若手机课表再次变化，丢弃旧学期分页并从“当天”重启，
         // 防止把两个版本的课程拼成一份整学期缓存。
-        guard acceptIncomingScheduleVersion(payload.scheduleVersion) else {
+        guard acceptIncomingScheduleVersion(
+            payload.scheduleVersion,
+            accountGeneration: reply[Key.accountGeneration] as? String
+        ) else {
             beginProgressiveRefresh(force: true)
             return
         }
 
-        guard payload.scope == expectedScope,
-              WatchSyncProtocol.acceptsPagination(
-                  scope: payload.scope, offset: requestedOffset,
-                  nextOffset: payload.nextOffset, hasMore: payload.hasMore)
+        guard WatchSyncProtocol.acceptsPagination(
+            scope: payload.scope,
+            offset: request.offset,
+            nextOffset: payload.nextOffset,
+            hasMore: payload.hasMore
+        )
         else {
             store.failRefresh(watchLocalizedString("课表分页数据无效，请重新刷新"))
             return
@@ -562,7 +585,14 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         store: WatchScheduleStore
     ) -> Bool {
         guard payload.isUnchanged else { return false }
-        activeIncomingScheduleVersion = nil
+        guard let version = WatchScheduleText.nonempty(payload.scheduleVersion),
+              version == store.installedScheduleVersion
+        else {
+            // 账户切换或缓存被清除后，轻量确认已不能证明本地仍有完整课表。
+            beginProgressiveRefresh(force: true)
+            return true
+        }
+        resetIncomingTransfer()
         store.finishRefreshWithoutScheduleChanges()
         return true
     }
@@ -608,9 +638,17 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         )
     }
 
-    /// 锁定本轮手机课表版本，并拒绝中途出现的另一个版本。
+    /// 版本与账户共同标识本轮数据，避免两账户课程内容相同时拼接不同分页。
     @MainActor
-    private func acceptIncomingScheduleVersion(_ value: String?) -> Bool {
+    private func acceptIncomingScheduleVersion(
+        _ value: String?,
+        accountGeneration: String?
+    ) -> Bool {
+        if let activeIncomingAccountGeneration,
+           activeIncomingAccountGeneration != accountGeneration {
+            return false
+        }
+        activeIncomingAccountGeneration = accountGeneration
         guard let value, !value.isEmpty else {
             // 与尚未升级协议的手机保持兼容。
             return activeIncomingScheduleVersion == nil
@@ -634,7 +672,11 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             isFinal: !payload.hasMore,
             scheduleVersion: payload.scheduleVersion
         )
-        guard accepted, payload.hasMore else { return }
+        guard accepted else { return }
+        guard payload.hasMore else {
+            resetIncomingTransfer()
+            return
+        }
 
         request(
             scope: .semester,
@@ -651,6 +693,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     ) {
         guard let store else { return }
         guard let nextScope = scope.next else {
+            resetIncomingTransfer()
             store.finishRefresh()
             return
         }
@@ -735,7 +778,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             let previous = defaults.string(forKey: WatchWidgetShared.accountGenerationKey)
             if revision == installed, let previous, previous != generation { return false }
             if previous != nil && previous != generation {
-                activeIncomingScheduleVersion = nil
+                // 保留本轮已接收的版本/账户标识，令中途换账户的分页从当天重启。
                 store?.clearSchedule(signedOut: false)
             }
             defaults.set(generation, forKey: WatchWidgetShared.accountGenerationKey)
@@ -744,11 +787,12 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         return true
     }
 
+    /// 清空同时废弃请求和计时窗口，确保退出前的队列回复不能恢复课表。
     @MainActor
     private func consumeClearIfNeeded(_ payload: [String: Any]) -> Bool {
         guard payload[Key.scheduleCleared] as? Bool == true else { return false }
         refreshID = UUID()
-        resetIncomingTransfer(keepingCapacity: false)
+        resetIncomingTransfer()
         cancelRefreshTimeout()
         launchReplyTimeoutTask?.cancel()
         launchReplyTimeoutTask = nil
@@ -801,12 +845,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         store?.receiveLaunchSyncReply()
     }
 
+    /// 新刷新和明确清空都会废弃旧请求，旧闭包不能影响后续阶段。
     @MainActor
-    private func resetIncomingTransfer(keepingCapacity: Bool) {
+    private func resetIncomingTransfer() {
         activeIncomingScheduleVersion = nil
-        requestedOffset = 0
-        processedQueuedRequestIDs.removeAll(keepingCapacity: keepingCapacity)
-        processedQueuedRequestOrder.removeAll(keepingCapacity: keepingCapacity)
+        activeIncomingAccountGeneration = nil
+        pendingRequest = nil
+        semesterBufferWasDiscarded = false
     }
 
     @MainActor
@@ -815,25 +860,11 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         refreshTimeoutTask = nil
     }
 
-    /// 登记一条队列回复，并以固定上限保存近期 ID。
-    ///
-    /// WatchConnectivity 正常只投递一次；此保护主要避免系统恢复、重试或
-    /// 未来协议扩展造成同一学期分页被重复追加。
+    /// 即时回调使用发送闭包捕获的 ID，队列回调使用手机回传的 ID。
+    /// scope 缺失时可回退到这里保留的请求范围，不能从回复自身推断预期范围。
     @MainActor
-    private func registerQueuedReply(_ requestID: String) -> Bool {
-        guard !processedQueuedRequestIDs.contains(requestID) else {
-            return false
-        }
-        processedQueuedRequestIDs.insert(requestID)
-        processedQueuedRequestOrder.append(requestID)
-
-        if processedQueuedRequestOrder.count
-            > Self.processedQueuedRequestLimit
-        {
-            let oldest = processedQueuedRequestOrder.removeFirst()
-            processedQueuedRequestIDs.remove(oldest)
-        }
-        return true
+    private func isPendingRequest(_ requestID: String, refreshID: UUID) -> Bool {
+        isActiveRefresh(refreshID) && pendingRequest?.id == requestID
     }
 
     /// 判断异步回调是否仍属于最新一轮刷新。

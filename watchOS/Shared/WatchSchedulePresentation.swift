@@ -29,7 +29,8 @@ struct WatchResolvedSchedule {
 }
 
 enum WatchScheduleResolver {
-    /// 同一学期按生成时间覆盖明确范围；同一版本的完整快照最后安装。
+    /// 同一学期按数据修订号覆盖明确范围；旧协议回退到生成时间。
+    /// 同一版本的完整快照最后安装。
     /// 空数组也具有删除语义，不能因为非空旧缓存而忽略。
     static func resolve(
         _ caches: [WatchScheduleScope: WatchScheduleSnapshot]
@@ -106,11 +107,18 @@ enum WatchScheduleResolver {
     }
 
     static func sorted(_ courses: [WatchCourse]) -> [WatchCourse] {
-        courses.sorted {
-            if $0.startAtEpochMs != $1.startAtEpochMs { return $0.startAtEpochMs < $1.startAtEpochMs }
-            if $0.endAtEpochMs != $1.endAtEpochMs { return $0.endAtEpochMs < $1.endAtEpochMs }
-            return $0.id < $1.id
-        }
+        courses.sorted(by: precedes)
+    }
+
+    /// 时间相同时以 ID 排序，让合并结果和持久化索引使用同一稳定顺序。
+    static func precedes(_ lhs: WatchCourse, _ rhs: WatchCourse) -> Bool {
+        if lhs.startAtEpochMs != rhs.startAtEpochMs { return lhs.startAtEpochMs < rhs.startAtEpochMs }
+        if lhs.endAtEpochMs != rhs.endAtEpochMs { return lhs.endAtEpochMs < rhs.endAtEpochMs }
+        return lhs.id < rhs.id
+    }
+
+    static func isSorted(_ courses: [WatchCourse]) -> Bool {
+        zip(courses, courses.dropFirst()).allSatisfy { !precedes($0.1, $0.0) }
     }
 
     private static func rank(_ scope: WatchScheduleScope) -> Int {
@@ -321,8 +329,9 @@ struct WatchSchedulePresentation {
         calendar.dateInterval(of: .weekOfYear, for: summaryDate)!
     }
     var weekCourses: [WatchCourse] {
-        (resolved?.snapshot.courses ?? []).filter {
-            $0.startAt >= weekInterval.start && $0.startAt < weekInterval.end
+        let interval = weekInterval
+        return (resolved?.snapshot.courses ?? []).filter {
+            $0.startAt >= interval.start && $0.startAt < interval.end
         }
     }
     var summaryIsComplete: Bool {
@@ -331,7 +340,8 @@ struct WatchSchedulePresentation {
             start, through: calendar.date(byAdding: .day, value: 1, to: start)!, at: date) ?? false
     }
     var weekIsComplete: Bool {
-        resolved?.covers(weekInterval.start, through: weekInterval.end, at: date) ?? false
+        let interval = weekInterval
+        return resolved?.covers(interval.start, through: interval.end, at: date) ?? false
     }
 
     static func timelineDates(

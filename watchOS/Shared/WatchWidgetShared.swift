@@ -276,7 +276,7 @@ enum WatchWidgetShared {
         }
     }
 
-    /// 写入一个键值。单独封装后便于未来替换为文件级原子存储。
+    /// 向 App Group 写入已验证的快照正文。
     private static func persist(
         json: String,
         key: String,
@@ -323,6 +323,8 @@ enum WatchWidgetShared {
 /// 按手表系统首选语言选择资源。因此手机设置为英语、而手表系统是中文时，
 /// 目录标题仍会返回中文。这里显式选择 `en.lproj` 或 `zh-Hant.lproj`；
 /// 简体中文是 String Catalog 的源语言，直接返回中文键即可。
+/// 经此封装读取的目录条目应设为手动管理；Xcode 无法从动态 `key`
+/// 追踪调用处，否则仍在使用的翻译会在构建后被误标为 STALE。
 func watchLocalizedString(
     _ key: String,
     languageIdentifier: String = WatchWidgetShared.preferredLanguageIdentifier

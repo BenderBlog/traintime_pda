@@ -67,7 +67,7 @@ struct WeekScheduleView: View {
 
     /// 当前周的周一零点。
     private var weekStart: Date {
-        startOfWeek(containing: anchorDate)
+        calendarWeekStart(containing: anchorDate)
     }
 
     /// 只保留当前周 `[周一, 下周一)` 内的日程。
@@ -141,7 +141,7 @@ struct WeekScheduleView: View {
         }
     }
 
-    /// 生成前一周、当前周和后一周；课程网格本身的尺寸与布局保持不变。
+    /// 生成相邻三周的网格，仅当前周接收点击和教学坐标上报。
     private func weekPage(_ relativePage: Int) -> some View {
         let pageStart = weekDate(relativePage)
         return WeekSchedulePageContent(
@@ -230,14 +230,15 @@ struct WeekScheduleView: View {
     /// 层；模拟器与真机随后都恢复相同的周视图表冠行为。
     private func scheduleCrownFocusRestore(afterClosing: Bool) {
         restoreCrownFocusTask?.cancel()
+        restoreCrownFocusTask = nil
         guard afterClosing else {
             crownFocused = false
             return
         }
 
-        restoreCrownFocusTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 420_000_000)
-            guard !Task.isCancelled, selectedCourse == nil else { return }
+        restoreCrownFocusTask = makeWatchAutoDismissTask(after: 0.42) {
+            restoreCrownFocusTask = nil
+            guard selectedCourse == nil else { return }
             crownFocused = true
         }
     }
@@ -245,7 +246,7 @@ struct WeekScheduleView: View {
     /// 优先采用手机同步的周次参考；缺少参考时按学期开始日期推算。
     private var weekTitle: String {
         if let reference = store.synchronizedWeekReference {
-            let referenceWeek = startOfWeek(containing: reference.date)
+            let referenceWeek = calendarWeekStart(containing: reference.date)
             let elapsedDays = Calendar.current.dateComponents(
                 [.day],
                 from: referenceWeek,
@@ -255,7 +256,7 @@ struct WeekScheduleView: View {
             return localizedWeekNumber(max(1, zeroBasedIndex + 1))
         }
 
-        let termStart = startOfWeek(
+        let termStart = calendarWeekStart(
             containing: store.semesterStart ?? weekStart
         )
         let elapsedDays = Calendar.current.dateComponents(
@@ -437,14 +438,14 @@ struct WeekScheduleView: View {
             // `onChange` 会立即校正当前周。
             return true
         }
-        let target = startOfWeek(containing: date)
+        let target = calendarWeekStart(containing: date)
         return target >= bounds.first && target <= bounds.last
     }
 
     /// 把当前周钳制到手机端的第一周或最后一周。
     private func clampAnchorToSemester() {
         guard let bounds = semesterWeekBounds else { return }
-        let current = startOfWeek(containing: anchorDate)
+        let current = calendarWeekStart(containing: anchorDate)
         let clamped = min(max(current, bounds.first), bounds.last)
         guard clamped != current else { return }
         anchorDate = clamped
@@ -459,10 +460,10 @@ struct WeekScheduleView: View {
             return nil
         }
 
-        let first = startOfWeek(containing: rangeStart)
+        let first = calendarWeekStart(containing: rangeStart)
         // `rangeEnd` 是右开边界，减去一秒后才属于手机最后一个周页面。
         let lastIncludedDate = rangeEnd.addingTimeInterval(-1)
-        let last = startOfWeek(containing: lastIncludedDate)
+        let last = calendarWeekStart(containing: lastIncludedDate)
         return (first, max(first, last))
     }
 
@@ -598,16 +599,17 @@ private struct WeekdayHeader: View {
                         value: index,
                         to: weekStart
                     ) ?? weekStart
+                    let isToday = Calendar.current.isDateInToday(date)
                     VStack(spacing: -1) {
                         Text(symbols[index])
                         Text(date, format: .dateTime.day())
                     }
                     .font(.system(size: fontSize, weight: .medium))
                     .frame(maxWidth: .infinity)
-                    // 今天的表头使用不参与布局的淡色背景，避免改变原有列宽。
+                    // 今天的表头使用不参与布局的淡色背景，避免改变列宽。
                     // 它会与网格中的同列高亮带连成一条完整的“今天”标记。
                     .background {
-                        if Calendar.current.isDateInToday(date) {
+                        if isToday {
                             RoundedRectangle(
                                 cornerRadius: 2,
                                 style: .continuous
@@ -616,7 +618,7 @@ private struct WeekdayHeader: View {
                         }
                     }
                     .foregroundStyle(
-                        Calendar.current.isDateInToday(date)
+                        isToday
                             ? Color.accentColor
                             : Color.secondary
                     )
@@ -715,8 +717,7 @@ private struct WeekPeriodGrid: View {
                         }
                     }
             )
-            // 教学圆心不再读取每个色块的渲染后 GeometryReader。这里直接
-            // 使用绘制/命中共用的课程矩形公式，再加上网格的全局原点。
+            // 教学圆心使用绘制/命中共用的课程矩形公式，再加上网格全局原点。
             // 因而圆心不会受分页预渲染、过渡动画或回报先后顺序影响。
             .onAppear {
                 reportOnboardingTarget(
@@ -760,8 +761,7 @@ private struct WeekPeriodGrid: View {
 
     /// 当前展示周包含今天时，在今天所在列的底层绘制一条淡色高亮带。
     ///
-    /// 高亮位于网格线和课程色块下方，不会覆盖课程颜色，也不会参与手势命中；
-    /// 原有色块坐标命中算法因此保持不变。
+    /// 高亮位于网格线和课程色块下方，不覆盖课程颜色，也不参与手势命中。
     @ViewBuilder
     private func todayColumnHighlight(
         geometry: WeekScheduleGridGeometry
@@ -918,16 +918,4 @@ private func localizedCoursePeriodRange(_ course: WatchCourse) -> String {
         Int64(course.startPeriod),
         Int64(course.endPeriod)
     )
-}
-
-/// 返回给定日期所在周的周一零点。
-private func startOfWeek(containing date: Date) -> Date {
-    let calendar = Calendar.current
-    let day = calendar.startOfDay(for: date)
-    let weekday = calendar.component(.weekday, from: day)
-    return calendar.date(
-        byAdding: .day,
-        value: -(weekday + 5) % 7,
-        to: day
-    ) ?? day
 }

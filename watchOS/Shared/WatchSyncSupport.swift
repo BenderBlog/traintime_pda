@@ -12,6 +12,8 @@ enum WatchSyncProtocol {
         scope: WatchScheduleScope, offset: Int, nextOffset: Int, hasMore: Bool
     ) -> Bool {
         guard offset >= 0, nextOffset >= 0 else { return false }
+        // 末页可以为空，但不能用回退的偏移确认前面的分块已经收齐。
+        if scope == .semester && nextOffset < offset { return false }
         return !hasMore || (scope == .semester && nextOffset > offset)
     }
 

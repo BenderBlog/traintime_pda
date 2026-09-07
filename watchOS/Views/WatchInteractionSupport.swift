@@ -3,6 +3,7 @@
 
 import Foundation
 #if canImport(WatchKit)
+import SwiftUI
 import WatchKit
 #endif
 
@@ -22,6 +23,82 @@ func makeWatchAutoDismissTask(
         action()
     }
 }
+
+/// 按住 0.3 秒后持续发出渐强、加速的短脉冲，三秒时结束。
+struct WatchHoldFeedbackPulse: Equatable {
+    private static let holdSeconds = 3.0
+    private static let startDelaySeconds = 0.3
+    static let holdDuration: Duration = .seconds(holdSeconds)
+    static let startDelay: Duration = .seconds(startDelaySeconds)
+
+    // 即使相邻两次强度相同，也要让 sensoryFeedback 识别为新的脉冲。
+    let sequence: Int
+    private let strengthLevel: Int
+    let interval: Duration
+
+    init(sequence: Int, elapsed: Duration) {
+        self.sequence = sequence
+        let components = elapsed.components
+        let elapsedSeconds = Double(components.seconds)
+            + Double(components.attoseconds) / 1_000_000_000_000_000_000
+        let progress = min(1, max(0,
+            (elapsedSeconds - Self.startDelaySeconds)
+                / (Self.holdSeconds - Self.startDelaySeconds)
+        ))
+        // 固定 13 档强度，避免每次按压都创建不同浮点强度的反馈对象。
+        strengthLevel = Int((progress * 12).rounded())
+        // 留出至少 120ms，避免过密触发使系统打断前一次触觉。
+        interval = .seconds(0.28 - 0.16 * progress)
+    }
+}
+
+/// 模式按钮与欢迎页共用三秒长按计时；调用方负责按压有效性和任务取消。
+@MainActor
+func makeWatchHoldFeedbackTask(
+    isActive: @escaping @MainActor () -> Bool,
+    onPulse: @escaping @MainActor (WatchHoldFeedbackPulse) -> Void,
+    onComplete: @escaping @MainActor () -> Void
+) -> Task<Void, Never> {
+    let clock = ContinuousClock()
+    let startedAt = clock.now
+    let completionAt = startedAt.advanced(by: WatchHoldFeedbackPulse.holdDuration)
+    return Task { @MainActor in
+        do {
+            try await clock.sleep(until: startedAt.advanced(by: WatchHoldFeedbackPulse.startDelay))
+            var sequence = 0
+            while true {
+                guard !Task.isCancelled, isActive() else { return }
+                let now = clock.now
+                guard now < completionAt else { break }
+                let pulse = WatchHoldFeedbackPulse(
+                    sequence: sequence,
+                    elapsed: startedAt.duration(to: now)
+                )
+                onPulse(pulse)
+                sequence &+= 1
+                // 只按实际经过时间推进，不补发卡顿期间错过的脉冲，完成时刻固定为三秒。
+                try await clock.sleep(until: min(now.advanced(by: pulse.interval), completionAt))
+            }
+        } catch {
+            return
+        }
+        guard !Task.isCancelled, isActive() else { return }
+        onComplete()
+    }
+}
+
+#if canImport(WatchKit)
+extension WatchHoldFeedbackPulse {
+    var feedback: SensoryFeedback {
+        let intensity = 0.25 + 0.75 * Double(strengthLevel) / 12
+        switch strengthLevel {
+        case 0..<4: return .impact(weight: .light, intensity: intensity)
+        case 4..<8: return .impact(weight: .medium, intensity: intensity)
+        default: return .impact(weight: .heavy, intensity: intensity)
+        }
+    }
+}
+#endif
 
 /// 手表端统一的轻量触觉反馈入口。
 ///
@@ -129,7 +206,7 @@ struct WatchInputCompletionGate {
 /// - 收到 `onIdle` 后改用 90ms 短确认窗。
 ///
 /// 新刻度、页面吸附或视图退出都会调用 `cancel()`，因此同一页面永远只有
-/// 一个待执行任务。三种视图不再分别维护相同的 Task 生命周期代码。
+/// 一个待执行任务。
 @MainActor
 final class CalendarCrownIdleCoordinator {
     private static let fallbackDelay: UInt64 = 360_000_000
@@ -188,7 +265,7 @@ struct WatchCrownTurnUpdate {
     let reversesDirection: Bool
 }
 
-/// 日视图和周视图共用的表冠连续旋转状态机。
+/// 日、周、月视图共用的表冠连续旋转状态机。
 ///
 /// 该类型不计算位移，也不播放触觉；它只提供两项基础能力：
 ///

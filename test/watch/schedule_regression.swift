@@ -322,6 +322,10 @@ struct ScheduleRegression {
             "Normal semester pagination continues")
         check(WatchSyncProtocol.acceptsPagination(scope: .semester, offset: 0, nextOffset: 0, hasMore: false),
             "An empty completed semester remains valid")
+        check(!WatchSyncProtocol.acceptsPagination(scope: .semester, offset: 50, nextOffset: 0, hasMore: false),
+            "A final page cannot move the semester cursor backwards")
+        check(WatchSyncProtocol.acceptsPagination(scope: .semester, offset: 50, nextOffset: 50, hasMore: false),
+            "An empty final page can confirm the current cursor")
 
         let early = course("A", start: date(7, 8), end: date(7, 9))
         let late = course("B", start: date(7, 10), end: date(7, 11))

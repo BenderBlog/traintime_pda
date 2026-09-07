@@ -104,7 +104,7 @@ struct CourseDetailView: View {
                     .ignoresSafeArea()
 
                 // 与概览、课程列表复用同一滚动输入桥。详情内容已有真实
-                // 滚动范围，不再附加 DragGesture；系统 ScrollPhase 同时
+                // 滚动范围，无需附加 DragGesture；系统 ScrollPhase 同时
                 // 驱动画面和上报教学输入，避免检测成功但页面没有位移。
                 InteractionAwareScrollView(
                     onScroll: onScroll,
@@ -129,8 +129,7 @@ struct CourseDetailView: View {
                                         report: onCloseButtonFrameChange
                                     )
                                 }
-                                // 外层内容稍后统一添加顶部 inset；减去该值
-                                // 后，按钮首次出现的位置与固定版本完全相同。
+                                // 扣除外层统一的顶部 inset，使关闭按钮按自己的安全距离定位。
                                 .padding(
                                     .top,
                                     max(

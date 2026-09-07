@@ -64,7 +64,6 @@ enum WatchCalendarMode: String, CaseIterable, Identifiable {
 /// 根页面的响应式布局参数。
 ///
 /// 集中维护尺寸计算可以防止不同表径下的按钮与内容各自使用一套比例。
-/// 这些函数保留已确认的视觉数值，只把散落的公式收拢到一个位置。
 enum RootScheduleLayout {
     static let controlContentSize: CGFloat = 20
     /// `.controlSize(.small)` 在表盘上的近似外径；教学脉冲用它计算真实中心。
@@ -75,8 +74,7 @@ enum RootScheduleLayout {
 
     /// 过期提示固定在整个表盘底部，并避开圆角裁切区域。
     ///
-    /// 仅保留约半行安全距离，避免提示紧贴下沿；提示位置不再受概览
-    /// 内容高度影响。
+    /// 仅留约半行安全距离，避免提示紧贴下沿；提示位置独立于概览内容高度。
     static func staleScheduleNoticeBottomInset(for height: CGFloat) -> CGFloat {
         max(14, height * 0.055)
     }
@@ -121,11 +119,17 @@ private enum RootFloatingControlKind {
     case mode
 }
 
+private enum WidgetOnboardingEntry {
+    case fullTutorial
+    case guide
+}
+
 /// Apple Watch 课表的根容器。
 ///
 /// 该视图负责模式切换、刷新入口、自动隐藏控件和同步完成提示；具体课程内容
 /// 由五个独立页面分别承担，避免在根页面中混入日/周/月布局细节。
 struct RootScheduleView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var store: WatchScheduleStore
     @StateObject private var onboardingInput = WatchOnboardingInputBridge()
     @State private var mode = WatchCalendarMode.overview
@@ -149,7 +153,10 @@ struct RootScheduleView: View {
     /// 目标色块在整个屏幕全局坐标系中的几何中心。
     @State private var weekCourseGlobalCenter: CGPoint?
     @State private var detailCloseGlobalFrame: CGRect = .zero
-    @State private var onboardingShowsCompletion = false
+    @State private var widgetOnboardingEntry: WidgetOnboardingEntry?
+
+    private var showsWidgetOnboarding: Bool { widgetOnboardingEntry != nil }
+
     /// 分段纯黑提示页等待用户轻点继续，不占用实操教学步骤。
     @State private var onboardingSectionIntro: WatchOnboardingSection?
     @State private var onboardingSectionIntroTask: Task<Void, Never>?
@@ -170,6 +177,7 @@ struct RootScheduleView: View {
     @State private var modeButtonPress = WatchPressSession()
     @GestureState private var modeButtonGestureIsActive = false
     @State private var modeButtonLongPressTask: Task<Void, Never>?
+    @State private var modeButtonHoldFeedback: WatchHoldFeedbackPulse?
     @State private var modeButtonTapReleaseTask: Task<Void, Never>?
     @State private var syncCompletionTask: Task<Void, Never>?
     @State private var showsOnboardingNotice = false
@@ -195,7 +203,8 @@ struct RootScheduleView: View {
 
     /// 手机同步期间两个入口必须保持可见，不受滚动和自动隐藏计时影响。
     private var controlsShouldBeVisible: Bool {
-        controlsVisible
+        guard !showsWidgetOnboarding else { return false }
+        return controlsVisible
             || store.isRefreshing
             || store.isAwaitingLaunchSyncReply
             || onboardingForcesControlsVisible
@@ -309,7 +318,7 @@ struct RootScheduleView: View {
                         }
 
                         // 过期提示使用整块表盘作为坐标系，固定在底部安全区
-                        // 上方，不再参与概览课程内容的纵向排版。
+                        // 上方，不参与概览课程内容的纵向排版。
                         if mode == .overview,
                            store.isStale,
                            !dismissesStaleScheduleNotice
@@ -369,12 +378,12 @@ struct RootScheduleView: View {
                     )
                 }
                 .ignoresSafeArea()
-                .allowsHitTesting(!presentsFullScreenMonthPage)
+                .allowsHitTesting(!presentsFullScreenMonthPage && !showsWidgetOnboarding)
                 // `allowsHitTesting` 只阻止触摸，底层日视图仍可能留在
                 // watchOS 焦点树中并继续接收表冠。选择器展示期间同时禁用
                 // 整个底层页面，确保 Digital Crown 只路由到顶层选择器。
-                .disabled(presentsFullScreenMonthPage)
-                .accessibilityHidden(presentsFullScreenMonthPage)
+                .disabled(presentsFullScreenMonthPage || showsWidgetOnboarding)
+                .accessibilityHidden(presentsFullScreenMonthPage || showsWidgetOnboarding)
 
                 // 日期选择器和顶层月视图共用根容器中的独立全屏页面，保证
                 // 两种入口具有完全相同的尺寸、安全区、星期栏和分页行为。
@@ -445,7 +454,7 @@ struct RootScheduleView: View {
 
                 // 最后加入根 ZStack，确保说明遮罩能覆盖所有真实页面。
                 // 进入实操后遮罩完全隐去，输入仍由底层原生页面接收。
-                if onboardingStep != nil {
+                if onboardingStep != nil || showsWidgetOnboarding {
                     onboardingOverlayLayer
                     .transition(.opacity)
                     // 教学层必须高于详情页、月视图和两个悬浮按钮；内部再由
@@ -485,6 +494,11 @@ struct RootScheduleView: View {
         }
         .onAppear(perform: handleAppear)
         .onDisappear(perform: handleDisappear)
+        .onChange(of: scenePhase) { _, phase in
+            guard phase != .active else { return }
+            cancelModeButtonPress()
+            resetModeButtonPressState()
+        }
         .onOpenURL(perform: openWidgetDestination)
         .onChange(of: store.isRefreshing) { _, isRefreshing in
             handleRefreshStateChange(isRefreshing)
@@ -539,11 +553,12 @@ struct RootScheduleView: View {
     /// 从任意小组件回到概览顶部；不把本次跳过教学记为“已完成”。
     private func openWidgetDestination(_ url: URL) {
         guard WatchWidgetDestination(url: url) != nil else { return }
+        resetModeButtonPressState()
         cancelOnboardingTasks()
         onboardingInput.clear()
         resetOnboardingTargets()
         onboardingStep = nil
-        onboardingShowsCompletion = false
+        widgetOnboardingEntry = nil
         onboardingWaitsForSchedule = false
         showsOnboardingScheduleAlert = false
         showsOnboardingNotice = false
@@ -609,8 +624,7 @@ struct RootScheduleView: View {
 
     /// 恢复模式按钮的空闲状态，不触发单击或长按结果。
     private func resetModeButtonPressState() {
-        modeButtonLongPressTask?.cancel()
-        modeButtonLongPressTask = nil
+        cancelModeButtonHoldFeedback()
         modeButtonTapReleaseTask?.cancel()
         modeButtonTapReleaseTask = nil
         modeButtonPress.reset()
@@ -1027,20 +1041,37 @@ struct RootScheduleView: View {
             value: controlsShouldBeVisible
         )
         .simultaneousGesture(modeButtonPressGesture)
+        .sensoryFeedback(trigger: modeButtonHoldFeedback) { _, pulse in
+            guard scenePhase == .active, modeButtonPress.isActive,
+                  !suppressesModeTapAfterLongPress, !showsWidgetOnboarding,
+                  onboardingStep == nil || onboardingInput.acceptsOperations
+            else { return nil }
+            return pulse?.feedback
+        }
         .accessibilityAction {
             performModeButtonTap()
+        }
+        .accessibilityAction(named: Text(verbatim: watchLocalizedString("重新打开引导"))) {
+            restartOnboarding()
         }
         .accessibilityLabel(watchLocalizedString("切换课表视图"))
         .accessibilityHint(watchLocalizedString("长按重新进入新手引导"))
     }
 
-    /// 所有不足三秒的按压及辅助功能默认动作都走这里，确保目录必定打开。
+    /// 教学先验证单击要求，错误时恢复当前步骤并显示反馈，不打开目录。
     private func performModeButtonTap() {
-        guard !suppressesModeTapAfterLongPress else { return }
-        reportOnboardingOperation(.tap(.mode), target: .mode)
+        guard !suppressesModeTapAfterLongPress, !showsWidgetOnboarding else { return }
+        if let onboardingStep {
+            guard onboardingInput.acceptsOperations else { return }
+            guard onboardingStep.operation == .tap(.mode) else {
+                reportOnboardingOperation(.tap(.mode), target: .mode)
+                return
+            }
+        }
         WatchHaptics.selection()
         revealControls()
         showsModePicker = true
+        reportOnboardingOperation(.tap(.mode), target: .mode)
     }
 
     /// 选中模式后立即关闭列表；课表数据和缓存不会被重置。
@@ -1069,6 +1100,17 @@ struct RootScheduleView: View {
                 } header: {
                     Text(verbatim: watchLocalizedString("切换视图"))
                 }
+                Section {
+                    Button(action: requestOnboardingStart) {
+                        Label(watchLocalizedString("App 操作教程"), systemImage: "hand.draw")
+                    }
+                    Button { presentWidgetOnboarding() } label: {
+                        Label(watchLocalizedString("小组件使用指南"), systemImage: "applewatch")
+                    }
+                } header: {
+                    Text(verbatim: watchLocalizedString("使用指南"))
+                }
+                .disabled(onboardingStep != nil)
             }
         }
     }
@@ -1079,7 +1121,9 @@ struct RootScheduleView: View {
     /// 同一 Overlay 挂入两个宿主可保持画面层级一致，又不会复制步骤状态机。
     @ViewBuilder
     private var onboardingOverlayLayer: some View {
-        if let onboardingStep {
+        if showsWidgetOnboarding {
+            WidgetOnboardingView(finish: finishOnboarding)
+        } else if let onboardingStep {
             WatchOnboardingOverlay(
                 step: onboardingStep,
                 sectionIntro: onboardingSectionIntro,
@@ -1087,7 +1131,6 @@ struct RootScheduleView: View {
                 controlCenters: onboardingControlCenters,
                 feedback: onboardingInput.feedback,
                 showsPrompt: onboardingInput.showsPrompt,
-                showsCompletion: onboardingShowsCompletion,
                 isInitialPreparationReady:
                     onboardingRenderDataReady
                         && onboardingInitialPresentationReady,
@@ -1095,8 +1138,8 @@ struct RootScheduleView: View {
                     onboardingInitialPresentationReady = true
                 },
                 start: handleOnboardingWelcomeTap,
-                continueSectionIntro: handleOnboardingSectionIntroTap,
-                finish: finishOnboarding
+                openWidgetTutorial: handleOnboardingWelcomeHold,
+                continueSectionIntro: handleOnboardingSectionIntroTap
             )
         }
     }
@@ -1140,11 +1183,12 @@ struct RootScheduleView: View {
     /// 长按右下角按钮重新开始时使用同一入口，不重建课表 Store。
     /// 教学进行中只把三秒按压作为教学操作上报，绝不会递归重启引导。
     private func restartOnboarding() {
+        guard !showsWidgetOnboarding else { return }
         if onboardingStep != nil {
             reportOnboardingOperation(.longPress(.mode), target: .mode)
             return
         }
-        WatchHaptics.selection()
+        WatchHaptics.onboardingSuccess()
         requestOnboardingStart()
     }
 
@@ -1182,13 +1226,13 @@ struct RootScheduleView: View {
             store.courses(on: $0).isEmpty
         } ?? false
         if onboardingStep != nil,
+           !showsWidgetOnboarding,
            store.recommendedOnboardingDate == nil || targetBecameInvalid || teachingDateBecameEmpty
         {
             cancelOnboardingTasks()
             onboardingInput.clear()
             resetOnboardingTargets()
             onboardingStep = nil
-            onboardingShowsCompletion = false
             dismissCourseDetailImmediately()
             dismissDayDatePickerImmediately()
             requestOnboardingStart()
@@ -1217,31 +1261,41 @@ struct RootScheduleView: View {
 
     /// 首个触摸刻度立即暂停按钮自动隐藏，并启动独立三秒计时。
     private func beginModeButtonPressIfNeeded() {
+        guard scenePhase == .active,
+              !showsWidgetOnboarding,
+              onboardingStep == nil || onboardingInput.acceptsOperations
+        else { return }
         guard modeButtonPress.begin() else { return }
         modeButtonTapReleaseTask?.cancel()
         modeButtonTapReleaseTask = nil
         suppressesModeTapAfterLongPress = false
+        modeButtonHoldFeedback = nil
         handleModeButtonPressing(true)
+        handleOnboardingTouchInputBegan()
         modeButtonLongPressTask?.cancel()
-        modeButtonLongPressTask = Task { @MainActor in
-            do {
-                try await Task.sleep(nanoseconds: 3_000_000_000)
-            } catch {
-                return
+        let initialOnboardingStep = onboardingStep
+        modeButtonLongPressTask = makeWatchHoldFeedbackTask(
+            isActive: {
+                scenePhase == .active
+                    && modeButtonPress.isActive && !showsWidgetOnboarding
+                    && onboardingStep == initialOnboardingStep
+                    && (initialOnboardingStep == nil || onboardingInput.acceptsOperations)
+            },
+            onPulse: { modeButtonHoldFeedback = $0 },
+            onComplete: {
+                suppressesModeTapAfterLongPress = true
+                modeButtonLongPressTask = nil
+                modeButtonHoldFeedback = nil
+                restartOnboarding()
             }
-            guard !Task.isCancelled, modeButtonPress.isActive else { return }
-            suppressesModeTapAfterLongPress = true
-            modeButtonLongPressTask = nil
-            restartOnboarding()
-        }
+        )
     }
 
     /// 松手时根据三秒任务是否已经触发，二选一执行单击或长按结果。
     private func finishModeButtonPress() {
         let didTriggerLongPress = suppressesModeTapAfterLongPress
         let shouldTap = modeButtonPress.finish(didTriggerLongPress: didTriggerLongPress)
-        modeButtonLongPressTask?.cancel()
-        modeButtonLongPressTask = nil
+        cancelModeButtonHoldFeedback()
         handleModeButtonPressing(false)
         if shouldTap {
             performModeButtonTap()
@@ -1257,10 +1311,16 @@ struct RootScheduleView: View {
     private func cancelModeButtonPress() {
         let wasActive = modeButtonPress.isActive
         modeButtonPress.cancel()
-        modeButtonLongPressTask?.cancel()
-        modeButtonLongPressTask = nil
+        cancelModeButtonHoldFeedback()
         guard wasActive else { return }
         handleModeButtonPressing(false)
+    }
+
+    /// 松手、移出命中范围和页面退出都必须同时停止计时与触觉脉冲。
+    private func cancelModeButtonHoldFeedback() {
+        modeButtonLongPressTask?.cancel()
+        modeButtonLongPressTask = nil
+        modeButtonHoldFeedback = nil
     }
 
     /// 按住三点按钮期间暂停自动隐藏，避免长按计时与 2.6 秒隐藏任务竞争。
@@ -1286,7 +1346,7 @@ struct RootScheduleView: View {
         onboardingInput.clear()
         showsModePicker = false
         showsOnboardingNotice = false
-        onboardingShowsCompletion = false
+        widgetOnboardingEntry = nil
         showsDayDatePicker = false
         selectedCourse = nil
         showsCachedScheduleNotice = false
@@ -1331,20 +1391,19 @@ struct RootScheduleView: View {
 
             await store.prepareOnboardingRenderData(around: date)
             guard !Task.isCancelled else { return }
-            // `prepareOnboardingRenderData` 返回即代表本轮必需的索引与
-            // 月历窗口已完成。不再用二次推导检查锁住欢迎页：
-            // 即使当前是空课表，用户也应能正常进入教学。
+            // 预热返回且任务未取消时，本轮索引与月历窗口已经就绪。
+            // 课表替换导致的教学数据失效由 handleScheduleReplacement 处理。
             onboardingRenderDataReady = true
         }
     }
 
-    /// 前进到下一项；最后一项的“完成”会提交持久化状态。
+    /// 前进到下一项；实操结束后衔接小组件介绍。
     private func showNextOnboardingStep() {
         guard let onboardingStep else { return }
         guard let next = WatchOnboardingStep(
             rawValue: onboardingStep.rawValue + 1
         ) else {
-            showOnboardingFinale()
+            showOnboardingWidgetIntroduction()
             return
         }
         presentOnboardingStep(next)
@@ -1417,7 +1476,7 @@ struct RootScheduleView: View {
             onboardingWeekTargetCourse = randomOnboardingWeekCourse()
             // 前面的箭头、滑动和表冠教学可能已把周页带离示范课程。
             // 只在进入色块教学时重建一次并回到教学周；其他相邻步骤保持
-            // 相同 identity，不再为每个提示销毁整棵周视图。
+            // 相同 identity，复用周视图及其表冠状态。
             onboardingPageResetToken &+= 1
         default:
             break
@@ -1426,7 +1485,7 @@ struct RootScheduleView: View {
 
     /// 在每个顶层视图的第一项实操前显示纯黑分段页。
     ///
-    /// 分段页不再自动计时消失；输入桥保持清空，直到用户主动轻点屏幕。
+    /// 分段页等待用户主动轻点；等待期间输入桥保持清空。
     /// 这样阅读速度不会影响教学节奏，轻点后的淡出也不会误算成下一项操作。
     private func presentOnboardingSectionIntro(
         _ section: WatchOnboardingSection,
@@ -1509,8 +1568,7 @@ struct RootScheduleView: View {
 
     /// 真实操作被验证后只做必要的教学页面收尾。
     ///
-    /// 引导不再模拟点击、刷新或分页：这些效果均由底层真实控件完成，
-    /// 因此用户能直接看到原本的滚动、动画和反馈。
+    /// 点击、刷新或分页均由底层真实控件完成；这里仅提交教学状态。
     private func handleOnboardingOperation(
         step: WatchOnboardingStep,
         operation: WatchOnboardingOperation
@@ -1527,8 +1585,7 @@ struct RootScheduleView: View {
         }
     }
 
-    /// 为当前步骤重置旁路输入桥。黑色半透明说明只在这里
-    /// 短暂出现；它消失后所有真实页面手势都保持原来的命中和动画。
+    /// 为当前步骤重置旁路输入桥；说明持续到用户开始操作，实际命中由页面负责。
     private func configureOnboardingInput(for step: WatchOnboardingStep) {
         onboardingCrownEvaluationTask?.cancel()
         onboardingCrownEvaluationTask = nil
@@ -1558,15 +1615,28 @@ struct RootScheduleView: View {
         }
     }
 
-    /// 最后一项完成后保留纯黑完成页，等待用户轻点确认后再退出引导。
-    private func showOnboardingFinale() {
-        onboardingSectionIntroTask?.cancel()
-        onboardingSectionIntro = nil
+    /// 最后一次长按成功后直接衔接小组件，整套教程结束才记录完成。
+    private func showOnboardingWidgetIntroduction() {
+        presentWidgetOnboarding(from: .fullTutorial)
+    }
+
+    /// 无需真实课表，也可从“使用指南”单独打开。
+    private func presentWidgetOnboarding(from entry: WidgetOnboardingEntry = .guide) {
+        cancelOnboardingTasks()
         onboardingInput.clear()
+        resetModeButtonPressState()
+        resetOnboardingTargets()
+        showsModePicker = false
+        showsDayDatePicker = false
+        selectedCourse = nil
+        showsOnboardingNotice = false
+        onboardingWaitsForSchedule = false
+        showsOnboardingScheduleAlert = false
         withAnimation(WatchOnboardingMotion.pageTransition) {
-            onboardingShowsCompletion = true
+            onboardingStep = nil
+            widgetOnboardingEntry = entry
+            mode = .overview
         }
-        WatchHaptics.onboardingSuccess()
     }
 
     /// 将按钮、分页器或顶层手势中的真实操作报告给引导。
@@ -1674,6 +1744,16 @@ struct RootScheduleView: View {
         showNextOnboardingStep()
     }
 
+    /// 欢迎页长按可跳过实操，完成后仍按整套引导记录；组件示例不依赖课表预热。
+    private func handleOnboardingWelcomeHold() {
+        guard scenePhase == .active, onboardingStep == .welcome,
+              !showsWidgetOnboarding, onboardingSectionIntro == nil,
+              onboardingInput.showsPrompt, onboardingInput.feedback == nil
+        else { return }
+        WatchHaptics.onboardingSuccess()
+        presentWidgetOnboarding(from: .fullTutorial)
+    }
+
     /// 原生 ScrollView 的偏移回调只用来管理悬浮按钮。
     ///
     /// watchOS 11 起由系统滚动阶段报告完成；watchOS 10 的兼容判定集中在
@@ -1729,7 +1809,7 @@ struct RootScheduleView: View {
         // 若教学日只有第 11 节后的事项，改从同一周寻找实际绘制在 1–10
         // 节网格中的色块；教学脉冲才能稳定落在一个真实可点课程上。
         let weekCourses = store.courses(
-            startingAt: onboardingWeekStart(containing: date),
+            startingAt: calendarWeekStart(containing: date),
             dayCount: 7
         )
         return weekCourses.first { $0.startPeriod <= 10 }
@@ -1740,13 +1820,13 @@ struct RootScheduleView: View {
     /// 周视图教学从当前展示周的可见色块中随机选择一个目标。
     ///
     /// 这里只选择课程数据；`WeekScheduleGridGeometry` 随后使用星期列和
-    /// 开始/结束节次反算色块矩形，不再读取色块渲染后的视图边界。
+    /// 开始/结束节次反算色块矩形，无需等待渲染后的视图边界。
     private func randomOnboardingWeekCourse() -> WatchCourse? {
         guard let date = onboardingTeachingDate
                 ?? store.recommendedOnboardingDate
         else { return nil }
         return store.courses(
-            startingAt: onboardingWeekStart(containing: date),
+            startingAt: calendarWeekStart(containing: date),
             dayCount: 7
         )
         .filter { $0.startPeriod <= 10 }
@@ -1754,38 +1834,27 @@ struct RootScheduleView: View {
     }
 
     /// 详情页沿用刚刚在周视图中实际点中的随机课程；若教学尚未进入周视图，
-    /// 再回退到原有教学日期中的课程。
+    /// 再回退到教学日期中的课程。
     private var onboardingDetailTeachingCourse: WatchCourse? {
         onboardingWeekTargetCourse ?? onboardingTeachingCourse
     }
 
-    /// 仅供教学课程定位使用的周一起点，避免依赖周视图的私有布局工具。
-    private func onboardingWeekStart(containing date: Date) -> Date {
-        let calendar = Calendar.current
-        let day = calendar.startOfDay(for: date)
-        let weekday = calendar.component(.weekday, from: day)
-        let daysSinceMonday = (weekday + 5) % 7
-        return calendar.date(
-            byAdding: .day,
-            value: -daysSinceMonday,
-            to: day
-        ) ?? day
-    }
-
-    /// 完成后只写入一个布尔标记，并展示可复用的 15 秒提示。
+    /// 结束页停留两秒后完成阅读，不推断用户已经安装系统小组件。
     private func finishOnboarding() {
-        guard onboardingStep != nil else { return }
+        guard let entry = widgetOnboardingEntry else { return }
         cancelOnboardingTasks()
         onboardingInput.clear()
-        onboardingShowsCompletion = false
         selectedCourse = nil
         resetOnboardingTargets()
-        UserDefaults.standard.set(
-            true,
-            forKey: WatchPersistentCacheKey.completedOnboarding
-        )
+        if case .fullTutorial = entry {
+            UserDefaults.standard.set(true, forKey: WatchPersistentCacheKey.completedOnboarding)
+        }
+        WatchHaptics.onboardingSuccess()
         withAnimation(WatchOnboardingMotion.pageTransition) {
+            widgetOnboardingEntry = nil
             onboardingStep = nil
+            mode = .overview
+            overviewOpenRevision &+= 1
         }
         showOnboardingCompletionNotice()
     }
@@ -2024,10 +2093,8 @@ struct RootScheduleView: View {
         withAnimation(.easeOut(duration: 0.18)) {
             controlsVisible = true
         }
-        hideControlsTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 2_600_000_000)
-            guard !Task.isCancelled,
-                  !store.isRefreshing,
+        hideControlsTask = makeWatchAutoDismissTask(after: 2.6) {
+            guard !store.isRefreshing,
                   onboardingStep == nil,
                   !showsOnboardingNotice
             else { return }
@@ -2102,8 +2169,7 @@ struct RootScheduleView: View {
         }
     }
 
-    /// 两个按钮脱离具体课表页面后复用同一套响应式定位；这不会改变原有
-    /// 尺寸和边距，只保证独立月视图也能显示它们。
+    /// 悬浮按钮共用表盘坐标系，因此课表页面与独立月视图具有一致的命中位置。
     private func floatingControlsLayer(size: CGSize) -> some View {
         let edgeInset = RootScheduleLayout.edgeInset(for: size)
         return ZStack {
@@ -2223,11 +2289,9 @@ struct RootScheduleView: View {
     }
 
     private func localControlCenter(for frame: CGRect) -> CGPoint? {
-        guard !frame.isEmpty, !onboardingViewportGlobalFrame.isEmpty
-        else { return nil }
-        return CGPoint(
-            x: frame.midX - onboardingViewportGlobalFrame.minX,
-            y: frame.midY - onboardingViewportGlobalFrame.minY
+        guard !frame.isEmpty else { return nil }
+        return localControlCenter(
+            forGlobalPoint: CGPoint(x: frame.midX, y: frame.midY)
         )
     }
 

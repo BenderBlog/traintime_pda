@@ -80,7 +80,7 @@ struct MonthScheduleView: View {
     var body: some View {
         // 使用独立导航容器持有月份标题栏。系统会把 `.toolbar` 提升到
         // 最近的 NavigationStack；若继续复用根导航容器，标题栏会脱离
-        // 日期选择页的 move 转场。现在标题、星期栏和网格属于同一棵
+        // 日期选择页的 move 转场。标题、星期栏和网格必须属于同一棵
         // 可转场视图，进入与退出时会作为整页同步移动。
         NavigationStack {
             ZStack(alignment: .bottomLeading) {
@@ -127,7 +127,7 @@ struct MonthScheduleView: View {
                 lastCrownEventOffset = crownValue
             }
             // Store 安装新阶段或恢复持久化派生索引后递增修订号。月份页面只
-            // 刷新当前三页颜色，不再直接观察整份快照并重新扫描全部课程。
+            // 按索引刷新当前三页颜色，无需重新扫描全部课程。
             .onChange(of: store.renderCacheRevision) { _, _ in
                 guard !prewarmingOnly else { return }
                 replaceMonthWindow(
@@ -288,7 +288,7 @@ struct MonthScheduleView: View {
     ///
     /// 日期选择器通过根视图的条件分支和底部转场出现。真机上在 `onAppear`
     /// 立即设置焦点时，焦点节点尚未完成挂载；随后底层日视图释放焦点以及
-    /// 相邻月份缓存更新，都可能使首次请求失效。等待同转场一致的 300ms，
+    /// 相邻月份缓存更新，都可能使首次请求失效。等待 320ms，
     /// 再先释放、后绑定一次，确保后续刻度进入本页的横向分页处理器。
     @MainActor
     private func activateMonthCrownAfterEntrance() async {
@@ -501,8 +501,7 @@ private struct MonthWeekdayHeader: View {
 
 /// 日期 Canvas 的固定视觉参数。
 ///
-/// 参数集中后，绘制函数和点击换算不再各自维护网格列数；这里保留的数值
-/// 与现有布局完全一致，重构不会改变日期、红框或五段标记的位置。
+/// 绘制与点击换算共用网格列数，日期、红框和五段标记据此对齐。
 private enum MonthCalendarCanvasLayout {
     static let columnCount = 7
     static let selectedFontSize: CGFloat = 12
@@ -544,6 +543,8 @@ private struct MonthCalendarCanvas: View {
     var body: some View {
         GeometryReader { geometry in
             Canvas(rendersAsynchronously: true) { context, size in
+                // 一次绘制共用日历快照，避免每个日期格重复读取系统日历。
+                let calendar = Calendar.current
                 let columnWidth = size.width
                     / CGFloat(MonthCalendarCanvasLayout.columnCount)
                 drawGrid(
@@ -560,16 +561,15 @@ private struct MonthCalendarCanvas: View {
                         row: row,
                         columnWidth: columnWidth
                     )
-                    let isSelected = Calendar.current.isDate(
+                    let isSelected = calendar.isDate(
                         cell.date,
                         inSameDayAs: selectedDate
                     )
-                    let isToday = Calendar.current.isDateInToday(cell.date)
+                    let isToday = calendar.isDateInToday(cell.date)
                     let periodMarker = periodMarkers[index]
 
                     if isToday {
-                        // 红框以日期数字和五段节次标记的联合区域为准；这样有
-                        // 日程时五段颜色不会落在框外，无日程时则保持原来尺寸。
+                        // 红框包围日期数字与五段标记的联合区域；无日程时只包围数字。
                         drawTodayFrame(
                             at: center,
                             row: row,
@@ -736,8 +736,8 @@ private struct MonthCalendarCanvas: View {
 
     /// 在日期底部画总宽 17pt 的五段节次条。
     ///
-    /// 17pt 沿用原“今天”红色线条的标准长度；五段依次代表两节课，已有
-    /// 日程使用课程色，其余段使用暗白色。整天没有日程时调用方不会绘制。
+    /// 五段依次代表两节课，已有日程使用课程色，其余段使用暗白色。
+    /// 整天没有日程时调用方不会绘制。
     private func drawPeriodMarker(
         _ marker: MonthPeriodMarker,
         row: Int,

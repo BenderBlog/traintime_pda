@@ -927,15 +927,20 @@ final class WatchScheduleStore: ObservableObject {
         var result: [Date: [String?]] = [:]
         result.reserveCapacity(grouped.count)
         for (day, courses) in grouped {
-            result[day] = WatchScheduleRenderCacheLayout.periodRanges.map {
-                periodRange in
-                courses.first {
-                    $0.startPeriod <= periodRange.upperBound
-                        && $0.endPeriod >= periodRange.lowerBound
-                }?.id
-            }
+            result[day] = makePeriodCourseIDs(from: courses)
         }
         return result
+    }
+
+    /// 输入沿用日程顺序；同一课时有多项安排时固定选择第一项。
+    /// 缓存恢复也使用此规则，防止有效课程 ID 被放入错误的课时。
+    private func makePeriodCourseIDs(from courses: [WatchCourse]) -> [String?] {
+        WatchScheduleRenderCacheLayout.periodRanges.map { periodRange in
+            courses.first {
+                $0.startPeriod <= periodRange.upperBound
+                    && $0.endPeriod >= periodRange.lowerBound
+            }?.id
+        }
     }
 
     /// 将内存索引交给后台任务编码，并只提交最新一代结果。
@@ -1060,7 +1065,7 @@ final class WatchScheduleStore: ObservableObject {
 
         // 新建和恢复两条路径最终都经过同一安装入口，确保以后新增派生字段时
         // 不会只更新其中一条路径。恢复值已经完成完整性校验，因此直接复用，
-        // 不再次扫描课程或重算五段索引。
+        // 复用已通过校验的日分组和五段索引。
         installVisibleScheduleIndex(
             sorted: sorted,
             grouped: restored.coursesByDay,
@@ -1084,7 +1089,8 @@ final class WatchScheduleStore: ObservableObject {
         }
         guard courseMap.count == snapshot.courses.count,
               cache.sortedCourseIDs.count == snapshot.courses.count,
-              Set(cache.sortedCourseIDs) == Set(courseMap.keys)
+              Set(cache.sortedCourseIDs) == Set(courseMap.keys),
+              WatchScheduleResolver.isSorted(cache.sortedCourseIDs.compactMap { courseMap[$0] })
         else {
             return nil
         }
@@ -1103,16 +1109,14 @@ final class WatchScheduleStore: ObservableObject {
             }
             let date = date(fromEpochMilliseconds: day.dayStartEpochMs)
             let courses = day.courseIDs.compactMap { courseMap[$0] }
-            let dayCourseIDs = Set(day.courseIDs)
             guard grouped[date] == nil,
+                  !courses.isEmpty,
                   courses.count == day.courseIDs.count,
+                  WatchScheduleResolver.isSorted(courses),
                   courses.allSatisfy({
                       calendar.startOfDay(for: $0.startAt) == date
                   }),
-                  day.periodCourseIDs.allSatisfy({ courseID in
-                      guard let courseID else { return true }
-                      return dayCourseIDs.contains(courseID)
-                  })
+                  day.periodCourseIDs == makePeriodCourseIDs(from: courses)
             else {
                 return nil
             }

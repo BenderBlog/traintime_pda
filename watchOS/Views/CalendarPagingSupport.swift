@@ -48,8 +48,8 @@ struct CalendarPagerPage: Identifiable {
 /// 仿系统日历的三页横向容器。
 ///
 /// 前一页、当前页、后一页始终并排预渲染，外部只需要提供一个连续像素偏移。
-/// 手指横拖和表冠旋转因此能看到同一套跟手动画；日期数据只在吸附动画结束
-/// 后替换，避免中途出现空白或旧页闪烁。
+/// 手指横拖和表冠旋转共用位移容器；父视图决定在吸附完成或表冠跨越整页时
+/// 提交日期，并同步轮换三页数据。
 struct CalendarHorizontalPager<Page: View>: View {
     let pageOffset: CGFloat
     let interactionResetToken: Int
@@ -125,14 +125,13 @@ struct CalendarHorizontalPager<Page: View>: View {
                             width: proxy.size.width,
                             height: proxy.size.height
                         )
-                        // 恢复页面内部原有的命中层级，使日视图纵向接管、
-                        // 轻点收口和周课程点击继续由内容页优先处理。手势虽然
-                        // 挂在页面上，但位移使用外层固定命名坐标，不会因页面
+                        // 内容页优先处理日视图纵向滚动、轻点收口和周课程点击。
+                        // 分页手势挂在页面上，但位移使用外层固定命名坐标，不会因页面
                         // 自身移动而产生坐标反馈抽动。
                         .simultaneousGesture(pagingGesture)
                 }
             }
-            // 三张页面保持原有、完全对称的三屏布局，避免把超宽内容再次
+            // 三张页面使用完全对称的三屏布局，避免把超宽内容
             // 压入单屏容器后造成前一页与后一页的非对称裁剪。
             .frame(
                 width: proxy.size.width * 3,
@@ -268,8 +267,8 @@ struct CalendarCrownPageMotion {
 
 /// 表冠横向分页的速度响应方式。
 ///
-/// `balanced` 保留周/月视图已经确认的手感；`precisionAccelerated` 用于
-/// 日视图，让慢转进入更细的像素级控制区，快速旋转时再明显提高页移倍率。
+/// `balanced` 用于周/月视图；`precisionAccelerated` 用于日视图，
+/// 在慢转时提供更细的像素级控制，快速旋转时提高页移倍率。
 enum CalendarCrownVelocityProfile {
     case balanced
     case precisionAccelerated
@@ -464,7 +463,7 @@ func normalizedContinuousPageOffset(
 /// 日、周、月页面共用的快速吸附曲线。
 func calendarPageSnapAnimation(duration: Double) -> Animation {
     // 使用无回摆系统弹簧衔接手指/表冠的当前位置；实际响应时长由剩余
-    // 距离和输入速度共同决定，不再让所有吸附都播放同一段固定动画。
+    // 距离和输入速度共同决定。
     .spring(
         duration: duration,
         bounce: 0,
@@ -566,6 +565,14 @@ let monthScheduleTransitionAnimation = Animation.spring(
     bounce: 0.06,
     blendDuration: 0.06
 )
+
+/// 周课表与教学定位共用周一零点，独立于系统地区设置的每周首日。
+func calendarWeekStart(containing date: Date) -> Date {
+    let calendar = Calendar.current
+    let day = calendar.startOfDay(for: date)
+    let daysSinceMonday = (calendar.component(.weekday, from: day) + 5) % 7
+    return calendar.date(byAdding: .day, value: -daysSinceMonday, to: day) ?? day
+}
 
 /// 获取系统本地化的极短星期符号，并转换为周一到周日顺序。
 ///

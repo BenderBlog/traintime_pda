@@ -24,14 +24,16 @@ enum DayCourseLayoutCacheConfiguration {
 
 /// 保存日视图已经测量的卡片高度，但不发布变化，避免重绘父页面。
 ///
-/// 相邻页在进入屏幕前就完成采样；横向跨页时只切换当前日期指针，不再临时
-/// 挂载一组测量视图。缓存是普通引用状态，不会让表冠每个像素都触发父页面
+/// 相邻页在进入屏幕前就完成采样；横向跨页时只切换当前日期指针并复用采样。
+/// 缓存是普通引用状态，不会让表冠每个像素都触发父页面
 /// 更新。高度按当前快照修订、语言、内容宽度及动态字体环境持久化；任何
 /// 条件变化都舍弃旧值，避免局部同步或字号变化后仍用旧高度计算位移。
 @MainActor
 final class DayCourseLayoutTracker {
     private let defaults: UserDefaults
     private var metrics = DayCourseLayoutMetrics()
+    // 平均高度只随采样变化，表冠和触摸每帧读取时不遍历整学期的测量结果。
+    private var averageMeasuredHeight: CGFloat?
     private var activeSignature: String?
     private var persistenceTask: Task<Void, Never>?
     private var persistenceDirty = false
@@ -56,6 +58,7 @@ final class DayCourseLayoutTracker {
             changed = true
         }
         if changed {
+            refreshAverageMeasuredHeight()
             persistenceDirty = true
             schedulePersistence()
         }
@@ -71,6 +74,7 @@ final class DayCourseLayoutTracker {
         persistenceDirty = false
         activeSignature = signature
         metrics = DayCourseLayoutMetrics()
+        averageMeasuredHeight = nil
 
         guard
             let cache = try? WatchCacheCoding.load(
@@ -88,6 +92,7 @@ final class DayCourseLayoutTracker {
             .mapValues { value in
                 CGFloat(value)
             }
+        refreshAverageMeasuredHeight()
     }
 
     /// 交互期间不排队新的编码和写盘；已启动的后台编码不能提交旧结果。
@@ -179,8 +184,7 @@ final class DayCourseLayoutTracker {
 
     /// 把统一的内容纵向偏移反算成连续课程位置。
     ///
-    /// 手指和表冠都通过这一坐标互相接续：手指拖动不再维护一套独立的
-    /// ScrollView 锚点，放手后表冠会从屏幕当前所见位置继续移动。
+    /// 手指和表冠共用这一坐标，放手后表冠从屏幕当前所见位置继续移动。
     func position(
         forContentOffset contentOffset: CGFloat,
         courses: [WatchCourse],
@@ -248,9 +252,9 @@ final class DayCourseLayoutTracker {
     }
 
     /// 首帧采样未完成时使用已有卡片的平均高度作为短暂回退。
-    private var averageMeasuredHeight: CGFloat? {
-        guard !metrics.cardHeights.isEmpty else { return nil }
-        return metrics.cardHeights.values.reduce(0, +)
-            / CGFloat(metrics.cardHeights.count)
+    private func refreshAverageMeasuredHeight() {
+        averageMeasuredHeight = metrics.cardHeights.isEmpty
+            ? nil
+            : metrics.cardHeights.values.reduce(0, +) / CGFloat(metrics.cardHeights.count)
     }
 }

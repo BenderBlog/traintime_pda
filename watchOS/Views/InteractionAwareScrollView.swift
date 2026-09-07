@@ -36,8 +36,7 @@ struct InteractionAwareScrollView<Content: View>: View {
     var alwaysAllowsBounce = false
     /// 需要可靠区分触摸与表冠、且实体表可能不发送 `.tracking` 时挂载兜底。
     ///
-    /// 默认只记录输入来源；仅当调用方明确打开教学视觉代理时，同一份手势
-    /// 数据才会额外推动内容。教学判定入口与原生表冠来源判断保持不变。
+    /// 默认只记录输入来源；调用方启用教学视觉代理时，同一份手势数据也用于推动内容。
     var usesShortContentTouchFallback = false
     /// 教学步骤切换时使旧输入及延迟回调失效，不重建或重定位实际列表。
     var inputContext: Int = 0
@@ -70,8 +69,7 @@ struct InteractionAwareScrollView<Content: View>: View {
     @State private var touchCompletionTask: Task<Void, Never>?
     @State private var touchResetTask: Task<Void, Never>?
     @State private var legacyCrownCompletionTask: Task<Void, Never>?
-    /// 教学触摸的起点与显示状态。检测结果仍由上面的原有状态负责；这些值
-    /// 只改变内容的可见位置，避免视觉驱动反过来影响操作类型判断。
+    /// 教学触摸的起点与显示状态独立于输入来源判断，避免视觉位移反过来影响判定。
     @State private var teachingDragStartScrollOffset: CGFloat = 0
     @State private var teachingRequestedScrollOffset: CGFloat = 0
     @State private var teachingElasticOffset: CGFloat = 0
@@ -319,14 +317,7 @@ struct InteractionAwareScrollView<Content: View>: View {
 
                 updateTeachingTouchScroll(using: value)
 
-                // 原有判定仍只确认用户确实做了纵向拖动。较小阈值适配表盘
-                // 行程，同时用轴向占优过滤轻点抖动和明显的横向动作；上方
-                // 的视觉代理更新不会改变这里的判断结果。
-                let verticalDistance = abs(value.translation.height)
-                let horizontalDistance = abs(value.translation.width)
-                if verticalDistance >= 8,
-                   verticalDistance >= horizontalDistance
-                {
+                if isVerticalTeachingDrag(value.translation) {
                     nativeTouchGestureMovedVertically = true
                 }
             }
@@ -334,9 +325,7 @@ struct InteractionAwareScrollView<Content: View>: View {
                 nativeTouchGestureIsActive = false
                 finishTeachingTouchScroll()
                 let generation = touchCompletionGate.generation
-                let endedVertically = abs(value.translation.height) >= 8
-                    && abs(value.translation.height)
-                        >= abs(value.translation.width)
+                let endedVertically = isVerticalTeachingDrag(value.translation)
                 let completedVerticalDrag =
                     nativeTouchGestureMovedVertically || endedVertically
 
@@ -357,6 +346,12 @@ struct InteractionAwareScrollView<Content: View>: View {
 
                 scheduleTouchSourceReset(generation: generation)
             }
+    }
+
+    /// 拖动中与松手时使用同一阈值，排除轻点抖动及横向占优的动作。
+    private func isVerticalTeachingDrag(_ translation: CGSize) -> Bool {
+        let verticalDistance = abs(translation.height)
+        return verticalDistance >= 8 && verticalDistance >= abs(translation.width)
     }
 
     /// watchOS 10 没有 ScrollPhase。仅在教学开启来源标记且没有程序化视觉

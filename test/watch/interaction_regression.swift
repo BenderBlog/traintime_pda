@@ -187,6 +187,8 @@ struct InteractionRegression {
         check(
             tracker.contentHeight(courses: courses, spacing: 5) == 255,
             "Content height includes existing spacing")
+        check(tracker.contentHeight(courses: [course("unmeasured")], spacing: 0) == 125,
+            "Unmeasured cards use the average of valid measurements")
         try await Task.sleep(nanoseconds: 1_650_000_000)
         check(
             defaults.data(forKey: key) == nil,
@@ -199,10 +201,14 @@ struct InteractionRegression {
         check(
             restored.contentHeight(courses: courses, spacing: 5) == 255,
             "Matching layout signatures restore measured heights")
+        check(restored.contentHeight(courses: [course("unmeasured")], spacing: 0) == 125,
+            "Restoring measurements also restores the fallback average")
         restored.configure(signature: "revision-2|accessibility")
         check(
             restored.contentHeight(courses: courses, spacing: 5) == 149,
             "New source or font discards old heights")
+        check(restored.contentHeight(courses: [course("unmeasured")], spacing: 0) == 72,
+            "Changing layout signatures discards the cached average")
 
         tracker.update(metrics: .init(cardHeights: ["A": 110]))
         WatchWidgetShared.clearSchedule(in: defaults)
@@ -222,7 +228,7 @@ struct InteractionRegression {
         let defaults = UserDefaults(suiteName: suite)!
         defer { defaults.removePersistentDomain(forName: suite) }
         let key = WatchPersistentCacheKey.scheduleRenderIndex
-        let original = snapshot([course("A"), course("B", day: 8)])
+        let original = snapshot([course("A"), course("C", section: 3), course("B", day: 8)])
         let store = WatchScheduleStore(defaults: defaults, sharedDefaults: nil, reloadWidgets: {})
         let originalJSON = try WatchCacheCoding.encodeJSON(original)
         check(
@@ -240,8 +246,40 @@ struct InteractionRegression {
             source["timeZoneIdentifier"] as? String == Calendar.current.timeZone.identifier,
             "Day grouping records its timezone")
 
+        // ID 集合正确仍不代表派生索引正确：顺序和同日课时也必须匹配原始课表。
+        for corruption in 0..<3 {
+            var malformed = index
+            if corruption == 0 {
+                malformed["sortedCourseIDs"] = ["B", "C", "A"]
+            } else {
+                var malformedDays = malformed["days"] as! [[String: Any]]
+                let dayIndex = malformedDays.firstIndex {
+                    ($0["courseIDs"] as? [String])?.contains("A") == true
+                }!
+                if corruption == 1 {
+                    malformedDays[dayIndex]["courseIDs"] = ["C", "A"]
+                } else {
+                    malformedDays[dayIndex]["periodCourseIDs"] =
+                        ["C", "A", NSNull(), NSNull(), NSNull()] as [Any]
+                }
+                malformed["days"] = malformedDays
+            }
+            defaults.set(try JSONSerialization.data(withJSONObject: malformed), forKey: key)
+            let restored = WatchScheduleStore(
+                defaults: defaults, sharedDefaults: nil, reloadWidgets: {})
+            check(restored.allCourses.map(\.id) == ["A", "C", "B"],
+                "Restore validates the global chronological order")
+            check(restored.courses(on: date(7)).map(\.id) == ["A", "C"],
+                "Restore validates each day's order")
+            let restoredMonth = restored.preparedMonthCalendarWindow(centeredOn: date(7))
+            check(restoredMonth.periodMarkers.values.flatMap { $0.values }.contains {
+                $0.segmentCourses[0]?.id == "A" && $0.segmentCourses[1]?.id == "C"
+            }, "Restore validates period placement even when both IDs belong to the same day")
+        }
+
         // 相同生成时间、相同 ID 与数量，只有课程节次和修订号变化。
-        let changed = snapshot([course("A", section: 3), course("B", day: 8)], revision: 2)
+        let changed = snapshot(
+            [course("A", section: 3), course("C", section: 3), course("B", day: 8)], revision: 2)
         defaults.set(
             try WatchCacheCoding.encodeJSON(changed), forKey: WatchWidgetShared.semesterCacheKey)
         let revised = WatchScheduleStore(defaults: defaults, sharedDefaults: nil, reloadWidgets: {})
@@ -263,7 +301,7 @@ struct InteractionRegression {
         let recovered = WatchScheduleStore(
             defaults: defaults, sharedDefaults: nil, reloadWidgets: {})
         check(
-            recovered.courses(on: date(7)).map(\.id) == ["A"],
+            recovered.courses(on: date(7)).map(\.id) == ["A", "C"],
             "Malformed derived caches preserve original schedule data")
         let repaired = recovered.preparedMonthCalendarWindow(centeredOn: date(7))
         let model = repaired.models[monthCalendarStart(for: date(7))]!

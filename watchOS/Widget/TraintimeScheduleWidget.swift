@@ -6,8 +6,8 @@ import SwiftUI
 import WidgetKit
 
 private enum CircularScheduleTypography {
-    static let primary = Font.system(size: 12, weight: .semibold)
-    static let secondary = Font.system(size: 8, weight: .medium)
+    static let primary = WatchWidgetDesignTokens.circularPrimary
+    static let secondary = WatchWidgetDesignTokens.circularSecondary
     static let minimumScale: CGFloat = 0.85
 }
 
@@ -61,8 +61,11 @@ struct TraintimeScheduleWidgetProvider: TimelineProvider {
             && date < expiry
         return .init(
             date: date, schedule: normal,
-            integrated: WatchSchedulePresentation(
-                resolved: resolved, at: date, signedOut: signedOut, preview: preview))
+            // 普通状态复用同一结果，避免每个时间线节点重复扫描课表。
+            integrated: preview
+                ? WatchSchedulePresentation(
+                    resolved: resolved, at: date, signedOut: signedOut, preview: true)
+                : normal)
     }
 
     private func sampleSchedule() -> WatchResolvedSchedule? {
@@ -98,7 +101,7 @@ struct ToggleScheduleWidgetCourseIntent: AppIntent {
         let now = Date()
         let schedule = WatchSchedulePresentation(
             resolved: WatchWidgetShared.loadResolvedSchedule(), at: now)
-        guard let current = schedule.current, current.id == currentCourseID, schedule.next != nil
+        guard let current = schedule.current, current.id == currentCourseID, let next = schedule.next
         else { return .result() }
         let expiry =
             defaults.object(forKey: WatchWidgetShared.previewExpiresKey) as? Date ?? .distantPast
@@ -109,9 +112,9 @@ struct ToggleScheduleWidgetCourseIntent: AppIntent {
             defaults.removeObject(forKey: WatchWidgetShared.previewExpiresKey)
         } else {
             defaults.set(current.id, forKey: WatchWidgetShared.selectedCurrentCourseKey)
-            // 五分钟或当前课程下课时自动回到正常状态，取先到者。
+            // 下一节开始、当前课程结束或五分钟到期时恢复正常状态，取先到者。
             defaults.set(
-                min(current.endAt, schedule.next!.startAt, now.addingTimeInterval(300)),
+                min(current.endAt, next.startAt, now.addingTimeInterval(300)),
                 forKey: WatchWidgetShared.previewExpiresKey)
         }
         WidgetCenter.shared.reloadTimelines(ofKind: WatchWidgetShared.widgetKind)
@@ -137,7 +140,7 @@ private struct ScheduleTime: View {
                 Spacer(minLength: 0)
                 Text(end)
             }
-            .font(.system(size: 16, weight: .regular))
+            .font(WatchWidgetDesignTokens.rectangularInfo)
             .foregroundStyle(.primary)
             .monospacedDigit()
             .lineLimit(1)
@@ -266,7 +269,7 @@ private struct ScheduleWidgetView: View {
     }
 
     private var compactTimeLocation: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: WatchWidgetDesignTokens.circularSpacing) {
             Text(compactTimeHeading)
                 .font(CircularScheduleTypography.secondary)
                 .foregroundStyle(.secondary)
@@ -286,7 +289,7 @@ private struct ScheduleWidgetView: View {
     private var compactTimeValue: some View {
         VStack(spacing: 0) {
             Text(compactTimeHeading)
-                .font(.system(size: 7, weight: .medium))
+                .font(WatchWidgetDesignTokens.circularProgressHeading)
                 .foregroundStyle(.secondary)
             Text(schedule.compactTime?.value ?? "")
                 .font(CircularScheduleTypography.primary)
@@ -310,7 +313,7 @@ private struct ScheduleWidgetView: View {
 
     private func cornerText(
         _ value: String,
-        font: Font = .system(size: 12, weight: .bold, design: .rounded)
+        font: Font = WatchWidgetDesignTokens.cornerPrimary
     ) -> some View {
         Text(value)
             .font(font)
@@ -330,11 +333,8 @@ private struct ScheduleWidgetView: View {
 
     @ViewBuilder private var corner: some View {
         if let course = schedule.focus {
-            // 位置置于开头，空间不足时从尾部省略课程名，优先保留完整教室号。
-            let courseLabel = [schedule.compactLocation, course.name]
-                .filter { !$0.isEmpty }.joined(separator: " · ")
             if let progress = schedule.courseProgress {
-                cornerText(courseLabel)
+                cornerText(course.name)
                     .widgetCurvesContent()
                     .widgetLabel {
                         // 数值 Gauge 由 WidgetKit 排成表角弧线，不展示百分比或时间。
@@ -346,9 +346,12 @@ private struct ScheduleWidgetView: View {
                         .accessibilityLabel(watchLocalizedString("课程进度"))
                     }
             } else {
+                // 未上课时位置置于开头，空间不足时从尾部省略课程名。
+                let courseLabel = [schedule.compactLocation, course.name]
+                    .filter { !$0.isEmpty }.joined(separator: " · ")
                 cornerText(
                     schedule.compactDateTimeText(for: course.startAt),
-                    font: .system(size: 10, weight: .regular, design: .rounded)
+                    font: WatchWidgetDesignTokens.cornerTime
                 )
                     .widgetCurvesContent()
                     .widgetLabel {
@@ -366,7 +369,9 @@ private struct ScheduleWidgetView: View {
         {
             overviewRectangle
         } else if let course = schedule.focus {
-            VStack(alignment: .leading, spacing: 2) {
+            let courseProgress: Double? = role == .name ? nil : schedule.courseProgress
+            // 进度条占一行，行间距与外侧留白共同控制组件总高度。
+            VStack(alignment: .leading, spacing: courseProgress == nil ? 2 : 4) {
                 HStack(spacing: 3) {
                     Text(
                         role == .name
@@ -394,12 +399,11 @@ private struct ScheduleWidgetView: View {
                     }
                 } else {
                     ScheduleTime(schedule: schedule)
-                    if let progress = schedule.courseProgress {
+                    if let progress = courseProgress {
                         ScheduleProgress(progress: progress, color: color)
-                            .padding(.vertical, 1)
                     }
                     Label(schedule.locationSummary, systemImage: "mappin")
-                        .font(.system(size: 16, weight: .regular)).lineLimit(1)
+                        .font(WatchWidgetDesignTokens.rectangularInfo).lineLimit(1)
                         .minimumScaleFactor(0.8)
                         .truncationMode(.tail)
                         .foregroundStyle(.primary)
@@ -422,7 +426,7 @@ private struct ScheduleWidgetView: View {
                 }
             }
             .padding(.horizontal, 2)
-            .padding(.vertical, 2)
+            .padding(.vertical, courseProgress == nil ? 2 : 0)
         } else {
             HStack(spacing: 8) {
                 Image(systemName: schedule.emptySymbol).font(.title3).foregroundStyle(.secondary)
