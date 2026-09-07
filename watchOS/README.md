@@ -3,6 +3,8 @@
 本目录包含原生 SwiftUI watchOS Companion App 和 WidgetKit Smart Stack
 小组件。完整架构、协议和维护说明见
 [`docs/apple_watch_technical_overview.md`](../docs/apple_watch_technical_overview.md)。
+本轮业务逻辑与多语言审计记录见
+[`docs/apple_watch_code_audit.md`](../docs/apple_watch_code_audit.md)。
 
 iPhone 始终是课表数据源。Flutter 将课程、自定义课程、考试和实验展开为
 完整学期快照，iOS 原生层负责持久化并响应 WatchConnectivity 请求。手表每次
@@ -115,6 +117,8 @@ WidgetRenderer 的无效布局坐标断言。上课期间时间线每五分钟�
 - `Storage/WatchScheduleStore.swift`：快照安装、缓存恢复、派生索引与预热；
 - `Storage/DayCourseLayoutCache.swift`：卡片实测高度、位移换算与可暂停持久化；
 - `Shared/`：Watch App 与 Widget 共用的 App Group、语言、schema 和缓存编码；
+- `Shared/WatchSyncSupport.swift`：iPhone、Watch App、Widget 共用的协议字段、
+  范围、语言映射、时间戳和文本处理纯函数；
 - `Widget/`：表盘 Complication、Smart Stack 时间线、课程切换和今日摘要；
 - `Views/`：页面、交互基础设施和新手引导。
 
@@ -155,4 +159,5 @@ watchOS 11 以上使用 ScrollPhase，watchOS 10 的原生教学通过触摸来�
 会拦截旧编码结果。现有可见布局、拖动阈值、表冠倍率和动画时长保持不变。
 
 运行 `bash tools/test_watch_regressions.sh` 可执行共享 Swift 状态、交互和缓存回归。
+运行 `python3 tools/audit_watch_localizations.py` 可检查三种语言的资源及格式参数。
 构建、实体表验证范围与两个 Python 签名脚本的用法见完整技术说明。

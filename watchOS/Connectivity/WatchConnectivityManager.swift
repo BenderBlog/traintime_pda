@@ -24,30 +24,8 @@ private struct ScheduleReplyPayload {
 final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     static let shared = WatchConnectivityManager()
 
-    /// 双端通信协议使用的键。修改时必须同步修改 iOS 端实现。
-    private enum Key {
-        static let scheduleJSON = "scheduleJSON"
-        static let requestSchedule = "requestSchedule"
-        static let scope = "scheduleScope"
-        static let offset = "scheduleOffset"
-        static let nextOffset = "scheduleNextOffset"
-        static let hasMore = "scheduleHasMore"
-        static let preferredLanguage = "preferredLanguage"
-        static let scheduleVersion = "scheduleVersion"
-        static let scheduleUnchanged = "scheduleUnchanged"
-        static let scheduleCleared = "scheduleCleared"
-        static let signedOut = "signedOut"
-        static let stateRevision = "stateRevision"
-        static let accountGeneration = "accountGeneration"
-        static let messageType = "messageType"
-        static let refreshID = "refreshID"
-        static let requestID = "requestID"
-    }
-
-    private enum MessageType {
-        static let request = "scheduleRequest"
-        static let response = "scheduleResponse"
-    }
+    private typealias Key = WatchSyncProtocol.Key
+    private typealias MessageType = WatchSyncProtocol.MessageType
 
     /// 一整轮渐进刷新允许的最长等待时间。
     private static let refreshTimeoutNanoseconds: UInt64 =
@@ -65,6 +43,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
     /// 当前三阶段响应必须全部属于同一个手机课表版本。
     private var activeIncomingScheduleVersion: String?
+    private var requestedOffset = 0
+    private var refreshTimeoutTask: Task<Void, Never>?
+    private var launchReplyTimeoutTask: Task<Void, Never>?
 
     /// 每次 App 打开时建立一次独立的手机回复等待窗口。
     ///
@@ -138,9 +119,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
         let newRefreshID = UUID()
         refreshID = newRefreshID
-        activeIncomingScheduleVersion = nil
-        processedQueuedRequestIDs.removeAll(keepingCapacity: true)
-        processedQueuedRequestOrder.removeAll(keepingCapacity: true)
+        resetIncomingTransfer(keepingCapacity: true)
         store.beginRefresh()
         request(
             scope: .today,
@@ -173,7 +152,8 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     /// 超时任务携带刷新 ID；新一轮刷新启动后，旧任务即使醒来也不会改状态。
     @MainActor
     private func scheduleTimeout(for expectedRefreshID: UUID) {
-        Task { @MainActor [weak self] in
+        refreshTimeoutTask?.cancel()
+        refreshTimeoutTask = Task { @MainActor [weak self] in
             try? await Task.sleep(
                 nanoseconds: Self.refreshTimeoutNanoseconds
             )
@@ -194,13 +174,15 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                     watchLocalizedString("暂时无法连接 iPhone")
                 )
             }
+            self.refreshTimeoutTask = nil
         }
     }
 
     /// 启动请求超时只改变提示状态，不触碰任何已安装或正在展示的缓存。
     @MainActor
     private func scheduleLaunchReplyTimeout(for expectedAttemptID: UUID) {
-        Task { @MainActor [weak self] in
+        launchReplyTimeoutTask?.cancel()
+        launchReplyTimeoutTask = Task { @MainActor [weak self] in
             try? await Task.sleep(
                 nanoseconds: Self.launchReplyTimeoutNanoseconds
             )
@@ -211,6 +193,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                 return
             }
             self.store?.markLaunchSyncTimedOut()
+            self.launchReplyTimeoutTask = nil
         }
     }
 
@@ -316,8 +299,8 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     private func reportActivationFailure(_ error: Error) {
         Task { @MainActor [weak self] in
             self?.store?.failRefresh(
-                String.localizedStringWithFormat(
-                    watchLocalizedString("无法连接 iPhone：%@"),
+                watchLocalizedFormat(
+                    "无法连接 iPhone：%@",
                     error.localizedDescription
                 )
             )
@@ -361,6 +344,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         }
 
         let requestID = UUID().uuidString
+        requestedOffset = offset
         sendRequest(
             through: session,
             scope: scope,
@@ -471,12 +455,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             store?.finishRefresh()
         } else {
             store?.failRefresh(
-                String.localizedStringWithFormat(
-                    watchLocalizedString("同步失败：%@"),
+                watchLocalizedFormat(
+                    "同步失败：%@",
                     error.localizedDescription
                 )
             )
         }
+        cancelRefreshTimeout()
     }
 
     /// 将即时发送失败的同一请求交给 WatchConnectivity 后台可靠队列。
@@ -518,12 +503,12 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         else {
             return
         }
+        defer {
+            if !store.isRefreshing { cancelRefreshTimeout() }
+        }
 
-        guard acceptStateEnvelope(reply) else { return }
+        guard consumeResponseMetadata(reply) else { return }
         if consumeClearIfNeeded(reply) { return }
-
-        // 每个课表请求的回复都携带语言，手表错过实时消息时也能自动修正。
-        consumePreferredLanguage(from: reply)
 
         let payload = parseReply(
             reply,
@@ -539,6 +524,15 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         // 防止把两个版本的课程拼成一份整学期缓存。
         guard acceptIncomingScheduleVersion(payload.scheduleVersion) else {
             beginProgressiveRefresh(force: true)
+            return
+        }
+
+        guard payload.scope == expectedScope,
+              WatchSyncProtocol.acceptsPagination(
+                  scope: payload.scope, offset: requestedOffset,
+                  nextOffset: payload.nextOffset, hasMore: payload.hasMore)
+        else {
+            store.failRefresh(watchLocalizedString("课表分页数据无效，请重新刷新"))
             return
         }
 
@@ -694,8 +688,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     private func consumeApplicationContext(
         _ context: [String: Any]
     ) -> Bool {
-        guard acceptStateEnvelope(context) else { return false }
-        consumePreferredLanguage(from: context)
+        guard consumeResponseMetadata(context) else { return false }
         if consumeClearIfNeeded(context) { return true }
 
         // 相同的完整版本直接复用本地缓存，避免重复解码和页面重新分组。
@@ -715,6 +708,14 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             rawValue: context[Key.scope] as? String ?? ""
         ) ?? .fourteenDays
         return store?.replaceSchedule(json: json, scope: scope) ?? false
+    }
+
+    /// 两条课表接收路径先校验状态再安装语言；清空回复也不会遗漏语言更新。
+    @MainActor
+    private func consumeResponseMetadata(_ payload: [String: Any]) -> Bool {
+        guard acceptStateEnvelope(payload) else { return false }
+        consumePreferredLanguage(from: payload)
+        return true
     }
 
     /// 修订号跨 iPhone 重启持久化；退出后的旧上下文和旧分页均不能复活课表。
@@ -747,11 +748,12 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     private func consumeClearIfNeeded(_ payload: [String: Any]) -> Bool {
         guard payload[Key.scheduleCleared] as? Bool == true else { return false }
         refreshID = UUID()
-        activeIncomingScheduleVersion = nil
+        resetIncomingTransfer(keepingCapacity: false)
+        cancelRefreshTimeout()
+        launchReplyTimeoutTask?.cancel()
+        launchReplyTimeoutTask = nil
         launchAttemptID = nil
         launchAttemptRefreshID = nil
-        processedQueuedRequestIDs.removeAll()
-        processedQueuedRequestOrder.removeAll()
         for transfer in WCSession.default.outstandingUserInfoTransfers { transfer.cancel() }
         store?.clearSchedule(signedOut: payload[Key.signedOut] as? Bool ?? false)
         return true
@@ -794,7 +796,23 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         }
         launchAttemptID = nil
         launchAttemptRefreshID = nil
+        launchReplyTimeoutTask?.cancel()
+        launchReplyTimeoutTask = nil
         store?.receiveLaunchSyncReply()
+    }
+
+    @MainActor
+    private func resetIncomingTransfer(keepingCapacity: Bool) {
+        activeIncomingScheduleVersion = nil
+        requestedOffset = 0
+        processedQueuedRequestIDs.removeAll(keepingCapacity: keepingCapacity)
+        processedQueuedRequestOrder.removeAll(keepingCapacity: keepingCapacity)
+    }
+
+    @MainActor
+    private func cancelRefreshTimeout() {
+        refreshTimeoutTask?.cancel()
+        refreshTimeoutTask = nil
     }
 
     /// 登记一条队列回复，并以固定上限保存近期 ID。

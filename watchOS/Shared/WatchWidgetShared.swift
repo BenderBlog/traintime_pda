@@ -47,6 +47,22 @@ enum WatchCacheCoding {
         try JSONEncoder().encode(value)
     }
 
+    /// 派生缓存共用后台编码；父任务取消时停止尚未开始的旧编码任务。
+    static func encodeInBackground<Value: Encodable & Sendable>(_ value: Value) async throws -> Data {
+        try Task.checkCancellation()
+        let task = Task.detached(priority: .utility) {
+            try Task.checkCancellation()
+            let data = try encode(value)
+            try Task.checkCancellation()
+            return data
+        }
+        return try await withTaskCancellationHandler {
+            try await task.value
+        } onCancel: {
+            task.cancel()
+        }
+    }
+
     /// 解码 WatchConnectivity 与持久化层共用的 UTF-8 JSON 字符串。
     static func decode<Value: Decodable>(
         _ type: Value.Type,
@@ -90,6 +106,17 @@ enum WatchCacheCoding {
     }
 }
 
+/// App 与 Widget 从通信或磁盘恢复快照时采用完全相同的 schema 校验。
+enum WatchScheduleCoding {
+    static func decode(_ json: String) throws -> WatchScheduleSnapshot {
+        let snapshot = try WatchCacheCoding.decode(WatchScheduleSnapshot.self, fromJSON: json)
+        guard WatchSyncProtocol.supportedSchemaVersions.contains(snapshot.schemaVersion) else {
+            throw WatchScheduleDataError.unsupportedSchema(snapshot.schemaVersion)
+        }
+        return snapshot
+    }
+}
+
 /// 手表 App 与 Widget Extension 的共享存储入口。
 ///
 /// 两个进程不能直接共享 `UserDefaults.standard`，因此课表需要同时写入
@@ -130,7 +157,7 @@ enum WatchWidgetShared {
     static let preferredLanguageKey = "watchPreferredLanguage"
 
     /// Watch App 与 Widget 当前共同支持的课表 schema。
-    static let supportedScheduleSchemaVersions = 1...4
+    static let supportedScheduleSchemaVersions = WatchSyncProtocol.supportedSchemaVersions
 
     /// 稳定的缓存读取顺序；最终选择由修订号与明确覆盖范围共同决定。
     static let scheduleCacheScopesByPriority: [WatchScheduleScope] = [
@@ -148,7 +175,7 @@ enum WatchWidgetShared {
 
     /// 当前手机指定的语言；首次同步前回退到手表系统语言。
     static var preferredLanguageIdentifier: String {
-        if let stored = defaults?.string(forKey: preferredLanguageKey),
+        if let stored = (defaults ?? .standard).string(forKey: preferredLanguageKey),
            let normalized = normalizedPreferredLanguage(stored)
         {
             return normalized
@@ -166,36 +193,12 @@ enum WatchWidgetShared {
 
     /// 将不同平台的语言代码收敛为与手机设置一致的三个协议值。
     static func normalizedPreferredLanguage(_ value: String) -> String? {
-        let normalized = value
-            .replacingOccurrences(of: "-", with: "_")
-            .lowercased()
-
-        if normalized.hasPrefix("zh_hant")
-            || normalized.hasPrefix("zh_tw")
-            || normalized.hasPrefix("zh_hk")
-            || normalized.hasPrefix("zh_mo")
-        {
-            return "zh_TW"
-        }
-        if normalized.hasPrefix("zh") {
-            return "zh_CN"
-        }
-        if normalized.hasPrefix("en") {
-            return "en_US"
-        }
-        return nil
+        WatchLanguage(identifier: value)?.rawValue
     }
 
     /// 将协议语言值映射为 String Catalog 能正确匹配的 Locale。
     static func locale(for languageIdentifier: String) -> Locale {
-        switch normalizedPreferredLanguage(languageIdentifier) {
-        case "zh_TW":
-            Locale(identifier: "zh-Hant")
-        case "en_US":
-            Locale(identifier: "en")
-        default:
-            Locale(identifier: "zh-Hans")
-        }
+        (WatchLanguage(identifier: languageIdentifier) ?? .simplifiedChinese).locale
     }
 
     /// 保存新语言并刷新 Widget；返回值表示语言是否实际发生变化。
@@ -303,15 +306,7 @@ enum WatchWidgetShared {
     private static func decodeSnapshot(
         from json: String
     ) -> WatchScheduleSnapshot? {
-        guard let snapshot = try? WatchCacheCoding.decode(
-            WatchScheduleSnapshot.self,
-            fromJSON: json
-        ),
-            supportedScheduleSchemaVersions.contains(snapshot.schemaVersion)
-        else {
-            return nil
-        }
-        return snapshot
+        try? WatchScheduleCoding.decode(json)
     }
 
     /// 只刷新本项目的课程组件，避免影响其他 Widget。
@@ -328,28 +323,29 @@ enum WatchWidgetShared {
 /// 按手表系统首选语言选择资源。因此手机设置为英语、而手表系统是中文时，
 /// 目录标题仍会返回中文。这里显式选择 `en.lproj` 或 `zh-Hant.lproj`；
 /// 简体中文是 String Catalog 的源语言，直接返回中文键即可。
-func watchLocalizedString(_ key: String) -> String {
-    let resourceName: String
-    switch WatchWidgetShared.preferredLanguageIdentifier {
-    case "en_US":
-        resourceName = "en"
-    case "zh_TW":
-        resourceName = "zh-Hant"
-    default:
-        return key
-    }
+func watchLocalizedString(
+    _ key: String,
+    languageIdentifier: String = WatchWidgetShared.preferredLanguageIdentifier
+) -> String {
+    let language = WatchLanguage(identifier: languageIdentifier) ?? .simplifiedChinese
+    guard language != .simplifiedChinese,
+          let bundle = WatchLocalizationResources.bundles[language]
+    else { return key }
+    return bundle.localizedString(forKey: key, value: key, table: nil)
+}
 
-    guard let path = Bundle.main.path(
-        forResource: resourceName,
-        ofType: "lproj"
-    ),
-        let localizationBundle = Bundle(path: path)
-    else {
-        return key
-    }
-    return localizationBundle.localizedString(
-        forKey: key,
-        value: key,
-        table: nil
-    )
+/// 文案与格式化参数均使用手机指定语言，避免混用手表系统 Locale。
+func watchLocalizedFormat(_ key: String, _ arguments: CVarArg...) -> String {
+    String(format: watchLocalizedString(key), locale: WatchWidgetShared.preferredLocale,
+        arguments: arguments)
+}
+
+private enum WatchLocalizationResources {
+    /// 资源包最多解析三次；切换语言只切换索引，不缓存已翻译的最终文案。
+    static let bundles: [WatchLanguage: Bundle] = Dictionary(
+        uniqueKeysWithValues: WatchLanguage.allCases.compactMap { language in
+            guard let path = Bundle.main.path(forResource: language.resourceName, ofType: "lproj"),
+                  let bundle = Bundle(path: path) else { return nil }
+            return (language, bundle)
+        })
 }

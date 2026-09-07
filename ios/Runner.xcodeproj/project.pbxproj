@@ -67,6 +67,9 @@
 		C17C00000000000000000002 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C17C00000000000000000003 /* Localizable.xcstrings */; };
 		F39F00000000000000000001 /* WatchSchedulePresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39F00000000000000000003 /* WatchSchedulePresentation.swift */; };
 		F39F00000000000000000002 /* WatchSchedulePresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39F00000000000000000003 /* WatchSchedulePresentation.swift */; };
+		F39F00000000000000000011 /* WatchSyncSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39F00000000000000000010 /* WatchSyncSupport.swift */; };
+		F39F00000000000000000012 /* WatchSyncSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39F00000000000000000010 /* WatchSyncSupport.swift */; };
+		F39F00000000000000000013 /* WatchSyncSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39F00000000000000000010 /* WatchSyncSupport.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -219,6 +222,7 @@
 		C17C00000000000000000003 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		D27A00000000000000000001 /* PhoneWatchQueuedScheduleTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchQueuedScheduleTransport.swift; sourceTree = "<group>"; };
 		F39F00000000000000000003 /* WatchSchedulePresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/WatchSchedulePresentation.swift; sourceTree = "<group>"; };
+		F39F00000000000000000010 /* WatchSyncSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/WatchSyncSupport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -374,6 +378,7 @@
 				C17C00000000000000000003 /* Localizable.xcstrings */,
 				B17B0000000000000000000D /* WatchWidgetShared.swift */,
 				F39F00000000000000000003 /* WatchSchedulePresentation.swift */,
+				F39F00000000000000000010 /* WatchSyncSupport.swift */,
 				B17B0000000000000000000B /* TraintimeWatchWidgetBundle.swift */,
 				B17B0000000000000000000C /* TraintimeScheduleWidget.swift */,
 				B17B0000000000000000000E /* Info.plist */,
@@ -670,6 +675,7 @@
 				262B01702B5905FA0094B372 /* ApiImplementation.swift in Sources */,
 				A17A0000000000000000001E /* WatchConnectivityManager.swift in Sources */,
 				D27A00000000000000000002 /* PhoneWatchQueuedScheduleTransport.swift in Sources */,
+				F39F00000000000000000011 /* WatchSyncSupport.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -697,6 +703,7 @@
 				A17A0000000000000000001D /* RootScheduleView.swift in Sources */,
 				B17B00000000000000000014 /* WatchWidgetShared.swift in Sources */,
 				F39F00000000000000000001 /* WatchSchedulePresentation.swift in Sources */,
+				F39F00000000000000000012 /* WatchSyncSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -708,6 +715,7 @@
 				B17B00000000000000000012 /* TraintimeScheduleWidget.swift in Sources */,
 				B17B00000000000000000013 /* WatchWidgetShared.swift in Sources */,
 				F39F00000000000000000002 /* WatchSchedulePresentation.swift in Sources */,
+				F39F00000000000000000013 /* WatchSyncSupport.swift in Sources */,
 				B17B00000000000000000015 /* WatchScheduleSnapshot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

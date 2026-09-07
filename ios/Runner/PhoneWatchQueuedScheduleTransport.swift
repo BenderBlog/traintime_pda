@@ -13,16 +13,8 @@ import WatchConnectivity
 /// 这里不读取 Flutter 状态，也不持有课表数据；回复内容仍由
 /// `PhoneWatchConnectivityManager` 根据手机本地完整学期缓存统一生成。
 final class PhoneWatchQueuedScheduleTransport {
-    private enum Key {
-        static let messageType = "messageType"
-        static let refreshID = "refreshID"
-        static let requestID = "requestID"
-    }
-
-    private enum MessageType {
-        static let request = "scheduleRequest"
-        static let response = "scheduleResponse"
-    }
+    private typealias Key = WatchSyncProtocol.Key
+    private typealias MessageType = WatchSyncProtocol.MessageType
 
     /// 处理一条系统后台投递的课表请求。
     ///
@@ -65,7 +57,7 @@ final class PhoneWatchQueuedScheduleTransport {
     /// 统一过滤缺失或空白的关联标识。
     private func nonemptyString(_ value: Any?) -> String? {
         guard let value = value as? String,
-              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+              WatchScheduleText.nonempty(value) != nil
         else {
             return nil
         }

@@ -8,6 +8,7 @@ cd "$(dirname "$0")/.."
 watch_test_dir=$(mktemp -d "${TMPDIR:-/tmp}/traintime-watch-tests.XXXXXX")
 trap 'rm -rf "$watch_test_dir"' EXIT
 watch_common_sources=(
+    watchOS/Shared/WatchSyncSupport.swift
     watchOS/Models/WatchScheduleSnapshot.swift
     watchOS/Shared/WatchWidgetShared.swift
     watchOS/Shared/WatchSchedulePresentation.swift

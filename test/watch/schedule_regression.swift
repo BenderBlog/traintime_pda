@@ -89,6 +89,7 @@ struct ScheduleRegression {
     }
 
     static func main() throws {
+        try sharedDataRegressions()
         overviewRegressions()
         let first = course("A", start: date(7, 8, 30), end: date(7, 10, 5))
         let second = course("B", start: date(7, 14), end: date(7, 15, 35), place: "C-101")
@@ -288,5 +289,79 @@ struct ScheduleRegression {
             defaults.bool(forKey: WatchPersistentCacheKey.completedOnboarding),
             "Clear preserves onboarding preference")
         print("Passed \(assertions) schedule/cache/order regression checks")
+    }
+
+    static func sharedDataRegressions() throws {
+        let languageCases: [(String?, WatchLanguage?)] = [
+            ("zh_CN", .simplifiedChinese), ("zh-SG", .simplifiedChinese),
+            ("zh-Hant", .traditionalChinese), ("zh-HK", .traditionalChinese),
+            ("zh-MO", .traditionalChinese), ("zh-Hans-TW", .simplifiedChinese),
+            ("zh-Hant-CN", .traditionalChinese), (" en-GB ", .english),
+            ("en_US", .english), ("english", nil), ("zh-invalid-language", .simplifiedChinese),
+            ("fr-FR", nil), (nil, nil),
+        ]
+        for (identifier, expected) in languageCases {
+            check(WatchLanguage(identifier: identifier) == expected,
+                "Phone and Watch normalize the same language aliases: \(identifier ?? "nil")")
+        }
+        check(WatchLanguage.traditionalChinese.resourceName == "zh-Hant",
+            "Traditional Chinese selects the script resource rather than a region-only bundle")
+        check(WatchScheduleDate.calendar(offsetMinutes: Int.max).timeZone == .current,
+            "An invalid timezone offset cannot overflow during decoding")
+        check(WatchScheduleDate.epochMilliseconds(
+            for: WatchScheduleDate.date(fromEpochMilliseconds: 1_000_123)) == 1_000_123,
+            "Milliseconds round-trip through the shared conversion")
+        check(WatchScheduleText.compactLocation("信远 Ⅱ-105 ") == "Ⅱ-105",
+            "Compact location retains the exact Roman numeral and classroom number")
+
+        check(!WatchSyncProtocol.acceptsPagination(scope: .semester, offset: 50, nextOffset: 50, hasMore: true),
+            "A repeated page cannot create an endless transfer")
+        check(!WatchSyncProtocol.acceptsPagination(scope: .today, offset: 0, nextOffset: 50, hasMore: true),
+            "Partial daily snapshots are not treated as a completed range")
+        check(WatchSyncProtocol.acceptsPagination(scope: .semester, offset: 50, nextOffset: 100, hasMore: true),
+            "Normal semester pagination continues")
+        check(WatchSyncProtocol.acceptsPagination(scope: .semester, offset: 0, nextOffset: 0, hasMore: false),
+            "An empty completed semester remains valid")
+
+        let early = course("A", start: date(7, 8), end: date(7, 9))
+        let late = course("B", start: date(7, 10), end: date(7, 11))
+        var firstPage = snapshot([late])
+        firstPage.sourceRevision = 8
+        firstPage.semesterEndEpochMs = ms(date(28))
+        let lastPage = firstPage.replacingCourses([early])
+        var transfer = WatchSemesterTransfer()
+        try transfer.append(firstPage)
+        try transfer.append(lastPage)
+        let completed = try transfer.completedSnapshot()
+        check(completed.courses.map(\.id) == ["A", "B"], "Pages are sorted only when assembled")
+        check(completed.sourceRevision == 8 && completed.semesterEndEpochMs == ms(date(28)),
+            "Assembly retains the original revision and full term boundary")
+
+        var changedPage = lastPage
+        changedPage.sourceRevision = 9
+        do {
+            try transfer.append(changedPage)
+            check(false, "Pages from another source revision must be rejected")
+        } catch WatchScheduleDataError.inconsistentSemester {
+            let unchanged = try transfer.completedSnapshot()
+            check(unchanged == completed, "Rejected pages cannot modify the accumulated data")
+        }
+        transfer.reset(keepingCapacity: true)
+        try transfer.append(firstPage.replacingCourses([]))
+        let empty = try transfer.completedSnapshot()
+        check(empty.courses.isEmpty, "Reset removes courses and keeps empty semesters valid")
+
+        let json = try WatchCacheCoding.encodeJSON(firstPage)
+        let decoded = try WatchScheduleCoding.decode(json)
+        check(decoded == firstPage, "Shared decoder preserves all supported fields")
+        var root = try JSONSerialization.jsonObject(with: Data(json.utf8)) as! [String: Any]
+        root["schemaVersion"] = 999
+        let unsupported = String(decoding: try JSONSerialization.data(withJSONObject: root), as: UTF8.self)
+        do {
+            _ = try WatchScheduleCoding.decode(unsupported)
+            check(false, "Unsupported schemas must fail before replacing a cache")
+        } catch WatchScheduleDataError.unsupportedSchema(let version) {
+            check(version == 999, "Diagnostics retain the rejected schema version")
+        }
     }
 }

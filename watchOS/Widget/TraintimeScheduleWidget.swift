@@ -71,7 +71,7 @@ struct TraintimeScheduleWidgetProvider: TimelineProvider {
         let start = now.addingTimeInterval(-600)
         let end = now.addingTimeInterval(2400)
         let course = WatchCourse(
-            id: "preview", name: "高等数学", teacher: nil, classroom: "B-302",
+            id: "preview", name: watchLocalizedString("高等数学"), teacher: nil, classroom: "B-302",
             startAtEpochMs: Int64(start.timeIntervalSince1970 * 1000),
             endAtEpochMs: Int64(end.timeIntervalSince1970 * 1000),
             startSection: 1, endSection: 2, colorARGB: 0xFF21_96F3, kind: "course", note: nil)
@@ -491,8 +491,7 @@ private struct ScheduleWidgetView: View {
         }
         if schedule.summaryCourses.isEmpty { return watchLocalizedString("今日无课") }
         if summaryRemaining == 0 { return watchLocalizedString("今日已下课") }
-        return String(
-            format: watchLocalizedString("%@ %d 项 · 还剩 %d 项"),
+        return watchLocalizedFormat("%@ %d 项 · 还剩 %d 项",
             schedule.dayLabel(for: schedule.summaryDate), schedule.summaryCourses.count,
             summaryRemaining)
     }
@@ -532,7 +531,7 @@ private struct ScheduleWidgetView: View {
             .foregroundStyle(.secondary)
 
             Text(summaryIsAvailable && summaryRemaining > 0
-                ? String(format: watchLocalizedString("还剩 %d 项"), summaryRemaining)
+                ? watchLocalizedFormat("还剩 %d 项", summaryRemaining)
                 : summaryText)
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                 .minimumScaleFactor(0.85)
@@ -542,11 +541,11 @@ private struct ScheduleWidgetView: View {
                 if summaryRemaining > 0,
                     let lastEnd = schedule.summaryCourses.map(\.endAt).max()
                 {
-                    Text(String(format: watchLocalizedString("%@ 全部结束"),
+                    Text(watchLocalizedFormat("%@ 全部结束",
                         schedule.compactDateTimeText(for: lastEnd)))
                         .font(.system(size: 11, weight: .medium))
                 } else if let next = schedule.focus, next.startAt > schedule.date {
-                    Text(String(format: watchLocalizedString("下一次 %@"),
+                    Text(watchLocalizedFormat("下一次 %@",
                         schedule.compactDateTimeText(for: next.startAt)))
                         .font(.system(size: 11, weight: .medium))
                 } else if [.unconfirmed, .todayFree, .todayFinished].contains(schedule.state) {
@@ -568,7 +567,7 @@ private struct ScheduleWidgetView: View {
         let label =
             currentWeek.start == schedule.weekInterval.start
             ? watchLocalizedString("本周") : schedule.dayLabel(for: schedule.weekInterval.start)
-        return String(format: watchLocalizedString("%@ %d 项"), label, schedule.weekCourses.count)
+        return watchLocalizedFormat("%@ %d 项", label, schedule.weekCourses.count)
     }
 }
 

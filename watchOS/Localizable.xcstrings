@@ -1,6 +1,98 @@
 {
   "sourceLanguage" : "zh-Hans",
   "strings" : {
+    "高等数学" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculus"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高等数学"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高等數學"
+          }
+        }
+      }
+    },
+    "课表分页数据无效，请重新刷新" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid schedule page. Refresh again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "课表分页数据无效，请重新刷新"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "課表分頁資料無效，請重新整理"
+          }
+        }
+      }
+    },
+    "座位 %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seat %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "座位 %@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "座位 %@"
+          }
+        }
+      }
+    },
+    "关闭课表过期提示" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss outdated schedule notice"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭课表过期提示"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉課表過期提示"
+          }
+        }
+      }
+    },
     "今日概览待同步" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -76,7 +168,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d events left today"
+            "value" : "Events left today: %d"
           }
         },
         "zh-Hans" : {
@@ -237,7 +329,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d scheduled days left this week"
+            "value" : "Scheduled days left this week: %d"
           }
         },
         "zh-Hans" : {
@@ -283,7 +375,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d upcoming exams"
+            "value" : "Upcoming exams: %d"
           }
         },
         "zh-Hans" : {
@@ -329,7 +421,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d upcoming labs"
+            "value" : "Upcoming labs: %d"
           }
         },
         "zh-Hans" : {
@@ -531,10 +623,10 @@
       }
     },
     "" : {
-
+      "shouldTranslate" : false
     },
     "–" : {
-
+      "shouldTranslate" : false
     },
     "%@ – %@" : {
       "localizations" : {
@@ -544,7 +636,8 @@
             "value" : "%1$@ – %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%@ %d 项" : {
       "extractionState" : "manual",
@@ -552,7 +645,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$d events"
+            "value" : "%1$@ · Events: %2$d"
           }
         },
         "zh-Hans" : {
@@ -575,7 +668,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$d events · %3$d left"
+            "value" : "%1$@ · Events: %2$d · Left: %3$d"
           }
         },
         "zh-Hans" : {
@@ -611,7 +704,7 @@
       }
     },
     "%lld" : {
-
+      "shouldTranslate" : false
     },
     "Apple Watch 课表" : {
       "extractionState" : "stale",
@@ -828,7 +921,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d classes today"
+            "value" : "Classes today: %d"
           }
         },
         "zh-Hant" : {
@@ -1160,7 +1253,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Starting now"
+            "value" : "Starting soon"
           }
         },
         "zh-Hans" : {
@@ -1495,7 +1588,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Term starts soon"
+            "value" : "Term not started"
           }
         },
         "zh-Hans" : {
@@ -2284,7 +2377,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d classes this week"
+            "value" : "Classes this week: %d"
           }
         },
         "zh-Hant" : {

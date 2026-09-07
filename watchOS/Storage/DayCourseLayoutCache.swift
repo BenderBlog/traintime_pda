@@ -129,9 +129,7 @@ final class DayCourseLayoutTracker {
             }
         )
         do {
-            let data = try await Task.detached(priority: .utility) {
-                try WatchCacheCoding.encode(cache)
-            }.value
+            let data = try await WatchCacheCoding.encodeInBackground(cache)
             guard !Task.isCancelled,
                 !persistenceSuspended,
                 self.activeSignature == activeSignature,

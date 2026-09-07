@@ -6,11 +6,7 @@ import Foundation
 import WatchConnectivity
 
 /// 手机端支持的手表课表请求范围。
-private enum PhoneScheduleScope: String {
-    case today
-    case fourteenDays
-    case semester
-}
+private typealias PhoneScheduleScope = WatchScheduleScope
 
 /// 经过范围过滤或学期分页后的回复内容。
 private struct PhoneScheduleResponse {
@@ -46,22 +42,7 @@ private struct StoredPhoneScheduleResult {
 final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     static let shared = PhoneWatchConnectivityManager()
 
-    /// 双端通信协议键，必须与 watchOS 管理器保持一致。
-    private enum Key {
-        static let scheduleJSON = "scheduleJSON"
-        static let requestSchedule = "requestSchedule"
-        static let scope = "scheduleScope"
-        static let offset = "scheduleOffset"
-        static let nextOffset = "scheduleNextOffset"
-        static let hasMore = "scheduleHasMore"
-        static let preferredLanguage = "preferredLanguage"
-        static let scheduleVersion = "scheduleVersion"
-        static let scheduleUnchanged = "scheduleUnchanged"
-        static let scheduleCleared = "scheduleCleared"
-        static let signedOut = "signedOut"
-        static let stateRevision = "stateRevision"
-        static let accountGeneration = "accountGeneration"
-    }
+    private typealias Key = WatchSyncProtocol.Key
 
     private static let persistedScheduleKey =
         "TraintimeWatchSemesterSchedule"
@@ -82,6 +63,8 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     private var accountGeneration = UserDefaults.standard.string(forKey: persistedGenerationKey) ?? UUID().uuidString
     private var signedOut = UserDefaults.standard.bool(forKey: persistedSignedOutKey)
     private var latestScheduleJSON: String?
+    /// 只在源 JSON 改变时解析；每个范围和分页复用这一份只读文档。
+    private var latestScheduleDocument: PhoneScheduleDocument?
     private var latestScheduleVersion: String?
     private var latestPreferredLanguage: String?
     private var latestRevision = UserDefaults.standard.integer(forKey: persistedRevisionKey)
@@ -99,15 +82,17 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         let storedLanguage = UserDefaults.standard.string(
             forKey: Self.persistedLanguageKey
         )
+        let document = storedJSON.flatMap(Self.parseScheduleDocument)
         latestScheduleJSON = storedJSON
-        latestScheduleVersion = Self.scheduleVersion(for: storedJSON)
-        latestPreferredLanguage = Self.normalizedLanguage(storedLanguage)
+        latestScheduleDocument = document
+        latestScheduleVersion = document.flatMap(Self.scheduleVersion)
+        latestPreferredLanguage = WatchLanguage(identifier: storedLanguage)?.rawValue
         super.init()
         latestRevision = max(latestRevision, Int(Date().timeIntervalSince1970 * 1_000))
         UserDefaults.standard.set(latestRevision, forKey: Self.persistedRevisionKey)
         UserDefaults.standard.set(accountGeneration, forKey: Self.persistedGenerationKey)
 
-        if let storedJSON, !isValidScheduleJSON(storedJSON) {
+        if storedJSON != nil, document == nil {
             latestScheduleJSON = nil
             latestScheduleVersion = nil
             UserDefaults.standard.removeObject(
@@ -138,28 +123,31 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     func syncSchedule(json: String) -> Bool {
         publicationLock.lock()
         defer { publicationLock.unlock() }
-        guard json.isEmpty || isValidScheduleJSON(json) else {
+        let document = json.isEmpty ? nil : Self.parseScheduleDocument(json)
+        guard json.isEmpty || document != nil else {
             log("Rejected invalid schedule JSON")
             return false
         }
 
-        let result = storeLatestSchedule(json)
+        let result = storeLatestSchedule(json, document: document)
         guard result.changed || currentPendingSchedule() != nil else {
             log("Schedule content unchanged; skipped republishing")
             return true
         }
-        if result.changed { persistSchedule(json, version: result.version) }
+        // 语义相同的重试继续发布已保存正文，保证分页与上下文的生成时间也一致。
+        let publicationJSON = currentLatestScheduleJSON() ?? ""
+        if result.changed { persistSchedule(publicationJSON, version: result.version) }
 
         guard WCSession.isSupported() else { return false }
         let session = WCSession.default
         guard session.activationState == .activated else {
-            setPendingSchedule(json: json, version: result.version, revision: result.revision)
+            setPendingSchedule(json: publicationJSON, version: result.version, revision: result.revision)
             configureAndActivate(session)
             return true
         }
 
         return updateApplicationContext(
-            json: json,
+            json: publicationJSON,
             version: result.version,
             revision: result.revision,
             session: session
@@ -190,7 +178,9 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     /// 时，再额外发送一次实时消息，使切换语言后无需重新打开手表应用。
     @discardableResult
     func syncPreferredLanguage(_ localeIdentifier: String) -> Bool {
-        guard let language = Self.normalizedLanguage(localeIdentifier) else {
+        publicationLock.lock()
+        defer { publicationLock.unlock() }
+        guard let language = WatchLanguage(identifier: localeIdentifier)?.rawValue else {
             log("Rejected unsupported language: \(localeIdentifier)")
             return false
         }
@@ -223,9 +213,10 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     /// `generatedAtEpochMs` 不参与版本计算，因此 App 重启或响应式 effect
     /// 重建同一份课表时不会触发无意义的 WatchConnectivity 传输。
     private func storeLatestSchedule(
-        _ json: String
+        _ json: String,
+        document: PhoneScheduleDocument?
     ) -> StoredPhoneScheduleResult {
-        let version = Self.scheduleVersion(for: json)
+        let version = document.flatMap(Self.scheduleVersion)
         return withStateLock {
             guard json.isEmpty || version != latestScheduleVersion else {
                 return StoredPhoneScheduleResult(
@@ -242,6 +233,7 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
                 UserDefaults.standard.set(false, forKey: Self.persistedSignedOutKey)
             }
             latestScheduleJSON = json.isEmpty ? nil : json
+            latestScheduleDocument = document
             latestScheduleVersion = version
             return StoredPhoneScheduleResult(
                 version: version,
@@ -363,18 +355,10 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         for response: PhoneScheduleResponse,
         scheduleVersion: String?
     ) -> [String: Any] {
-        var context: [String: Any] = [
+        responseDictionary([
             Key.scheduleJSON: response.json,
             Key.scope: PhoneScheduleScope.fourteenDays.rawValue,
-        ]
-        if let scheduleVersion {
-            context[Key.scheduleVersion] = scheduleVersion
-        }
-        if let language = currentPreferredLanguage() {
-            context[Key.preferredLanguage] = language
-        }
-        context.merge(stateMetadata()) { _, new in new }
-        return context
+        ], scheduleVersion: scheduleVersion)
     }
 
     private func stateMetadata() -> [String: Any] {
@@ -388,12 +372,12 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
 
     /// 在不覆盖已有课表上下文的前提下更新语言，并在可达时即时通知手表。
     private func publishPreferredLanguage(using session: WCSession) -> Bool {
+        publicationLock.lock()
+        defer { publicationLock.unlock() }
         guard let language = currentPreferredLanguage() else {
             return false
         }
 
-        publicationLock.lock()
-        defer { publicationLock.unlock() }
         let fallback = responsePayload(sourceJSON: currentLatestScheduleJSON() ?? "", scope: .fourteenDays, offset: 0, now: Date())
         var context = applicationContext(for: fallback, scheduleVersion: currentLatestScheduleVersion())
         context[Key.preferredLanguage] = language
@@ -425,8 +409,12 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         offset: Int,
         now: Date
     ) -> PhoneScheduleResponse {
+        // 值类型根字典在筛选时按需复制，已缓存的完整学期文档不会被修改。
+        let cachedDocument = withStateLock {
+            sourceJSON == latestScheduleJSON ? latestScheduleDocument : nil
+        }
         guard !sourceJSON.isEmpty,
-              var document = parseScheduleDocument(sourceJSON)
+              var document = cachedDocument ?? Self.parseScheduleDocument(sourceJSON)
         else {
             return PhoneScheduleResponse(
                 json: sourceJSON,
@@ -435,10 +423,8 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
             )
         }
 
-        var calendar = Calendar(identifier: .gregorian)
-        if let offset = document.root["timeZoneOffsetMinutes"] as? Int,
-           let zone = TimeZone(secondsFromGMT: offset * 60) { calendar.timeZone = zone }
-        calendar.firstWeekday = 2
+        let calendar = WatchScheduleDate.calendar(
+            offsetMinutes: document.root["timeZoneOffsetMinutes"] as? Int)
         document.root["sourceRevision"] = withStateLock { latestRevision }
         if document.root["semesterEndEpochMs"] == nil {
             document.root["semesterEndEpochMs"] = document.root["rangeEndEpochMs"]
@@ -598,23 +584,19 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     }
 
     /// 解析并验证课表根对象。
-    private func parseScheduleDocument(
+    private static func parseScheduleDocument(
         _ json: String
     ) -> PhoneScheduleDocument? {
         guard let data = json.data(using: .utf8),
               let object = try? JSONSerialization.jsonObject(with: data),
               let root = object as? [String: Any],
               let courses = root["courses"] as? [[String: Any]],
-              root["schemaVersion"] is NSNumber
+              let schemaVersion = root["schemaVersion"] as? Int,
+              WatchSyncProtocol.supportedSchemaVersions.contains(schemaVersion)
         else {
             return nil
         }
         return PhoneScheduleDocument(root: root, courses: courses)
-    }
-
-    /// 判断 Flutter 传入的 JSON 是否具备最低协议结构。
-    private func isValidScheduleJSON(_ json: String) -> Bool {
-        parseScheduleDocument(json) != nil
     }
 
     /// 把更新后的根对象重新编码为 JSON。
@@ -636,17 +618,8 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     /// JSON 使用排序键重新编码后计算 SHA-256；唯一被剔除的字段是每次构建
     /// 都变化、但不影响展示内容的 `generatedAtEpochMs`。课程、考试、实验、
     /// 周次、提醒、颜色或时间等任何实际字段变化都会产生新版本。
-    private static func scheduleVersion(for json: String?) -> String? {
-        guard let json,
-              !json.isEmpty,
-              let data = json.data(using: .utf8),
-              let object = try? JSONSerialization.jsonObject(with: data),
-              var root = object as? [String: Any],
-              root["courses"] is [[String: Any]]
-        else {
-            return nil
-        }
-
+    private static func scheduleVersion(for document: PhoneScheduleDocument) -> String? {
+        var root = document.root
         root.removeValue(forKey: "generatedAtEpochMs")
         guard JSONSerialization.isValidJSONObject(root),
               let canonicalData = try? JSONSerialization.data(
@@ -672,44 +645,12 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
     /// 将毫秒时间戳转换为 Date。
     private func date(fromEpochMilliseconds value: Any?) -> Date? {
         guard let milliseconds = epochValue(value) else { return nil }
-        return Date(
-            timeIntervalSince1970: TimeInterval(milliseconds) / 1_000
-        )
+        return WatchScheduleDate.date(fromEpochMilliseconds: milliseconds)
     }
 
     /// 将 Date 转换为跨语言使用的毫秒时间戳。
     private func epochMilliseconds(for date: Date) -> Int64 {
-        Int64((date.timeIntervalSince1970 * 1_000).rounded())
-    }
-
-    /// 把 Flutter、iOS 系统和历史版本可能产生的语言格式收敛为协议值。
-    private static func normalizedLanguage(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let normalized = value
-            .replacingOccurrences(of: "-", with: "_")
-            .lowercased()
-
-        if normalized.hasPrefix("zh_hant")
-            || normalized.hasPrefix("zh_tw")
-            || normalized.hasPrefix("zh_hk")
-            || normalized.hasPrefix("zh_mo")
-        {
-            return "zh_TW"
-        }
-        if normalized.hasPrefix("zh") {
-            return "zh_CN"
-        }
-        if normalized.hasPrefix("en") {
-            return "en_US"
-        }
-        return nil
-    }
-
-    /// 从多个持久化来源选择当前完整学期 JSON。
-    private func sourceScheduleJSON(
-        session: WCSession
-    ) -> String {
-        currentLatestScheduleJSON() ?? ""
+        WatchScheduleDate.epochMilliseconds(for: date)
     }
 
     /// WCSession 激活完成后重试最新待发送数据。
@@ -746,7 +687,7 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         didReceiveMessage message: [String: Any],
         replyHandler: @escaping ([String: Any]) -> Void
     ) {
-        replyHandler(makeScheduleReply(for: message, session: session) ?? [:])
+        replyHandler(makeScheduleReply(for: message) ?? [:])
     }
 
     /// 响应手表通过 `transferUserInfo` 排队发送的后台请求。
@@ -761,24 +702,21 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
             userInfo,
             through: session
         ) { [weak self] request in
-            self?.makeScheduleReply(for: request, session: session)
+            self?.makeScheduleReply(for: request)
         }
     }
 
     /// 为实时消息和后台队列生成同一格式的课表回复。
     private func makeScheduleReply(
-        for message: [String: Any],
-        session: WCSession
+        for message: [String: Any]
     ) -> [String: Any]? {
         guard isScheduleRequest(message) else { return nil }
         publicationLock.lock()
         defer { publicationLock.unlock() }
 
         let scope = requestedScope(from: message)
-        let sourceJSON = sourceScheduleJSON(session: session)
-        let scheduleVersion =
-            currentLatestScheduleVersion()
-            ?? Self.scheduleVersion(for: sourceJSON)
+        let sourceJSON = currentLatestScheduleJSON() ?? ""
+        let scheduleVersion = currentLatestScheduleVersion()
 
         // 手表只上传它已经完整安装的版本号。相同则用一个轻量回复结束，
         // 不生成当天/14 天 JSON，更不会启动整学期分页传输。
@@ -839,20 +777,12 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         scope: PhoneScheduleScope,
         scheduleVersion: String?
     ) -> [String: Any] {
-        var reply: [String: Any] = [
+        responseDictionary([
             Key.scheduleJSON: response.json,
             Key.scope: scope.rawValue,
             Key.nextOffset: response.nextOffset,
             Key.hasMore: response.hasMore,
-        ]
-        if let scheduleVersion {
-            reply[Key.scheduleVersion] = scheduleVersion
-        }
-        if let language = currentPreferredLanguage() {
-            reply[Key.preferredLanguage] = language
-        }
-        reply.merge(stateMetadata()) { _, new in new }
-        return reply
+        ], scheduleVersion: scheduleVersion)
     }
 
     /// 版本一致时返回的轻量确认，不包含课表 JSON。
@@ -860,13 +790,21 @@ final class PhoneWatchConnectivityManager: NSObject, WCSessionDelegate {
         scope: PhoneScheduleScope,
         scheduleVersion: String
     ) -> [String: Any] {
-        var reply: [String: Any] = [
+        responseDictionary([
             Key.scope: scope.rawValue,
-            Key.scheduleVersion: scheduleVersion,
             Key.scheduleUnchanged: true,
             Key.hasMore: false,
             Key.nextOffset: 0,
-        ]
+        ], scheduleVersion: scheduleVersion)
+    }
+
+    /// 轻量确认、分页回复和 Application Context 共用版本、语言和账户状态封装。
+    private func responseDictionary(
+        _ body: [String: Any],
+        scheduleVersion: String?
+    ) -> [String: Any] {
+        var reply = body
+        if let scheduleVersion { reply[Key.scheduleVersion] = scheduleVersion }
         if let language = currentPreferredLanguage() {
             reply[Key.preferredLanguage] = language
         }

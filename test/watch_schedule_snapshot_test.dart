@@ -160,6 +160,38 @@ void main() {
     expect(snapshot.courses[1].teacher, '张老师');
   });
 
+  test('uses calendar-day boundaries across a daylight-saving week', () {
+    final classTable = ClassTableData(
+      semesterLength: 2,
+      semesterCode: '2026-1',
+      termStartDay: '2026-03-02 00:00:00',
+      classDetail: [ClassDetail(name: 'Sunday class')],
+      timeArrangement: [
+        TimeArrangement(
+          source: Source.school,
+          index: 0,
+          weekList: [true, true],
+          teacher: '',
+          classroom: 'A-101',
+          day: DateTime.sunday,
+          start: 1,
+          stop: 2,
+        ),
+      ],
+    );
+    final snapshot = const WatchScheduleSnapshotBuilder().build(
+      classTable: classTable,
+      effectiveTermStart: DateTime(2026, 3, 2),
+      currentWeekIndex: 0,
+      now: DateTime(2026, 3, 2),
+      days: 14,
+    );
+    expect(snapshot.rangeEnd, DateTime(2026, 3, 16));
+    expect(snapshot.semesterEnd, snapshot.rangeEnd);
+    expect(snapshot.courses.map((course) => course.startAt.day), [8, 15]);
+    expect(snapshot.courses.every((course) => course.startAt.hour == 8), isTrue);
+  });
+
   test('rejects a non-positive synchronization range', () {
     final classTable = ClassTableData(
       semesterLength: 1,

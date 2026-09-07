@@ -45,6 +45,7 @@ struct InteractionRegression {
         testMonthCache()
         try await testDayLayoutCache()
         try await testStoreCache()
+        try testStoreTransferRejection()
         print("Passed \(assertions) interaction/lifecycle/cache regression checks")
     }
 
@@ -282,5 +283,39 @@ struct InteractionRegression {
             recovered.presentation(at: date(7)).state == .signedOut,
             "Cached overview resolution is cleared with the schedule")
         check(defaults.data(forKey: key) == nil, "Clear deletes persisted render indexes")
+    }
+
+    static func testStoreTransferRejection() throws {
+        let suite = "watch-transfer-regression-\(UUID())"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = WatchScheduleStore(defaults: defaults, sharedDefaults: nil, reloadWidgets: {})
+        defer { store.clearSchedule(signedOut: false) }
+        let currentJSON = try WatchCacheCoding.encodeJSON(snapshot([course("current")], revision: 2))
+        store.beginSemesterTransfer()
+        check(store.appendSemesterChunk(json: currentJSON, isFinal: true, scheduleVersion: "current-v2"),
+            "A complete semester installs its version")
+
+        let oldJSON = try WatchCacheCoding.encodeJSON(snapshot([course("old")], revision: 1))
+        check(!store.replaceSchedule(json: oldJSON, scope: .semester),
+            "Rejected snapshots report failure to the caller")
+        store.beginSemesterTransfer()
+        check(!store.appendSemesterChunk(json: oldJSON, isFinal: true, scheduleVersion: "old-v1"),
+            "An outdated final page cannot confirm an uninstalled version")
+        check(store.installedScheduleVersion == "current-v2" && store.allCourses.map(\.id) == ["current"],
+            "Both current cache and installed version survive a rejected transfer")
+
+        let pageOne = try WatchCacheCoding.encodeJSON(snapshot([course("first")], revision: 3))
+        let pageTwo = try WatchCacheCoding.encodeJSON(snapshot([course("second")], revision: 4))
+        store.beginSemesterTransfer()
+        check(store.appendSemesterChunk(json: pageOne, isFinal: false, scheduleVersion: nil),
+            "The first legacy page stays in memory")
+        check(!store.appendSemesterChunk(json: pageTwo, isFinal: true, scheduleVersion: nil),
+            "Even versionless transfers reject mixed metadata")
+        check(store.installedScheduleVersion == "current-v2" && store.allCourses.map(\.id) == ["current"],
+            "Failed assembly never replaces the last complete cache")
+        _ = store.setPreferredLanguage("en-GB")
+        check(defaults.string(forKey: WatchWidgetShared.preferredLanguageKey) == "en_US",
+            "Language remains persistent when the shared suite is unavailable")
     }
 }

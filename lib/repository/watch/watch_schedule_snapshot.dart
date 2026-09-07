@@ -126,6 +126,11 @@ final class _ScheduleWindow {
 class WatchScheduleSnapshotBuilder {
   const WatchScheduleSnapshotBuilder();
 
+  // 标准节次只解析一次，展开整学期时复用分钟值。
+  static final List<int> _periodMinutes = timeList
+      .map(_minutesFromClockText)
+      .toList(growable: false);
+
   /// Material 课程色的精确 ARGB 值，与手机端 `color_seed.dart` 顺序一致。
   static const _courseColors = <int>[
     0xFFF44336,
@@ -184,10 +189,9 @@ class WatchScheduleSnapshotBuilder {
     return WatchScheduleSnapshot(
       generatedAt: now,
       semesterStart: semesterStart,
-      semesterEnd: DateTime(
-        semesterStart.year,
-        semesterStart.month,
-        semesterStart.day + classTable.semesterLength * DateTime.daysPerWeek,
+      semesterEnd: _dateAddingDays(
+        semesterStart,
+        classTable.semesterLength * DateTime.daysPerWeek,
       ),
       currentWeekIndex: currentWeekIndex,
       validThrough: window.end,
@@ -213,7 +217,7 @@ class WatchScheduleSnapshotBuilder {
     final start = _startOfDay(requestedStart);
     return _ScheduleWindow(
       start: start,
-      end: start.add(Duration(days: days)),
+      end: _dateAddingDays(start, days),
     );
   }
 
@@ -224,16 +228,18 @@ class WatchScheduleSnapshotBuilder {
     required _ScheduleWindow window,
   }) {
     final occurrences = <WatchCourseOccurrence>[];
-    final dayCount = window.end.difference(window.start).inDays;
+    final arrangementsByDay = _arrangementsByWeekday(classTable.timeArrangement);
+    final dayCount = _calendarDayDifference(window.end, window.start);
 
     for (var dayOffset = 0; dayOffset < dayCount; dayOffset++) {
-      final date = window.start.add(Duration(days: dayOffset));
+      final date = _dateAddingDays(window.start, dayOffset);
       final weekIndex = _weekIndexForDate(date, semesterStart: semesterStart);
       if (!_isWeekInsideSemester(weekIndex, classTable.semesterLength)) {
         continue;
       }
 
-      for (final arrangement in classTable.timeArrangement) {
+      final arrangements = arrangementsByDay[date.weekday] ?? const <TimeArrangement>[];
+      for (final arrangement in arrangements) {
         if (!_arrangementOccurs(
           arrangement,
           date: date,
@@ -398,7 +404,7 @@ class WatchScheduleSnapshotBuilder {
 
   /// 计算某日相对学期起点的零基周次。
   int _weekIndexForDate(DateTime date, {required DateTime semesterStart}) {
-    final deltaDays = date.difference(semesterStart).inDays;
+    final deltaDays = _calendarDayDifference(date, semesterStart);
     if (deltaDays < 0) return -1;
     return deltaDays ~/ DateTime.daysPerWeek;
   }
@@ -435,8 +441,8 @@ class WatchScheduleSnapshotBuilder {
       return null;
     }
 
-    final startAt = _withTime(date, timeList[startIndex]);
-    final endAt = _withTime(date, timeList[endIndex]);
+    final startAt = _withMinutes(date, _periodMinutes[startIndex]);
+    final endAt = _withMinutes(date, _periodMinutes[endIndex]);
     return endAt.isAfter(startAt) ? (startAt, endAt) : null;
   }
 
@@ -501,15 +507,14 @@ class WatchScheduleSnapshotBuilder {
     return _courseColors[index % _courseColors.length];
   }
 
-  /// 把 `HH:mm` 合并到给定日期。
-  DateTime _withTime(DateTime date, String time) {
-    final parts = time.split(':');
+  /// 把标准节次的分钟值合并到给定日期。
+  DateTime _withMinutes(DateTime date, int minutes) {
     return DateTime(
       date.year,
       date.month,
       date.day,
-      int.parse(parts[0]),
-      int.parse(parts[1]),
+      minutes ~/ 60,
+      minutes % 60,
     );
   }
 
@@ -521,8 +526,7 @@ class WatchScheduleSnapshotBuilder {
 
     for (var section = 0; section < timeList.length ~/ 2; section++) {
       final index = section * 2 + (isStart ? 0 : 1);
-      final distance = (_minutesFromClockText(timeList[index]) - targetMinutes)
-          .abs();
+      final distance = (_periodMinutes[index] - targetMinutes).abs();
       if (distance < nearestDistance) {
         nearestDistance = distance;
         nearestSection = section + 1;
@@ -537,7 +541,7 @@ class WatchScheduleSnapshotBuilder {
   }
 
   /// 将 `HH:mm` 文本转为当天零点后的分钟数。
-  int _minutesFromClockText(String time) {
+  static int _minutesFromClockText(String time) {
     final parts = time.split(':');
     return int.parse(parts[0]) * 60 + int.parse(parts[1]);
   }
@@ -553,13 +557,36 @@ class WatchScheduleSnapshotBuilder {
     return DateTime(date.year, date.month, date.day);
   }
 
-  /// 日程按开始时间排序；开始相同时用结束时间保证结果稳定。
+  /// 以自然日移动和计算周次，避免夏令时的 23/25 小时日期造成漏课或错周。
+  DateTime _dateAddingDays(DateTime date, int days) {
+    return DateTime(date.year, date.month, date.day + days);
+  }
+
+  int _calendarDayDifference(DateTime date, DateTime reference) {
+    return DateTime.utc(date.year, date.month, date.day)
+        .difference(DateTime.utc(reference.year, reference.month, reference.day))
+        .inDays;
+  }
+
+  /// 每个日期只遍历相同星期的安排，避免重复扫描整个课表。
+  Map<int, List<TimeArrangement>> _arrangementsByWeekday(
+    List<TimeArrangement> arrangements,
+  ) {
+    final result = <int, List<TimeArrangement>>{};
+    for (final arrangement in arrangements) {
+      result.putIfAbsent(arrangement.day, () => []).add(arrangement);
+    }
+    return result;
+  }
+
+  /// 起止时刻相同时按稳定 ID 排序，避免输入重排触发无意义的新语义版本。
   int _compareOccurrences(
     WatchCourseOccurrence left,
     WatchCourseOccurrence right,
   ) {
     final startComparison = left.startAt.compareTo(right.startAt);
     if (startComparison != 0) return startComparison;
-    return left.endAt.compareTo(right.endAt);
+    final endComparison = left.endAt.compareTo(right.endAt);
+    return endComparison != 0 ? endComparison : left.id.compareTo(right.id);
   }
 }

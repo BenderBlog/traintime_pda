@@ -52,7 +52,7 @@ enum WatchScheduleResolver {
             let start = incoming.rangeStart
             let end = incoming.rangeEnd
             if let endEpoch = incoming.semesterEndEpochMs {
-                semesterEnd = Date(timeIntervalSince1970: Double(endEpoch) / 1_000)
+                semesterEnd = WatchScheduleDate.date(fromEpochMilliseconds: endEpoch)
             }
             guard end > start else { continue }
             if incomingScope == .semester {
@@ -107,8 +107,8 @@ enum WatchScheduleResolver {
 
     static func sorted(_ courses: [WatchCourse]) -> [WatchCourse] {
         courses.sorted {
-            if $0.startAt != $1.startAt { return $0.startAt < $1.startAt }
-            if $0.endAt != $1.endAt { return $0.endAt < $1.endAt }
+            if $0.startAtEpochMs != $1.startAtEpochMs { return $0.startAtEpochMs < $1.startAtEpochMs }
+            if $0.endAtEpochMs != $1.endAtEpochMs { return $0.endAtEpochMs < $1.endAtEpochMs }
             return $0.id < $1.id
         }
     }
@@ -202,11 +202,7 @@ struct WatchSchedulePresentation {
     }
 
     static func calendar(offsetMinutes: Int?) -> Calendar {
-        var result = Calendar(identifier: .gregorian)
-        result.firstWeekday = 2
-        result.minimumDaysInFirstWeek = 4
-        result.timeZone = offsetMinutes.flatMap { TimeZone(secondsFromGMT: $0 * 60) } ?? .current
-        return result
+        WatchScheduleDate.calendar(offsetMinutes: offsetMinutes)
     }
 
     var isCurrent: Bool { focus.map { $0.startAt <= date && date < $0.endAt } ?? false }
@@ -280,11 +276,7 @@ struct WatchSchedulePresentation {
         return formatter.string(from: target)
     }
     func clockText(_ target: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = WatchWidgetShared.preferredLocale
-        formatter.timeZone = calendar.timeZone
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: target)
+        WatchScheduleDate.clockText(target, timeZone: calendar.timeZone)
     }
     /// 小组件的紧凑日期：今天省略、明天直写，其余固定为月/日。
     func compactDayLabel(for target: Date) -> String {
@@ -305,32 +297,25 @@ struct WatchSchedulePresentation {
         let time = clockText(target)
         if day.isEmpty { return time }
         if day == watchLocalizedString("明天") {
-            return String(format: watchLocalizedString("明天%@"), time)
+            return watchLocalizedFormat("明天%@", time)
         }
         return day + " " + time
     }
     var location: String {
-        let value = focus?.classroom?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return value.isEmpty ? watchLocalizedString("地点待定") : value
+        focus?.classroomText ?? watchLocalizedString("地点待定")
     }
     /// 小尺寸组件省略信远楼名，保留原有分区编号和教室号。
     var compactLocation: String {
-        location.replacingOccurrences(of: "信远", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        WatchScheduleText.compactLocation(location)
     }
     /// 长方形与 App 课程卡片一致：位置后补充教师，考试则补充座位等备注。
     var locationSummary: String {
-        let rawDetails = focus?.kind == "exam" ? focus?.note : focus?.teacher
-        let details = rawDetails?.split(whereSeparator: { $0.isWhitespace })
-            .joined(separator: " ") ?? ""
-        return details.isEmpty ? location : location + " · " + details
+        focus?.locationSummary(includingDetails: true, fallbackLocation: location)?.text ?? location
     }
     /// 日程概览始终汇总今天；下一次安排只作为次要信息展示。
     var summaryDate: Date { date }
     var summaryCourses: [WatchCourse] {
-        (resolved?.snapshot.courses ?? []).filter {
-            calendar.isDate($0.startAt, inSameDayAs: summaryDate)
-        }
+        todayCourses
     }
     var weekInterval: DateInterval {
         calendar.dateInterval(of: .weekOfYear, for: summaryDate)!
@@ -393,10 +378,14 @@ struct WatchOverviewSummary {
         var total: Int { courses + exams + experiments }
 
         init(_ items: [WatchCourse]) {
-            exams = items.filter { $0.kind == "exam" }.count
-            experiments = items.filter {
-                $0.kind == "physicsExperiment" || $0.kind == "otherExperiment"
-            }.count
+            var examCount = 0
+            var experimentCount = 0
+            for item in items {
+                if item.isExam { examCount += 1 }
+                else if item.isExperiment { experimentCount += 1 }
+            }
+            exams = examCount
+            experiments = experimentCount
             courses = items.count - exams - experiments
         }
     }

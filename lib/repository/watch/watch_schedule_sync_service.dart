@@ -33,7 +33,6 @@ final class _WatchScheduleSourceState {
     required this.subjects,
     required this.experiments,
     required this.reminderMinutes,
-    required this.localeIdentifier,
   });
 
   final ClassTableData classTable;
@@ -43,7 +42,6 @@ final class _WatchScheduleSourceState {
   final List<Subject> subjects;
   final List<ExperimentData> experiments;
   final int reminderMinutes;
-  final String localeIdentifier;
 }
 
 /// 将手机端最新课表持续同步给配对 Apple Watch。
@@ -71,6 +69,8 @@ class WatchScheduleSyncService {
 
   /// 每次数据源变化都会递增；旧定时任务和旧构建任务会主动放弃发送。
   int _generation = 0;
+  int _languageGeneration = 0;
+  String? _lastSyncedLanguage;
 
   /// 幂等启动监听。非 iOS 平台不会创建任何 Effect 或原生通道调用。
   void start() {
@@ -98,6 +98,7 @@ class WatchScheduleSyncService {
   void resume({required int sessionRevision}) {
     if (!Platform.isIOS || sessionRevision != _sessionRevision) return;
     if (!_started) start();
+    if (sessionRevision != _sessionRevision) return;
     if (!_suspended) return;
     _suspended = false;
     _scheduleUpdate(_readSourceState());
@@ -110,6 +111,12 @@ class WatchScheduleSyncService {
 
   /// 创建 Signals effect；读取行为必须发生在 effect 回调内才能建立依赖。
   void _startReactiveSync() {
+    // 语言独立于课表和登录状态；退出后仍能同步语言，也不会为语言变化重建学期。
+    effect(() {
+      final locale = ThemeController.i.localeIdentifierSignal.value;
+      final generation = ++_languageGeneration;
+      unawaited(_syncPreferredLanguageIfCurrent(locale, generation));
+    }, options: EffectOptions(name: 'WatchPreferredLanguageSyncEffect'));
     effect(() {
       final state = _readSourceState();
       _scheduleUpdate(state);
@@ -136,9 +143,6 @@ class WatchScheduleSyncService {
         ...OtherExperimentController.i.otherExperiments.value,
       ]),
       reminderMinutes: _normalizedReminderMinutes(configuredMinutes),
-      // 读取 Signal 会把语言变化纳入同一个响应式同步流程。
-      // 即使当前还没有学期课表，语言也会先独立发送给手表。
-      localeIdentifier: ThemeController.i.localeIdentifierSignal.value,
     );
   }
 
@@ -159,15 +163,11 @@ class WatchScheduleSyncService {
     unawaited(_performScheduledUpdate(state, generation));
   }
 
-  /// 每轮先同步轻量语言状态，再处理可能较大的课表数据。
-  ///
-  /// 语言发送与课表是否存在解耦，首次登录前或课表被清空后切换语言也能立即
-  /// 更新 Apple Watch；语言发送失败不会阻断原有课表同步。
+  /// 课表只响应数据变化；语言通过独立 effect 和同一写入队列同步。
   Future<void> _performScheduledUpdate(
     _WatchScheduleSourceState state,
     int generation,
   ) async {
-    await _syncPreferredLanguageIfCurrent(state.localeIdentifier, generation);
     if (!_isCurrentGeneration(generation)) return;
 
     final termStart = state.effectiveTermStart;
@@ -185,12 +185,19 @@ class WatchScheduleSyncService {
     String localeIdentifier,
     int generation,
   ) async {
-    if (!_isCurrentGeneration(generation)) return;
+    if (generation != _languageGeneration) return;
 
     try {
-      await _api.syncPreferredLanguage(localeIdentifier);
+      await _serializeWrite(() async {
+        if (generation != _languageGeneration) return false;
+        // 到实际执行时再去重，避免快速 A→B→A 时跳过正在发送的 B 后面的 A。
+        if (localeIdentifier == _lastSyncedLanguage) return true;
+        final accepted = await _api.syncPreferredLanguage(localeIdentifier);
+        if (accepted) _lastSyncedLanguage = localeIdentifier;
+        return accepted;
+      });
     } catch (error, stackTrace) {
-      if (!_isCurrentGeneration(generation)) return;
+      if (generation != _languageGeneration) return;
       log.handle(
         error,
         stackTrace,

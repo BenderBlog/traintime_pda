@@ -906,16 +906,14 @@ private struct WeekScheduleGridGeometry {
 
 /// 按手机端相同的系统区域规则，生成“第 N 周”标题。
 private func localizedWeekNumber(_ number: Int) -> String {
-    String.localizedStringWithFormat(
-        watchLocalizedString("第%lld周"),
+    watchLocalizedFormat("第%lld周",
         Int64(number)
     )
 }
 
 /// 生成 VoiceOver 使用的本地化节次范围。
 private func localizedCoursePeriodRange(_ course: WatchCourse) -> String {
-    String.localizedStringWithFormat(
-        watchLocalizedString("%1$@，第%2$lld到第%3$lld节"),
+    watchLocalizedFormat("%1$@，第%2$lld到第%3$lld节",
         course.name,
         Int64(course.startPeriod),
         Int64(course.endPeriod)

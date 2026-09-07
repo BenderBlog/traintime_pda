@@ -73,32 +73,7 @@ struct CourseRow: View {
     ///
     /// `lineLimit(1)` 与尾部截断由调用处统一负责，窄表盘不会把卡片撑宽。
     private var locationSummary: (text: String, systemImage: String)? {
-        let classroom = normalizedText(course.classroom)
-        var values = [String]()
-
-        if let classroom {
-            values.append(classroom)
-        }
-
-        if showsInlineMetadata {
-            let metadata = course.kind == "exam"
-                ? course.note
-                : course.teacher
-            if let metadata = normalizedText(metadata) {
-                values.append(metadata)
-            }
-        }
-
-        guard !values.isEmpty else { return nil }
-        let systemImage: String
-        if classroom != nil {
-            systemImage = "mappin.and.ellipse"
-        } else if course.kind == "exam" {
-            systemImage = "number.square"
-        } else {
-            systemImage = "person"
-        }
-        return (values.joined(separator: " · "), systemImage)
+        course.locationSummary(includingDetails: showsInlineMetadata)
     }
 }
 
@@ -224,7 +199,7 @@ struct CourseDetailView: View {
             if let teacher = course.teacher, !teacher.isEmpty {
                 Label(teacher, systemImage: "person")
             }
-            if let note = course.note, !note.isEmpty {
+            if let note = course.localizedNote {
                 Label(note, systemImage: "info.circle")
             }
 
@@ -301,22 +276,7 @@ struct CourseDetailView: View {
 
 /// 统一生成不受系统 12/24 小时偏好影响的 `HH:mm` 文本。
 private func twentyFourHourTime(_ date: Date) -> String {
-    date.formatted(
-        Date.VerbatimFormatStyle(
-            format: "\(hour: .twoDigits(clock: .twentyFourHour, hourCycle: .zeroBased)):\(minute: .twoDigits)",
-            timeZone: .current,
-            calendar: Calendar(identifier: .gregorian)
-        )
-    )
-}
-
-/// 清理可选文本：去除首尾空白并把空字符串统一视为缺失值。
-private func normalizedText(_ value: String?) -> String? {
-    let normalized = value?.trimmingCharacters(
-        in: .whitespacesAndNewlines
-    )
-    guard let normalized, !normalized.isEmpty else { return nil }
-    return normalized
+    WatchScheduleDate.clockText(date)
 }
 
 private extension View {

@@ -15,15 +15,6 @@ struct WatchCourseDayGroup: Identifiable {
     var id: Date { date }
 }
 
-/// 一份已解码缓存及其同步范围。
-///
-/// 使用命名类型代替散落的元组后，缓存恢复策略可以拆成多个职责单一的筛选
-/// 函数，同时避免调用处混淆 `scope` 和 `snapshot` 的位置。
-private struct CachedScheduleSelection {
-    let scope: WatchScheduleScope
-    let snapshot: WatchScheduleSnapshot
-}
-
 /// Watch 各课表视图共用的派生缓存格式。
 ///
 /// 这里保存的是“课程 ID 如何排序、如何按自然日分组、月视图五段标记引用哪
@@ -118,7 +109,7 @@ final class WatchScheduleStore: ObservableObject {
     private var resolvedPresentation: WatchResolvedSchedule?
 
     /// 整学期数据可能分多个消息传输，先按课程 ID 合并到临时缓冲区。
-    private var semesterBuffer: [String: WatchCourse] = [:]
+    private var semesterTransfer = WatchSemesterTransfer()
 
     /// 当前页面使用的稳定排序结果，随快照安装同步更新。
     private var sortedVisibleCourses: [WatchCourse] = []
@@ -209,7 +200,7 @@ final class WatchScheduleStore: ObservableObject {
 
         let changed = preferredLanguageIdentifier != normalized
         _ = WatchWidgetShared.updatePreferredLanguage(
-            normalized, in: sharedDefaults, reloadWidgets: reloadWidgets)
+            normalized, in: sharedDefaults ?? defaults, reloadWidgets: reloadWidgets)
         preferredLanguageIdentifier = normalized
         if changed {
             // 错误文本是在产生时本地化的；语言切换后清除旧文本，空状态会用
@@ -294,6 +285,7 @@ final class WatchScheduleStore: ObservableObject {
         renderCachePersistenceTask = nil
         clearSemesterBuffer(keepingCapacity: false)
         cachedSnapshots.removeAll()
+        resolvedPresentation = nil
         snapshot = nil
         loadedScope = nil
         installedScheduleVersion = nil
@@ -494,6 +486,7 @@ final class WatchScheduleStore: ObservableObject {
     /// 手机课表先变化、随后又恢复为手表已安装版本，避免保留先前局部阶段
     /// 已经合入页面的临时内容。
     func finishRefreshWithoutScheduleChanges() {
+        clearSemesterBuffer(keepingCapacity: false)
         if let semester = cachedSnapshots[.semester] {
             for scope in [WatchScheduleScope.today, .fourteenDays] {
                 cachedSnapshots.removeValue(forKey: scope)
@@ -501,6 +494,7 @@ final class WatchScheduleStore: ObservableObject {
                 defaults.removeObject(forKey: key)
                 sharedDefaults?.removeObject(forKey: key)
             }
+            resolvedPresentation = WatchScheduleResolver.resolve(cachedSnapshots)
             snapshot = semester
             loadedScope = .semester
             reloadWidgets()
@@ -541,12 +535,11 @@ final class WatchScheduleStore: ObservableObject {
 
         do {
             let decoded = try decode(json)
-            installProgressiveSnapshot(
+            return installProgressiveSnapshot(
                 decoded,
                 json: json,
                 scope: scope
             )
-            return true
         } catch {
             syncError = watchLocalizedString("课表数据无法读取")
             logFailure(.scheduleDecode, error: error)
@@ -577,16 +570,14 @@ final class WatchScheduleStore: ObservableObject {
 
         do {
             let chunk = try decode(json)
-            mergeSemesterCourses(from: chunk)
+            try semesterTransfer.append(chunk)
 
             guard isFinal else { return true }
             try completeSemesterTransfer(
-                using: chunk,
                 scheduleVersion: scheduleVersion
             )
             return true
         } catch {
-            clearSemesterBuffer(keepingCapacity: false)
             failRefresh(watchLocalizedString("全学期课表无法合并"))
             logFailure(.semesterMerge, error: error)
             return false
@@ -606,7 +597,7 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 判断字符串是否包含可尝试解码的数据。
     private func hasPayload(_ json: String) -> Bool {
-        !json.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        WatchScheduleText.nonempty(json) != nil
     }
 
     /// 只有当前完全没有页面内容时才显示“手机暂无课表”。
@@ -619,16 +610,7 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 解码课表并验证数据结构版本。
     private func decode(_ json: String) throws -> WatchScheduleSnapshot {
-        let decoded = try WatchCacheCoding.decode(
-            WatchScheduleSnapshot.self,
-            fromJSON: json
-        )
-        guard WatchWidgetShared.supportedScheduleSchemaVersions.contains(
-            decoded.schemaVersion
-        ) else {
-            throw ScheduleError.unsupportedSchema(decoded.schemaVersion)
-        }
-        return decoded
+        try WatchScheduleCoding.decode(json)
     }
 
     /// 将完整快照编码回共享缓存格式。
@@ -641,66 +623,38 @@ final class WatchScheduleStore: ObservableObject {
         _ completedSnapshot: WatchScheduleSnapshot,
         json: String,
         scope: WatchScheduleScope
-    ) {
+    ) -> Bool {
         if let newest = cachedSnapshots.values.max(by: { $0.freshnessStamp < $1.freshnessStamp }),
            newest.semesterStartEpochMs != completedSnapshot.semesterStartEpochMs {
-            guard completedSnapshot.freshnessStamp >= newest.freshnessStamp else { return }
+            guard completedSnapshot.freshnessStamp >= newest.freshnessStamp else { return false }
             clearSchedule(signedOut: false)
         }
-        if let existing = cachedSnapshots[scope], existing.freshnessStamp > completedSnapshot.freshnessStamp { return }
+        if let existing = cachedSnapshots[scope], existing.freshnessStamp > completedSnapshot.freshnessStamp { return false }
         persistCompletedStage(snapshot: completedSnapshot, json: json, scope: scope)
         defaults.set(false, forKey: WatchWidgetShared.signedOutKey)
         sharedDefaults?.set(false, forKey: WatchWidgetShared.signedOutKey)
         if let resolved = WatchScheduleResolver.resolve(cachedSnapshots) {
+            resolvedPresentation = resolved
             snapshot = resolved.snapshot
             loadedScope = resolved.scope
         }
         syncError = nil
         rebuildVisibleScheduleIndex(persisting: true)
-    }
-
-    /// 把分块中的日程按 ID 合并；后到的记录覆盖先到的同 ID 记录。
-    private func mergeSemesterCourses(
-        from chunk: WatchScheduleSnapshot
-    ) {
-        for course in chunk.courses {
-            semesterBuffer[course.id] = course
-        }
-    }
-
-    /// 使用最后一块的元数据与全部缓冲课程生成完整学期快照。
-    private func makeCompletedSemesterSnapshot(
-        metadata: WatchScheduleSnapshot
-    ) -> WatchScheduleSnapshot {
-        WatchScheduleSnapshot(
-            schemaVersion: metadata.schemaVersion,
-            generatedAtEpochMs: metadata.generatedAtEpochMs,
-            semesterStartEpochMs: metadata.semesterStartEpochMs,
-            currentWeekIndex: metadata.currentWeekIndex,
-            validThroughEpochMs: metadata.validThroughEpochMs,
-            rangeStartEpochMs: metadata.rangeStartEpochMs,
-            rangeEndEpochMs: metadata.rangeEndEpochMs,
-            timeZoneOffsetMinutes: metadata.timeZoneOffsetMinutes,
-            reminderMinutes: metadata.reminderMinutes,
-            courses: sortedCourses(Array(semesterBuffer.values)),
-            semesterEndEpochMs: metadata.semesterEndEpochMs,
-            sourceRevision: metadata.sourceRevision
-        )
+        return true
     }
 
     /// 原子完成学期传输：构造、编码、持久化成功后才替换当前页面。
     private func completeSemesterTransfer(
-        using metadata: WatchScheduleSnapshot,
         scheduleVersion: String?
     ) throws {
-        let complete = makeCompletedSemesterSnapshot(metadata: metadata)
+        let complete = try semesterTransfer.completedSnapshot()
         let json = try encode(complete)
 
-        installProgressiveSnapshot(
+        guard installProgressiveSnapshot(
             complete,
             json: json,
             scope: .semester
-        )
+        ) else { throw WatchScheduleDataError.outdatedSnapshot }
         installCompletedScheduleVersion(scheduleVersion)
         clearSemesterBuffer(keepingCapacity: false)
         finishRefresh(showCompletion: true)
@@ -745,7 +699,7 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 清空学期分块缓冲区。
     private func clearSemesterBuffer(keepingCapacity: Bool) {
-        semesterBuffer.removeAll(keepingCapacity: keepingCapacity)
+        semesterTransfer.reset(keepingCapacity: keepingCapacity)
     }
 
     /// 从标准缓存和 App Group 中恢复每个阶段。
@@ -754,8 +708,7 @@ final class WatchScheduleStore: ObservableObject {
     private func loadCachedSchedule() {
         for scope in WatchWidgetShared.scheduleCacheScopesByPriority {
             let key = WatchWidgetShared.cacheKey(for: scope)
-            guard let cached = loadFirstValidCache(
-                for: scope,
+            guard let cached = loadNewestValidCache(
                 key: key
             ) else {
                 continue
@@ -770,21 +723,20 @@ final class WatchScheduleStore: ObservableObject {
         restoreCacheIfNeeded()
     }
 
-    /// 依次尝试标准缓存与共享缓存，返回第一份能完整解码的数据。
-    private func loadFirstValidCache(
-        for scope: WatchScheduleScope,
+    /// 两个缓存内容相同时只解码一次，内容不同时选择修订号最新的有效结果。
+    private func loadNewestValidCache(
         key: String
     ) -> (snapshot: WatchScheduleSnapshot, json: String)? {
         let candidates = [
             defaults.string(forKey: key),
             sharedDefaults?.string(forKey: key),
         ].compactMap { $0 }
-
-        return candidates.compactMap { json -> (snapshot: WatchScheduleSnapshot, json: String)? in
-            guard let snapshot = try? decode(json) else { return nil }
-            return (snapshot, json)
-        }.max { $0.snapshot.freshnessStamp < $1.snapshot.freshnessStamp }
-
+        var seen = Set<String>()
+        return candidates.filter { seen.insert($0).inserted }
+            .compactMap { json -> (snapshot: WatchScheduleSnapshot, json: String)? in
+                guard let snapshot = try? decode(json) else { return nil }
+                return (snapshot, json)
+            }.max { $0.snapshot.freshnessStamp < $1.snapshot.freshnessStamp }
     }
 
     /// 旧版本只有标准缓存时，将有效数据迁移到 Widget 可读的 App Group。
@@ -792,6 +744,7 @@ final class WatchScheduleStore: ObservableObject {
         json: String,
         key: String
     ) {
+        guard sharedDefaults?.string(forKey: key) != json else { return }
         sharedDefaults?.set(json, forKey: key)
     }
 
@@ -810,22 +763,17 @@ final class WatchScheduleStore: ObservableObject {
     /// 当前没有页面数据时，恢复优先级最高的缓存。
     private func restoreCacheIfNeeded() {
         guard snapshot == nil,
-              let cached = preferredCachedSnapshot()
+              let cached = WatchScheduleResolver.resolve(cachedSnapshots)
         else {
             return
         }
+        resolvedPresentation = cached
         snapshot = cached.snapshot
         loadedScope = cached.scope
         prepareVisibleScheduleIndex(
             preferringPersistentCache: true,
             persistIfRebuilt: false
         )
-    }
-
-    private func preferredCachedSnapshot() -> CachedScheduleSelection? {
-        WatchScheduleResolver.resolve(cachedSnapshots).map {
-            CachedScheduleSelection(scope: $0.scope, snapshot: $0.snapshot)
-        }
     }
 
     /// 判断快照是否已经过期。
@@ -840,12 +788,7 @@ final class WatchScheduleStore: ObservableObject {
     private func sortedCourses(
         _ courses: [WatchCourse]
     ) -> [WatchCourse] {
-        courses.sorted {
-            if $0.startAt == $1.startAt {
-                return $0.endAt < $1.endAt
-            }
-            return $0.startAt < $1.startAt
-        }
+        WatchScheduleResolver.sorted(courses)
     }
 
     /// 优先恢复持久化派生缓存；缺失或校验失败时才遍历原始课表重建。
@@ -903,7 +846,6 @@ final class WatchScheduleStore: ObservableObject {
         restoredPeriodCourseIDs: [Date: [String?]]? = nil
     ) {
         sortedVisibleCourses = sorted
-        resolvedPresentation = WatchScheduleResolver.resolve(cachedSnapshots)
         indexedCalendar = .current
         coursesByDay = grouped
         courseListGroups = groups
@@ -1018,11 +960,8 @@ final class WatchScheduleStore: ObservableObject {
         let generation = renderCachePersistenceGeneration
         renderCachePersistenceTask?.cancel()
         renderCachePersistenceTask = Task { @MainActor [weak self] in
-            let encodingTask = Task.detached(priority: .utility) {
-                try WatchCacheCoding.encode(cache)
-            }
             do {
-                let data = try await encodingTask.value
+                let data = try await WatchCacheCoding.encodeInBackground(cache)
                 guard let self,
                       !Task.isCancelled,
                       generation == self.renderCachePersistenceGeneration
@@ -1240,12 +1179,12 @@ final class WatchScheduleStore: ObservableObject {
 
     /// 将 Date 转换为缓存统一使用的 Unix 毫秒。
     private func epochMilliseconds(_ date: Date) -> Int64 {
-        Int64((date.timeIntervalSince1970 * 1_000).rounded())
+        WatchScheduleDate.epochMilliseconds(for: date)
     }
 
     /// 将缓存毫秒时间戳转换回 Date。
     private func date(fromEpochMilliseconds value: Int64) -> Date {
-        Date(timeIntervalSince1970: TimeInterval(value) / 1_000)
+        WatchScheduleDate.date(fromEpochMilliseconds: value)
     }
 
     /// 首次打开列表优先定位今天；今天无课则选择距离最近的有课日期。
@@ -1303,19 +1242,6 @@ private enum ScheduleStoreFailureContext {
             "Ignoring invalid \(scope.rawValue) cache"
         case .renderCacheEncoding:
             "Render cache encode failed"
-        }
-    }
-}
-
-/// 本地数据校验错误。
-private enum ScheduleError: LocalizedError {
-    case unsupportedSchema(Int)
-
-    /// 日志使用的可读错误说明。
-    var errorDescription: String? {
-        switch self {
-        case .unsupportedSchema(let version):
-            "Unsupported schedule schema: \(version)"
         }
     }
 }

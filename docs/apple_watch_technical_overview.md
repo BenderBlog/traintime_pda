@@ -1,5 +1,8 @@
 # XDYou Apple Watch 技术说明
 
+2026-09-07 的业务逻辑重构、多语言补全及待执行验证项见
+[Apple Watch 代码审计记录](apple_watch_code_audit.md)。
+
 ## 总体架构
 
 Apple Watch 功能采用 **iPhone 主数据源 + 原生 watchOS Companion App**
@@ -486,6 +489,17 @@ Watch App 与 Widget 支持：
 App 与 Widget 共用。目录、状态和周次通过 `watchLocalizedString` 读取 String
 Catalog；日期与星期使用注入的 Locale。课程、教师和地点属于用户或学校数据，
 保持原文。
+
+`WatchSyncSupport.swift` 同时编入 iPhone、Watch App 与 Widget，集中维护协议字段、
+三阶段范围、schema 支持范围和 `WatchLanguage`。语言代码先按脚本再按地区归一化，
+例如 `zh-Hans-TW` 保持简体，`zh-Hant-CN` 保持繁体；未知语言不会误判成英语。
+Flutter 使用独立语言 effect 与同一串行写入队列，清空课表或退出后仍能更新语言，
+语言变化不再重建完整学期。去重发生在实际发送前，避免快速切换时遗漏最终选择。
+
+`watchLocalizedFormat` 与资源查找共用手机指定 Locale；`.lproj` 资源包只解析一次，
+最终文案按当前语言读取。考试快照中由生成器添加的“座位 ”前缀在显示时本地化，
+原始 JSON、座位号和其他学校备注保持原文。缺少 App Group 时语言可落入本地缓存。
+`tools/audit_watch_localizations.py` 检查资源缺失和 `%@`、`%d`、`%lld` 参数是否匹配。
 
 ## 表盘 Complication 与 Smart Stack 小组件
 

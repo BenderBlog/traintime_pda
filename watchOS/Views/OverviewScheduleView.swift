@@ -85,13 +85,13 @@ struct OverviewScheduleView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if day.completedCount > 0 && day.remaining.total > 0 {
-                    Text(String(format: watchLocalizedString("已完成 %d 项"), day.completedCount))
+                    Text(watchLocalizedFormat("已完成 %d 项", day.completedCount))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
                 if let end = day.additionalEndTime {
                     Label(
-                        String(format: watchLocalizedString("%@ 全部结束"),
+                        watchLocalizedFormat("%@ 全部结束",
                             presentation.compactDateTimeText(for: end)),
                         systemImage: "flag.checkered")
                         .font(.caption2)
@@ -115,11 +115,11 @@ struct OverviewScheduleView: View {
     private func todayTitle(_ day: WatchOverviewSummary.Day) -> String {
         if day.all.total == 0 { return watchLocalizedString("今日没有安排") }
         if day.remaining.total == 0 { return watchLocalizedString("今日安排已完成") }
-        return String(format: watchLocalizedString("今日还剩 %d 项"), day.remaining.total)
+        return watchLocalizedFormat("今日还剩 %d 项", day.remaining.total)
     }
 
     private func countsText(_ counts: WatchOverviewSummary.Counts) -> String {
-        String(format: watchLocalizedString("课程 %d · 考试 %d · 实验 %d"),
+        watchLocalizedFormat("课程 %d · 考试 %d · 实验 %d",
             counts.courses, counts.exams, counts.experiments)
     }
 
@@ -153,20 +153,20 @@ struct OverviewScheduleView: View {
         VStack(alignment: .leading, spacing: 5) {
             Divider()
             Text(week.remainingDays > 0
-                ? String(format: watchLocalizedString("本周还有 %d 天安排"), week.remainingDays)
+                ? watchLocalizedFormat("本周还有 %d 天安排", week.remainingDays)
                 : watchLocalizedString("本周没有后续安排"))
                 .font(.caption.weight(.semibold))
 
             if week.remainingDays > 0 {
                 Label(week.upcoming.exams > 0
-                    ? String(format: watchLocalizedString("待考 %d 场"), week.upcoming.exams)
+                    ? watchLocalizedFormat("待考 %d 场", week.upcoming.exams)
                     : watchLocalizedString("本周暂无待考"),
                     systemImage: "pencil.and.list.clipboard")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 if week.upcoming.experiments > 0 {
                     Label(
-                        String(format: watchLocalizedString("待做实验 %d 项"), week.upcoming.experiments),
+                        watchLocalizedFormat("待做实验 %d 项", week.upcoming.experiments),
                         systemImage: "flask")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
