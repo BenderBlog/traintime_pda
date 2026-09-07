@@ -27,7 +27,7 @@ dependencies:
   path_provider: ^2.0.11
   json_annotation: ^4.9.0
   # Deal with html
-  html: ^0.15.4
+  html: '>=0.15.5 <0.15.7'
   charset_converter: ^2.2.1
   # Homepage
   infinite_scroll_pagination: ^5.1.1
