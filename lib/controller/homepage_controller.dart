@@ -23,6 +23,7 @@ import 'package:watermeter/repository/notification/course_reminder_service.dart'
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/repository/watch/watch_schedule_sync_service.dart';
 
 enum ArrangementState { fetching, fetched, error, none }
 
@@ -101,6 +102,7 @@ class HomepageController {
     bool forceRetryLogin = false,
     required Future<void> Function(String) sliderCaptcha,
   }) async {
+    final watchSession = WatchScheduleSyncService.instance.sessionRevision;
     if (forceRetryLogin || loginState == IDSLoginState.fail) {
       await _comboLogin(sliderCaptcha: sliderCaptcha);
     }
@@ -135,7 +137,10 @@ class HomepageController {
     final hasCredential =
         preference.getString(preference.Preference.idsAccount).isNotEmpty &&
         preference.getString(preference.Preference.idsPassword).isNotEmpty;
-    await syncWidgetLoginState(hasCredential);
+    await syncWidgetLoginState(
+      hasCredential,
+      expectedWatchSession: watchSession,
+    );
   }
 
   List<HomeArrangement> _sortArrangements(Iterable<HomeArrangement> data) {

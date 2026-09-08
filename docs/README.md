@@ -43,3 +43,5 @@ XDYou，代码称为 Traintime PDA，是为西电学生设计的开源信息查�
  - [常见问题问答](faq.md)
  - [技术终极回顾](https://legacy.superbart.top/writing/Traintime%20PDA%20Ultimate%20Review.html)
  - [涉及到的数据结构](data_structure.md)
+ - [Apple Watch 功能与源码入口](../watchOS/README.md)
+ - [Apple Watch 架构、同步与维护](../watchOS/apple_watch_technical_overview.md)

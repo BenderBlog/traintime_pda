@@ -26,6 +26,7 @@ import 'package:watermeter/repository/notification/notification_registrar.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
+import 'package:watermeter/repository/watch/watch_schedule_sync_service.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/themes/font_setting.dart';
 import 'package:home_widget/home_widget.dart';
@@ -59,6 +60,10 @@ void main() async {
 
   // Load package info.
   preference.packageInfo = await PackageInfo.fromPlatform();
+
+  // iPhone 始终作为 Apple Watch 课表的数据源；服务会监听课程、考试、
+  // 实验和周次变化，并在后台把完整学期快照同步给手表。
+  WatchScheduleSyncService.instance.start();
 
   // Have user registered?
   String username = preference.getString(preference.Preference.idsAccount);
