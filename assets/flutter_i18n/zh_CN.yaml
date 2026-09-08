@@ -326,7 +326,7 @@ electricity:
   water_usage_fetch_date: 获取时间
   water_usage_read_before: 上次读数
   water_usage_read_now: 本次读数
-  water_usage: 洗澡水用量
+  water_usage: 热水用量
   water_title: 水费信息
   water_loading: 正在加载水费信息
   water_unavailable: 水费信息暂不可用，请在电费卡片重试。
