@@ -47,7 +47,7 @@ object ClassTableConstants {
         listOf(17, 30),
         listOf(19, 0),
         listOf(19, 45),
-        listOf(19, 55),
+        listOf(19, 50),
         listOf(20, 35),
         listOf(20, 40),
         listOf(21, 25),
