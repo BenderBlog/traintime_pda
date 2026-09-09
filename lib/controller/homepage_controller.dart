@@ -13,6 +13,7 @@ import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
+import 'package:watermeter/controller/sport_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/password_exceptions.dart';
@@ -118,6 +119,9 @@ class HomepageController {
         "OtherExperiment",
         OtherExperimentController.i.reloadOtherExperiment,
       ),
+      _safeReload("Sport", () async {
+        await SportController.i.reloadClass();
+      }),
       _safeReload("Library", LibraryController.i.reloadBorrowList),
       _safeReload("SchoolCard", SchoolCardController.i.reloadOverview),
       _safeReload("Electricity", EnergyController.i.refreshElectricityInfo),

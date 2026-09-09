@@ -8,11 +8,13 @@ import 'package:signals/signals.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
+import 'package:watermeter/controller/sport_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/xidian_sport/sport_class_table_sync.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/ids_session/classtable_session.dart';
@@ -92,19 +94,9 @@ class ClassTableController {
 
   late final classTableComputedSignal = computed<ClassTableData>(() {
     final networkClassTable = schoolClassTableComputedSignal.value;
-
-    return ClassTableData(
-      semesterLength: networkClassTable.semesterLength,
-      semesterCode: networkClassTable.semesterCode,
-      termStartDay: networkClassTable.termStartDay,
-      classDetail: List<ClassDetail>.from(networkClassTable.classDetail),
-      notArranged: List<NotArrangementClassDetail>.from(
-        networkClassTable.notArranged,
-      ),
-      timeArrangement: List<TimeArrangement>.from(
-        networkClassTable.timeArrangement,
-      ),
-      classChanges: List<ClassChange>.from(networkClassTable.classChanges),
+    return mergeSportClassLocations(
+      classTable: networkClassTable,
+      sportClasses: SportController.i.sportClassesComputedSignal.value,
     );
   });
 
