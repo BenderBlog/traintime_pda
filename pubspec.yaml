@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.6.5+49
+version: 1.6.6+50
 
 environment:
   sdk: ^3.8.0
@@ -40,7 +40,7 @@ dependencies:
   auto_size_text: ^3.0.0
   restart_app: ^1.7.3
   calendar_date_picker2: ^3.0.0
-  cached_network_image: ^3.2.3
+  cached_network_image: ^4.0.0
   flutter_native_splash: ^2.3.1
   flutter:
     sdk: flutter
@@ -55,7 +55,7 @@ dependencies:
   based_split_view: ^1.2.0
   permission_handler: ^13.0.1
   # QR code scanner
-  flutter_zxing: ^2.3.0
+  flutter_zxing: ^3.0.1
   # Output to system calendar
   device_calendar_plus: ^0.8.0
   # Homepage Widget
@@ -79,9 +79,16 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.3
   build_runner: ^2.6.0
   flutter_lints: ^6.0.0
-  pigeon: ^27.1.0
+  pigeon: ^28.0.0
   yaml: ^3.1.3
   json_serializable: ^6.10.0
+
+# Fix for flutter_html 3.0.0 compatibility issue with html package.
+# flutter_html 3.0.0 calls qs.matches() which was removed in html 0.15.7+.
+# This override pins html to 0.15.6 until flutter_html releases a fix.
+# See: https://github.com/Sub6Resources/flutter_html/issues/1522
+dependency_overrides:
+  html: 0.15.6
 
 flutter_launcher_icons:
   android: true
