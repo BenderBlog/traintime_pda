@@ -11,22 +11,39 @@ import 'package:dio/dio.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/model/xidian_ids/paid_record.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 class SchoolCardSession extends IDSSession {
-  static String openid = "";
-  static DateTime? _openidFetchedAt;
   static const Duration _openidValidDuration = Duration(minutes: 5);
 
+  String _openid = "";
+  DateTime? _openidFetchedAt;
+  Future<String>? _initFuture;
+  final _overviewFlight = SingleFlight<String>();
+
   bool get _isOpenIdValid =>
-      openid.isNotEmpty &&
+      _openid.isNotEmpty &&
       _openidFetchedAt != null &&
       DateTime.now().difference(_openidFetchedAt!) < _openidValidDuration;
 
-  Future<void> _ensureOpenId({bool forceRefresh = false}) async {
-    if (!forceRefresh && _isOpenIdValid) return;
+  Future<String> _ensureOpenId({bool forceRefresh = false}) {
+    final initializing = _initFuture;
+    if (initializing != null) return initializing;
+    if (!forceRefresh && _isOpenIdValid) return Future.value(_openid);
 
-    openid = "";
     _openidFetchedAt = null;
+    late final Future<String> future;
+    future = _fetchOpenId().whenComplete(() {
+      if (identical(_initFuture, future)) {
+        _initFuture = null;
+      }
+    });
+    _initFuture = future;
+    return future;
+  }
+
+  Future<String> _fetchOpenId() async {
+    String fetchedOpenId = "";
 
     final response = await followIDSRedirects(
       initialLocation: "https://v8scan.xidian.edu.cn/home/openXDOAuth2Page",
@@ -37,21 +54,25 @@ class SchoolCardSession extends IDSSession {
     var getOpenId = page.getElementsByTagName('input');
     for (var i in getOpenId) {
       if (i.id == "openid" && i.attributes["type"] == "hidden") {
-        openid = i.attributes["value"]!;
+        fetchedOpenId = i.attributes["value"] ?? "";
         break;
       }
     }
 
-    if (openid.isEmpty) {
+    if (fetchedOpenId.isEmpty) {
       throw Exception("School card openid not found.");
     }
+    _openid = fetchedOpenId;
     _openidFetchedAt = DateTime.now();
+    return fetchedOpenId;
   }
 
-  Future<T> _withOpenIdRetry<T>(Future<T> Function() action) async {
-    await _ensureOpenId();
+  Future<T> _withOpenIdRetry<T>(
+    Future<T> Function(String openid) action,
+  ) async {
+    final openid = await _ensureOpenId();
     try {
-      return await action();
+      return await action(openid);
     } catch (e, s) {
       log.warning(
         "[SchoolCardSession][_withOpenIdRetry] "
@@ -59,12 +80,12 @@ class SchoolCardSession extends IDSSession {
         e,
         s,
       );
-      await _ensureOpenId(forceRefresh: true);
-      return await action();
+      final refreshedOpenId = await _ensureOpenId(forceRefresh: true);
+      return action(refreshedOpenId);
     }
   }
 
-  Future<String> _fetchOverview() async {
+  Future<String> _fetchOverview(String openid) async {
     final responseData = await dio
         .get(
           "https://v8scan.xidian.edu.cn/myaccount/openMyAccount?openid=$openid",
@@ -81,15 +102,17 @@ class SchoolCardSession extends IDSSession {
         "school_card_status.failed_to_query";
   }
 
-  Future<String> getOverview() async {
+  Future<String> getOverview() => _overviewFlight.run(_getOverviewOnce);
+
+  Future<String> _getOverviewOnce() async {
     log.info(
       "[SchoolCardSession][getOverview] "
       "Try to fetch school card overview.",
     );
     String money = await _withOpenIdRetry(_fetchOverview);
     if (money == "school_card_status.failed_to_query") {
-      await _ensureOpenId(forceRefresh: true);
-      money = await _fetchOverview();
+      final refreshedOpenId = await _ensureOpenId(forceRefresh: true);
+      money = await _fetchOverview(refreshedOpenId);
     }
     return money;
   }
@@ -99,7 +122,7 @@ class SchoolCardSession extends IDSSession {
       "[SchoolCardSession][initSession] "
       "Try to get QR Code",
     );
-    return _withOpenIdRetry(() async {
+    return _withOpenIdRetry((openid) async {
       final homeUrl =
           "https://v8scan.xidian.edu.cn/home/openHomePage?openid=$openid";
       final homeResp = await dio.get(homeUrl);
@@ -146,7 +169,7 @@ class SchoolCardSession extends IDSSession {
 
   // 获取支付记录
   Future<List<PaidRecord>> getPaidStatus(String begin, String end) async {
-    return _withOpenIdRetry(() async {
+    return _withOpenIdRetry((openid) async {
       List<PaidRecord> toReturn = [];
       var response = await dio
           .post(

@@ -32,16 +32,16 @@ class _BorrowListWindowState extends State<BorrowListWindow>
       child: SignalBuilder(
         builder: (context) =>
             LibraryController.i.libraryBorrowStateSignal.value.map(
-          data: (list) => BorrowListView(borrowList: list),
-          loading: () => const CircularProgressIndicator().center(),
-          refreshing: () => const CircularProgressIndicator().center(),
-          reloading: () => const CircularProgressIndicator().center(),
-          error: (err, stack) => ReloadWidget(
-            errorStatus: err,
-            stackTrace: stack,
-            function: LibraryController.i.reloadBorrowList,
-          ).center(),
-        ),
+              data: (list) => BorrowListView(borrowList: list),
+              loading: () => const CircularProgressIndicator().center(),
+              refreshing: () => const CircularProgressIndicator().center(),
+              reloading: () => const CircularProgressIndicator().center(),
+              error: (err, stack) => ReloadWidget(
+                errorStatus: err,
+                stackTrace: stack,
+                function: LibraryController.i.reloadBorrowList,
+              ).center(),
+            ),
       ),
     );
   }

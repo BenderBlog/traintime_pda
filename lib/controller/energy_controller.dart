@@ -12,7 +12,6 @@ import 'package:watermeter/repository/ids_session/energy_session.dart';
 class EnergyController {
   static final EnergyController i = EnergyController._();
   static const int defaultLowElectricityWarningThreshold = 20;
-  bool _isReloading = false;
 
   final EnergySession session = EnergySession();
 
@@ -118,13 +117,21 @@ class EnergyController {
     historyElectricityInfoList.addAll(newHistoryInfo);
   }
 
+  late final electricityThreshold = computed(() {
+    return electricityWarning.value > 0
+        ? electricityWarning.value
+        : defaultLowElectricityWarningThreshold;
+  });
+
+  late final lowElectricityWarningEnabled = computed(() {
+    return electricityWarning.value >= 0;
+  });
+
   /// ==================
   ///  Electricity Info
   /// ==================
 
   Future<void> refreshElectricityInfo({bool force = false}) async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = _lastValidEnergyInfo.value;
     energyInfoStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
@@ -132,12 +139,10 @@ class EnergyController {
     try {
       final result = await session.getElectricityInfo();
       _syncLastValidElectricity(result);
-      energyInfoStateSignal.value = AsyncState.data(result);
+      energyInfoStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       energyInfoStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[EnergyController][refreshElectricityInfo] Have issue");
-    } finally {
-      _isReloading = false;
     }
   }
 

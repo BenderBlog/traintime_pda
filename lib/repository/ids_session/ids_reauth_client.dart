@@ -29,64 +29,78 @@ class IDSReAuthClient {
   final Future<void> Function()? registerBrowserFingerprint;
 
   String? recipientDescription;
-  bool _prepared = false;
+  String? _deliveryUsername;
+  bool _challengePrepared = false;
+  IDSReAuthCodeType? _preparedCodeType;
 
   String get _isMultifactor =>
       challengeUri.queryParameters['isMultifactor'] ?? 'true';
 
-  Future<void> prepare() async {
-    if (_prepared) return;
-
-    final challengeResponse = await _dio.getUri(challengeUri);
-    if (challengeResponse.statusCode != HttpStatus.ok) {
-      throw const IDSReAuthExpiredException('二次认证已失效，请重新登录');
+  Future<void> prepare({
+    IDSReAuthCodeType codeType = IDSReAuthCodeType.sms,
+  }) async {
+    if (!_challengePrepared) {
+      final challengeResponse = await _dio.getUri(challengeUri);
+      if (challengeResponse.statusCode != HttpStatus.ok) {
+        throw const IDSReAuthExpiredException('二次认证已失效，请重新登录');
+      }
+      _deliveryUsername = _parseReAuthUserId(challengeResponse.data);
+      await registerBrowserFingerprint?.call();
+      _challengePrepared = true;
     }
-    await registerBrowserFingerprint?.call();
+    if (_preparedCodeType == codeType) return;
+
     final response = await _dio.post(
       'https://ids.xidian.edu.cn/authserver/reAuthCheck/changeReAuthType.do',
       data: {
         'isMultifactor': _isMultifactor,
-        'reAuthType': '3',
+        'reAuthType': codeType.reAuthType,
         'service': service ?? '',
       },
     );
     final json = _responseJson(response.data);
     if (json['code']?.toString() != '1') {
-      throw IDSProtocolException(json['message']?.toString() ?? '无法切换到短信二次认证');
+      throw IDSProtocolException(json['message']?.toString() ?? '无法切换二次认证方式');
     }
 
     final data = json['data'];
     if (data is Map) {
       recipientDescription = data['reAuthUserNameInput']?.toString();
     }
-    _prepared = true;
+    _preparedCodeType = codeType;
   }
 
-  Future<IDSSmsDelivery> sendSms() async {
-    await prepare();
+  Future<IDSCodeDelivery> sendCode({
+    IDSReAuthCodeType codeType = IDSReAuthCodeType.sms,
+  }) async {
+    await prepare(codeType: codeType);
     final response = await _dio.post(
       'https://ids.xidian.edu.cn/authserver/dynamicCode/'
       'getDynamicCodeByReauth.do',
-      data: {'userName': username, 'authCodeTypeName': 'reAuthDynamicCodeType'},
+      data: {
+        'userName': _deliveryUsername ?? username,
+        'authCodeTypeName': codeType.authCodeTypeName,
+      },
     );
-    return parseIDSSmsDelivery(_responseJson(response.data));
+    return parseIDSCodeDelivery(_responseJson(response.data));
   }
 
-  Future<Uri> submitSms({
+  Future<Uri> submitCode({
+    IDSReAuthCodeType codeType = IDSReAuthCodeType.sms,
     required String code,
     required bool trustDevice,
   }) async {
-    await prepare();
+    await prepare(codeType: codeType);
     final normalizedCode = code.trim();
     if (normalizedCode.isEmpty) {
-      throw const IDSReAuthCodeRejectedException('请输入短信验证码');
+      throw const IDSReAuthCodeRejectedException('请输入验证码');
     }
 
     final response = await _dio.post(
       'https://ids.xidian.edu.cn/authserver/reAuthCheck/reAuthSubmit.do',
       data: {
         'service': service ?? '',
-        'reAuthType': '3',
+        'reAuthType': codeType.reAuthType,
         'isMultifactor': _isMultifactor,
         'password': '',
         'dynamicCode': normalizedCode,
@@ -124,6 +138,13 @@ class IDSReAuthClient {
   }
 }
 
+String? _parseReAuthUserId(dynamic data) {
+  if (data is! String) return null;
+  final match = RegExp(r'"reAuthUserId"\s*:\s*"([^"\\]+)"').firstMatch(data);
+  final value = match?.group(1)?.trim();
+  return value == null || value.isEmpty ? null : value;
+}
+
 Map<dynamic, dynamic> _responseJson(dynamic data) {
   if (data is Map) return data;
   if (data is String) {
@@ -141,7 +162,7 @@ class IDSReAuthRequiredException implements Exception {
   const IDSReAuthRequiredException();
 
   @override
-  String toString() => '登录需要短信二次认证，请打开应用后重试';
+  String toString() => '登录需要二次认证，请打开应用后重试';
 }
 
 class IDSReAuthCodeRejectedException implements Exception {
@@ -166,5 +187,5 @@ class IDSReAuthCancelledException implements Exception {
   const IDSReAuthCancelledException();
 
   @override
-  String toString() => '已取消短信二次认证';
+  String toString() => '已取消二次认证';
 }

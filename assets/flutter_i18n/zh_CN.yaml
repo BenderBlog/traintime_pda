@@ -23,7 +23,7 @@ login_process:
   get_encrypt: 获取密码加密密钥
   ready_login: 准备登录
   slider: 登录中
-  second_factor: 等待短信二次认证
+  second_factor: 等待二次认证
   after_process: 登录后处理
   failed: 登录失败，响应状态码：{statusCode}
 no_info: 没有信息
@@ -317,9 +317,7 @@ electricity:
   history: 历史记录
   daily_usage: 平均每日用量
   not_enough_data: 数据量不足以用于渲染
-  info: "新能源系统获取仅校园网内访问，获取过程中有问题请向开发者报告。
-
-    历史记录依旧为本地记录，平均日用量基于抄表记录计算。"
+  info: "历史记录依旧为本地记录，平均日用量基于抄表记录计算。"
   fetching_hint: 正在获取最新电费信息
   fetch_error: 电费信息获取失败，请重试。
   date: 日期
@@ -328,7 +326,7 @@ electricity:
   water_usage_fetch_date: 获取时间
   water_usage_read_before: 上次读数
   water_usage_read_now: 本次读数
-  water_usage: 洗澡水用量
+  water_usage: 热水用量
   water_title: 水费信息
   water_loading: 正在加载水费信息
   water_unavailable: 水费信息暂不可用，请在电费卡片重试。
@@ -623,6 +621,7 @@ library:
   publish_year_end: 出版年止
   book_detail: 书籍详细信息
   no_result: 没有结果，请修改搜索参数或者开始你的搜索
+  no_more_data: 没有更多结果了
 library_card:
   title: 图书馆当前状况
   fetching: 正在获取图书馆信息
@@ -651,16 +650,18 @@ login:
     refresh_failed: "刷新验证码失败: {error}"
   slider_title: 服务器认证服务
   second_factor:
-    title: 短信二次认证
-    description: 学校要求完成二次认证。请先获取短信验证码，再输入验证码继续登录。
-    code: 短信验证码
-    empty_code: 请输入短信验证码
+    title: 二次认证
+    description: 学校要求完成二次认证。请选择验证码接收方式，获取并输入验证码后继续登录。
+    method: 验证码接收方式
+    sms: 短信验证码
+    enterprise_wechat: 企业微信验证码
+    empty_code: 请输入验证码
     send_code: 获取验证码
     resend_countdown: "{seconds} 秒后可重新获取"
     trust_device: 信任此设备
     trust_device_hint: 开启后学校可能在一段时间内不再要求本设备二次认证
     network_error: 二次认证请求失败，请检查网络后重试
-    cancelled: 已取消短信二次认证
+    cancelled: 已取消二次认证
     expired: 二次认证已失效，请重新登录
 school_net:
   title: 校园网使用详情
@@ -775,6 +776,7 @@ score:
     CET-4: 国家英语四级
     CET-6: 国家英语六级
 setting:
+  about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 关于
   about_this_program: 关于本程序
@@ -784,13 +786,24 @@ setting:
   latest_version: "最新版本: {latest}"
   waiting: 等待获取
   fetching_update: 正在获取更新信息
-  new_version: 有新版本发布！
+  new_version: 有新版本发布，请立刻更新！
   current_stable: 目前您正在运行最新版
   current_testing: 目前您正在运行测试版
   fetch_failed: 获取更新信息失败
   ui_setting: 界面设置
   brightness_setting: 设置深浅色
   color_setting: 颜色设置
+  font_size_setting: 字体大小与粗细
+  font_size_page:
+    size_title: 字体大小
+    weight_title: 字体粗细
+    preview_title: 预览
+    weight_thin: 细
+    weight_regular: 常规
+    weight_medium: 中等
+    weight_semibold: 半粗
+    weight_bold: 加粗
+    summary: "{scale}% · {weight}"
   simplify_timeline: 简化日程时间轴
   simplify_timeline_description: 没有日程时 减少空间占用
   low_electricity_warning: 低电量卡片变色提醒
@@ -1061,18 +1074,35 @@ setting:
 
       本程序和西安电子科技大学，体适能服务，书蜗，电表等服务无关。
 
+      本程序代码版权受中国国家版权局保护，登记号2026SR0738647。
 
       Copyright 2023-2025 BenderBlog Rodriguez and contributors.
-
       Copyright 2025-present Traintime PDA authors.
 
+      The Copyright of the Software is protected by NCAC, register code is 2026SR0738647
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
       v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
       one at https://mozilla.org/MPL/2.0/."
     beian: 备案号
+    copyright_register_code: 著作权登记号
     sign_android: 安卓签名
     title: 关于本软件
+sponsorship:
+  title: "本版本由极创工作室和网管会赞助发布"
+  dialog_title: "赞助信息"
+  dialog_content:
+    "极创工作室介绍辞：极创工作室是一个由西电创新创业学院支持建设的科技创新俱乐部，旨在与校内最优秀的创新创业人才同行，专注于人工智能等领域的技术创新与产品研发。目前工作室和华为等厂家合作，深耕大语言模型相关前沿方向，已孵化超过数十个人工智能领域科创产品，其中8项产品成功落地商用。工作室最知名的产品包括SwanLab、LLMOne、NexusGate。
+
+
+    网管会介绍辞：学生网管会隶属于西电信息网络技术中心，主要协助处理师生校园网络使用问题，参与校园网络维护、线上咨询、线下处理和技术支持等工作。我们欢迎认真负责、愿意学习、对网络与技术实践感兴趣的同学加入，一起服务同学、提升能力、积累经验。
+
+
+    XDYou软件开发者辞：极创在XDYou早期开发期间给了相当大的帮助，网管会我在20年入学期间加入过，可惜他们没要我。应我最近找工作，找了他们的人了解了一些信息，按照约定制作本页面作为咨询费。
+
+    Bender Rodriguez 6/9/2026"
+  button_jichuang: "了解极创"
+  button_xduna: "了解网管会"
 sport:
   title: 体育查询
   class_info: 课程信息

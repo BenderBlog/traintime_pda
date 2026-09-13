@@ -2,8 +2,6 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-// TODO: Concept prove: whether remove EhallSession is OK
-
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
@@ -66,15 +64,13 @@ class EmptyClassroomSession extends IDSSession {
   Future<List<EmptyClassroomPlace>> getBuildingList() async {
     List<EmptyClassroomPlace> toReturn = [];
     developer.log("Ready to login the system.", name: "Ehall emptyClassroom");
-    var location = await checkAndLogin(
+    await checkAndLogin(
       target: "https://ehall.xidian.edu.cn/appShow?appId=4768402106681759",
       sliderCaptcha: (String cookieStr) =>
           SliderCaptchaClientProvider(cookie: cookieStr).solve(),
-    );
-    var response = await followIDSRedirects(
-      initialLocation: location,
-      client: dio,
-    );
+    ).then((location) async {
+      await followIDSRedirects(initialLocation: location, client: dio);
+    });
     var data = await dio
         .post("$baseUrl/jxlcx.do", data: {"*order": "+XXXQDM,+PX,+JXLDM"})
         .then((value) => value.data["datas"]["jxlcx"]["rows"]);

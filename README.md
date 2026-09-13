@@ -1,22 +1,19 @@
 <div align="center">
-<img src="./assets/icon.png" style="border-radius:10px; margin:10px; width:120px" alt="XDYou">
+<img src="./assets/icon.png" style="border-radius:16px; margin:10px; width:120px" alt="XDYou">
 <h1>Traintime PDA / XDYou</h1>
 
 [![Release downloads](https://img.shields.io/github/downloads/BenderBlog/traintime_pda/total.svg)](https://GitHub.com/BenderBlog/traintime_pda/releases/) ![Android Version](https://img.shields.io/badge/Android%20API-23%2B-green)
 
 XDYou，代码名称为 Traintime PDA，是为西电学生设计的开源信息查询软件。
 
-[临时主页地址](https://legacy.superbart.top/xdyou.html) 
+[主页地址](https://xdyou.superbart.top)
+[苹果商店下载](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)
+[安卓版本下载](https://mirror.tuna.tsinghua.edu.cn/fdroid/repo/io.github.benderblog.traintime_pda_483.apk)
 
-</div>
+[F-Droid商店链接](https://f-droid.org/zh_Hans/packages/io.github.benderblog.traintime_pda)
+[Github Release](https://github.com/BenderBlog/traintime_pda/releases)
 
-[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-    alt="Get it on App Store"
-    height="60px">](https://apps.apple.com/us/app/xdyou/id6461723688?l=zh-Hans-CN)
-[<img src="https://raw.githubusercontent.com/f-droid/artwork/master/badge/get-it-on-zh-cn.svg"
-    alt="Get it on F-Droid"
-    height="60px">](https://f-droid.org/zh_Hans/packages/io.github.benderblog.traintime_pda/)
-
+![](XDYou-Poster.jpg)
 </div>
 
 ## 特性概览
@@ -59,11 +56,12 @@ XDYou，代码名称为 Traintime PDA，是为西电学生设计的开源信息�
 ## 编译环境
 
 ```bash
-(base) superbart@Mac traintime_pda % flutter --version
-Flutter 3.44.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 559ffa3f75 (2 周前) • 2026-05-15 14:13:13 -0700
-Engine • hash fcf463a2242790d1fdcd9d044f533080f5022e18 (revision 4c525dac5e) (16 days ago) • 2026-05-15 19:00:04.000Z
-Tools • Dart 3.12.0 • DevTools 2.57.0
+Flutter 3.47.0 • channel stable •
+https://github.com/flutter/flutter.git
+Framework • revision 4cf2416426 (6 天前) • 2026-08-11 11:53:49 -0700
+Engine • hash 59d54a2b2896a6bbf356c94b7fac7b9e235bdacd (revision
+5f77625673) (6 days ago) • 2026-08-11 16:38:36.000Z
+Tools • Dart 3.13.0 • DevTools 2.60.0
 ```
 
 ## 授权信息

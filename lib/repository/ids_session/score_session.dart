@@ -18,18 +18,19 @@ import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
-import 'package:watermeter/repository/ids_session/ehall_session.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 /// 考试成绩 4768574631264620
-class ScoreSession extends EhallSession {
+class ScoreSession extends IDSSession {
   static const _scoreListCacheName = "scores.json";
   static final File _file = File("${supportPath.path}/$_scoreListCacheName");
 
   // Use static since it is not a global function, which is not controller-based.
   static bool get isCacheExist => _file.existsSync();
   static void deleteCache() {
-    _file.deleteSync();
+    if (_file.existsSync()) {
+      _file.deleteSync();
+    }
   }
 
   Future<FetchResult<List<Score>>> getScore(UserRole role) async {
@@ -108,13 +109,16 @@ class ScoreSession extends EhallSession {
 
       if (needRelogin) {
         log.info("[ScoreSession][getDetail] Cache detected, need login.");
-
-        var firstPost = await useApp("4768574631264620");
-        log.info("[ScoreSession] First post: $firstPost.");
-        await dioEhall.get(firstPost);
+        await checkAndLogin(
+          target: "https://ehall.xidian.edu.cn/appShow?appId=4768574631264620",
+          sliderCaptcha: (String cookieStr) =>
+              SliderCaptchaClientProvider(cookie: cookieStr).solve(),
+        ).then((location) async {
+          await followIDSRedirects(initialLocation: location, client: dio);
+        });
       }
 
-      var response = await dioEhall
+      var response = await dio
           .post(
             "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/cxkckgcxlrcj.do",
             data: {
@@ -239,15 +243,19 @@ class ScoreSession extends EhallSession {
       "[ScoreSession][getScoreFromEhall] "
       "Ready to log into the system.",
     );
-    var firstPost = await useApp("4768574631264620");
-    log.info("[ScoreSession] First post: $firstPost.");
-    await dioEhall.get(firstPost);
+    await checkAndLogin(
+      target: "https://ehall.xidian.edu.cn/appShow?appId=4768574631264620",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
+    ).then((location) async {
+      await followIDSRedirects(initialLocation: location, client: dio);
+    });
 
     log.info(
       "[ScoreSession][getScoreFromEhall] "
       "Getting score data.",
     );
-    var getData = await dioEhall
+    var getData = await dio
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
           data: {

@@ -7,7 +7,6 @@ import 'package:watermeter/repository/ids_session/school_card_session.dart';
 
 class SchoolCardController {
   static final SchoolCardController i = SchoolCardController._();
-  bool _isReloading = false;
   final session = SchoolCardSession();
 
   SchoolCardController._();
@@ -16,20 +15,16 @@ class SchoolCardController {
 
   Future<void> reloadOverview() async {
     log.info("[SchoolCardController] Ready to fetch school card overview.");
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = moneyStateSignal.peek().value;
     moneyStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
       final result = await session.getOverview();
-      moneyStateSignal.value = AsyncState.data(result);
+      moneyStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       moneyStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[SchoolCardController][reloadOverview] Have issue");
-    } finally {
-      _isReloading = false;
     }
   }
 }

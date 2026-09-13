@@ -106,7 +106,7 @@ class AirconController {
       final result = await getAirconEnergyInfo(imei);
       _lastValidInfo.value = result;
       _syncEnergyHistory(result);
-      energyInfoStateSignal.value = AsyncState.data(result);
+      energyInfoStateSignal.value = AsyncState.data(result，force: true,);
     } catch (e, s) {
       energyInfoStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[AirconController][refreshEnergyInfo] Have issue");

@@ -2,11 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:signals/signals.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/exam_controller.dart';
-import 'package:watermeter/controller/other_experiment_controller.dart';
-import 'package:watermeter/controller/physics_experiment_controller.dart';
-import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/repository/ids_session/semester_session.dart';
@@ -74,14 +69,6 @@ class SemesterController {
     return remoteSemester;
   }
 
-  void _ensureSemesterAwareControllersReady() {
-    ClassTableController.i;
-    ExamController.i;
-    OtherExperimentController.i;
-    PhysicsExperimentController.i;
-    WeekSwiftController.i;
-  }
-
   Future<SemesterSyncResult> _syncSemester({String? preferredSemester}) async {
     final localSemester = semesterSignal.value;
     final remoteSemester = await fetchRemoteSemester();
@@ -91,8 +78,6 @@ class SemesterController {
     final effectiveSemester = _latestSemester(remoteSemester, preferred);
     final didChange = effectiveSemester != localSemester;
     final isUserDefinedSemester = effectiveSemester != remoteSemester;
-
-    _ensureSemesterAwareControllersReady();
 
     await pref.setString(pref.Preference.currentSemester, effectiveSemester);
     await pref.setBool(
@@ -129,8 +114,6 @@ class SemesterController {
   Future<bool> setSemesterDirectly(String semester) async {
     final localSemester = semesterSignal.value;
     final didChange = semester != localSemester;
-
-    _ensureSemesterAwareControllersReady();
 
     await pref.setString(pref.Preference.currentSemester, semester);
     await pref.setBool(pref.Preference.isUserDefinedSemester, true);

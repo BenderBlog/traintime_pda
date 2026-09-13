@@ -122,6 +122,7 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
                   icon: const Icon(Icons.shuffle),
                   label: const Text("Change A Pig"),
                 ),
+                SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: () => launchUrlString(
                     data[index].url,

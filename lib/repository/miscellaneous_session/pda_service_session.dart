@@ -7,9 +7,11 @@ import 'dart:math' as math;
 import 'package:watermeter/model/pda_service/message.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
+import 'package:watermeter/repository/single_flight.dart';
 
 class PdaServiceSession {
   static final url = "https://legacy.superbart.top/traintime_pda_backend";
+  final _checkUpdateFlight = SingleFlight<UpdateMessage>();
 
   /// Version comparsion function
   ///
@@ -40,7 +42,10 @@ class PdaServiceSession {
     return isNewAvaliable;
   }
 
-  Future<UpdateMessage> checkUpdate() => NetworkClients.otherDio
+  Future<UpdateMessage> checkUpdate() =>
+      _checkUpdateFlight.run(_checkUpdateOnce);
+
+  Future<UpdateMessage> _checkUpdateOnce() => NetworkClients.otherDio
       .get("$url/version.json")
       .then((data) => UpdateMessage.fromJson(data.data));
 }

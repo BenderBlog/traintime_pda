@@ -801,7 +801,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         bytes: Uint8List.fromList(
                           utf8.encode(classTableState.iCalenderStr),
                         ),
-                        lockParentWindow: true,
+                        windowsOptions: WindowsOptions(lockParentWindow: true),
+                        linuxOptions: LinuxOptions(lockParentWindow: true),
                       );
                       //  } else {
                       //    String tempPath = await getTemporaryDirectory().then(

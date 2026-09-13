@@ -12,6 +12,22 @@ bool isIDSReAuthLocation(String location, {Uri? baseUri}) {
 
 enum IDSReAuthSubmitStatus { success, failed, unauthorized }
 
+enum IDSReAuthCodeType {
+  sms(reAuthType: '3', authCodeTypeName: 'reAuthDynamicCodeType'),
+  enterpriseWechat(
+    reAuthType: '4',
+    authCodeTypeName: 'reAuthWChatDynamicCodeType',
+  );
+
+  const IDSReAuthCodeType({
+    required this.reAuthType,
+    required this.authCodeTypeName,
+  });
+
+  final String reAuthType;
+  final String authCodeTypeName;
+}
+
 class IDSReAuthSubmitResult {
   const IDSReAuthSubmitResult({required this.status, required this.message});
 
@@ -31,8 +47,8 @@ IDSReAuthSubmitResult parseIDSReAuthSubmit(Map<dynamic, dynamic> json) {
   return IDSReAuthSubmitResult(status: status, message: message);
 }
 
-class IDSSmsDelivery {
-  const IDSSmsDelivery({
+class IDSCodeDelivery {
+  const IDSCodeDelivery({
     required this.message,
     required this.maskedMobile,
     required this.retryAfter,
@@ -45,18 +61,21 @@ class IDSSmsDelivery {
   final bool wasAlreadySent;
 }
 
-IDSSmsDelivery parseIDSSmsDelivery(Map<dynamic, dynamic> json) {
+IDSCodeDelivery parseIDSCodeDelivery(Map<dynamic, dynamic> json) {
   final result = json['res']?.toString();
-  if (result != 'success' && result != 'code_time_fail') {
-    throw IDSProtocolException(
-      json['returnMessage']?.toString() ?? '短信验证码发送失败',
-    );
+  if (result != 'success' &&
+      result != 'other_success' &&
+      result != 'wechat_success' &&
+      result != 'code_time_fail') {
+    throw IDSProtocolException(json['returnMessage']?.toString() ?? '验证码发送失败');
   }
 
   final rawSeconds = int.tryParse(json['codeTime']?.toString() ?? '');
-  final seconds = rawSeconds == null || rawSeconds < 0 ? 0 : rawSeconds;
+  final seconds = rawSeconds == null || rawSeconds < 0
+      ? (result == 'wechat_success' ? 120 : 0)
+      : rawSeconds;
   final mobile = json['mobile']?.toString();
-  return IDSSmsDelivery(
+  return IDSCodeDelivery(
     message: json['returnMessage']?.toString() ?? '验证码已发送',
     maskedMobile: mobile == null || mobile.isEmpty
         ? null

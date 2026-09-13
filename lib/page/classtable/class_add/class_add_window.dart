@@ -8,6 +8,7 @@ import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_add/date_selector_free.dart';
 
@@ -172,7 +173,9 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 600),
           child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+            ).withSafeBottom(context),
             children: [
               Column(
                 children: [

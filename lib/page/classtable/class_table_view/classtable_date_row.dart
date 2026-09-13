@@ -19,9 +19,8 @@ class ClassTableDateRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      /// This will detertime the height of the row, also the way week info and
-      /// day shows.
-      height: midRowHeight,
+      /// The height is determined by the content, so the text will not
+      /// overflow when the font scale is enlarged.
       padding: const EdgeInsets.symmetric(vertical: 5),
       color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.75),
       child: Row(

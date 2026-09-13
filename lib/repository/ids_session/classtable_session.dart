@@ -9,8 +9,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
-import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/user_role.dart';
@@ -19,19 +17,22 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/repository/ids_session/ehall_session.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/single_flight.dart';
 
 /// 课程表 4770397878132218
-class ClassTableSession extends EhallSession {
+class ClassTableSession extends IDSSession {
   static const _schoolClassName = "ClassTable.json";
   static final File _schoolClassDataCache = File(
     "${supportPath.path}/$_schoolClassName",
   );
+  final _classTableFlight = SingleFlight<FetchResult<ClassTableData>>();
+  String? _requestedSemesterCode;
+  UserRole? _requestedRole;
 
   bool get isCacheExist => _schoolClassDataCache.existsSync();
 
-  void deleteCache() async {
+  void deleteCache() {
     if (_schoolClassDataCache.existsSync()) {
       _schoolClassDataCache.deleteSync();
     }
@@ -40,7 +41,6 @@ class ClassTableSession extends EhallSession {
   Future<void> updateCacheAndGroup(ClassTableData data) async {
     await _schoolClassDataCache.writeAsString(jsonEncode(data.toJson()));
 
-    /// TODO: Change ios widgitkit code to parse user defined classtable.
     if (Platform.isIOS) {
       final api = SaveToGroupIdSwiftApi();
       try {
@@ -77,27 +77,52 @@ class ClassTableSession extends EhallSession {
   Future<FetchResult<ClassTableData>> getClassTable(
     String semesterCode,
     UserRole role,
-  ) async {
-    try {
-      ClassTableData data = role == UserRole.postgraduate
-          ? await _getYjspt(semesterCode)
-          : await _getEhall(semesterCode);
-      DateTime fetchTime = DateTime.now();
-      await updateCacheAndGroup(data);
-      return FetchResult.fresh(fetchTime: fetchTime, data: data);
-    } catch (e, s) {
-      log.handle(e, s, "[getClassTable] Have issue");
-      (DateTime, ClassTableData)? cache = getCache();
-      if (cache != null) {
-        return FetchResult.cache(
-          fetchTime: cache.$1,
-          data: cache.$2,
-          hintKey: _cacheHintFromError(e),
-        );
+  ) {
+    _requestedSemesterCode = semesterCode;
+    _requestedRole = role;
+    return _classTableFlight.run(_getLatestClassTable);
+  }
+
+  Future<FetchResult<ClassTableData>> _getLatestClassTable() async {
+    while (true) {
+      final semesterCode = _requestedSemesterCode!;
+      final role = _requestedRole!;
+
+      try {
+        final data = role == UserRole.postgraduate
+            ? await _getYjspt(semesterCode)
+            : await _getEhall(semesterCode);
+
+        if (!_isLatestRequest(semesterCode, role)) continue;
+
+        final fetchTime = DateTime.now();
+        await updateCacheAndGroup(data);
+
+        if (!_isLatestRequest(semesterCode, role)) {
+          deleteCache();
+          continue;
+        }
+
+        return FetchResult.fresh(fetchTime: fetchTime, data: data);
+      } catch (e, s) {
+        if (!_isLatestRequest(semesterCode, role)) continue;
+
+        log.handle(e, s, "[getClassTable] Have issue");
+        final cache = getCache();
+        if (cache != null) {
+          return FetchResult.cache(
+            fetchTime: cache.$1,
+            data: cache.$2,
+            hintKey: _cacheHintFromError(e),
+          );
+        }
+        rethrow;
       }
-      rethrow;
     }
   }
+
+  bool _isLatestRequest(String semesterCode, UserRole role) =>
+      semesterCode == _requestedSemesterCode && role == _requestedRole;
 
   String _cacheHintFromError(Object error) {
     if (error is PasswordWrongException) {
@@ -132,26 +157,17 @@ class ClassTableSession extends EhallSession {
 
     await followIDSRedirects(initialLocation: location, client: dio);
 
-    DateTime now = DateTime.now();
-    var currentWeek = await dio
-        .post(
-          'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
-          data: {'day': DateFormat("yyyyMMdd").format(now)},
-        )
-        .then((value) => value.data);
-    if (!currentWeek.toString().contains("xnxq")) {
-      return ClassTableData(semesterCode: semesterCode);
-    }
-    currentWeek =
-        RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])?[0] ?? "null";
+    final calendarResponse = await dio.post(
+      'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/homeAppend/getSchoolCalendar.do',
+      data: {'xnxqdm': semesterCode},
+    );
 
-    log.info(
-      "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
-    );
-    int weekDay = now.weekday - 1;
-    String termStartDay = DateFormat("yyyy-MM-dd HH:mm:ss").format(
-      now.add(Duration(days: (1 - int.parse(currentWeek)) * 7 - weekDay)).date,
-    );
+    final rawCalendar = calendarResponse.data['msg'];
+    final calendar = rawCalendar is String
+        ? jsonDecode(rawCalendar)
+        : rawCalendar;
+
+    final termStartDay = calendar['QSRQ'] as String;
 
     Map<String, dynamic> data = await dio
         .post(classInfoURL, data: {"XNXQDM": semesterCode})
@@ -297,9 +313,14 @@ class ClassTableSession extends EhallSession {
   Future<ClassTableData> _getEhall(String semesterCode) async {
     Map<String, dynamic> qResult = {};
     log.info("[getClasstable][getEhall] Login the system.");
-    String get = await useApp("4770397878132218");
-    log.info("[getClasstable][getEhall] Location: $get");
-    await dioEhall.post(get);
+    await checkAndLogin(
+      target: "https://ehall.xidian.edu.cn/appShow?appId=4770397878132218",
+      sliderCaptcha: (String cookieStr) =>
+          SliderCaptchaClientProvider(cookie: cookieStr).solve(),
+    ).then((location) async {
+      log.info("[getClasstable][getEhall] Location: $location");
+      await followIDSRedirects(initialLocation: location, client: dio);
+    });
 
     log.info(
       "[getClasstable][getEhall] "
@@ -310,7 +331,7 @@ class ClassTableSession extends EhallSession {
       "[getClasstable][getEhall] "
       "Fetch the day the semester begin.",
     );
-    String termStartDay = await dioEhall
+    String termStartDay = await dio
         .post(
           'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/jshkcb/cxjcs.do',
           data: {
@@ -324,7 +345,7 @@ class ClassTableSession extends EhallSession {
       "Will get $semesterCode which start at $termStartDay.",
     );
 
-    qResult = await dioEhall
+    qResult = await dio
         .post(
           'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xskcb.do',
           data: {
@@ -361,7 +382,7 @@ class ClassTableSession extends EhallSession {
     qResult["semesterCode"] = semesterCode;
     qResult["termStartDay"] = termStartDay;
 
-    var notOnTable = await dioEhall
+    var notOnTable = await dio
         .post(
           "https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/cxxsllsywpk.do",
           data: {
@@ -431,7 +452,7 @@ class ClassTableSession extends EhallSession {
       "Deal with the class change...",
     );
 
-    qResult = await dioEhall
+    qResult = await dio
         .post(
           'https://ehall.xidian.edu.cn/jwapp/sys/wdkb/modules/xskcb/xsdkkc.do',
           data: {

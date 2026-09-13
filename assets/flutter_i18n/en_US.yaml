@@ -25,7 +25,7 @@ login_process:
   get_encrypt: Obtain password encryption key
   ready_login: Prepare to login
   slider: Logging in
-  second_factor: Waiting for SMS verification
+  second_factor: Waiting for verification
   after_process: Post-login processing
   failed: "Login failed, response status code: {statusCode}"
 no_info: No information
@@ -359,12 +359,7 @@ electricity:
   history: Billing History
   daily_usage: Average usage per day
   not_enough_data: Not enough data for rendering graph
-  info:
-    "Energy system can be only be accessed at schoolnet, do contact developers
-    if have issue.
-
-    History will be recorded locally while average usage is based on the electric
-    meter's record."
+  info: History will be recorded locally while average usage is based on the electric meter's record.
   fetching_hint: Fetching the latest electricity info.
   fetch_error: Failed to fetch electricity information. Please retry.
   date: Date
@@ -693,6 +688,7 @@ library:
   publish_year_end: Publish year to
   book_detail: Book details
   no_result: No result, change parameter or start your search
+  no_more_data: No more data
 library_card:
   title: Library status
   fetching: Fetching
@@ -723,16 +719,18 @@ login:
     refresh_failed: "Failed to refresh captcha: {error}"
   slider_title: Server authentication service
   second_factor:
-    title: SMS verification
-    description: The school requires an additional verification step. Request and enter the SMS code to continue.
-    code: SMS code
-    empty_code: Enter the SMS code
+    title: Additional verification
+    description: Choose where to receive the code, then request and enter it to continue.
+    method: Code delivery
+    sms: SMS code
+    enterprise_wechat: WeCom code
+    empty_code: Enter the verification code
     send_code: Send code
     resend_countdown: "Resend in {seconds}s"
     trust_device: Trust this device
     trust_device_hint: The school may skip verification on this device for a limited time
     network_error: Verification request failed. Check your connection and retry.
-    cancelled: SMS verification cancelled
+    cancelled: Verification cancelled
     expired: Verification expired. Please log in again.
 school_net:
   title: School Net Usage Query
@@ -852,6 +850,7 @@ score:
     CET-4: College English Test Band 4
     CET-6: College English Test Band 6
 setting:
+  about_info: APP info
   acknowledgement: Made With Love From {developers} People
   about: About
   about_this_program: About this APP
@@ -861,13 +860,24 @@ setting:
   latest_version: "Latest version: {latest}"
   waiting: Waiting for obtain
   fetching_update: Fetching update information
-  new_version: New version released!
+  new_version: New version released，PLEASE UPDATE AT ONCE!
   current_stable: You are running the latest version
   current_testing: You are running the testing version
   fetch_failed: Failed to fetch update information
   ui_setting: UI Settings
   brightness_setting: Light/Dark mode
   color_setting: Color theme
+  font_size_setting: Font size & weight
+  font_size_page:
+    size_title: Font size
+    weight_title: Font weight
+    preview_title: Preview
+    weight_thin: Thin
+    weight_regular: Regular
+    weight_medium: Medium
+    weight_semibold: Semi bold
+    weight_bold: Bold
+    summary: "{scale}% · {weight}"
   simplify_timeline: Simplify schedule timeline
   simplify_timeline_description: Reduce space occupation while no schedule
   low_electricity_warning: Low electricity card color warning
@@ -1199,22 +1209,36 @@ setting:
       (a.k.a watermeter) codebase, which is licensed under Mozilla Public License
       v2.0.
 
-
       This APP has no relation to Xidian University, Tishineng Service, Shuwow and
       other services.
 
-
       Copyright 2023-2025 BenderBlog Rodriguez and contributors.
-
       Copyright 2025-present Traintime PDA authors.
 
+      The Copyright of the Software is protected by NCAC, register code is 2026SR0738647
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
       v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
       one at https://mozilla.org/MPL/2.0/."
     beian: ICP record code
+    copyright_register_code: Copyright register code
     sign_android: Android signature
     title: About this APP
+sponsorship:
+  title: "This version is sponsored and released by Jichuang Studio and the Network Management Committee."
+  dialog_title: "Sponsorship Information"
+  dialog_content:
+    "Introduction to Jichuang Studio: Jichuang Studio is a tech innovation club supported and established by the Xidian University Innovation and Entrepreneurship College. It aims to walk alongside the campus's most outstanding innovation and entrepreneurship talent, focusing on technological innovation and product research and development in fields such as artificial intelligence. Currently, the studio collaborates with manufacturers like Huawei, deeply cultivating cutting-edge directions related to large language models, and has incubated over dozens of AI-related sci-tech innovation products, 8 of which have successfully achieved commercial deployment. The studio's best-known products include SwanLab, LLMOne, and NexusGate.
+
+
+    Introduction to the XDUNA: The XDUNA operates under the Xidian University Information Network Technology Center. It primarily assists in handling campus network usage issues for faculty and students, and participates in campus network maintenance, online consultation, offline processing, and technical support. We welcome responsible students who are eager to learn and interested in network and technical practices to join us in serving fellow students, improving abilities, and gaining experience.
+
+
+    Note from the XDYou Software Developer: Jichuang provided significant help during the early development of XDYou. I joined the Network Management Committee back in my admission year in 2020, though unfortunately they didn't accept me. As I've recently been looking for a job and consulted some of their members for information, this page has been created as a consultation fee in accordance with our agreement.
+
+    Bender Rodriguez 6/9/2026"
+  button_jichuang: "About Jichuang"
+  button_xduna: "About XDUNA"
 sport:
   title: Sport Query
   class_info: Class information

@@ -24,7 +24,7 @@ login_process:
   get_encrypt: 獲取密碼加密密鑰
   ready_login: 準備登錄
   slider: 登錄中
-  second_factor: 等待短信二次認證
+  second_factor: 等待二次認證
   after_process: 登錄後處理
   failed: 登錄失敗，響應狀態碼：{statusCode}
 no_info: 沒有信息
@@ -305,20 +305,18 @@ club_promotion:
   picture_preview: 圖片預覽
 electricity:
   title: 水電信息
-  power_title: 餘額信息
+  power_title: 電量信息
   cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
   cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
   cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
   cache_notice: 獲取時間
   account: 電費賬號
-  remain_power: 電量信息
+  remain_power: 電量額度
   owe_info: 欠費信息
   history: 歷史記錄
   daily_usage: 平均每日用量
   not_enough_data: 數據量不足以用於渲染
-  info: '新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。
-
-    歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。'
+  info: 歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。
   fetching_hint: 正在獲取最新電費信息
   fetch_error: 電費信息獲取失敗，請重試。
   date: 日期
@@ -327,7 +325,7 @@ electricity:
   water_usage_fetch_date: 獲取時間
   water_usage_read_before: 上次讀數
   water_usage_read_now: 本次讀數
-  water_usage: 洗澡水用量
+  water_usage: 熱水用量
   water_title: 水費信息
   water_loading: 正在加載水費信息
   water_unavailable: 水費信息暫不可用，請在電費卡片重試。
@@ -335,7 +333,7 @@ electricity:
   not_school_network: 非校園網訪問
   aircon_title: 空調用電
   aircon_imei: 空調 IMEI
-  aircon_amount: 平台用電量
+  aircon_amount: 平臺用電量
   aircon_update_time: 更新時間
   aircon_waiting: 等待獲取空調用電信息
   aircon_error: 空調用電獲取失敗
@@ -621,6 +619,7 @@ library:
   publish_year_end: 出版年止
   book_detail: 書籍詳細信息
   no_result: 沒有結果，請修改搜索參數或者開始你的搜索
+  no_more_data: 沒有更多結果了
 library_card:
   title: 圖書館當前狀況
   fetching: 正在獲取圖書館信息
@@ -649,16 +648,18 @@ login:
     refresh_failed: '刷新驗證碼失敗: {error}'
   slider_title: 服務器認證服務
   second_factor:
-    title: 短信二次認證
-    description: 學校要求完成二次認證。請先獲取短信驗證碼，再輸入驗證碼繼續登錄。
-    code: 短信驗證碼
-    empty_code: 請輸入短信驗證碼
+    title: 二次認證
+    description: 學校要求完成二次認證。請選擇驗證碼接收方式，獲取並輸入驗證碼後繼續登錄。
+    method: 驗證碼接收方式
+    sms: 短信驗證碼
+    enterprise_wechat: 企業微信驗證碼
+    empty_code: 請輸入驗證碼
     send_code: 獲取驗證碼
-    resend_countdown: "{seconds} 秒後可重新獲取"
+    resend_countdown: '{seconds} 秒後可重新獲取'
     trust_device: 信任此設備
     trust_device_hint: 開啟後學校可能在一段時間內不再要求本設備二次認證
     network_error: 二次認證請求失敗，請檢查網絡後重試
-    cancelled: 已取消短信二次認證
+    cancelled: 已取消二次認證
     expired: 二次認證已失效，請重新登錄
 school_net:
   title: 校園網使用詳情
@@ -773,6 +774,7 @@ score:
     CET-4: 國家英語四級
     CET-6: 國家英語六級
 setting:
+  about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 關於
   about_this_program: 關於本程序
@@ -782,19 +784,30 @@ setting:
   latest_version: '最新版本: {latest}'
   waiting: 等待獲取
   fetching_update: 正在獲取更新信息
-  new_version: 有新版本發佈！
+  new_version: 有新版本發佈，請立刻更新！
   current_stable: 目前您正在運行最新版
   current_testing: 目前您正在運行測試版
   fetch_failed: 獲取更新信息失敗
   ui_setting: 界面設置
   brightness_setting: 設置深淺色
   color_setting: 顏色設置
+  font_size_setting: 字體大小與粗細
+  font_size_page:
+    size_title: 字體大小
+    weight_title: 字體粗細
+    preview_title: 預覽
+    weight_thin: 細
+    weight_regular: 常規
+    weight_medium: 中等
+    weight_semibold: 半粗
+    weight_bold: 加粗
+    summary: '{scale}% · {weight}'
   simplify_timeline: 簡化日程時間軸
   simplify_timeline_description: 沒有日程時 減少空間佔用
   low_electricity_warning: 低電量卡片變色提醒
   low_electricity_warning_description: 電量小於閾值時 電量卡片變色提醒
   low_electricity_threshold: 低電量閾值
-  low_electricity_threshold_description: 目前為 {threshold} 度
+  low_electricity_threshold_description: 當前為 {threshold} 度
   low_electricity_threshold_dialog:
     title: 設置低電量閾值
     input_hint: 請輸入電量度數
@@ -816,7 +829,7 @@ setting:
   aircon_imei_clear: 清除
   scan_aircon_qr: 掃描空調二維碼
   pick_aircon_qr_image: 從相冊選擇二維碼圖片
-  aircon_camera_unavailable: 當前平台不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI
+  aircon_camera_unavailable: 當前平臺不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI
   notification_setting: 通知設置
   course_reminder_setting: 課前通知設置
   course_reminder_description: 設置課前提醒通知
@@ -1058,18 +1071,34 @@ setting:
 
       本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
 
+      本程序代碼版權受中國國家版權局保護，登記號2026SR0738647。
 
-      Copyright 2023-2025 BenderBlog Rodriguez and contributors.
+      Copyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present
+      Traintime PDA authors.
 
-      Copyright 2025-present Traintime PDA authors.
-
+      The Copyright of the Software is protected by NCAC, register code is 2026SR0738647
 
       The Source Code Form is subject to the terms of the Mozilla Public License,
       v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain
       one at https://mozilla.org/MPL/2.0/.'
     beian: 備案號
+    copyright_register_code: 著作權登記號
     sign_android: 安卓簽名
     title: 關於本軟件
+sponsorship:
+  title: 本版本由極創工作室和網管會贊助發佈
+  dialog_title: 贊助信息
+  dialog_content: '極創工作室介紹辭：極創工作室是一個由西電創新創業學院支持建設的科技創新俱樂部，旨在與校內最優秀的創新創業人才同行，專注於人工智能等領域的技術創新與產品研發。目前工作室和華為等廠家合作，深耕大語言模型相關前沿方向，已孵化超過數十個人工智能領域科創產品，其中8項產品成功落地商用。工作室最知名的產品包括SwanLab、LLMOne、NexusGate。
+
+
+    網管會介紹辭：學生網管會隸屬於西電信息網絡技術中心，主要協助處理師生校園網絡使用問題，參與校園網絡維護、線上諮詢、線下處理和技術支持等工作。我們歡迎認真負責、願意學習、對網絡與技術實踐感興趣的同學加入，一起服務同學、提升能力、積累經驗。
+
+
+    XDYou軟件開發者辭：極創在XDYou早期開發期間給了相當大的幫助，網管會我在20年入學期間加入過，可惜他們沒要我。應我最近找工作，找了他們的人瞭解了一些信息，按照約定製作本頁面作為諮詢費。
+
+    Bender Rodriguez 6/9/2026'
+  button_jichuang: 瞭解極創
+  button_xduna: 瞭解網管會
 sport:
   title: 體育查詢
   class_info: 課程信息
@@ -1207,7 +1236,7 @@ easter_egg_apple: '=== 帶我飛向月亮吧 ===
 
   不想失去這種感覺，被你的愛撫摸的舒適
 
-  你讓我感到好自在，被你的愛託舉的堅強
+  你讓我感到好自在，被你的愛托舉的堅強
 
   想一直在你懷中，沉浸在你的愛意中
 
@@ -1226,7 +1255,7 @@ easter_egg_others: '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===
 
   我的世界有夢想、熱愛與躊躇
 
-  但有些東西，我依舊無法想象
+  但有些東西，我依舊無法想像
 
   我想向著廣闊的天空，尋求自己的方向
 
@@ -1254,7 +1283,7 @@ easter_egg_others: '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===
 
   不想失去這種感覺，被你的愛撫摸的舒適
 
-  你讓我感到好自在，被你的愛託舉的堅強
+  你讓我感到好自在，被你的愛托舉的堅強
 
   想躺在你的懷中，沉浸在你的愛意
 

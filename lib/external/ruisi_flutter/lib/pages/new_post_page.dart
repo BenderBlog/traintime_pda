@@ -92,9 +92,9 @@ class _NewPostPageState extends State<NewPostPage> {
     if (file == null) return;
     if (!mounted) return;
 
-    final ext = file.extension?.toLowerCase();
+    final ext = file.name.toLowerCase();
     const allowed = {'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'};
-    if (ext == null || !allowed.contains(ext)) {
+    if (!allowed.contains(ext)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('仅支持 jpg/jpeg/png/gif/bmp/webp 图片')),
       );
@@ -187,7 +187,7 @@ class _NewPostPageState extends State<NewPostPage> {
                 final forums = state.groups.expand((g) => g.forums).toList();
 
                 return DropdownButtonFormField<int>(
-                  value:
+                  initialValue:
                       _selectedFid, // 注意：Flutter 新版本推荐使用 value 代替 initialValue
                   decoration: InputDecoration(
                     labelText: FlutterI18n.translate(

@@ -247,203 +247,208 @@ class _ClassAttendanceTableState extends State<ClassAttendanceTable> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: widget.onRefresh,
-            child: SingleChildScrollView(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const ClampingScrollPhysics(),
-                child: DataTable(
-                  sortColumnIndex: _sortColumnIndex,
-                  sortAscending: _sortAscending,
-                  columns: [
-                    DataColumn(
-                      label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.course_name",
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onSort: (columnIndex, ascending) {
-                        setState(() {
-                          _sortColumnIndex = columnIndex;
-                          _sortAscending = ascending;
-                        });
-                      },
-                    ),
-                    DataColumn(
-                      label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.status",
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onSort: (columnIndex, ascending) {
-                        setState(() {
-                          _sortColumnIndex = columnIndex;
-                          _sortAscending = ascending;
-                        });
-                      },
-                    ),
-                    DataColumn(
-                      label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.attendance_rate",
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) {
-                        setState(() {
-                          _sortColumnIndex = columnIndex;
-                          _sortAscending = ascending;
-                        });
-                      },
-                    ),
-                    DataColumn(
-                      label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.check_in",
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) {
-                        setState(() {
-                          _sortColumnIndex = columnIndex;
-                          _sortAscending = ascending;
-                        });
-                      },
-                    ),
-                    DataColumn(
-                      label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.absence",
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) {
-                        setState(() {
-                          _sortColumnIndex = columnIndex;
-                          _sortAscending = ascending;
-                        });
-                      },
-                    ),
-                    DataColumn(
-                      label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.required",
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      numeric: true,
-                      onSort: (columnIndex, ascending) {
-                        setState(() {
-                          _sortColumnIndex = columnIndex;
-                          _sortAscending = ascending;
-                        });
-                      },
-                    ),
-                    DataColumn(
-                      label: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.table.leave",
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                  rows: filteredCourses.map((course) {
-                    final status = course.attendanceStatus;
-                    final statusColor = _getStatusColor(status);
-
-                    return DataRow(
-                      cells: [
-                        DataCell(
-                          Text(
-                            course.courseName,
-                            softWrap: true,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+            child: ListView(
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: DataTable(
+                    sortColumnIndex: _sortColumnIndex,
+                    sortAscending: _sortAscending,
+                    columns: [
+                      DataColumn(
+                        label: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "class_attendance.table.course_name",
                           ),
-                          onTap: () async {
-                            if (status != AttendanceStatus.unknown) {
-                              await BothSideSheet.show(
-                                context: context,
-                                title: FlutterI18n.translate(
-                                  context,
-                                  "class_attendance.detail_title",
-                                  translationParams: {
-                                    "courseName": course.courseName,
-                                  },
-                                ),
-                                child: ClassAttendanceDetailView(
-                                  classAttendance: course,
-                                  showAppBar: false,
-                                ),
-                              );
-                            }
-                          },
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        DataCell(
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                        onSort: (columnIndex, ascending) {
+                          setState(() {
+                            _sortColumnIndex = columnIndex;
+                            _sortAscending = ascending;
+                          });
+                        },
+                      ),
+                      DataColumn(
+                        label: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "class_attendance.table.status",
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        onSort: (columnIndex, ascending) {
+                          setState(() {
+                            _sortColumnIndex = columnIndex;
+                            _sortAscending = ascending;
+                          });
+                        },
+                      ),
+                      DataColumn(
+                        label: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "class_attendance.table.attendance_rate",
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        numeric: true,
+                        onSort: (columnIndex, ascending) {
+                          setState(() {
+                            _sortColumnIndex = columnIndex;
+                            _sortAscending = ascending;
+                          });
+                        },
+                      ),
+                      DataColumn(
+                        label: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "class_attendance.table.check_in",
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        numeric: true,
+                        onSort: (columnIndex, ascending) {
+                          setState(() {
+                            _sortColumnIndex = columnIndex;
+                            _sortAscending = ascending;
+                          });
+                        },
+                      ),
+                      DataColumn(
+                        label: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "class_attendance.table.absence",
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        numeric: true,
+                        onSort: (columnIndex, ascending) {
+                          setState(() {
+                            _sortColumnIndex = columnIndex;
+                            _sortAscending = ascending;
+                          });
+                        },
+                      ),
+                      DataColumn(
+                        label: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "class_attendance.table.required",
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        numeric: true,
+                        onSort: (columnIndex, ascending) {
+                          setState(() {
+                            _sortColumnIndex = columnIndex;
+                            _sortAscending = ascending;
+                          });
+                        },
+                      ),
+                      DataColumn(
+                        label: Text(
+                          FlutterI18n.translate(
+                            context,
+                            "class_attendance.table.leave",
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                    rows: filteredCourses.map((course) {
+                      final status = course.attendanceStatus;
+                      final statusColor = _getStatusColor(status);
+
+                      return DataRow(
+                        cells: [
+                          DataCell(
+                            Text(
+                              course.courseName,
+                              softWrap: true,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            decoration: BoxDecoration(
-                              color: statusColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              FlutterI18n.translate(context, status.i18nString),
-                              style: TextStyle(
-                                color: statusColor,
-                                fontWeight: FontWeight.bold,
+                            onTap: () async {
+                              if (status != AttendanceStatus.unknown) {
+                                await BothSideSheet.show(
+                                  context: context,
+                                  title: FlutterI18n.translate(
+                                    context,
+                                    "class_attendance.detail_title",
+                                    translationParams: {
+                                      "courseName": course.courseName,
+                                    },
+                                  ),
+                                  child: ClassAttendanceDetailView(
+                                    classAttendance: course,
+                                    showAppBar: false,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                          DataCell(
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                FlutterI18n.translate(
+                                  context,
+                                  status.i18nString,
+                                ),
+                                style: TextStyle(
+                                  color: statusColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        DataCell(Text(course.attendanceRate)),
-                        DataCell(Text(course.checkInCount)),
-                        DataCell(
-                          Text(
-                            course.absenceCount,
-                            style: TextStyle(
-                              color:
-                                  int.tryParse(course.absenceCount) != null &&
-                                      int.parse(course.absenceCount) > 0
-                                  ? Colors.red
-                                  : null,
+                          DataCell(Text(course.attendanceRate)),
+                          DataCell(Text(course.checkInCount)),
+                          DataCell(
+                            Text(
+                              course.absenceCount,
+                              style: TextStyle(
+                                color:
+                                    int.tryParse(course.absenceCount) != null &&
+                                        int.parse(course.absenceCount) > 0
+                                    ? Colors.red
+                                    : null,
+                              ),
                             ),
                           ),
-                        ),
-                        DataCell(Text(course.requiredCheckIn)),
-                        DataCell(
-                          Text(
-                            "${course.personalLeave}/${course.sickLeave}/${course.officialLeave}",
-                            style: const TextStyle(fontSize: 12),
-                            softWrap: true,
+                          DataCell(Text(course.requiredCheckIn)),
+                          DataCell(
+                            Text(
+                              "${course.personalLeave}/${course.sickLeave}/${course.officialLeave}",
+                              style: const TextStyle(fontSize: 12),
+                              softWrap: true,
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),

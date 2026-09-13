@@ -10,6 +10,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/ids_session/empty_classroom_session.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -340,7 +341,10 @@ class _EmptyClassroomSearchWindowState
         else
           ListView.separated(
             itemCount: data.length,
-            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 4,
+              vertical: 8,
+            ).withSafeBottom(context),
             itemBuilder: (context, index) {
               final item = data[index];
               return Row(

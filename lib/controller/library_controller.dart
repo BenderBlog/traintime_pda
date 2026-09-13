@@ -8,7 +8,6 @@ import 'package:watermeter/repository/ids_session/library_session.dart';
 
 class LibraryController {
   static final LibraryController i = LibraryController._();
-  bool _isReloading = false;
   final Map<int, Future<List<BookLocation>>> _bookLocationFutures = {};
   final LibrarySession session = LibrarySession();
 
@@ -19,20 +18,16 @@ class LibraryController {
   );
 
   Future<void> reloadBorrowList() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = libraryBorrowStateSignal.peek().value;
     libraryBorrowStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
       final result = await session.getBorrowList();
-      libraryBorrowStateSignal.value = AsyncState.data(result);
+      libraryBorrowStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       libraryBorrowStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[LibraryController][reloadBorrowList] Have issue");
-    } finally {
-      _isReloading = false;
     }
   }
 
