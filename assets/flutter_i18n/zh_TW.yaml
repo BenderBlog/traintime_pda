@@ -149,24 +149,6 @@ classtable:
     switch_semester: 切換課程表學期
     current_time_settings: 時間指示設置
     class_color_settings: 課表樣式設置
-  visual_settings:
-    current_time_settings_title: 時間指示設置
-    class_color_settings_title: 課表樣式設置
-    completed_style_enabled: 已結束課程樣式區分
-    current_time_section: 時間指示
-    show_current_time_indicator: 顯示當前時間指示線
-    show_current_time_label: 顯示迷你數字時鐘
-    show_today_column_highlight: 強調顯示今天的縱列
-    unfinished_section: 課程樣式
-    active_brightness_factor: '亮度: {value}'
-    active_border_alpha: '邊框透明度: {value}'
-    active_inner_alpha: '底色透明度: {value}'
-    completed_section: 已結束課程樣式
-    completed_saturation_factor: '底色飽和度: {value}'
-    completed_brightness_factor: '亮度: {value}'
-    completed_text_saturation_factor: '文字飽和度: {value}'
-    completed_border_alpha: '邊框透明度: {value}'
-    completed_inner_alpha: '底色透明度: {value}'
   status_source:
     class_table: 課表
     exam: 考試
@@ -896,6 +878,27 @@ setting:
   background: 開啟課表背景圖
   no_background: 你先選個圖片罷，就在下面
   choose_background: 課表背景圖選擇
+  class_table_style_setting: 課表顯示與樣式
+  class_table_style_description: 時間指示和課程卡片樣式
+  class_table_style_page:
+    current_time_settings_title: 時間指示設置
+    class_color_settings_title: 課表樣式設置
+    current_time_section: 時間指示設置
+    show_current_time_indicator: 顯示當前時間指示線
+    show_current_time_label: 顯示迷你數字時鐘
+    show_today_column_highlight: 強調顯示今天的縱列
+    active_section: 課程卡片樣式
+    unfinished_section: 課程卡片樣式
+    active_brightness_factor: '亮度: {value}'
+    active_border_alpha: '邊框透明度: {value}'
+    active_inner_alpha: '底色透明度: {value}'
+    completed_section: 已結束課程樣式
+    completed_style_enabled: 已結束課程樣式區分
+    completed_saturation_factor: '底色飽和度: {value}'
+    completed_brightness_factor: '亮度: {value}'
+    completed_text_saturation_factor: '文字飽和度: {value}'
+    completed_border_alpha: '邊框透明度: {value}'
+    completed_inner_alpha: '底色透明度: {value}'
   no_permission: 未獲取存儲權限，無法讀取文件
   successful_setting: 設定成功
   failure_setting: 你沒有選圖片捏
