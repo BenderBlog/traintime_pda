@@ -321,7 +321,10 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
-          ClassTablePreview(key: ValueKey(_previewVersion)),
+          ClassTablePreview(
+            key: ValueKey(_previewVersion),
+            loadStylePreferences: false,
+          ),
         ],
       ),
     );

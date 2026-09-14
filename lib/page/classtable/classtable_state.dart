@@ -269,6 +269,8 @@ class ClassTableWidgetState with ChangeNotifier {
       .value
       .getClassDetail(timeArrangement[index]);
 
+  bool isClassCardInteractive(ClassOrgainzedData detail) => true;
+
   Future<void> addCustomClass(CustomClass customClass) =>
       customClassController.addCustomClass(customClass).then((_) {
         notifyListeners();
