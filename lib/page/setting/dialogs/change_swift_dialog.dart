@@ -10,6 +10,15 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
+final signedIntegerInputFormatter = TextInputFormatter.withFunction((
+  oldValue,
+  newValue,
+) {
+  return RegExp(r'^[+-]?\d*$').hasMatch(newValue.text) ? newValue : oldValue;
+});
+
+int parseWeekSwiftInput(String input) => int.tryParse(input) ?? 0;
+
 class ChangeSwiftDialog extends StatelessWidget {
   final TextEditingController _getNumberController =
       TextEditingController.fromValue(
@@ -38,10 +47,8 @@ class ChangeSwiftDialog extends StatelessWidget {
       content: TextField(
         autofocus: true,
         controller: _getNumberController,
-        keyboardType: TextInputType.number,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[0-9]*')),
-        ],
+        keyboardType: const TextInputType.numberWithOptions(signed: true),
+        inputFormatters: [signedIntegerInputFormatter],
         maxLines: 1,
         decoration: InputDecoration(
           hintText: FlutterI18n.translate(
@@ -58,9 +65,7 @@ class ChangeSwiftDialog extends StatelessWidget {
         TextButton(
           child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
-            final value = _getNumberController.text.isEmpty
-                ? 0
-                : int.parse(_getNumberController.text);
+            final value = parseWeekSwiftInput(_getNumberController.text);
             await WeekSwiftController.i.setWeekSwift(value);
             if (context.mounted) {
               Navigator.of(context).pop();
