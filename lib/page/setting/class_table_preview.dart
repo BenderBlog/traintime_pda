@@ -43,6 +43,7 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
             child: ClassTableView(
               index: previewState.currentWeek,
               constraint: constraint,
+              enableVerticalScrolling: false,
             ),
           );
         },
