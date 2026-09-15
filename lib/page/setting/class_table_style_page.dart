@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
-import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/setting/class_table_preview.dart';
 
 class ClassTableStylePage extends StatefulWidget {
@@ -90,10 +89,11 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
     Widget sectionCard(String title, List<Widget> children) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ReXCard(
-          title: Text(title),
-          remaining: const [],
-          bottomRow: Column(children: children),
+        child: Column(
+          children: [
+            ListTile(contentPadding: EdgeInsets.zero, title: Text(title)),
+            ...children,
+          ],
         ),
       );
     }
@@ -112,7 +112,7 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
                 contentPadding: EdgeInsets.zero,
                 title: Text(
                   translation(
-                        "setting.class_table_style_page.show_current_time_indicator",
+                    "setting.class_table_style_page.show_current_time_indicator",
                   ),
                 ),
                 value: CurrentTimeIndicatorConfig.enabled,
