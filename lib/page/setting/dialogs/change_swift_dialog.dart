@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ChangeSwiftDialog extends StatelessWidget {
@@ -69,7 +70,11 @@ class ChangeSwiftDialog extends StatelessWidget {
         TextButton(
           child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
-            final value = int.tryParse(_getNumberController.text) ?? 0;
+            final value = int.tryParse(_getNumberController.text);
+            if (value == null) {
+              showToast(context: context, msg: "无法处理成数字！请检查输入");
+              return;
+            }
             await WeekSwiftController.i.setWeekSwift(value);
             if (context.mounted) {
               Navigator.of(context).pop();
