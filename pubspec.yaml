@@ -82,8 +82,6 @@ dev_dependencies:
   pigeon: ^28.0.0
   yaml: ^3.1.3
   json_serializable: ^6.10.0
-  # In-memory SharedPreferences platform for controller unit tests.
-  shared_preferences_platform_interface: ^2.4.2
 
 # Fix for flutter_html 3.0.0 compatibility issue with html package.
 # flutter_html 3.0.0 calls qs.matches() which was removed in html 0.15.7+.

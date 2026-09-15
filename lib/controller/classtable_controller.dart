@@ -3,7 +3,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:intl/intl.dart';
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
@@ -92,37 +91,26 @@ class ClassTableController {
     () => _lastValidSchoolClassTable.value?.data ?? ClassTableData(),
   );
 
-  /// 仅供测试：绕过网络与文件缓存，直接注入课表结果。
-  @visibleForTesting
-  void debugSetClassTable(FetchResult<ClassTableData> result) {
-    _lastValidSchoolClassTable.value = result;
-  }
-
   late final classTableComputedSignal = computed<ClassTableData>(() {
     // 第一步：获取教务课表与体育课程。computed 内同时读取两个信号，
     // 体育课程刷新后课表教室会自动重算。
     final networkClassTable = schoolClassTableComputedSignal.value;
     final sportClasses = SportController.i.sportClassesComputedSignal.value;
 
-    // 教师名去空白归一，课表侧与体育侧匹配时共用。
-    String normalizeTeacher(String? teacher) =>
-        (teacher ?? '').replaceAll(RegExp(r'\s+'), '');
-
     // 第二步-a：按（学期、教师、星期、起止节次）汇总体育上课地点，
     // 同一语义键对应多个地点时保留为集合，唯一匹配才回填。
     final sportLocations = <(String, String, int, int, int), Set<String>>{};
     for (final sportClass in sportClasses) {
       final place = sportClass.place.trim();
-      final teacher = normalizeTeacher(sportClass.teacher);
       if (sportClass.term != networkClassTable.semesterCode ||
-          teacher.isEmpty ||
+          sportClass.teacher.isEmpty ||
           place.isEmpty) {
         continue;
       }
       sportLocations
           .putIfAbsent((
             sportClass.term,
-            teacher,
+            sportClass.teacher,
             sportClass.week,
             sportClass.start,
             sportClass.stop,
@@ -157,7 +145,7 @@ class ClassTableController {
       final matchedLocations =
           sportLocations[(
             networkClassTable.semesterCode,
-            normalizeTeacher(arrangement.teacher),
+            arrangement.teacher ?? '',
             arrangement.day,
             arrangement.start,
             arrangement.stop,
