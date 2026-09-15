@@ -71,7 +71,6 @@ class _HomePageMasterState extends State<HomePageMaster>
   int _selectedIndex = 0;
   static bool refreshAtStart = false;
 
-  late StreamSubscription _intentSub;
   late PageController _controller;
   late final IDSReAuthHandler _idsReAuthHandler;
 
@@ -231,7 +230,6 @@ class _HomePageMasterState extends State<HomePageMaster>
     if (identical(activeIDSReAuthHandler, _idsReAuthHandler)) {
       activeIDSReAuthHandler = null;
     }
-    if (Platform.isAndroid || Platform.isIOS) _intentSub.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
