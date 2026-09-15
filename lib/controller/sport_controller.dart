@@ -1,6 +1,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:signals/signals.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
@@ -24,6 +25,12 @@ class SportController {
   late final sportClassesComputedSignal = computed<SportClass>(
     () => _lastValidClass.value?.data ?? const <SportClassItem>[],
   );
+
+  /// 仅供测试：绕过网络，直接注入体育课程结果。
+  @visibleForTesting
+  void debugSetSportClass(FetchResult<SportClass> result) {
+    _lastValidClass.value = result;
+  }
 
   Future<FetchResult<SportClass>> reloadClass() {
     final previous = _lastValidClass.value;
