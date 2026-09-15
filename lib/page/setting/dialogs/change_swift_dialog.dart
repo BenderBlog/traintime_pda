@@ -5,19 +5,9 @@
 // Change class table swift dialog.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-
-final signedIntegerInputFormatter = TextInputFormatter.withFunction((
-  oldValue,
-  newValue,
-) {
-  return RegExp(r'^[+-]?\d*$').hasMatch(newValue.text) ? newValue : oldValue;
-});
-
-int parseWeekSwiftInput(String input) => int.tryParse(input) ?? 0;
 
 class ChangeSwiftDialog extends StatelessWidget {
   final TextEditingController _getNumberController =
@@ -38,6 +28,17 @@ class ChangeSwiftDialog extends StatelessWidget {
 
   ChangeSwiftDialog({super.key});
 
+  void _toggleSign() {
+    final currentText = _getNumberController.text;
+    final updatedText = currentText.startsWith('-')
+        ? currentText.substring(1)
+        : '-$currentText';
+    _getNumberController.value = TextEditingValue(
+      text: updatedText,
+      selection: TextSelection.collapsed(offset: updatedText.length),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -47,13 +48,16 @@ class ChangeSwiftDialog extends StatelessWidget {
       content: TextField(
         autofocus: true,
         controller: _getNumberController,
-        keyboardType: const TextInputType.numberWithOptions(signed: true),
-        inputFormatters: [signedIntegerInputFormatter],
+        keyboardType: TextInputType.number,
         maxLines: 1,
         decoration: InputDecoration(
           hintText: FlutterI18n.translate(
             context,
             "setting.change_swift_dialog.input_hint",
+          ),
+          suffixIcon: IconButton(
+            onPressed: _toggleSign,
+            icon: const Text("±", style: TextStyle(fontSize: 20)),
           ),
         ),
       ),
@@ -65,7 +69,7 @@ class ChangeSwiftDialog extends StatelessWidget {
         TextButton(
           child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
-            final value = parseWeekSwiftInput(_getNumberController.text);
+            final value = int.tryParse(_getNumberController.text) ?? 0;
             await WeekSwiftController.i.setWeekSwift(value);
             if (context.mounted) {
               Navigator.of(context).pop();
