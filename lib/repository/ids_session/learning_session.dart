@@ -90,7 +90,7 @@ class LearningSession extends IDSSession {
 
     if (!_isAuthenticatedCoursePage(coursePageResponse)) {
       if (!canRelogin) {
-        throw const LoginFailedException(msg: "超星课程系统登录失败");
+        throw const LoginFailedException(msg: "课程系统登录失败");
       }
       log.info("[LearningSession][getAttandanceRecord] Need login");
       await loginLearningSession();
@@ -101,7 +101,7 @@ class LearningSession extends IDSSession {
 
     final semester = _selectedSemester(doc);
     if (semester == null) {
-      throw const FormatException("无法解析超星当前学期");
+      throw const FormatException("无法解析当前学期");
     }
     log.info(
       "[LearningSession][getAttandanceRecord] Fetching semester $semester",
@@ -186,7 +186,7 @@ class LearningSession extends IDSSession {
 
     if (_isRedirect(attendanceResponse)) {
       if (!canRelogin) {
-        throw const LoginFailedException(msg: "登录失败");
+        throw const LoginFailedException(msg: "课程系统登录失败");
       }
       log.info(
         "[LearningSession][getAttandanceRecord] "
