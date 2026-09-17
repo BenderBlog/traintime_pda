@@ -10,6 +10,7 @@ import 'package:watermeter/page/classtable/class_table_view/class_organized_data
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/themes/color_seed.dart';
 
 class ClassTablePreview extends StatefulWidget {
   final bool loadStylePreferences;
@@ -84,6 +85,7 @@ class _PreviewCourse {
   });
 }
 
+/// TODO: ClassTableWidgetState should be a abstrct class
 class _PreviewClassTableState extends ClassTableWidgetState {
   static const _previewSemesterLength = 16;
   static const _previewCourses = <_PreviewCourse>[
@@ -227,6 +229,9 @@ class _PreviewClassTableState extends ClassTableWidgetState {
   int get currentWeek => 1;
 
   @override
+  DateTime get startDay => DateTime(2026, 9, 7);
+
+  @override
   List<ClassDetail> get classDetail => _previewClassDetails;
 
   @override
@@ -252,6 +257,23 @@ class _PreviewClassTableState extends ClassTableWidgetState {
   List<ExperimentData> get experiments => const [];
 
   @override
-  DateTime get currentTime =>
-      startDay.add(const Duration(days: 10, hours: 10, minutes: 24));
+  List<ClassOrgainzedData> getArrangement({
+    required int weekIndex,
+    required int dayIndex,
+  }) {
+    return [
+      for (final arrangement in timeArrangement)
+        if (arrangement.weekList.length > weekIndex &&
+            arrangement.weekList[weekIndex] &&
+            arrangement.day == dayIndex)
+          ClassOrgainzedData.fromTimeArrangement(
+            arrangement,
+            colorList[arrangement.index % colorList.length],
+            getClassDetail(timeArrangement.indexOf(arrangement)).name,
+          ),
+    ];
+  }
+
+  @override
+  DateTime get currentTime => DateTime(2026, 9, 17, 14, 00);
 }
