@@ -3,9 +3,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/setting/class_table_preview.dart';
+import 'package:watermeter/page/setting/groups/section_setting_scaffold.dart';
 
 class ClassTableStylePage extends StatefulWidget {
   const ClassTableStylePage({super.key});
@@ -53,27 +55,22 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
   }) {
     return Opacity(
       opacity: enabled ? 1 : 0.38,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label),
-          Slider(
-            value: value,
-            min: min,
-            max: max,
-            divisions: divisions,
-            onChanged: enabled ? onChanged : null,
-            onChangeEnd: enabled ? (_) => onChangeEnd() : null,
-          ),
-        ],
+      child: ListTile(
+        title: Text(label),
+        subtitle: Slider(
+          value: value,
+          min: min,
+          max: max,
+          divisions: divisions,
+          onChanged: enabled ? onChanged : null,
+          onChangeEnd: enabled ? (_) => onChangeEnd() : null,
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    String translation(String key, [Map<String, String>? params]) =>
-        FlutterI18n.translate(context, key, translationParams: params);
     final activeBrightness = CompletedClassStyleConfig.activeBrightnessFactor;
     final activeBorder = CompletedClassStyleConfig.activeBorderAlpha;
     final activeInner = CompletedClassStyleConfig.activeInnerAlpha;
@@ -86,32 +83,24 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
     final completedBorder = CompletedClassStyleConfig.completedBorderAlpha;
     final completedInner = CompletedClassStyleConfig.completedInnerAlpha;
 
-    Widget sectionCard(String title, List<Widget> children) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            ListTile(contentPadding: EdgeInsets.zero, title: Text(title)),
-            ...children,
-          ],
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(translation("setting.class_table_style_setting")),
+        title: Text(
+          FlutterI18n.translate(context, "setting.class_table_style_setting"),
+        ),
       ),
       body: ListView(
-        padding: const EdgeInsets.only(top: 16, bottom: 24),
         children: [
-          sectionCard(
-            translation("setting.class_table_style_page.current_time_section"),
-            [
+          SectionSettingScaffold(
+            title: FlutterI18n.translate(
+              context,
+              "setting.class_table_style_page.current_time_section",
+            ),
+            items: [
               SwitchListTile(
-                contentPadding: EdgeInsets.zero,
                 title: Text(
-                  translation(
+                  FlutterI18n.translate(
+                    context,
                     "setting.class_table_style_page.show_current_time_indicator",
                   ),
                 ),
@@ -122,10 +111,10 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
                 },
               ),
               SwitchListTile(
-                contentPadding: EdgeInsets.zero,
                 title: Text(
-                  translation(
-                        "setting.class_table_style_page.show_current_time_label",
+                  FlutterI18n.translate(
+                    context,
+                    "setting.class_table_style_page.show_current_time_label",
                   ),
                 ),
                 value: CurrentTimeIndicatorConfig.showTimeLabel,
@@ -140,10 +129,10 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
                     : null,
               ),
               SwitchListTile(
-                contentPadding: EdgeInsets.zero,
                 title: Text(
-                  translation(
-                        "setting.class_table_style_page.show_today_column_highlight",
+                  FlutterI18n.translate(
+                    context,
+                    "setting.class_table_style_page.show_today_column_highlight",
                   ),
                 ),
                 value: CurrentTimeIndicatorConfig.showTodayColumnHighlight,
@@ -158,14 +147,20 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
             ],
           ),
           const SizedBox(height: 16),
-          sectionCard(
-            translation("setting.class_table_style_page.active_section"),
-            [
+          SectionSettingScaffold(
+            title: FlutterI18n.translate(
+              context,
+              "setting.class_table_style_page.active_section",
+            ),
+            items: [
               _slider(
                 enabled: true,
-                label: translation(
-                      "setting.class_table_style_page.active_brightness_factor",
-                  {"value": _formatPercent(activeBrightness)},
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.active_brightness_factor",
+                  translationParams: {
+                    "value": _formatPercent(activeBrightness),
+                  },
                 ),
                 value: activeBrightness,
                 min: 0.5,
@@ -179,9 +174,10 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
               ),
               _slider(
                 enabled: true,
-                label: translation(
-                      "setting.class_table_style_page.active_border_alpha",
-                  {"value": _formatPercent(activeBorder)},
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.active_border_alpha",
+                  translationParams: {"value": _formatPercent(activeBorder)},
                 ),
                 value: activeBorder,
                 min: 0.1,
@@ -194,9 +190,10 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
               ),
               _slider(
                 enabled: true,
-                label: translation(
-                      "setting.class_table_style_page.active_inner_alpha",
-                  {"value": _formatPercent(activeInner)},
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.active_inner_alpha",
+                  translationParams: {"value": _formatPercent(activeInner)},
                 ),
                 value: activeInner,
                 min: 0.1,
@@ -210,14 +207,17 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
             ],
           ),
           const SizedBox(height: 16),
-          sectionCard(
-            translation("setting.class_table_style_page.completed_section"),
-            [
+          SectionSettingScaffold(
+            title: FlutterI18n.translate(
+              context,
+              "setting.class_table_style_page.completed_section",
+            ),
+            items: [
               SwitchListTile(
-                contentPadding: EdgeInsets.zero,
                 title: Text(
-                  translation(
-                        "setting.class_table_style_page.completed_style_enabled",
+                  FlutterI18n.translate(
+                    context,
+                    "setting.class_table_style_page.completed_style_enabled",
                   ),
                 ),
                 value: CompletedClassStyleConfig.completedEnabled,
@@ -230,9 +230,12 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
               ),
               _slider(
                 enabled: CompletedClassStyleConfig.completedEnabled,
-                label: translation(
-                    "setting.class_table_style_page.completed_saturation_factor",
-                  {"value": _formatPercent(completedSaturation)},
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.completed_saturation_factor",
+                  translationParams: {
+                    "value": _formatPercent(completedSaturation),
+                  },
                 ),
                 value: completedSaturation,
                 min: 0.1,
@@ -246,9 +249,12 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
               ),
               _slider(
                 enabled: CompletedClassStyleConfig.completedEnabled,
-                label: translation(
-                    "setting.class_table_style_page.completed_brightness_factor",
-                  {"value": _formatPercent(completedBrightness)},
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.completed_brightness_factor",
+                  translationParams: {
+                    "value": _formatPercent(completedBrightness),
+                  },
                 ),
                 value: completedBrightness,
                 min: 0.5,
@@ -262,9 +268,12 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
               ),
               _slider(
                 enabled: CompletedClassStyleConfig.completedEnabled,
-                label: translation(
-                    "setting.class_table_style_page.completed_text_saturation_factor",
-                  {"value": _formatPercent(completedTextSaturation)},
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.completed_text_saturation_factor",
+                  translationParams: {
+                    "value": _formatPercent(completedTextSaturation),
+                  },
                 ),
                 value: completedTextSaturation,
                 min: 0.1,
@@ -279,9 +288,10 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
               ),
               _slider(
                 enabled: CompletedClassStyleConfig.completedEnabled,
-                label: translation(
-                    "setting.class_table_style_page.completed_border_alpha",
-                  {"value": _formatPercent(completedBorder)},
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.completed_border_alpha",
+                  translationParams: {"value": _formatPercent(completedBorder)},
                 ),
                 value: completedBorder,
                 min: 0.1,
@@ -294,9 +304,10 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
               ),
               _slider(
                 enabled: CompletedClassStyleConfig.completedEnabled,
-                label: translation(
-                    "setting.class_table_style_page.completed_inner_alpha",
-                  {"value": _formatPercent(completedInner)},
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.completed_inner_alpha",
+                  translationParams: {"value": _formatPercent(completedInner)},
                 ),
                 value: completedInner,
                 min: 0.1,
