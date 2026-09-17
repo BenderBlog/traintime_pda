@@ -26,18 +26,8 @@ class LearningSession extends IDSSession {
   static String userId = "";
 
   Future<bool> isLogin() async {
-    return await dio
-        .get(
-          COURSE_DETAIL_URL,
-          queryParameters: {
-            "classId": 123,
-            "courseId": 1,
-            "page": 1,
-            "pageSize": 999,
-            "puid": "",
-          },
-        )
-        .then((data) => data.data["errorMsg"] != "请登录后再试");
+    final response = await _fetchCoursePage();
+    return _isAuthenticatedCoursePage(response);
   }
 
   Future<void> loginLearningSession() async {
@@ -89,32 +79,30 @@ class LearningSession extends IDSSession {
   }
 
   Future<List<ClassAttendance>> getAttandanceRecord() async {
-    if (await isLogin() == false) {
+    return _getAttendanceRecord(canRelogin: true);
+  }
+
+  Future<List<ClassAttendance>> _getAttendanceRecord({
+    required bool canRelogin,
+  }) async {
+    log.info("[LearningSession][getAttandanceRecord] Fetching class list info");
+    final coursePageResponse = await _fetchCoursePage();
+
+    if (!_isAuthenticatedCoursePage(coursePageResponse)) {
+      if (!canRelogin) {
+        throw const LoginFailedException(msg: "超星课程系统登录失败");
+      }
       log.info("[LearningSession][getAttandanceRecord] Need login");
       await loginLearningSession();
+      return _getAttendanceRecord(canRelogin: false);
     }
 
-    log.info("[LearningSession][getAttandanceRecord] Fetching class list info");
-    String courseListHtml = await dio
-        .get(
-          COURSE_INFO_URL,
-          options: Options(
-            headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
-          ),
-        )
-        .then((data) => data.data);
+    final doc = parse(coursePageResponse.data?.toString() ?? "");
 
-    final doc = parse(courseListHtml);
-
-    String semester =
-        doc
-            .getElementById("yearList")
-            ?.children
-            .firstWhere(
-              (ele) => ele.attributes["selected"]?.contains("true") ?? false,
-            )
-            .attributes["value"] ??
-        "";
+    final semester = _selectedSemester(doc);
+    if (semester == null) {
+      throw const FormatException("无法解析超星当前学期");
+    }
     log.info(
       "[LearningSession][getAttandanceRecord] Fetching semester $semester",
     );
@@ -184,17 +172,34 @@ class LearningSession extends IDSSession {
     log.info(
       "[LearningSession][getAttandanceRecord] Fetching class attendance table.",
     );
-    String html = await dio
-        .get(
-          COURSE_DATA_URL,
-          queryParameters: {"v": 1, "semesternum": semester},
-          options: Options(
-            headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
-          ),
-        )
-        .then(
-          (data) => data.data.toString().replaceAll(RegExp(r'\r|\n|\t'), ""),
-        );
+    final attendanceResponse = await dio.get(
+      COURSE_DATA_URL,
+      queryParameters: {"v": 1, "semesternum": semester},
+      options: Options(
+        headers: {
+          HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com",
+          HttpHeaders.refererHeader: COURSE_INFO_URL,
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      ),
+    );
+
+    if (_isRedirect(attendanceResponse)) {
+      if (!canRelogin) {
+        throw const LoginFailedException(msg: "登录失败");
+      }
+      log.info(
+        "[LearningSession][getAttandanceRecord] "
+        "Attendance request needs login",
+      );
+      await loginLearningSession();
+      return _getAttendanceRecord(canRelogin: false);
+    }
+
+    final html = attendanceResponse.data.toString().replaceAll(
+      RegExp(r'\r|\n|\t'),
+      "",
+    );
 
     Document document = parse(html);
     List<ClassAttendance> results = [];
@@ -202,7 +207,7 @@ class LearningSession extends IDSSession {
     Element? table = document.querySelector('table');
 
     if (table == null) {
-      return results;
+      throw const FormatException("接口未返回数据表格");
     }
 
     List<Element> rows = table.querySelectorAll('tbody tr');
@@ -247,5 +252,36 @@ class LearningSession extends IDSSession {
     }
 
     return results;
+  }
+
+  Future<Response<dynamic>> _fetchCoursePage() {
+    return dio.get(
+      COURSE_INFO_URL,
+      options: Options(
+        headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
+      ),
+    );
+  }
+
+  bool _isAuthenticatedCoursePage(Response<dynamic> response) {
+    if (_isRedirect(response)) return false;
+    final document = parse(response.data?.toString() ?? "");
+    return document.getElementById("yearList") != null;
+  }
+
+  bool _isRedirect(Response<dynamic> response) {
+    final statusCode = response.statusCode ?? 0;
+    return (statusCode >= 300 && statusCode < 400) ||
+        response.headers.value(HttpHeaders.locationHeader) != null;
+  }
+
+  String? _selectedSemester(Document document) {
+    final options = document.getElementById("yearList")?.children ?? const [];
+    for (final option in options) {
+      if (!option.attributes.containsKey("selected")) continue;
+      final value = option.attributes["value"]?.trim();
+      if (value != null && value.isNotEmpty) return value;
+    }
+    return null;
   }
 }
