@@ -342,6 +342,28 @@ electricity:
   aircon_imei_missing: 尚未添加空调 IMEI，添加后即可查看空调用电信息。
   aircon_add_imei: 添加空调 IMEI
   aircon_cache_notice: 当前显示空调缓存数据，缓存时间：{time}
+  aircon_remote: 空调遥控
+  aircon_control_error: 无法获取空调状态
+  aircon_command_ok: 空调指令已执行
+  aircon_power: 电源
+  aircon_target_temperature: 设定温度
+  aircon_temperature_range: 温度必须在 18–32 ℃ 之间
+  aircon_indoor_temperature: "室内温度：{temperature} ℃"
+  aircon_mode: 运行模式
+  aircon_mode_fan: 送风
+  aircon_mode_heat: 制热
+  aircon_mode_cool: 制冷
+  aircon_mode_dry: 除湿
+  aircon_mode_auto: 自动
+  aircon_wind_speed: 风速
+  aircon_wind_auto: 自动
+  aircon_wind_silent: 静音
+  aircon_wind_low: 低
+  aircon_wind_medium: 中
+  aircon_wind_high: 高
+  aircon_vertical_swing: 上下扫风
+  aircon_strong_mode: 强力模式
+  aircon_electric_heating: 辅助电热
 empty_classroom:
   title: 空闲教室
   date: 日期 {date}
@@ -489,6 +511,17 @@ homepage:
     title: 水电信息
     current_electricity: 余额 {amount} 度
     cache_notice: 最后一次读表：{date}
+  aircon_card:
+    title: 空调遥控
+    not_configured: 尚未配置空调
+    configure_hint: 点击添加空调 IMEI
+    running: "{mode} · {temperature} ℃"
+    power_off: 空调已关闭
+    indoor_and_wind: "室内 {temperature} ℃ · 风速 {wind}"
+    wind: "风速 {wind}"
+    fetching: 正在获取空调状态
+    error: 空调状态获取失败
+    open_remote: 点击进入空调遥控
   library_card:
     title: 图书借阅
     current_borrow: 借书 {count} 本
@@ -821,9 +854,9 @@ setting:
   electricity_account_setting: 电费账号设置
   schoolnet_password_setting: 校园网帐号密码设置
   schoolnet_password_description: 不设置查看不了网费
-  aircon_imei_title: 空调用电数据源
+  aircon_imei_title: 空调设备
   aircon_imei: 空调 IMEI
-  aircon_imei_not_set: 未设置，电费页不显示空调用电
+  aircon_imei_not_set: 未设置，无法查询或遥控空调
   aircon_imei_current: 当前 IMEI：{imei}
   aircon_imei_saved: 空调 IMEI 已保存
   aircon_imei_cleared: 空调 IMEI 已清除

@@ -384,6 +384,28 @@ electricity:
   aircon_imei_missing: Add the aircon IMEI to view its electricity usage.
   aircon_add_imei: Add aircon IMEI
   aircon_cache_notice: "Showing cached aircon data from {time}"
+  aircon_remote: Aircon Remote
+  aircon_control_error: Unable to fetch the aircon state
+  aircon_command_ok: Aircon command completed
+  aircon_power: Power
+  aircon_target_temperature: Target temperature
+  aircon_temperature_range: Temperature must be between 18 and 32 ℃
+  aircon_indoor_temperature: "Indoor temperature: {temperature} ℃"
+  aircon_mode: Mode
+  aircon_mode_fan: Fan
+  aircon_mode_heat: Heat
+  aircon_mode_cool: Cool
+  aircon_mode_dry: Dry
+  aircon_mode_auto: Auto
+  aircon_wind_speed: Fan speed
+  aircon_wind_auto: Auto
+  aircon_wind_silent: Silent
+  aircon_wind_low: Low
+  aircon_wind_medium: Medium
+  aircon_wind_high: High
+  aircon_vertical_swing: Vertical swing
+  aircon_strong_mode: Turbo mode
+  aircon_electric_heating: Auxiliary heating
 empty_classroom:
   title: Empty Classrooms
   date: Date {date}
@@ -558,6 +580,17 @@ homepage:
     title: Electricity and Hydroenergy Information
     current_electricity: "{amount} kWh remains"
     cache_notice: "Last fetch date: {date}"
+  aircon_card:
+    title: Aircon Remote
+    not_configured: Aircon not configured
+    configure_hint: Tap to add an aircon IMEI
+    running: "{mode} · {temperature} ℃"
+    power_off: Aircon is off
+    indoor_and_wind: "Indoor {temperature} ℃ · Fan {wind}"
+    wind: "Fan {wind}"
+    fetching: Fetching aircon status
+    error: Unable to fetch aircon status
+    open_remote: Tap to open the aircon remote
   library_card:
     title: Library Info
     current_borrow: Borrowing {count} book(s)
@@ -897,9 +930,9 @@ setting:
   electricity_account_setting: Electricity account setting
   schoolnet_password_setting: Campus net password
   schoolnet_password_description: If you have not setted it, you cannot query it.
-  aircon_imei_title: Aircon electricity data source
+  aircon_imei_title: Aircon device
   aircon_imei: Aircon IMEI
-  aircon_imei_not_set: Not set. Aircon electricity will be hidden on the power page.
+  aircon_imei_not_set: Not set. Aircon data and remote control are unavailable.
   aircon_imei_current: "Current IMEI: {imei}"
   aircon_imei_saved: Aircon IMEI saved
   aircon_imei_cleared: Aircon IMEI cleared
