@@ -259,8 +259,6 @@ class _ClasstableSectionState extends State<ClasstableSection> {
             ),
           ),
         ),
-
-        /// TODO: Refactor class swift, explain goes to dialog, show current state
         ListTile(
           title: Text(FlutterI18n.translate(context, "setting.class_swift")),
           subtitle: Text(

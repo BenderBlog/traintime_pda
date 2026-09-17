@@ -907,9 +907,8 @@ setting:
   class_refresh_title: 確認對話框
   class_refresh_content: 是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。
   class_swift: 課程偏移設置
-  class_swift_description: '正數錯後開學日期 負數提前開學日期
-
-    目前為 {swift}'
+  class_swift_explain: 正數錯後開學日期 負數提前開學日期
+  class_swift_description: 目前為 {swift}
   core_setting: 緩存登錄設置
   check_logger: 查看網絡攔截器和日誌
   clear_and_restart: 清除緩存後重啟
