@@ -20,11 +20,13 @@ import 'package:watermeter/repository/preference.dart' as preference;
 class ClassTableView extends StatefulWidget {
   final int index;
   final BoxConstraints constraint;
+  final bool enableVerticalScrolling;
 
   const ClassTableView({
     super.key,
     required this.constraint,
     required this.index,
+    this.enableVerticalScrolling = true,
   });
 
   @override
@@ -273,7 +275,11 @@ class _ClassTableViewState extends State<ClassTableView> {
           ]
           .toStack()
           .constrained(height: blockheight(61), width: size.maxWidth)
-          .scrollable()
+          .scrollable(
+            physics: widget.enableVerticalScrolling
+                ? null
+                : const NeverScrollableScrollPhysics(),
+          )
           .expanded(),
     ].toColumn();
   }

@@ -267,6 +267,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   String _formatPercent(double value) => "${(value * 100).round()}%";
 
+  // ignore: unused_element
   Future<void> _showCurrentTimeSettingsDialog() async {
     var enabled = CurrentTimeIndicatorConfig.enabled;
     var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
@@ -281,7 +282,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               title: Text(
                 FlutterI18n.translate(
                   context,
-                  "classtable.visual_settings.current_time_settings_title",
+                  "setting.class_table_style_page.current_time_settings_title",
                 ),
               ),
               content: SizedBox(
@@ -296,7 +297,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         title: Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.show_current_time_indicator",
+                            "setting.class_table_style_page.show_current_time_indicator",
                           ),
                         ),
                         value: enabled,
@@ -308,7 +309,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         title: Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.show_current_time_label",
+                            "setting.class_table_style_page.show_current_time_label",
                           ),
                         ),
                         value: showTimeLabel,
@@ -322,7 +323,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         title: Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.show_today_column_highlight",
+                            "setting.class_table_style_page.show_today_column_highlight",
                           ),
                         ),
                         value: showTodayColumnHighlight,
@@ -361,6 +362,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     setState(() {});
   }
 
+  // ignore: unused_element
   Future<void> _showClassColorSettingsDialog() async {
     var completedEnabled = CompletedClassStyleConfig.completedEnabled;
     var activeBrightnessFactor = CompletedClassStyleConfig
@@ -388,7 +390,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               title: Text(
                 FlutterI18n.translate(
                   context,
-                  "classtable.visual_settings.class_color_settings_title",
+                  "setting.class_table_style_page.class_color_settings_title",
                 ),
               ),
               content: SizedBox(
@@ -403,7 +405,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         title: Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.completed_style_enabled",
+                            "setting.class_table_style_page.completed_style_enabled",
                           ),
                         ),
                         value: completedEnabled,
@@ -414,14 +416,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                          "classtable.visual_settings.unfinished_section",
+                          "setting.class_table_style_page.unfinished_section",
                         ),
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       Text(
                         FlutterI18n.translate(
                           context,
-                          "classtable.visual_settings.active_brightness_factor",
+                            "setting.class_table_style_page.active_brightness_factor",
                           translationParams: {
                             "value": _formatPercent(activeBrightnessFactor),
                           },
@@ -439,7 +441,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                          "classtable.visual_settings.active_border_alpha",
+                            "setting.class_table_style_page.active_border_alpha",
                           translationParams: {
                             "value": _formatPercent(activeBorderAlpha),
                           },
@@ -456,7 +458,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                          "classtable.visual_settings.active_inner_alpha",
+                            "setting.class_table_style_page.active_inner_alpha",
                           translationParams: {
                             "value": _formatPercent(activeInnerAlpha),
                           },
@@ -475,14 +477,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.completed_section",
+                            "setting.class_table_style_page.completed_section",
                           ),
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                         Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.completed_saturation_factor",
+                            "setting.class_table_style_page.completed_saturation_factor",
                             translationParams: {
                               "value": _formatPercent(
                                 completedSaturationFactor,
@@ -502,7 +504,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.completed_brightness_factor",
+                            "setting.class_table_style_page.completed_brightness_factor",
                             translationParams: {
                               "value": _formatPercent(
                                 completedBrightnessFactor,
@@ -522,7 +524,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.completed_text_saturation_factor",
+                            "setting.class_table_style_page.completed_text_saturation_factor",
                             translationParams: {
                               "value": _formatPercent(
                                 completedTextSaturationFactor,
@@ -542,7 +544,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.completed_border_alpha",
+                            "setting.class_table_style_page.completed_border_alpha",
                             translationParams: {
                               "value": _formatPercent(completedBorderAlpha),
                             },
@@ -560,7 +562,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         Text(
                           FlutterI18n.translate(
                             context,
-                            "classtable.visual_settings.completed_inner_alpha",
+                            "setting.class_table_style_page.completed_inner_alpha",
                             translationParams: {
                               "value": _formatPercent(completedInnerAlpha),
                             },
@@ -688,24 +690,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   FlutterI18n.translate(
                     context,
                     "classtable.popup_menu.refresh_classtable",
-                  ),
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'J',
-                child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.popup_menu.current_time_settings",
-                  ),
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'K',
-                child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.popup_menu.class_color_settings",
                   ),
                 ),
               ),
@@ -945,12 +929,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       }
                     });
                   }
-                  break;
-                case 'J':
-                  await _showCurrentTimeSettingsDialog();
-                  break;
-                case 'K':
-                  await _showClassColorSettingsDialog();
                   break;
               }
             },
