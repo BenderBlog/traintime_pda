@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -29,39 +30,43 @@ class ChangeSwiftDialog extends StatelessWidget {
 
   ChangeSwiftDialog({super.key});
 
-  void _toggleSign() {
-    final currentText = _getNumberController.text;
-    final updatedText = currentText.startsWith('-')
-        ? currentText.substring(1)
-        : '-$currentText';
-    _getNumberController.value = TextEditingValue(
-      text: updatedText,
-      selection: TextSelection.collapsed(offset: updatedText.length),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
         FlutterI18n.translate(context, "setting.change_swift_dialog.title"),
       ),
-      content: TextField(
-        autofocus: true,
-        controller: _getNumberController,
-        keyboardType: TextInputType.number,
-        maxLines: 1,
-        decoration: InputDecoration(
-          hintText: FlutterI18n.translate(
-            context,
-            "setting.change_swift_dialog.input_hint",
-          ),
-          suffixIcon: IconButton(
-            onPressed: _toggleSign,
-            icon: const Text("±", style: TextStyle(fontSize: 20)),
+      content: [
+        Text(FlutterI18n.translate(context, "setting.class_swift_explain")),
+        SizedBox(height: 8),
+        TextField(
+          autofocus: true,
+          controller: _getNumberController,
+          keyboardType: TextInputType.number,
+          maxLines: 1,
+          decoration: InputDecoration(
+            hintText: FlutterI18n.translate(
+              context,
+              "setting.change_swift_dialog.input_hint",
+            ),
+            suffixIcon: IconButton(
+              onPressed: () {
+                final currentText = _getNumberController.text;
+                final updatedText = currentText.startsWith('-')
+                    ? currentText.substring(1)
+                    : '-$currentText';
+                _getNumberController.value = TextEditingValue(
+                  text: updatedText,
+                  selection: TextSelection.collapsed(
+                    offset: updatedText.length,
+                  ),
+                );
+              },
+              icon: const Text("±", style: TextStyle(fontSize: 20)),
+            ),
           ),
         ),
-      ),
+      ].toColumn(mainAxisSize: MainAxisSize.min),
       actions: <Widget>[
         TextButton(
           child: Text(FlutterI18n.translate(context, "cancel")),

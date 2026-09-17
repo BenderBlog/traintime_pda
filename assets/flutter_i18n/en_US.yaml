@@ -1007,13 +1007,8 @@ setting:
     Do you want to force refreshing the class schedule? If you
     agree, we will fetch the schedule from the school, which may takes a long time.
   class_swift: Class schedule offset setting
-  class_swift_description:
-    "Positive number delays the start date, negative number
-    advances the start date
-
-    Currently {swift}
-
-    "
+  class_swift_explain: Positive number delays the start date, negative number advances the start date
+  class_swift_description: Currently {swift}
   core_setting: Cached login settings
   check_logger: View network interceptor and logs
   clear_and_restart: Clear cache and restart
