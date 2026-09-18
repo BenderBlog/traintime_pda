@@ -339,8 +339,9 @@ class CourseReminderService extends NotificationService
         CustomClassController.i.customClassesSignal.value.isNotEmpty;
 
     final hasExperimentData =
-        PhysicsExperimentController.i.physicsExperiments.value.isNotEmpty ||
-        OtherExperimentController.i.otherExperiments.value.isNotEmpty;
+        !preference.getBool(preference.Preference.role) &&
+        (PhysicsExperimentController.i.physicsExperiments.value.isNotEmpty ||
+            OtherExperimentController.i.otherExperiments.value.isNotEmpty);
 
     final hasExamData = ExamController.i.subjects.value.any(
       (subject) => subject.startTime != null,
@@ -587,6 +588,10 @@ class CourseReminderService extends NotificationService
     int daysToSchedule = 7,
     int minutesBefore = 5,
   }) async {
+    if (preference.getBool(preference.Preference.role)) {
+      return;
+    }
+
     log.info(
       '[CourseReminderService] [scheduleNotificationsFromExperimentData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
     );
@@ -814,7 +819,7 @@ class CourseReminderService extends NotificationService
     int minutesBefore = 5,
   }) async {
     try {
-    // Schedule course, custom course, experiment, and exam notifications in parallel.
+      // Schedule course, custom course, experiment, and exam notifications in parallel.
       await Future.wait([
         _scheduleNotificationFromCourseData(
           daysToSchedule: daysToSchedule,

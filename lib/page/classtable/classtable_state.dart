@@ -20,6 +20,7 @@ import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -327,8 +328,10 @@ class ClassTableWidgetState with ChangeNotifier {
     await Future.wait([
       classTableController.reloadClassTable(),
       examController.reloadExamInfo(),
-      physicsExperimentController.reloadPhysicsExperiment(),
-      otherExperimentController.reloadOtherExperiment(),
+      if (!preference.getBool(preference.Preference.role)) ...[
+        physicsExperimentController.reloadPhysicsExperiment(),
+        otherExperimentController.reloadOtherExperiment(),
+      ],
     ]);
     await maybeAutoSyncSystemCalendar();
     notifyListeners();

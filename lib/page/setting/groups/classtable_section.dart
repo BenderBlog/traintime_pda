@@ -259,8 +259,10 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                     await Future.wait([
                       ClassTableController.i.reloadClassTable(),
                       ExamController.i.reloadExamInfo(),
-                      PhysicsExperimentController.i.reloadPhysicsExperiment(),
-                      OtherExperimentController.i.reloadOtherExperiment(),
+                      if (!preference.getBool(preference.Preference.role)) ...[
+                        PhysicsExperimentController.i.reloadPhysicsExperiment(),
+                        OtherExperimentController.i.reloadOtherExperiment(),
+                      ],
                     ]);
                     await maybeAutoSyncSystemCalendar();
                     if (mounted) {

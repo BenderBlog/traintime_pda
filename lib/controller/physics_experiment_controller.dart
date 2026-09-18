@@ -20,6 +20,11 @@ class PhysicsExperimentController {
   static final PhysicsExperimentController i = PhysicsExperimentController._();
 
   PhysicsExperimentController._() {
+    if (pref.getBool(pref.Preference.role)) {
+      _setUnavailableForPostgraduate();
+      return;
+    }
+
     /// Load from cache at the beginning
     final cache = session.getCache();
     if (cache != null) {
@@ -28,6 +33,16 @@ class PhysicsExperimentController {
       physicsExperimentStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
+  }
+
+  void _setUnavailableForPostgraduate() {
+    _lastValidPhysicsExperiment.value = null;
+    physicsExperimentStateSignal.value = AsyncState.data(
+      FetchResult.fresh(
+        fetchTime: DateTime.now(),
+        data: const <ExperimentData>[],
+      ),
+    );
   }
 
   final _lastValidPhysicsExperiment =
@@ -40,6 +55,11 @@ class PhysicsExperimentController {
 
   void _initEffects() {
     effect(() {
+      if (pref.getBool(pref.Preference.role)) {
+        _setUnavailableForPostgraduate();
+        return;
+      }
+
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
       if (semesterChangeEvent == null ||
@@ -63,6 +83,11 @@ class PhysicsExperimentController {
   }
 
   Future<void> reloadPhysicsExperiment() async {
+    if (pref.getBool(pref.Preference.role)) {
+      _setUnavailableForPostgraduate();
+      return;
+    }
+
     final previous = _lastValidPhysicsExperiment.value;
     physicsExperimentStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)

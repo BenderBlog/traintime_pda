@@ -14,6 +14,7 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/ids_session/classtable_session.dart';
@@ -95,7 +96,9 @@ class ClassTableController {
     // 第一步：获取教务课表与体育课程。computed 内同时读取两个信号，
     // 体育课程刷新后课表教室会自动重算。
     final networkClassTable = schoolClassTableComputedSignal.value;
-    final sportClasses = SportController.i.sportClassesComputedSignal.value;
+    final sportClasses = preference.getBool(preference.Preference.role)
+        ? const <SportClassItem>[]
+        : SportController.i.sportClassesComputedSignal.value;
 
     // 第二步-a：按（学期、教师、星期、起止节次）汇总体育上课地点，
     // 同一语义键对应多个地点时保留为集合，唯一匹配才回填。
