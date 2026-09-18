@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/setting/class_table_preview.dart';
