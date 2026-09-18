@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/sport_controller.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -51,7 +52,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
   @override
   bool get wantKeepAlive => true;
 
-  Future<FetchResult<SportScore>> _future = SportSession().getScore();
+  Future<FetchResult<SportScore>> _future = SportController.i.reloadScore();
 
   Object? _translateError(BuildContext context, Object? error) {
     if (error is SportCredentialMissingException ||
@@ -94,7 +95,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {
-          _future = SportSession().getScore();
+          _future = SportController.i.reloadScore();
         });
       },
       child: FutureBuilder(
@@ -254,7 +255,7 @@ class _SportScoreWindowState extends State<SportScoreWindow>
               snapshot.hasError) {
             return ReloadWidget(
               function: () => setState(() {
-                _future = SportSession().getScore();
+                _future = SportController.i.reloadScore();
               }),
               errorStatus: _translateError(context, snapshot.error),
               stackTrace: snapshot.stackTrace,

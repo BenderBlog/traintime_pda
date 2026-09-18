@@ -4,6 +4,7 @@
 import 'package:signals/signals.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
+import 'package:watermeter/model/xidian_sport/sport_score.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/miscellaneous_session/xidian_sport_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
@@ -15,9 +16,14 @@ class SportController {
 
   final SportSession session = SportSession();
   final _classFlight = SingleFlight<FetchResult<SportClass>>();
+  final _scoreFlight = SingleFlight<FetchResult<SportScore>>();
   final _lastValidClass = signal<FetchResult<SportClass>?>(null);
+  final _lastValidScore = signal<FetchResult<SportScore>?>(null);
 
   final sportClassStateSignal = signal<AsyncState<FetchResult<SportClass>>>(
+    const AsyncLoading(),
+  );
+  final sportScoreStateSignal = signal<AsyncState<FetchResult<SportScore>>>(
     const AsyncLoading(),
   );
 
@@ -40,6 +46,26 @@ class SportController {
       } catch (e, s) {
         sportClassStateSignal.value = AsyncState.error(e, s);
         log.handle(e, s, '[SportController][reloadClass] Have issue');
+        rethrow;
+      }
+    });
+  }
+
+  Future<FetchResult<SportScore>> reloadScore() {
+    final previous = _lastValidScore.value;
+    sportScoreStateSignal.value = previous != null
+        ? AsyncState.dataRefreshing(previous)
+        : AsyncState.loading();
+
+    return _scoreFlight.run(() async {
+      try {
+        final result = await session.getScore();
+        _lastValidScore.value = result;
+        sportScoreStateSignal.set(AsyncState.data(result), force: true);
+        return result;
+      } catch (e, s) {
+        sportScoreStateSignal.value = AsyncState.error(e, s);
+        log.handle(e, s, '[SportController][reloadScore] Have issue');
         rethrow;
       }
     });
