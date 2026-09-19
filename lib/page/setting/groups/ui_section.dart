@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/energy_controller.dart';
@@ -26,197 +27,248 @@ class UiSection extends StatefulWidget {
 }
 
 class _UiSectionState extends State<UiSection> {
+  Widget _brightnessSetting(BuildContext context) {
+    final labels = ['follow_setting', 'day_mode', 'night_mode']
+        .map(
+          (label) => FlutterI18n.translate(
+            context,
+            'setting.change_brightness_dialog.$label',
+          ),
+        )
+        .toList();
+    final selected = preference.getInt(preference.Preference.brightness);
+    const icons = [
+      MingCuteIcons.mgc_brightness_line,
+      MingCuteIcons.mgc_sun_line,
+      MingCuteIcons.mgc_moon_line,
+    ];
+    return ListTile(
+      leading: Icon(icons[selected]),
+      title: Text(FlutterI18n.translate(context, 'setting.brightness_setting')),
+      subtitle: Text(labels[selected]),
+      trailing: const Icon(Icons.navigate_next),
+      onTap: () async {
+        final value = await showDialog<int>(
+          context: context,
+          builder: (context) => SimpleDialog(
+            title: Text(
+              FlutterI18n.translate(context, 'setting.brightness_setting'),
+            ),
+            children: [
+              RadioGroup<int>(
+                groupValue: selected,
+                onChanged: (value) => Navigator.of(context).pop(value),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (var index = 0; index < labels.length; index++)
+                      RadioListTile<int>(
+                        value: index,
+                        title: Text(labels[index]),
+                        secondary: Icon(icons[index]),
+                        controlAffinity: ListTileControlAffinity.trailing,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+        if (value == null || value == selected) return;
+        await preference.setInt(preference.Preference.brightness, value);
+        ThemeController.i.updateTheme();
+        if (mounted) setState(() {});
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.ui_setting"),
       items: [
-        ListTile(
-          title: Text(FlutterI18n.translate(context, "setting.color_setting")),
-          subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.change_color_dialog."
-              "${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
-            ),
-          ),
-          trailing: const Icon(Icons.navigate_next),
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) => const ChangeColorDialog(),
-            );
-          },
-        ),
-        ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.brightness_setting"),
-          ),
-          subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              [
-                "setting.change_brightness_dialog.follow_setting",
-                "setting.change_brightness_dialog.day_mode",
-                "setting.change_brightness_dialog.night_mode",
-              ][preference.getInt(preference.Preference.brightness)],
-            ),
-          ),
-          trailing: ToggleButtons(
-            isSelected: List<bool>.generate(
-              3,
-              (index) =>
-                  index == preference.getInt(preference.Preference.brightness),
-            ),
-            onPressed: (int value) async {
-              preference.setInt(preference.Preference.brightness, value).then((
-                value,
-              ) {
-                ThemeController.i.updateTheme();
-                setState(() {});
-              });
-            },
-            children: const [
-              Icon(Icons.phone_android_rounded),
-              Icon(Icons.light_mode_rounded),
-              Icon(Icons.dark_mode_rounded),
-            ],
-          ),
-        ),
-        ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.font_size_setting"),
-          ),
-          subtitle: SignalBuilder(
-            builder: (context) => Text(
-              FlutterI18n.translate(
-                context,
-                "setting.font_size_page.summary",
-                translationParams: {
-                  "scale":
-                      "${(ThemeController.i.fontScaleSignal.value * 100).round()}",
-                  "weight": FlutterI18n.translate(
-                    context,
-                    "setting.font_size_page.weight_"
-                    "${fontWeightLabels[fontWeightLabelIndex(ThemeController.i.fontWeightSignal.value)]}",
-                  ),
-                },
+        SectionSettingScaffold(
+          title: FlutterI18n.translate(context, 'setting.sections.display'),
+          items: [
+            ListTile(
+              leading: const Icon(MingCuteIcons.mgc_palette_line),
+              title: Text(
+                FlutterI18n.translate(context, "setting.color_setting"),
               ),
+              subtitle: Text(
+                FlutterI18n.translate(
+                  context,
+                  "setting.change_color_dialog."
+                  "${ColorSeed.values[preference.getInt(preference.Preference.color)].label}",
+                ),
+              ),
+              trailing: const Icon(Icons.navigate_next),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const ChangeColorDialog(),
+                );
+              },
             ),
-          ),
-          trailing: const Icon(Icons.navigate_next),
-          onTap: () {
-            context.push(const FontSizePage());
-          },
-        ),
-        ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.simplify_timeline"),
-          ),
-          subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.simplify_timeline_description",
+            _brightnessSetting(context),
+            ListTile(
+              leading: const Icon(MingCuteIcons.mgc_font_size_line),
+              title: Text(
+                FlutterI18n.translate(context, "setting.font_size_setting"),
+              ),
+              subtitle: SignalBuilder(
+                builder: (context) => Text(
+                  FlutterI18n.translate(
+                    context,
+                    "setting.font_size_page.summary",
+                    translationParams: {
+                      "scale":
+                          "${(ThemeController.i.fontScaleSignal.value * 100).round()}",
+                      "weight": FlutterI18n.translate(
+                        context,
+                        "setting.font_size_page.weight_"
+                        "${fontWeightLabels[fontWeightLabelIndex(ThemeController.i.fontWeightSignal.value)]}",
+                      ),
+                    },
+                  ),
+                ),
+              ),
+              trailing: const Icon(Icons.navigate_next),
+              onTap: () {
+                context.push(const FontSizePage());
+              },
             ),
-          ),
-          trailing: Switch(
-            value: preference.getBool(
-              preference.Preference.simplifiedClassTimeline,
-            ),
-            onChanged: (bool value) async {
-              await preference.setBool(
-                preference.Preference.simplifiedClassTimeline,
-                value,
-              );
-              ClassTableCard.reloadSettingsFromPref();
-
-              if (mounted) {
-                setState(() {});
-              }
-            },
-          ),
-        ),
-        ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.low_electricity_warning"),
-          ),
-          subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              "setting.low_electricity_warning_description",
-            ),
-          ),
-          trailing: SignalBuilder(
-            builder: (context) {
-              return Switch(
-                value: EnergyController.i.electricityWarning.value >= 0,
-                onChanged: (bool value) async {
-                  await EnergyController.i.setLowElectricityWarningEnabled(
-                    value,
-                  );
-                },
-              );
-            },
-          ),
-        ),
-        SignalBuilder(
-          builder: (context) {
-            return ListTile(
-              enabled: EnergyController.i.lowElectricityWarningEnabled.value,
+            ListTile(
+              leading: const Icon(MingCuteIcons.mgc_translate_line),
               title: Text(
                 FlutterI18n.translate(
                   context,
-                  "setting.low_electricity_threshold",
+                  "setting.localization_dialog.title",
                 ),
               ),
               subtitle: Text(
                 FlutterI18n.translate(
                   context,
-                  "setting.low_electricity_threshold_description",
-                  translationParams: {
-                    "threshold": EnergyController.i.electricityThreshold
-                        .toString(),
-                  },
+                  Localization.values
+                      .firstWhere(
+                        (value) =>
+                            value.string ==
+                            preference.getString(
+                              preference.Preference.localization,
+                            ),
+                      )
+                      .toShow,
                 ),
               ),
               trailing: const Icon(Icons.navigate_next),
-              onTap: EnergyController.i.lowElectricityWarningEnabled.value
-                  ? () async {
-                      await showDialog<int>(
-                        context: context,
-                        builder: (context) => LowElectricityThresholdDialog(),
-                      );
-                    }
-                  : null,
-            );
-          },
-        ),
-        ListTile(
-          title: Text(
-            FlutterI18n.translate(context, "setting.localization_dialog.title"),
-          ),
-          subtitle: Text(
-            FlutterI18n.translate(
-              context,
-              Localization.values
-                  .firstWhere(
-                    (value) =>
-                        value.string ==
-                        preference.getString(
-                          preference.Preference.localization,
-                        ),
-                  )
-                  .toShow,
+              onTap: () {
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) => const ChangeLanguageDialog(),
+                );
+              },
             ),
-          ),
-          trailing: const Icon(Icons.navigate_next),
-          onTap: () {
-            showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (context) => const ChangeLanguageDialog(),
-            );
-          },
+          ],
+        ),
+        SectionSettingScaffold(
+          title: FlutterI18n.translate(context, 'setting.sections.home'),
+          items: [
+            ListTile(
+              leading: const Icon(MingCuteIcons.mgc_timeline_line),
+              title: Text(
+                FlutterI18n.translate(context, "setting.simplify_timeline"),
+              ),
+              subtitle: Text(
+                FlutterI18n.translate(
+                  context,
+                  "setting.simplify_timeline_description",
+                ),
+              ),
+              trailing: Switch(
+                value: preference.getBool(
+                  preference.Preference.simplifiedClassTimeline,
+                ),
+                onChanged: (bool value) async {
+                  await preference.setBool(
+                    preference.Preference.simplifiedClassTimeline,
+                    value,
+                  );
+                  ClassTableCard.reloadSettingsFromPref();
+
+                  if (mounted) {
+                    setState(() {});
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        SectionSettingScaffold(
+          title: FlutterI18n.translate(context, 'setting.sections.electricity'),
+          items: [
+            ListTile(
+              leading: const Icon(MingCuteIcons.mgc_flash_line),
+              title: Text(
+                FlutterI18n.translate(
+                  context,
+                  "setting.low_electricity_warning",
+                ),
+              ),
+              subtitle: Text(
+                FlutterI18n.translate(
+                  context,
+                  "setting.low_electricity_warning_description",
+                ),
+              ),
+              trailing: SignalBuilder(
+                builder: (context) {
+                  return Switch(
+                    value: EnergyController.i.electricityWarning.value >= 0,
+                    onChanged: (bool value) async {
+                      await EnergyController.i.setLowElectricityWarningEnabled(
+                        value,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            SignalBuilder(
+              builder: (context) {
+                return ListTile(
+                  leading: const Icon(MingCuteIcons.mgc_alert_line),
+                  enabled:
+                      EnergyController.i.lowElectricityWarningEnabled.value,
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_threshold",
+                    ),
+                  ),
+                  subtitle: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.low_electricity_threshold_description",
+                      translationParams: {
+                        "threshold": EnergyController.i.electricityThreshold
+                            .toString(),
+                      },
+                    ),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: EnergyController.i.lowElectricityWarningEnabled.value
+                      ? () async {
+                          await showDialog<int>(
+                            context: context,
+                            builder: (context) =>
+                                LowElectricityThresholdDialog(),
+                          );
+                        }
+                      : null,
+                );
+              },
+            ),
+          ],
         ),
       ],
     );

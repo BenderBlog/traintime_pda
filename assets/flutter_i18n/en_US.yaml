@@ -832,6 +832,20 @@ score:
     CET-4: College English Test Band 4
     CET-6: College English Test Band 6
 setting:
+  sections:
+    display: Display
+    home: Home screen
+    electricity: Electricity alerts
+    timetable_appearance: Timetable appearance
+    semester: Semester and weeks
+    course_data: Course data
+  navigation:
+    ui_description: Theme, text, language and home display
+    classtable_description: Timetable style, semester and course data
+    account_description: Accounts and passwords for campus services
+    notifications_description: Course reminders and notifications
+    core_description: Logs, cached data and sign out
+    about_description: App information and version updates
   about_info: APP info
   acknowledgement: Made With Love From {developers} People
   about: About
@@ -966,7 +980,7 @@ setting:
     cancel_all_success: All pre-class reminders cancelled
     reschedule_success: Rescheduled {count} pre-class reminders
     reschedule_failed: "Failed to reschedule notifications: {error}"
-  notification_debug_page: Notification Services Debug Page
+  notification_debug_page: Notification status and test
   classtable_setting: Class Schedule Related
   background: Background image
   no_background: You need to select an image first, it's at below
@@ -1038,9 +1052,10 @@ setting:
   change_brightness_dialog:
     title: Brightness settings
     follow_setting: Follow system
-    day_mode: Day mode
-    night_mode: Night mode
+    day_mode: Light
+    night_mode: Dark
   change_swift_dialog:
+    invalid_number: Please enter a valid whole number
     title: Class schedule offset setting
     input_hint: Please input number here
   change_electricity_title: Modify electricity account

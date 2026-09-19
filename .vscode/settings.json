@@ -18,7 +18,7 @@
   "licenser.author": "Traintime PDA Authours, originally by BenderBlog Rodriguez",
   "licenser.license": "MPLv2",
   "licenser.useSPDXLicenseFormat": true,
-  "cmake.sourceDirectory": "/Volumes/BenderBlog/Development/traintime_pda/linux",
+  "cmake.configureOnOpen": false,
   "python-envs.defaultEnvManager": "ms-python.python:conda",
   "python-envs.defaultPackageManager": "ms-python.python:conda",
   "python-envs.pythonProjects": [],
