@@ -109,15 +109,19 @@ class _ClasstableSectionState extends State<ClasstableSection> {
           title: Text(FlutterI18n.translate(context, "setting.background")),
           trailing: Switch(
             value: preference.getBool(preference.Preference.decorated),
-            onChanged: (bool value) {
+            onChanged: (bool value) async {
               if (value == true &&
                   !preference.getBool(preference.Preference.decoration)) {
                 showToast(
                   context: context,
                   msg: FlutterI18n.translate(context, "setting.no_background"),
                 );
-              } else {
-                preference.setBool(preference.Preference.decorated, value);
+                return;
+              }
+
+              await preference.setBool(preference.Preference.decorated, value);
+              if (mounted) {
+                setState(() {});
               }
             },
           ),
@@ -144,7 +148,12 @@ class _ClasstableSectionState extends State<ClasstableSection> {
               final saved =
                   selectedFile != null && await _saveBackground(selectedFile);
               if (saved) {
-                preference.setBool(preference.Preference.decoration, true);
+                await preference.setBool(
+                  preference.Preference.decoration,
+                  true,
+                );
+                if (!mounted) return;
+                setState(() {});
                 if (context.mounted) {
                   showToast(
                     context: context,
