@@ -9,6 +9,7 @@ import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
+import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
 
 class AirconRemotePage extends StatefulWidget {
   const AirconRemotePage({super.key});
@@ -19,11 +20,19 @@ class AirconRemotePage extends StatefulWidget {
 
 class _AirconRemotePageState extends State<AirconRemotePage> {
   final _controller = AirconController.i;
+  AirconState? _state;
+  Object? _error;
+  bool _isFetching = false;
+  bool Function(AirconState state)? _pendingMatches;
+
+  static const _pollInterval = Duration(milliseconds: 300);
+  static const _pollAttempts = 12;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(_controller.refreshDeviceState);
+    _state = _controller.deviceStateSignal.peek().value;
+    Future.microtask(_refreshDeviceState);
   }
 
   Future<void> _configure() async {
@@ -31,19 +40,121 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
       context: context,
       builder: (context) => const AirconImeiDialog(),
     );
-    await _controller.refreshDeviceState();
+    if (!mounted) return;
+    setState(() {
+      _state = null;
+      _error = null;
+    });
+    await _refreshDeviceState();
   }
 
-  Future<void> _send(Future<void> command) async {
+  Future<void> _refreshDeviceState() async {
+    final imei = _controller.imeiSignal.value;
+    if (imei.isEmpty || _isFetching) return;
+
+    setState(() {
+      _isFetching = true;
+      _error = null;
+    });
+
     try {
-      await command;
+      final state = await _controller.session.getDeviceState(imei);
+      if (!mounted || imei != _controller.imeiSignal.value) return;
+
+      final matches = _pendingMatches;
+      if (matches != null && !matches(state)) {
+        setState(() {
+          _error = const AirconResponseException("设备状态仍未确认");
+          _isFetching = false;
+        });
+        return;
+      }
+
+      setState(() {
+        _state = state;
+        _error = null;
+        _isFetching = false;
+        _pendingMatches = null;
+      });
+      _controller.setDeviceState(state);
+    } catch (error) {
       if (!mounted) return;
+      setState(() {
+        _error = error;
+        _isFetching = false;
+      });
+    }
+  }
+
+  Future<void> _sendCommand({
+    required Map<String, dynamic> command,
+    required AirconState optimisticState,
+    required bool Function(AirconState state) matches,
+  }) async {
+    final imei = _controller.imeiSignal.value;
+    final previous = _state;
+    if (imei.isEmpty ||
+        previous == null ||
+        _pendingMatches != null ||
+        _isFetching) {
+      return;
+    }
+
+    setState(() {
+      _state = optimisticState;
+      _error = null;
+      _isFetching = true;
+      _pendingMatches = matches;
+    });
+
+    var commandSent = false;
+    try {
+      await _controller.session.sendCommand(imei: imei, command: command);
+      commandSent = true;
+      AirconState? confirmedState;
+      Object? pollError;
+
+      for (var attempt = 0; attempt < _pollAttempts; attempt++) {
+        if (attempt > 0) await Future<void>.delayed(_pollInterval);
+        if (!mounted || imei != _controller.imeiSignal.value) return;
+
+        try {
+          final state = await _controller.session.getDeviceState(imei);
+          if (matches(state)) {
+            confirmedState = state;
+            break;
+          }
+        } catch (error) {
+          pollError = error;
+        }
+      }
+
+      if (!mounted || imei != _controller.imeiSignal.value) return;
+      if (confirmedState == null) {
+        throw pollError ?? const AirconResponseException("设备状态未确认");
+      }
+
+      setState(() {
+        _state = confirmedState;
+        _error = null;
+        _isFetching = false;
+        _pendingMatches = null;
+      });
+      _controller.setDeviceState(confirmedState);
       showToast(
         context: context,
         msg: FlutterI18n.translate(context, "electricity.aircon_command_ok"),
       );
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || imei != _controller.imeiSignal.value) return;
+      setState(() {
+        _error = error;
+        _isFetching = false;
+        if (!commandSent) {
+          _state = previous;
+          _pendingMatches = null;
+        }
+      });
       showToast(context: context, msg: error.toString());
     }
   }
@@ -57,12 +168,14 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         ),
         actions: [
           IconButton(
-            onPressed: _controller.refreshDeviceState,
+            onPressed: _isFetching ? null : _refreshDeviceState,
             tooltip: FlutterI18n.translate(context, "electricity.update"),
             icon: const Icon(Icons.refresh),
           ),
           IconButton(
-            onPressed: _configure,
+            onPressed: _isFetching || _pendingMatches != null
+                ? null
+                : _configure,
             tooltip: FlutterI18n.translate(
               context,
               "setting.aircon_imei_title",
@@ -83,23 +196,25 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             );
           }
 
-          final busyControls = _controller.controllingControlsSignal.value;
-          return _controller.deviceStateSignal.value.map(
-            data: (state) => Stack(
-              children: [
-                _controls(context, state, busyControls),
-                if (busyControls.isNotEmpty) const LinearProgressIndicator(),
-              ],
-            ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            refreshing: () => const Center(child: CircularProgressIndicator()),
-            reloading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => _message(
-              context,
-              "electricity.aircon_control_error",
-              details: error.toString(),
-              onPressed: _controller.refreshDeviceState,
-            ),
+          final state = _state;
+          if (state == null) {
+            if (_error != null) {
+              return _message(
+                context,
+                "electricity.aircon_control_error",
+                details: _error.toString(),
+                onPressed: _refreshDeviceState,
+              );
+            }
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final busy = _isFetching || _pendingMatches != null;
+          return Stack(
+            children: [
+              _controls(context, state, busy, _error),
+              if (busy) const LinearProgressIndicator(),
+            ],
           );
         },
       ),
@@ -109,11 +224,30 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   Widget _controls(
     BuildContext context,
     AirconState state,
-    Set<AirconControl> busyControls,
+    bool busy,
+    Object? error,
   ) {
+    void setTemperature(int value) => _sendCommand(
+      command: {"tempSet": value},
+      optimisticState: state.copyWith(targetTemperature: value),
+      matches: (state) => state.targetTemperature == value,
+    );
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        if (error != null)
+          Card(
+            color: Theme.of(context).colorScheme.errorContainer,
+            child: ListTile(
+              leading: const Icon(Icons.error_outline),
+              title: Text(error.toString()),
+              trailing: IconButton(
+                onPressed: _isFetching ? null : _refreshDeviceState,
+                icon: const Icon(Icons.refresh),
+              ),
+            ),
+          ),
         Card(
           child: Column(
             children: [
@@ -123,9 +257,25 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                   FlutterI18n.translate(context, "electricity.aircon_power"),
                 ),
                 value: state.isOn,
-                onChanged: busyControls.contains(AirconControl.power)
+                onChanged: busy
                     ? null
-                    : (value) => _send(_controller.setPower(value)),
+                    : (value) => _sendCommand(
+                        command: value
+                            ? {"switchStatus": 1}
+                            : {
+                                "switchStatus": 0,
+                                "indoorClean": 0,
+                                "outdoorClean": 0,
+                                "electricHeating": 0,
+                              },
+                        optimisticState: state.copyWith(
+                          isOn: value,
+                          electricHeating: value
+                              ? state.electricHeating
+                              : false,
+                        ),
+                        matches: (state) => state.isOn == value,
+                      ),
               ),
               ListTile(
                 leading: const Icon(Icons.device_thermostat),
@@ -150,15 +300,9 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      onPressed:
-                          busyControls.contains(AirconControl.temperature) ||
-                              state.targetTemperature <= 18
+                      onPressed: busy || state.targetTemperature <= 18
                           ? null
-                          : () => _send(
-                              _controller.setTemperature(
-                                state.targetTemperature - 1,
-                              ),
-                            ),
+                          : () => setTemperature(state.targetTemperature - 1),
                       icon: const Icon(Icons.remove),
                     ),
                     SizedBox(
@@ -166,9 +310,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                       child: TextFormField(
                         key: ValueKey(state.targetTemperature),
                         initialValue: state.targetTemperature.toString(),
-                        enabled: !busyControls.contains(
-                          AirconControl.temperature,
-                        ),
+                        enabled: !busy,
                         textAlign: TextAlign.center,
                         keyboardType: TextInputType.number,
                         textInputAction: TextInputAction.done,
@@ -195,21 +337,15 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                             return;
                           }
                           if (temperature != state.targetTemperature) {
-                            _send(_controller.setTemperature(temperature));
+                            setTemperature(temperature);
                           }
                         },
                       ),
                     ),
                     IconButton(
-                      onPressed:
-                          busyControls.contains(AirconControl.temperature) ||
-                              state.targetTemperature >= 32
+                      onPressed: busy || state.targetTemperature >= 32
                           ? null
-                          : () => _send(
-                              _controller.setTemperature(
-                                state.targetTemperature + 1,
-                              ),
-                            ),
+                          : () => setTemperature(state.targetTemperature + 1),
                       icon: const Icon(Icons.add),
                     ),
                   ],
@@ -223,18 +359,59 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           titleKey: "electricity.aircon_mode",
           values: AirconMode.values,
           selected: state.mode,
-          enabled: !busyControls.contains(AirconControl.mode),
+          enabled: !busy,
           labelKey: (mode) => mode.labelKey,
-          onSelected: (mode) => _send(_controller.setMode(mode)),
+          onSelected: (mode) {
+            final temperature = switch (mode) {
+              AirconMode.heat => 23,
+              AirconMode.cool => 26,
+              _ => 25,
+            };
+            final windSpeed = mode == AirconMode.fan
+                ? AirconWindSpeed.medium
+                : AirconWindSpeed.auto;
+            _sendCommand(
+              command: {
+                "runMode": mode.value.toString(),
+                "indoorClean": 0,
+                "outdoorClean": 0,
+                "strongMode": 0,
+                "electricHeating": 0,
+                "tempView": temperature,
+                "tempSet": temperature,
+                "windSpeed": windSpeed.value,
+              },
+              optimisticState: state.copyWith(
+                mode: mode,
+                targetTemperature: temperature,
+                windSpeed: windSpeed,
+                strongMode: false,
+                electricHeating: false,
+              ),
+              matches: (state) =>
+                  state.mode == mode &&
+                  state.targetTemperature == temperature &&
+                  state.windSpeed == windSpeed &&
+                  !state.strongMode &&
+                  !state.electricHeating,
+            );
+          },
         ),
         _choiceSection<AirconWindSpeed>(
           context,
           titleKey: "electricity.aircon_wind_speed",
           values: AirconWindSpeed.values,
           selected: state.windSpeed,
-          enabled: !busyControls.contains(AirconControl.windSpeed),
+          enabled: !busy,
           labelKey: (speed) => speed.labelKey,
-          onSelected: (speed) => _send(_controller.setWindSpeed(speed)),
+          onSelected: (speed) => _sendCommand(
+            command: {"windSpeed": speed.value.toString(), "strongMode": 0},
+            optimisticState: state.copyWith(
+              windSpeed: speed,
+              strongMode: false,
+            ),
+            matches: (state) => state.windSpeed == speed && !state.strongMode,
+          ),
         ),
         Card(
           child: Column(
@@ -244,26 +421,44 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                 icon: Icons.swap_vert,
                 labelKey: "electricity.aircon_vertical_swing",
                 value: state.verticalSwing,
-                enabled: !busyControls.contains(AirconControl.verticalSwing),
-                onChanged: (value) =>
-                    _send(_controller.setVerticalSwing(value)),
+                enabled: !busy,
+                onChanged: (value) => _sendCommand(
+                  command: {"verticalSwing": value ? 1 : 0},
+                  optimisticState: state.copyWith(verticalSwing: value),
+                  matches: (state) => state.verticalSwing == value,
+                ),
               ),
               _featureSwitch(
                 context,
                 icon: Icons.air,
                 labelKey: "electricity.aircon_strong_mode",
                 value: state.strongMode,
-                enabled: !busyControls.contains(AirconControl.strongMode),
-                onChanged: (value) => _send(_controller.setStrongMode(value)),
+                enabled: !busy,
+                onChanged: (value) => _sendCommand(
+                  command: {
+                    "strongMode": value ? 1 : 0,
+                    if (value) "windSpeed": AirconWindSpeed.auto.value,
+                  },
+                  optimisticState: state.copyWith(
+                    strongMode: value,
+                    windSpeed: value ? AirconWindSpeed.auto : state.windSpeed,
+                  ),
+                  matches: (state) =>
+                      state.strongMode == value &&
+                      (!value || state.windSpeed == AirconWindSpeed.auto),
+                ),
               ),
               _featureSwitch(
                 context,
                 icon: Icons.local_fire_department,
                 labelKey: "electricity.aircon_electric_heating",
                 value: state.electricHeating,
-                enabled: !busyControls.contains(AirconControl.electricHeating),
-                onChanged: (value) =>
-                    _send(_controller.setElectricHeating(value)),
+                enabled: !busy,
+                onChanged: (value) => _sendCommand(
+                  command: {"electricHeating": value ? 1 : 0},
+                  optimisticState: state.copyWith(electricHeating: value),
+                  matches: (state) => state.electricHeating == value,
+                ),
               ),
             ],
           ),
