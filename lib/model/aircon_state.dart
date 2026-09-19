@@ -1,6 +1,11 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'aircon_state.g.dart';
+
+@JsonEnum(valueField: "value")
 enum AirconMode {
   fan(0, "electricity.aircon_mode_fan"),
   heat(1, "electricity.aircon_mode_heat"),
@@ -14,6 +19,7 @@ enum AirconMode {
   final String labelKey;
 }
 
+@JsonEnum(valueField: "value")
 enum AirconWindSpeed {
   auto(0, "electricity.aircon_wind_auto"),
   silent(1, "electricity.aircon_wind_silent"),
@@ -27,78 +33,68 @@ enum AirconWindSpeed {
   final String labelKey;
 }
 
+@JsonSerializable()
 class AirconState {
   const AirconState({
     required this.imei,
-    required this.isOn,
+    required this.switchStatus,
     required this.mode,
     required this.windSpeed,
     required this.targetTemperature,
     required this.indoorTemperature,
-    required this.verticalSwing,
-    required this.strongMode,
-    required this.electricHeating,
+    required this.verticalSwingStatus,
+    required this.strongModeStatus,
+    required this.electricHeatingStatus,
     required this.electricAmount,
-    required this.timestamp,
+    required this.timestampSeconds,
     required this.errorCode,
   });
 
+  @JsonKey(defaultValue: "")
   final String imei;
-  final bool isOn;
+
+  final int switchStatus;
+
+  @JsonKey(name: "runMode")
   final AirconMode mode;
+
   final AirconWindSpeed windSpeed;
+
+  @JsonKey(name: "tempSet")
   final int targetTemperature;
+
+  @JsonKey(name: "indoorTemp")
   final num? indoorTemperature;
-  final bool verticalSwing;
-  final bool strongMode;
-  final bool electricHeating;
+
+  @JsonKey(name: "verticalSwing")
+  final int verticalSwingStatus;
+
+  @JsonKey(name: "strongMode")
+  final int strongModeStatus;
+
+  @JsonKey(name: "electricHeating")
+  final int electricHeatingStatus;
+
   final num? electricAmount;
-  final DateTime? timestamp;
+
+  @JsonKey(name: "timestamp")
+  final int? timestampSeconds;
+
+  @JsonKey(name: "errCode")
   final String? errorCode;
 
-  factory AirconState.fromJson(Map<String, dynamic> json) {
-    final switchStatus = _toInt(json["switchStatus"]);
-    final modeValue = _toInt(json["runMode"]);
-    final windValue = _toInt(json["windSpeed"]);
-    final targetTemperature = _toInt(json["tempSet"]);
-    final verticalSwing = _toInt(json["verticalSwing"]);
-    final strongMode = _toInt(json["strongMode"]);
-    final electricHeating = _toInt(json["electricHeating"]);
-    final timestamp = _toInt(json["timestamp"]);
-    final mode = AirconMode.values
-        .where((value) => value.value == modeValue)
-        .firstOrNull;
-    final windSpeed = AirconWindSpeed.values
-        .where((value) => value.value == windValue)
-        .firstOrNull;
+  bool get isOn => switchStatus == 1;
+  bool get verticalSwing => verticalSwingStatus == 1;
+  bool get strongMode => strongModeStatus == 1;
+  bool get electricHeating => electricHeatingStatus == 1;
+  DateTime? get timestamp => timestampSeconds == null
+      ? null
+      : DateTime.fromMillisecondsSinceEpoch(timestampSeconds! * 1000);
 
-    if (switchStatus == null ||
-        mode == null ||
-        windSpeed == null ||
-        targetTemperature == null ||
-        verticalSwing == null ||
-        strongMode == null ||
-        electricHeating == null) {
-      throw const FormatException("Aircon state is incomplete");
-    }
+  factory AirconState.fromJson(Map<String, dynamic> json) =>
+      _$AirconStateFromJson(json);
 
-    return AirconState(
-      imei: json["imei"]?.toString() ?? "",
-      isOn: switchStatus == 1,
-      mode: mode,
-      windSpeed: windSpeed,
-      targetTemperature: targetTemperature.clamp(18, 32).toInt(),
-      indoorTemperature: _toNum(json["indoorTemp"]),
-      verticalSwing: verticalSwing == 1,
-      strongMode: strongMode == 1,
-      electricHeating: electricHeating == 1,
-      electricAmount: _toNum(json["electricAmount"]),
-      timestamp: timestamp == null
-          ? null
-          : DateTime.fromMillisecondsSinceEpoch(timestamp * 1000),
-      errorCode: json["errCode"]?.toString(),
-    );
-  }
+  Map<String, dynamic> toJson() => _$AirconStateToJson(this);
 
   AirconState copyWith({
     bool? isOn,
@@ -111,23 +107,23 @@ class AirconState {
   }) {
     return AirconState(
       imei: imei,
-      isOn: isOn ?? this.isOn,
+      switchStatus: isOn == null ? switchStatus : (isOn ? 1 : 0),
       mode: mode ?? this.mode,
       windSpeed: windSpeed ?? this.windSpeed,
       targetTemperature: targetTemperature ?? this.targetTemperature,
       indoorTemperature: indoorTemperature,
-      verticalSwing: verticalSwing ?? this.verticalSwing,
-      strongMode: strongMode ?? this.strongMode,
-      electricHeating: electricHeating ?? this.electricHeating,
+      verticalSwingStatus: verticalSwing == null
+          ? verticalSwingStatus
+          : (verticalSwing ? 1 : 0),
+      strongModeStatus: strongMode == null
+          ? strongModeStatus
+          : (strongMode ? 1 : 0),
+      electricHeatingStatus: electricHeating == null
+          ? electricHeatingStatus
+          : (electricHeating ? 1 : 0),
       electricAmount: electricAmount,
-      timestamp: timestamp,
+      timestampSeconds: timestampSeconds,
       errorCode: errorCode,
     );
   }
 }
-
-int? _toInt(dynamic value) =>
-    value is num ? value.toInt() : int.tryParse(value?.toString() ?? "");
-
-num? _toNum(dynamic value) =>
-    value is num ? value : num.tryParse(value?.toString() ?? "");
