@@ -134,15 +134,10 @@ class HomepageController {
     ]);
     await maybeAutoSyncSystemCalendar();
 
-    // Match notification startup and settings availability in the app.
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
       final reminderService = CourseReminderService();
-      if (reminderService.isInitialized) {
-        reminderService.validateAndUpdateNotifications();
-      } else {
-        await reminderService.initialize();
-        reminderService.validateAndUpdateNotifications();
-      }
+      await reminderService.initialize();
+      reminderService.validateAndUpdateNotifications();
     }
 
     final hasCredential =
