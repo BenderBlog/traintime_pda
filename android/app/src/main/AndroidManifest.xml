@@ -62,6 +62,14 @@
         <!-- To handle the notification click event -->
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
 
+        <!-- Starts and finishes the Live Update of the class which is going on -->
+        <receiver android:exported="false" android:name=".liveupdate.CourseLiveUpdateReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
         <!-- To use foreground services -->
         <service
             android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
@@ -91,6 +99,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Notification Permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Promote the ongoing class notification into a Live Update (Android 16+) -->
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
     <!-- Overlay Permission -->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 </manifest>

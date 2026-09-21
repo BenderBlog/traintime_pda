@@ -3,3 +3,10 @@ course_reminder:
   body: "{time} 分钟后开始上课"
   location: "地点：{location}"
   teacher: "教师：{teacher}"
+
+course_live_update:
+  period: "第 {start}-{stop} 节"
+  period_single: "第 {start} 节"
+  next_class: "下一节 {time} · {location}"
+  upcoming_start: "即将开始"
+  no_location: "未知教室"
