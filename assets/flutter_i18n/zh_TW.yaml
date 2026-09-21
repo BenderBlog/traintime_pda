@@ -331,6 +331,12 @@ empty_classroom:
   classroom: 教室
   empty: 空閒
   occupied: 佔用
+  now_ongoing: 現在 · 第 {period} 節 {start}-{end}
+  now_upcoming: 即將 · 第 {period} 節 {start}-{end}
+  now_free: 空閒 {free}/{total} 間
+  only_free_now: 只看現在空閒
+  no_free_now: 現在沒有空閒教室
+  classes_over: 今天的課已經結束了
 exam:
   title: 考試安排
   cache_hint: 已顯示緩存考試安排信息

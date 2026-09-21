@@ -332,6 +332,12 @@ empty_classroom:
   classroom: 教室
   empty: 空闲
   occupied: 占用
+  now_ongoing: 现在 · 第 {period} 节 {start}-{end}
+  now_upcoming: 即将 · 第 {period} 节 {start}-{end}
+  now_free: 空闲 {free}/{total} 间
+  only_free_now: 只看现在空闲
+  no_free_now: 现在没有空闲教室
+  classes_over: 今天的课已经结束了
 exam:
   title: 考试安排
   cache_hint: 已显示缓存考试安排信息

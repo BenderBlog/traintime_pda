@@ -374,6 +374,12 @@ empty_classroom:
   classroom: Classroom
   empty: Available
   occupied: Occupied
+  now_ongoing: "Now · Period {period} {start}-{end}"
+  now_upcoming: "Next · Period {period} {start}-{end}"
+  now_free: "{free} of {total} free"
+  only_free_now: Only free ones now
+  no_free_now: No classroom is free right now
+  classes_over: The classes of today are over
 exam:
   title: Exam Schedule
   cache_hint: Displaying cached exam schedule info
