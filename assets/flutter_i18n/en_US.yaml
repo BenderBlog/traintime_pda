@@ -931,6 +931,16 @@ setting:
     minutes_before: Advance Reminder Time
     minutes_before_hint: The time setting for pre-class reminders
     minutes_unit: minutes
+    live_update_section: Live Update (island)
+    live_update_enabled: Show the class on the island
+    live_update_enabled_hint:
+      Stays in the status bar and in the island while the class goes
+      on, and goes away at its end - this is not the reminder above
+    live_update_lead: How early it shows up
+    live_update_lead_hint:
+      Only decides when the island appears; the reminder above is
+      the one which makes a sound
+    live_update_lead_at_class: At the class
     days_to_schedule: Schedule Duration
     days_to_schedule_hint:
       This program writes course information into the planned
