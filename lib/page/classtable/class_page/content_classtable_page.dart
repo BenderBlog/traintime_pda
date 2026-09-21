@@ -4,7 +4,9 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui' show ImageFilter;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,7 @@ import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/repository/display_corner.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -34,7 +37,8 @@ class ContentClassTablePage extends StatefulWidget {
   State<StatefulWidget> createState() => _ContentClassTablePageState();
 }
 
-class _ContentClassTablePageState extends State<ContentClassTablePage> {
+class _ContentClassTablePageState extends State<ContentClassTablePage>
+    with WidgetsBindingObserver {
   /// Check whether listener is pushed...
   //bool isPushedListener = false;
 
@@ -48,10 +52,36 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// Week choice row controller.
   late PageController rowControl;
 
-  late BoxDecoration decoration;
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
   bool _didLoadVisualSettings = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    /// The corners of the display are not part of the window insets, they have
+    /// to be queried from the platform. The sheet is laid out again once they
+    /// are known.
+    _loadDisplayCorner();
+  }
+
+  /// The window just changed size, which is also what happens when the app goes
+  /// into a floating window or into a split screen. The corners of the display
+  /// no longer cover anything there, so the sheet has to be measured again.
+  @override
+  void didChangeMetrics() {
+    _loadDisplayCorner();
+  }
+
+  void _loadDisplayCorner() {
+    DisplayCorner.refresh().then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
 
   void _switchPage() {
     if (!mounted) {
@@ -78,6 +108,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     classTableState.removeListener(_switchPage);
     super.dispose();
   }
@@ -111,23 +142,81 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       keepPage: true,
     );
 
-    /// Let controllers listen to the currentWeek's change.
-    /// Init the background.
-    File image = File("${supportPath.path}/${classTableState.decorationName}");
-    decoration = BoxDecoration(
-      image:
-          (preference.getBool(preference.Preference.decorated) &&
-              image.existsSync())
-          ? DecorationImage(
-              image: FileImage(image),
-              fit: BoxFit.cover,
-              opacity: Theme.of(context).brightness == Brightness.dark
-                  ? 0.4
-                  : 1.0,
-            )
-          : null,
-    );
     super.didChangeDependencies();
+  }
+
+  /// Padding which keeps the classtable sheet away from the edges of the
+  /// display.
+  ///
+  /// The sheet is scrollable down to its very last row, and the bottom of the
+  /// screen is where the system navigation bar and the rounded corners of the
+  /// display are. Both are honoured here, so the last block of the day (the
+  /// time of the 11th class) stays readable.
+  EdgeInsets _sheetSafeInsets(BuildContext context) {
+    /// `padding` already has the top inset of the app bar taken out, while
+    /// `viewPadding` keeps the real size of the system bars. The bottom one
+    /// has to come from `viewPadding`, otherwise the sheet would crawl under
+    /// the navigation bar whenever the keyboard is around.
+    final padding = MediaQuery.paddingOf(context);
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+    final corners = DisplayCorner.radii;
+    return EdgeInsets.fromLTRB(
+      padding.left + classTableSheetMargin,
+      padding.top + classTableSheetMargin,
+      padding.right + classTableSheetMargin,
+      math.max(
+            math.max(viewPadding.bottom, corners.bottom),
+            classTableMinimumBottomInset,
+          ) +
+          classTableSheetMargin,
+    );
+  }
+
+  /// The user defined background image, blurred as configured.
+  Widget _backgroundLayer(BuildContext context) {
+    if (!preference.getBool(preference.Preference.decorated)) {
+      return const SizedBox.shrink();
+    }
+
+    final image = File("${supportPath.path}/${classTableState.decorationName}");
+    if (!image.existsSync()) {
+      return const SizedBox.shrink();
+    }
+
+    final blur = preference
+        .getDouble(preference.Preference.classTableBackgroundBlur)
+        .clamp(0.0, maxClassTableBackgroundBlur)
+        .toDouble();
+
+    Widget layer = Image.file(
+      image,
+      fit: BoxFit.cover,
+      gaplessPlayback: true,
+      opacity: AlwaysStoppedAnimation<double>(
+        Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
+      ),
+    );
+
+    if (blur > 0) {
+      /// Blurring pulls in the pixels outside of the image, which would leave
+      /// the edges translucent. The image is scaled up a little to make sure
+      /// the whole background stays covered.
+      layer = ClipRect(
+        child: Transform.scale(
+          scale: 1 + blur / 50,
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: blur,
+              sigmaY: blur,
+              tileMode: TileMode.clamp,
+            ),
+            child: layer,
+          ),
+        ),
+      );
+    }
+
+    return Positioned.fill(child: layer);
   }
 
   /// A row shows a series of buttons about the classtable's index.
@@ -423,7 +512,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_brightness_factor",
+                          "setting.class_table_style_page.active_brightness_factor",
                           translationParams: {
                             "value": _formatPercent(activeBrightnessFactor),
                           },
@@ -441,7 +530,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_border_alpha",
+                          "setting.class_table_style_page.active_border_alpha",
                           translationParams: {
                             "value": _formatPercent(activeBorderAlpha),
                           },
@@ -458,7 +547,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_inner_alpha",
+                          "setting.class_table_style_page.active_inner_alpha",
                           translationParams: {
                             "value": _formatPercent(activeInnerAlpha),
                           },
@@ -935,26 +1024,58 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          PreferredSize(
-            preferredSize: Size.fromHeight(
-              MediaQuery.sizeOf(context).height >= 500
-                  ? topRowHeightBig
-                  : topRowHeightSmall,
+      body: Builder(
+        /// The safe area has to be measured below the app bar: the insets of
+        /// the context above the scaffold still contain the status bar the app
+        /// bar has already taken care of.
+        builder: (context) => Stack(
+          fit: StackFit.expand,
+          children: [
+            /// The background image is drawn behind everything, so the
+            /// decorated area still reaches the edges of the screen while the
+            /// sheet below respects the safe area.
+            _backgroundLayer(context),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                PreferredSize(
+                  preferredSize: Size.fromHeight(
+                    MediaQuery.sizeOf(context).height >= 500
+                        ? topRowHeightBig
+                        : topRowHeightSmall,
+                  ),
+                  child: _topView(),
+                ),
+                ClassTableInlineBanner(
+                  loadingSources: state.loadingSources,
+                  cacheSources: state.cacheSources,
+                ),
+                _sheet(context).expanded(),
+              ],
             ),
-            child: _topView(),
-          ),
-          ClassTableInlineBanner(
-            loadingSources: state.loadingSources,
-            cacheSources: state.cacheSources,
-          ),
-          DecoratedBox(
-            decoration: decoration,
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The sheet of the classtable: it is kept inside the safe area of the
+  /// display and gets rounded corners of its own, since it does not reach the
+  /// edges of the screen any more.
+  Widget _sheet(BuildContext context) {
+    return Padding(
+      padding: _sheetSafeInsets(context),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(classTableSheetRadius),
+        child: LayoutBuilder(
+          /// The table measures itself against the room which is really left
+          /// for it, instead of the whole window.
+          builder: (context, constraints) => ClassTableState(
+            constraints: constraints,
+            controllers: classTableState,
             child: _classTablePage(),
-          ).expanded(),
-        ],
+          ),
+        ),
       ),
     );
   }
