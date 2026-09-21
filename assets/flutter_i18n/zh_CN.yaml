@@ -771,7 +771,6 @@ setting:
     account_description: 校园服务的账号与密码
     notifications_description: 课前提醒与通知管理
     core_description: 日志、缓存清理与退出登录
-    about_description: 应用信息与版本更新
   about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 关于

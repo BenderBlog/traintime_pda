@@ -845,7 +845,6 @@ setting:
     account_description: Accounts and passwords for campus services
     notifications_description: Course reminders and notifications
     core_description: Logs, cached data and sign out
-    about_description: App information and version updates
   about_info: APP info
   acknowledgement: Made With Love From {developers} People
   about: About

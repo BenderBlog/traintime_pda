@@ -146,7 +146,13 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                       ),
                     );
                   } else {
-                    preference.setBool(preference.Preference.decorated, value);
+                    preference
+                        .setBool(preference.Preference.decorated, value)
+                        .then((_) {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        });
                   }
                 },
               ),
@@ -178,7 +184,13 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                       selectedFile != null &&
                       await _saveBackground(selectedFile);
                   if (saved) {
-                    preference.setBool(preference.Preference.decoration, true);
+                    preference
+                        .setBool(preference.Preference.decoration, true)
+                        .then((_) {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        });
                     if (context.mounted) {
                       showToast(
                         context: context,

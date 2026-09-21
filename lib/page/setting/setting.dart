@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/setting/groups/about_section.dart';
 import 'package:watermeter/page/setting/groups/account_section.dart';
 import 'package:watermeter/page/setting/groups/classtable_section.dart';
@@ -35,13 +36,9 @@ class _SettingWindowState extends State<SettingWindow>
   @override
   bool get wantKeepAlive => true;
 
-  Future<void> _openCategory(_SettingsCategory category) async {
+  Future<void> _openPage(String id, Widget page) async {
     final revision = ++_navigationRevision;
-    setState(() => _selectedCategory = category.id);
-    final page = SettingsCategoryPage(
-      titleKey: category.titleKey,
-      child: category.child,
-    );
+    setState(() => _selectedCategory = id);
 
     // BasedSplitView owns the responsive navigator, including on phones.
     // Keep its root while replacing the previous category and its subpages.
@@ -91,12 +88,6 @@ class _SettingWindowState extends State<SettingWindow>
         MingCuteIcons.mgc_storage_line,
         CoreSection(),
       ),
-      const _SettingsCategory(
-        'about',
-        'setting.about_info',
-        MingCuteIcons.mgc_information_line,
-        AboutSection(),
-      ),
     ];
     return Scaffold(
       appBar: AppBar(
@@ -107,6 +98,11 @@ class _SettingWindowState extends State<SettingWindow>
         top: false,
         child: ListView(
           children: [
+            AboutSection(
+              selected: _selectedCategory == 'about',
+              onAboutTap: () => _openPage('about', const AboutPage()),
+            ),
+            const Divider(),
             for (final category in categories)
               ListTile(
                 key: ValueKey('settings-category-${category.id}'),
@@ -121,7 +117,13 @@ class _SettingWindowState extends State<SettingWindow>
                     'setting.navigation.${category.id}_description',
                   ),
                 ),
-                onTap: () => _openCategory(category),
+                onTap: () => _openPage(
+                  category.id,
+                  SettingsCategoryPage(
+                    titleKey: category.titleKey,
+                    child: category.child,
+                  ),
+                ),
               ),
           ],
         ),

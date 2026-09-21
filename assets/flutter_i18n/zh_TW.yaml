@@ -769,7 +769,6 @@ setting:
     account_description: 校園服務的帳號與密碼
     notifications_description: 課前提醒與通知管理
     core_description: 日誌、快取清理與登出
-    about_description: 應用程式資訊與版本更新
   about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 關於
