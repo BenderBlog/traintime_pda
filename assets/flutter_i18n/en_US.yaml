@@ -970,6 +970,8 @@ setting:
   classtable_setting: Class Schedule Related
   background: Background image
   no_background: You need to select an image first, it's at below
+  background_blur: "Background blur: {value}"
+  background_blur_off: Off
   choose_background: Choose background image
   class_table_style_setting: Class schedule display & style
   class_table_style_description: Time indicator and course card style

@@ -879,6 +879,8 @@ setting:
   classtable_setting: 课表相关设置
   background: 开启课表背景图
   no_background: 你先选个图片罢，就在下面
+  background_blur: "背景模糊: {value}"
+  background_blur_off: 关闭
   choose_background: 课表背景图选择
   class_table_style_setting: 课表显示与样式
   class_table_style_description: 时间指示和课程卡片样式

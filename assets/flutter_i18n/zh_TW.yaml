@@ -877,6 +877,8 @@ setting:
   classtable_setting: 課表相關設置
   background: 開啟課表背景圖
   no_background: 你先選個圖片罷，就在下面
+  background_blur: "背景模糊: {value}"
+  background_blur_off: 關閉
   choose_background: 課表背景圖選擇
   class_table_style_setting: 課表顯示與樣式
   class_table_style_description: 時間指示和課程卡片樣式
