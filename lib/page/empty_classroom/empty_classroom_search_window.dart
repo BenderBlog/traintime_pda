@@ -152,13 +152,10 @@ class _EmptyClassroomSearchWindowState
   /// ones which are free right now when that switch is on.
   List<EmptyClassroomData> get data {
     final period = onlyFreeNow ? nowPeriod : null;
-    List<EmptyClassroomData> toReturn = [];
-    for (var i in fetchedData) {
-      if (!i.name.contains(text.text)) continue;
-      if (period != null && i.isUsed[period - 1]) continue;
-      toReturn.add(i);
-    }
-    return toReturn;
+    return fetchedData
+        .where((item) => item.name.contains(text.text))
+        .where((item) => period == null || !item.isUsed[period - 1])
+        .toList();
   }
 
   /// Whether the day which is chosen is the day which is going on.
@@ -246,7 +243,13 @@ class _EmptyClassroomSearchWindowState
     updateData();
     clock = Timer.periodic(const Duration(minutes: 1), (_) {
       if (mounted) {
-        setState(() {});
+        setState(() {
+          /// 页面跨过午夜时，选中的那天已经不是「今天」了，「只看现在空闲」
+          /// 也就没有意义了 —— 那个筛选是给今天用的。
+          if (!isToday) {
+            onlyFreeNow = false;
+          }
+        });
       }
     });
     super.initState();
