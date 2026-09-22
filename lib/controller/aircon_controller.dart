@@ -1,10 +1,10 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-/*
 import 'package:signals/signals.dart';
 import 'package:time/time.dart';
 import 'package:watermeter/model/aircon_energy.dart';
+import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
@@ -14,11 +14,13 @@ import 'package:watermeter/repository/preference.dart' as preference;
 class AirconController {
   static final AirconController i = AirconController._();
 
-  bool _isReloading = false;
+  final session = AirconSession();
+  bool _isEnergyReloading = false;
+  bool _isDeviceReloading = false;
 
   AirconController._() {
     final imei = imeiSignal.peek();
-    final cache = AirconSession.getCache(imei: imei);
+    final cache = session.getCache(imei: imei);
     if (cache != null) {
       _lastValidInfo.value = cache;
       energyInfoStateSignal.value = AsyncState.data(cache);
@@ -26,10 +28,11 @@ class AirconController {
 
     energyHistoryInfoList
       ..clear()
-      ..addAll(AirconSession.getEnergyHistory());
+      ..addAll(session.getEnergyHistory());
 
     if (imei.isNotEmpty) {
       Future.microtask(refreshEnergyInfo);
+      Future.microtask(refreshDeviceState);
     }
   }
 
@@ -39,6 +42,9 @@ class AirconController {
   final _lastValidInfo = signal<FetchResult<AirconEnergyInfo>?>(null);
   final energyInfoStateSignal =
       signal<AsyncState<FetchResult<AirconEnergyInfo>>>(const AsyncLoading());
+  final deviceStateSignal = signal<AsyncState<AirconState>>(
+    const AsyncLoading(),
+  );
   final energyHistoryInfoList = <ElectricityHistoryInfo>[];
 
   static String? tryParseImei(String raw) {
@@ -94,25 +100,59 @@ class AirconController {
 
   Future<void> refreshEnergyInfo() async {
     final imei = imeiSignal.value;
-    if (imei.isEmpty || _isReloading) return;
+    if (imei.isEmpty || _isEnergyReloading) return;
 
-    _isReloading = true;
+    _isEnergyReloading = true;
     final previous = _lastValidInfo.value;
     energyInfoStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
 
     try {
-      final result = await getAirconEnergyInfo(imei);
+      final result = await session.getAirconEnergyInfo(imei);
+      if (imei != imeiSignal.value) return;
       _lastValidInfo.value = result;
       _syncEnergyHistory(result);
-      energyInfoStateSignal.value = AsyncState.data(result，force: true,);
+      energyInfoStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
+      if (imei != imeiSignal.value) return;
       energyInfoStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[AirconController][refreshEnergyInfo] Have issue");
     } finally {
-      _isReloading = false;
+      _isEnergyReloading = false;
+      if (imeiSignal.value.isNotEmpty && imei != imeiSignal.value) {
+        Future.microtask(refreshEnergyInfo);
+      }
     }
+  }
+
+  Future<void> refreshDeviceState() async {
+    final imei = imeiSignal.value;
+    if (imei.isEmpty || _isDeviceReloading) return;
+
+    _isDeviceReloading = true;
+    final previous = deviceStateSignal.peek().value;
+    deviceStateSignal.value = previous == null
+        ? const AsyncLoading()
+        : AsyncState.dataRefreshing(previous);
+    try {
+      final state = await session.getDeviceState(imei);
+      if (imei != imeiSignal.value) return;
+      deviceStateSignal.set(AsyncState.data(state), force: true);
+    } catch (e, s) {
+      if (imei != imeiSignal.value) return;
+      deviceStateSignal.value = AsyncState.error(e, s);
+      log.handle(e, s, "[AirconController][refreshDeviceState] Have issue");
+    } finally {
+      _isDeviceReloading = false;
+      if (imeiSignal.value.isNotEmpty && imei != imeiSignal.value) {
+        Future.microtask(refreshDeviceState);
+      }
+    }
+  }
+
+  void setDeviceState(AirconState state) {
+    deviceStateSignal.set(AsyncState.data(state), force: true);
   }
 
   Future<void> updateImei(String rawImei) async {
@@ -124,14 +164,16 @@ class AirconController {
 
     final imei = normalizeImei(trimmed);
     if (imeiSignal.value != imei) {
-      AirconSession.clearCache();
+      session.clearCache();
       AirconSession.clearEnergyHistory();
       energyHistoryInfoList.clear();
       _lastValidInfo.value = null;
+      deviceStateSignal.value = const AsyncLoading();
     }
     await preference.setString(preference.Preference.airconImei, imei);
     imeiSignal.value = imei;
     await refreshEnergyInfo();
+    await refreshDeviceState();
   }
 
   Future<void> clearImei() async {
@@ -139,7 +181,8 @@ class AirconController {
     imeiSignal.value = "";
     _lastValidInfo.value = null;
     energyInfoStateSignal.value = const AsyncLoading();
-    AirconSession.clearCache();
+    deviceStateSignal.value = const AsyncLoading();
+    session.clearCache();
     AirconSession.clearEnergyHistory();
     energyHistoryInfoList.clear();
   }
@@ -153,4 +196,3 @@ class AirconImeiInvalidException implements Exception {
   @override
   String toString() => "Invalid aircon IMEI: $raw";
 }
-*/
