@@ -770,7 +770,7 @@ class CourseReminderService extends NotificationService
         String title = NonUII18n.translate(
           locale,
           'course_reminder.title',
-          translateParams: {'name': '${exam.subject}鑰冭瘯'},
+          translateParams: {'name': '${exam.subject}考试'},
         );
 
         String body = NonUII18n.translate(
