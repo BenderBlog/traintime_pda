@@ -2,13 +2,13 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:async';
-
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/model/session_state.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
@@ -145,9 +145,6 @@ class _EmptyClassroomSearchWindowState
   /// 只看现在这一刻还空着的教室。
   bool onlyFreeNow = false;
 
-  /// 「现在」这个说法要跟着时间走，所以页面开着的时候每分钟重算一次。
-  Timer? clock;
-
   /// The classrooms which are shown: the ones the search box matches, and the
   /// ones which are free right now when that switch is on.
   List<EmptyClassroomData> get data {
@@ -159,49 +156,19 @@ class _EmptyClassroomSearchWindowState
   }
 
   /// Whether the day which is chosen is the day which is going on.
-  bool get isToday {
-    final now = DateTime.now();
-    return time.year == now.year &&
-        time.month == now.month &&
-        time.day == now.day;
-  }
+  bool get isToday => GlobalTimerController.i.isToday(time);
 
   /// The period which is going on right now, or the one which starts next while
   /// the classes are between two of them.
   ///
   /// It is null when another day is shown - the usage of that day says nothing
   /// about now - and when the last period of the day is over.
-  int? get nowPeriod {
-    if (!isToday) {
-      return null;
-    }
-
-    final now = DateTime.now();
-    final minutes = now.hour * 60 + now.minute;
-    for (var index = 0; index < timeList.length ~/ 2; index++) {
-      if (minutes <= minutesOf(timeList[index * 2 + 1])) {
-        return index + 1;
-      }
-    }
-    return null;
-  }
+  int? get nowPeriod => GlobalTimerController.i.nowPeriodComputedSignal.value;
 
   /// Whether that period has already begun; when it has not, the classes are on
   /// a break and the period which is shown is the one which comes next.
-  bool get isNowOngoing {
-    final period = nowPeriod;
-    if (period == null) {
-      return false;
-    }
-
-    final now = DateTime.now();
-    return now.hour * 60 + now.minute >= minutesOf(timeList[(period - 1) * 2]);
-  }
-
-  int minutesOf(String hourMinute) {
-    final parts = hourMinute.split(":");
-    return int.parse(parts[0]) * 60 + int.parse(parts[1]);
-  }
+  bool get isNowOngoing =>
+      GlobalTimerController.i.isNowOngoingComputedSignal.value;
 
   void updateData() async {
     try {
@@ -239,26 +206,9 @@ class _EmptyClassroomSearchWindowState
     }
     toGet ??= widget.places.first;
     chosen = toGet;
-    time = DateTime.now();
+    time = GlobalTimerController.i.currentTimeSignal.value;
     updateData();
-    clock = Timer.periodic(const Duration(minutes: 1), (_) {
-      if (mounted) {
-        setState(() {
-          /// 页面跨过午夜时，选中的那天已经不是「今天」了，「只看现在空闲」
-          /// 也就没有意义了 —— 那个筛选是给今天用的。
-          if (!isToday) {
-            onlyFreeNow = false;
-          }
-        });
-      }
-    });
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    clock?.cancel();
-    super.dispose();
   }
 
   @override
@@ -401,184 +351,195 @@ class _EmptyClassroomSearchWindowState
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        [
-              TextField(
-                controller: text,
-                autofocus: false,
-                style: const TextStyle(fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: FlutterI18n.translate(
-                    context,
-                    "empty_classroom.search_hint",
+    return SignalBuilder(
+      builder: (context) => Column(
+        children: [
+          [
+                TextField(
+                  controller: text,
+                  autofocus: false,
+                  style: const TextStyle(fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: FlutterI18n.translate(
+                      context,
+                      "empty_classroom.search_hint",
+                    ),
+                    isDense: false,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                    prefixIcon: const Icon(Icons.search),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
                   ),
-                  isDense: false,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                  prefixIcon: const Icon(Icons.search),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                ),
-                onSubmitted: (String text) => setState(() {}),
-              ).padding(bottom: 8),
-              [
-                    [
-                      FilledButton(
-                        onPressed: () async {
-                          await showCalendarDatePicker2Dialog(
-                            context: context,
-                            config: CalendarDatePicker2WithActionButtonsConfig(
-                              calendarType: CalendarDatePicker2Type.single,
-                            ),
-                            dialogSize: const Size(325, 400),
-                            value: [time],
-                          ).then((value) {
-                            if (value?.length == 1 && value?[0] != null) {
-                              setState(() {
-                                time = value![0]!;
+                  onSubmitted: (String text) => setState(() {}),
+                ).padding(bottom: 8),
+                [
+                      [
+                        FilledButton(
+                          onPressed: () async {
+                            await showCalendarDatePicker2Dialog(
+                              context: context,
+                              config:
+                                  CalendarDatePicker2WithActionButtonsConfig(
+                                    calendarType:
+                                        CalendarDatePicker2Type.single,
+                                  ),
+                              dialogSize: const Size(325, 400),
+                              value: [time],
+                            ).then((value) {
+                              if (value?.length == 1 && value?[0] != null) {
+                                setState(() {
+                                  time = value![0]!;
 
-                                /// 「只看现在空闲」是给今天准备的，换到别的日子
-                                /// 就没有意义了。
-                                onlyFreeNow = false;
-                                updateData();
-                              });
-                            }
-                          });
-                        },
-                        child: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "empty_classroom.date",
-                            translationParams: {"date": formatter.format(time)},
+                                  /// 「只看现在空闲」是给今天准备的，换到别的日子
+                                  /// 就没有意义了。
+                                  onlyFreeNow = false;
+                                  updateData();
+                                });
+                              }
+                            });
+                          },
+                          child: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "empty_classroom.date",
+                              translationParams: {
+                                "date": formatter.format(time),
+                              },
+                            ),
+                          ),
+                        ).padding(right: 8),
+                        FilledButton(
+                          onPressed: () {
+                            setState(() {
+                              text.clear();
+                            });
+                            chooseBuilding();
+                          },
+                          child: Text(
+                            FlutterI18n.translate(
+                              context,
+                              "empty_classroom.building",
+                              translationParams: {"building": chosen.name},
+                            ),
                           ),
                         ),
-                      ).padding(right: 8),
-                      FilledButton(
-                        onPressed: () {
-                          setState(() {
-                            text.clear();
-                          });
-                          chooseBuilding();
-                        },
-                        child: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "empty_classroom.building",
-                            translationParams: {"building": chosen.name},
+                      ].toRow(),
+                    ]
+                    .toRow(mainAxisAlignment: MainAxisAlignment.center)
+                    .padding(bottom: 8),
+                [
+                  [
+                    getIcon(true),
+                    const SizedBox(width: 4.0),
+                    Text(
+                      FlutterI18n.translate(
+                        context,
+                        "empty_classroom.occupied",
+                      ),
+                    ),
+                  ].toRow().padding(right: 8.0),
+                  [
+                    getIcon(false),
+                    const SizedBox(width: 4.0),
+                    Text(
+                      FlutterI18n.translate(context, "empty_classroom.empty"),
+                    ),
+                  ].toRow(),
+                ].toRow(mainAxisAlignment: MainAxisAlignment.center),
+                if (state == SessionState.fetched && isToday) nowSummary(),
+              ]
+              .toColumn()
+              .padding(horizontal: 14, top: 8, bottom: 12)
+              .constrained(maxWidth: 480),
+          if (state == SessionState.fetching)
+            const CircularProgressIndicator().center().expanded()
+          else if (state == SessionState.error)
+            ReloadWidget(
+              function: () => setState(() {
+                updateData();
+              }),
+            ).expanded()
+          else if (data.isEmpty && onlyFreeNow)
+            Center(
+              child: Text(
+                FlutterI18n.translate(context, "empty_classroom.no_free_now"),
+              ),
+            ).expanded()
+          else
+            ListView.separated(
+              itemCount: data.length,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4,
+                vertical: 8,
+              ).withSafeBottom(context),
+              itemBuilder: (context, index) {
+                final item = data[index];
+                final now = nowPeriod;
+                return Row(
+                  children: [
+                    Flexible(
+                      flex: 3,
+                      child: Text(
+                        item.name,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ).center(),
+                    ),
+                    Flexible(
+                      flex: 4,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 4.0,
+                        children: List.generate(
+                          4,
+                          (i) => getIcon(
+                            item.isUsed[i],
+                            index: i + 1,
+                            isNow: now == i + 1,
                           ),
                         ),
-                      ),
-                    ].toRow(),
-                  ]
-                  .toRow(mainAxisAlignment: MainAxisAlignment.center)
-                  .padding(bottom: 8),
-              [
-                [
-                  getIcon(true),
-                  const SizedBox(width: 4.0),
-                  Text(
-                    FlutterI18n.translate(context, "empty_classroom.occupied"),
-                  ),
-                ].toRow().padding(right: 8.0),
-                [
-                  getIcon(false),
-                  const SizedBox(width: 4.0),
-                  Text(FlutterI18n.translate(context, "empty_classroom.empty")),
-                ].toRow(),
-              ].toRow(mainAxisAlignment: MainAxisAlignment.center),
-              if (state == SessionState.fetched && isToday) nowSummary(),
-            ]
-            .toColumn()
-            .padding(horizontal: 14, top: 8, bottom: 12)
-            .constrained(maxWidth: 480),
-        if (state == SessionState.fetching)
-          const CircularProgressIndicator().center().expanded()
-        else if (state == SessionState.error)
-          ReloadWidget(
-            function: () => setState(() {
-              updateData();
-            }),
-          ).expanded()
-        else if (data.isEmpty && onlyFreeNow)
-          Center(
-            child: Text(
-              FlutterI18n.translate(context, "empty_classroom.no_free_now"),
-            ),
-          ).expanded()
-        else
-          ListView.separated(
-            itemCount: data.length,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 4,
-              vertical: 8,
-            ).withSafeBottom(context),
-            itemBuilder: (context, index) {
-              final item = data[index];
-              final now = nowPeriod;
-              return Row(
-                children: [
-                  Flexible(
-                    flex: 3,
-                    child: Text(
-                      item.name,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ).center(),
-                  ),
-                  Flexible(
-                    flex: 4,
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 4.0,
-                      children: List.generate(
-                        4,
-                        (i) => getIcon(
-                          item.isUsed[i],
-                          index: i + 1,
-                          isNow: now == i + 1,
+                      ).center(),
+                    ),
+                    Flexible(
+                      flex: 4,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 4.0,
+                        children: List.generate(
+                          4,
+                          (i) => getIcon(
+                            item.isUsed[i + 4],
+                            index: i + 5,
+                            isNow: now == i + 5,
+                          ),
                         ),
-                      ),
-                    ).center(),
-                  ),
-                  Flexible(
-                    flex: 4,
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 4.0,
-                      children: List.generate(
-                        4,
-                        (i) => getIcon(
-                          item.isUsed[i + 4],
-                          index: i + 5,
-                          isNow: now == i + 5,
+                      ).center(),
+                    ),
+                    Flexible(
+                      flex: 3,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 4.0,
+                        children: List.generate(
+                          3,
+                          (i) => getIcon(
+                            item.isUsed[i + 8],
+                            index: i + 9,
+                            isNow: now == i + 9,
+                          ),
                         ),
-                      ),
-                    ).center(),
-                  ),
-                  Flexible(
-                    flex: 3,
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 4.0,
-                      children: List.generate(
-                        3,
-                        (i) => getIcon(
-                          item.isUsed[i + 8],
-                          index: i + 9,
-                          isNow: now == i + 9,
-                        ),
-                      ),
-                    ).center(),
-                  ),
-                ],
-              ).constrained(maxWidth: sheetMaxWidth).center();
-            },
-            separatorBuilder: (BuildContext context, int index) =>
-                SizedBox(height: 12),
-          ).expanded(),
-      ],
+                      ).center(),
+                    ),
+                  ],
+                ).constrained(maxWidth: sheetMaxWidth).center();
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  SizedBox(height: 12),
+            ).expanded(),
+        ],
+      ),
     );
   }
 }
