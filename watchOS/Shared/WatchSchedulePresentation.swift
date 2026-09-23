@@ -55,12 +55,16 @@ enum WatchScheduleResolver {
             if let endEpoch = incoming.semesterEndEpochMs {
                 semesterEnd = WatchScheduleDate.date(fromEpochMilliseconds: endEpoch)
             }
-            guard end > start else { continue }
             if incomingScope == .semester {
+                // 全学期快照是权威删除边界。即使服务端返回空范围，也要先
+                // 清掉旧的局部缓存，避免教学或概览继续展示上一版课程。
                 courses.removeAll()
                 coverage.removeAll()
-                semesterEnd = end
                 scope = .semester
+            }
+            guard end > start else { continue }
+            if incomingScope == .semester {
+                semesterEnd = end
             }
             courses = courses.filter {
                 $0.value.startAt < start || $0.value.startAt >= end

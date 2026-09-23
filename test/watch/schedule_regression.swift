@@ -189,6 +189,14 @@ struct ScheduleRegression {
         check(
             WatchScheduleResolver.resolve([.semester: refreshedSemester, .today: today])!.snapshot
                 .courses.isEmpty, "Newest full semester is authoritative")
+        let emptySemesterAtBoundary = snapshot(
+            [], generated: date(9), start: date(9), end: date(9), valid: date(9))
+        check(
+            WatchScheduleResolver.resolve([
+                .fourteenDays: full.snapshot,
+                .semester: emptySemesterAtBoundary,
+            ])!.snapshot.courses.isEmpty,
+            "An empty full-semester boundary snapshot clears older cached courses")
         let newTerm = snapshot([], generated: date(8), start: date(14), term: date(14))
         check(
             WatchScheduleResolver.resolve([.semester: full.snapshot, .today: newTerm])!.snapshot

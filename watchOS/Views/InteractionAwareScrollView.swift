@@ -184,17 +184,7 @@ struct InteractionAwareScrollView<Content: View>: View {
     /// watchOS 11 的 `ScrollPosition`。watchOS 10 没有该 API，必须保留
     /// 原生滚动，否则会出现教学能识别手势但课程列表完全不移动的问题。
     private var disablesNativeScrollForTeaching: Bool {
-        switch teachingTouchScrollEffect {
-        case .disabled:
-            return false
-        case .elastic:
-            return true
-        case .nativePosition:
-            if #available(watchOS 11.0, *) {
-                return true
-            }
-            return false
-        }
+        hasProgrammaticTeachingScrollEffect
     }
 
     /// watchOS 11 起使用 `ScrollPosition` 连续推动原生滚动容器。
@@ -368,7 +358,7 @@ struct InteractionAwareScrollView<Content: View>: View {
             return
         }
         guard usesShortContentTouchFallback,
-              !teachingTouchScrollEffect.isEnabled,
+              !hasProgrammaticTeachingScrollEffect,
               !nativeTouchGestureIsActive,
               !nativeScrollSawTouchTracking
         else { return }
@@ -380,6 +370,22 @@ struct InteractionAwareScrollView<Content: View>: View {
             else { return }
             legacyCrownCompletionTask = nil
             onCrownInput()
+        }
+    }
+
+    /// watchOS 10 没有 `ScrollPosition`，`.nativePosition` 会回退到系统原生
+    /// ScrollView。此时仍需用位移静止窗口识别表冠，否则教学步骤收不到表冠事件。
+    private var hasProgrammaticTeachingScrollEffect: Bool {
+        switch teachingTouchScrollEffect {
+        case .disabled:
+            return false
+        case .elastic:
+            return true
+        case .nativePosition:
+            if #available(watchOS 11.0, *) {
+                return true
+            }
+            return false
         }
     }
 
