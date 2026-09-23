@@ -35,7 +35,8 @@ struct WeekScheduleView: View {
     let onHeaderNextTap: () -> Void
     let onboardingTargetCourse: WatchCourse?
     let onCourseFrameChange: (WatchCourse, CGRect) -> Void
-    let onCourseSelected: (WatchCourse) -> Void
+    let onCourseSelected: (WatchCourse) -> Bool
+    let onPageChange: (Date) -> Void
 
     init(
         selectedCourse: Binding<WatchCourse?>,
@@ -49,7 +50,8 @@ struct WeekScheduleView: View {
         onHeaderNextTap: @escaping () -> Void,
         onboardingTargetCourse: WatchCourse?,
         onCourseFrameChange: @escaping (WatchCourse, CGRect) -> Void,
-        onCourseSelected: @escaping (WatchCourse) -> Void
+        onCourseSelected: @escaping (WatchCourse) -> Bool,
+        onPageChange: @escaping (Date) -> Void
     ) {
         _selectedCourse = selectedCourse
         _anchorDate = State(initialValue: initialDate)
@@ -63,6 +65,7 @@ struct WeekScheduleView: View {
         self.onboardingTargetCourse = onboardingTargetCourse
         self.onCourseFrameChange = onCourseFrameChange
         self.onCourseSelected = onCourseSelected
+        self.onPageChange = onPageChange
     }
 
     /// 当前周的周一零点。
@@ -124,6 +127,7 @@ struct WeekScheduleView: View {
             lastCrownEventOffset = crownValue
             clampAnchorToSemester()
         }
+        .onChange(of: weekStart) { _, date in onPageChange(date) }
         .onChange(of: store.semesterRangeStart) { _, _ in
             clampAnchorToSemester()
         }
@@ -469,9 +473,9 @@ struct WeekScheduleView: View {
 
     /// 打开课程详情前取消表冠焦点并隐藏根页面悬浮按钮。
     private func selectCourse(_ course: WatchCourse) {
+        guard onCourseSelected(course) else { return }
         crownFocused = false
         onCrownInteraction()
-        onCourseSelected(course)
         WatchHaptics.selection()
         withAnimation(.spring(response: 0.38, dampingFraction: 0.84)) {
             selectedCourse = course

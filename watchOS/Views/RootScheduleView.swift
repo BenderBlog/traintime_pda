@@ -3,31 +3,7 @@
 
 import SwiftUI
 
-/// 手表课表支持的五种顶层展示方式。
-enum WatchCalendarMode: String, CaseIterable, Identifiable {
-    case overview
-    case courseList
-    case day
-    case week
-    case month
-
-    var id: String { rawValue }
-
-    /// 日、周、月页面共享同一个当前日期锚点。
-    var usesSelectedDate: Bool {
-        switch self {
-        case .day, .week, .month:
-            true
-        case .overview, .courseList:
-            false
-        }
-    }
-
-    /// 首次进入时需要把悬浮按钮让给内容的页面。
-    var hidesFloatingControlsOnEntry: Bool {
-        self == .day || self == .month
-    }
-
+extension WatchCalendarMode {
     /// 视图选择列表中的本地化名称。
     var title: String {
         switch self {
@@ -147,8 +123,7 @@ struct RootScheduleView: View {
     @State private var onboardingViewportGlobalFrame: CGRect = .zero
     @State private var refreshControlGlobalFrame: CGRect = .zero
     @State private var modeControlGlobalFrame: CGRect = .zero
-    /// 周视图教学随机选中的真实课程。步骤内保持不变，避免提示跳到
-    /// 另一个色块；重新进入引导时重新选择。
+    /// 当前周的真实课程提示目标；翻周后随页面更新。
     @State private var onboardingWeekTargetCourse: WatchCourse?
     /// 目标色块在整个屏幕全局坐标系中的几何中心。
     @State private var weekCourseGlobalCenter: CGPoint?
@@ -157,21 +132,15 @@ struct RootScheduleView: View {
 
     private var showsWidgetOnboarding: Bool { widgetOnboardingEntry != nil }
 
-    /// 分段纯黑提示页等待用户轻点继续，不占用实操教学步骤。
-    @State private var onboardingSectionIntro: WatchOnboardingSection?
-    @State private var onboardingSectionIntroTask: Task<Void, Never>?
     /// App 启动后立即合作式预热课程列表、日索引与月历窗口。
     @State private var onboardingRenderPreparationTask: Task<Void, Never>?
     @State private var onboardingRenderDataReady = false
-    /// 第一段黑场和首个实操提示已经在欢迎页背后完成首轮构造。
+    /// 首个实操提示已经在欢迎页背后完成首轮构造。
     @State private var onboardingInitialPresentationReady = false
-    @State private var onboardingSectionPreparation =
-        WatchOnboardingPreparationState.ready
     /// 自定义分页器按最后一个表冠刻度防抖，停止后才提交教学判断。
     @State private var onboardingCrownEvaluationTask: Task<Void, Never>?
     @State private var onboardingTeachingDate: Date?
-    /// 错误操作后递增，用来重建当前教学页面并恢复到步骤开始状态。
-    @State private var onboardingPageResetToken = 0
+    @State private var onboardingVisibleWeekDate: Date?
     /// 长按完成后 watchOS 可能补发一次普通 Button 点击；只抑制这一笔。
     @State private var suppressesModeTapAfterLongPress = false
     @State private var modeButtonPress = WatchPressSession()
@@ -204,6 +173,7 @@ struct RootScheduleView: View {
     /// 手机同步期间两个入口必须保持可见，不受滚动和自动隐藏计时影响。
     private var controlsShouldBeVisible: Bool {
         guard !showsWidgetOnboarding else { return false }
+        if onboardingStep?.teachesControlVisibility == true { return controlsVisible }
         return controlsVisible
             || store.isRefreshing
             || store.isAwaitingLaunchSyncReply
@@ -400,14 +370,17 @@ struct RootScheduleView: View {
                         onTouchInputBegan: handleOnboardingTouchInputBegan,
                         onSwipeInput: handleOnboardingSwipeInput,
                         onHeaderPreviousTap: handleOnboardingHeaderPreviousTap,
-                        onHeaderNextTap: handleOnboardingHeaderNextTap
+                        onHeaderNextTap: handleOnboardingHeaderNextTap,
+                        onPageChange: { _ in
+                            guard mode == .month, !showsDayDatePicker else { return }
+                            reportOnboardingOperation(.pageChanged)
+                        }
                     )
-                    // 教学的每个月视图步骤都从选定的有课日期出发；
-                    // 正常使用时 identity 稳定，不会破坏用户当前浏览月。
+                    // 翻月与选择日期共用页面 identity，保留刚刚浏览的月份。
                 .id(
                     onboardingStep == nil
                         ? "month-page"
-                        : "onboarding-month-\(onboardingPageResetToken)"
+                        : "onboarding-month"
                 )
                     .transition(.move(edge: .bottom))
                     .zIndex(200)
@@ -491,6 +464,16 @@ struct RootScheduleView: View {
             Text(verbatim: watchLocalizedString(
                 "请打开手机 XDYou 并单击刷新按钮"
             ))
+        }
+        .onChange(of: daySelectedDate) { oldDate, newDate in
+            guard oldDate != newDate, onboardingStep == .dayPaging else { return }
+            reportOnboardingOperation(.pageChanged)
+        }
+        .onChange(of: showsModePicker) { _, isPresented in
+            // 用户主动关掉目录后重新提示入口；成功选中时输入桥已锁定反馈。
+            guard !isPresented, onboardingInput.acceptsOperations,
+                  let openStep = onboardingStep?.menuOpenStep else { return }
+            presentOnboardingStep(openStep)
         }
         .onAppear(perform: handleAppear)
         .onDisappear(perform: handleDisappear)
@@ -597,15 +580,11 @@ struct RootScheduleView: View {
         onboardingNoticeTask = nil
     }
 
-    /// 取消新手引导的计时、章节过渡和表冠停止判定。
+    /// 取消新手引导的数据准备和表冠停止判定。
     ///
     /// 页面销毁、整轮引导重新开始或完成时调用，防止旧步骤的异步回调
     /// 修改新页面状态。
     private func cancelOnboardingTasks() {
-        onboardingSectionIntroTask?.cancel()
-        onboardingSectionIntroTask = nil
-        onboardingSectionIntro = nil
-        onboardingSectionPreparation = .ready
         onboardingCrownEvaluationTask?.cancel()
         onboardingCrownEvaluationTask = nil
 
@@ -618,6 +597,7 @@ struct RootScheduleView: View {
     /// 清空仅对当前引导示例有效的课程与坐标。
     private func resetOnboardingTargets() {
         onboardingWeekTargetCourse = nil
+        onboardingVisibleWeekDate = nil
         weekCourseGlobalCenter = nil
         detailCloseGlobalFrame = .zero
     }
@@ -662,6 +642,13 @@ struct RootScheduleView: View {
     /// 从日视图进入独立日期选择页；页面从表盘底部向上弹入。
     private func presentDayDatePicker(_ date: Date) {
         guard mode == .day, !showsDayDatePicker else { return }
+        if let step = onboardingStep {
+            guard onboardingInput.acceptsOperations else { return }
+            guard step == .dayDatePickerOpen else {
+                reportOnboardingOperation(.tap(.headerTitle), target: .headerTitle)
+                return
+            }
+        }
         reportOnboardingOperation(
             .tap(.headerTitle),
             target: .headerTitle
@@ -701,6 +688,10 @@ struct RootScheduleView: View {
 
     /// 全屏月份页只负责选择日期；最终提交路径由打开它的入口决定。
     private func submitPresentedMonthDate(_ date: Date) {
+        if let step = onboardingStep {
+            guard onboardingInput.acceptsOperations,
+                  step == .monthSelect || step == .dayDatePickerSelect else { return }
+        }
         reportOnboardingOperation(
             .tap(.calendarDate),
             target: .calendarDate
@@ -714,14 +705,22 @@ struct RootScheduleView: View {
 
     /// 日期入口关闭后留在日视图；顶层月视图关闭后切回日视图。
     private func dismissPresentedMonthPage() {
-        reportOnboardingOperation(
-            .tap(.monthTitle),
-            target: .monthTitle
-        )
+        if onboardingStep != .monthPaging && onboardingStep != .monthSelect
+            && onboardingStep != .dayDatePickerSelect {
+            reportOnboardingOperation(.tap(.monthTitle), target: .monthTitle)
+        }
         if showsDayDatePicker {
             dismissDayDatePicker()
+            if onboardingStep == .dayDatePickerSelect {
+                // 取消选日后回到同一任务的入口，仍需实际打开月历并选择日期。
+                presentOnboardingStep(.dayDatePickerOpen)
+            }
         } else {
             dismissMonthView()
+            if onboardingStep == .monthPaging || onboardingStep == .monthSelect {
+                // 提前退出月历后可沿目录重新进入，用户不被强行拉回月历。
+                presentOnboardingStep(.monthOpen)
+            }
         }
     }
 
@@ -772,25 +771,22 @@ struct RootScheduleView: View {
                 .id(
                     onboardingStep == nil
                         ? "overview-page-\(overviewOpenRevision)"
-                        : "onboarding-overview-\(onboardingPageResetToken)"
+                        : "onboarding-overview"
                 )
             case .courseList:
                 CourseListView(
                     onCrownInteraction: handlePassiveScrollInteraction,
                     onCrownInput: handleOnboardingCrownInput,
                     onTouchInput: handleOnboardingVerticalSwipeInput,
-                    alwaysAllowsTeachingBounce:
-                        onboardingStep == .courseListSwipe
-                            || onboardingStep == .courseListCrown,
-                    drivesTeachingTouchScroll:
-                        onboardingStep == .courseListSwipe,
+                    alwaysAllowsTeachingBounce: onboardingStep == .courseListBrowse,
+                    drivesTeachingTouchScroll: false,
                     inputContext: onboardingStep?.rawValue ?? -1,
                     positionsInitialDate: onboardingStep == nil
                 )
                 .id(
                     onboardingStep == nil
                         ? "course-list-page"
-                        : "onboarding-list-\(onboardingPageResetToken)"
+                        : "onboarding-list"
                 )
             case .day:
                 DayScheduleView(
@@ -809,7 +805,7 @@ struct RootScheduleView: View {
                 .id(
                     onboardingStep == nil
                         ? "day-page"
-                        : "onboarding-day-\(onboardingPageResetToken)"
+                        : "onboarding-day"
                 )
             case .month:
                 // 月视图实际内容由根层的全屏页面承载。这里仅提供不会参与
@@ -818,9 +814,8 @@ struct RootScheduleView: View {
             case .week:
                 WeekScheduleView(
                     selectedCourse: $selectedCourse,
-                    // 正常进入仍从本周开始；只有教学期间才改用
-                    // 预先选定的真实有课日期。
-                    initialDate: onboardingTeachingDate ?? Date(),
+                    // 教学从用户刚浏览的日期进入周视图。
+                    initialDate: onboardingStep == nil ? Date() : daySelectedDate,
                     onEmptyTap: toggleControlsFromContentTap,
                     onCrownInteraction: hideControls,
                     onCrownInput: handleOnboardingCrownInput,
@@ -830,14 +825,13 @@ struct RootScheduleView: View {
                     onHeaderNextTap: handleOnboardingHeaderNextTap,
                     onboardingTargetCourse: onboardingWeekTargetCourse,
                     onCourseFrameChange: recordOnboardingWeekCourseFrame,
-                    onCourseSelected: { course in
-                        reportOnboardingWeekCourseSelection(course)
-                    }
+                    onCourseSelected: reportOnboardingWeekCourseSelection,
+                    onPageChange: handleOnboardingWeekPageChange
                 )
                 .id(
                     onboardingStep == nil
                         ? "week-page"
-                        : "onboarding-week-\(onboardingPageResetToken)"
+                        : "onboarding-week"
                 )
             }
         }
@@ -886,12 +880,11 @@ struct RootScheduleView: View {
                 },
                 dismiss: dismissCourseDetail
             )
-            // 教学从手指滑动进入表冠步骤时重建原生 ScrollView，
-            // 阻止上一步惯性滚动被误判成新的表冠操作。
+            // 阅读与关闭属于同一任务，保留实际打开的详情及滚动位置。
             .id(
                 onboardingStep == nil
                     ? "course-detail"
-                    : "onboarding-detail-\(onboardingPageResetToken)"
+                    : "onboarding-detail"
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .transition(.move(edge: .bottom))
@@ -971,6 +964,13 @@ struct RootScheduleView: View {
     /// 触发强制渐进刷新；图标转动由 Store 的刷新状态驱动。
     private var refreshButton: some View {
         Button {
+            if let step = onboardingStep {
+                guard onboardingInput.acceptsOperations else { return }
+                guard step.accepts(.tap(.refresh)) else {
+                    reportOnboardingOperation(.tap(.refresh), target: .refresh)
+                    return
+                }
+            }
             reportOnboardingOperation(.tap(.refresh), target: .refresh)
             WatchHaptics.refreshStarted()
             revealControls()
@@ -1058,12 +1058,12 @@ struct RootScheduleView: View {
         .accessibilityHint(watchLocalizedString("长按重新进入新手引导"))
     }
 
-    /// 教学先验证单击要求，错误时恢复当前步骤并显示反馈，不打开目录。
+    /// 教学先验证目录入口，成功打开后由用户亲自选择视图。
     private func performModeButtonTap() {
         guard !suppressesModeTapAfterLongPress, !showsWidgetOnboarding else { return }
         if let onboardingStep {
             guard onboardingInput.acceptsOperations else { return }
-            guard onboardingStep.operation == .tap(.mode) else {
+            guard onboardingStep.operations.contains(.tap(.mode)) else {
                 reportOnboardingOperation(.tap(.mode), target: .mode)
                 return
             }
@@ -1077,40 +1077,62 @@ struct RootScheduleView: View {
     /// 选中模式后立即关闭列表；课表数据和缓存不会被重置。
     private var modePicker: some View {
         NavigationStack {
-            List {
-                Section {
-                    ForEach(WatchCalendarMode.allCases) { candidate in
-                        Button {
-                            selectMode(candidate)
-                        } label: {
-                            HStack {
-                                Label(
-                                    candidate.title,
-                                    systemImage: candidate.systemImage
-                                )
-                                Spacer()
-                                if candidate == mode {
-                                    Image(systemName: "checkmark")
-                                        .foregroundStyle(.tint)
+            ScrollViewReader { proxy in
+                List {
+                    Section {
+                        ForEach(WatchCalendarMode.allCases) { candidate in
+                            Button {
+                                selectMode(candidate)
+                            } label: {
+                                HStack {
+                                    Label(
+                                        candidate.title,
+                                        systemImage: candidate.systemImage
+                                    )
+                                    Spacer()
+                                    if candidate == mode {
+                                        Image(systemName: "checkmark")
+                                            .foregroundStyle(.tint)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .id(candidate)
+                            .listRowBackground(
+                                onboardingStep?.isModeSelection == true
+                                    && onboardingStep?.destinationMode == candidate
+                                    ? Color.accentColor.opacity(0.3) : nil
+                            )
+                            .overlay(alignment: .trailing) {
+                                if onboardingStep?.isModeSelection == true,
+                                   onboardingStep?.destinationMode == candidate {
+                                    WatchOnboardingMenuCue()
+                                        .allowsHitTesting(false)
                                 }
                             }
                         }
-                        .buttonStyle(.plain)
+                    } header: {
+                        Text(verbatim: watchLocalizedString("切换视图"))
                     }
-                } header: {
-                    Text(verbatim: watchLocalizedString("切换视图"))
+                    Section {
+                        Button(action: requestOnboardingStart) {
+                            Label(watchLocalizedString("App 操作教程"), systemImage: "hand.draw")
+                        }
+                        Button { presentWidgetOnboarding() } label: {
+                            Label(watchLocalizedString("小组件使用指南"), systemImage: "applewatch")
+                        }
+                    } header: {
+                        Text(verbatim: watchLocalizedString("使用指南"))
+                    }
+                    .disabled(onboardingStep != nil)
                 }
-                Section {
-                    Button(action: requestOnboardingStart) {
-                        Label(watchLocalizedString("App 操作教程"), systemImage: "hand.draw")
-                    }
-                    Button { presentWidgetOnboarding() } label: {
-                        Label(watchLocalizedString("小组件使用指南"), systemImage: "applewatch")
-                    }
-                } header: {
-                    Text(verbatim: watchLocalizedString("使用指南"))
+                .task(id: onboardingStep) {
+                    guard onboardingStep?.isModeSelection == true,
+                          let destination = onboardingStep?.destinationMode else { return }
+                    await Task.yield()
+                    guard !Task.isCancelled else { return }
+                    proxy.scrollTo(destination, anchor: .center)
                 }
-                .disabled(onboardingStep != nil)
             }
         }
     }
@@ -1126,8 +1148,6 @@ struct RootScheduleView: View {
         } else if let onboardingStep {
             WatchOnboardingOverlay(
                 step: onboardingStep,
-                sectionIntro: onboardingSectionIntro,
-                sectionPreparation: onboardingSectionPreparation,
                 controlCenters: onboardingControlCenters,
                 feedback: onboardingInput.feedback,
                 showsPrompt: onboardingInput.showsPrompt,
@@ -1139,7 +1159,7 @@ struct RootScheduleView: View {
                 },
                 start: handleOnboardingWelcomeTap,
                 openWidgetTutorial: handleOnboardingWelcomeHold,
-                continueSectionIntro: handleOnboardingSectionIntroTap
+                hasWeekCourseTarget: onboardingWeekTargetCourse != nil
             )
         }
     }
@@ -1149,6 +1169,16 @@ struct RootScheduleView: View {
     /// 模式选择的触觉、状态提交和目录关闭必须属于同一次操作；集中在这里后，
     /// 新增视图不会遗漏其中一步，也不会触碰各视图已经保存的浏览位置。
     private func selectMode(_ candidate: WatchCalendarMode) {
+        if let step = onboardingStep {
+            guard onboardingInput.acceptsOperations else { return }
+            guard step.accepts(.selectMode(candidate)) else {
+                reportOnboardingOperation(.selectMode(candidate))
+                return
+            }
+        }
+        if candidate == .week {
+            onboardingVisibleWeekDate = calendarWeekStart(containing: daySelectedDate)
+        }
         WatchHaptics.selection()
         if candidate.hidesFloatingControlsOnEntry {
             hideControls()
@@ -1161,6 +1191,7 @@ struct RootScheduleView: View {
             mode = candidate
         }
         showsModePicker = false
+        reportOnboardingOperation(.selectMode(candidate))
     }
 
     // MARK: - 新手引导
@@ -1314,6 +1345,7 @@ struct RootScheduleView: View {
         cancelModeButtonHoldFeedback()
         guard wasActive else { return }
         handleModeButtonPressing(false)
+        onboardingInput.restorePromptAfterIncompleteOperation()
     }
 
     /// 松手、移出命中范围和页面退出都必须同时停止计时与触觉脉冲。
@@ -1367,9 +1399,8 @@ struct RootScheduleView: View {
 
     /// 欢迎页出现后立即预热后续五个页面共用的派生数据。
     ///
-    /// 已命中持久化缓存时直接标记完成；缓存缺失时把工作拆到多个可让出
-    /// 执行权的阶段。课程列表章节页会在必要时等待这个任务，但欢迎、概览
-    /// 动画和用户操作不会被同步阻塞。
+    /// 已命中持久化缓存时直接标记完成；缓存缺失时分阶段让出主线程，
+    /// 欢迎页等待准备完成，实操之间不再插入加载过场。
     private func startOnboardingRenderPreparation() {
         onboardingRenderPreparationTask?.cancel()
         onboardingRenderDataReady = false
@@ -1397,46 +1428,30 @@ struct RootScheduleView: View {
         }
     }
 
-    /// 前进到下一项；实操结束后衔接小组件介绍。
+    /// 任务内直接更换短提示，真实页面由用户操作推进。
     private func showNextOnboardingStep() {
-        guard let onboardingStep else { return }
-        guard let next = WatchOnboardingStep(
-            rawValue: onboardingStep.rawValue + 1
-        ) else {
+        guard let step = onboardingStep else { return }
+        if let next = step.next {
+            presentOnboardingStep(next)
+        } else if step == .restartHold {
             showOnboardingWidgetIntroduction()
-            return
         }
-        presentOnboardingStep(next)
     }
 
-    /// 原子切换步骤及其对应的真实背景页面。
     private func presentOnboardingStep(_ step: WatchOnboardingStep) {
-        resetOnboardingTargetFrame(for: step)
-        if let section = WatchOnboardingSection.starting(at: step) {
-            presentOnboardingSectionIntro(section, for: step)
-        } else {
-            applyOnboardingBackground(for: step)
-            withAnimation(WatchOnboardingMotion.pageTransition) {
-                onboardingStep = step
-            }
-            configureOnboardingInput(for: step)
+        if step == .overviewControlsHide {
+            prepareControlVisibility(for: step)
         }
+        if step == .weekCourse {
+            updateOnboardingWeekTarget()
+        }
+        withAnimation(WatchOnboardingMotion.pageTransition) {
+            onboardingStep = step
+        }
+        configureOnboardingInput(for: step)
     }
 
-    /// 在黑色章节页下方切换真实页面；普通步骤也复用同一原子入口。
-    ///
-    /// 这里不启动任何视觉转场。章节页先完整覆盖表盘，下一次主线程更新才
-    /// 安装底层页面，因此不会再出现“先漏一帧页面变化、随后才变黑”。
-    private func applyOnboardingBackground(for step: WatchOnboardingStep) {
-        performWithoutAnimation {
-            installOnboardingRoute(for: step)
-        }
-    }
-
-    /// 把教学示例日期原子写入日视图和月份选择器入口。
-    ///
-    /// Store 可能尚未给出推荐日期，因此 `nil` 只清空教学引用，不改动用户
-    /// 正在浏览的日期；一旦日期可用，两个入口始终保持一致。
+    /// 教学日期只在欢迎页准备时安装一次，后续保留用户实际浏览的位置。
     private func installOnboardingTeachingDate(_ date: Date?) {
         onboardingTeachingDate = date
         guard let date else { return }
@@ -1446,143 +1461,22 @@ struct RootScheduleView: View {
         dayDatePickerInitialDate = day
     }
 
-    /// 安装某一步需要的真实底层页面和详情路由。
-    ///
-    /// 正常推进与错误恢复共用该入口，避免两条路径对日期选择器、详情课程或
-    /// 悬浮控件的处理逐渐产生差异。调用方负责决定是否禁用动画。
-    private func installOnboardingRoute(for step: WatchOnboardingStep) {
-        if step.requiredMode.usesSelectedDate {
-            installOnboardingTeachingDate(
-                onboardingTeachingDate ?? store.recommendedOnboardingDate
-            )
-        }
-        selectedCourse = step == .courseDetailClose
-            ? onboardingDetailTeachingCourse
-            : nil
-        showsDayDatePicker = step.presentsDayDatePicker
-        mode = step.requiredMode
-        prepareControlVisibility(for: step)
+    private func updateOnboardingWeekTarget() {
+        weekCourseGlobalCenter = nil
+        let date = onboardingVisibleWeekDate ?? daySelectedDate
+        onboardingWeekTargetCourse = store.courses(
+            startingAt: calendarWeekStart(containing: date), dayCount: 7
+        ).first { $0.startPeriod <= 10 }
     }
 
-    /// 为需要重新选择示例内容的步骤清理动态目标。
-    ///
-    /// 详情页在“点开课程”成功后已经显示并上报关闭按钮坐标，进入下一步时
-    /// 必须保留该坐标；若清零但不重建详情页，GeometryReader 不会再次回调，
-    /// 关闭提示就会一直隐藏到错误恢复重建页面之后。
-    private func resetOnboardingTargetFrame(for step: WatchOnboardingStep) {
-        switch step.operation {
-        case .tap(.weekCourse):
-            weekCourseGlobalCenter = nil
-            onboardingWeekTargetCourse = randomOnboardingWeekCourse()
-            // 前面的箭头、滑动和表冠教学可能已把周页带离示范课程。
-            // 只在进入色块教学时重建一次并回到教学周；其他相邻步骤保持
-            // 相同 identity，复用周视图及其表冠状态。
-            onboardingPageResetToken &+= 1
-        default:
-            break
+    private func handleOnboardingWeekPageChange(_ date: Date) {
+        guard onboardingStep != nil else { return }
+        onboardingVisibleWeekDate = date
+        daySelectedDate = date
+        if onboardingStep == .weekCourse {
+            updateOnboardingWeekTarget()
         }
-    }
-
-    /// 在每个顶层视图的第一项实操前显示纯黑分段页。
-    ///
-    /// 分段页等待用户主动轻点；等待期间输入桥保持清空。
-    /// 这样阅读速度不会影响教学节奏，轻点后的淡出也不会误算成下一项操作。
-    private func presentOnboardingSectionIntro(
-        _ section: WatchOnboardingSection,
-        for step: WatchOnboardingStep
-    ) {
-        onboardingSectionIntroTask?.cancel()
-        onboardingInput.clear()
-        onboardingSectionPreparation = .ready
-        // 黑色覆盖层先同步插入；底层模式在下一次 run-loop 才更新。
-        // `WatchOnboardingOverlay` 的非对称 transition 保证插入没有淡入漏帧。
-        performWithoutAnimation {
-            onboardingStep = step
-            onboardingSectionIntro = section
-        }
-
-        onboardingSectionIntroTask = Task { @MainActor in
-            await Task.yield()
-            guard !Task.isCancelled, onboardingStep == step,
-                  onboardingSectionIntro == section
-            else { return }
-
-            let waitsForInitialRender = section == .courseList
-                && !onboardingRenderDataReady
-            if waitsForInitialRender {
-                onboardingSectionPreparation = .loading
-                await onboardingRenderPreparationTask?.value
-                guard !Task.isCancelled,
-                      onboardingStep == step,
-                      onboardingSectionIntro == section
-                else { return }
-            }
-
-            // 页面在纯黑覆盖下完成首次构造；用户阅读章节说明的时间也会
-            // 成为 SwiftUI 建立列表/分页树的预热窗口。
-            applyOnboardingBackground(for: step)
-
-            if waitsForInitialRender {
-                onboardingSectionPreparation = .completed
-                WatchHaptics.onboardingSuccess()
-                do {
-                    try await Task.sleep(nanoseconds: 820_000_000)
-                } catch {
-                    return
-                }
-                guard onboardingStep == step,
-                      onboardingSectionIntro == section
-                else { return }
-                onboardingSectionPreparation = .ready
-            }
-            onboardingSectionIntroTask = nil
-        }
-    }
-
-    /// 用户轻点纯黑分段页后淡出，再启用当前页面的第一项真实操作检测。
-    private func handleOnboardingSectionIntroTap() {
-        guard let step = onboardingStep,
-              onboardingSectionIntro != nil,
-              onboardingSectionIntroTask == nil
-        else { return }
-        onboardingSectionIntroTask = Task { @MainActor in
-            withAnimation(WatchOnboardingMotion.sectionIntro) {
-                onboardingSectionIntro = nil
-            }
-
-            do {
-                try await Task.sleep(
-                    nanoseconds: WatchOnboardingMotion
-                        .sectionIntroFadeNanoseconds
-                )
-            } catch {
-                return
-            }
-            guard onboardingStep == step,
-                  onboardingSectionIntro == nil
-            else { return }
-            WatchHaptics.selection()
-            configureOnboardingInput(for: step)
-        }
-    }
-
-    /// 真实操作被验证后只做必要的教学页面收尾。
-    ///
-    /// 点击、刷新或分页均由底层真实控件完成；这里仅提交教学状态。
-    private func handleOnboardingOperation(
-        step: WatchOnboardingStep,
-        operation: WatchOnboardingOperation
-    ) {
-        if step == .overviewSwitcherTap,
-           operation == .tap(.mode)
-        {
-            // 用户已经真实看到目录；成功反馈期间只收起 Sheet。不要在这里
-            // 提前挂载课程列表：列表的首次 scrollTo 会让实体表同步计算
-            // 跨整学期布局，反而阻塞黑场和下一条教学提示。
-            DispatchQueue.main.async {
-                showsModePicker = false
-            }
-        }
+        reportOnboardingOperation(.pageChanged)
     }
 
     /// 为当前步骤重置旁路输入桥；说明持续到用户开始操作，实际命中由页面负责。
@@ -1591,32 +1485,22 @@ struct RootScheduleView: View {
         onboardingCrownEvaluationTask = nil
         onboardingInput.configure(
             step: step,
-            operationAccepted: handleOnboardingOperation,
             operationRejected: handleRejectedOnboardingOperation,
             advance: showNextOnboardingStep
         )
     }
 
-    /// 错误输入可能已经真实打开目录、切换日期或关闭顶层页面；播放错号前，
-    /// 统一恢复到当前步骤开始时的页面。内部分页状态通过 identity 重建，
-    /// 根层路由则直接回到该步骤要求的模式、日期选择器或详情页。
+    /// 路由入口在操作前校验；错误只恢复提示，不重建当前课表或重置日期。
     private func handleRejectedOnboardingOperation(
         step: WatchOnboardingStep,
         operation: WatchOnboardingOperation
     ) {
-        _ = operation
         onboardingCrownEvaluationTask?.cancel()
         onboardingCrownEvaluationTask = nil
-
-        performWithoutAnimation {
-            showsModePicker = false
-            installOnboardingRoute(for: step)
-            onboardingPageResetToken &+= 1
-        }
     }
 
-    /// 最后一次长按成功后直接衔接小组件，整套教程结束才记录完成。
     private func showOnboardingWidgetIntroduction() {
+        guard onboardingStep == .restartHold else { return }
         presentWidgetOnboarding(from: .fullTutorial)
     }
 
@@ -1677,22 +1561,13 @@ struct RootScheduleView: View {
         )
     }
 
-    /// 周视图教学只接受当前随机目标课程；其他色块走错误恢复流程。
-    private func reportOnboardingWeekCourseSelection(_ course: WatchCourse) {
-        guard onboardingStep != nil else { return }
-        if onboardingStep == .weekCourse,
-           course == onboardingWeekTargetCourse
-        {
-            reportOnboardingOperation(
-                .tap(.weekCourse),
-                target: .weekCourse
-            )
-        } else {
-            reportOnboardingOperation(
-                .tap(.content),
-                target: .content
-            )
-        }
+    /// 接受实际点中的任一课程；高亮只帮助定位，不把其他有效色块判错。
+    private func reportOnboardingWeekCourseSelection(_ course: WatchCourse) -> Bool {
+        guard let step = onboardingStep else { return true }
+        guard onboardingInput.acceptsOperations, step == .weekCourse else { return false }
+        onboardingWeekTargetCourse = course
+        reportOnboardingOperation(.tap(.weekCourse), target: .weekCourse)
+        return true
     }
 
     /// 日历自身的单一触摸层锁定轴向时，只隐去说明，不创建第二个手势。
@@ -1747,7 +1622,7 @@ struct RootScheduleView: View {
     /// 欢迎页长按可跳过实操，完成后仍按整套引导记录；组件示例不依赖课表预热。
     private func handleOnboardingWelcomeHold() {
         guard scenePhase == .active, onboardingStep == .welcome,
-              !showsWidgetOnboarding, onboardingSectionIntro == nil,
+              !showsWidgetOnboarding,
               onboardingInput.showsPrompt, onboardingInput.feedback == nil
         else { return }
         WatchHaptics.onboardingSuccess()
@@ -1767,7 +1642,7 @@ struct RootScheduleView: View {
     /// 自定义分页器每个表冠刻度都会调用；持续旋转时反复取消任务，只有
     /// 最后一个刻度后的短暂空闲才真正提交判断。
     private func handleOnboardingCrownInput() {
-        guard onboardingStep != nil else { return }
+        guard let step = onboardingStep else { return }
         onboardingInput.beginOperation()
         // 日视图的连续翻页步骤必须真正跨过一个日期页面才完成；普通刻度
         // 只负责隐去说明。停止后若仍未跨页，恢复说明而不判定成功或错误。
@@ -1783,6 +1658,7 @@ struct RootScheduleView: View {
         }
         onboardingCrownEvaluationTask?.cancel()
         onboardingCrownEvaluationTask = makeWatchAutoDismissTask(after: 0.20) {
+            guard onboardingStep == step else { return }
             reportOnboardingOperation(.crown)
         }
     }
@@ -1795,51 +1671,7 @@ struct RootScheduleView: View {
         reportOnboardingOperation(.crownPage)
     }
 
-    /// 详情教学使用与日/周/月教学相同日期中的第一项真实日程。
-    private var onboardingTeachingCourse: WatchCourse? {
-        guard let date = onboardingTeachingDate else {
-            return store.snapshot?.courses.first { $0.startPeriod <= 10 }
-                ?? store.snapshot?.courses.first
-        }
-        let dayCourses = store.courses(on: date)
-        if let visibleCourse = dayCourses.first(where: { $0.startPeriod <= 10 }) {
-            return visibleCourse
-        }
-
-        // 若教学日只有第 11 节后的事项，改从同一周寻找实际绘制在 1–10
-        // 节网格中的色块；教学脉冲才能稳定落在一个真实可点课程上。
-        let weekCourses = store.courses(
-            startingAt: calendarWeekStart(containing: date),
-            dayCount: 7
-        )
-        return weekCourses.first { $0.startPeriod <= 10 }
-            ?? dayCourses.first
-            ?? store.snapshot?.courses.first
-    }
-
-    /// 周视图教学从当前展示周的可见色块中随机选择一个目标。
-    ///
-    /// 这里只选择课程数据；`WeekScheduleGridGeometry` 随后使用星期列和
-    /// 开始/结束节次反算色块矩形，无需等待渲染后的视图边界。
-    private func randomOnboardingWeekCourse() -> WatchCourse? {
-        guard let date = onboardingTeachingDate
-                ?? store.recommendedOnboardingDate
-        else { return nil }
-        return store.courses(
-            startingAt: calendarWeekStart(containing: date),
-            dayCount: 7
-        )
-        .filter { $0.startPeriod <= 10 }
-        .randomElement()
-    }
-
-    /// 详情页沿用刚刚在周视图中实际点中的随机课程；若教学尚未进入周视图，
-    /// 再回退到教学日期中的课程。
-    private var onboardingDetailTeachingCourse: WatchCourse? {
-        onboardingWeekTargetCourse ?? onboardingTeachingCourse
-    }
-
-    /// 结束页停留两秒后完成阅读，不推断用户已经安装系统小组件。
+    /// 用户轻点或左滑关闭结束页后完成阅读，不推断用户已经安装系统小组件。
     private func finishOnboarding() {
         guard let entry = widgetOnboardingEntry else { return }
         cancelOnboardingTasks()
@@ -2107,10 +1939,19 @@ struct RootScheduleView: View {
     /// 空白区域轻点使用同一个显隐入口。同步、启动等待和完成提示期间按钮
     /// 按既有规则强制可见；普通浏览和对应引导步骤才允许点击隐藏。
     private func toggleControlsFromContentTap() {
-        if onboardingStep?.operation == .verticalSwipe {
+        if onboardingStep == .overviewSwipe {
             // 纵向滑动教学由 ScrollView 的原生滚动阶段和拖动结束兜底
             // 独占判定。短内容橡皮筋在个别系统版本上可能补发父层轻点，
             // 无论说明淡出是否已提交，都不能把这次补发当成错误操作。
+            return
+        }
+        if onboardingStep?.teachesControlVisibility == true {
+            guard onboardingInput.acceptsOperations else { return }
+            hideControlsTask?.cancel()
+            withAnimation(.easeOut(duration: 0.18)) {
+                controlsVisible.toggle()
+            }
+            reportOnboardingOperation(.tap(.content), target: .content)
             return
         }
         reportOnboardingOperation(.tap(.content), target: .content)
@@ -2128,8 +1969,7 @@ struct RootScheduleView: View {
         }
     }
 
-    /// 在两个教学步骤开始前设置确定的初始状态：先展示按钮教用户隐藏，
-    /// 再保持隐藏教用户重新显示。其他步骤继续由引导强制展示入口。
+    /// 显隐任务开始时显示按钮，后续点击直接保留真实的显隐状态。
     private func prepareControlVisibility(for step: WatchOnboardingStep) {
         guard step.teachesControlVisibility else { return }
         hideControlsTask?.cancel()
@@ -2142,6 +1982,7 @@ struct RootScheduleView: View {
     /// 同步开始时取消隐藏任务，并立即恢复两个悬浮入口。
     private func keepControlsVisibleDuringRefresh() {
         hideControlsTask?.cancel()
+        guard onboardingStep?.teachesControlVisibility != true else { return }
         guard !controlsVisible else { return }
         withAnimation(.easeOut(duration: 0.18)) {
             controlsVisible = true

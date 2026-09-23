@@ -20,6 +20,7 @@ struct MonthScheduleView: View {
     let onSwipeInput: (CalendarPagingDragAxis) -> Void
     let onHeaderPreviousTap: () -> Void
     let onHeaderNextTap: () -> Void
+    let onPageChange: (Date) -> Void
     /// 启动预热实例只负责建立真实渲染树，不取得表冠焦点或监听课表变化。
     let prewarmingOnly: Bool
 
@@ -56,6 +57,7 @@ struct MonthScheduleView: View {
         onSwipeInput: @escaping (CalendarPagingDragAxis) -> Void,
         onHeaderPreviousTap: @escaping () -> Void,
         onHeaderNextTap: @escaping () -> Void,
+        onPageChange: @escaping (Date) -> Void = { _ in },
         prewarmingOnly: Bool = false
     ) {
         let normalizedDate = Calendar.current.startOfDay(for: initialDate)
@@ -69,6 +71,7 @@ struct MonthScheduleView: View {
         self.onSwipeInput = onSwipeInput
         self.onHeaderPreviousTap = onHeaderPreviousTap
         self.onHeaderNextTap = onHeaderNextTap
+        self.onPageChange = onPageChange
         self.prewarmingOnly = prewarmingOnly
         _visibleMonth = State(initialValue: month)
         _loadedMonths = State(initialValue: initialWindow.models)
@@ -128,6 +131,10 @@ struct MonthScheduleView: View {
             }
             // Store 安装新阶段或恢复持久化派生索引后递增修订号。月份页面只
             // 按索引刷新当前三页颜色，无需重新扫描全部课程。
+            .onChange(of: visibleMonth) { _, date in
+                guard !prewarmingOnly else { return }
+                onPageChange(date)
+            }
             .onChange(of: store.renderCacheRevision) { _, _ in
                 guard !prewarmingOnly else { return }
                 replaceMonthWindow(

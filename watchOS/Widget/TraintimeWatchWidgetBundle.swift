@@ -6,7 +6,7 @@ import WidgetKit
 
 /// Apple Watch Widget Extension 入口。
 ///
-/// 综合组件之外提供名称、时间地点、日程概览三个互补组件。
+/// 长方形仅提供综合组件；名称、时间地点、日程概览用于圆形与单行表盘位置。
 /// 它们共用同一个 Provider 与 App Group 缓存，不会重复请求或复制课表数据。
 @main
 struct TraintimeWatchWidgetBundle: WidgetBundle {

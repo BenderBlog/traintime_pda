@@ -26,3 +26,9 @@ xcrun swiftc -parse-as-library "${watch_common_sources[@]}" \
     test/watch/interaction_regression.swift \
     -module-cache-path "$watch_test_dir/modules" -o "$watch_test_dir/interaction"
 "$watch_test_dir/interaction"
+
+xcrun swiftc -parse-as-library \
+    watchOS/Views/WatchOnboardingFlow.swift \
+    test/watch/onboarding_regression.swift \
+    -module-cache-path "$watch_test_dir/modules" -o "$watch_test_dir/onboarding"
+"$watch_test_dir/onboarding"

@@ -123,7 +123,7 @@ enum WatchScheduleCoding {
 /// App Group。所有缓存键统一定义在此处，防止 App 与小组件使用不同键名。
 enum WatchWidgetShared {
     /// 必须与两个 target 的 entitlements 中的 App Group 完全一致。
-    static let appGroupIdentifier = "group.xyz.superbart.xdyou"
+    static let appGroupIdentifier = "group.com.littlestar.traintimepda"
 
     /// WidgetKit 注册和刷新时间线时使用的唯一类型标识。
     static let widgetKind = "TraintimeScheduleWidget"

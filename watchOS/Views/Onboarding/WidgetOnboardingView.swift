@@ -69,9 +69,9 @@ struct WidgetOnboardingView: View {
     @State private var introductionSlideProgress: CGFloat = 0
     @FocusState private var crownFocused: Bool
 
-    // 三种课中形态，以及圆形和长方形的次日状态。
+    // 优先展示这次实拍的下一节课，随后展示表角和次日状态。
     private static let schedulePreviews: [WidgetTutorialImage] = [
-        .circularScheduleOngoing, .cornerScheduleOngoing, .rectangularScheduleOngoing,
+        .rectangularScheduleNext, .circularScheduleNext, .cornerScheduleOngoing,
         .circularScheduleTomorrow, .rectangularScheduleTomorrow,
     ]
 
@@ -93,10 +93,6 @@ struct WidgetOnboardingView: View {
             page: canAnimate && page == .schedule ? page : nil,
             revision: manualPreviewRevision
         )
-    }
-
-    private var completionIsActive: Bool {
-        page == .completion && scenePhase == .active
     }
 
     var body: some View {
@@ -146,15 +142,6 @@ struct WidgetOnboardingView: View {
             guard playbackID.page != nil else { return }
             await runWidgetTutorialPlayback(advanceCard: advancePreview)
         }
-        .task(id: completionIsActive) {
-            // TabView 会预加载相邻页，因此由真实选中页控制计时，不能依赖 onAppear。
-            guard completionIsActive, !didFinish else { return }
-            do { try await Task.sleep(for: .seconds(2)) }
-            catch { return }
-            guard !Task.isCancelled, completionIsActive, !didFinish else { return }
-            didFinish = true
-            finish()
-        }
     }
 
     private func pages(in viewport: CGSize, topInset: CGFloat) -> some View {
@@ -184,9 +171,20 @@ struct WidgetOnboardingView: View {
             WidgetOnboardingTransitionPage(
                 title: watchLocalizedString("教程结束"),
                 message: watchLocalizedString("开始愉快的使用吧"),
-                playsAnimations: canAnimate && page == .completion
+                playsAnimations: canAnimate && page == .completion,
+                viewport: viewport,
+                continueAction: finishTutorial
             )
-            .frame(width: viewport.width, height: viewport.height)
+            // 仅结束页从右向左继续滑动会退出，同时保留向右返回上一页的分页手势。
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 12)
+                    .onEnded { value in
+                        guard value.translation.width <= -30,
+                              -value.translation.width > abs(value.translation.height)
+                        else { return }
+                        finishTutorial()
+                    }
+            )
             .tag(WidgetTutorialPage.completion)
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
@@ -218,9 +216,9 @@ struct WidgetOnboardingView: View {
             title: watchLocalizedString("还有一个更快的方法"),
             message: watchLocalizedString("轻点以继续"),
             playsAnimations: canAnimate && page == .introduction,
+            viewport: viewport,
             continueAction: startIntroductionSlide
         )
-        .frame(width: viewport.width, height: viewport.height)
     }
 
     private func schedulePage(in viewport: CGSize, topInset: CGFloat) -> some View {
@@ -240,6 +238,7 @@ struct WidgetOnboardingView: View {
         .frame(width: viewport.width, height: viewport.height, alignment: .leading)
         .clipped()
         .background(.black)
+        .ignoresSafeArea()
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
@@ -321,6 +320,9 @@ struct WidgetOnboardingView: View {
         .padding(.top, contentTopInset)
         .padding(.bottom, WidgetTutorialLayout.pageIndicatorBottomInset)
         .frame(width: viewport.width, height: viewport.height, alignment: .top)
+        // 内容已按根视口分配标题与底栏留白，TabView 和转场覆盖层
+        // 都不能再叠加各自的安全区，否则交接时会产生半行高度的位移。
+        .ignoresSafeArea()
     }
 
     private func selectPage(at index: Int) {
@@ -329,6 +331,14 @@ struct WidgetOnboardingView: View {
         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.24)) {
             page = next
         }
+    }
+
+    /// 仅由结束页的轻点或左滑调用，同一次退出只提交一次完成状态。
+    private func finishTutorial() {
+        guard scenePhase == .active, !didFinish else { return }
+        didFinish = true
+        crownFocused = false
+        finish()
     }
 
     private func reclaimCrownFocus() {

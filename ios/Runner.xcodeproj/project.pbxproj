@@ -50,6 +50,7 @@
 		A27B00000000000000000017 /* OverviewScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000007 /* OverviewScheduleView.swift */; };
 		A27B00000000000000000018 /* MonthCalendarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000008 /* MonthCalendarData.swift */; };
 		A27B00000000000000000019 /* WatchOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B00000000000000000009 /* WatchOnboardingView.swift */; };
+		A27C00000000000000000019 /* WatchOnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000009 /* WatchOnboardingFlow.swift */; };
 		A17A0000000000000000001C /* TraintimeWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000002 /* TraintimeWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A17A0000000000000000001D /* RootScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A00000000000000000011 /* RootScheduleView.swift */; };
 		A17A0000000000000000001E /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A0000000000000000001F /* WatchConnectivityManager.swift */; };
@@ -215,6 +216,7 @@
 		A27B00000000000000000007 /* OverviewScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/OverviewScheduleView.swift; sourceTree = "<group>"; };
 		A27B00000000000000000008 /* MonthCalendarData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MonthCalendarData.swift; sourceTree = "<group>"; };
 		A27B00000000000000000009 /* WatchOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WatchOnboardingView.swift; sourceTree = "<group>"; };
+		A27C00000000000000000009 /* WatchOnboardingFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WatchOnboardingFlow.swift; sourceTree = "<group>"; };
 		A17A00000000000000000012 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A17A0000000000000000001F /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
 		A17A00000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -384,6 +386,7 @@
 				A27B00000000000000000005 /* InteractionAwareScrollView.swift */,
 				A27B00000000000000000006 /* WatchInteractionSupport.swift */,
 				A27B00000000000000000009 /* WatchOnboardingView.swift */,
+				A27C00000000000000000009 /* WatchOnboardingFlow.swift */,
 				F41B00000000000000000001 /* WidgetOnboardingView.swift */,
 				F41B00000000000000000002 /* WidgetIntroPage.swift */,
 				F41B00000000000000000003 /* WidgetPreviewView.swift */,
@@ -716,6 +719,7 @@
 				A27B00000000000000000015 /* InteractionAwareScrollView.swift in Sources */,
 				A27B00000000000000000016 /* WatchInteractionSupport.swift in Sources */,
 				A27B00000000000000000019 /* WatchOnboardingView.swift in Sources */,
+				A27C00000000000000000019 /* WatchOnboardingFlow.swift in Sources */,
 				A17A0000000000000000001D /* RootScheduleView.swift in Sources */,
 				B17B00000000000000000014 /* WatchWidgetShared.swift in Sources */,
 				F39F00000000000000000001 /* WatchSchedulePresentation.swift in Sources */,
@@ -826,7 +830,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				CUSTOM_GROUP_ID = group.xyz.superbart.xdyou;
+				CUSTOM_GROUP_ID = group.com.littlestar.traintimepda;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -857,14 +861,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -888,7 +892,7 @@
 				CODE_SIGN_ENTITLEMENTS = ClasstableWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -905,7 +909,7 @@
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.ClasstableWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.ClasstableWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
@@ -932,7 +936,7 @@
 				CODE_SIGN_ENTITLEMENTS = ClasstableWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -948,7 +952,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.ClasstableWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.ClasstableWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -973,7 +977,7 @@
 				CODE_SIGN_ENTITLEMENTS = ClasstableWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -989,7 +993,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.ClasstableWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.ClasstableWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1006,7 +1010,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.benderblog.traintimePda.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1023,7 +1027,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.benderblog.traintimePda.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -1038,7 +1042,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.benderblog.traintimePda.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -1078,7 +1082,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				CUSTOM_GROUP_ID = group.xyz.superbart.xdyou;
+				CUSTOM_GROUP_ID = group.com.littlestar.traintimepda;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1139,7 +1143,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				CUSTOM_GROUP_ID = group.xyz.superbart.xdyou;
+				CUSTOM_GROUP_ID = group.com.littlestar.traintimepda;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1172,14 +1176,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1196,14 +1200,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1221,15 +1225,15 @@
 				CODE_SIGN_ENTITLEMENTS = ../watchOS/TraintimeWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = XDYou;
 				INFOPLIST_KEY_WKApplication = YES;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.littlestar.traintimepda;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -1253,15 +1257,15 @@
 				CODE_SIGN_ENTITLEMENTS = ../watchOS/TraintimeWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = XDYou;
 				INFOPLIST_KEY_WKApplication = YES;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.littlestar.traintimepda;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -1284,15 +1288,15 @@
 				CODE_SIGN_ENTITLEMENTS = ../watchOS/TraintimeWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = XDYou;
 				INFOPLIST_KEY_WKApplication = YES;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = xyz.superbart.xdyou;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.littlestar.traintimepda;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -1313,12 +1317,12 @@
 				CODE_SIGN_ENTITLEMENTS = ../watchOS/Widget/TraintimeWatchWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = ../watchOS/Widget/Info.plist;
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.watchkitapp.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -1341,12 +1345,12 @@
 				CODE_SIGN_ENTITLEMENTS = ../watchOS/Widget/TraintimeWatchWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = ../watchOS/Widget/Info.plist;
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.watchkitapp.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -1368,12 +1372,12 @@
 				CODE_SIGN_ENTITLEMENTS = ../watchOS/Widget/TraintimeWatchWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = YXS6PA6787;
+				DEVELOPMENT_TEAM = RW37L3W23K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = ../watchOS/Widget/Info.plist;
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = xyz.superbart.xdyou.watchkitapp.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.littlestar.traintimepda.watchkitapp.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;

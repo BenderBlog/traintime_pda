@@ -364,22 +364,13 @@ private struct ScheduleWidgetView: View {
     }
 
     @ViewBuilder private var rectangular: some View {
-        if role == .overview
-            && ![.semesterEnded, .signedOut, .noData, .expired].contains(schedule.state)
-        {
-            overviewRectangle
-        } else if let course = schedule.focus {
-            let courseProgress: Double? = role == .name ? nil : schedule.courseProgress
+        if let course = schedule.focus {
+            let courseProgress = schedule.courseProgress
             // 进度条占一行，行间距与外侧留白共同控制组件总高度。
             VStack(alignment: .leading, spacing: courseProgress == nil ? 2 : 4) {
                 HStack(spacing: 3) {
-                    Text(
-                        role == .name
-                            ? nameContext
-                            : (role == .integrated
-                                ? contextTitle + " · " + course.name : contextTitle)
-                    )
-                    .font(.system(size: role == .name ? 10 : 12, weight: .medium))
+                    Text(contextTitle + " · " + course.name)
+                    .font(.system(size: 12, weight: .medium))
                     .lineLimit(1).minimumScaleFactor(0.8)
                     Spacer(minLength: 0)
                     if switchableCurrentCourse != nil {
@@ -390,24 +381,15 @@ private struct ScheduleWidgetView: View {
                     }
                 }
                 .foregroundStyle(color)
-                if role == .name {
-                    Label(course.name, systemImage: course.kindSystemImage)
-                        .font(.system(size: 16, weight: .semibold)).lineLimit(2).minimumScaleFactor(
-                            0.8)
-                    if let kind = course.kindTitle {
-                        Text(kind).font(.caption2).foregroundStyle(.secondary)
-                    }
-                } else {
-                    ScheduleTime(schedule: schedule)
-                    if let progress = courseProgress {
-                        ScheduleProgress(progress: progress, color: color)
-                    }
-                    Label(schedule.locationSummary, systemImage: "mappin")
-                        .font(WatchWidgetDesignTokens.rectangularInfo).lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .truncationMode(.tail)
-                        .foregroundStyle(.primary)
+                ScheduleTime(schedule: schedule)
+                if let progress = courseProgress {
+                    ScheduleProgress(progress: progress, color: color)
                 }
+                Label(schedule.locationSummary, systemImage: "mappin")
+                    .font(WatchWidgetDesignTokens.rectangularInfo).lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .truncationMode(.tail)
+                    .foregroundStyle(.primary)
             }
             .overlay(alignment: .topTrailing) {
                 if let current = switchableCurrentCourse {
@@ -417,7 +399,8 @@ private struct ScheduleWidgetView: View {
                         Image(systemName: schedule.isPreview ? "arrow.uturn.backward" : "arrow.right")
                             .font(.system(size: 11, weight: .semibold))
                             .frame(width: 20, height: 16)
-                            .frame(width: 40, height: 32, alignment: .topTrailing)
+                            // 扩大实际按钮边界，图标保持原位，不改变卡片文字布局。
+                            .frame(width: 56, height: 44, alignment: .topTrailing)
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
@@ -523,56 +506,6 @@ private struct ScheduleWidgetView: View {
             circularStatus(symbol: schedule.emptySymbol, title: summaryText)
         }
     }
-    private var overviewRectangle: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(watchLocalizedString("今日"))
-                Spacer(minLength: 0)
-                Text(schedule.weekIsComplete ? weekLabel : watchLocalizedString("本周日程待同步"))
-                    .minimumScaleFactor(0.85)
-            }
-            .font(.system(size: 10, weight: .medium))
-            .foregroundStyle(.secondary)
-
-            Text(summaryIsAvailable && summaryRemaining > 0
-                ? watchLocalizedFormat("还剩 %d 项", summaryRemaining)
-                : summaryText)
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                .minimumScaleFactor(0.85)
-                .widgetAccentable()
-
-            if summaryIsAvailable {
-                if summaryRemaining > 0,
-                    let lastEnd = schedule.summaryCourses.map(\.endAt).max()
-                {
-                    Text(watchLocalizedFormat("%@ 全部结束",
-                        schedule.compactDateTimeText(for: lastEnd)))
-                        .font(.system(size: 11, weight: .medium))
-                } else if let next = schedule.focus, next.startAt > schedule.date {
-                    Text(watchLocalizedFormat("下一次 %@",
-                        schedule.compactDateTimeText(for: next.startAt)))
-                        .font(.system(size: 11, weight: .medium))
-                } else if [.unconfirmed, .todayFree, .todayFinished].contains(schedule.state) {
-                    Text(watchLocalizedString("后续课表待同步"))
-                        .font(.system(size: 11))
-                }
-            } else {
-                Text(watchLocalizedString("打开手机更新课表"))
-                    .font(.system(size: 11)).foregroundStyle(.secondary)
-            }
-        }
-        .lineLimit(1)
-        .padding(.horizontal, 2)
-        .padding(.vertical, 3)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    private var weekLabel: String {
-        let currentWeek = schedule.calendar.dateInterval(of: .weekOfYear, for: schedule.date)!
-        let label =
-            currentWeek.start == schedule.weekInterval.start
-            ? watchLocalizedString("本周") : schedule.dayLabel(for: schedule.weekInterval.start)
-        return watchLocalizedFormat("%@ %d 项", label, schedule.weekCourses.count)
-    }
 }
 
 private struct ScheduleConfiguration {
@@ -586,9 +519,10 @@ private struct ScheduleConfiguration {
         }
         .configurationDisplayName(name)
         .description(summary)
+        // 长方形只保留综合课表，其余用途仍可用于紧凑的表盘位置。
         .supportedFamilies(role == .integrated
             ? [.accessoryInline, .accessoryCircular, .accessoryCorner, .accessoryRectangular]
-            : [.accessoryInline, .accessoryCircular, .accessoryRectangular])
+            : [.accessoryInline, .accessoryCircular])
     }
 }
 

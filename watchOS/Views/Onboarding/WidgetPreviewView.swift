@@ -7,22 +7,57 @@ import SwiftUI
 enum WidgetPreviewState: Int, CaseIterable {
     case ongoing
     case tomorrow
+    case nextClass
 
-    var time: String { self == .ongoing ? "21:15" : "08:30" }
-    var startTime: String { self == .ongoing ? "20:00" : "08:30" }
-    var endTime: String { self == .ongoing ? "21:15" : "10:05" }
-    var location: String { self == .ongoing ? "B-312" : "B-442" }
-    var teacher: String { self == .ongoing ? "宋浩" : "苏玉龙" }
+    var time: String { self == .ongoing ? endTime : startTime }
+    var startTime: String {
+        switch self {
+        case .ongoing: "20:00"
+        case .tomorrow: "08:30"
+        case .nextClass: "10:25"
+        }
+    }
+    var endTime: String {
+        switch self {
+        case .ongoing: "21:15"
+        case .tomorrow: "10:05"
+        case .nextClass: "12:00"
+        }
+    }
+    var location: String {
+        switch self {
+        case .ongoing: "B-312"
+        case .tomorrow: "B-442"
+        case .nextClass: "A-602"
+        }
+    }
+    var teacher: String {
+        switch self {
+        case .ongoing: "宋浩"
+        case .tomorrow: "苏玉龙"
+        case .nextClass: "相萌，董雪"
+        }
+    }
     var courseName: String {
-        watchLocalizedString(self == .ongoing ? "高等数学" : "工程概论 (IV)")
+        switch self {
+        case .ongoing: watchLocalizedString("高等数学")
+        case .tomorrow: watchLocalizedString("工程概论 (IV)")
+        case .nextClass: watchLocalizedString("光电成像原理")
+        }
     }
     var title: String {
-        watchLocalizedString(self == .ongoing ? "正在上课" : "今日已下课")
+        switch self {
+        case .ongoing: watchLocalizedString("正在上课")
+        case .tomorrow: watchLocalizedString("今日已下课")
+        case .nextClass: watchLocalizedString("下一节课")
+        }
     }
     var heading: String {
-        self == .ongoing
-            ? watchLocalizedString("下课")
-            : watchLocalizedFormat("明天%@", watchLocalizedString("上课"))
+        switch self {
+        case .ongoing: watchLocalizedString("下课")
+        case .tomorrow: watchLocalizedFormat("明天%@", watchLocalizedString("上课"))
+        case .nextClass: watchLocalizedString("上课")
+        }
     }
     var accessibilitySummary: String {
         [heading, time, location].joined(separator: "，")
@@ -72,23 +107,24 @@ enum WidgetPreviewFamily: Int, CaseIterable, Identifiable {
     var examples: [WidgetTutorialImage] {
         switch self {
         case .circular:
-            [.circularScheduleOngoing, .circularScheduleTomorrow,
+            [.circularScheduleNext, .circularNameNext,
+             .circularScheduleOngoing, .circularScheduleTomorrow,
              .circularNameOngoing, .circularNameTomorrow,
              .circularTimeOngoing, .circularTimeTomorrow,
              .circularOverviewOngoing, .circularOverviewTomorrow]
         case .corner:
             [.cornerScheduleOngoing]
         case .rectangular:
-            [.rectangularScheduleOngoing, .rectangularScheduleTomorrow,
-             .rectangularNameOngoing, .rectangularNameTomorrow,
-             .rectangularTimeOngoing, .rectangularOverviewOngoing,
-             .rectangularOverviewTomorrow]
+            [.rectangularScheduleNext, .rectangularScheduleOngoing, .rectangularScheduleTomorrow]
         }
     }
 }
 
 /// 资源名集中管理。保留截图原色，避免图片随教程按钮的强调色被重新着色。
 enum WidgetTutorialImage: String {
+    case circularScheduleNext = "WidgetGuideCircularScheduleNext"
+    case circularNameNext = "WidgetGuideCircularNameNext"
+    case rectangularScheduleNext = "WidgetGuideRectangularScheduleNext"
     case circularScheduleOngoing = "WidgetGuideCircularScheduleOngoing"
     case circularScheduleTomorrow = "WidgetGuideCircularScheduleTomorrow"
     case circularNameOngoing = "WidgetGuideCircularNameOngoing"
@@ -99,41 +135,32 @@ enum WidgetTutorialImage: String {
     case circularOverviewTomorrow = "WidgetGuideCircularOverviewTomorrow"
     case rectangularScheduleOngoing = "WidgetGuideRectangularScheduleOngoing"
     case rectangularScheduleTomorrow = "WidgetGuideRectangularScheduleTomorrow"
-    case rectangularNameOngoing = "WidgetGuideRectangularNameOngoing"
-    case rectangularNameTomorrow = "WidgetGuideRectangularNameTomorrow"
-    case rectangularTimeOngoing = "WidgetGuideRectangularTimeOngoing"
-    case rectangularOverviewOngoing = "WidgetGuideRectangularOverviewOngoing"
-    case rectangularOverviewTomorrow = "WidgetGuideRectangularOverviewTomorrow"
     case cornerScheduleOngoing = "WidgetGuideCornerScheduleOngoing"
     case faceCircularOngoing = "WidgetGuideFaceCircularOngoing"
     case faceRectangularOngoing = "WidgetGuideFaceRectangularOngoing"
 
     var state: WidgetPreviewState {
         switch self {
+        case .circularScheduleNext, .circularNameNext, .rectangularScheduleNext: .nextClass
         case .circularScheduleTomorrow, .circularNameTomorrow,
              .circularTimeTomorrow, .circularOverviewTomorrow,
-             .rectangularScheduleTomorrow, .rectangularNameTomorrow,
-             .rectangularOverviewTomorrow: .tomorrow
+             .rectangularScheduleTomorrow: .tomorrow
         default: .ongoing
         }
     }
     var family: WidgetPreviewFamily {
         switch self {
         case .cornerScheduleOngoing: .corner
-        case .rectangularScheduleOngoing, .rectangularScheduleTomorrow,
-             .rectangularNameOngoing, .rectangularNameTomorrow,
-             .rectangularTimeOngoing, .rectangularOverviewOngoing,
-             .rectangularOverviewTomorrow, .faceRectangularOngoing: .rectangular
+        case .rectangularScheduleNext, .rectangularScheduleOngoing, .rectangularScheduleTomorrow,
+             .faceRectangularOngoing: .rectangular
         default: .circular
         }
     }
     var role: WidgetPreviewRole {
         switch self {
-        case .circularNameOngoing, .circularNameTomorrow,
-             .rectangularNameOngoing, .rectangularNameTomorrow: .name
-        case .circularTimeOngoing, .circularTimeTomorrow, .rectangularTimeOngoing: .timeAndPlace
-        case .circularOverviewOngoing, .circularOverviewTomorrow,
-             .rectangularOverviewOngoing, .rectangularOverviewTomorrow: .overview
+        case .circularNameNext, .circularNameOngoing, .circularNameTomorrow: .name
+        case .circularTimeOngoing, .circularTimeTomorrow: .timeAndPlace
+        case .circularOverviewOngoing, .circularOverviewTomorrow: .overview
         default: .combined
         }
     }
@@ -168,14 +195,8 @@ enum WidgetTutorialImage: String {
         case .overview:
             if state == .ongoing {
                 details.append(watchLocalizedFormat("今日还剩 %lld 项", Int64(1)))
-                if family == .rectangular {
-                    details.append(watchLocalizedFormat("%@ 全部结束", state.endTime))
-                }
             } else {
                 details.append(watchLocalizedFormat("明天%@", state.time))
-            }
-            if family == .rectangular {
-                details.append(watchLocalizedFormat("%@ %d 项", watchLocalizedString("本周"), 6))
             }
         case .combined, .timeAndPlace:
             if role == .combined { details.append(state.courseName) }
@@ -205,7 +226,7 @@ struct WidgetScreenshotPreview: View {
     }
 }
 
-/// 所有独立组件共用长方形画布，等高缩放并保留原图比例。
+/// 各种形态的组件截图共用长方形画布，等高缩放并保留原图比例。
 struct WidgetTutorialCardPreview: View {
     let image: WidgetTutorialImage
 
@@ -240,29 +261,5 @@ struct WidgetPreviewStage<Content: View>: View {
                 .scaleEffect(scale)
                 .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
         }
-    }
-}
-
-/// 只组合 XDYou 的真实组件截图；外框和操作提示仍由教程绘制。
-struct WidgetFacePreview: View {
-    let state: WidgetPreviewState
-
-    var body: some View {
-        VStack(spacing: 6) {
-            HStack {
-                WidgetScreenshotPreview(image: state == .ongoing ? .faceCircularOngoing : .circularScheduleTomorrow)
-                    .frame(width: 46, height: 46)
-                Spacer(minLength: 4)
-                WidgetScreenshotPreview(image: state == .ongoing ? .circularOverviewOngoing : .circularOverviewTomorrow)
-                    .frame(width: 46, height: 46)
-            }
-            WidgetScreenshotPreview(image: state == .ongoing ? .faceRectangularOngoing : .rectangularScheduleTomorrow)
-                .frame(width: 146, height: 62)
-        }
-        .padding(9)
-        .frame(width: 164, height: 134)
-        .background(.black, in: RoundedRectangle(cornerRadius: 22))
-        .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(.white.opacity(0.22), lineWidth: 1))
-        .accessibilityElement(children: .combine)
     }
 }

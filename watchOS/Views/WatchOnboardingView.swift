@@ -16,8 +16,7 @@ extension EnvironmentValues {
 
 /// 新手引导统一采用接近 watchOS 系统控件的短促响应节奏。
 ///
-/// 动画参数集中在这里，避免各页面分别累积固定等待时间。结果绘制允许圆环和
-/// 标记轻微重叠，输入完成后能立即得到反馈，而不需要等待上一段完全结束。
+/// 动画参数集中在这里；任务内直接更新提示，任务结束只短暂显示小图标。
 enum WatchOnboardingMotion {
     static let prompt = Animation.easeOut(duration: 0.24)
     // 用户开始真实操作后以淡出结束说明，避免低功耗显示下的单帧跳变。
@@ -40,26 +39,10 @@ enum WatchOnboardingMotion {
         dampingFraction: 0.90
     )
     static let welcomePrompt = Animation.easeOut(duration: 0.32)
-    static let ring = Animation.easeOut(duration: 0.46)
-    static let result = Animation.spring(
-        response: 0.38,
-        dampingFraction: 0.78
-    )
     static let operationHint = Animation.easeInOut(duration: 0.88)
-    /// 五个功能分段之间使用纯黑过场，淡入淡出比普通步骤稍慢，给用户
-    /// 留出明确的“开始介绍下一视图”节奏，同时不会拖慢后续实操。
-    static let sectionIntro = Animation.easeInOut(duration: 0.34)
+    static let successVisibleDuration: TimeInterval = 0.36
+    static let errorVisibleDuration: TimeInterval = 0.65
 
-    static let resultOverlapDelayNanoseconds: UInt64 = 300_000_000
-    static let sectionIntroFadeNanoseconds: UInt64 = 340_000_000
-    static let successVisibleDuration: TimeInterval = 0.95
-    static let holdSuccessVisibleDuration: TimeInterval = 0.55
-    /// 概览目录操作先留出观察窗口，再以纯黑成功反馈衔接课程列表章节。
-    static let overviewExitTapResultDelay: TimeInterval = 0.18
-    static let overviewExitSuccessVisibleDuration: TimeInterval = 0.62
-    static let errorVisibleDuration: TimeInterval = 1.35
-    /// 点击完成后先让真实页面变化短暂可见，再覆盖正确结果。
-    static let tapResultDelay: TimeInterval = 0.35
 }
 
 /// 新手引导遮罩的公共几何参数。
@@ -83,87 +66,11 @@ private enum WatchOnboardingOverlayLayout {
     static let nextPageCueXRatio: CGFloat = 0.626
 }
 
-/// 五个顶层视图对应的教学分段。
-///
-/// 分段页只是实操之间的视觉过场，不占用教学步骤，也不改变进度。
-/// 标题直接复用视图目录的本地化名称，避免目录与引导出现两套译文。
-enum WatchOnboardingSection: Equatable {
-    case overview
-    case courseList
-    case day
-    case week
-    case month
-
-    var mode: WatchCalendarMode {
-        switch self {
-        case .overview: .overview
-        case .courseList: .courseList
-        case .day: .day
-        case .week: .week
-        case .month: .month
-        }
-    }
-
-    var title: String {
-        mode.title
-    }
-
-    /// 五个真实视图依次占第 1...5 阶段；欢迎页不参与章节进度。
-    var progressStage: Int {
-        switch self {
-        case .overview: 1
-        case .courseList: 2
-        case .day: 3
-        case .week: 4
-        case .month: 5
-        }
-    }
-
-    /// 只在每个视图的第一项教学前插入分段页。
-    static func starting(at step: WatchOnboardingStep) -> Self? {
-        switch step {
-        case .overviewSwipe:
-            .overview
-        case .courseListSwipe:
-            .courseList
-        case .dayBrowseSwipe:
-            .day
-        case .weekPagingArrow:
-            .week
-        case .monthPagingArrow:
-            .month
-        default:
-            nil
-        }
-    }
-}
-
-/// 课程列表章节开始前的底层渲染准备状态。
-///
-/// 状态只显示在纯黑章节页上，不会叠在正在进行的操作教学之上。
-enum WatchOnboardingPreparationState: Equatable {
-    case ready
-    case loading
-    case completed
-}
-
 /// 引导点击位置的语义名称。
 ///
 /// 位置以真实页面的稳定布局为基准计算，而不是把说明文字本身做成按钮。
 /// 用户因此会在刷新、模式、日期标题、箭头或详情关闭按钮的实际位置完成操作。
-enum WatchOnboardingTapTarget: Equatable {
-    case anywhere
-    case refresh
-    case mode
-    case content
-    case headerPrevious
-    case headerNext
-    case headerTitle
-    case calendarDate
-    case weekCourse
-    case detailClose
-    case monthTitle
-
+extension WatchOnboardingTapTarget {
     /// 目标中心点。所有值只服务于旁路位置验证，不改变底层页面布局。
     func point(
         in size: CGSize,
@@ -326,249 +233,62 @@ struct WatchOnboardingFrameReader: View {
     }
 }
 
-/// 引导可以自动识别的原子操作。
-///
-/// 每一步只匹配一个原子操作。产生相同页面效果的箭头、滑动和表冠被拆成相邻
-/// 步骤，让初次使用者分别实际操作一次。
-enum WatchOnboardingOperation: Equatable {
-    case tap(WatchOnboardingTapTarget)
-    case longPress(WatchOnboardingTapTarget)
-    case verticalSwipe
-    case horizontalSwipe
-    case crown
-    /// 日视图连续旋转表冠并真正跨过一个日期页面。
-    case crownPage
-}
-
-/// 交互式新手引导的顺序状态机。
-///
-/// 顺序严格跟随模式目录：概览、课程列表、日视图、周视图、月视图。日视图
-/// 的基础操作结束后会提前进入一次日期选择器，完整演示打开、选中和返回。
-enum WatchOnboardingStep: Int, CaseIterable, Identifiable {
-    case welcome
-    case overviewSwipe
-    case overviewCrown
-    case overviewControlsHide
-    case overviewControlsShow
-    case overviewRefresh
-    case overviewSwitcherTap
-    case courseListSwipe
-    case courseListCrown
-    case dayBrowseSwipe
-    case dayBrowseCrown
-    case dayPagingArrow
-    case dayPagingNext
-    case dayPagingSwipe
-    case dayPagingCrown
-    case dayDatePickerOpen
-    case dayDatePickerSelect
-    case weekPagingArrow
-    case weekPagingNext
-    case weekPagingSwipe
-    case weekPagingCrown
-    case weekCourse
-    case courseDetailClose
-    case monthPagingArrow
-    case monthPagingNext
-    case monthPagingSwipe
-    case monthPagingCrown
-    case monthSelect
-    case monthExit
-    /// 实操最后一项练习再次进入引导的长按，成功后衔接组件指南。
-    case overviewSwitcherHold
-
-    var id: Int { rawValue }
-
-    var requiredMode: WatchCalendarMode {
-        switch self {
-        case .welcome, .overviewSwipe, .overviewCrown, .overviewRefresh,
-             .overviewControlsHide, .overviewControlsShow,
-             .overviewSwitcherTap, .overviewSwitcherHold:
-            .overview
-        case .courseListSwipe, .courseListCrown:
-            .courseList
-        case .dayBrowseSwipe, .dayBrowseCrown,
-             .dayPagingArrow, .dayPagingNext,
-             .dayPagingSwipe, .dayPagingCrown,
-             .dayDatePickerOpen, .dayDatePickerSelect:
-            .day
-        case .weekPagingArrow, .weekPagingNext,
-             .weekPagingSwipe, .weekPagingCrown,
-             .weekCourse, .courseDetailClose:
-            .week
-        case .monthPagingArrow, .monthPagingNext,
-             .monthPagingSwipe, .monthPagingCrown,
-             .monthSelect, .monthExit:
-            .month
-        }
-    }
-
-    /// 日期选择步骤需要根视图提前挂载独立月历层。
-    var presentsDayDatePicker: Bool {
-        self == .dayDatePickerSelect
-    }
-
-    /// 这两步需要让按钮真正随点击隐藏或显示，根视图不能强制覆盖状态。
-    var teachesControlVisibility: Bool {
-        self == .overviewControlsHide || self == .overviewControlsShow
-    }
-
+/// 文案与视觉保留在 SwiftUI 层；顺序和完成规则由纯状态模型共享。
+extension WatchOnboardingStep {
     var title: String {
+        let action: String
         switch self {
-        case .welcome:
-            watchLocalizedString("欢迎使用 XDYou")
-        case .overviewSwipe, .overviewCrown:
-            onboardingTitle(.overview, action: "浏览课程")
+        case .welcome: return watchLocalizedString("欢迎使用 XDYou")
+        case .overviewSwipe: action = watchLocalizedString("滑动浏览")
+        case .overviewCrown: action = watchLocalizedString("表冠浏览")
+        case .courseListBrowse: action = watchLocalizedString("浏览课程")
         case .overviewControlsHide, .overviewControlsShow:
-            onboardingTitle(.overview, action: "悬浮按钮")
-        case .overviewRefresh:
-            onboardingTitle(.overview, action: "刷新课表")
-        case .overviewSwitcherTap:
-            onboardingTitle(.overview, action: "切换视图")
-        case .overviewSwitcherHold:
-            onboardingTitle(.overview, action: "重新打开引导")
-        case .courseListSwipe, .courseListCrown:
-            onboardingTitle(.courseList, action: "浏览课程")
-        case .dayBrowseSwipe, .dayBrowseCrown:
-            onboardingTitle(.day, action: "浏览课程")
-        case .dayPagingArrow, .dayPagingNext,
-             .dayPagingSwipe, .dayPagingCrown:
-            onboardingTitle(.day, action: "翻页")
-        case .dayDatePickerOpen:
-            onboardingTitle(.day, action: "打开日期选择器")
+            action = watchLocalizedString("悬浮按钮")
+        case .overviewRefresh: action = watchLocalizedString("刷新课表")
+        case .courseListOpen, .courseListSelect, .dayOpen, .daySelect,
+             .weekOpen, .weekSelect, .monthOpen, .monthChoose:
+            return watchLocalizedFormat("切换到%@", destinationMode!.title)
+        case .dayPaging, .weekPaging, .monthPaging: action = watchLocalizedString("翻页")
+        case .dayPagingCrown: action = watchLocalizedString("表冠跨日")
+        case .weekCourse, .courseDetailClose: action = watchLocalizedString("查看课程")
+        case .monthSelect: action = watchLocalizedString("选择日期")
+        case .dayDatePickerOpen: action = watchLocalizedString("打开日期选择器")
         case .dayDatePickerSelect:
-            onboardingTitleText("日期选择器", action: "选择日期")
-        case .weekPagingArrow, .weekPagingNext,
-             .weekPagingSwipe, .weekPagingCrown:
-            onboardingTitle(.week, action: "翻页")
-        case .weekCourse:
-            onboardingTitle(.week, action: "查看课程")
-        case .courseDetailClose:
-            onboardingTitleText("课程详情", action: "关闭详情")
-        case .monthPagingArrow, .monthPagingNext,
-             .monthPagingSwipe, .monthPagingCrown:
-            onboardingTitle(.month, action: "翻页")
-        case .monthSelect:
-            onboardingTitle(.month, action: "选择日期")
-        case .monthExit:
-            onboardingTitle(.month, action: "退出")
+            return watchLocalizedFormat("切换到%@", WatchCalendarMode.day.title)
+        case .restartHold: action = watchLocalizedString("重新打开引导")
         }
+        return "\(requiredMode.title)·\(action)"
     }
 
-    /// 面向第一次使用者的说明只描述当前要执行的动作。
-    ///
-    /// 页面名称由上方标题给出，目标位置由动画指出，因此这里不重复解释实现
-    /// 方式、同步阶段或页面定义，避免小屏幕上的说明超过必要长度。
     var message: String {
         switch self {
-        case .welcome:
-            watchLocalizedString("轻点屏幕以开始")
-        case .overviewSwipe:
-            watchLocalizedString("用手指上下滑动屏幕，以浏览当前课程和下一节课程。")
-        case .courseListSwipe, .dayBrowseSwipe:
-            watchLocalizedString("用手指上下滑动屏幕，以浏览当前页面中的课程。")
-        case .overviewCrown:
-            watchLocalizedString("旋转数码表冠，以浏览当前课程和下一节课程。")
-        case .courseListCrown, .dayBrowseCrown:
-            watchLocalizedString("旋转数码表冠，以浏览当前页面中的课程。")
-        case .overviewControlsHide:
-            watchLocalizedString("用手指轻点页面空白处，以隐藏右侧操作按钮。")
-        case .overviewControlsShow:
-            watchLocalizedString("用手指再次轻点页面空白处，以显示右侧操作按钮。")
-        case .overviewRefresh:
-            watchLocalizedString("用手指轻点刷新按钮，以从 iPhone 更新课表。")
-        case .overviewSwitcherTap:
-            watchLocalizedString("用手指轻点右下角切换按钮，以打开视图目录。")
-        case .overviewSwitcherHold:
-            watchLocalizedString("按住右下角切换按钮三秒，感受逐渐增强的震动。")
-        case .dayPagingArrow, .weekPagingArrow, .monthPagingArrow:
-            watchLocalizedString("用手指轻点左侧箭头，以切换到上一页。")
-        case .dayPagingNext, .weekPagingNext, .monthPagingNext:
-            watchLocalizedString("用手指轻点右侧箭头，以切换到下一页。")
-        case .dayPagingSwipe:
-            watchLocalizedString("用手指左右滑动屏幕，以切换前后日期。")
-        case .weekPagingSwipe:
-            watchLocalizedString("用手指左右滑动屏幕，以切换前后周。")
-        case .monthPagingSwipe:
-            watchLocalizedString("用手指左右滑动屏幕，以切换前后月份。")
-        case .dayPagingCrown:
-            watchLocalizedString("连续旋转数码表冠并越过课程边界，以连续切换日期。")
-        case .dayDatePickerOpen:
-            watchLocalizedString("用手指轻点顶部日期标题，以打开日期选择器。")
-        case .dayDatePickerSelect:
-            watchLocalizedString("用手指轻点一个日期，以切换到该日期的日视图。")
-        case .weekPagingCrown:
-            watchLocalizedString("旋转数码表冠，以连续切换前后周。")
-        case .monthPagingCrown:
-            watchLocalizedString("旋转数码表冠，以连续切换前后月份。")
-        case .weekCourse:
-            watchLocalizedString("用手指轻点高亮的课程色块，以打开课程详情。")
-        case .courseDetailClose:
-            watchLocalizedString("用手指轻点关闭按钮，以返回周视图。")
-        case .monthSelect:
-            watchLocalizedString("用手指轻点一个日期，以打开该日期的日视图。")
-        case .monthExit:
-            watchLocalizedString("用手指轻点顶部月份标题，以退出月视图。")
-        }
-    }
-
-    /// 使用目录中的本地化视图名拼出统一的“视图·任务”教学标题。
-    private func onboardingTitle(
-        _ mode: WatchCalendarMode,
-        action: String
-    ) -> String {
-        "\(mode.title)·\(watchLocalizedString(action))"
-    }
-
-    /// 非目录页面（日期选择器、课程详情）使用相同标题格式。
-    private func onboardingTitleText(
-        _ page: String,
-        action: String
-    ) -> String {
-        "\(watchLocalizedString(page))·\(watchLocalizedString(action))"
-    }
-
-    /// 每个教学步骤只验证一个动作；步骤推进后再配置下一项。
-    var operation: WatchOnboardingOperation {
-        switch self {
-        case .welcome:
-            .tap(.anywhere)
-        case .overviewSwipe, .courseListSwipe, .dayBrowseSwipe:
-            .verticalSwipe
-        case .overviewCrown, .courseListCrown, .dayBrowseCrown,
-             .weekPagingCrown, .monthPagingCrown:
-            .crown
-        case .overviewControlsHide, .overviewControlsShow:
-            .tap(.content)
-        case .overviewRefresh:
-            .tap(.refresh)
-        case .overviewSwitcherTap:
-            .tap(.mode)
-        case .overviewSwitcherHold:
-            .longPress(.mode)
-        case .dayPagingArrow, .weekPagingArrow, .monthPagingArrow:
-            .tap(.headerPrevious)
-        case .dayPagingNext, .weekPagingNext, .monthPagingNext:
-            .tap(.headerNext)
-        case .dayPagingSwipe, .weekPagingSwipe, .monthPagingSwipe:
-            .horizontalSwipe
-        case .dayPagingCrown:
-            .crownPage
-        case .dayDatePickerOpen:
-            .tap(.headerTitle)
-        case .dayDatePickerSelect, .monthSelect:
-            .tap(.calendarDate)
-        case .weekCourse:
-            .tap(.weekCourse)
-        case .courseDetailClose:
-            .tap(.detailClose)
-        case .monthExit:
-            .tap(.monthTitle)
+        case .welcome: watchLocalizedString("轻点屏幕以开始")
+        case .overviewSwipe: watchLocalizedString("上下滑动，浏览当前和下一节课程。")
+        case .overviewCrown: watchLocalizedString("旋转数码表冠，也能浏览课程。")
+        case .overviewControlsHide: watchLocalizedString("轻点空白处，隐藏右侧按钮。")
+        case .overviewControlsShow: watchLocalizedString("再点一次空白处，显示按钮。")
+        case .overviewRefresh: watchLocalizedString("轻点刷新，从 iPhone 更新课表。")
+        case .courseListOpen: watchLocalizedString("点右下角，切换到课程列表。")
+        case .courseListBrowse: watchLocalizedString("上下滑动或转动表冠，浏览整学期课程。")
+        case .dayOpen: watchLocalizedString("点右下角，切换到日视图。")
+        case .weekOpen: watchLocalizedString("点右下角，切换到周视图。")
+        case .monthOpen: watchLocalizedString("点右下角，切换到月视图。")
+        case .courseListSelect, .daySelect, .weekSelect, .monthChoose:
+            watchLocalizedFormat("在目录中选择“%@”。", destinationMode!.title)
+        case .dayPaging: watchLocalizedString("左右滑动或点箭头，切换日期。")
+        case .dayPagingCrown: watchLocalizedString("继续转动表冠，滚过课程边界，进入另一天。")
+        case .weekPaging: watchLocalizedString("滑动、箭头或表冠，任选一种翻周。")
+        case .weekCourse: watchLocalizedString("轻点课程色块，查看详情。")
+        case .courseDetailClose: watchLocalizedString("可滚动查看详情，读完后点关闭。")
+        case .monthPaging: watchLocalizedString("滑动、箭头或表冠，任选一种翻月。")
+        case .monthSelect, .dayDatePickerSelect: watchLocalizedString("轻点一个日期，返回日视图查看当天课程。")
+        case .dayDatePickerOpen: watchLocalizedString("在日视图轻点顶部日期，打开月历。")
+        case .restartHold: watchLocalizedString("长按右下角按钮 3 秒，可再次进入教程。现在试一试。")
         }
     }
 }
 
-/// 成功或错误时才会短暂出现在表盘中央的结果状态。
+/// 任务结果以紧凑图标显示，不遮挡真实页面。
 enum WatchOnboardingFeedback: Equatable {
     case success
     case error
@@ -586,10 +306,6 @@ final class WatchOnboardingInputBridge: ObservableObject {
     private var step: WatchOnboardingStep?
     private var isEvaluating = false
     private var feedbackTask: Task<Void, Never>?
-    private var operationAccepted: ((
-        WatchOnboardingStep,
-        WatchOnboardingOperation
-    ) -> Void)?
     private var operationRejected: ((
         WatchOnboardingStep,
         WatchOnboardingOperation
@@ -603,10 +319,6 @@ final class WatchOnboardingInputBridge: ObservableObject {
     /// 切换步骤前取消上一轮反馈；回调始终绑定当前这次教学配置。
     func configure(
         step: WatchOnboardingStep,
-        operationAccepted: @escaping (
-            WatchOnboardingStep,
-            WatchOnboardingOperation
-        ) -> Void,
         operationRejected: @escaping (
             WatchOnboardingStep,
             WatchOnboardingOperation
@@ -615,7 +327,6 @@ final class WatchOnboardingInputBridge: ObservableObject {
     ) {
         cancelFeedbackTask()
         self.step = step
-        self.operationAccepted = operationAccepted
         self.operationRejected = operationRejected
         self.advance = advance
         isEvaluating = false
@@ -627,7 +338,6 @@ final class WatchOnboardingInputBridge: ObservableObject {
     func clear() {
         cancelFeedbackTask()
         step = nil
-        operationAccepted = nil
         operationRejected = nil
         advance = nil
         isEvaluating = false
@@ -660,7 +370,7 @@ final class WatchOnboardingInputBridge: ObservableObject {
         presentPrompt()
     }
 
-    /// 操作类型及语义目标都必须匹配；点击还需通过实际命中坐标校验。
+    /// 验证完整任务的结果；任务内连续动作直接推进提示。
     func observe(
         _ operation: WatchOnboardingOperation,
         at location: CGPoint? = nil,
@@ -669,77 +379,44 @@ final class WatchOnboardingInputBridge: ObservableObject {
     ) {
         guard let step, !isEvaluating
         else { return }
-        let expectedOperation = step.operation
-
         beginOperation()
-
-        guard expectedOperation == operation,
-              tapLocationMatches(
-                  expected: expectedOperation,
-                  location: location,
-                  controlCenters: controlCenters,
-                  size: size
-              )
-        else {
-            operationRejected?(step, operation)
+        guard step.accepts(operation) else {
+            if step.ignores(operation) {
+                // 等真实翻页动画或滚动结束后再恢复提示，避免输入刚开始就闪回。
+                cancelFeedbackTask()
+                feedbackTask = makeWatchAutoDismissTask(after: 0.65) { [weak self] in
+                    guard let self, self.step == step else { return }
+                    self.restorePromptAfterIncompleteOperation()
+                }
+            } else {
+                operationRejected?(step, operation)
+                showError()
+            }
+            return
+        }
+        guard tapLocationMatches(
+            expected: operation, location: location,
+            controlCenters: controlCenters, size: size
+        ) else {
             showError()
             return
         }
 
         isEvaluating = true
         showsPrompt = false
-
-        // 点击会直接改变真实页面（打开目录、翻页、进入详情等）。若立即
-        // 黑屏显示对号，用户看不到刚完成的变化；短暂留出透明观察窗口后
-        // 再确认成功。滑动和表冠没有这段额外等待，保持即时反馈。
-        if expectedOperation.isTapInteraction {
-            let delay = step == .overviewSwitcherTap
-                ? WatchOnboardingMotion.overviewExitTapResultDelay
-                : WatchOnboardingMotion.tapResultDelay
-            cancelFeedbackTask()
-            feedbackTask = makeWatchAutoDismissTask(
-                after: delay
-            ) { [weak self] in
-                guard let self,
-                      self.step == step,
-                      self.isEvaluating
-                else { return }
-                self.showSuccess(
-                    step: step,
-                    operation: expectedOperation
-                )
-            }
+        guard step.completesTask else {
+            advance?()
             return
         }
-
-        showSuccess(step: step, operation: expectedOperation)
-    }
-
-    /// 正确结果的绘制、触觉、业务收尾和自动推进统一从这里执行。
-    private func showSuccess(
-        step: WatchOnboardingStep,
-        operation: WatchOnboardingOperation
-    ) {
         withAnimation(WatchOnboardingMotion.feedback) {
             feedback = .success
         }
         WatchHaptics.onboardingSuccess()
-        operationAccepted?(step, operation)
-
         cancelFeedbackTask()
-        let visibleDuration: TimeInterval
-        switch step {
-        case .overviewSwitcherTap:
-            visibleDuration = WatchOnboardingMotion.overviewExitSuccessVisibleDuration
-        case .overviewSwitcherHold:
-            visibleDuration = WatchOnboardingMotion.holdSuccessVisibleDuration
-        default:
-            visibleDuration = WatchOnboardingMotion.successVisibleDuration
-        }
         feedbackTask = makeWatchAutoDismissTask(
-            after: visibleDuration
+            after: WatchOnboardingMotion.successVisibleDuration
         ) { [weak self] in
-            guard let self else { return }
+            guard let self, self.step == step else { return }
             withAnimation(WatchOnboardingMotion.feedbackDismiss) {
                 self.feedback = nil
             }
@@ -749,7 +426,7 @@ final class WatchOnboardingInputBridge: ObservableObject {
 
     private func showError() {
         isEvaluating = true
-        // 错误反馈只叠加白色错号；教学提示和动作示意在下层持续可见。
+        // 保留提示与真实页面，用户可在短反馈后直接继续。
         withAnimation(WatchOnboardingMotion.feedback) {
             showsPrompt = true
             feedback = .error
@@ -809,68 +486,26 @@ final class WatchOnboardingInputBridge: ObservableObject {
     }
 }
 
-private extension WatchOnboardingOperation {
-    /// 普通点击和长按都会立即改变底层界面，二者共享短暂观察延迟。
-    var isTapInteraction: Bool {
-        switch self {
-        case .tap, .longPress:
-            true
-        default:
-            false
-        }
-    }
-}
-
-/// 只负责显示的全屏引导层；欢迎页和分段页会接收继续轻点，
-/// 其余实操步骤不参与命中，让输入直接抵达真实页面。
+/// 真实页面上的提示层；除欢迎页外不拦截触摸。
 struct WatchOnboardingOverlay: View {
     let step: WatchOnboardingStep
-    let sectionIntro: WatchOnboardingSection?
-    let sectionPreparation: WatchOnboardingPreparationState
     let controlCenters: WatchOnboardingControlCenters
     let feedback: WatchOnboardingFeedback?
     let showsPrompt: Bool
     let isInitialPreparationReady: Bool
-    /// 欢迎页背后的第一段黑场与首个操作提示已完成首轮渲染。
+    /// 首个实操提示已在欢迎页背后完成首轮渲染。
     let initialPresentationPrepared: () -> Void
     let start: () -> Void
     let openWidgetTutorial: () -> Void
-    let continueSectionIntro: () -> Void
+    let hasWeekCourseTarget: Bool
     @State private var animatedCompletedSteps: CGFloat = 0
 
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                if let sectionIntro {
+                if step == .welcome, showsPrompt, feedback == nil {
                     ZStack {
-                        // 在纯黑章节页背后提前建立下一项提示使用的玻璃、
-                        // Canvas 和动作动画资源。实体表第一次创建这些渲染
-                        // 节点的开销不再落在用户轻点“概览”之后；0.001 只为
-                        // 防止系统把整棵不可见子树直接裁掉，前方纯黑页会将
-                        // 它完全遮住，不改变章节页显示。
-                        onboardingPromptPrewarm(
-                            for: step,
-                            in: proxy.size
-                        )
-                            .opacity(0.001)
-                            .allowsHitTesting(false)
-
-                        WatchOnboardingSectionIntroView(
-                            section: sectionIntro,
-                            preparation: sectionPreparation,
-                            continueAction: continueSectionIntro
-                        )
-                    }
-                        // 章节页必须先于底层路由变化完整盖住表盘。插入不做
-                        // 淡入，退出仍保留系统式淡出，杜绝首帧漏出页面切换。
-                        .transition(
-                            .asymmetric(insertion: .identity, removal: .opacity)
-                        )
-                } else if step == .welcome, showsPrompt, feedback == nil {
-                    ZStack {
-                        // 欢迎页的纯黑背景后提前创建第一段黑场和第一个实操
-                        // 提示。实体表首次建立扫光、玻璃和 Canvas 管线的
-                        // 开销发生在“正在加载”期间，而不是用户轻点之后。
+                        // 首个实操提示在欢迎页背后准备，后续不再插入章节页。
                         initialOnboardingPresentationWarmup(in: proxy.size)
 
                         // 欢迎页接收继续轻点和指南长按；实操遮罩不参与命中，
@@ -884,11 +519,10 @@ struct WatchOnboardingOverlay: View {
                     .transition(.opacity)
                 } else {
                     ZStack {
-                    Group {
-                    if showsPrompt {
+                        if showsPrompt {
                             // 教学出现时稍微压低真实页面亮度，把注意力集中在
                             // 操作目标；整层连续透明，不制造横向分界线。
-                            Color.black.opacity(0.32)
+                            Color.black.opacity(0.12)
                                 .ignoresSafeArea()
                                 .transition(.opacity)
                                 .zIndex(0)
@@ -905,7 +539,7 @@ struct WatchOnboardingOverlay: View {
                                 .zIndex(10)
 
                             WatchOnboardingOperationCue(
-                                operation: step.operation,
+                                operations: step.operations,
                                 viewportSize: proxy.size,
                                 controlCenters: controlCenters
                             )
@@ -927,33 +561,21 @@ struct WatchOnboardingOverlay: View {
                                 .padding(.horizontal, WatchOnboardingOverlayLayout.horizontalInset)
                                 .padding(.bottom, WatchOnboardingOverlayLayout.instructionBottomInset)
                                 .zIndex(10)
-                    }
-
-                    if let feedback {
-                        // 正确时完全黑屏确认；错误时保留真实页面，仅把白色
-                        // 错号和操作提示叠在最上层，便于立即对照重试。
-                        if feedback == .success {
-                            Color.black
-                                .ignoresSafeArea()
                         }
 
-                        WatchOnboardingResultAnimation(
-                            feedback: feedback
-                        )
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: .infinity,
-                                alignment: .center
-                            )
-                            .transition(.opacity)
-                            // 正确/错误反馈属于教学动作的最终状态，覆盖其余
-                            // 教学内容，但不会参与真实页面命中。
-                            .zIndex(200)
-                    }
+                        if let feedback {
+                            Image(systemName: feedback == .success ? "checkmark.circle.fill" : "arrow.clockwise.circle.fill")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundStyle(feedback == .success ? .green : .white)
+                                .padding(6)
+                                .background(.ultraThinMaterial, in: Capsule())
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                                .padding(.top, WatchOnboardingOverlayLayout.titleTopInset)
+                                .transition(.opacity)
+                                .zIndex(200)
+                        }
                     }
                     .allowsHitTesting(false)
-
-                    }
                 }
             }
         }
@@ -962,17 +584,14 @@ struct WatchOnboardingOverlay: View {
         .ignoresSafeArea()
         .accessibilityElement(children: .contain)
         .onAppear {
-            animateProgress(to: step.rawValue + 1)
+            animateProgress(to: step.taskNumber)
         }
-        .onChange(of: step.rawValue) { _, rawValue in
-            animateProgress(to: rawValue + 1)
+        .onChange(of: step.taskNumber) { _, number in
+            animateProgress(to: number)
         }
     }
 
-    /// 章节黑场期间仅预热下一项会使用的提示组件，不显示也不接收输入。
-    ///
-    /// 这里保持与实操层相同的尺寸、材质和动作类型，使真机提前完成首轮
-    /// 字形、玻璃和 Canvas 管线准备；章节淡出后不再集中创建这些节点。
+    /// 欢迎页期间预热首个操作提示的材质与字形。
     private func onboardingPromptPrewarm(
         for warmupStep: WatchOnboardingStep,
         in viewportSize: CGSize
@@ -988,7 +607,7 @@ struct WatchOnboardingOverlay: View {
                 .padding(.top, WatchOnboardingOverlayLayout.titleTopInset)
 
             WatchOnboardingOperationCue(
-                operation: warmupStep.operation,
+                operations: warmupStep.operations,
                 viewportSize: viewportSize,
                 controlCenters: controlCenters
             )
@@ -1004,7 +623,7 @@ struct WatchOnboardingOverlay: View {
                 .padding(.horizontal, WatchOnboardingOverlayLayout.horizontalInset)
                 .padding(.bottom, WatchOnboardingOverlayLayout.instructionBottomInset)
         }
-        // 预热只需提交首帧材质与字形；黑场背后的提示不应持续运行动画。
+        // 预热只提交首帧材质与字形，不持续运行动画。
         .environment(\.watchOnboardingAnimationsPaused, true)
     }
 
@@ -1022,11 +641,6 @@ struct WatchOnboardingOverlay: View {
                 in: viewportSize
             )
 
-            WatchOnboardingSectionIntroView(
-                section: .overview,
-                preparation: .ready,
-                continueAction: {}
-            )
         }
         .opacity(0.001)
         .allowsHitTesting(false)
@@ -1057,13 +671,15 @@ struct WatchOnboardingOverlay: View {
     ) -> some View {
         let content = HStack(alignment: .center, spacing: 7) {
             Image(systemName: instructionSystemImage(
-                for: instructionStep.operation
+                for: instructionStep.operations.first
             ))
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.96))
                 .frame(width: 20, alignment: .center)
 
-            Text(verbatim: instructionStep.message)
+            Text(verbatim: instructionStep == .weekCourse && !hasWeekCourseTarget
+                 ? watchLocalizedString("本周暂无课程，翻周找到课程后轻点查看。")
+                 : instructionStep.message)
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.white)
                 .lineLimit(2)
@@ -1095,7 +711,7 @@ struct WatchOnboardingOverlay: View {
 
     /// 底部说明图标只表达输入方式，不重复页面图标。
     private func instructionSystemImage(
-        for operation: WatchOnboardingOperation
+        for operation: WatchOnboardingOperation?
     ) -> String {
         switch operation {
         case .tap:
@@ -1106,6 +722,10 @@ struct WatchOnboardingOverlay: View {
             "hand.draw.fill"
         case .crown, .crownPage:
             "digitalcrown.horizontal.arrow.counterclockwise"
+        case .selectMode:
+            "list.bullet"
+        case .pageChanged, nil:
+            "info.circle"
         }
     }
 
@@ -1191,9 +811,7 @@ struct WatchOnboardingOverlay: View {
 
     /// 欢迎页不显示普通教学标题；其余步骤使用从 1 开始的教学序号。
     private func bannerTitle(for bannerStep: WatchOnboardingStep) -> String {
-        let total = max(1, WatchOnboardingStep.allCases.count - 1)
-        let index = min(total, max(1, bannerStep.rawValue))
-        return "\(index)/\(total) \(bannerStep.title)"
+        "\(bannerStep.taskNumber)/\(WatchOnboardingStep.taskCount) \(bannerStep.title)"
     }
 
     /// 所有教学步骤共用一条 0...1 连续进度。
@@ -1203,7 +821,7 @@ struct WatchOnboardingOverlay: View {
             max(
                 0,
                 animatedCompletedSteps
-                    / CGFloat(WatchOnboardingStep.allCases.count)
+                    / CGFloat(WatchOnboardingStep.taskCount)
             )
         )
     }
@@ -1216,157 +834,6 @@ struct WatchOnboardingOverlay: View {
 
 }
 
-/// 与欢迎页一致的纯黑分段提示页。
-///
-/// 该页面在存在期间主动覆盖并拦截底层输入；根视图会等淡出结束后才配置下一
-/// 项教学检测，因此用户在过场期间触摸或转动表冠都不会被误判为已完成操作。
-private struct WatchOnboardingSectionIntroView: View {
-    let section: WatchOnboardingSection
-    let preparation: WatchOnboardingPreparationState
-    let continueAction: () -> Void
-    @State private var contentVisible = false
-
-    var body: some View {
-        Button {
-            guard preparation == .ready else { return }
-            continueAction()
-        } label: {
-            ZStack {
-                Color.black
-                    .ignoresSafeArea()
-
-                VStack(spacing: 18) {
-                    WatchOnboardingSweepingLightText(
-                        text: section.title,
-                        font: .headline.weight(.semibold),
-                        baseOpacity: 1
-                    )
-                    preparationMessage
-                }
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 22)
-                .opacity(contentVisible ? 1 : 0)
-                .scaleEffect(contentVisible ? 1 : 0.96)
-
-                WatchOnboardingSectionProgressView(
-                    stage: section.progressStage
-                )
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity,
-                    alignment: .top
-                )
-                .padding(.top, 30)
-                .opacity(contentVisible ? 1 : 0)
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .onAppear {
-            withAnimation(WatchOnboardingMotion.sectionIntro) {
-                contentVisible = true
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var preparationMessage: some View {
-        switch preparation {
-        case .ready:
-            WatchOnboardingSweepingLightText(
-                text: watchLocalizedString("轻点以继续"),
-                font: .caption2.weight(.medium),
-                baseOpacity: 0.76
-            )
-        case .loading:
-            VStack(spacing: 7) {
-                ProgressView()
-                    .controlSize(.small)
-                    .tint(.white)
-                Text(verbatim: watchLocalizedString(
-                    "第一次载入课表，正在渲染底层数据"
-                ))
-                    .font(.caption2.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.82))
-                    .multilineTextAlignment(.center)
-            }
-        case .completed:
-            VStack(spacing: 7) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(.green)
-                Text(verbatim: watchLocalizedString("底层数据已准备完成"))
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.white)
-            }
-        }
-    }
-}
-
-/// 五个视图章节共用的阶段进度。
-///
-/// `n/5` 只统计真实功能视图；欢迎页和最终完成页不显示章节进度。进入
-/// 第五段时只填满最后一格，五段之间始终留有间隔。
-private struct WatchOnboardingSectionProgressView: View {
-    let stage: Int
-    @State private var currentSegmentFill: CGFloat = 0
-
-    private let segmentCount = 5
-    private let barWidth: CGFloat = 112
-    private let barHeight: CGFloat = 5
-    private let segmentSpacing: CGFloat = 4
-
-    var body: some View {
-        VStack(spacing: 5) {
-            Text(verbatim: "\(min(5, max(1, stage)))/5")
-                .font(.caption2.weight(.semibold))
-                .monospacedDigit()
-                .foregroundStyle(.white.opacity(0.88))
-
-            HStack(spacing: segmentSpacing) {
-                ForEach(0..<segmentCount, id: \.self) { index in
-                    segment(index)
-                }
-            }
-            .frame(width: barWidth, height: barHeight)
-        }
-        .onAppear(perform: startAnimation)
-    }
-
-    /// `stage - 1` 是本次需要从 0 填满的格；更早的格保持完成状态。
-    private func segment(_ index: Int) -> some View {
-        let activeIndex = stage - 1
-        let completed = index < activeIndex
-        let isCurrent = index == activeIndex
-        let fill = completed ? 1 : (isCurrent ? currentSegmentFill : 0)
-        let segmentWidth = (
-            barWidth - CGFloat(segmentCount - 1) * segmentSpacing
-        ) / CGFloat(segmentCount)
-
-        return Capsule()
-            .fill(Color.white.opacity(0.15))
-            .overlay(alignment: .leading) {
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.blue, Color.cyan.opacity(0.88)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(width: segmentWidth * fill)
-            }
-            .clipShape(Capsule())
-            .frame(width: segmentWidth, height: barHeight)
-    }
-
-    private func startAnimation() {
-        withAnimation(.easeOut(duration: 0.52)) {
-            currentSegmentFill = 1
-        }
-    }
-}
-
 /// 直接画在真实操作位置上的视觉示范。
 ///
 /// 滑动提示位于屏幕中央，点击/长按使用语义目标的真实坐标，表冠提示根据
@@ -1374,76 +841,41 @@ private struct WatchOnboardingSectionProgressView: View {
 /// 不会抢走底层输入。
 private struct WatchOnboardingOperationCue: View {
     @Environment(\.watchOnboardingAnimationsPaused) private var animationsPaused
-    let operation: WatchOnboardingOperation
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let operations: [WatchOnboardingOperation]
     let viewportSize: CGSize
     let controlCenters: WatchOnboardingControlCenters
-    /// 点击步骤只在首个有效实测坐标到达时锁定一次；页面后续布局采样不会
-    /// 再驱动 `.position`，因此提示不会从回退点缓慢漂向实际按钮。
-    @State private var lockedTapPoint: CGPoint? = nil
 
-    @ViewBuilder
     var body: some View {
-        switch operation {
-        case let .tap(target):
-            tapAnimation(target: target, holds: false)
-        case let .longPress(target):
-            tapAnimation(target: target, holds: true)
-        case .verticalSwipe:
-            phaseAnimation { phase in
-                swipeCue(axis: .vertical, phase: phase)
+        PhaseAnimator(animationsPaused || reduceMotion ? [false] : [false, true]) { phase in
+            ZStack {
+                ForEach(operations.indices, id: \.self) { index in
+                    cue(for: operations[index], phase: phase)
+                }
             }
-        case .horizontalSwipe:
-            phaseAnimation { phase in
-                swipeCue(axis: .horizontal, phase: phase)
-            }
-        case .crown:
-            phaseAnimation { phase in
-                crownCue(phase: phase, showsPagingHint: false)
-            }
-        case .crownPage:
-            phaseAnimation { phase in
-                crownCue(phase: phase, showsPagingHint: true)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func phaseAnimation<Content: View>(
-        @ViewBuilder content: @escaping (Bool) -> Content
-    ) -> some View {
-        PhaseAnimator(animationsPaused ? [false] : [false, true]) { phase in
-            content(phase)
-                .compositingGroup()
         } animation: { _ in
             WatchOnboardingMotion.operationHint
         }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder
-    private func tapAnimation(
-        target: WatchOnboardingTapTarget,
-        holds: Bool
-    ) -> some View {
-        Group {
-            if let lockedTapPoint {
-                PhaseAnimator(animationsPaused ? [false] : [false, true]) { phase in
-                    tapCue(holds: holds, phase: phase)
-                } animation: { _ in
-                    WatchOnboardingMotion.operationHint
-                }
-                // 坐标位于循环动画之外，只在第一次得到真实几何时直接安装；
-                // PhaseAnimator 此后只改变圆环和手指大小，绝不会插值位置。
-                .position(lockedTapPoint)
-                .compositingGroup()
-            } else {
-                Color.clear
+    private func cue(for operation: WatchOnboardingOperation, phase: Bool) -> some View {
+        switch operation {
+        case let .tap(target), let .longPress(target):
+            if let point = target.cuePoint(in: viewportSize, controlCenters: controlCenters) {
+                tapCue(holds: operation == .longPress(target), phase: phase)
+                    .position(point)
             }
-        }
-        // Toolbar 和周网格可能晚一帧上报。每次中心集合变化时只尝试
-        // 补齐尚未锁定的位置，已经显示的提示保持不动。
-        .onAppear { lockTapPointIfPossible(target) }
-        .onChange(of: controlCenters) { _, _ in
-            lockTapPointIfPossible(target)
+        case .verticalSwipe:
+            swipeCue(axis: .vertical, phase: phase)
+        case .horizontalSwipe:
+            swipeCue(axis: .horizontal, phase: phase)
+        case .crown, .crownPage:
+            crownCue(phase: phase)
+        case .selectMode, .pageChanged:
+            EmptyView()
         }
     }
 
@@ -1474,25 +906,17 @@ private struct WatchOnboardingOperationCue: View {
         }
     }
 
-    private func lockTapPointIfPossible(
-        _ target: WatchOnboardingTapTarget
-    ) {
-        guard lockedTapPoint == nil,
-              let point = target.cuePoint(
-                  in: viewportSize,
-                  controlCenters: controlCenters
-              )
-        else { return }
-        // 不包裹 withAnimation：提示第一次出现时直接位于目标圆心。
-        lockedTapPoint = point
-    }
-
-    /// 横向或纵向手势使用同一组系统手形，只改变运动轴。
+    /// 用指尖沿箭头轨迹移动，手掌留在箭头下方；横纵向共用同一接触点。
     private func swipeCue(
         axis: CalendarPagingDragAxis,
         phase: Bool
     ) -> some View {
-        ZStack {
+        let handSize: CGFloat = 25
+        // hand.draw.fill 的指尖位于字形中心左上方。补偿这段距离，
+        // 让实际触点落在箭头上，而不是让手掌中心沿着箭头移动。
+        let fingertipOffset = CGSize(width: handSize * 0.28, height: handSize * 0.46)
+
+        return ZStack {
             Image(
                 systemName: axis == .horizontal
                     ? "arrow.left.and.right"
@@ -1502,11 +926,11 @@ private struct WatchOnboardingOperationCue: View {
             .foregroundStyle(.white.opacity(0.68))
 
             Image(systemName: "hand.draw.fill")
-                .font(.system(size: 25, weight: .medium))
+                .font(.system(size: handSize, weight: .medium))
                 .foregroundStyle(.white)
                 .offset(
-                    x: axis == .horizontal ? (phase ? 17 : -17) : 0,
-                    y: axis == .vertical ? (phase ? 17 : -17) : 0
+                    x: fingertipOffset.width + (axis == .horizontal ? (phase ? 17 : -17) : 0),
+                    y: fingertipOffset.height + (axis == .vertical ? (phase ? 17 : -17) : 0)
                 )
         }
         .frame(
@@ -1518,10 +942,7 @@ private struct WatchOnboardingOperationCue: View {
 
     /// 手指贴着实体表冠上下拨动，刻纹同步滚动，表达“用手指旋转表冠”。
     /// 这里只动画几何位移，不使用模糊或阴影，避免教学循环掉帧。
-    private func crownCue(
-        phase: Bool,
-        showsPagingHint: Bool
-    ) -> some View {
+    private func crownCue(phase: Bool) -> some View {
         let cueHeight: CGFloat = 70
         let rightEdgeInset: CGFloat = 1
         let verticalTravel: CGFloat = phase ? 9 : -9
@@ -1537,17 +958,8 @@ private struct WatchOnboardingOperationCue: View {
         return ZStack(alignment: .topTrailing) {
             Color.clear
 
-            // 三个可见组件组成紧凑 HStack；末尾表冠胶囊是动画的真实右边界。
+            // 仅保留手指与表冠，翻页方向由中央的滑动示意表达。
             HStack(spacing: 0) {
-                Image(
-                    systemName: showsPagingHint
-                        ? "arrow.left.and.right"
-                        : "arrow.up.and.down"
-                )
-                .font(.system(size: 31, weight: .light))
-                .foregroundStyle(.white.opacity(0.36))
-                .frame(width: 31)
-
                 Image(systemName: "hand.point.up.left.fill")
                     .font(.system(size: 24, weight: .medium))
                     .foregroundStyle(.white)
@@ -1902,117 +1314,20 @@ struct WatchOnboardingSweepingLightText: View {
     }
 }
 
-/// 参考系统确认反馈的紧凑“圆环—对号”动画。
-///
-/// 成功绘制圆环与对号，错误只绘制白色错号；两种反馈共用容器，切换时不跳位。
-private struct WatchOnboardingResultAnimation: View {
-    let feedback: WatchOnboardingFeedback
-    @State private var ringProgress: CGFloat = 0
-    @State private var resultProgress: CGFloat = 0
-    @State private var resultScale: CGFloat = 0.82
-
-    private var resultColor: Color {
-        feedback == .success ? .green : .white
-    }
+/// 目录里的提示跟随真实列表项滚动，不依赖屏幕坐标估算。
+struct WatchOnboardingMenuCue: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        resultSymbol
-            .task(animateResult)
-            .accessibilityLabel(
-                feedback == .success
-                    ? watchLocalizedString("操作正确")
-                    : watchLocalizedString("操作错误")
-            )
-    }
-
-    /// 成功和错误共用相同的外部尺寸，只替换内部图形。
-    private var resultSymbol: some View {
-        ZStack {
-            if feedback == .success {
-                Circle()
-                    .trim(from: 0, to: ringProgress)
-                    .stroke(
-                        resultColor,
-                        style: StrokeStyle(lineWidth: 3.6, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .shadow(color: resultColor.opacity(0.24), radius: 2.5)
-                    .frame(width: 54, height: 54)
-
-                WatchOnboardingCheckmarkShape()
-                    .trim(from: 0, to: resultProgress)
-                    .stroke(
-                        resultColor,
-                        style: StrokeStyle(
-                            lineWidth: 4.6,
-                            lineCap: .round,
-                            lineJoin: .round
-                        )
-                    )
-                    .frame(width: 27, height: 22)
-            } else {
-                WatchOnboardingXmarkShape()
-                    .trim(from: 0, to: resultProgress)
-                    .stroke(
-                        resultColor,
-                        style: StrokeStyle(
-                            lineWidth: 5.8,
-                            lineCap: .round,
-                            lineJoin: .round
-                        )
-                    )
-                    .frame(width: 37, height: 37)
-                    .shadow(color: resultColor.opacity(0.18), radius: 2)
-            }
+        PhaseAnimator(reduceMotion ? [false] : [false, true]) { phase in
+            Image(systemName: "hand.tap.fill")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.white)
+                .scaleEffect(phase ? 1.12 : 0.82)
+                .padding(.trailing, 5)
+        } animation: { _ in
+            WatchOnboardingMotion.operationHint
         }
-        .frame(width: 58, height: 58)
-        .scaleEffect(resultScale)
-    }
-
-    /// 成功先画圆环再画对号；错误直接画错号，不执行无意义的圆环阶段。
-    private func animateResult() async {
-        if feedback == .success {
-            withAnimation(WatchOnboardingMotion.ring) {
-                ringProgress = 1
-                resultScale = 1
-            }
-            try? await Task.sleep(
-                nanoseconds: WatchOnboardingMotion.resultOverlapDelayNanoseconds
-            )
-            guard !Task.isCancelled else { return }
-            withAnimation(WatchOnboardingMotion.result) {
-                resultProgress = 1
-            }
-        } else {
-            withAnimation(WatchOnboardingMotion.result) {
-                resultProgress = 1
-                resultScale = 1
-            }
-        }
-    }
-}
-
-/// 从左下至右上一笔绘制的对号。
-private struct WatchOnboardingCheckmarkShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.midY))
-        path.addLine(
-            to: CGPoint(x: rect.minX + rect.width * 0.38, y: rect.maxY)
-        )
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        return path
-    }
-}
-
-/// 两条对角线组成的纯白错号。
-private struct WatchOnboardingXmarkShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.move(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        return path
+        .accessibilityHidden(true)
     }
 }

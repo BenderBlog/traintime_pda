@@ -39,6 +39,7 @@ struct WidgetIntroPage<Content: View>: View {
                 Text(verbatim: title)
                     .font(.system(size: WidgetTutorialLayout.textSize, weight: .semibold))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .frame(width: proxy.size.width, height: WidgetTutorialLayout.titleHeight)
                     .accessibilityAddTraits(.isHeader)
 
@@ -87,7 +88,7 @@ struct WidgetIntroPage<Content: View>: View {
                 weight: .regular
             ))
             .lineLimit(2)
-            .minimumScaleFactor(usesCaptionStyle ? 0.75 : 1)
+            .minimumScaleFactor(usesCaptionStyle ? 0.75 : (messageScale < 1 ? 0.85 : 1))
     }
 }
 
@@ -96,6 +97,7 @@ struct WidgetOnboardingTransitionPage: View {
     let title: String
     let message: String
     let playsAnimations: Bool
+    let viewport: CGSize
     var continueAction: (() -> Void)? = nil
 
     var body: some View {
@@ -107,12 +109,14 @@ struct WidgetOnboardingTransitionPage: View {
                 content.accessibilityElement(children: .combine)
             }
         }
+        .frame(width: viewport.width, height: viewport.height)
+        .ignoresSafeArea()
         .environment(\.watchOnboardingAnimationsPaused, !playsAnimations)
     }
 
     private var content: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            Color.black
             VStack(spacing: 18) {
                 WatchOnboardingSweepingLightText(
                     text: title,
@@ -126,9 +130,12 @@ struct WidgetOnboardingTransitionPage: View {
                     baseOpacity: 0.76
                 )
             }
-            .padding(.horizontal, 22)
+            // 原生分页和轻点转场覆盖层共用根视口，不随分页宿主的安全区
+            // 重新居中或换行，避免转场开始、结束时文字上下跳动。
+            .frame(width: max(0, viewport.width - 44))
+            .position(x: viewport.width / 2, y: viewport.height / 2)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(width: viewport.width, height: viewport.height)
         .contentShape(Rectangle())
     }
 }
