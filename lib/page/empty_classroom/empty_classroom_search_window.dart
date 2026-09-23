@@ -260,6 +260,13 @@ class _EmptyClassroomSearchWindowState
   Widget nowSummary() {
     final scheme = Theme.of(context).colorScheme;
     final period = nowPeriod;
+
+    /// 课前、午休空档、半夜的时候也没有正在进行的节次，但那不是"已经结束"，
+    /// 所以这时候不显示这一条。
+    if (period == null &&
+        !GlobalTimerController.i.isTodayClassesOverComputedSignal.value) {
+      return const SizedBox.shrink();
+    }
     final label = period == null
         ? FlutterI18n.translate(context, "empty_classroom.classes_over")
         : FlutterI18n.translate(

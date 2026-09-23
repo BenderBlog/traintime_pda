@@ -54,6 +54,16 @@ class GlobalTimerController {
     return day.year == now.year && day.month == now.month && day.day == now.day;
   }
 
+  /// 今天最后一节课是否已经结束。
+  ///
+  /// 「现在没有正在进行的节次」有两种可能：还没开始，或者已经全部上完。
+  /// 用它把这两种情况分开，免得半夜和课间空档被当成"今天的课已经结束了"。
+  late final isTodayClassesOverComputedSignal = computed(() {
+    final now = currentTimeSignal.value;
+    final minutes = now.hour * 60 + now.minute;
+    return minutes > minutesOf(timeList.last);
+  });
+
   /// 每次触发后重新计算到下一个整分的间隔，确保始终对齐整分。
   void _scheduleNext() {
     final now = DateTime.now();
