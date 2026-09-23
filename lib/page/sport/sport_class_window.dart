@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/controller/sport_controller.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
@@ -26,7 +27,7 @@ class _SportClassWindowState extends State<SportClassWindow>
   @override
   bool get wantKeepAlive => true;
 
-  Future<FetchResult<SportClass>> _future = SportSession().getClass();
+  Future<FetchResult<SportClass>> _future = SportController.i.reloadClass();
 
   Object? _translateError(BuildContext context, Object? error) {
     if (error is SportCredentialMissingException ||
@@ -45,7 +46,7 @@ class _SportClassWindowState extends State<SportClassWindow>
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {
-          _future = SportSession().getClass();
+          _future = SportController.i.reloadClass();
         });
       },
       child: FutureBuilder(
@@ -109,7 +110,7 @@ class _SportClassWindowState extends State<SportClassWindow>
               snapshot.hasError) {
             return ReloadWidget(
               function: () => setState(() {
-                _future = SportSession().getClass();
+                _future = SportController.i.reloadClass();
               }),
               errorStatus: _translateError(context, snapshot.error),
               stackTrace: snapshot.stackTrace,

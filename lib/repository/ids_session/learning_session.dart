@@ -26,18 +26,17 @@ class LearningSession extends IDSSession {
   static String userId = "";
 
   Future<bool> isLogin() async {
-    return await dio
-        .get(
-          COURSE_DETAIL_URL,
-          queryParameters: {
-            "classId": 123,
-            "courseId": 1,
-            "page": 1,
-            "pageSize": 999,
-            "puid": "",
-          },
-        )
-        .then((data) => data.data["errorMsg"] != "请登录后再试");
+    final response = await dio.get(
+      COURSE_INFO_URL,
+      options: Options(
+        headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
+      ),
+    );
+    final statusCode = response.statusCode ?? 0;
+    return !(statusCode >= 300 && statusCode < 400) &&
+        response.headers.value(HttpHeaders.locationHeader) == null &&
+        parse(response.data?.toString() ?? "").getElementById("yearList") !=
+            null;
   }
 
   Future<void> loginLearningSession() async {
@@ -89,35 +88,83 @@ class LearningSession extends IDSSession {
   }
 
   Future<List<ClassAttendance>> getAttandanceRecord() async {
-    if (await isLogin() == false) {
-      log.info("[LearningSession][getAttandanceRecord] Need login");
-      await loginLearningSession();
+    late Document doc;
+    late String attendanceHtml;
+
+    for (var attempt = 0; attempt < 2; attempt++) {
+      log.info(
+        "[LearningSession][getAttandanceRecord] Fetching class list info",
+      );
+      final coursePageResponse = await dio.get(
+        COURSE_INFO_URL,
+        options: Options(
+          headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
+        ),
+      );
+      final courseStatusCode = coursePageResponse.statusCode ?? 0;
+      doc = parse(coursePageResponse.data?.toString() ?? "");
+      final needsLogin =
+          (courseStatusCode >= 300 && courseStatusCode < 400) ||
+          coursePageResponse.headers.value(HttpHeaders.locationHeader) !=
+              null ||
+          doc.getElementById("yearList") == null;
+      if (needsLogin) {
+        if (attempt == 1) {
+          throw const LoginFailedException(msg: "课程系统登录失败");
+        }
+        log.info("[LearningSession][getAttandanceRecord] Need login");
+        await loginLearningSession();
+        continue;
+      }
+
+      final semester = doc
+          .querySelector("#yearList option[selected]")
+          ?.attributes["value"]
+          ?.trim();
+      if (semester == null || semester.isEmpty) {
+        throw const FormatException("无法解析当前学期");
+      }
+      log.info(
+        "[LearningSession][getAttandanceRecord] Fetching semester $semester",
+      );
+
+      log.info(
+        "[LearningSession][getAttandanceRecord] "
+        "Fetching class attendance table.",
+      );
+      final attendanceResponse = await dio.get(
+        COURSE_DATA_URL,
+        queryParameters: {"v": 1, "semesternum": semester},
+        options: Options(
+          headers: {
+            HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com",
+            HttpHeaders.refererHeader: COURSE_INFO_URL,
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        ),
+      );
+      final attendanceStatusCode = attendanceResponse.statusCode ?? 0;
+      final attendanceNeedsLogin =
+          (attendanceStatusCode >= 300 && attendanceStatusCode < 400) ||
+          attendanceResponse.headers.value(HttpHeaders.locationHeader) != null;
+      if (attendanceNeedsLogin) {
+        if (attempt == 1) {
+          throw const LoginFailedException(msg: "课程系统登录失败");
+        }
+        log.info(
+          "[LearningSession][getAttandanceRecord] "
+          "Attendance request needs login",
+        );
+        await loginLearningSession();
+        continue;
+      }
+
+      attendanceHtml = attendanceResponse.data.toString().replaceAll(
+        RegExp(r'\r|\n|\t'),
+        "",
+      );
+      break;
     }
-
-    log.info("[LearningSession][getAttandanceRecord] Fetching class list info");
-    String courseListHtml = await dio
-        .get(
-          COURSE_INFO_URL,
-          options: Options(
-            headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
-          ),
-        )
-        .then((data) => data.data);
-
-    final doc = parse(courseListHtml);
-
-    String semester =
-        doc
-            .getElementById("yearList")
-            ?.children
-            .firstWhere(
-              (ele) => ele.attributes["selected"]?.contains("true") ?? false,
-            )
-            .attributes["value"] ??
-        "";
-    log.info(
-      "[LearningSession][getAttandanceRecord] Fetching semester $semester",
-    );
 
     final items = doc.querySelectorAll('div.myde_course_item');
 
@@ -181,28 +228,13 @@ class LearningSession extends IDSSession {
       });
     }
 
-    log.info(
-      "[LearningSession][getAttandanceRecord] Fetching class attendance table.",
-    );
-    String html = await dio
-        .get(
-          COURSE_DATA_URL,
-          queryParameters: {"v": 1, "semesternum": semester},
-          options: Options(
-            headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
-          ),
-        )
-        .then(
-          (data) => data.data.toString().replaceAll(RegExp(r'\r|\n|\t'), ""),
-        );
-
-    Document document = parse(html);
+    Document document = parse(attendanceHtml);
     List<ClassAttendance> results = [];
 
     Element? table = document.querySelector('table');
 
     if (table == null) {
-      return results;
+      throw const FormatException("接口未返回数据表格");
     }
 
     List<Element> rows = table.querySelectorAll('tbody tr');

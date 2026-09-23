@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/user_role.dart';
@@ -167,7 +168,9 @@ class ClassTableSession extends IDSSession {
         ? jsonDecode(rawCalendar)
         : rawCalendar;
 
-    final termStartDay = calendar['QSRQ'] as String;
+    final termStartDay = DateFormat(
+      "yyyy-MM-dd hh:mm:ss",
+    ).format(DateTime.parse(calendar['QSRQ'] as String));
 
     Map<String, dynamic> data = await dio
         .post(classInfoURL, data: {"XNXQDM": semesterCode})

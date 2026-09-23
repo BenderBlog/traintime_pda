@@ -148,24 +148,6 @@ classtable:
     switch_semester: 切换课程表学期
     current_time_settings: 时间指示设置
     class_color_settings: 课表样式设置
-  visual_settings:
-    current_time_settings_title: 时间指示设置
-    class_color_settings_title: 课表样式设置
-    completed_style_enabled: 已结束课程样式区分
-    current_time_section: 时间指示
-    show_current_time_indicator: 显示当前时间指示线
-    show_current_time_label: 显示迷你数字时钟
-    show_today_column_highlight: 强调显示今天的纵列
-    unfinished_section: 课程样式
-    active_brightness_factor: "亮度: {value}"
-    active_border_alpha: "边框透明度: {value}"
-    active_inner_alpha: "底色透明度: {value}"
-    completed_section: 已结束课程样式
-    completed_saturation_factor: "底色饱和度: {value}"
-    completed_brightness_factor: "亮度: {value}"
-    completed_text_saturation_factor: "文字饱和度: {value}"
-    completed_border_alpha: "边框透明度: {value}"
-    completed_inner_alpha: "底色透明度: {value}"
   status_source:
     class_table: 课表
     exam: 考试
@@ -326,7 +308,7 @@ electricity:
   water_usage_fetch_date: 获取时间
   water_usage_read_before: 上次读数
   water_usage_read_now: 本次读数
-  water_usage: 洗澡水用量
+  water_usage: 热水用量
   water_title: 水费信息
   water_loading: 正在加载水费信息
   water_unavailable: 水费信息暂不可用，请在电费卡片重试。
@@ -898,6 +880,27 @@ setting:
   background: 开启课表背景图
   no_background: 你先选个图片罢，就在下面
   choose_background: 课表背景图选择
+  class_table_style_setting: 课表显示与样式
+  class_table_style_description: 时间指示和课程卡片样式
+  class_table_style_page:
+    current_time_settings_title: 时间指示设置
+    class_color_settings_title: 课表样式设置
+    current_time_section: 时间指示设置
+    show_current_time_indicator: 显示当前时间指示线
+    show_current_time_label: 显示迷你数字时钟
+    show_today_column_highlight: 强调显示今天的纵列
+    active_section: 课程卡片样式
+    unfinished_section: 课程卡片样式
+    active_brightness_factor: "亮度: {value}"
+    active_border_alpha: "边框透明度: {value}"
+    active_inner_alpha: "底色透明度: {value}"
+    completed_section: 已结束课程样式
+    completed_style_enabled: 已结束课程样式区分
+    completed_saturation_factor: "底色饱和度: {value}"
+    completed_brightness_factor: "亮度: {value}"
+    completed_text_saturation_factor: "文字饱和度: {value}"
+    completed_border_alpha: "边框透明度: {value}"
+    completed_inner_alpha: "底色透明度: {value}"
   no_permission: 未获取存储权限，无法读取文件
   successful_setting: 设定成功
   failure_setting: 你没有选图片捏
@@ -909,9 +912,8 @@ setting:
   class_refresh_title: 确认对话框
   class_refresh_content: 是否要强制刷新课表？同意后，将会从学校一站式后端重新获取课表，耗时会比较久。
   class_swift: 课程偏移设置
-  class_swift_description: "正数错后开学日期 负数提前开学日期
-
-    目前为 {swift}"
+  class_swift_explain: 正数错后开学日期 负数提前开学日期
+  class_swift_description: 目前为 {swift}
   core_setting: 缓存登录设置
   check_logger: 查看网络拦截器和日志
   clear_and_restart: 清除缓存后重启
@@ -1088,6 +1090,21 @@ setting:
     copyright_register_code: 著作权登记号
     sign_android: 安卓签名
     title: 关于本软件
+sponsorship:
+  title: "本版本由极创工作室和网管会赞助发布"
+  dialog_title: "赞助信息"
+  dialog_content:
+    "极创工作室介绍辞：极创工作室是一个由西电创新创业学院支持建设的科技创新俱乐部，旨在与校内最优秀的创新创业人才同行，专注于人工智能等领域的技术创新与产品研发。目前工作室和华为等厂家合作，深耕大语言模型相关前沿方向，已孵化超过数十个人工智能领域科创产品，其中8项产品成功落地商用。工作室最知名的产品包括SwanLab、LLMOne、NexusGate。
+
+
+    网管会介绍辞：学生网管会隶属于西电信息网络技术中心，主要协助处理师生校园网络使用问题，参与校园网络维护、线上咨询、线下处理和技术支持等工作。我们欢迎认真负责、愿意学习、对网络与技术实践感兴趣的同学加入，一起服务同学、提升能力、积累经验。
+
+
+    XDYou软件开发者辞：极创在XDYou早期开发期间给了相当大的帮助，网管会我在20年入学期间加入过，可惜他们没要我。应我最近找工作，找了他们的人了解了一些信息，按照约定制作本页面作为咨询费。
+
+    Bender Rodriguez 6/9/2026"
+  button_jichuang: "了解极创"
+  button_xduna: "了解网管会"
 sport:
   title: 体育查询
   class_info: 课程信息

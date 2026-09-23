@@ -160,24 +160,6 @@ classtable:
     switch_semester: Switch classtable semester
     current_time_settings: Time indicator settings
     class_color_settings: Class color settings
-  visual_settings:
-    current_time_settings_title: Time indicator settings
-    class_color_settings_title: Class color settings
-    completed_style_enabled: Completed class styling distinction
-    current_time_section: Time indicators
-    show_current_time_indicator: Show current time indicator
-    show_current_time_label: Show mini time label
-    show_today_column_highlight: Highlight today's column
-    unfinished_section: Class style
-    active_brightness_factor: "Brightness: {value}"
-    active_border_alpha: "Border opacity: {value}"
-    active_inner_alpha: "Fill opacity: {value}"
-    completed_section: Completed class style
-    completed_saturation_factor: "Fill saturation: {value}"
-    completed_brightness_factor: "Brightness: {value}"
-    completed_text_saturation_factor: "Text saturation: {value}"
-    completed_border_alpha: "Border opacity: {value}"
-    completed_inner_alpha: "Fill opacity: {value}"
   status_source:
     class_table: Class Table
     exam: Exams
@@ -989,6 +971,27 @@ setting:
   background: Background image
   no_background: You need to select an image first, it's at below
   choose_background: Choose background image
+  class_table_style_setting: Class schedule display & style
+  class_table_style_description: Time indicator and course card style
+  class_table_style_page:
+    current_time_settings_title: Time indicator settings
+    class_color_settings_title: Class schedule style settings
+    current_time_section: Time indicator settings
+    show_current_time_indicator: Show current time indicator
+    show_current_time_label: Show mini time label
+    show_today_column_highlight: Highlight today's column
+    active_section: Course card style
+    unfinished_section: Course card style
+    active_brightness_factor: "Brightness: {value}"
+    active_border_alpha: "Border opacity: {value}"
+    active_inner_alpha: "Fill opacity: {value}"
+    completed_section: Completed class style
+    completed_style_enabled: Completed class styling distinction
+    completed_saturation_factor: "Fill saturation: {value}"
+    completed_brightness_factor: "Brightness: {value}"
+    completed_text_saturation_factor: "Text saturation: {value}"
+    completed_border_alpha: "Border opacity: {value}"
+    completed_inner_alpha: "Fill opacity: {value}"
   no_permission: No storage permission obtained, cannot read files
   successful_setting: Successfully set
   failure_setting: You did not select an image
@@ -1004,13 +1007,8 @@ setting:
     Do you want to force refreshing the class schedule? If you
     agree, we will fetch the schedule from the school, which may takes a long time.
   class_swift: Class schedule offset setting
-  class_swift_description:
-    "Positive number delays the start date, negative number
-    advances the start date
-
-    Currently {swift}
-
-    "
+  class_swift_explain: Positive number delays the start date, negative number advances the start date
+  class_swift_description: Currently {swift}
   core_setting: Cached login settings
   check_logger: View network interceptor and logs
   clear_and_restart: Clear cache and restart
@@ -1224,6 +1222,21 @@ setting:
     copyright_register_code: Copyright register code
     sign_android: Android signature
     title: About this APP
+sponsorship:
+  title: "This version is sponsored and released by Jichuang Studio and the Network Management Committee."
+  dialog_title: "Sponsorship Information"
+  dialog_content:
+    "Introduction to Jichuang Studio: Jichuang Studio is a tech innovation club supported and established by the Xidian University Innovation and Entrepreneurship College. It aims to walk alongside the campus's most outstanding innovation and entrepreneurship talent, focusing on technological innovation and product research and development in fields such as artificial intelligence. Currently, the studio collaborates with manufacturers like Huawei, deeply cultivating cutting-edge directions related to large language models, and has incubated over dozens of AI-related sci-tech innovation products, 8 of which have successfully achieved commercial deployment. The studio's best-known products include SwanLab, LLMOne, and NexusGate.
+
+
+    Introduction to the XDUNA: The XDUNA operates under the Xidian University Information Network Technology Center. It primarily assists in handling campus network usage issues for faculty and students, and participates in campus network maintenance, online consultation, offline processing, and technical support. We welcome responsible students who are eager to learn and interested in network and technical practices to join us in serving fellow students, improving abilities, and gaining experience.
+
+
+    Note from the XDYou Software Developer: Jichuang provided significant help during the early development of XDYou. I joined the Network Management Committee back in my admission year in 2020, though unfortunately they didn't accept me. As I've recently been looking for a job and consulted some of their members for information, this page has been created as a consultation fee in accordance with our agreement.
+
+    Bender Rodriguez 6/9/2026"
+  button_jichuang: "About Jichuang"
+  button_xduna: "About XDUNA"
 sport:
   title: Sport Query
   class_info: Class information

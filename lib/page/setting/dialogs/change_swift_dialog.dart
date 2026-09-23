@@ -5,9 +5,10 @@
 // Change class table swift dialog.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
+import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ChangeSwiftDialog extends StatelessWidget {
@@ -35,21 +36,37 @@ class ChangeSwiftDialog extends StatelessWidget {
       title: Text(
         FlutterI18n.translate(context, "setting.change_swift_dialog.title"),
       ),
-      content: TextField(
-        autofocus: true,
-        controller: _getNumberController,
-        keyboardType: TextInputType.number,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[0-9]*')),
-        ],
-        maxLines: 1,
-        decoration: InputDecoration(
-          hintText: FlutterI18n.translate(
-            context,
-            "setting.change_swift_dialog.input_hint",
+      content: [
+        Text(FlutterI18n.translate(context, "setting.class_swift_explain")),
+        SizedBox(height: 8),
+        TextField(
+          autofocus: true,
+          controller: _getNumberController,
+          keyboardType: TextInputType.number,
+          maxLines: 1,
+          decoration: InputDecoration(
+            hintText: FlutterI18n.translate(
+              context,
+              "setting.change_swift_dialog.input_hint",
+            ),
+            suffixIcon: IconButton(
+              onPressed: () {
+                final currentText = _getNumberController.text;
+                final updatedText = currentText.startsWith('-')
+                    ? currentText.substring(1)
+                    : '-$currentText';
+                _getNumberController.value = TextEditingValue(
+                  text: updatedText,
+                  selection: TextSelection.collapsed(
+                    offset: updatedText.length,
+                  ),
+                );
+              },
+              icon: const Text("±", style: TextStyle(fontSize: 20)),
+            ),
           ),
         ),
-      ),
+      ].toColumn(mainAxisSize: MainAxisSize.min),
       actions: <Widget>[
         TextButton(
           child: Text(FlutterI18n.translate(context, "cancel")),
@@ -58,9 +75,11 @@ class ChangeSwiftDialog extends StatelessWidget {
         TextButton(
           child: Text(FlutterI18n.translate(context, "confirm")),
           onPressed: () async {
-            final value = _getNumberController.text.isEmpty
-                ? 0
-                : int.parse(_getNumberController.text);
+            final value = int.tryParse(_getNumberController.text);
+            if (value == null) {
+              showToast(context: context, msg: "无法处理成数字！请检查输入");
+              return;
+            }
             await WeekSwiftController.i.setWeekSwift(value);
             if (context.mounted) {
               Navigator.of(context).pop();

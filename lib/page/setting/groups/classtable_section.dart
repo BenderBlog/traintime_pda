@@ -10,7 +10,9 @@ import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/page/setting/class_table_style_page.dart';
 import 'package:watermeter/page/setting/dialogs/change_swift_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/semester_switch_dialog.dart';
 import 'package:watermeter/page/setting/groups/section_setting_scaffold.dart';
@@ -114,9 +116,16 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                   context: context,
                   msg: FlutterI18n.translate(context, "setting.no_background"),
                 );
-              } else {
-                preference.setBool(preference.Preference.decorated, value);
+                return;
               }
+
+              preference.setBool(preference.Preference.decorated, value).then((
+                _,
+              ) {
+                if (mounted) {
+                  setState(() {});
+                }
+              });
             },
           ),
         ),
@@ -142,7 +151,13 @@ class _ClasstableSectionState extends State<ClasstableSection> {
               final saved =
                   selectedFile != null && await _saveBackground(selectedFile);
               if (saved) {
-                preference.setBool(preference.Preference.decoration, true);
+                preference.setBool(preference.Preference.decoration, true).then(
+                  (_) {
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  },
+                );
                 if (context.mounted) {
                   showToast(
                     context: context,
@@ -164,6 +179,21 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                 }
               }
             }
+          },
+        ),
+        ListTile(
+          title: Text(
+            FlutterI18n.translate(context, "setting.class_table_style_setting"),
+          ),
+          subtitle: Text(
+            FlutterI18n.translate(
+              context,
+              "setting.class_table_style_description",
+            ),
+          ),
+          trailing: const Icon(Icons.navigate_next),
+          onTap: () {
+            context.push(const ClassTableStylePage());
           },
         ),
         ListTile(
@@ -242,8 +272,10 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                     await Future.wait([
                       ClassTableController.i.reloadClassTable(),
                       ExamController.i.reloadExamInfo(),
-                      PhysicsExperimentController.i.reloadPhysicsExperiment(),
-                      OtherExperimentController.i.reloadOtherExperiment(),
+                      if (!preference.getBool(preference.Preference.role)) ...[
+                        PhysicsExperimentController.i.reloadPhysicsExperiment(),
+                        OtherExperimentController.i.reloadOtherExperiment(),
+                      ],
                     ]);
                     await maybeAutoSyncSystemCalendar();
                     if (mounted) {
@@ -259,8 +291,6 @@ class _ClasstableSectionState extends State<ClasstableSection> {
             ),
           ),
         ),
-
-        /// TODO: Refactor class swift, explain goes to dialog, show current state
         ListTile(
           title: Text(FlutterI18n.translate(context, "setting.class_swift")),
           subtitle: Text(
