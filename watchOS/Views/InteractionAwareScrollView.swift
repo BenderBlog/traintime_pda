@@ -116,8 +116,9 @@ struct InteractionAwareScrollView<Content: View>: View {
                 alwaysAllowsBounce ? .always : .basedOnSize,
                 axes: .vertical
             )
-            // 教学视觉代理启用时由同一份 DragGesture 数据唯一驱动位置，
-            // 避免系统滚动与代理同时响应而产生双倍位移。程序化定位仍可用。
+            // 教学视觉代理启用时，只有手指拖动已经开始才暂时停用原生
+            // 滚动。空闲时必须保留原生滚动容器，否则 Digital Crown 没有
+            // 可以驱动的滚动会话，课程列表教学中的表冠就会完全失效。
             .scrollDisabled(disablesNativeScrollForTeaching)
 
             crownFocusedScrollView(
@@ -187,13 +188,24 @@ struct InteractionAwareScrollView<Content: View>: View {
         "\(requestsCrownFocus ? 1 : 0):\(inputContext)"
     }
 
-    /// 仅在当前系统确实具备对应视觉代理时禁用系统手势滚动。
+    /// 仅在当前系统确实具备对应视觉代理且手指正在拖动时禁用系统手势滚动。
     ///
     /// `.elastic` 完全由本视图的偏移实现；`.nativePosition` 则依赖
-    /// watchOS 11 的 `ScrollPosition`。watchOS 10 没有该 API，必须保留
-    /// 原生滚动，否则会出现教学能识别手势但课程列表完全不移动的问题。
+    /// watchOS 11 的 `ScrollPosition`。手指按下前保留原生滚动，让表冠仍然
+    /// 可以直接推动 ScrollView；手指结束后立即恢复原生滚动与惯性。watchOS
+    /// 10 没有该 API，始终保留原生滚动。
     private var disablesNativeScrollForTeaching: Bool {
-        hasProgrammaticTeachingScrollEffect
+        switch teachingTouchScrollEffect {
+        case .disabled:
+            return false
+        case .elastic:
+            return true
+        case .nativePosition:
+            if #available(watchOS 11.0, *) {
+                return nativeTouchGestureIsActive
+            }
+            return false
+        }
     }
 
     /// watchOS 11 起使用 `ScrollPosition` 连续推动原生滚动容器。
