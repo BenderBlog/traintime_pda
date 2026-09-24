@@ -233,6 +233,12 @@ struct DayScheduleView: View {
             courseLayoutTracker.resumePersistence()
             updateDayNavigationTitle()
         }
+        // 日视图既可能从模式列表进入，也可能在月历选择器关闭后恢复；两种
+        // 路径都让出两次主线程更新，确保透明表冠节点已经回到焦点树。
+        .task(id: isDatePickerPresented) {
+            guard !isDatePickerPresented else { return }
+            await reclaimCrownFocusAfterEntrance()
+        }
         .onDisappear {
             crownFocused = false
             // 同时废弃已排入主队列的聚焦回调；取消 Task 不能撤回 DispatchQueue 回调。
@@ -1349,6 +1355,17 @@ struct DayScheduleView: View {
     /// 目标日期零或一项日程时继续横向翻页；两项及以上时恢复纵向浏览。
     private func dayCrownBinding(for courseCount: Int) -> DayCrownBinding {
         courseCount <= 1 ? .horizontalPages : .verticalCourses
+    }
+
+    /// 重新绑定日视图的透明表冠节点，不重置当前日期或内容偏移。
+    @MainActor
+    private func reclaimCrownFocusAfterEntrance() async {
+        await Task.yield()
+        guard !Task.isCancelled, !isDatePickerPresented else { return }
+        crownFocused = false
+        await Task.yield()
+        guard !Task.isCancelled, !isDatePickerPresented else { return }
+        crownFocused = true
     }
 
     /// 在吸附完成后更新导航轴，并于下一次主线程循环重新取得表冠焦点。

@@ -150,7 +150,10 @@ struct InteractionAwareScrollView<Content: View>: View {
                 }
                 intrinsicContentHeight = height
             }
-            .task(id: requestsCrownFocus) {
+            // 教学步骤复用同一个页面 identity；把输入上下文纳入任务 ID，
+            // 每次切换步骤都重新绑定一次焦点，避免旧步骤的焦点失效后要
+            // 先点一下表冠才能重新进入原生滚动容器。
+            .task(id: crownFocusTaskID) {
                 guard requestsCrownFocus else {
                     nativeScrollFocused = false
                     return
@@ -177,6 +180,11 @@ struct InteractionAwareScrollView<Content: View>: View {
                 }
             }
         }
+    }
+
+    /// 同一滚动视图会跨多个教学步骤复用；上下文变化时必须重新申请焦点。
+    private var crownFocusTaskID: String {
+        "\(requestsCrownFocus ? 1 : 0):\(inputContext)"
     }
 
     /// 仅在当前系统确实具备对应视觉代理时禁用系统手势滚动。

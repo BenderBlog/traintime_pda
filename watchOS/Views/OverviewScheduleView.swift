@@ -26,6 +26,9 @@ struct OverviewScheduleView: View {
             teachingTouchScrollEffect: drivesTeachingTouchScroll
                 ? .elastic
                 : .disabled,
+            // 概览教学在识别触摸与表冠时都需要由滚动容器接管输入焦点。
+            // 否则步骤切换后焦点可能仍停在根容器，首次操作会被吞掉。
+            requestsCrownFocus: alwaysAllowsTeachingBounce,
             protectsInitialTopEdge: true
         ) {
             TimelineView(.explicit(store.presentationTimelineDates)) { context in

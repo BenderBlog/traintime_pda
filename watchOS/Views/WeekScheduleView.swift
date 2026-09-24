@@ -127,6 +127,11 @@ struct WeekScheduleView: View {
             lastCrownEventOffset = crownValue
             clampAnchorToSemester()
         }
+        // 模式选择页关闭后，系统可能仍在上一层焦点事务中。让出两次主线程
+        // 更新再重新绑定透明表冠节点，避免进入周视图后第一次旋转没有事件。
+        .task {
+            await reclaimCrownFocusAfterEntrance()
+        }
         .onChange(of: weekStart) { _, date in onPageChange(date) }
         .onChange(of: store.semesterRangeStart) { _, _ in
             clampAnchorToSemester()
@@ -245,6 +250,17 @@ struct WeekScheduleView: View {
             guard selectedCourse == nil else { return }
             crownFocused = true
         }
+    }
+
+    /// 初次进入周视图时重新绑定焦点；不改变分页状态或当前周次。
+    @MainActor
+    private func reclaimCrownFocusAfterEntrance() async {
+        await Task.yield()
+        guard !Task.isCancelled, selectedCourse == nil else { return }
+        crownFocused = false
+        await Task.yield()
+        guard !Task.isCancelled, selectedCourse == nil else { return }
+        crownFocused = true
     }
 
     /// 优先采用手机同步的周次参考；缺少参考时按学期开始日期推算。
