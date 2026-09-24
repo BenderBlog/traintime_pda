@@ -42,7 +42,8 @@ struct InteractionAwareScrollView<Content: View>: View {
     var inputContext: Int = 0
     /// 教学专用视觉滚动。正常使用与其他教学步骤始终保持 `.disabled`。
     var teachingTouchScrollEffect: TeachingTouchScrollEffect = .disabled
-    /// 顶层详情覆盖周视图时，由内部原生 ScrollView 主动接管表冠焦点。
+    /// 顶层详情或教学课程列表需要稳定的表冠输入时，由内部原生
+    /// ScrollView 主动接管焦点。
     var requestsCrownFocus = false
     var protectsInitialTopEdge = false
     var alwaysProtectsInitialTopEdge = false

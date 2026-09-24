@@ -47,6 +47,9 @@ struct CourseListView: View {
                 teachingTouchScrollEffect: drivesTeachingTouchScroll
                     ? .nativePosition
                     : .disabled,
+                // 教学同时支持表冠浏览时主动取得滚动焦点，避免首次触摸后
+                // 焦点仍停在根容器，出现必须先点一下或转一下表冠才响应的情况。
+                requestsCrownFocus: alwaysAllowsTeachingBounce,
                 protectsInitialTopEdge: true
             ) {
                 if groups.isEmpty {

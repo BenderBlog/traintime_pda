@@ -779,7 +779,10 @@ struct RootScheduleView: View {
                     onCrownInput: handleOnboardingCrownInput,
                     onTouchInput: handleOnboardingVerticalSwipeInput,
                     alwaysAllowsTeachingBounce: onboardingStep == .courseListBrowse,
-                    drivesTeachingTouchScroll: false,
+                    // 课程列表教学由同一份拖动采样驱动原生位置，确保提示
+                    // 通过检查的同时内容已经跟手移动；watchOS 10 会在
+                    // InteractionAwareScrollView 内自动回退到系统滚动。
+                    drivesTeachingTouchScroll: onboardingStep == .courseListBrowse,
                     inputContext: onboardingStep?.rawValue ?? -1,
                     positionsInitialDate: onboardingStep == nil
                 )
