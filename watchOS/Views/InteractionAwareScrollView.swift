@@ -74,6 +74,13 @@ struct InteractionAwareScrollView<Content: View>: View {
     @State private var teachingDragStartScrollOffset: CGFloat = 0
     @State private var teachingRequestedScrollOffset: CGFloat = 0
     @State private var teachingElasticOffset: CGFloat = 0
+    /// 教学滚动容器显式接管表冠后，记录累计刻度与本轮可见行程。
+    /// 原生 ScrollView 在不同 watchOS 版本上的表冠焦点行为不一致，
+    /// 这里沿用日/周/月分页器的显式 `digitalCrownRotation` 入口。
+    @State private var teachingCrownDetent = 0.0
+    @State private var teachingCrownLastDetent = 0.0
+    @State private var teachingCrownSessionActive = false
+    @State private var teachingCrownTravel: CGFloat = 0
     @FocusState private var nativeScrollFocused: Bool
 
     var body: some View {
@@ -188,13 +195,29 @@ struct InteractionAwareScrollView<Content: View>: View {
         "\(requestsCrownFocus ? 1 : 0):\(inputContext)"
     }
 
-    /// 仅在当前系统确实具备对应视觉代理且手指正在拖动时禁用系统手势滚动。
+    /// 教学页面使用独立表冠输入桥，避免不同 watchOS 版本对原生
+    /// ScrollView 焦点的差异。正常浏览和课程详情仍完全使用系统滚动。
+    private var usesTeachingCrownBridge: Bool {
+        guard requestsCrownFocus, alwaysAllowsBounce else { return false }
+        switch teachingTouchScrollEffect {
+        case .disabled, .nativePosition:
+            return true
+        case .elastic:
+            return false
+        }
+    }
+
+    /// 教学表冠桥或触摸视觉代理接管时禁用系统手势滚动。
     ///
-    /// `.elastic` 完全由本视图的偏移实现；`.nativePosition` 则依赖
-    /// watchOS 11 的 `ScrollPosition`。手指按下前保留原生滚动，让表冠仍然
-    /// 可以直接推动 ScrollView；手指结束后立即恢复原生滚动与惯性。watchOS
-    /// 10 没有该 API，始终保留原生滚动。
+    /// `.elastic` 完全由本视图的偏移实现；watchOS 11 的教学表冠与
+    /// `.nativePosition` 共用 `ScrollPosition`。watchOS 10 没有该 API，
+    /// 保留系统 ScrollView 的兼容路径。
     private var disablesNativeScrollForTeaching: Bool {
+        if #available(watchOS 11.0, *), usesTeachingCrownBridge {
+            // 表冠和 watchOS 11 的触摸代理共用 ScrollPosition；保留原生
+            // ScrollView 的滚动手势会把同一刻度应用两次。
+            return true
+        }
         switch teachingTouchScrollEffect {
         case .disabled:
             return false
@@ -216,8 +239,7 @@ struct InteractionAwareScrollView<Content: View>: View {
     private func teachingPositionedScrollView<ScrollContent: View>(
         _ scrollView: ScrollContent
     ) -> some View {
-        if #available(watchOS 11.0, *),
-           teachingTouchScrollEffect == .nativePosition
+        if #available(watchOS 11.0, *), usesTeachingCrownBridge
         {
             TeachingNativeScrollPositionBridge(
                 requestedOffset: $teachingRequestedScrollOffset,
@@ -249,9 +271,24 @@ struct InteractionAwareScrollView<Content: View>: View {
         _ scrollView: ScrollContent
     ) -> some View {
         if requestsCrownFocus {
-            scrollView
+            let focusedScrollView = scrollView
                 .focusable()
                 .focused($nativeScrollFocused)
+            if #available(watchOS 11.0, *), usesTeachingCrownBridge {
+                focusedScrollView.digitalCrownRotation(
+                    detent: $teachingCrownDetent,
+                    from: -1_000,
+                    through: 1_000,
+                    by: 0.25,
+                    sensitivity: .medium,
+                    isContinuous: true,
+                    isHapticFeedbackEnabled: false,
+                    onChange: handleTeachingCrownChange,
+                    onIdle: finishTeachingCrown
+                )
+            } else {
+                focusedScrollView
+            }
         } else {
             scrollView
         }
@@ -438,7 +475,60 @@ struct InteractionAwareScrollView<Content: View>: View {
         nativeScrollSawTouchTracking = false
         nativeScrollReportedInput = false
         offsetTracker.previousOffset = nil
+        resetTeachingCrownSession()
         finishTeachingTouchScroll()
+    }
+
+    /// 步骤切换、页面离开和焦点重绑都必须丢弃上一轮表冠累计刻度。
+    private func resetTeachingCrownSession() {
+        teachingCrownSessionActive = false
+        teachingCrownTravel = 0
+        teachingCrownLastDetent = teachingCrownDetent
+    }
+
+    /// 将显式表冠刻度映射到教学滚动位置。正向刻度表示向下浏览，
+    /// 与系统 ScrollView 的内容坐标保持一致；实际上限由 ScrollPosition
+    /// 根据当前 LazyVStack 的滚动范围自动裁剪。
+    private func handleTeachingCrownChange(_ event: DigitalCrownEvent) {
+        guard usesTeachingCrownBridge,
+              event.offset.isFinite
+        else { return }
+
+        let delta = event.offset - teachingCrownLastDetent
+        teachingCrownLastDetent = event.offset
+        guard abs(delta) > .ulpOfOne else { return }
+
+        if !teachingCrownSessionActive {
+            teachingCrownSessionActive = true
+            teachingCrownTravel = 0
+            onScroll()
+            // 触摸或上一轮表冠可能刚刚改变了实际位置；以最近一次
+            // 偏移采样作为本轮起点，避免第一格刻度跳回顶部。
+            if let observedOffset = offsetTracker.previousOffset {
+                teachingRequestedScrollOffset = max(0, -observedOffset)
+            }
+        }
+
+        let proposedOffset = max(
+            0,
+            teachingRequestedScrollOffset - CGFloat(delta) * 44
+        )
+        let visibleDelta = abs(
+            proposedOffset - teachingRequestedScrollOffset
+        )
+        guard visibleDelta > 0.05 else { return }
+        teachingRequestedScrollOffset = proposedOffset
+        teachingCrownTravel += visibleDelta
+    }
+
+    /// 表冠停止后再提交教学结果，持续旋转期间只更新真实页面。
+    private func finishTeachingCrown() {
+        guard teachingCrownSessionActive else { return }
+        let didMove = teachingCrownTravel >= 1
+        resetTeachingCrownSession()
+        if didMove {
+            onCrownInput()
+        }
     }
 
     /// 记录本轮拖动开始时的真实滚动位置。
