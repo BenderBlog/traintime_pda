@@ -54,9 +54,18 @@ const double classTableSheetMargin = 8.0;
 
 /// The least amount of room kept below the sheet.
 ///
-/// Devices which do not report the corners of their display would otherwise
-/// only get the (possibly zero) navigation bar inset.
-const double classTableMinimumBottomInset = 16.0;
+/// The sheet does not reach the edges of the display, so the corner of the
+/// screen only reaches in about half of its radius where the sheet starts. This
+/// is the floor of that half, so that devices which do not report their corners
+/// still get some breathing room.
+const double classTableMinimumBottomInset = 24.0;
+
+/// The most room the rounded corner of a display may push the sheet up by.
+///
+/// Half of the corner radius is enough to keep the last class of the day clear
+/// of it, and this keeps a device with an unusually round screen from wasting
+/// a lot of room.
+const double classTableMaximumBottomInset = 40.0;
 
 /// The corner radius of the classtable sheet.
 ///

@@ -159,16 +159,21 @@ class _ContentClassTablePageState extends State<ContentClassTablePage>
     /// the navigation bar whenever the keyboard is around.
     final padding = MediaQuery.paddingOf(context);
     final viewPadding = MediaQuery.viewPaddingOf(context);
+
+    /// The sheet does not reach the edges of the display, so the corner of the
+    /// screen only reaches in about half of its radius where the sheet starts.
+    /// Keeping the whole radius free left a lot of empty room on devices with
+    /// round corners, so only half of it is kept, within sane limits.
     final corners = DisplayCorner.radii;
+    final cornerInset = math.min(
+      math.max(corners.bottom / 2, classTableMinimumBottomInset),
+      classTableMaximumBottomInset,
+    );
     return EdgeInsets.fromLTRB(
       padding.left + classTableSheetMargin,
       padding.top + classTableSheetMargin,
       padding.right + classTableSheetMargin,
-      math.max(
-            math.max(viewPadding.bottom, corners.bottom),
-            classTableMinimumBottomInset,
-          ) +
-          classTableSheetMargin,
+      math.max(viewPadding.bottom, cornerInset) + classTableSheetMargin,
     );
   }
 
