@@ -4,12 +4,15 @@
 
 // Course reminder notification settings page
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/repository/notification/course_live_update_service.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
@@ -34,6 +37,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   bool _isLoading = true;
   int _pendingCount = 0;
   bool _enableExperimentNotifications = false;
+
+  /// 岛（实时更新 / 灵动岛）是另一件事：提醒响一下就走了，它是上课期间一直挂着的
+  /// 状态，所以有自己的开关和提前量。
+  bool _islandEnabled = true;
+  bool _islandSupported = false;
+  int _islandLead = kDefaultLiveUpdateLeadMinutes;
 
   @override
   void initState() {
@@ -81,6 +90,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       // Get the number of notifications to be sent
       _pendingCount = await _courseReminder
           .getPendingCourseNotificationsCount();
+
+      await _loadIslandSettings();
     } catch (e) {
       if (mounted) {
         showToast(
@@ -97,6 +108,74 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         setState(() {
           _isLoading = false;
         });
+      }
+    }
+  }
+
+  /// 岛的状态（有没有、开着没、提前多少）都在平台侧，这里读一次做镜像。
+  Future<void> _loadIslandSettings() async {
+    final service = CourseLiveUpdateService.instance;
+    final supported = await service.isSupported();
+    if (!supported) {
+      if (mounted) {
+        setState(() => _islandSupported = false);
+      }
+      return;
+    }
+
+    final diagnostics = await service.diagnostics();
+    final lead =
+        (diagnostics["leadMinutes"] as int?) ?? kDefaultLiveUpdateLeadMinutes;
+
+    if (mounted) {
+      setState(() {
+        _islandSupported = true;
+        _islandEnabled = diagnostics["enabled"] as bool? ?? true;
+        _islandLead = kLiveUpdateLeadMinuteOptions.contains(lead)
+            ? lead
+            : kDefaultLiveUpdateLeadMinutes;
+      });
+    }
+  }
+
+  /// 岛的总开关。打开时顺手把接下来的课排上，关掉时把岛上那条也收走。
+  Future<void> _toggleIsland(bool value) async {
+    setState(() {
+      _islandEnabled = value;
+      _isLoading = true;
+    });
+
+    try {
+      final service = CourseLiveUpdateService.instance;
+      await service.setEnabled(value);
+      if (value) {
+        await service.scheduleFromCourseData(daysToSchedule: _daysToSchedule);
+      } else {
+        await service.cancelAll();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  /// 提前多久上岛。和「提前提醒时间」是两个设置，各管各的。
+  Future<void> _changeIslandLead(int value) async {
+    setState(() {
+      _islandLead = value;
+      _isLoading = true;
+    });
+
+    try {
+      final service = CourseLiveUpdateService.instance;
+      await service.setLeadMinutes(value);
+      if (_islandEnabled) {
+        await service.scheduleFromCourseData(daysToSchedule: _daysToSchedule);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -640,6 +719,81 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ],
             ),
           ),
+
+          // The island of the ongoing class. It is not a reminder, so it is not
+          // part of the card above.
+          if (Platform.isAndroid && _islandSupported)
+            ReXCard(
+              title: _buildListSubtitle(
+                FlutterI18n.translate(
+                  context,
+                  'setting.notification_page.live_update_section',
+                ),
+              ),
+              remaining: const [],
+              bottomRow: Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      FlutterI18n.translate(
+                        context,
+                        'setting.notification_page.live_update_enabled',
+                      ),
+                    ),
+                    subtitle: Text(
+                      FlutterI18n.translate(
+                        context,
+                        'setting.notification_page.live_update_enabled_hint',
+                      ),
+                    ),
+                    trailing: Switch(
+                      value: _islandEnabled,
+                      onChanged: _toggleIsland,
+                    ),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: Text(
+                      FlutterI18n.translate(
+                        context,
+                        'setting.notification_page.live_update_lead',
+                      ),
+                    ),
+                    subtitle: Text(
+                      FlutterI18n.translate(
+                        context,
+                        'setting.notification_page.live_update_lead_hint',
+                      ),
+                    ),
+                    trailing: DropdownButton<int>(
+                      value: _islandLead,
+                      items: kLiveUpdateLeadMinuteOptions
+                          .map(
+                            (value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(
+                                value == 0
+                                    ? FlutterI18n.translate(
+                                        context,
+                                        'setting.notification_page.live_update_lead_at_class',
+                                      )
+                                    : '$value ${FlutterI18n.translate(context, "setting.notification_page.minutes_unit")}',
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: _islandEnabled
+                          ? (value) {
+                              if (value != null) {
+                                _changeIslandLead(value);
+                              }
+                            }
+                          : null,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
           // Permission state
           ReXCard(

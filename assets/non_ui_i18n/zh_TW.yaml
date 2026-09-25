@@ -4,3 +4,10 @@ course_reminder:
   body: '{time} 分鐘後開始上課'
   location: 地點：{location}
   teacher: 教師：{teacher}
+
+course_live_update:
+  period: 第 {start}-{stop} 節
+  period_single: 第 {start} 節
+  next_class: 下一節 {time} · {location}
+  upcoming_start: 即將開始
+  no_location: 未知教室

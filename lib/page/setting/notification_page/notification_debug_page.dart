@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
+import 'package:watermeter/page/setting/notification_page/course_live_update_debug_card.dart';
 import 'package:watermeter/page/setting/notification_page/notification_test_widget.dart';
 import 'package:watermeter/repository/notification/notification_registrar.dart';
 
@@ -24,12 +25,12 @@ class _NotificationDebugPageState extends State<NotificationDebugPage> {
       appBar: AppBar(title: Text('通知服务调试页面')),
       body: ListView(
         padding: const EdgeInsets.all(16).withSafeBottom(context),
-        children: NotificationServiceRegistrar()
-            .getAllServices()
-            .map(
-              (service) => NotificationTestWidget(notificationService: service),
-            )
-            .toList(),
+        children: [
+          const CourseLiveUpdateDebugCard(),
+          ...NotificationServiceRegistrar().getAllServices().map(
+            (service) => NotificationTestWidget(notificationService: service),
+          ),
+        ],
       ),
     );
   }

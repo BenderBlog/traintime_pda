@@ -853,6 +853,12 @@ setting:
     minutes_before: 提前提醒时间
     minutes_before_hint: 课前提前提醒的时间设置
     minutes_unit: 分钟
+    live_update_section: 实时更新（岛）
+    live_update_enabled: 上课时显示在岛上
+    live_update_enabled_hint: 上课期间一直挂在状态栏/岛上，放学自动消失；和提醒是两回事
+    live_update_lead: 提前多久上岛
+    live_update_lead_hint: 只影响岛，不响铃；上面的「提前提醒时间」才是会响的那条
+    live_update_lead_at_class: 上课时
     days_to_schedule: 计划通知天数
     days_to_schedule_hint: 本程序是提前将课程信息写入计划日程，该设置可调整写入计划日程的天数
     days_unit: 天
@@ -885,6 +891,8 @@ setting:
   classtable_setting: 课表相关设置
   background: 开启课表背景图
   no_background: 你先选个图片罢，就在下面
+  background_blur: "背景模糊: {value}"
+  background_blur_off: 关闭
   choose_background: 课表背景图选择
   class_table_style_setting: 课表显示与样式
   class_table_style_description: 时间指示和课程卡片样式

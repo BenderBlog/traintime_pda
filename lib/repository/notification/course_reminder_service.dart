@@ -18,6 +18,7 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/notification/course_live_update_service.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/routing/routes.dart';
@@ -301,7 +302,7 @@ class CourseReminderService extends NotificationService
     );
   }
 
-  String _getCurrentLocale() {
+  String getCurrentLocale() {
     // Get current locale from preference
     String locale = preference.getString(preference.Preference.localization);
     // If localization is not set or empty, get system locale
@@ -376,7 +377,7 @@ class CourseReminderService extends NotificationService
         return;
       }
 
-      final String locale = _getCurrentLocale();
+      final String locale = getCurrentLocale();
       int scheduledCount = 0;
 
       for (final customClass in data) {
@@ -527,7 +528,7 @@ class CourseReminderService extends NotificationService
             '${classStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
           );
 
-          String locale = _getCurrentLocale();
+          String locale = getCurrentLocale();
 
           String title = NonUII18n.translate(
             locale,
@@ -662,7 +663,7 @@ class CourseReminderService extends NotificationService
             '$minutesBefore|$weekIndex',
           );
 
-          String locale = _getCurrentLocale();
+          String locale = getCurrentLocale();
 
           // Use course_reminder translation keys to treat experiments as courses
           String title = NonUII18n.translate(
@@ -764,7 +765,7 @@ class CourseReminderService extends NotificationService
           'exam|${exam.subject}|${exam.typeStr}|${exam.place}|'
           '${examStartTime.toIso8601String()}|$minutesBefore|$weekIndex',
         );
-        final locale = _getCurrentLocale();
+        final locale = getCurrentLocale();
 
         String title = NonUII18n.translate(
           locale,
@@ -839,6 +840,11 @@ class CourseReminderService extends NotificationService
           minutesBefore: minutesBefore,
         ),
       ]);
+
+      /// The class which is going on is published as a Live Update (Android)
+      /// or a Live Activity (iOS) as well, so that it shows up in the island
+      /// of the device while it lasts.
+      await _scheduleLiveUpdate(daysToSchedule);
     } catch (e, stackTrace) {
       log.error(
         '[CourseReminderService] [scheduleNotificationsFromCourseData] Failed to schedule notifications from course data',
@@ -848,21 +854,22 @@ class CourseReminderService extends NotificationService
     }
   }
 
+  /// 把接下来的课放到岛上（实时更新 / 灵动岛）。
+  ///
+  /// 它有自己的开关（通知设置里的「上课时显示在岛上」），关着的时候原生那边
+  /// 什么都不会排，所以这里不用再判断一次。
+  Future<void> _scheduleLiveUpdate(int daysToSchedule) async {
+    await CourseLiveUpdateService.instance.scheduleFromCourseData(
+      daysToSchedule: daysToSchedule,
+    );
+  }
+
   /// Validate and update the scheduled notification
   Future<void> validateAndUpdateNotifications() async {
     log.info(
       '[CourseReminderService] [validateAndUpdateNotifications] Validating scheduled notifications...',
     );
     try {
-      // Check if notifications are enabled first
-      if (!isEnabled) {
-        log.info(
-          '[CourseReminderService] [validateAndUpdateNotifications] Notifications not enabled, skipping validation',
-        );
-        await cancelAllCourseNotifications();
-        return;
-      }
-
       if (!hasSchedulableReminderSourceData) {
         log.warning(
           '[CourseReminderService] [validateAndUpdateNotifications] No schedulable reminder source data available, cannot validate notifications',
@@ -875,8 +882,22 @@ class CourseReminderService extends NotificationService
       final int daysToSchedule = config?['daysToSchedule'] ?? 7;
       final int minutesBefore = config?['minutesBefore'] ?? 5;
 
+      /// The island of the ongoing class is not a reminder: it is a status which
+      /// stays while the class goes on, so it follows its own switch and is put
+      /// in place whether the reminders are on or not.
+      await _scheduleLiveUpdate(daysToSchedule);
+
+      // Check if notifications are enabled first
+      if (!isEnabled) {
+        log.info(
+          '[CourseReminderService] [validateAndUpdateNotifications] Notifications not enabled, skipping validation',
+        );
+        await cancelAllCourseNotifications();
+        return;
+      }
+
       // Check if locale has changed
-      final currentLocale = _getCurrentLocale();
+      final currentLocale = getCurrentLocale();
       final lastLocale = config?['lastLocale'] as String?;
 
       if (lastLocale != null && lastLocale != currentLocale) {
@@ -948,7 +969,7 @@ class CourseReminderService extends NotificationService
       minutesBefore,
     );
 
-    String currentLocale = _getCurrentLocale();
+    String currentLocale = getCurrentLocale();
     await _setLastLocale(currentLocale);
   }
 
