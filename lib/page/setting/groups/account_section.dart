@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
@@ -15,10 +16,10 @@ class AccountSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.account_setting"),
       items: [
         if (!preference.getBool(preference.Preference.role)) ...[
           ListTile(
+            leading: const Icon(MingCuteIcons.mgc_run_line),
             title: Text(
               FlutterI18n.translate(context, "setting.sport_password_setting"),
             ),
@@ -32,6 +33,7 @@ class AccountSection extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(MingCuteIcons.mgc_flask_line),
             title: Text(
               FlutterI18n.translate(
                 context,
@@ -50,6 +52,7 @@ class AccountSection extends StatelessWidget {
         ],
 
         ListTile(
+          leading: const Icon(MingCuteIcons.mgc_wifi_line),
           title: Text(
             FlutterI18n.translate(
               context,

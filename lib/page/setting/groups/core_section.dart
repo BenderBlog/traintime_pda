@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:restart_app/restart_app.dart';
@@ -32,15 +33,16 @@ class CoreSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.core_setting"),
       items: [
         ListTile(
+          leading: const Icon(MingCuteIcons.mgc_document_line),
           title: Text(FlutterI18n.translate(context, "setting.check_logger")),
           trailing: const Icon(Icons.navigate_next),
-          onTap: () => context.pushReplacement(TalkerScreen(talker: log)),
+          onTap: () => context.push(TalkerScreen(talker: log)),
         ),
 
         ListTile(
+          leading: const Icon(MingCuteIcons.mgc_broom_line),
           title: Text(
             FlutterI18n.translate(context, "setting.clear_and_restart"),
           ),
@@ -130,6 +132,7 @@ class CoreSection extends StatelessWidget {
           ),
         ),
         ListTile(
+          leading: const Icon(MingCuteIcons.mgc_exit_door_line),
           title: Text(FlutterI18n.translate(context, "setting.logout")),
           trailing: const Icon(Icons.navigate_next),
           onTap: () => showDialog<String>(

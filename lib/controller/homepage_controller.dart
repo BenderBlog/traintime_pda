@@ -1,6 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
@@ -132,10 +134,8 @@ class HomepageController {
     ]);
     await maybeAutoSyncSystemCalendar();
 
-    final reminderService = CourseReminderService();
-    if (reminderService.isInitialized) {
-      reminderService.validateAndUpdateNotifications();
-    } else {
+    if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+      final reminderService = CourseReminderService();
       await reminderService.initialize();
       reminderService.validateAndUpdateNotifications();
     }

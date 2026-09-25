@@ -2,25 +2,34 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/material.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
 import 'package:watermeter/page/setting/groups/section_setting_scaffold.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/routing/routes.dart';
 
 class AboutSection extends StatelessWidget {
-  const AboutSection({super.key});
+  final VoidCallback onAboutTap;
+  final bool selected;
+
+  const AboutSection({
+    super.key,
+    required this.onAboutTap,
+    this.selected = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.about_info"),
       items: [
         ListTile(
+          selected: selected,
+          selectedTileColor: Theme.of(context).colorScheme.secondaryContainer,
+          selectedColor: Theme.of(context).colorScheme.onSecondaryContainer,
+          leading: const Icon(MingCuteIcons.mgc_information_line),
           title: Text(
             FlutterI18n.translate(context, "setting.about_this_program"),
           ),
@@ -35,10 +44,11 @@ class AboutSection extends StatelessWidget {
               },
             ),
           ),
-          onTap: () => context.pushReplacementNamed(Routes.about),
+          onTap: onAboutTap,
           trailing: const Icon(Icons.navigate_next),
         ),
         ListTile(
+          leading: const Icon(MingCuteIcons.mgc_download_line),
           title: Text(FlutterI18n.translate(context, "setting.check_update")),
           subtitle: SignalBuilder(
             builder: (context) {

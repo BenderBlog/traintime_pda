@@ -764,6 +764,19 @@ score:
     CET-4: 国家英语四级
     CET-6: 国家英语六级
 setting:
+  sections:
+    display: 显示
+    home: 首页
+    electricity: 电量提醒
+    timetable_appearance: 课表外观
+    semester: 学期与周次
+    course_data: 课程数据
+  navigation:
+    ui_description: 主题、字体、语言与首页显示
+    classtable_description: 课表外观、学期与课程数据
+    account_description: 校园服务的账号与密码
+    notifications_description: 课前提醒与通知管理
+    core_description: 日志、缓存清理与退出登录
   about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 关于
@@ -779,7 +792,7 @@ setting:
   current_testing: 目前您正在运行测试版
   fetch_failed: 获取更新信息失败
   ui_setting: 界面设置
-  brightness_setting: 设置深浅色
+  brightness_setting: 深浅色模式
   color_setting: 颜色设置
   font_size_setting: 字体大小与粗细
   font_size_page:
@@ -881,7 +894,7 @@ setting:
     cancel_all_success: 已取消所有课前提醒
     reschedule_success: 已重新安排 {count} 个课前提醒
     reschedule_failed: "重新安排通知失败: {error}"
-  notification_debug_page: 通知服务调试页面
+  notification_debug_page: 通知状态与测试
   classtable_setting: 课表相关设置
   background: 开启课表背景图
   no_background: 你先选个图片罢，就在下面
@@ -947,9 +960,10 @@ setting:
   change_brightness_dialog:
     title: 亮度设置
     follow_setting: 跟随系统
-    day_mode: 白天模式
-    night_mode: 黑夜模式
+    day_mode: 浅色
+    night_mode: 深色
   change_swift_dialog:
+    invalid_number: 请输入有效的整数
     title: 课程偏移设置
     input_hint: 请在此输入数字
   change_electricity_title: 修改电费帐号
