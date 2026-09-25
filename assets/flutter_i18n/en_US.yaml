@@ -228,6 +228,9 @@ classtable:
 
     Go back to mainpage and goto the exam info page."
   week_title: Week {week}
+  week_bar:
+    pin: Pin the week bar
+    unpin: Collapse the week bar
   noon_break: Noon
   supper_break: Supper
   month: "{month}

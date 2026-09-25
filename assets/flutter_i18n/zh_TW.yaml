@@ -198,6 +198,9 @@ classtable:
 
     請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面'
   week_title: 第{week}周
+  week_bar:
+    pin: 固定週次欄
+    unpin: 收起週次欄
   noon_break: 午休
   supper_break: 晚休
   month: '{month}

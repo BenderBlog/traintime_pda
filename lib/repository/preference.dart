@@ -59,6 +59,10 @@ enum Preference {
     key: "classTableBackgroundBlur",
     type: "double",
   ), // 课表背景图的模糊程度
+  classTableWeekBarCollapsed(
+    key: "classTableWeekBarCollapsed",
+    type: "bool",
+  ), // 周次栏是否收进标题栏；默认 false 即固定显示
   swift(key: "swift", type: "int"), // 周次偏移
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式
