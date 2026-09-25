@@ -5,33 +5,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/time_list.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
-import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_table_time_line.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-
-/// THe classtable view, the way the the classtable sheet rendered.
-class ClassTableView extends StatefulWidget {
-  final int index;
-  final BoxConstraints constraint;
-  final bool enableVerticalScrolling;
-
-  const ClassTableView({
-    super.key,
-    required this.constraint,
-    required this.index,
-    this.enableVerticalScrolling = true,
-  });
-
-  @override
-  State<ClassTableView> createState() => _ClassTableViewState();
-}
 
 ///
 /// Classtable blanks below per blocks.
@@ -42,6 +23,25 @@ class ClassTableView extends StatefulWidget {
 ///  * Evening time 9-11 each 5 blocks.
 /// Total 61 parts, 49 as phone divider.
 ///
+
+/// One week of the class table: the class cards, the day-column highlight and the current-time
+/// indicator.
+///
+/// The date row and the time line are deliberately not here. They belong to `ClassTableSheet`, which
+/// lays them out once for the whole table so that they stay still while the weeks page horizontally.
+class ClassTableView extends StatefulWidget {
+  /// The week this page shows.
+  final int index;
+
+  /// The height of the whole class table area, which the blocks are scaled to.
+  final double available;
+
+  const ClassTableView({super.key, required this.index, required this.available});
+
+  @override
+  State<ClassTableView> createState() => _ClassTableViewState();
+}
+
 class _ClassTableViewState extends State<ClassTableView> {
   late ClassTableWidgetState classTableState;
   late BoxConstraints size;
@@ -95,127 +95,64 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   /// The height of the class card.
   double blockheight(double count) =>
-      count *
-      (widget.constraint.minHeight - midRowHeight) /
-      (isPhone(context) ? 48 : 61);
+      classTableBlockHeight(context, widget.available, count);
 
   double get blockwidth => (size.maxWidth - leftRow) / 7;
 
-  /// The class table are divided into 8 rows, the leftest row is the index row.
-  List<Widget> classSubRow(bool isRest) {
-    if (isRest) {
-      List<Widget> thisRow = [];
-      final currentDayColumnBox = _currentDayColumnBox();
-      if (currentDayColumnBox != null) {
-        thisRow.add(currentDayColumnBox);
-      }
+  /// The class cards of this week, plus the highlight and the current-time indicator over them.
+  List<Widget> _classLayer() {
+    final List<Widget> thisRow = [];
 
-      for (var index = 1; index <= 7; ++index) {
-        List<ClassOrgainzedData> arrangedEvents = classTableState
-            .getArrangement(weekIndex: widget.index, dayIndex: index);
+    final currentDayColumnBox = _currentDayColumnBox();
+    if (currentDayColumnBox != null) {
+      thisRow.add(currentDayColumnBox);
+    }
 
-        /// Choice the day and render it!
-        for (var i in arrangedEvents) {
-          /// Generate the row.
-          final completedHeight = _completedHeight(i, index);
-          thisRow.add(
-            Positioned(
-              top: blockheight(i.start),
-              height: blockheight(i.stop - i.start),
-              left: leftRow + blockwidth * (index - 1),
-              width: blockwidth,
-              child: ClassCard(detail: i, completedHeight: completedHeight),
-            ),
-          );
-        }
-      }
+    for (var index = 1; index <= 7; ++index) {
+      final List<ClassOrgainzedData> arrangedEvents = classTableState
+          .getArrangement(weekIndex: widget.index, dayIndex: index);
 
-      final timeIndicator = _currentTimeIndicator();
-      if (timeIndicator != null) {
-        thisRow.add(timeIndicator);
-      }
-
-      if (thisRow.isEmpty &&
-          !preference.getBool(preference.Preference.decorated)) {
+      /// Choice the day and render it!
+      for (var i in arrangedEvents) {
+        /// Generate the row.
+        final completedHeight = _completedHeight(i, index);
         thisRow.add(
-          Center(
-            child: Column(
-              children: [
-                SizedBox(height: blockheight(8)),
-                Image.asset("assets/art/pda_classtable_empty.webp", scale: 2),
-                const SizedBox(height: 20),
-                ...FlutterI18n.translate(
-                  context,
-                  "classtable.no_class",
-                ).split("\n").map((e) => Text(e)),
-              ],
-            ),
-          ).padding(left: leftRow),
+          Positioned(
+            top: blockheight(i.start),
+            height: blockheight(i.stop - i.start),
+            left: leftRow + blockwidth * (index - 1),
+            width: blockwidth,
+            child: ClassCard(detail: i, completedHeight: completedHeight),
+          ),
         );
       }
-
-      return thisRow;
-    } else {
-      /// Leftest side, the index array.
-      return List.generate(13, (index) {
-        double height = blockheight(index != 4 && index != 9 ? 5 : 3);
-
-        late int indexOfChar;
-        if ([0, 1, 2, 3].contains(index)) {
-          indexOfChar = index;
-        } else if (index == 4) {
-          indexOfChar = -1; // noon break
-        } else if ([5, 6, 7, 8].contains(index)) {
-          indexOfChar = index - 1;
-        } else if (index == 9) {
-          indexOfChar = -2; // supper break
-        } else {
-          //if ([10, 11, 12].contains(index))
-          indexOfChar = index - 2;
-        }
-
-        return DefaultTextStyle.merge(
-          style: TextStyle(
-            fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          child: Text.rich(
-            TextSpan(
-              children: [
-                if (indexOfChar == -1)
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "classtable.noon_break",
-                    ),
-                    style: const TextStyle(fontSize: 12),
-                  )
-                else if (indexOfChar == -2)
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "classtable.supper_break",
-                    ),
-                    style: const TextStyle(fontSize: 12),
-                  )
-                else ...[
-                  TextSpan(text: "${indexOfChar + 1}\n"),
-                  TextSpan(
-                    text: "${timeList[indexOfChar * 2]}\n",
-                    style: const TextStyle(fontSize: 8),
-                  ),
-                  TextSpan(
-                    text: timeList[indexOfChar * 2 + 1],
-                    style: const TextStyle(fontSize: 8),
-                  ),
-                ],
-              ],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ).center().constrained(width: leftRow, height: height);
-      });
     }
+
+    final timeIndicator = _currentTimeIndicator();
+    if (timeIndicator != null) {
+      thisRow.add(timeIndicator);
+    }
+
+    if (thisRow.isEmpty &&
+        !preference.getBool(preference.Preference.decorated)) {
+      thisRow.add(
+        Center(
+          child: Column(
+            children: [
+              SizedBox(height: blockheight(8)),
+              Image.asset("assets/art/pda_classtable_empty.webp", scale: 2),
+              const SizedBox(height: 20),
+              ...FlutterI18n.translate(
+                context,
+                "classtable.no_class",
+              ).split("\n").map((e) => Text(e)),
+            ],
+          ),
+        ).padding(left: leftRow),
+      );
+    }
+
+    return thisRow;
   }
 
   /// This function will be triggered when user changed class info.
@@ -252,35 +189,6 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   @override
   Widget build(BuildContext context) {
-    return [
-      /// The main class table.
-      ClassTableDateRow(
-        firstDay: classTableState.startDay
-            .add(Duration(days: 7 * classTableState.offset))
-            .add(Duration(days: 7 * widget.index)),
-      ),
-
-      /// The rest of the table.
-      [
-            classSubRow(false)
-                .toColumn()
-                .decorated(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.surface.withValues(alpha: 0.75),
-                )
-                .constrained(width: leftRow)
-                .positioned(left: 0),
-            ...classSubRow(true),
-          ]
-          .toStack()
-          .constrained(height: blockheight(61), width: size.maxWidth)
-          .scrollable(
-            physics: widget.enableVerticalScrolling
-                ? null
-                : const NeverScrollableScrollPhysics(),
-          )
-          .expanded(),
-    ].toColumn();
+    return Stack(children: _classLayer());
   }
 }

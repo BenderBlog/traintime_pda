@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
@@ -41,9 +41,8 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
           return ClassTableState(
             constraints: constraint,
             controllers: previewState,
-            child: ClassTableView(
-              index: previewState.currentWeek,
-              constraint: constraint,
+            child: ClassTableSheet(
+              singleIndex: previewState.currentWeek,
               enableVerticalScrolling: false,
             ),
           );

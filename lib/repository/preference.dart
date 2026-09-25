@@ -55,6 +55,10 @@ enum Preference {
   //electricityPassword(key: "electricityPassword", type: "String"), // 电费密码
   decorated(key: "decorated", type: "bool"), // 课表是否开启背景
   decoration(key: "decoration", type: "bool"), // 背景图是否设置
+  classTableWeekBarCollapsed(
+    key: "classTableWeekBarCollapsed",
+    type: "bool",
+  ), // 周次栏是否收进标题栏；默认 false 即固定显示
   swift(key: "swift", type: "int"), // 周次偏移
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式

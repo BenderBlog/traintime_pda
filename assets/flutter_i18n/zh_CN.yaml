@@ -199,6 +199,9 @@ classtable:
 
     请回到主页后下滑点击”考试安排“按钮进入考试安排页面"
   week_title: 第{week}周
+  week_bar:
+    pin: 固定周次栏
+    unpin: 收起周次栏
   noon_break: 午休
   supper_break: 晚休
   month: "{month}
