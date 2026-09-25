@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/time_list.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
@@ -35,20 +36,19 @@ class ClassTableTimeLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        /// Decoration only. The labels are laid out separately, so insetting the panel cannot push
-        /// them out of step with the class blocks.
+        /// The panel. Frosted, like the other controls over the table: the wallpaper behind it is
+        /// blurred inside the panel's own rounded bounds while it stays sharp everywhere else.
+        ///
+        /// Kept separate from the class-card blur group because this panel stays fixed above the
+        /// scrolling grid and needs its own backdrop read on every vertical scroll frame.
         Positioned(
           left: timeLineInset,
           top: timeLineInset,
           bottom: timeLineInset,
           width: timeLineWidth,
           child: DecoratedBox(
+            /// The shadow is painted outside the clip so it is not blurred away with the backdrop.
             decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.surfaceContainerHigh.withValues(
-                alpha: timeLineSurfaceAlpha,
-              ),
               borderRadius: BorderRadius.circular(timeLineRadius),
               boxShadow: [
                 BoxShadow(
@@ -57,6 +57,16 @@ class ClassTableTimeLine extends StatelessWidget {
                   offset: const Offset(0, 2),
                 ),
               ],
+            ),
+            child: GlassBlur(
+              borderRadius: BorderRadius.circular(timeLineRadius),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh
+                      .withValues(alpha: timeLineSurfaceAlpha),
+                  borderRadius: BorderRadius.circular(timeLineRadius),
+                ),
+              ),
             ),
           ),
         ),

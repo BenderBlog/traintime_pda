@@ -5,54 +5,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
 /// The date row of the class table: the month and the seven day headers.
 ///
-/// The rounded panel is static and only its contents change, so the row never slides even though
-/// the week pages underneath do. A week change flips the contents over.
+/// The rounded panel is static; only the headers move. The headers are painted with a fractional
+/// translation from the page position, so following a swipe does not drive a second scrollable.
 class ClassTableDateRow extends StatefulWidget {
   const ClassTableDateRow({
     super.key,
     required this.index,
     required this.firstDayOfWeek,
+    this.pageControl,
+    this.semesterLength = 1,
   });
 
-  /// The week on show.
+  /// The week on show when there is no [pageControl], and the week the headers start on.
   final int index;
 
   /// First day of the week at the given index.
   final DateTime Function(int index) firstDayOfWeek;
+
+  /// The week pages. When set, the headers slide with them.
+  final PageController? pageControl;
+
+  /// How many weeks the row has headers for.
+  final int semesterLength;
 
   @override
   State<ClassTableDateRow> createState() => _ClassTableDateRowState();
 }
 
 class _ClassTableDateRowState extends State<ClassTableDateRow> {
-  /// Which way the last week change went, so the flip follows the paging direction.
-  bool _forward = true;
-
-  @override
-  void didUpdateWidget(covariant ClassTableDateRow oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.index != widget.index) {
-      _forward = widget.index > oldWidget.index;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         /// The floating panel, matching the time line beside it.
+        ///
+        /// The class cards scroll underneath this row, so unlike the time line — which has nothing
+        /// but the wallpaper behind it — the panel blurs what is passing behind it. The shadow is
+        /// painted outside the blur so the clip cannot eat it.
         Positioned.fill(
           child: Padding(
             padding: const EdgeInsets.all(timeLineInset),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHigh
-                    .withValues(alpha: timeLineSurfaceAlpha),
                 borderRadius: BorderRadius.circular(timeLineRadius),
                 boxShadow: [
                   BoxShadow(
@@ -61,6 +61,16 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
                     offset: const Offset(0, 2),
                   ),
                 ],
+              ),
+              child: GlassBlur(
+                borderRadius: BorderRadius.circular(timeLineRadius),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh
+                        .withValues(alpha: timeLineSurfaceAlpha),
+                    borderRadius: BorderRadius.circular(timeLineRadius),
+                  ),
+                ),
               ),
             ),
           ),
@@ -72,44 +82,48 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
           /// The height is determined by the content, so the text will not overflow when the font
           /// scale is enlarged.
           padding: const EdgeInsets.symmetric(vertical: 5),
-          child: SizedBox(
-            width: double.infinity,
-            child: ClipRect(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: _flip,
-                child: KeyedSubtree(
-                  key: ValueKey<int>(widget.index),
-                  child: _weekRow(context, widget.index),
-                ),
-              ),
-            ),
+          child: ClipRect(
+            /// Clipped to the panel rather than to the row, so a header sliding out of the way
+            /// disappears behind the panel's edge instead of hanging outside it.
+            clipper: const _HeaderClip(),
+            child: _headers(context),
           ),
         ),
       ],
     );
   }
 
-  /// Slides the incoming week in from the direction of travel while the outgoing one leaves the
-  /// other way.
-  ///
-  /// [AnimatedSwitcher] runs the outgoing child's animation in reverse, so testing the key tells
-  /// the two apart and each can be given its own start offset.
-  Widget _flip(Widget child, Animation<double> animation) {
-    final Object? key = child.key;
-    final bool incoming = key is ValueKey<int> && key.value == widget.index;
-    final double from = incoming
-        ? (_forward ? 1.0 : -1.0)
-        : (_forward ? -1.0 : 1.0);
+  /// The headers, one week wide each, sliding with the pages when there are pages to follow.
+  Widget _headers(BuildContext context) {
+    if (widget.pageControl == null) {
+      return _weekRow(context, widget.index);
+    }
 
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: Offset(from, 0),
-        end: Offset.zero,
-      ).animate(animation),
-      child: FadeTransition(opacity: animation, child: child),
+    final PageController pages = widget.pageControl!;
+    return LayoutBuilder(
+      builder: (context, constraints) => ClipRect(
+        child: AnimatedBuilder(
+          animation: pages,
+          child: Row(
+            children: List.generate(
+              widget.semesterLength,
+              (index) => SizedBox(
+                width: constraints.maxWidth,
+                child: ExcludeSemantics(
+                  excluding: index != widget.index,
+                  child: _weekRow(context, index),
+                ),
+              ),
+            ),
+          ),
+          builder: (context, child) {
+            final double offset = pages.hasClients
+                ? pages.position.pixels
+                : widget.index * constraints.maxWidth;
+            return Transform.translate(offset: Offset(-offset, 0), child: child);
+          },
+        ),
+      ),
     );
   }
 
@@ -185,4 +199,24 @@ class WeekInfomation extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Keeps the headers inside the panel while they slide.
+///
+/// The panel sits [timeLineInset] inside the row while the cells keep the table's full width so the
+/// columns stay aligned with the grid, so the clip has to be pulled in by that same inset: without
+/// it a month or a date sliding out of the way hangs outside the panel's edge.
+class _HeaderClip extends CustomClipper<Rect> {
+  const _HeaderClip();
+
+  @override
+  Rect getClip(Size size) => Rect.fromLTRB(
+    timeLineInset,
+    0,
+    size.width - timeLineInset,
+    size.height,
+  );
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) => false;
 }

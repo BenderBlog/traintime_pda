@@ -170,6 +170,11 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                 key: _dateRowKey,
                 index: widget.singleIndex,
                 firstDayOfWeek: _firstDayOfWeek,
+
+                /// Handed the pages so the headers can slide with them rather than flipping over
+                /// once the week has already changed.
+                pageControl: widget.pageControl,
+                semesterLength: widget.semesterLength,
               ),
             ),
           ],
