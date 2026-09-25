@@ -12,6 +12,7 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
@@ -63,6 +64,8 @@ class ClassCard extends StatelessWidget {
             return Stack(
               fit: StackFit.expand,
               children: [
+                /// Keep every class card frosted while it moves with the page.
+                const Positioned.fill(child: GlassBlur(grouped: true)),
                 if (splitHeight > 0)
                   Positioned(
                     top: 0,

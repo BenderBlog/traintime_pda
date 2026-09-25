@@ -19,10 +19,12 @@ import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.d
 import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
+import 'package:watermeter/page/classtable/class_page/week_selection_highlight.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -51,11 +53,31 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// it can be dragged freely, instead of snapping from one week button to the next.
   late ScrollController rowControl;
 
+  /// Set while [ClassTableWidgetState.chosenWeek] changes because the table itself was dragged.
+  ///
+  /// Such a change waits until the page settles, so the week row does not rebuild during the drag.
+  bool _chosenWeekFromTable = false;
+
+  /// Set while the week row's highlight is waiting for the pages to come to rest before it redraws.
+  ///
+  /// A week change redraws the week row and every week page with it, which is easily a frame's worth
+  /// of work. Doing that in the middle of a drag is what made the table itself stutter, so it waits
+  /// until the pages are still, where the very same work costs nothing anyone can see.
+  bool _weekRowRefreshPending = false;
+
+  /// Whether a frame callback is already watching for the pages to stop.
+  bool _settleWatchScheduled = false;
+
+  /// The page offset the watch last saw, which is how it tells "still moving" from "stopped".
+  double _lastPagePixels = 0;
+
+  /// The wallpaper behind the table. It stays sharp: the frosted look belongs to the backgrounds of
+  /// the controls on top of it, not to the wallpaper itself.
   late BoxDecoration decoration;
+
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
   bool _didLoadVisualSettings = false;
-
   /// Whether the week bar is tucked into the app bar.
   ///
   /// Pinned is the default, so the stored flag is the opposite of it and an unset preference reads
@@ -72,39 +94,165 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       ? topRowHeightBig
       : topRowHeightSmall;
 
+  /// Rebuilds and repositions the week row once the pages have stopped moving.
+  void _watchPageSettle(double pixels) {
+    _lastPagePixels = pixels;
+    if (_settleWatchScheduled) {
+      return;
+    }
+    _settleWatchScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback(_onSettleWatchFrame);
+  }
+
+  void _onSettleWatchFrame(Duration _) {
+    _settleWatchScheduled = false;
+    if (!mounted || !_weekRowRefreshPending) {
+      return;
+    }
+    if (pageControl.hasClients) {
+      final double pixels = pageControl.position.pixels;
+      if ((pixels - _lastPagePixels).abs() > 0.01) {
+        /// Still moving: look again on the next frame.
+        _watchPageSettle(pixels);
+        return;
+      }
+    }
+    _weekRowRefreshPending = false;
+    final double? offset = _weekRowOffset(
+      classTableState.chosenWeek.toDouble(),
+    );
+    if (offset != null) {
+      rowControl.jumpTo(offset);
+    }
+    setState(() {});
+  }
+
+  /// The week row offset that shows the week [weeks] weeks into the semester.
+  ///
+  /// Null while the row cannot be measured yet.
+  double? _weekRowOffset(double weeks) {
+    if (!rowControl.hasClients) {
+      return null;
+    }
+    final ScrollPosition rowPosition = rowControl.position;
+    if (!rowPosition.hasContentDimensions) {
+      return null;
+    }
+    return (weeks * weekChoiceItemExtent)
+        .clamp(rowPosition.minScrollExtent, rowPosition.maxScrollExtent)
+        .toDouble();
+  }
+
+  /// Keeps the week row on the same week as the table while the table moves.
+  ///
+  /// One table page is one week and one row item is one week, so the row's offset is the page's
+  /// progress in weeks times [weekChoiceItemExtent]. Following the page frame by frame is what gives
+  /// the row its easing: it rides the page's own animation curve when the week is picked elsewhere,
+  /// and it stays under the finger when the table itself is dragged.
+  void _syncWeekRowToTable() {
+    /// While the page is running a week change picked elsewhere, the row is left where it is so the
+    /// highlight can visibly slide from the old week to the new one. Only the table's own drag moves
+    /// the row along.
+    if (isTopRowLocked) {
+      return;
+    }
+    if (!pageControl.hasClients) {
+      return;
+    }
+    final ScrollPosition pagePosition = pageControl.position;
+    if (!pagePosition.hasViewportDimension ||
+        pagePosition.viewportDimension <= 0) {
+      return;
+    }
+    final double? offset = _weekRowOffset(
+      pagePosition.pixels / pagePosition.viewportDimension,
+    );
+    if (offset != null) {
+      rowControl.jumpTo(offset);
+    }
+  }
+
   void _switchPage() {
     if (!mounted) {
       return;
     }
-    setState(() => isTopRowLocked = true);
-    Future.wait([
-      /// The week row scrolls continuously, so its target is a pixel offset rather than a page.
-      if (rowControl.hasClients)
-        rowControl.animateTo(
-          (classTableState.chosenWeek * weekChoiceItemExtent)
-              .clamp(
-                rowControl.position.minScrollExtent,
-                rowControl.position.maxScrollExtent,
-              )
-              .toDouble(),
-          curve: Curves.easeInOut,
-          duration: const Duration(milliseconds: changePageTime),
-        ),
-      pageControl.animateToPage(
-        classTableState.chosenWeek,
-        curve: Curves.easeInOutCubic,
-        duration: const Duration(milliseconds: changePageTime),
-      ),
-    ]).then((value) {
-      if (mounted) {
-        isTopRowLocked = false;
+
+    /// A week picked by dragging the table is already moving on screen. Defer the week row update
+    /// until the page settles so the drag does not rebuild the overview buttons on every page tick.
+    if (_chosenWeekFromTable) {
+      _weekRowRefreshPending = true;
+      if (!_settleWatchScheduled &&
+          pageControl.hasClients &&
+          pageControl.position.hasPixels) {
+        _watchPageSettle(pageControl.position.pixels);
       }
-    });
+      return;
+    }
+
+    setState(() => isTopRowLocked = true);
+
+    /// The highlight slides to the chosen week on its own, so the row is only nudged when that week
+    /// would otherwise be off screen. Watching the page scroll is paused for the duration (see
+    /// [_syncWeekRowToTable]), which is what lets the highlight be seen moving.
+    _revealWeekRow(classTableState.chosenWeek);
+
+    /// The page is animated independently; the row ends up on the same week either way.
+    pageControl
+        .animateToPage(
+          classTableState.chosenWeek,
+          curve: Curves.easeInOutCubic,
+          duration: const Duration(milliseconds: changePageTime),
+        )
+        .then((value) {
+          if (!mounted) {
+            return;
+          }
+
+          /// The row can be scrolled on its own, so make sure the chosen week is at least in view
+          /// once the page has landed. When it already is, this does nothing.
+          _revealWeekRow(classTableState.chosenWeek);
+          isTopRowLocked = false;
+        });
+  }
+
+  /// Brings [week]'s button into view, if it is not there already.
+  ///
+  /// Deliberately not an alignment: when the week is already on screen the row is left exactly where
+  /// it is, so picking a neighbouring week slides the highlight across rather than dragging the whole
+  /// row along with it. The row only moves when the new week would otherwise be off screen.
+  void _revealWeekRow(int week) {
+    if (!rowControl.hasClients) {
+      return;
+    }
+    final ScrollPosition rowPosition = rowControl.position;
+    if (!rowPosition.hasContentDimensions) {
+      return;
+    }
+    final double left = week * weekChoiceItemExtent;
+    final double right = left + weekChoiceItemExtent;
+    final double offset = rowControl.offset;
+    double? target;
+    if (left < offset) {
+      target = left;
+    } else if (right > offset + rowPosition.viewportDimension) {
+      target = right - rowPosition.viewportDimension;
+    }
+    if (target == null) {
+      return;
+    }
+    rowControl.animateTo(
+      target
+          .clamp(rowPosition.minScrollExtent, rowPosition.maxScrollExtent)
+          .toDouble(),
+      curve: Curves.easeInOutCubic,
+      duration: const Duration(milliseconds: changePageTime),
+    );
   }
 
   @override
   void dispose() {
     classTableState.removeListener(_switchPage);
+    pageControl.removeListener(_syncWeekRowToTable);
     pageControl.dispose();
     rowControl.dispose();
     super.dispose();
@@ -131,6 +279,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       rowControl = ScrollController(
         initialScrollOffset: classTableState.chosenWeek * weekChoiceItemExtent,
       );
+
+      /// The table drives the week row while it moves, which is what gives the row its easing: it
+      /// rides the page's own animation curve instead of jumping once the page has arrived.
+      pageControl.addListener(_syncWeekRowToTable);
+
       _isListening = true;
     }
 
@@ -161,39 +314,53 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// When user click on the button, the pageview will show the class table of the
   /// week the button suggested.
   Widget _weekRow() {
-    return ListView.builder(
-      controller: rowControl,
-      physics: const ClampingScrollPhysics(),
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.zero,
-      itemExtent: weekChoiceItemExtent,
-      itemCount: classTableState.semesterLength,
-      itemBuilder: (BuildContext context, int index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: weekButtonHorizontalPadding,
-          ),
-          child: Card(
-            color: Theme.of(context).highlightColor.withValues(
-              alpha: classTableState.chosenWeek == index ? 0.3 : 0.0,
+    return Stack(
+      children: [
+        /// The highlight sits behind the buttons, sliding from week to week.
+        Positioned.fill(
+          child: IgnorePointer(
+            child: WeekSelectionHighlight(
+              week: classTableState.chosenWeek,
+              rowControl: rowControl,
             ),
-            elevation: 0.0,
-            child: InkWell(
-              /// The following themes are the same as the Material 3 Card Radius.
-              borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-              onTap: () {
-                if (isTopRowLocked == false) {
-                  classTableState.chosenWeek = index;
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: WeekChoiceView(index: index),
+          ),
+        ),
+        ListView.builder(
+          controller: rowControl,
+          physics: const ClampingScrollPhysics(),
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.zero,
+          itemExtent: weekChoiceItemExtent,
+          itemCount: classTableState.semesterLength,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: weekButtonHorizontalPadding,
               ),
-            ),
-          ),
-        );
-      },
+              child: Card(
+                /// Transparent: the highlight is the box behind the row, not a tint per button.
+                color: Colors.transparent,
+                elevation: 0.0,
+                child: InkWell(
+                  /// The following themes are the same as the Material 3 Card Radius.
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(weekChoiceCardRadius),
+                  ),
+                  onTap: () {
+                    if (isTopRowLocked == false) {
+                      classTableState.chosenWeek = index;
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: WeekChoiceView(index: index),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -1034,6 +1201,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       body: Stack(
         fit: StackFit.expand,
         children: [
+          /// The wallpaper. It spans the whole body, under the week bar as well as the table, and it
+          /// is never blurred itself: every frosted control blurs its own copy of it inside its own
+          /// bounds.
+          DecoratedBox(decoration: decoration),
+
           /// The page. While the bar floats it starts at the top and the bar covers it; once the bar
           /// is pinned it slides down to leave the bar a strip of its own.
           AnimatedPositioned(
@@ -1044,31 +1216,39 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             duration: weekBarDockDuration,
             curve: Curves.easeOutCubic,
             child: NotificationListener<ScrollNotification>(
-              /// Scrolling the table puts the floating bar away. Without this the bar would sit on
-              /// top of a table the user is trying to drag.
+              /// Dragging the table puts the floating bar away, so it does not sit on top of a
+              /// table the user is trying to reach.
+              ///
+              /// Only a drag counts. Picking a week from the bar itself pages the table over an
+              /// animation, and that is not a reason to close the bar the user is working in: it
+              /// stays out until they put it away themselves.
               onNotification: (ScrollNotification notification) {
-                if (_weekBarCollapsed && _weekBarExpanded) {
+                final bool dragStarted =
+                    notification is ScrollStartNotification &&
+                    notification.dragDetails != null;
+                if (dragStarted && _weekBarCollapsed && _weekBarExpanded) {
                   setState(() => _weekBarExpanded = false);
                 }
                 return false;
               },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  ClassTableInlineBanner(
-                    loadingSources: state.loadingSources,
-                    cacheSources: state.cacheSources,
-                  ),
-                  DecoratedBox(
-                    decoration: decoration,
-                    child: ClassTableSheet(
+              /// Everything above the wallpaper that wants a frosted background shares one blur of
+              /// it: the status banner and every control in the table.
+              child: BackdropGroup(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ClassTableInlineBanner(
+                      loadingSources: state.loadingSources,
+                      cacheSources: state.cacheSources,
+                    ),
+                    ClassTableSheet(
                       singleIndex: classTableState.chosenWeek,
                       pageControl: pageControl,
                       semesterLength: classTableState.semesterLength,
                       onPageChanged: _onPageChanged,
-                    ),
-                  ).expanded(),
-                ],
+                    ).expanded(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1117,18 +1297,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   alignment: Alignment.topCenter,
                   duration: weekBarPopDuration,
                   curve: Curves.easeOutCubic,
-                  child: AnimatedOpacity(
-                    opacity: _weekBarVisible ? 1.0 : 0.0,
+                  child: AnimatedContainer(
                     duration: weekBarPopDuration,
-                    curve: Curves.easeOut,
-                    child: AnimatedContainer(
-                      duration: weekBarPopDuration,
-                      curve: Curves.easeOutCubic,
-                      decoration: BoxDecoration(
-                        color: _weekBarFloating
-                            ? Theme.of(context).colorScheme.surfaceContainerHigh
-                                  .withValues(alpha: timeLineSurfaceAlpha)
-                            : Theme.of(context).colorScheme.surface,
+                    curve: Curves.easeOutCubic,
+                    decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
                           _weekBarFloating ? timeLineRadius : 0,
                         ),
@@ -1144,7 +1316,45 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                               ]
                             : null,
                       ),
-                      child: _weekBarContents(),
+                    child: Stack(
+                      children: [
+                          /// Frosted, like the panels in the table: the bar's own background blurs
+                          /// the wallpaper behind it while the wallpaper itself stays sharp.
+                          ///
+                          /// The tint is the filter's child, not a colour under it, so what gets
+                          /// blurred is the raw wallpaper — the same order the class cards use.
+                          ///
+                          /// Keep the filter mounted throughout the pop so the backdrop is blurred
+                          /// from the first frame rather than appearing only after the bar settles.
+                          Positioned.fill(
+                            child: GlassBlur(
+                              borderRadius: BorderRadius.circular(
+                                _weekBarFloating ? timeLineRadius : 0,
+                              ),
+                              child: ColoredBox(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHigh
+                                    .withValues(alpha: weekBarSurfaceAlpha),
+                              ),
+                            ),
+                          ),
+                          /// Taps on the bar's own body keep it open: putting it away is for taps
+                          /// outside it. Translucent rather than opaque, so a drag that starts on
+                          /// the bar still reaches the table underneath.
+                          Positioned.fill(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {},
+                            ),
+                          ),
+                          AnimatedOpacity(
+                            opacity: _weekBarVisible ? 1.0 : 0.0,
+                            duration: weekBarPopDuration,
+                            curve: Curves.easeOut,
+                            child: _weekBarContents(),
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -1167,7 +1377,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     /// locked, it will not refresh the [chosenWeek]. And when [chosenWeek]
     /// is equal to the current page, unlock the [isTopRowLocked].
     if (isTopRowLocked == false) {
-      classTableState.chosenWeek = value;
+      /// Flagged so [_switchPage] leaves the table to finish its own gesture instead of animating
+      /// a page the user is still dragging. The row is repositioned after the page settles.
+      _chosenWeekFromTable = true;
+      try {
+        classTableState.chosenWeek = value;
+      } finally {
+        _chosenWeekFromTable = false;
+      }
     }
   }
 }
