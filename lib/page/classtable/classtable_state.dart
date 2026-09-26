@@ -61,6 +61,10 @@ enum ClassTableStatusSource {
   otherExperiment,
 }
 
+class TimeTickNotifier extends ChangeNotifier {
+  void tick() => notifyListeners();
+}
+
 /// The controllers and shared datas of the class table.
 class ClassTableWidgetState with ChangeNotifier {
   ///*******************************************************************///
@@ -69,12 +73,26 @@ class ClassTableWidgetState with ChangeNotifier {
   bool _disposed = false;
   final List<EffectCleanup> _effectCleanup = [];
 
+  /// Notifies only when the visible week changes (tap or swipe).
+  ///
+  /// Kept separate from the main [ChangeNotifier] so that listeners that do not care about
+  /// navigation — every [ClassTableView] page, for instance — are not rebuilt mid-gesture when
+  /// the user swipes past the halfway point.
+  final ValueNotifier<int> weekNavigationNotifier = ValueNotifier<int>(0);
+
+  /// Notifies only on minute timer ticks so that time indicator and card completion
+  /// progress can update without rebuilding the entire ContentClassTablePage or
+  /// non-current week pages while idle.
+  final TimeTickNotifier timeTickNotifier = TimeTickNotifier();
+
   @override
   void dispose() {
     _disposed = true;
     for (final cleanup in _effectCleanup) {
       cleanup();
     }
+    weekNavigationNotifier.dispose();
+    timeTickNotifier.dispose();
     super.dispose();
   }
 
@@ -230,11 +248,13 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Change chosen week.
   set chosenWeek(int chosenWeek) {
-    if (chosenWeek == _chosenWeek) {
+    final int maxWeek = semesterLength > 0 ? semesterLength - 1 : 0;
+    final int clamped = chosenWeek.clamp(0, maxWeek);
+    if (clamped == _chosenWeek) {
       return;
     }
-    _chosenWeek = chosenWeek;
-    notifyListeners();
+    _chosenWeek = clamped;
+    weekNavigationNotifier.value = clamped;
   }
 
   int get chosenWeek => _chosenWeek;
@@ -282,6 +302,9 @@ class ClassTableWidgetState with ChangeNotifier {
 
   Future<void> addCustomClass(CustomClass customClass) =>
       customClassController.addCustomClass(customClass).then((_) {
+        clearArrangementCache();
+        _scheduleVersion++;
+        preloadArrangements();
         notifyListeners();
       });
 
@@ -291,11 +314,17 @@ class ClassTableWidgetState with ChangeNotifier {
   ) => customClassController
       .editCustomClassById(customClassId, customClass)
       .then((_) {
+        clearArrangementCache();
+        _scheduleVersion++;
+        preloadArrangements();
         notifyListeners();
       });
 
   Future<void> deleteCustomClassById(String customClassId) =>
       customClassController.deleteCustomClassById(customClassId).then((_) {
+        clearArrangementCache();
+        _scheduleVersion++;
+        preloadArrangements();
         notifyListeners();
       });
 
@@ -308,6 +337,9 @@ class ClassTableWidgetState with ChangeNotifier {
         timeRangeId: timeRangeId,
       )
       .then((_) {
+        clearArrangementCache();
+        _scheduleVersion++;
+        preloadArrangements();
         notifyListeners();
       });
 
@@ -342,7 +374,29 @@ class ClassTableWidgetState with ChangeNotifier {
       ],
     ]);
     await maybeAutoSyncSystemCalendar();
+    clearArrangementCache();
     notifyListeners();
+  }
+
+  int _scheduleVersion = 0;
+  int get scheduleVersion => _scheduleVersion;
+
+  /// Cached arrangements per week and day to avoid costly sorting and overlap calculations on every build.
+  final Map<(int, int), List<ClassOrgainzedData>> _arrangementCache = {};
+
+  void clearArrangementCache() {
+    _arrangementCache.clear();
+  }
+
+  /// Preload arrangement cache for all weeks to prevent jank when scrolling to new weeks.
+  void preloadArrangements() {
+    final length = semesterLength;
+    if (length <= 0) return;
+    for (int w = 0; w < length; w++) {
+      for (int d = 1; d <= 7; d++) {
+        getArrangement(weekIndex: w, dayIndex: d);
+      }
+    }
   }
 
   ClassTableWidgetState() {
@@ -366,11 +420,25 @@ class ClassTableWidgetState with ChangeNotifier {
           otherExperimentController.isOtherExperimentFromCache.value;
           otherExperimentController.otherExperimentCacheHintKey.value;
           weekSwiftController.weekSwiftSignal.value;
-          globalTimerController.currentTimeSignal.value;
+          clearArrangementCache();
+          _scheduleVersion++;
+          preloadArrangements();
           notifyListeners();
         },
 
-        options: EffectOptions(name: "ClassTableWidgetStateSignalBridgeEffect"),
+        options: EffectOptions(name: "ClassTableWidgetStateScheduleEffect"),
+      ),
+    );
+    _effectCleanup.add(
+      effect(
+        () {
+          globalTimerController.currentTimeSignal.value;
+          // Time tick: DO NOT clear arrangement cache.
+          // Notify only timeTickNotifier so only the current week and time indicator update.
+          timeTickNotifier.tick();
+        },
+
+        options: EffectOptions(name: "ClassTableWidgetStateTimeTickEffect"),
       ),
     );
     // Init current week info
@@ -381,6 +449,10 @@ class ClassTableWidgetState with ChangeNotifier {
     } else {
       _chosenWeek = currentWeek;
     }
+    weekNavigationNotifier.value = _chosenWeek;
+
+    // Preload arrangements in background microtask so initial frame is not blocked
+    scheduleMicrotask(preloadArrangements);
   }
 
   bool _checkIsOverlapping(
@@ -399,11 +471,18 @@ class ClassTableWidgetState with ChangeNotifier {
     required int weekIndex,
     required int dayIndex,
   }) {
+    final cacheKey = (weekIndex, dayIndex);
+    final cached = _arrangementCache[cacheKey];
+    if (cached != null) {
+      return cached;
+    }
+
     /// Fetch all class in this range.
     List<ClassOrgainzedData> events = [];
 
     for (final i in timeArrangement) {
-      if (i.weekList.length > weekIndex &&
+      if (weekIndex >= 0 &&
+          i.weekList.length > weekIndex &&
           i.weekList[weekIndex] &&
           i.day == dayIndex) {
         events.add(
@@ -532,6 +611,7 @@ class ClassTableWidgetState with ChangeNotifier {
       }
     }
 
+    _arrangementCache[cacheKey] = arrangedEvents;
     return arrangedEvents;
   }
 }

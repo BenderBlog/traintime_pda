@@ -42,10 +42,14 @@ class ClassTableView extends StatefulWidget {
   State<ClassTableView> createState() => _ClassTableViewState();
 }
 
-class _ClassTableViewState extends State<ClassTableView> {
+class _ClassTableViewState extends State<ClassTableView>
+    with AutomaticKeepAliveClientMixin {
   late ClassTableWidgetState classTableState;
   late BoxConstraints size;
   bool _isListening = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   DateTime get _visibleWeekStart => classTableState.startDay
       .add(Duration(days: 7 * classTableState.offset))
@@ -129,11 +133,9 @@ class _ClassTableViewState extends State<ClassTableView> {
               detail: i,
               completedHeight: completedHeight,
 
-              /// Known here already, so the card does not measure itself, and so its frosted
-              /// background can crop the wallpaper to match the piece behind it.
+              /// Known here already, so the card does not have to measure itself.
               height: cardHeight - 2,
-              gridOrigin: Offset(cardLeft, cardTop),
-              pageIndex: widget.index,
+              width: blockwidth,
             ),
           ),
         );
@@ -167,9 +169,21 @@ class _ClassTableViewState extends State<ClassTableView> {
     return thisRow;
   }
 
+  int _lastScheduleVersion = 0;
+
   /// This function will be triggered when user changed class info.
   void _reload() {
-    if (mounted) {
+    if (!mounted) return;
+    if (_lastScheduleVersion != classTableState.scheduleVersion) {
+      _lastScheduleVersion = classTableState.scheduleVersion;
+      setState(() {});
+    }
+  }
+
+  /// Triggered on minute time ticks: only the current week updates its time indicator and progress.
+  void _onTimeTick() {
+    if (!mounted) return;
+    if (widget.index == classTableState.currentWeek) {
       setState(() {});
     }
   }
@@ -181,7 +195,9 @@ class _ClassTableViewState extends State<ClassTableView> {
     super.didChangeDependencies();
     if (!_isListening) {
       classTableState = ClassTableState.of(context)!.controllers;
+      _lastScheduleVersion = classTableState.scheduleVersion;
       classTableState.addListener(_reload);
+      classTableState.timeTickNotifier.addListener(_onTimeTick);
       _isListening = true;
     }
     updateSize();
@@ -190,6 +206,7 @@ class _ClassTableViewState extends State<ClassTableView> {
   @override
   void dispose() {
     classTableState.removeListener(_reload);
+    classTableState.timeTickNotifier.removeListener(_onTimeTick);
     super.dispose();
   }
 
@@ -201,6 +218,7 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Stack(children: _classLayer());
   }
 }

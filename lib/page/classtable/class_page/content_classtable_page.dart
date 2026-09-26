@@ -19,7 +19,6 @@ import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.d
 import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
-import 'package:watermeter/page/classtable/class_table_view/frosted_wallpaper.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -76,20 +75,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// the controls on top of it, not to the wallpaper itself.
   late BoxDecoration decoration;
 
-  /// The wallpaper file, blurred once into the texture the frosted cards paint from.
-  File? _wallpaperFile;
-
-  /// How far the week pages are scrolled, read by those cards to place their crop.
-  final ValueNotifier<double> _pageOffset = ValueNotifier<double>(0);
-
   /// The week on show. Published as a listenable so the week bar's highlight can follow it
   /// without the bar being rebuilt on the last frame of a swipe.
   final ValueNotifier<int> _chosenWeek = ValueNotifier<int>(0);
-
-  /// Where the table starts inside the body, measured: the banner and the docked week bar both
-  /// push it down, and the crop has to account for that.
-  final GlobalKey _sheetKey = GlobalKey();
-  double _sheetTop = 0;
 
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
@@ -140,15 +128,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     if (offset != null) {
       rowControl.jumpTo(offset);
     }
-
-    /// A moment after everything has stopped, rather than on the last frame of the animation. The
-    /// rebuild this needs covers a page of overview buttons and week rows, and landing that on the
-    /// tail of a swipe is exactly what shows up as a stutter at the end of it.
-    Future<void>.delayed(const Duration(milliseconds: 320), () {
-      if (mounted) {
-        setState(() {});
-      }
-    });
   }
 
   /// The week row offset that shows the week [weeks] weeks into the semester.
@@ -176,8 +155,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   void _syncWeekRowToTable() {
     /// While the page is running a week change picked elsewhere, the row is left where it is so the
     /// highlight can visibly slide from the old week to the new one. Only the table's own drag moves
-    /// the row along.
-    if (isTopRowLocked) {
+    /// the row along. Also skip when the week bar is collapsed and hidden.
+    if (isTopRowLocked || !_weekBarVisible) {
       return;
     }
     if (!pageControl.hasClients) {
@@ -192,7 +171,22 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       pagePosition.pixels / pagePosition.viewportDimension,
     );
     if (offset != null) {
-      rowControl.jumpTo(offset);
+      final bool needsJump = !rowControl.hasClients ||
+          !rowControl.position.hasPixels ||
+          (rowControl.offset - offset).abs() > 0.01;
+      if (needsJump) {
+        rowControl.jumpTo(offset);
+      }
+    }
+  }
+
+  /// Rebuilds the page when signal-driven data changes: loading states and class data refreshes.
+  /// Minute ticks are deliberately not here, they go to [ClassTableWidgetState.timeTickNotifier].
+  /// Kept separate from [_switchPage] so that a data change does not trigger a page animation or
+  /// lock the week row.
+  void _onDataChanged() {
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -276,36 +270,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
-  /// Keeps the page offset the frosted cards read in step with the pages.
-  void _syncPageOffset() {
-    if (pageControl.hasClients) {
-      _pageOffset.value = pageControl.offset;
-    }
-  }
-
-  /// Measures where the table starts, so a crop of the wallpaper lines up with it.
-  void _measureSheetTop(Duration _) {
-    if (!mounted) {
-      return;
-    }
-    final RenderBox? sheet =
-        _sheetKey.currentContext?.findRenderObject() as RenderBox?;
-    final RenderBox? self = context.findRenderObject() as RenderBox?;
-    if (sheet == null || self == null) {
-      return;
-    }
-    final double top = sheet.localToGlobal(Offset.zero, ancestor: self).dy;
-    if ((top - _sheetTop).abs() > 0.5) {
-      setState(() => _sheetTop = top);
-    }
-  }
-
   @override
   void dispose() {
-    classTableState.removeListener(_switchPage);
+    classTableState.removeListener(_onDataChanged);
+    classTableState.weekNavigationNotifier.removeListener(_switchPage);
     pageControl.removeListener(_syncWeekRowToTable);
-    pageControl.removeListener(_syncPageOffset);
-    _pageOffset.dispose();
     _chosenWeek.dispose();
     pageControl.dispose();
     rowControl.dispose();
@@ -322,7 +291,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     if (!_isListening) {
       classTableState = ClassTableState.of(context)!.controllers;
-      classTableState.addListener(_switchPage);
+
+      /// Data changes (loading states, class data refreshes) rebuild the page to update the status
+      /// banners and other data-dependent UI. Minute ticks are not among them: they only tick
+      /// [ClassTableWidgetState.timeTickNotifier], so just the current week redraws.
+      classTableState.addListener(_onDataChanged);
+
+      /// Week navigation (tap or swipe) is handled separately so the class card pages — which do
+      /// not depend on the chosen week at all — are not rebuilt mid-gesture.
+      classTableState.weekNavigationNotifier.addListener(_switchPage);
 
       /// Created once: rebuilding them on every dependency change would reset the row's scroll
       /// position and leak the previous controllers.
@@ -339,10 +316,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       /// rides the page's own animation curve instead of jumping once the page has arrived.
       pageControl.addListener(_syncWeekRowToTable);
 
-      /// The frosted cards read this for their crop, so it has to keep up even during a
-      /// programmatic week change.
-      pageControl.addListener(_syncPageOffset);
-
       _isListening = true;
     }
 
@@ -352,7 +325,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     final bool decorated =
         preference.getBool(preference.Preference.decorated) &&
         image.existsSync();
-    _wallpaperFile = decorated ? image : null;
     decoration = BoxDecoration(
       image:
           decorated
@@ -366,6 +338,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           : null,
     );
     super.didChangeDependencies();
+    precacheImage(
+      const AssetImage("assets/art/pda_classtable_empty.webp"),
+      context,
+    );
+    if (decorated) {
+      precacheImage(FileImage(image), context);
+    }
   }
 
   /// A row shows a series of buttons about the classtable's index.
@@ -465,13 +444,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   }
 
   /// The mode is a preference, so it is remembered.
-  Future<void> _toggleWeekBarPinned() async {
+  void _toggleWeekBarPinned() {
     final bool collapsed = !_weekBarCollapsed;
-    await preference.setBool(
+    preference.setBool(
       preference.Preference.classTableWeekBarCollapsed,
       collapsed,
     );
-    if (!mounted) return;
     setState(() {
       _weekBarCollapsed = collapsed;
       _weekBarExpanded = false;
@@ -480,33 +458,46 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   /// What the collapsed bar reduces to in the app bar: the week number, as a rounded chip.
   Widget _weekChip() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Material(
-        color: Theme.of(
-          context,
-        ).colorScheme.surfaceContainerHigh.withValues(
-          alpha: timeLineSurfaceAlpha,
-        ),
-        borderRadius: BorderRadius.circular(timeLineRadius),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(timeLineRadius),
-          onTap: () => setState(() => _weekBarExpanded = !_weekBarExpanded),
+    return ValueListenableBuilder<int>(
+      key: const ValueKey('week_chip'),
+      valueListenable: _chosenWeek,
+      builder: (context, chosenWeek, _) {
+        return Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Text(
-              FlutterI18n.translate(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Material(
+              color: Theme.of(
                 context,
-                "classtable.week_title",
-                translationParams: {
-                  "week": (classTableState.chosenWeek + 1).toString(),
-                },
+              ).colorScheme.surfaceContainerHigh.withValues(
+                alpha: timeLineSurfaceAlpha,
               ),
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              borderRadius: BorderRadius.circular(timeLineRadius),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(timeLineRadius),
+                onTap: () => setState(() => _weekBarExpanded = !_weekBarExpanded),
+                child: Container(
+                  height: 32,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "classtable.week_title",
+                      translationParams: {
+                        "week": (chosenWeek + 1).toString(),
+                      },
+                    ),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -945,8 +936,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   Widget build(BuildContext context) {
     final state = ClassTableState.of(context)!.controllers;
 
-    /// Measured after each frame; it only rebuilds when the table actually moves.
-    WidgetsBinding.instance.addPostFrameCallback(_measureSheetTop);
     final hasError =
         state.errorWithoutCacheSources.isNotEmpty ||
         state.errorWithCacheSources.isNotEmpty;
@@ -963,7 +952,20 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               tooltip: FlutterI18n.translate(context, "load_error"),
             ),
           /// While collapsed, the week number is all that is left of the bar.
-          if (_weekBarCollapsed) _weekChip(),
+          AnimatedSwitcher(
+            duration: weekBarPopDuration,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SizeTransition(
+                sizeFactor: animation,
+                axis: Axis.horizontal,
+                child: Center(child: child),
+              ),
+            ),
+            child: _weekBarCollapsed
+                ? _weekChip()
+                : const SizedBox.shrink(key: ValueKey('week_chip_empty')),
+          ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
@@ -1263,16 +1265,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           ),
         ],
       ),
-      /// The frosted class cards paint a crop of the baked wallpaper, so the body is wrapped in
-      /// the baker: it measures itself, blurs the wallpaper once and tells the cards where it sits.
-      body: FrostedWallpaper(
-        file:
-            _wallpaperFile ??
-            File("${supportPath.path}/${classTableState.decorationName}"),
-        sheetTop: _sheetTop,
-        pageOffset: _pageOffset,
-        child: Stack(
+      body: Stack(
         fit: StackFit.expand,
+        clipBehavior: Clip.hardEdge,
         children: [
           /// The wallpaper. It spans the whole body, under the week bar as well as the table, and it
           /// is never blurred itself: every frosted control blurs its own copy of it inside its own
@@ -1315,7 +1310,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       cacheSources: state.cacheSources,
                     ),
                     ClassTableSheet(
-                      key: _sheetKey,
                       singleIndex: classTableState.chosenWeek,
                       pageControl: pageControl,
                       semesterLength: classTableState.semesterLength,
@@ -1359,84 +1353,78 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             top: _weekBarFloating ? timeLineInset : 0,
             height: _weekBarHeight,
             duration: weekBarPopDuration,
-            curve: Curves.easeOutCubic,
+            curve: _weekBarVisible
+                ? Curves.easeOutCubic
+                : Curves.easeInOutCubic,
             child: IgnorePointer(
               ignoring: !_weekBarVisible,
               child: AnimatedSlide(
-                offset: _weekBarVisible ? Offset.zero : const Offset(0, -1),
+                offset: _weekBarVisible
+                    ? Offset.zero
+                    : const Offset(0, -1.35),
                 duration: weekBarPopDuration,
-                curve: Curves.easeOutCubic,
-                child: AnimatedScale(
-                  scale: _weekBarVisible ? 1.0 : 0.96,
-                  alignment: Alignment.topCenter,
+                curve: _weekBarVisible
+                    ? Curves.easeOutCubic
+                    : Curves.easeInOutCubic,
+                child: AnimatedContainer(
                   duration: weekBarPopDuration,
-                  curve: Curves.easeOutCubic,
-                  child: AnimatedContainer(
-                    duration: weekBarPopDuration,
-                    curve: Curves.easeOutCubic,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          _weekBarFloating ? timeLineRadius : 0,
-                        ),
-                        boxShadow: _weekBarFloating
-                            ? [
-                                BoxShadow(
-                                  color: Colors.black.withValues(
-                                    alpha: timeLineShadowAlpha,
-                                  ),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : null,
-                      ),
-                    child: Stack(
-                      children: [
-                          /// Frosted, like the panels in the table: the bar's own background blurs
-                          /// the wallpaper behind it while the wallpaper itself stays sharp.
-                          ///
-                          /// The tint is the filter's child, not a colour under it, so what gets
-                          /// blurred is the raw wallpaper — the same order the class cards use.
-                          ///
-                          /// Keep the filter mounted throughout the pop so the backdrop is blurred
-                          /// from the first frame rather than appearing only after the bar settles.
-                          Positioned.fill(
-                            child: GlassBlur(
-                              borderRadius: BorderRadius.circular(
-                                _weekBarFloating ? timeLineRadius : 0,
-                              ),
-                              child: ColoredBox(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHigh
-                                    .withValues(alpha: weekBarSurfaceAlpha),
-                              ),
-                            ),
-                          ),
-                          /// Taps on the bar's own body keep it open: putting it away is for taps
-                          /// outside it. Translucent rather than opaque, so a drag that starts on
-                          /// the bar still reaches the table underneath.
-                          Positioned.fill(
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {},
-                            ),
-                          ),
-                          AnimatedOpacity(
-                            opacity: _weekBarVisible ? 1.0 : 0.0,
-                            duration: weekBarPopDuration,
-                            curve: Curves.easeOut,
-                            child: _weekBarContents(),
-                          ),
-                      ],
+                  curve: _weekBarVisible
+                      ? Curves.easeOutCubic
+                      : Curves.easeInOutCubic,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      _weekBarFloating ? timeLineRadius : 0,
                     ),
+                    boxShadow: _weekBarFloating
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withValues(
+                                alpha: timeLineShadowAlpha,
+                              ),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Stack(
+                    children: [
+                      /// Frosted, like the panels in the table: the bar's own background blurs
+                      /// the wallpaper behind it while the wallpaper itself stays sharp.
+                      ///
+                      /// The tint is the filter's child, not a colour under it, so what gets
+                      /// blurred is the raw wallpaper — the same order the class cards use.
+                      ///
+                      /// Keep the filter mounted throughout the pop so the backdrop is blurred
+                      /// from the first frame rather than appearing only after the bar settles.
+                      Positioned.fill(
+                        child: GlassBlur(
+                          child: ColoredBox(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHigh
+                                .withValues(alpha: weekBarSurfaceAlpha),
+                          ),
+                        ),
+                      ),
+                      /// Taps on the bar's own body keep it open: putting it away is for taps
+                      /// outside it. Translucent rather than opaque, so a drag that starts on
+                      /// the bar still reaches the table underneath.
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {},
+                        ),
+                      ),
+                      _weekBarContents(),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
         ],
-      ),
       ),
     );
   }
