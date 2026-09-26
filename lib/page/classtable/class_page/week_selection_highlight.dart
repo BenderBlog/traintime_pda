@@ -3,6 +3,7 @@
 
 // The box behind the week button on show.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
@@ -11,6 +12,10 @@ import 'package:watermeter/page/classtable/classtable_constant.dart';
 /// A single box rather than a tint on every button: a change of week then slides it from the old
 /// week to the new one, instead of the tint jumping across the row. It also rides the row's own
 /// scrolling, so it stays on its week while the table drags the row along.
+///
+/// The week arrives as a [ValueListenable] so the box can follow it on its own, without the week bar
+/// being rebuilt: that rebuild is a page's worth of overview buttons, and spending it on the last
+/// frames of a swipe is what makes the end of a swipe stutter.
 class WeekSelectionHighlight extends StatefulWidget {
   const WeekSelectionHighlight({
     super.key,
@@ -19,7 +24,7 @@ class WeekSelectionHighlight extends StatefulWidget {
   });
 
   /// The week on show.
-  final int week;
+  final ValueListenable<int> week;
 
   /// The row's controller, so the highlight follows when the row scrolls.
   final ScrollController rowControl;
@@ -35,7 +40,7 @@ class _WeekSelectionHighlightState extends State<WeekSelectionHighlight>
   /// Tweened rather than read straight from [WeekSelectionHighlight.week], so a change of week
   /// slides the box across instead of moving it in one frame.
   late Animation<double> _weeks = AlwaysStoppedAnimation<double>(
-    widget.week.toDouble(),
+    widget.week.value.toDouble(),
   );
 
   late final AnimationController _slide = AnimationController(
@@ -44,24 +49,36 @@ class _WeekSelectionHighlightState extends State<WeekSelectionHighlight>
   );
 
   @override
+  void initState() {
+    super.initState();
+    widget.week.addListener(_onWeekChanged);
+  }
+
+  @override
   void didUpdateWidget(covariant WeekSelectionHighlight oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.week == widget.week) {
-      return;
+    if (oldWidget.week != widget.week) {
+      oldWidget.week.removeListener(_onWeekChanged);
+      widget.week.addListener(_onWeekChanged);
+      _onWeekChanged();
     }
-
-    /// From wherever it is now, which may be halfway through an earlier slide.
-    _weeks =
-        Tween<double>(begin: _weeks.value, end: widget.week.toDouble()).animate(
-          CurvedAnimation(parent: _slide, curve: Curves.easeInOutCubic),
-        );
-    _slide.forward(from: 0);
   }
 
   @override
   void dispose() {
+    widget.week.removeListener(_onWeekChanged);
     _slide.dispose();
     super.dispose();
+  }
+
+  void _onWeekChanged() {
+    /// From wherever it is now, which may be halfway through an earlier slide.
+    _weeks =
+        Tween<double>(begin: _weeks.value, end: widget.week.value.toDouble())
+            .animate(
+              CurvedAnimation(parent: _slide, curve: Curves.easeInOutCubic),
+            );
+    _slide.forward(from: 0);
   }
 
   @override

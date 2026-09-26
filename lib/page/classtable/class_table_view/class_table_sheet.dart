@@ -8,6 +8,7 @@ import 'package:watermeter/page/classtable/class_table_view/class_table_time_lin
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/class_table_view/frosted_wallpaper.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -50,10 +51,29 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
   final GlobalKey _dateRowKey = GlobalKey();
   double _dateRowHeight = 0;
 
+  /// Where the sheet's content starts relative to the sheet: the reserved space minus the scroll
+  /// offset. The frosted cards read it to place their crop of the wallpaper.
+  final ValueNotifier<double> _contentTop = ValueNotifier<double>(0);
+
+  @override
+  void initState() {
+    super.initState();
+    _verticalControl.addListener(_updateContentTop);
+  }
+
   @override
   void dispose() {
+    _verticalControl.removeListener(_updateContentTop);
+    _contentTop.dispose();
     _verticalControl.dispose();
     super.dispose();
+  }
+
+  void _updateContentTop() {
+    final double scrolled = _verticalControl.hasClients
+        ? _verticalControl.offset
+        : 0;
+    _contentTop.value = _dateRowHeight - scrolled;
   }
 
   void _measureDateRow(Duration _) {
@@ -68,7 +88,10 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
       return;
     }
     if ((height - _dateRowHeight).abs() > 0.5) {
-      setState(() => _dateRowHeight = height);
+      setState(() {
+        _dateRowHeight = height;
+        _updateContentTop();
+      });
     }
   }
 
@@ -83,6 +106,11 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
   ///
   /// It is built here rather than by the week page, because the time line is stacked above the
   /// classes and the label has to stay on top of the time line's panel.
+  ///
+  /// It is pinned to the week today falls in rather than to the week on show. The times down the
+  /// side are the same every week, so "now" is a meaningful mark on any of them — and pinning it
+  /// this way keeps the capsule sitting still through a week change, instead of dropping out and
+  /// popping back while the pages slide past.
   Widget? _currentTimeLabel(BuildContext context, double available) {
     final ClassTableState? state = ClassTableState.of(context);
     if (state == null) return null;
@@ -90,7 +118,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
     final ClassTableWidgetState controllers = state.controllers;
     final DateTime weekStart = controllers.startDay
         .add(Duration(days: 7 * controllers.offset))
-        .add(Duration(days: 7 * widget.singleIndex));
+        .add(Duration(days: 7 * controllers.currentWeek));
 
     return CurrentTimeIndicator.buildLabel(
       context: context,
@@ -125,34 +153,48 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
           children: [
             /// The sheet fills the whole area, so its content slides underneath the date row
             /// instead of being cut off at a hard edge below it.
-            SingleChildScrollView(
-              controller: _verticalControl,
-              physics: widget.enableVerticalScrolling
-                  ? null
-                  : const NeverScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  /// Room reserved for the floating date row.
-                  SizedBox(height: _dateRowHeight),
+            ///
+            /// Under [_ClassTableScrollBehavior]: the platform's overscroll indicator is diverted to the
+            /// glow, because the stretch scales its child and a scaled subtree breaks every backdrop
+            /// filter inside it — the frost would blink out on each top and bottom pull.
+            ScrollConfiguration(
+              behavior: const _ClassTableScrollBehavior(),
+              child: FrostedSheetGeometry(
+                /// One page is one sheet width, and the grid starts after the reserved date row.
+                pageWidth: constraints.maxWidth,
+                contentTop: _contentTop,
+                child: SingleChildScrollView(
+                controller: _verticalControl,
+                physics: !widget.enableVerticalScrolling
+                    ? const NeverScrollableScrollPhysics()
+                    : classTableBounceOverscroll
+                    ? const BouncingScrollPhysics()
+                    : null,
+                child: Column(
+                  children: [
+                    /// Room reserved for the floating date row.
+                    SizedBox(height: _dateRowHeight),
 
-                  SizedBox(
-                    height: gridHeight,
-                    child: Stack(
-                      children: [
-                        /// The classes, below everything else, so a card sliding in from the next
-                        /// week passes behind the time line rather than over it.
-                        _pages(available),
+                    SizedBox(
+                      height: gridHeight,
+                      child: Stack(
+                        children: [
+                          /// The classes, below everything else, so a card sliding in from the
+                          /// next week passes behind the time line rather than over it.
+                          _pages(available),
 
-                        /// Laid out once for the whole table, so it does not page with the weeks.
-                        ClassTableTimeLine(available: available),
+                          /// Laid out once for the whole table, so it does not page with the weeks.
+                          ClassTableTimeLine(available: available),
 
-                        /// The current-time label rides on top of the time line's panel.
-                        ?_currentTimeLabel(context, available),
-                      ],
+                          /// The current-time label rides on top of the time line's panel.
+                          ?_currentTimeLabel(context, available),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+            ),
             ),
 
             /// The date row floats above the sheet and is never clipped, so scrolled content passes
@@ -195,5 +237,35 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
       itemBuilder: (context, index) =>
           ClassTableView(index: index, available: available),
     );
+  }
+}
+
+/// Whether the table pulls out past its ends and springs back, instead of using the platform's
+/// overscroll indicator.
+///
+/// A bounce only moves the content, which the frosted controls handle like any other scroll, so the
+/// blur survives the pull and the table still answers the finger. The platform's stretch scales its
+/// child instead, and a scaled subtree breaks the backdrop filters underneath it: with the stretch
+/// the blur disappears for the length of the pull. Set this to false to go back to it.
+const bool classTableBounceOverscroll = true;
+
+/// The table's overscroll feedback.
+///
+/// With [classTableBounceOverscroll] the pull itself is the feedback, so no indicator is drawn; that
+/// is also the only way the blur survives, since every platform indicator either scales the content
+/// or paints a layer over it. Set the flag to false to get the platform default back.
+class _ClassTableScrollBehavior extends MaterialScrollBehavior {
+  const _ClassTableScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    if (classTableBounceOverscroll) {
+      return child;
+    }
+    return super.buildOverscrollIndicator(context, child, details);
   }
 }

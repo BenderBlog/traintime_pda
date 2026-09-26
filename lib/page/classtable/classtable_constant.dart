@@ -66,6 +66,20 @@ const double weekBarSurfaceAlpha = 0.42;
 /// own surface under them for contrast.
 const double bannerSurfaceAlpha = 0.6;
 
+/// Blur of the table's wallpaper, in logical pixels, as it looks on screen.
+///
+/// The wallpaper is decoded at [wallpaperDecodeScale] of its display width, blurred at that size and
+/// baked at [wallpaperBakeScale] — the mipmap part of the trick. The frosted class cards then paint
+/// a crop of that texture instead of running a backdrop filter of their own, which is what keeps a
+/// tableful of cards cheap while they are dragged and scrolled.
+const double wallpaperBlurSigma = 16;
+
+/// The fraction of the display width the wallpaper is decoded at before it is blurred.
+const double wallpaperDecodeScale = 0.25;
+
+/// The fraction of the display size the blurred wallpaper is baked at.
+const double wallpaperBakeScale = 0.5;
+
 /// Blur of the controls' own backgrounds, in logical pixels.
 ///
 /// This is what makes a class card, the time line panel or the week bar look like frosted glass: the

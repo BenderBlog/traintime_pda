@@ -12,7 +12,9 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
+import 'package:watermeter/page/classtable/class_table_view/frosted_wallpaper.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -24,6 +26,19 @@ class ClassCard extends StatelessWidget {
   final ClassOrgainzedData detail;
   final double completedHeight;
 
+  /// The height inside the card's padding, which the completed split is measured against.
+  ///
+  /// Handed in rather than measured: a [LayoutBuilder] rebuilds its subtree during layout
+  /// whenever its constraints change, which is every frame of a drag or a scroll, for every card
+  /// on screen. [ClassTableView] already knows the height it positioned the card at.
+  final double height;
+
+  /// Where the card sits in the grid, which is what places its crop of the blurred wallpaper.
+  final Offset gridOrigin;
+
+  /// The week page the card belongs to.
+  final int pageIndex;
+
   List<dynamic> get data => detail.data;
   MaterialColor get color => detail.color;
   String get name => detail.name;
@@ -32,6 +47,9 @@ class ClassCard extends StatelessWidget {
     super.key,
     required this.detail,
     required this.completedHeight,
+    required this.height,
+    required this.gridOrigin,
+    required this.pageIndex,
   });
 
   @override
@@ -52,13 +70,10 @@ class ClassCard extends StatelessWidget {
       padding: const EdgeInsets.all(1),
       child: ClipRRect(
         borderRadius: borderRadius,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final splitHeight = completedHeight.clamp(
-              0.0,
-              constraints.maxHeight,
-            );
-            final isCompleted = splitHeight >= constraints.maxHeight - 0.5;
+        child: Builder(
+          builder: (context) {
+            final splitHeight = completedHeight.clamp(0.0, height);
+            final isCompleted = splitHeight >= height - 0.5;
             final textStyle = isCompleted ? completedStyle : activeStyle;
             final borderStyle = isCompleted ? completedStyle : activeStyle;
 
@@ -84,8 +99,19 @@ class ClassCard extends StatelessWidget {
             return Stack(
               fit: StackFit.expand,
               children: [
-                /// Keep every class card frosted while it moves with the page.
-                const Positioned.fill(child: GlassBlur(grouped: true)),
+                /// The frosted background: a real backdrop blur of the wallpaper behind the card.
+                ///
+                /// Grouped with the other cards, so a whole tableful shares one blur of the same
+                /// backdrop. The alternative — painting a crop of a pre-baked blurred wallpaper — is
+                /// still wired up in [FrostedCardBackground] and selected by swapping this for it,
+                /// which trades the blur's texture for a good deal less work per frame.
+                Positioned.fill(
+                  child: GlassBlur(
+                    grouped: true,
+                    sigma: GlassStyleConfig.cardSigma,
+                    child: const SizedBox.expand(),
+                  ),
+                ),
                 if (splitHeight > 0)
                   Positioned(
                     top: 0,
@@ -98,7 +124,7 @@ class ClassCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (splitHeight < constraints.maxHeight)
+                if (splitHeight < height)
                   Positioned(
                     top: splitHeight,
                     left: 0,
