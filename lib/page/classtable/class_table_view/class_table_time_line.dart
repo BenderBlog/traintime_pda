@@ -40,8 +40,9 @@ class ClassTableTimeLine extends StatelessWidget {
         /// The panel. Frosted, like the other controls over the table: the wallpaper behind it is
         /// blurred inside the panel's own rounded bounds while it stays sharp everywhere else.
         ///
-        /// Kept separate from the class-card blur group because this panel stays fixed above the
-        /// scrolling grid and needs its own backdrop read on every vertical scroll frame.
+        /// Grouped with the other controls under [BackdropGroup] because this panel sits alongside
+        /// the class cards without overlapping them (x: [4, 36] vs x: [40, width]), allowing a single
+        /// blur pass for the entire table.
         Positioned(
           left: timeLineInset,
           top: timeLineInset,
@@ -62,6 +63,7 @@ class ClassTableTimeLine extends StatelessWidget {
             child: GlassBlur(
               borderRadius: BorderRadius.circular(timeLineRadius),
               sigma: GlassStyleConfig.timeLineSigma,
+              grouped: true,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerHigh

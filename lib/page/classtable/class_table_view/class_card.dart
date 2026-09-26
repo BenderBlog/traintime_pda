@@ -12,7 +12,6 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
-import 'package:watermeter/page/classtable/class_table_view/frosted_wallpaper.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
@@ -32,12 +31,6 @@ class ClassCard extends StatelessWidget {
   /// on screen. [ClassTableView] already knows the height it positioned the card at.
   final double height;
 
-  /// Where the card sits in the grid, which is what places its crop of the blurred wallpaper.
-  final Offset gridOrigin;
-
-  /// The week page the card belongs to.
-  final int pageIndex;
-
   List<dynamic> get data => detail.data;
   MaterialColor get color => detail.color;
   String get name => detail.name;
@@ -47,8 +40,6 @@ class ClassCard extends StatelessWidget {
     required this.detail,
     required this.completedHeight,
     required this.height,
-    required this.gridOrigin,
-    required this.pageIndex,
   });
 
   @override
@@ -63,6 +54,7 @@ class ClassCard extends StatelessWidget {
       isCompleted: true,
     );
     final isInteractive = classTableState.isClassCardInteractive(detail);
+    final bool isPhoneDevice = isPhone(context);
 
     const borderRadius = BorderRadius.all(Radius.circular(8));
     return Padding(
@@ -82,9 +74,7 @@ class ClassCard extends StatelessWidget {
                 /// The frosted background: a real backdrop blur of the wallpaper behind the card.
                 ///
                 /// Grouped with the other cards, so a whole tableful shares one blur of the same
-                /// backdrop. The alternative — painting a crop of a pre-baked blurred wallpaper — is
-                /// still wired up in [FrostedCardBackground] and selected by swapping this for it,
-                /// which trades the blur's texture for a good deal less work per frame.
+                /// backdrop.
                 Positioned.fill(
                   child: GlassBlur(
                     grouped: true,
@@ -116,12 +106,9 @@ class ClassCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    overlayColor: Colors.transparent,
-                  ),
-                  onPressed: isInteractive
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: isInteractive
                       ? () async {
                           final controller = ClassTableState.of(
                             context,
@@ -212,7 +199,7 @@ class ClassCard extends StatelessWidget {
                       : null,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: isPhone(context) ? 2 : 4,
+                      horizontal: isPhoneDevice ? 2 : 4,
                       vertical: 4,
                     ),
                     child: Align(
@@ -225,7 +212,7 @@ class ClassCard extends StatelessWidget {
                               name,
                               style: TextStyle(
                                 color: textStyle.textColor,
-                                fontSize: isPhone(context) ? 12 : 14,
+                                fontSize: isPhoneDevice ? 12 : 14,
                               ),
                               maxLines: 3,
                               overflow: TextOverflow.clip,
@@ -235,7 +222,7 @@ class ClassCard extends StatelessWidget {
                             "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
                             style: TextStyle(
                               color: textStyle.textColor,
-                              fontSize: isPhone(context) ? 10 : 12,
+                              fontSize: isPhoneDevice ? 10 : 12,
                             ),
                           ),
                           if (data.length > 1)
@@ -249,7 +236,7 @@ class ClassCard extends StatelessWidget {
                               ),
                               style: TextStyle(
                                 color: textStyle.textColor,
-                                fontSize: isPhone(context) ? 10 : 12,
+                                fontSize: isPhoneDevice ? 10 : 12,
                               ),
                             ),
                         ],

@@ -8,7 +8,6 @@ import 'package:watermeter/page/classtable/class_table_view/class_table_time_lin
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
-import 'package:watermeter/page/classtable/class_table_view/frosted_wallpaper.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -51,29 +50,10 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
   final GlobalKey _dateRowKey = GlobalKey();
   double _dateRowHeight = 0;
 
-  /// Where the sheet's content starts relative to the sheet: the reserved space minus the scroll
-  /// offset. The frosted cards read it to place their crop of the wallpaper.
-  final ValueNotifier<double> _contentTop = ValueNotifier<double>(0);
-
-  @override
-  void initState() {
-    super.initState();
-    _verticalControl.addListener(_updateContentTop);
-  }
-
   @override
   void dispose() {
-    _verticalControl.removeListener(_updateContentTop);
-    _contentTop.dispose();
     _verticalControl.dispose();
     super.dispose();
-  }
-
-  void _updateContentTop() {
-    final double scrolled = _verticalControl.hasClients
-        ? _verticalControl.offset
-        : 0;
-    _contentTop.value = _dateRowHeight - scrolled;
   }
 
   void _measureDateRow(Duration _) {
@@ -90,7 +70,6 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
     if ((height - _dateRowHeight).abs() > 0.5) {
       setState(() {
         _dateRowHeight = height;
-        _updateContentTop();
       });
     }
   }
@@ -116,18 +95,23 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
     if (state == null) return null;
 
     final ClassTableWidgetState controllers = state.controllers;
-    final DateTime weekStart = controllers.startDay
-        .add(Duration(days: 7 * controllers.offset))
-        .add(Duration(days: 7 * controllers.currentWeek));
+    return ListenableBuilder(
+      listenable: controllers.timeTickNotifier,
+      builder: (context, _) {
+        final DateTime weekStart = controllers.startDay
+            .add(Duration(days: 7 * controllers.offset))
+            .add(Duration(days: 7 * controllers.currentWeek));
 
-    return CurrentTimeIndicator.buildLabel(
-      context: context,
-      now: controllers.currentTime,
-      weekStart: weekStart,
-      leftRow: leftRow,
-      blockWidth: (state.constraints.maxWidth - leftRow) / 7,
-      blockHeight: (double count) =>
-          classTableBlockHeight(context, available, count),
+        return CurrentTimeIndicator.buildLabel(
+          context: context,
+          now: controllers.currentTime,
+          weekStart: weekStart,
+          leftRow: leftRow,
+          blockWidth: (state.constraints.maxWidth - leftRow) / 7,
+          blockHeight: (double count) =>
+              classTableBlockHeight(context, available, count),
+        ) ?? const SizedBox.shrink();
+      },
     );
   }
 
@@ -159,11 +143,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
             /// filter inside it — the frost would blink out on each top and bottom pull.
             ScrollConfiguration(
               behavior: const _ClassTableScrollBehavior(),
-              child: FrostedSheetGeometry(
-                /// One page is one sheet width, and the grid starts after the reserved date row.
-                pageWidth: constraints.maxWidth,
-                contentTop: _contentTop,
-                child: SingleChildScrollView(
+              child: SingleChildScrollView(
                 controller: _verticalControl,
                 physics: !widget.enableVerticalScrolling
                     ? const NeverScrollableScrollPhysics()
@@ -194,7 +174,6 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                   ],
                 ),
               ),
-            ),
             ),
 
             /// The date row floats above the sheet and is never clipped, so scrolled content passes
