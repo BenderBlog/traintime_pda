@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -64,6 +65,7 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
               ),
               child: GlassBlur(
                 borderRadius: BorderRadius.circular(timeLineRadius),
+                sigma: GlassStyleConfig.dateRowSigma,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surfaceContainerHigh
@@ -104,14 +106,19 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
       builder: (context, constraints) => ClipRect(
         child: AnimatedBuilder(
           animation: pages,
-          child: Row(
-            children: List.generate(
-              widget.semesterLength,
-              (index) => SizedBox(
-                width: constraints.maxWidth,
-                child: ExcludeSemantics(
-                  excluding: index != widget.index,
-                  child: _weekRow(context, index),
+
+          /// The headers are the same widget every frame; the barrier keeps them out of the repaint
+          /// that the sliding transform would otherwise force on all of them, every frame.
+          child: RepaintBoundary(
+            child: Row(
+              children: List.generate(
+                widget.semesterLength,
+                (index) => SizedBox(
+                  width: constraints.maxWidth,
+                  child: ExcludeSemantics(
+                    excluding: index != widget.index,
+                    child: _weekRow(context, index),
+                  ),
                 ),
               ),
             ),
@@ -120,7 +127,10 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
             final double offset = pages.hasClients
                 ? pages.position.pixels
                 : widget.index * constraints.maxWidth;
-            return Transform.translate(offset: Offset(-offset, 0), child: child);
+            return Transform.translate(
+              offset: Offset(-offset, 0),
+              child: child,
+            );
           },
         ),
       ),

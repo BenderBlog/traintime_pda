@@ -115,14 +115,26 @@ class _ClassTableViewState extends State<ClassTableView> {
       /// Choice the day and render it!
       for (var i in arrangedEvents) {
         /// Generate the row.
+        final double cardHeight = blockheight(i.stop - i.start);
+        final double cardTop = blockheight(i.start);
+        final double cardLeft = leftRow + blockwidth * (index - 1);
         final completedHeight = _completedHeight(i, index);
         thisRow.add(
           Positioned(
-            top: blockheight(i.start),
-            height: blockheight(i.stop - i.start),
-            left: leftRow + blockwidth * (index - 1),
+            top: cardTop,
+            height: cardHeight,
+            left: cardLeft,
             width: blockwidth,
-            child: ClassCard(detail: i, completedHeight: completedHeight),
+            child: ClassCard(
+              detail: i,
+              completedHeight: completedHeight,
+
+              /// Known here already, so the card does not measure itself, and so its frosted
+              /// background can crop the wallpaper to match the piece behind it.
+              height: cardHeight - 2,
+              gridOrigin: Offset(cardLeft, cardTop),
+              pageIndex: widget.index,
+            ),
           ),
         );
       }

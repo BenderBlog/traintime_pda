@@ -156,6 +156,30 @@ enum Preference {
     key: "classStyleCompletedInnerAlpha",
     type: "double",
   ), // 已完成课程底色透明度
+  classStyleGlassEnabled(
+    key: "classStyleGlassEnabled",
+    type: "bool",
+  ), // 毛玻璃背景总开关
+  classStyleGlassCardSigma(
+    key: "classStyleGlassCardSigma",
+    type: "double",
+  ), // 课程卡片背景模糊
+  classStyleGlassTimeLineSigma(
+    key: "classStyleGlassTimeLineSigma",
+    type: "double",
+  ), // 时间轴面板背景模糊
+  classStyleGlassDateRowSigma(
+    key: "classStyleGlassDateRowSigma",
+    type: "double",
+  ), // 日期栏面板背景模糊
+  classStyleGlassWeekBarSigma(
+    key: "classStyleGlassWeekBarSigma",
+    type: "double",
+  ), // 周次栏背景模糊
+  classStyleGlassBannerSigma(
+    key: "classStyleGlassBannerSigma",
+    type: "double",
+  ), // 状态横幅背景模糊
   lowElectricityWarningEnabled(
     key: "lowElectricityWarningEnabled",
     type: "bool",

@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
@@ -69,6 +70,7 @@ class ClassTableInlineBanner extends StatelessWidget {
                 child: GlassBlur(
                   borderRadius: BorderRadius.zero,
                   grouped: true,
+                  sigma: GlassStyleConfig.bannerSigma,
                   child: ColoredBox(
                     color: Theme.of(
                       context,

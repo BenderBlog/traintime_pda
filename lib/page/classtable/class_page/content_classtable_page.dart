@@ -19,6 +19,7 @@ import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.d
 import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/class_table_view/frosted_wallpaper.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
@@ -75,6 +76,21 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// the controls on top of it, not to the wallpaper itself.
   late BoxDecoration decoration;
 
+  /// The wallpaper file, blurred once into the texture the frosted cards paint from.
+  File? _wallpaperFile;
+
+  /// How far the week pages are scrolled, read by those cards to place their crop.
+  final ValueNotifier<double> _pageOffset = ValueNotifier<double>(0);
+
+  /// The week on show. Published as a listenable so the week bar's highlight can follow it
+  /// without the bar being rebuilt on the last frame of a swipe.
+  final ValueNotifier<int> _chosenWeek = ValueNotifier<int>(0);
+
+  /// Where the table starts inside the body, measured: the banner and the docked week bar both
+  /// push it down, and the crop has to account for that.
+  final GlobalKey _sheetKey = GlobalKey();
+  double _sheetTop = 0;
+
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
   bool _didLoadVisualSettings = false;
@@ -124,7 +140,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     if (offset != null) {
       rowControl.jumpTo(offset);
     }
-    setState(() {});
+
+    /// A moment after everything has stopped, rather than on the last frame of the animation. The
+    /// rebuild this needs covers a page of overview buttons and week rows, and landing that on the
+    /// tail of a swipe is exactly what shows up as a stutter at the end of it.
+    Future<void>.delayed(const Duration(milliseconds: 320), () {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   /// The week row offset that shows the week [weeks] weeks into the semester.
@@ -176,6 +200,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     if (!mounted) {
       return;
     }
+
+    /// First thing, whatever else happens: the highlight follows this directly.
+    _chosenWeek.value = classTableState.chosenWeek;
 
     /// A week picked by dragging the table is already moving on screen. Defer the week row update
     /// until the page settles so the drag does not rebuild the overview buttons on every page tick.
@@ -249,10 +276,37 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
+  /// Keeps the page offset the frosted cards read in step with the pages.
+  void _syncPageOffset() {
+    if (pageControl.hasClients) {
+      _pageOffset.value = pageControl.offset;
+    }
+  }
+
+  /// Measures where the table starts, so a crop of the wallpaper lines up with it.
+  void _measureSheetTop(Duration _) {
+    if (!mounted) {
+      return;
+    }
+    final RenderBox? sheet =
+        _sheetKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? self = context.findRenderObject() as RenderBox?;
+    if (sheet == null || self == null) {
+      return;
+    }
+    final double top = sheet.localToGlobal(Offset.zero, ancestor: self).dy;
+    if ((top - _sheetTop).abs() > 0.5) {
+      setState(() => _sheetTop = top);
+    }
+  }
+
   @override
   void dispose() {
     classTableState.removeListener(_switchPage);
     pageControl.removeListener(_syncWeekRowToTable);
+    pageControl.removeListener(_syncPageOffset);
+    _pageOffset.dispose();
+    _chosenWeek.dispose();
     pageControl.dispose();
     rowControl.dispose();
     super.dispose();
@@ -279,10 +333,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       rowControl = ScrollController(
         initialScrollOffset: classTableState.chosenWeek * weekChoiceItemExtent,
       );
+      _chosenWeek.value = classTableState.chosenWeek;
 
       /// The table drives the week row while it moves, which is what gives the row its easing: it
       /// rides the page's own animation curve instead of jumping once the page has arrived.
       pageControl.addListener(_syncWeekRowToTable);
+
+      /// The frosted cards read this for their crop, so it has to keep up even during a
+      /// programmatic week change.
+      pageControl.addListener(_syncPageOffset);
 
       _isListening = true;
     }
@@ -290,10 +349,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     /// Let controllers listen to the currentWeek's change.
     /// Init the background.
     File image = File("${supportPath.path}/${classTableState.decorationName}");
+    final bool decorated =
+        preference.getBool(preference.Preference.decorated) &&
+        image.existsSync();
+    _wallpaperFile = decorated ? image : null;
     decoration = BoxDecoration(
       image:
-          (preference.getBool(preference.Preference.decorated) &&
-              image.existsSync())
+          decorated
           ? DecorationImage(
               image: FileImage(image),
               fit: BoxFit.cover,
@@ -320,7 +382,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         Positioned.fill(
           child: IgnorePointer(
             child: WeekSelectionHighlight(
-              week: classTableState.chosenWeek,
+              week: _chosenWeek,
               rowControl: rowControl,
             ),
           ),
@@ -882,6 +944,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   @override
   Widget build(BuildContext context) {
     final state = ClassTableState.of(context)!.controllers;
+
+    /// Measured after each frame; it only rebuilds when the table actually moves.
+    WidgetsBinding.instance.addPostFrameCallback(_measureSheetTop);
     final hasError =
         state.errorWithoutCacheSources.isNotEmpty ||
         state.errorWithCacheSources.isNotEmpty;
@@ -1198,7 +1263,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           ),
         ],
       ),
-      body: Stack(
+      /// The frosted class cards paint a crop of the baked wallpaper, so the body is wrapped in
+      /// the baker: it measures itself, blurs the wallpaper once and tells the cards where it sits.
+      body: FrostedWallpaper(
+        file:
+            _wallpaperFile ??
+            File("${supportPath.path}/${classTableState.decorationName}"),
+        sheetTop: _sheetTop,
+        pageOffset: _pageOffset,
+        child: Stack(
         fit: StackFit.expand,
         children: [
           /// The wallpaper. It spans the whole body, under the week bar as well as the table, and it
@@ -1242,6 +1315,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       cacheSources: state.cacheSources,
                     ),
                     ClassTableSheet(
+                      key: _sheetKey,
                       singleIndex: classTableState.chosenWeek,
                       pageControl: pageControl,
                       semesterLength: classTableState.semesterLength,
@@ -1362,6 +1436,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

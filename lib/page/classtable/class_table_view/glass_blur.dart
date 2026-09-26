@@ -6,7 +6,33 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
+
+/// Tells every [GlassBlur] below it whether it may blur at all.
+///
+/// The settings page's preview uses this to switch the blur off: it is a small static sample where
+/// the blur is barely visible, while a whole tableful of backdrop filters makes the page stutter
+/// while it scrolls.
+class GlassBlurScope extends InheritedWidget {
+  const GlassBlurScope({
+    super.key,
+    required this.enabled,
+    required super.child,
+  });
+
+  /// Whether the controls in this subtree may blur their backgrounds.
+  final bool enabled;
+
+  /// Whether a [GlassBlur] here may blur, taking the scopes above it into account.
+  static bool allowsBlur(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<GlassBlurScope>()?.enabled ??
+      true;
+
+  @override
+  bool updateShouldNotify(GlassBlurScope oldWidget) =>
+      oldWidget.enabled != enabled;
+}
 
 /// Blurs whatever is painted behind it, clipped to its own bounds.
 ///
@@ -44,7 +70,11 @@ class GlassBlur extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (sigma <= 0) {
+    /// Turned off in the settings, a control keeps its translucent tint and only loses the blur. The
+    /// same goes inside a scope that asks for no blur at all.
+    if (!GlassStyleConfig.enabled ||
+        !GlassBlurScope.allowsBlur(context) ||
+        sigma <= 0) {
       return child ?? const SizedBox.shrink();
     }
 

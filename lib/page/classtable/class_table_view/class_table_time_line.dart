@@ -8,6 +8,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
@@ -60,6 +61,7 @@ class ClassTableTimeLine extends StatelessWidget {
             ),
             child: GlassBlur(
               borderRadius: BorderRadius.circular(timeLineRadius),
+              sigma: GlassStyleConfig.timeLineSigma,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerHigh

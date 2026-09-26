@@ -9,6 +9,7 @@ import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.da
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -41,9 +42,16 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
           return ClassTableState(
             constraints: constraint,
             controllers: previewState,
-            child: ClassTableSheet(
-              singleIndex: previewState.currentWeek,
-              enableVerticalScrolling: false,
+
+            /// No blur in here on purpose: this is a small static sample where the frosted look is
+            /// barely legible, and a tableful of backdrop filters re-reading their backdrop on every
+            /// frame is what made the settings page stutter while it scrolled.
+            child: GlassBlurScope(
+              enabled: false,
+              child: ClassTableSheet(
+                singleIndex: previewState.currentWeek,
+                enableVerticalScrolling: false,
+              ),
             ),
           );
         },
