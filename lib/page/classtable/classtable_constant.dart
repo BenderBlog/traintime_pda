@@ -26,6 +26,56 @@ const changePageTime = 200;
 /// The height of the middle row.
 const midRowHeight = 54.0;
 
+/// The shortest one of the 61 blocks of a day may get.
+///
+/// A day is drawn with 61 blocks, of which a phone shows 48 at once, so a
+/// block measures `(height - midRowHeight) / 48`. In a short window — a
+/// floating window, a split screen, the landscape orientation — that would
+/// squeeze a class into a couple of pixels and the text of its card would be
+/// cut off, so the blocks keep this height and the table simply scrolls
+/// further instead.
+const double minBlockUnitHeight = 9.0;
+
+/// The width below which a class card switches to smaller text.
+///
+/// Seven days have to fit next to the index row, which leaves narrow cards on
+/// a phone sized window; with the regular sizes the name of a class would be
+/// broken into one or two characters per line.
+const double narrowClassCardWidth = 46.0;
+
+/// The width below which a class card uses the smallest text it has.
+const double tinyClassCardWidth = 32.0;
+
+/// The gap kept between the classtable sheet and the edges of the display.
+///
+/// The sheet gets the window insets of the system bars as well, this is only
+/// the breathing room on top of them.
+const double classTableSheetMargin = 8.0;
+
+/// The least amount of room kept below the sheet.
+///
+/// The sheet does not reach the edges of the display, so the corner of the
+/// screen only reaches in about half of its radius where the sheet starts. This
+/// is the floor of that half, so that devices which do not report their corners
+/// still get some breathing room.
+const double classTableMinimumBottomInset = 24.0;
+
+/// The most room the rounded corner of a display may push the sheet up by.
+///
+/// Half of the corner radius is enough to keep the last class of the day clear
+/// of it, and this keeps a device with an unusually round screen from wasting
+/// a lot of room.
+const double classTableMaximumBottomInset = 40.0;
+
+/// The corner radius of the classtable sheet.
+///
+/// The sheet no longer reaches the edges of the display, so its own corners
+/// are rounded as well.
+const double classTableSheetRadius = 14.0;
+
+/// The largest blur which can be applied to a user defined background image.
+const double maxClassTableBackgroundBlur = 30.0;
+
 String getWeekString(BuildContext context, int index) {
   List<String> weekList = [
     'monday',

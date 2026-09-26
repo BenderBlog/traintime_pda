@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -93,11 +95,18 @@ class _ClassTableViewState extends State<ClassTableView> {
     blockHeight: blockheight,
   );
 
+  /// The height of one of the 61 blocks of a day.
+  ///
+  /// It never falls below [minBlockUnitHeight]: in a window which is much
+  /// shorter than the display of a phone the blocks would otherwise be squeezed
+  /// until the cards of the classes lose their text.
+  double get _blockUnit => math.max(
+    (widget.constraint.minHeight - midRowHeight) / (isPhone(context) ? 48 : 61),
+    minBlockUnitHeight,
+  );
+
   /// The height of the class card.
-  double blockheight(double count) =>
-      count *
-      (widget.constraint.minHeight - midRowHeight) /
-      (isPhone(context) ? 48 : 61);
+  double blockheight(double count) => count * _blockUnit;
 
   double get blockwidth => (size.maxWidth - leftRow) / 7;
 
@@ -174,46 +183,49 @@ class _ClassTableViewState extends State<ClassTableView> {
           indexOfChar = index - 2;
         }
 
+        /// 每一节的上下课时间贴着这一格的上下边，节次写在中间。
+        ///
+        /// 三行都挤在格子中间时，当前时间线落在格子的哪一段是看不出来的 ——
+        /// 它压在中间那几行字上，很容易被读成压在两个节次的分界上。贴着边写，
+        /// 线夹在哪两条时间之间，就是哪一节。
+        final Widget cell;
+        if (indexOfChar == -1 || indexOfChar == -2) {
+          cell = Text(
+            FlutterI18n.translate(
+              context,
+              indexOfChar == -1
+                  ? "classtable.noon_break"
+                  : "classtable.supper_break",
+            ),
+            style: const TextStyle(fontSize: 12),
+            textAlign: TextAlign.center,
+          ).center();
+        } else {
+          cell = Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                timeList[indexOfChar * 2],
+                style: const TextStyle(fontSize: 8),
+                textAlign: TextAlign.center,
+              ),
+              Text("${indexOfChar + 1}", textAlign: TextAlign.center),
+              Text(
+                timeList[indexOfChar * 2 + 1],
+                style: const TextStyle(fontSize: 8),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          );
+        }
+
         return DefaultTextStyle.merge(
           style: TextStyle(
             fontSize: 14,
             color: Theme.of(context).colorScheme.onSurface,
           ),
-          child: Text.rich(
-            TextSpan(
-              children: [
-                if (indexOfChar == -1)
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "classtable.noon_break",
-                    ),
-                    style: const TextStyle(fontSize: 12),
-                  )
-                else if (indexOfChar == -2)
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "classtable.supper_break",
-                    ),
-                    style: const TextStyle(fontSize: 12),
-                  )
-                else ...[
-                  TextSpan(text: "${indexOfChar + 1}\n"),
-                  TextSpan(
-                    text: "${timeList[indexOfChar * 2]}\n",
-                    style: const TextStyle(fontSize: 8),
-                  ),
-                  TextSpan(
-                    text: timeList[indexOfChar * 2 + 1],
-                    style: const TextStyle(fontSize: 8),
-                  ),
-                ],
-              ],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ).center().constrained(width: leftRow, height: height);
+          child: SizedBox(width: leftRow, height: height, child: cell),
+        );
       });
     }
   }
@@ -276,6 +288,8 @@ class _ClassTableViewState extends State<ClassTableView> {
           .toStack()
           .constrained(height: blockheight(61), width: size.maxWidth)
           .scrollable(
+            /// The safe area of the screen is handled by the page which hosts
+            /// the table, the sheet itself only has to be scrollable here.
             physics: widget.enableVerticalScrolling
                 ? null
                 : const NeverScrollableScrollPhysics(),

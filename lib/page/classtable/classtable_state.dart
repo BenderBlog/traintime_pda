@@ -42,8 +42,15 @@ class ClassTableState extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant ClassTableState oldWidget) {
-    controllers.chosenWeek = oldWidget.controllers.chosenWeek;
-    return true;
+    /// This widget is provided again with every rebuild (the classtable sheet
+    /// is given the room which is really left for it), so it must not touch
+    /// the controllers unless they actually changed: the setter notifies, and
+    /// that notification would rebuild this very widget again.
+    if (!identical(controllers, oldWidget.controllers)) {
+      controllers.chosenWeek = oldWidget.controllers.chosenWeek;
+      return true;
+    }
+    return constraints != oldWidget.constraints;
   }
 }
 
@@ -223,9 +230,10 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Change chosen week.
   set chosenWeek(int chosenWeek) {
-    if (chosenWeek != _chosenWeek) {
-      _chosenWeek = chosenWeek;
+    if (chosenWeek == _chosenWeek) {
+      return;
     }
+    _chosenWeek = chosenWeek;
     notifyListeners();
   }
 
