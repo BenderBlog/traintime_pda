@@ -12,6 +12,8 @@ import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
@@ -22,6 +24,13 @@ class ClassCard extends StatelessWidget {
   final ClassOrgainzedData detail;
   final double completedHeight;
 
+  /// The height inside the card's padding, which the completed split is measured against.
+  ///
+  /// Handed in rather than measured: a [LayoutBuilder] rebuilds its subtree during layout
+  /// whenever its constraints change, which is every frame of a drag or a scroll, for every card
+  /// on screen. [ClassTableView] already knows the height it positioned the card at.
+  final double height;
+
   List<dynamic> get data => detail.data;
   MaterialColor get color => detail.color;
   String get name => detail.name;
@@ -30,6 +39,7 @@ class ClassCard extends StatelessWidget {
     super.key,
     required this.detail,
     required this.completedHeight,
+    required this.height,
   });
 
   @override
@@ -44,25 +54,34 @@ class ClassCard extends StatelessWidget {
       isCompleted: true,
     );
     final isInteractive = classTableState.isClassCardInteractive(detail);
+    final bool isPhoneDevice = isPhone(context);
 
     const borderRadius = BorderRadius.all(Radius.circular(8));
     return Padding(
       padding: const EdgeInsets.all(1),
       child: ClipRRect(
         borderRadius: borderRadius,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final splitHeight = completedHeight.clamp(
-              0.0,
-              constraints.maxHeight,
-            );
-            final isCompleted = splitHeight >= constraints.maxHeight - 0.5;
+        child: Builder(
+          builder: (context) {
+            final splitHeight = completedHeight.clamp(0.0, height);
+            final isCompleted = splitHeight >= height - 0.5;
             final textStyle = isCompleted ? completedStyle : activeStyle;
             final borderStyle = isCompleted ? completedStyle : activeStyle;
 
             return Stack(
               fit: StackFit.expand,
               children: [
+                /// The frosted background: a real backdrop blur of the wallpaper behind the card.
+                ///
+                /// Grouped with the other cards, so a whole tableful shares one blur of the same
+                /// backdrop.
+                Positioned.fill(
+                  child: GlassBlur(
+                    grouped: true,
+                    sigma: GlassStyleConfig.cardSigma,
+                    child: const SizedBox.expand(),
+                  ),
+                ),
                 if (splitHeight > 0)
                   Positioned(
                     top: 0,
@@ -75,7 +94,7 @@ class ClassCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (splitHeight < constraints.maxHeight)
+                if (splitHeight < height)
                   Positioned(
                     top: splitHeight,
                     left: 0,
@@ -87,12 +106,9 @@ class ClassCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    overlayColor: Colors.transparent,
-                  ),
-                  onPressed: isInteractive
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: isInteractive
                       ? () async {
                           final controller = ClassTableState.of(
                             context,
@@ -183,7 +199,7 @@ class ClassCard extends StatelessWidget {
                       : null,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: isPhone(context) ? 2 : 4,
+                      horizontal: isPhoneDevice ? 2 : 4,
                       vertical: 4,
                     ),
                     child: Align(
@@ -196,7 +212,7 @@ class ClassCard extends StatelessWidget {
                               name,
                               style: TextStyle(
                                 color: textStyle.textColor,
-                                fontSize: isPhone(context) ? 12 : 14,
+                                fontSize: isPhoneDevice ? 12 : 14,
                               ),
                               maxLines: 3,
                               overflow: TextOverflow.clip,
@@ -206,7 +222,7 @@ class ClassCard extends StatelessWidget {
                             "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
                             style: TextStyle(
                               color: textStyle.textColor,
-                              fontSize: isPhone(context) ? 10 : 12,
+                              fontSize: isPhoneDevice ? 10 : 12,
                             ),
                           ),
                           if (data.length > 1)
@@ -220,7 +236,7 @@ class ClassCard extends StatelessWidget {
                               ),
                               style: TextStyle(
                                 color: textStyle.textColor,
-                                fontSize: isPhone(context) ? 10 : 12,
+                                fontSize: isPhoneDevice ? 10 : 12,
                               ),
                             ),
                         ],

@@ -228,6 +228,9 @@ classtable:
 
     Go back to mainpage and goto the exam info page."
   week_title: Week {week}
+  week_bar:
+    pin: Pin the week bar
+    unpin: Collapse the week bar
   noon_break: Noon
   supper_break: Supper
   month: "{month}
@@ -998,6 +1001,14 @@ setting:
     completed_text_saturation_factor: "Text saturation: {value}"
     completed_border_alpha: "Border opacity: {value}"
     completed_inner_alpha: "Fill opacity: {value}"
+    frosted_section: Frosted backgrounds
+    frosted_enabled: Enable frosted backgrounds
+    frosted_enabled_hint: When off, the controls keep their translucent tint and drop the blur
+    frosted_card_sigma: "Course card blur: {value}"
+    frosted_time_line_sigma: "Time line blur: {value}"
+    frosted_date_row_sigma: "Date row blur: {value}"
+    frosted_week_bar_sigma: "Week bar blur: {value}"
+    frosted_banner_sigma: "Status banner blur: {value}"
   no_permission: No storage permission obtained, cannot read files
   successful_setting: Successfully set
   failure_setting: You did not select an image

@@ -3,43 +3,194 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
-/// The index row of the class table, shows the index of the day and the week.
-class ClassTableDateRow extends StatelessWidget {
-  final List<DateTime> dateList = [];
-  ClassTableDateRow({super.key, required DateTime firstDay}) {
-    /// Here, we get the first day of the week, and generate the date row.
-    dateList.addAll(List.generate(7, (i) => firstDay.add(Duration(days: i))));
+/// The date row of the class table: the month and the seven day headers.
+///
+/// The rounded panel is static; only the headers move. The headers are painted with a fractional
+/// translation from the page position, so following a swipe does not drive a second scrollable.
+class ClassTableDateRow extends StatefulWidget {
+  const ClassTableDateRow({
+    super.key,
+    required this.index,
+    required this.firstDayOfWeek,
+    this.pageControl,
+    this.semesterLength = 1,
+  });
+
+  /// The week on show when there is no [pageControl], and the week the headers start on.
+  final int index;
+
+  /// First day of the week at the given index.
+  final DateTime Function(int index) firstDayOfWeek;
+
+  /// The week pages. When set, the headers slide with them.
+  final PageController? pageControl;
+
+  /// How many weeks the row has headers for.
+  final int semesterLength;
+
+  @override
+  State<ClassTableDateRow> createState() => _ClassTableDateRowState();
+}
+
+class _ClassTableDateRowState extends State<ClassTableDateRow> {
+  double? _cachedWidth;
+  int? _cachedSemesterLength;
+  Widget? _cachedHeadersChild;
+
+  @override
+  void didUpdateWidget(covariant ClassTableDateRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.semesterLength != widget.semesterLength) {
+      _cachedHeadersChild = null;
+    }
+  }
+
+  Widget _buildHeadersStrip(BuildContext context, double maxWidth) {
+    if (_cachedWidth == maxWidth &&
+        _cachedSemesterLength == widget.semesterLength &&
+        _cachedHeadersChild != null) {
+      return _cachedHeadersChild!;
+    }
+    _cachedWidth = maxWidth;
+    _cachedSemesterLength = widget.semesterLength;
+    final double dayWidth = (maxWidth - leftRow) / 7;
+
+    _cachedHeadersChild = RepaintBoundary(
+      child: _HorizontalStrip(
+        child: Row(
+          children: List.generate(
+            widget.semesterLength,
+            (index) => SizedBox(
+              width: maxWidth,
+              child: _weekRow(context, index, dayWidth),
+            ),
+          ),
+        ),
+      ),
+    );
+    return _cachedHeadersChild!;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      /// The height is determined by the content, so the text will not
-      /// overflow when the font scale is enlarged.
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.75),
-      child: Row(
-        children: [
-          Text(
-            FlutterI18n.translate(
-              context,
-              "classtable.month",
-              translationParams: {"month": dateList.first.month.toString()},
+    return Stack(
+      children: [
+        /// The floating panel, matching the time line beside it.
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.all(timeLineInset),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(timeLineRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: timeLineShadowAlpha),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: GlassBlur(
+                borderRadius: BorderRadius.circular(timeLineRadius),
+                sigma: GlassStyleConfig.dateRowSigma,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh
+                        .withValues(alpha: timeLineSurfaceAlpha),
+                    borderRadius: BorderRadius.circular(timeLineRadius),
+                  ),
+                ),
+              ),
             ),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ).center().constrained(width: leftRow),
-          ...List.generate(7, (index) => WeekInfomation(time: dateList[index])),
-        ],
+          ),
+        ),
+
+        /// The cells size the row and span the table width, so they stay aligned with the columns
+        /// underneath even though the panel is inset.
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: ClipRect(
+            clipper: const _HeaderClip(),
+            child: _headers(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The headers, one week wide each, sliding with the pages when there are pages to follow.
+  Widget _headers(BuildContext context) {
+    final double? stateWidth =
+        ClassTableState.of(context)?.constraints.maxWidth;
+    if (stateWidth != null && stateWidth > 0) {
+      return _buildHeadersWithWidth(context, stateWidth);
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          _buildHeadersWithWidth(context, constraints.maxWidth),
+    );
+  }
+
+  Widget _buildHeadersWithWidth(BuildContext context, double maxWidth) {
+    if (widget.pageControl == null) {
+      final double dayWidth = (maxWidth - leftRow) / 7;
+      return _weekRow(context, widget.index, dayWidth);
+    }
+
+    final PageController pages = widget.pageControl!;
+    return ClipRect(
+      child: AnimatedBuilder(
+        animation: pages,
+        child: _buildHeadersStrip(context, maxWidth),
+        builder: (context, child) {
+          final double offset =
+              pages.hasClients && pages.position.hasPixels
+                  ? pages.position.pixels
+                  : widget.index * maxWidth;
+          return Transform.translate(
+            offset: Offset(-offset, 0),
+            child: child,
+          );
+        },
       ),
+    );
+  }
+
+  /// One week: the month of its first day and the seven day headers.
+  Widget _weekRow(BuildContext context, int weekIndex, double dayWidth) {
+    final DateTime firstDay = widget.firstDayOfWeek(weekIndex);
+    final List<DateTime> dateList = List.generate(
+      7,
+      (i) => firstDay.add(Duration(days: i)),
+    );
+
+    return Row(
+      children: [
+        Text(
+          FlutterI18n.translate(
+            context,
+            "classtable.month",
+            translationParams: {"month": firstDay.month.toString()},
+          ),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ).center().constrained(width: leftRow),
+        ...List.generate(
+          7,
+          (index) => WeekInfomation(time: dateList[index], width: dayWidth),
+        ),
+      ],
     );
   }
 }
@@ -47,15 +198,15 @@ class ClassTableDateRow extends StatelessWidget {
 /// The week index info, shows the day and the week.
 class WeekInfomation extends StatelessWidget {
   final DateTime time;
-  const WeekInfomation({super.key, required this.time});
+  final double width;
+  const WeekInfomation({super.key, required this.time, required this.width});
 
   @override
   Widget build(BuildContext context) {
     bool isToday =
         (time.month == DateTime.now().month && time.day == DateTime.now().day);
-    BoxConstraints size = ClassTableState.of(context)!.constraints;
     return SizedBox(
-      width: (size.maxWidth - leftRow) / 7,
+      width: width,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -89,3 +240,69 @@ class WeekInfomation extends StatelessWidget {
     );
   }
 }
+
+/// Keeps the headers inside the panel while they slide.
+///
+/// The panel sits [timeLineInset] inside the row while the cells keep the table's full width so the
+/// columns stay aligned with the grid, so the clip has to be pulled in by that same inset: without
+/// it a month or a date sliding out of the way hangs outside the panel's edge.
+class _HeaderClip extends CustomClipper<Rect> {
+  const _HeaderClip();
+
+  @override
+  Rect getClip(Size size) => Rect.fromLTRB(
+    timeLineInset,
+    0,
+    size.width - timeLineInset,
+    size.height,
+  );
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) => false;
+}
+
+/// Allows its child to lay out with unconstrained width horizontally (preventing RenderFlex overflow),
+/// while reporting the parent's width constraint and the child's measured height.
+class _HorizontalStrip extends SingleChildRenderObjectWidget {
+  const _HorizontalStrip({super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderHorizontalStrip();
+}
+
+class _RenderHorizontalStrip extends RenderProxyBox {
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    if (child == null) {
+      return constraints.smallest;
+    }
+    final childConstraints = BoxConstraints(
+      minWidth: 0,
+      maxWidth: double.infinity,
+      minHeight: constraints.minHeight,
+      maxHeight: constraints.maxHeight,
+    );
+    final childSize = child!.getDryLayout(childConstraints);
+    return constraints.constrain(Size(constraints.maxWidth, childSize.height));
+  }
+
+  @override
+  void performLayout() {
+    if (child == null) {
+      size = constraints.smallest;
+      return;
+    }
+    child!.layout(
+      BoxConstraints(
+        minWidth: 0,
+        maxWidth: double.infinity,
+        minHeight: constraints.minHeight,
+        maxHeight: constraints.maxHeight,
+      ),
+      parentUsesSize: true,
+    );
+    size = constraints.constrain(Size(constraints.maxWidth, child!.size.height));
+  }
+}
+

@@ -4,6 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
+import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 
 class ClassTableInlineBanner extends StatelessWidget {
@@ -55,59 +58,79 @@ class ClassTableInlineBanner extends StatelessWidget {
 
     return !isVisible
         ? const SizedBox.shrink()
-        : Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (loadingText != null) ...[
-                        Text(
-                          loadingText,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSecondaryContainer,
-                              ),
-                        ),
-                        if (cacheText != null) const SizedBox(height: 2),
-                      ],
-                      if (cacheText != null) ...[
-                        Text(
-                          cacheText,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSecondaryContainer,
-                              ),
-                        ),
-                      ],
-                    ],
+        : Stack(
+            children: [
+              /// Frosted, like the rest of the controls over the table: the banner's own background
+              /// blurs the wallpaper behind it while the wallpaper itself stays sharp. Grouped with
+              /// the table's controls so the whole page shares one blur of the same backdrop.
+              ///
+              /// A zero radius rather than none: the filter has to be clipped to the banner, or it
+              /// would read back the whole screen behind it.
+              Positioned.fill(
+                child: GlassBlur(
+                  borderRadius: BorderRadius.zero,
+                  grouped: true,
+                  sigma: GlassStyleConfig.bannerSigma,
+                  child: ColoredBox(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withValues(alpha: bannerSurfaceAlpha),
                   ),
                 ),
-                if (loadingText != null) ...[
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (loadingText != null) ...[
+                            Text(
+                              loadingText,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondaryContainer,
+                                  ),
+                            ),
+                            if (cacheText != null) const SizedBox(height: 2),
+                          ],
+                          if (cacheText != null) ...[
+                            Text(
+                              cacheText,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondaryContainer,
+                                  ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ],
-            ),
+                    if (loadingText != null) ...[
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSecondaryContainer,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           );
   }
 }

@@ -55,6 +55,10 @@ enum Preference {
   //electricityPassword(key: "electricityPassword", type: "String"), // 电费密码
   decorated(key: "decorated", type: "bool"), // 课表是否开启背景
   decoration(key: "decoration", type: "bool"), // 背景图是否设置
+  classTableWeekBarCollapsed(
+    key: "classTableWeekBarCollapsed",
+    type: "bool",
+  ), // 周次栏是否收进标题栏；默认 false 即固定显示
   swift(key: "swift", type: "int"), // 周次偏移
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式
@@ -152,6 +156,30 @@ enum Preference {
     key: "classStyleCompletedInnerAlpha",
     type: "double",
   ), // 已完成课程底色透明度
+  classStyleGlassEnabled(
+    key: "classStyleGlassEnabled",
+    type: "bool",
+  ), // 毛玻璃背景总开关
+  classStyleGlassCardSigma(
+    key: "classStyleGlassCardSigma",
+    type: "double",
+  ), // 课程卡片背景模糊
+  classStyleGlassTimeLineSigma(
+    key: "classStyleGlassTimeLineSigma",
+    type: "double",
+  ), // 时间轴面板背景模糊
+  classStyleGlassDateRowSigma(
+    key: "classStyleGlassDateRowSigma",
+    type: "double",
+  ), // 日期栏面板背景模糊
+  classStyleGlassWeekBarSigma(
+    key: "classStyleGlassWeekBarSigma",
+    type: "double",
+  ), // 周次栏背景模糊
+  classStyleGlassBannerSigma(
+    key: "classStyleGlassBannerSigma",
+    type: "double",
+  ), // 状态横幅背景模糊
   lowElectricityWarningEnabled(
     key: "lowElectricityWarningEnabled",
     type: "bool",

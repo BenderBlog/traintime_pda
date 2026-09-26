@@ -198,6 +198,9 @@ classtable:
 
     請回到主頁後下滑點擊”考試安排“按鈕進入考試安排頁面'
   week_title: 第{week}周
+  week_bar:
+    pin: 固定週次欄
+    unpin: 收起週次欄
   noon_break: 午休
   supper_break: 晚休
   month: '{month}
@@ -905,6 +908,14 @@ setting:
     completed_text_saturation_factor: '文字飽和度: {value}'
     completed_border_alpha: '邊框透明度: {value}'
     completed_inner_alpha: '底色透明度: {value}'
+    frosted_section: 毛玻璃背景
+    frosted_enabled: 啟用毛玻璃背景
+    frosted_enabled_hint: 關閉後各控件只保留半透明底色，可省電、更流暢
+    frosted_card_sigma: '課程卡片模糊: {value}'
+    frosted_time_line_sigma: '時間軸模糊: {value}'
+    frosted_date_row_sigma: '日期欄模糊: {value}'
+    frosted_week_bar_sigma: '週次欄模糊: {value}'
+    frosted_banner_sigma: '狀態橫幅模糊: {value}'
   no_permission: 未獲取存儲權限，無法讀取文件
   successful_setting: 設定成功
   failure_setting: 你沒有選圖片捏
