@@ -374,4 +374,299 @@ void main() {
       reason: 'the drag should reach the table through the catcher',
     );
   });
+
+  testWidgets(
+    'the current-time indicator is shown only on the current week when not paging',
+    (tester) async {
+      tester.view.physicalSize = const Size(kSheetWidth, 780);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      // Current week is 1. When displaying singleIndex: 1, label '14:00' must be visible.
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('zh', 'CN'),
+          localizationsDelegates: [
+            FlutterI18nDelegate(
+              translationLoader: _StubTranslationLoader(),
+              missingTranslationHandler: (key, locale) {},
+            ),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('zh', 'CN')],
+          home: Scaffold(
+            body: SizedBox(
+              width: kSheetWidth,
+              height: kSheetHeight,
+              child: ClassTableState(
+                constraints: const BoxConstraints(
+                  maxWidth: kSheetWidth,
+                  maxHeight: kSheetHeight,
+                ),
+                controllers: _StubClassTableState(),
+                child: const ClassTableSheet(
+                  singleIndex: 1,
+                  enableVerticalScrolling: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('14:00'),
+        findsOneWidget,
+        reason: 'current time buoy should be displayed on current week',
+      );
+
+      // Now switch to singleIndex: 2 (another week). Label '14:00' must NOT be visible.
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('zh', 'CN'),
+          localizationsDelegates: [
+            FlutterI18nDelegate(
+              translationLoader: _StubTranslationLoader(),
+              missingTranslationHandler: (key, locale) {},
+            ),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('zh', 'CN')],
+          home: Scaffold(
+            body: SizedBox(
+              width: kSheetWidth,
+              height: kSheetHeight,
+              child: ClassTableState(
+                constraints: const BoxConstraints(
+                  maxWidth: kSheetWidth,
+                  maxHeight: kSheetHeight,
+                ),
+                controllers: _StubClassTableState(),
+                child: const ClassTableSheet(
+                  singleIndex: 2,
+                  enableVerticalScrolling: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('14:00'),
+        findsNothing,
+        reason: 'current time buoy should not be displayed on another week',
+      );
+    },
+  );
+
+  testWidgets(
+    'the current-time indicator animates with top-to-bottom motion when swiping weeks',
+    (tester) async {
+      tester.view.physicalSize = const Size(kSheetWidth, 780);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final PageController pageControl = PageController(initialPage: 1);
+      addTearDown(pageControl.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('zh', 'CN'),
+          localizationsDelegates: [
+            FlutterI18nDelegate(
+              translationLoader: _StubTranslationLoader(),
+              missingTranslationHandler: (key, locale) {},
+            ),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('zh', 'CN')],
+          home: Scaffold(
+            body: SizedBox(
+              width: kSheetWidth,
+              height: kSheetHeight,
+              child: ClassTableState(
+                constraints: const BoxConstraints(
+                  maxWidth: kSheetWidth,
+                  maxHeight: kSheetHeight,
+                ),
+                controllers: _StubClassTableState(),
+                child: ClassTableSheet(
+                  singleIndex: 1,
+                  pageControl: pageControl,
+                  semesterLength: 16,
+                  enableVerticalScrolling: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // On current week (week 1), indicator is at rest position.
+      expect(find.text('14:00'), findsOneWidget);
+      final double restTop = tester.getRect(find.text('14:00')).top;
+
+      // --- RIGHT SIDE (towards week 2, relative > 0) ---
+      // Swipe partway towards week 2 (exit animation: moves downwards).
+      pageControl.jumpTo(kSheetWidth * 1.5);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      final double exitingRightTop = tester.getRect(find.text('14:00')).top;
+      expect(
+        exitingRightTop,
+        greaterThan(restTop),
+        reason: 'right-side exit animation should move downwards from rest position',
+      );
+
+      // Slide halfway then retreat back towards week 1:
+      // must remain continuous and smoothly return towards rest position without jumping.
+      pageControl.jumpTo(kSheetWidth * 1.25);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      final double retreatingExitRightTop =
+          tester.getRect(find.text('14:00')).top;
+      expect(
+        retreatingExitRightTop,
+        greaterThan(restTop),
+        reason: 'retreating should remain below rest position',
+      );
+      expect(
+        retreatingExitRightTop,
+        lessThan(exitingRightTop),
+        reason: 'retreating closer to week 1 should smoothly rise towards rest position',
+      );
+
+      // Move completely to week 2: indicator must be hidden.
+      pageControl.jumpTo(kSheetWidth * 2.0);
+      await tester.pump();
+
+      expect(
+        find.text('14:00'),
+        findsNothing,
+        reason: 'indicator should be completely hidden outside current week',
+      );
+
+      // Now swipe from week 2 towards week 1 (enter animation: comes from below upwards towards rest position).
+      pageControl.jumpTo(kSheetWidth * 1.5);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      final double enteringRightTop = tester.getRect(find.text('14:00')).top;
+      expect(
+        enteringRightTop,
+        greaterThan(restTop),
+        reason: 'right-side enter animation should arrive from below rest position',
+      );
+      expect(
+        enteringRightTop,
+        closeTo(exitingRightTop, 0.01),
+        reason: 'right-side enter and exit share the exact same continuous path',
+      );
+
+      // Slide halfway then retreat back towards week 2:
+      // must remain continuous on enter trajectory and smoothly move downwards.
+      pageControl.jumpTo(kSheetWidth * 1.75);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      final double retreatingEnterRightTop =
+          tester.getRect(find.text('14:00')).top;
+      expect(
+        retreatingEnterRightTop,
+        greaterThan(restTop),
+        reason: 'retreating should remain below rest position',
+      );
+      expect(
+        retreatingEnterRightTop,
+        greaterThan(enteringRightTop),
+        reason: 'retreating closer to week 2 should smoothly move further downwards',
+      );
+
+      // Back at week 1, returns to exact rest position.
+      pageControl.jumpTo(kSheetWidth * 1.0);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      final double backRestTop = tester.getRect(find.text('14:00')).top;
+      expect(backRestTop, closeTo(restTop, 0.01));
+
+      // --- LEFT SIDE (towards week 0, relative < 0) ---
+      // Swipe partway towards week 0 (exit animation: retraces path upwards towards top).
+      pageControl.jumpTo(kSheetWidth * 0.5);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      final double exitingLeftTop = tester.getRect(find.text('14:00')).top;
+      expect(
+        exitingLeftTop,
+        lessThan(restTop),
+        reason: 'left-side exit animation should retrace path upwards from rest position',
+      );
+
+      // Slide halfway then retreat back towards week 1:
+      // must remain continuous and smoothly return towards rest position without jumping.
+      pageControl.jumpTo(kSheetWidth * 0.75);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      final double retreatingExitLeftTop =
+          tester.getRect(find.text('14:00')).top;
+      expect(
+        retreatingExitLeftTop,
+        lessThan(restTop),
+        reason: 'retreating should remain above rest position',
+      );
+      expect(
+        retreatingExitLeftTop,
+        greaterThan(exitingLeftTop),
+        reason: 'retreating closer to week 1 should smoothly drop back towards rest position',
+      );
+
+      // Move completely to week 0: indicator must be hidden.
+      pageControl.jumpTo(0.0);
+      await tester.pump();
+
+      expect(
+        find.text('14:00'),
+        findsNothing,
+        reason: 'indicator should be completely hidden outside current week',
+      );
+
+      // Now swipe from week 0 towards week 1 (enter animation: comes from above downwards towards rest position).
+      pageControl.jumpTo(kSheetWidth * 0.5);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      final double enteringLeftTop = tester.getRect(find.text('14:00')).top;
+      expect(
+        enteringLeftTop,
+        lessThan(restTop),
+        reason: 'left-side enter animation should arrive from above rest position',
+      );
+      expect(
+        enteringLeftTop,
+        closeTo(exitingLeftTop, 0.01),
+        reason: 'left-side enter and exit share the exact same continuous path',
+      );
+
+      // Back at week 1, returns to exact rest position.
+      pageControl.jumpTo(kSheetWidth * 1.0);
+      await tester.pump();
+
+      expect(find.text('14:00'), findsOneWidget);
+      expect(tester.getRect(find.text('14:00')).top, closeTo(restTop, 0.01));
+    },
+  );
 }

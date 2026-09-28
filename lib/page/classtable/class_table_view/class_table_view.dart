@@ -79,15 +79,6 @@ class _ClassTableViewState extends State<ClassTableView>
     return blockheight(completedBlocks);
   }
 
-  Positioned? _currentTimeIndicator() => CurrentTimeIndicator.build(
-    context: context,
-    now: classTableState.currentTime,
-    weekStart: _visibleWeekStart,
-    leftRow: leftRow,
-    blockWidth: blockwidth,
-    blockHeight: blockheight,
-  );
-
   Positioned? _currentDayColumnBox() => CurrentTimeIndicator.buildDayColumnBox(
     context: context,
     now: classTableState.currentTime,
@@ -140,11 +131,6 @@ class _ClassTableViewState extends State<ClassTableView>
           ),
         );
       }
-    }
-
-    final timeIndicator = _currentTimeIndicator();
-    if (timeIndicator != null) {
-      thisRow.add(timeIndicator);
     }
 
     if (thisRow.isEmpty &&

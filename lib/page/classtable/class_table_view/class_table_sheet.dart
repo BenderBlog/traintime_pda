@@ -81,40 +81,6 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
         .add(Duration(days: 7 * index));
   }
 
-  /// The current-time label.
-  ///
-  /// It is built here rather than by the week page, because the time line is stacked above the
-  /// classes and the label has to stay on top of the time line's panel.
-  ///
-  /// It is pinned to the week today falls in rather than to the week on show. The times down the
-  /// side are the same every week, so "now" is a meaningful mark on any of them — and pinning it
-  /// this way keeps the capsule sitting still through a week change, instead of dropping out and
-  /// popping back while the pages slide past.
-  Widget? _currentTimeLabel(BuildContext context, double available) {
-    final ClassTableState? state = ClassTableState.of(context);
-    if (state == null) return null;
-
-    final ClassTableWidgetState controllers = state.controllers;
-    return ListenableBuilder(
-      listenable: controllers.timeTickNotifier,
-      builder: (context, _) {
-        final DateTime weekStart = controllers.startDay
-            .add(Duration(days: 7 * controllers.offset))
-            .add(Duration(days: 7 * controllers.currentWeek));
-
-        return CurrentTimeIndicator.buildLabel(
-          context: context,
-          now: controllers.currentTime,
-          weekStart: weekStart,
-          leftRow: leftRow,
-          blockWidth: (state.constraints.maxWidth - leftRow) / 7,
-          blockHeight: (double count) =>
-              classTableBlockHeight(context, available, count),
-        ) ?? const SizedBox.shrink();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     /// The date row must be laid out once before its height is known; the sheet then reserves
@@ -166,8 +132,15 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                           /// Laid out once for the whole table, so it does not page with the weeks.
                           ClassTableTimeLine(available: available),
 
-                          /// The current-time label rides on top of the time line's panel.
-                          ?_currentTimeLabel(context, available),
+                          /// The current-time indicator (time buoy + horizontal line) as a connected whole.
+                          Positioned.fill(
+                            child: _CurrentTimeIndicatorLayer(
+                              pageControl: widget.pageControl,
+                              singleIndex: widget.singleIndex,
+                              available: available,
+                              maxWidth: constraints.maxWidth,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -246,5 +219,134 @@ class _ClassTableScrollBehavior extends MaterialScrollBehavior {
       return child;
     }
     return super.buildOverscrollIndicator(context, child, details);
+  }
+}
+
+/// The current-time indicator layer: combines the time buoy on the timeline with the horizontal line
+/// as a single connected whole, visible only on the current week.
+///
+/// Follows week swiping gestures frame by frame:
+/// - Swiping from/to the left (relative < 0): enters from top to bottom, exits retracing back up.
+/// - Swiping from/to the right (relative > 0): exits downwards, enters from bottom to top.
+class _CurrentTimeIndicatorLayer extends StatelessWidget {
+  const _CurrentTimeIndicatorLayer({
+    required this.pageControl,
+    required this.singleIndex,
+    required this.available,
+    required this.maxWidth,
+  });
+
+  final PageController? pageControl;
+  final int singleIndex;
+  final double available;
+  final double maxWidth;
+
+  static const double _slideOffset = 24.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final ClassTableState? state = ClassTableState.of(context);
+    if (state == null) return const SizedBox.shrink();
+
+    final ClassTableWidgetState controllers = state.controllers;
+    final int currentWeek = controllers.currentWeek;
+
+    if (pageControl == null) {
+      if (singleIndex != currentWeek) {
+        return const SizedBox.shrink();
+      }
+      return ListenableBuilder(
+        listenable: controllers.timeTickNotifier,
+        builder: (context, _) {
+          final indicator = _buildIndicator(
+            context: context,
+            controllers: controllers,
+            currentWeek: currentWeek,
+            offsetY: 0.0,
+            opacity: 1.0,
+          );
+          if (indicator == null) return const SizedBox.shrink();
+          return IgnorePointer(
+            child: Stack(
+              children: [indicator],
+            ),
+          );
+        },
+      );
+    }
+
+    final PageController pages = pageControl!;
+    return AnimatedBuilder(
+      animation: Listenable.merge([pages, controllers.timeTickNotifier]),
+      builder: (context, _) {
+        double page = currentWeek.toDouble();
+        if (pages.hasClients && pages.position.hasPixels) {
+          page = pages.page ??
+              (maxWidth > 0
+                  ? pages.position.pixels / maxWidth
+                  : singleIndex.toDouble());
+        } else {
+          page = singleIndex.toDouble();
+        }
+
+        final double relative = page - currentWeek;
+        final double dist = relative.abs();
+        if (dist >= 1.0) {
+          return const SizedBox.shrink();
+        }
+
+        final double t = (1.0 - dist).clamp(0.0, 1.0);
+        final double eased = Curves.easeOutCubic.transform(t);
+        final double opacity = eased.clamp(0.0, 1.0);
+        // On the left (relative < 0): enter drops from top to bottom (-slideOffset -> 0),
+        // and exit retraces back up (0 -> -slideOffset).
+        // On the right (relative > 0): exit continues downwards (0 -> +slideOffset),
+        // and enter arrives from bottom to top (+slideOffset -> 0).
+        final double direction = relative < 0 ? -1.0 : 1.0;
+        final double offsetY = direction * (1.0 - eased) * _slideOffset;
+
+        final Positioned? indicator = _buildIndicator(
+          context: context,
+          controllers: controllers,
+          currentWeek: currentWeek,
+          offsetY: offsetY,
+          opacity: opacity,
+        );
+
+        if (indicator == null) {
+          return const SizedBox.shrink();
+        }
+
+        return IgnorePointer(
+          child: Stack(
+            children: [indicator],
+          ),
+        );
+      },
+    );
+  }
+
+  Positioned? _buildIndicator({
+    required BuildContext context,
+    required ClassTableWidgetState controllers,
+    required int currentWeek,
+    required double offsetY,
+    required double opacity,
+  }) {
+    final DateTime weekStart = controllers.startDay
+        .add(Duration(days: 7 * controllers.offset))
+        .add(Duration(days: 7 * currentWeek));
+
+    return CurrentTimeIndicator.build(
+      context: context,
+      now: controllers.currentTime,
+      weekStart: weekStart,
+      leftRow: leftRow,
+      blockWidth: (maxWidth - leftRow) / 7,
+      blockHeight: (double count) =>
+          classTableBlockHeight(context, available, count),
+      offsetY: offsetY,
+      opacity: opacity,
+    );
   }
 }

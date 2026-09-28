@@ -131,10 +131,6 @@ class CurrentTimeIndicator {
   static double transferTimeToBlockIndex(DateTime time) => _transferIndex(time);
 
   /// Everything the indicator needs to place itself this frame.
-  ///
-  /// Pulled out because the indicator is drawn in two layers: the label belongs with the time line,
-  /// which is stacked above the classes, while the line itself belongs with the week pages so that
-  /// it slides with the column it crosses.
   static _IndicatorGeometry? _geometry({
     required BuildContext context,
     required DateTime now,
@@ -200,7 +196,8 @@ class CurrentTimeIndicator {
     );
   }
 
-  /// The line across today's column, with the connector running back towards the time line.
+  /// The combined current time indicator: the time buoy on the timeline and the horizontal line
+  /// across to today's column, as a single connected whole.
   static Positioned? build({
     required BuildContext context,
     required DateTime now,
@@ -208,7 +205,12 @@ class CurrentTimeIndicator {
     required double leftRow,
     required double blockWidth,
     required double Function(double) blockHeight,
+    double offsetY = 0.0,
+    double opacity = 1.0,
   }) {
+    if (opacity <= 0.0) {
+      return null;
+    }
     final _IndicatorGeometry? geometry = _geometry(
       context: context,
       now: now,
@@ -221,125 +223,100 @@ class CurrentTimeIndicator {
       return null;
     }
 
-    return Positioned(
-      left: 0,
-      top: geometry.indicatorTop,
-      width: geometry.leftRow + geometry.blockWidth * (geometry.dayOffset + 1),
-      child: IgnorePointer(
-        child: SizedBox(
-          height: geometry.indicatorHeight,
-          child: Stack(
-            children: [
-              if (geometry.dayOffset > 0)
-                Positioned(
-                  top: geometry.lineTopOffset,
-                  left: geometry.leftRow,
-                  width: geometry.blockWidth * geometry.dayOffset,
-                  child: Container(
-                    height: CurrentTimeIndicatorConfig.lineThickness,
-                    color: geometry.connectorColor,
+    final hasLabel = geometry.hasLabel;
+    final double lineStart =
+        hasLabel ? (timeLineInset + timeLineWidth) : leftRow;
+    final double todayColumnStart =
+        geometry.leftRow + geometry.blockWidth * geometry.dayOffset;
+    final double totalWidth =
+        geometry.leftRow + geometry.blockWidth * (geometry.dayOffset + 1);
+
+    Widget content = SizedBox(
+      height: geometry.indicatorHeight,
+      child: Stack(
+        children: [
+          if (hasLabel)
+            Positioned(
+              top: geometry.labelTop,
+              left: timeLineInset,
+              width: timeLineWidth,
+              height: CurrentTimeIndicatorConfig.labelHeight,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: geometry.labelBackgroundColor,
+                  border: Border.all(
+                    color: geometry.color.withValues(alpha: 0.7),
+                    width: 1.4,
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    CurrentTimeIndicatorConfig.labelBorderRadius,
                   ),
                 ),
-              Positioned(
-                top: geometry.lineTopOffset,
-                left:
-                    geometry.leftRow +
-                    geometry.blockWidth * geometry.dayOffset,
-                width: geometry.blockWidth,
-                child: Container(
-                  height: CurrentTimeIndicatorConfig.lineThickness,
-                  color: geometry.lineColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Just the time label.
-  ///
-  /// Drawn with the time line rather than with the week pages, so that the floating time-line panel
-  /// cannot cover it now that the time line is stacked above the classes.
-  static Positioned? buildLabel({
-    required BuildContext context,
-    required DateTime now,
-    required DateTime weekStart,
-    required double leftRow,
-    required double blockWidth,
-    required double Function(double) blockHeight,
-  }) {
-    final _IndicatorGeometry? geometry = _geometry(
-      context: context,
-      now: now,
-      weekStart: weekStart,
-      leftRow: leftRow,
-      blockWidth: blockWidth,
-      blockHeight: blockHeight,
-    );
-    if (geometry == null || !geometry.hasLabel) {
-      return null;
-    }
-
-    return Positioned(
-      left: 0,
-      top: geometry.indicatorTop,
-      width: geometry.leftRow,
-      child: IgnorePointer(
-        child: SizedBox(
-          height: geometry.indicatorHeight,
-          child: Stack(
-            children: [
-              Positioned(
-                top: geometry.labelTop,
-                /// Lines up with the floating time-line panel, which is inset from the edge.
-                left: timeLineInset,
-                width: timeLineWidth,
-                height: CurrentTimeIndicatorConfig.labelHeight,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: geometry.labelBackgroundColor,
-                    border: Border.all(
-                      color: geometry.color.withValues(alpha: 0.7),
-                      width: 1.4,
-                    ),
-                    borderRadius: BorderRadius.circular(
-                      CurrentTimeIndicatorConfig.labelBorderRadius,
-                    ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal:
+                        CurrentTimeIndicatorConfig.labelHorizontalPadding,
+                    vertical:
+                        CurrentTimeIndicatorConfig.labelVerticalPadding,
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal:
-                          CurrentTimeIndicatorConfig.labelHorizontalPadding,
-                      vertical:
-                          CurrentTimeIndicatorConfig.labelVerticalPadding,
-                    ),
-                    child: Center(
-                      child: Text(
-                        geometry.labelText,
-                        style: TextStyle(
-                          fontSize: CurrentTimeIndicatorConfig.labelFontSize,
-                          color: geometry.color,
-                          fontWeight: FontWeight.w700,
-                          height: 1,
-                          shadows: const [
-                            Shadow(
-                              offset: Offset(0, 0),
-                              blurRadius: 2,
-                              color: Colors.black26,
-                            ),
-                          ],
-                        ),
+                  child: Center(
+                    child: Text(
+                      geometry.labelText,
+                      style: TextStyle(
+                        fontSize: CurrentTimeIndicatorConfig.labelFontSize,
+                        color: geometry.color,
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                        shadows: const [
+                          Shadow(
+                            offset: Offset(0, 0),
+                            blurRadius: 2,
+                            color: Colors.black26,
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
+            ),
+          if (todayColumnStart > lineStart)
+            Positioned(
+              top: geometry.lineTopOffset,
+              left: lineStart,
+              width: todayColumnStart - lineStart,
+              child: Container(
+                height: CurrentTimeIndicatorConfig.lineThickness,
+                color: geometry.dayOffset == 0
+                    ? geometry.lineColor
+                    : geometry.connectorColor,
+              ),
+            ),
+          Positioned(
+            top: geometry.lineTopOffset,
+            left: todayColumnStart,
+            width: geometry.blockWidth,
+            child: Container(
+              height: CurrentTimeIndicatorConfig.lineThickness,
+              color: geometry.lineColor,
+            ),
           ),
-        ),
+        ],
       ),
+    );
+
+    if (opacity < 1.0) {
+      content = Opacity(
+        opacity: opacity.clamp(0.0, 1.0),
+        child: content,
+      );
+    }
+
+    return Positioned(
+      left: 0,
+      top: geometry.indicatorTop + offsetY,
+      width: totalWidth,
+      child: IgnorePointer(child: content),
     );
   }
 
@@ -390,9 +367,6 @@ class CurrentTimeIndicator {
 }
 
 /// Where the current-time indicator sits this frame.
-///
-/// Shared by [CurrentTimeIndicator.build] and [CurrentTimeIndicator.buildLabel], which are drawn in
-/// different layers.
 class _IndicatorGeometry {
   const _IndicatorGeometry({
     required this.indicatorTop,
