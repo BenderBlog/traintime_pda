@@ -467,7 +467,7 @@ void main() {
   );
 
   testWidgets(
-    'the current-time indicator animates with top-to-bottom motion when swiping weeks',
+    'the current-time indicator fade is directly correlated with horizontal swiping progress in place',
     (tester) async {
       tester.view.physicalSize = const Size(kSheetWidth, 780);
       tester.view.devicePixelRatio = 1.0;
@@ -512,160 +512,114 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // On current week (week 1), indicator is at rest position.
+      // On current week (week 1), indicator is at rest position and fully visible (no Opacity wrapper).
       expect(find.text('14:00'), findsOneWidget);
       final double restTop = tester.getRect(find.text('14:00')).top;
+      Finder indicatorOpacity() => find.ancestor(
+            of: find.text('14:00'),
+            matching: find.byType(Opacity),
+          );
+      expect(indicatorOpacity(), findsNothing);
 
       // --- RIGHT SIDE (towards week 2, relative > 0) ---
-      // Swipe partway towards week 2 (exit animation: moves downwards).
-      pageControl.jumpTo(kSheetWidth * 1.5);
+      // 1. Swipe 10% of page (dist = 0.1 < fadeThreshold 0.25):
+      // Opacity directly correlates with swipe progress frame-by-frame.
+      pageControl.jumpTo(kSheetWidth * 1.1);
       await tester.pump();
 
       expect(find.text('14:00'), findsOneWidget);
-      final double exitingRightTop = tester.getRect(find.text('14:00')).top;
+      final double expectedOpacity1 =
+          Curves.easeIn.transform(1.0 - (0.1 / 0.25));
       expect(
-        exitingRightTop,
-        greaterThan(restTop),
-        reason: 'right-side exit animation should move downwards from rest position',
+        tester.widget<Opacity>(indicatorOpacity()).opacity,
+        closeTo(expectedOpacity1, 0.01),
+        reason: 'indicator opacity should directly track swipe progress',
+      );
+      expect(
+        tester.getRect(find.text('14:00')).top,
+        closeTo(restTop, 0.01),
+        reason: 'indicator should remain in place (no vertical movement)',
       );
 
-      // Slide halfway then retreat back towards week 1:
-      // must remain continuous and smoothly return towards rest position without jumping.
-      pageControl.jumpTo(kSheetWidth * 1.25);
+      // 2. Swipe past fade threshold (dist = 0.3 >= 0.25): indicator is hidden.
+      pageControl.jumpTo(kSheetWidth * 1.3);
       await tester.pump();
+      expect(find.text('14:00'), findsNothing);
 
-      expect(find.text('14:00'), findsOneWidget);
-      final double retreatingExitRightTop =
-          tester.getRect(find.text('14:00')).top;
-      expect(
-        retreatingExitRightTop,
-        greaterThan(restTop),
-        reason: 'retreating should remain below rest position',
-      );
-      expect(
-        retreatingExitRightTop,
-        lessThan(exitingRightTop),
-        reason: 'retreating closer to week 1 should smoothly rise towards rest position',
-      );
-
-      // Move completely to week 2: indicator must be hidden.
+      // 3. Move completely to week 2: indicator remains hidden.
       pageControl.jumpTo(kSheetWidth * 2.0);
       await tester.pump();
+      expect(find.text('14:00'), findsNothing);
 
-      expect(
-        find.text('14:00'),
-        findsNothing,
-        reason: 'indicator should be completely hidden outside current week',
-      );
-
-      // Now swipe from week 2 towards week 1 (enter animation: comes from below upwards towards rest position).
-      pageControl.jumpTo(kSheetWidth * 1.5);
+      // 4. Swipe back from week 2 towards week 1 (dist = 0.15 < 0.25):
+      // Re-enters smoothly in place with opacity corresponding to position.
+      pageControl.jumpTo(kSheetWidth * 1.15);
       await tester.pump();
 
       expect(find.text('14:00'), findsOneWidget);
-      final double enteringRightTop = tester.getRect(find.text('14:00')).top;
+      final double expectedOpacityReturn =
+          Curves.easeIn.transform(1.0 - (0.15 / 0.25));
       expect(
-        enteringRightTop,
-        greaterThan(restTop),
-        reason: 'right-side enter animation should arrive from below rest position',
+        tester.widget<Opacity>(indicatorOpacity()).opacity,
+        closeTo(expectedOpacityReturn, 0.01),
       );
-      expect(
-        enteringRightTop,
-        closeTo(exitingRightTop, 0.01),
-        reason: 'right-side enter and exit share the exact same continuous path',
-      );
+      expect(tester.getRect(find.text('14:00')).top, closeTo(restTop, 0.01));
 
-      // Slide halfway then retreat back towards week 2:
-      // must remain continuous on enter trajectory and smoothly move downwards.
-      pageControl.jumpTo(kSheetWidth * 1.75);
-      await tester.pump();
-
-      expect(find.text('14:00'), findsOneWidget);
-      final double retreatingEnterRightTop =
-          tester.getRect(find.text('14:00')).top;
-      expect(
-        retreatingEnterRightTop,
-        greaterThan(restTop),
-        reason: 'retreating should remain below rest position',
-      );
-      expect(
-        retreatingEnterRightTop,
-        greaterThan(enteringRightTop),
-        reason: 'retreating closer to week 2 should smoothly move further downwards',
-      );
-
-      // Back at week 1, returns to exact rest position.
+      // 5. Settle back on current week (week 1):
       pageControl.jumpTo(kSheetWidth * 1.0);
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('14:00'), findsOneWidget);
-      final double backRestTop = tester.getRect(find.text('14:00')).top;
-      expect(backRestTop, closeTo(restTop, 0.01));
+      expect(indicatorOpacity(), findsNothing);
+      expect(tester.getRect(find.text('14:00')).top, closeTo(restTop, 0.01));
 
       // --- LEFT SIDE (towards week 0, relative < 0) ---
-      // Swipe partway towards week 0 (exit animation: retraces path upwards towards top).
-      pageControl.jumpTo(kSheetWidth * 0.5);
+      // 6. Swipe 10% left towards week 0 (dist = 0.1):
+      pageControl.jumpTo(kSheetWidth * 0.9);
       await tester.pump();
 
       expect(find.text('14:00'), findsOneWidget);
-      final double exitingLeftTop = tester.getRect(find.text('14:00')).top;
       expect(
-        exitingLeftTop,
-        lessThan(restTop),
-        reason: 'left-side exit animation should retrace path upwards from rest position',
+        tester.widget<Opacity>(indicatorOpacity()).opacity,
+        closeTo(expectedOpacity1, 0.01),
       );
+      expect(tester.getRect(find.text('14:00')).top, closeTo(restTop, 0.01));
 
-      // Slide halfway then retreat back towards week 1:
-      // must remain continuous and smoothly return towards rest position without jumping.
-      pageControl.jumpTo(kSheetWidth * 0.75);
-      await tester.pump();
-
-      expect(find.text('14:00'), findsOneWidget);
-      final double retreatingExitLeftTop =
-          tester.getRect(find.text('14:00')).top;
-      expect(
-        retreatingExitLeftTop,
-        lessThan(restTop),
-        reason: 'retreating should remain above rest position',
-      );
-      expect(
-        retreatingExitLeftTop,
-        greaterThan(exitingLeftTop),
-        reason: 'retreating closer to week 1 should smoothly drop back towards rest position',
-      );
-
-      // Move completely to week 0: indicator must be hidden.
+      // 7. Move past threshold to week 0:
       pageControl.jumpTo(0.0);
       await tester.pump();
+      expect(find.text('14:00'), findsNothing);
 
-      expect(
-        find.text('14:00'),
-        findsNothing,
-        reason: 'indicator should be completely hidden outside current week',
-      );
-
-      // Now swipe from week 0 towards week 1 (enter animation: comes from above downwards towards rest position).
-      pageControl.jumpTo(kSheetWidth * 0.5);
-      await tester.pump();
-
-      expect(find.text('14:00'), findsOneWidget);
-      final double enteringLeftTop = tester.getRect(find.text('14:00')).top;
-      expect(
-        enteringLeftTop,
-        lessThan(restTop),
-        reason: 'left-side enter animation should arrive from above rest position',
-      );
-      expect(
-        enteringLeftTop,
-        closeTo(exitingLeftTop, 0.01),
-        reason: 'left-side enter and exit share the exact same continuous path',
-      );
-
-      // Back at week 1, returns to exact rest position.
+      // 8. Settle back on week 1:
       pageControl.jumpTo(kSheetWidth * 1.0);
+      await tester.pumpAndSettle();
+
+      expect(find.text('14:00'), findsOneWidget);
+      expect(indicatorOpacity(), findsNothing);
+      expect(tester.getRect(find.text('14:00')).top, closeTo(restTop, 0.01));
+
+      // --- HORIZONTAL DRAG GESTURE ---
+      // 9. Start a drag on week 1 and move horizontally: opacity updates instantly with gesture.
+      final gesture = await tester.startGesture(const Offset(200, 300));
+      await gesture.moveBy(const Offset(-15, 0));
       await tester.pump();
 
       expect(find.text('14:00'), findsOneWidget);
+      final double draggedDist = 15.0 / kSheetWidth;
+      final double expectedDragOpacity =
+          Curves.easeIn.transform(1.0 - (draggedDist / 0.25));
+      expect(
+        tester.widget<Opacity>(indicatorOpacity()).opacity,
+        closeTo(expectedDragOpacity, 0.02),
+        reason: 'drag gesture directly drives opacity with zero lag',
+      );
+
+      // Release drag and let PageView snap back to week 1:
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      expect(find.text('14:00'), findsOneWidget);
+      expect(indicatorOpacity(), findsNothing);
       expect(tester.getRect(find.text('14:00')).top, closeTo(restTop, 0.01));
     },
   );

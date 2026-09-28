@@ -225,9 +225,10 @@ class _ClassTableScrollBehavior extends MaterialScrollBehavior {
 /// The current-time indicator layer: combines the time buoy on the timeline with the horizontal line
 /// as a single connected whole, visible only on the current week.
 ///
-/// Follows week swiping gestures frame by frame:
-/// - Swiping from/to the left (relative < 0): enters from top to bottom, exits retracing back up.
-/// - Swiping from/to the right (relative > 0): exits downwards, enters from bottom to top.
+/// Correlates fade-in and fade-out animations directly with horizontal swiping progress:
+/// - Fades out quickly in place as swiping starts away from the current week.
+/// - Stays invisible while swiping and on other weeks.
+/// - Fades in smoothly in place as the swipe brings the current week back into view and settles.
 class _CurrentTimeIndicatorLayer extends StatelessWidget {
   const _CurrentTimeIndicatorLayer({
     required this.pageControl,
@@ -241,7 +242,9 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
   final double available;
   final double maxWidth;
 
-  static const double _slideOffset = 24.0;
+  /// Fraction of a page swipe over which the indicator fades out/in.
+  /// Beyond this distance, the indicator is completely invisible (opacity 0).
+  static const double _fadeThreshold = 0.25;
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +265,6 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
             context: context,
             controllers: controllers,
             currentWeek: currentWeek,
-            offsetY: 0.0,
             opacity: 1.0,
           );
           if (indicator == null) return const SizedBox.shrink();
@@ -276,6 +278,7 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
     }
 
     final PageController pages = pageControl!;
+
     return AnimatedBuilder(
       animation: Listenable.merge([pages, controllers.timeTickNotifier]),
       builder: (context, _) {
@@ -289,27 +292,25 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
           page = singleIndex.toDouble();
         }
 
-        final double relative = page - currentWeek;
-        final double dist = relative.abs();
-        if (dist >= 1.0) {
+        final double dist = (page - currentWeek).abs();
+        if (dist >= _fadeThreshold) {
           return const SizedBox.shrink();
         }
 
-        final double t = (1.0 - dist).clamp(0.0, 1.0);
-        final double eased = Curves.easeOutCubic.transform(t);
-        final double opacity = eased.clamp(0.0, 1.0);
-        // On the left (relative < 0): enter drops from top to bottom (-slideOffset -> 0),
-        // and exit retraces back up (0 -> -slideOffset).
-        // On the right (relative > 0): exit continues downwards (0 -> +slideOffset),
-        // and enter arrives from bottom to top (+slideOffset -> 0).
-        final double direction = relative < 0 ? -1.0 : 1.0;
-        final double offsetY = direction * (1.0 - eased) * _slideOffset;
+        // Correlate fade directly with swipe progress:
+        // As dist increases from 0, opacity quickly drops to 0.
+        // As dist decreases to 0, opacity smoothly fades in to 1.
+        final double t = (1.0 - (dist / _fadeThreshold)).clamp(0.0, 1.0);
+        final double opacity = Curves.easeIn.transform(t);
+
+        if (opacity <= 0.0) {
+          return const SizedBox.shrink();
+        }
 
         final Positioned? indicator = _buildIndicator(
           context: context,
           controllers: controllers,
           currentWeek: currentWeek,
-          offsetY: offsetY,
           opacity: opacity,
         );
 
@@ -330,7 +331,6 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
     required BuildContext context,
     required ClassTableWidgetState controllers,
     required int currentWeek,
-    required double offsetY,
     required double opacity,
   }) {
     final DateTime weekStart = controllers.startDay
@@ -345,7 +345,6 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
       blockWidth: (maxWidth - leftRow) / 7,
       blockHeight: (double count) =>
           classTableBlockHeight(context, available, count),
-      offsetY: offsetY,
       opacity: opacity,
     );
   }

@@ -198,6 +198,8 @@ class CurrentTimeIndicator {
 
   /// The combined current time indicator: the time buoy on the timeline and the horizontal line
   /// across to today's column, as a single connected whole.
+  ///
+  /// [opacity] fades the whole indicator, which is how the sheet ties it to the swipe progress.
   static Positioned? build({
     required BuildContext context,
     required DateTime now,
@@ -205,7 +207,6 @@ class CurrentTimeIndicator {
     required double leftRow,
     required double blockWidth,
     required double Function(double) blockHeight,
-    double offsetY = 0.0,
     double opacity = 1.0,
   }) {
     if (opacity <= 0.0) {
@@ -314,7 +315,7 @@ class CurrentTimeIndicator {
 
     return Positioned(
       left: 0,
-      top: geometry.indicatorTop + offsetY,
+      top: geometry.indicatorTop,
       width: totalWidth,
       child: IgnorePointer(child: content),
     );
