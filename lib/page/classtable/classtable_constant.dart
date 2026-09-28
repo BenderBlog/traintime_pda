@@ -66,14 +66,6 @@ const double weekBarSurfaceAlpha = 0.42;
 /// own surface under them for contrast.
 const double bannerSurfaceAlpha = 0.6;
 
-/// Blur of the controls' own backgrounds, in logical pixels.
-///
-/// This is what makes a class card, the time line panel or the week bar look like frosted glass: the
-/// wallpaper and the table behind the control stay sharp, only the control's background is blurred.
-/// Controls that never overlap share one blur of the backdrop through a [BackdropGroup], so a table
-/// full of cards still costs a single blur rather than one per card.
-const double glassBlurSigma = 12;
-
 /// The height of the top row.
 const topRowHeightBig = 96.0;
 const topRowHeightSmall = 50.0;

@@ -7,7 +7,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
 
 /// Tells every [GlassBlur] below it whether it may blur at all.
 ///
@@ -51,7 +50,7 @@ class GlassBlur extends StatelessWidget {
   const GlassBlur({
     super.key,
     this.borderRadius,
-    this.sigma = glassBlurSigma,
+    required this.sigma,
     this.grouped = false,
     this.child,
   });

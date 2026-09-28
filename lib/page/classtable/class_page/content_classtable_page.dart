@@ -20,6 +20,7 @@ import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.da
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
@@ -43,6 +44,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// A lock of the week choice row.
   /// When locked, choiceWeek cannot be changed.
   bool isTopRowLocked = false;
+
+  /// The backdrop this page's frosted controls share.
+  ///
+  /// Held here rather than left to [BackdropGroup]'s own default: that default mints a fresh
+  /// [BackdropKey] every time the widget is built, so every rebuild of this page would re-key the
+  /// group, and re-keying it marks every grouped filter as needing a repaint.
+  final BackdropKey _backdropKey = BackdropKey();
 
   /// Classtable pageView controller.
   late PageController pageControl;
@@ -1302,6 +1310,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               /// Everything above the wallpaper that wants a frosted background shares one blur of
               /// it: the status banner and every control in the table.
               child: BackdropGroup(
+                backdropKey: _backdropKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -1400,6 +1409,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       /// from the first frame rather than appearing only after the bar settles.
                       Positioned.fill(
                         child: GlassBlur(
+                          sigma: GlassStyleConfig.weekBarSigma,
                           child: ColoredBox(
                             color: Theme.of(context)
                                 .colorScheme

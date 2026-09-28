@@ -27,9 +27,9 @@ class ClassCard extends StatelessWidget {
 
   /// The height inside the card's padding, which the completed split is measured against.
   ///
-  /// Handed in rather than measured: a [LayoutBuilder] rebuilds its subtree during layout
-  /// whenever its constraints change, which is every frame of a drag or a scroll, for every card
-  /// on screen. [ClassTableView] already knows the height it positioned the card at.
+  /// Handed in rather than measured with a [LayoutBuilder]: the card sits in a slot whose height
+  /// [ClassTableView] already knows, and measuring it inside the card would move its subtree build
+  /// into the layout phase and add a render object per card for a number that is right here.
   final double height;
 
   /// The width the card was given, which the text shrinks with on a narrow table.
