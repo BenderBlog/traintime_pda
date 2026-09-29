@@ -201,7 +201,7 @@ class _ClassTableViewState extends State<ClassTableView> {
             textAlign: TextAlign.center,
           ).center();
         } else {
-          cell = Column(
+          final Widget timeColumn = Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -217,6 +217,13 @@ class _ClassTableViewState extends State<ClassTableView> {
               ),
             ],
           );
+
+          /// 最后一节的下课时间贴着 sheet 的底边，会被它自己的圆角裁掉，
+          /// 所以这一格的内容往上收一个圆角的高度 —— 底色照旧铺到底，
+          /// 圆角还是裁得出来的。
+          cell = indexOfChar == timeList.length ~/ 2 - 1
+              ? timeColumn.padding(bottom: classTableSheetRadius)
+              : timeColumn;
         }
 
         return DefaultTextStyle.merge(

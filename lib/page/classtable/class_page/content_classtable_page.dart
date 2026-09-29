@@ -1078,16 +1078,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage>
           builder: (context, constraints) => ClassTableState(
             constraints: constraints,
             controllers: classTableState,
-            child: Column(
-              children: [
-                _classTablePage().expanded(),
-
-                /// The end of the last class sits against the bottom of the
-                /// sheet, where its own rounded corner would cut the time of it
-                /// away. The room of that corner is kept below the table.
-                const SizedBox(height: classTableSheetRadius),
-              ],
-            ),
+            child: _classTablePage(),
           ),
         ),
       ),
