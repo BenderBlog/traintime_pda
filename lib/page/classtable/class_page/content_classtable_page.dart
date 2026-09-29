@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
-import 'dart:ui' show ImageFilter;
+import 'dart:ui' show BlurStyle, ImageFilter, MaskFilter;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -1067,20 +1067,60 @@ class _ContentClassTablePageState extends State<ContentClassTablePage>
   /// The sheet of the classtable: it is kept inside the safe area of the
   /// display and gets rounded corners of its own, since it does not reach the
   /// edges of the screen any more.
+  ///
+  /// A shadow drawn only outside of it, plus a hairline around it, lift it off
+  /// the screen, so the table reads as one card floating over the picture and
+  /// the room kept below it reads as the margin of that card instead of a gap.
+  ///
+  /// The picture itself is left alone: a colour laid over it would hide the
+  /// background image, and blurring it here would only repeat what the
+  /// background blur already does.
   Widget _sheet(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final borderRadius = BorderRadius.circular(classTableSheetRadius);
     return Padding(
       padding: _sheetSafeInsets(context),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(classTableSheetRadius),
-        child: LayoutBuilder(
-          /// The table measures itself against the room which is really left
-          /// for it, instead of the whole window.
-          builder: (context, constraints) => ClassTableState(
-            constraints: constraints,
-            controllers: classTableState,
-            child: _classTablePage(),
+      child: Stack(
+        /// 阴影要画到面板外面去，所以这一层不能裁。
+        clipBehavior: Clip.none,
+        children: [
+          /// 阴影单独一层，而且**只画面板外侧**：面板本身是透明的，
+          /// 用普通的 BoxShadow 会在面板内部透出来一圈黑。
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _SheetShadowPainter(
+                radius: classTableSheetRadius,
+                sigma: classTableSheetShadowSigma,
+                color: scheme.shadow.withValues(alpha: 0.5),
+              ),
+            ),
           ),
-        ),
+          Positioned.fill(
+            child: DecoratedBox(
+              /// 紧贴着边缘描一圈极细的线：花壁纸上只靠阴影，边角是"站不住"的。
+              position: DecorationPosition.foreground,
+              decoration: BoxDecoration(
+                borderRadius: borderRadius,
+                border: Border.all(
+                  color: scheme.outlineVariant.withValues(alpha: 0.6),
+                  width: 0.8,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: borderRadius,
+                child: LayoutBuilder(
+                  /// The table measures itself against the room which is really
+                  /// left for it, instead of the whole window.
+                  builder: (context, constraints) => ClassTableState(
+                    constraints: constraints,
+                    controllers: classTableState,
+                    child: _classTablePage(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1108,4 +1148,48 @@ class _ContentClassTablePageState extends State<ContentClassTablePage>
           ClassTableView(constraint: constraint, index: index),
     ),
   );
+}
+
+/// 画课表面板外侧的一圈阴影。
+///
+/// 面板里面是透的（能看见壁纸），所以不能直接用 `BoxShadow` —— 它的模糊会从
+/// 面板内部透出来，看着就是"里面一圈黑"。这里先把面板那块从画布上挖掉，
+/// 再画模糊的圆角矩形，于是只有外侧那一圈留下来。
+class _SheetShadowPainter extends CustomPainter {
+  const _SheetShadowPainter({
+    required this.radius,
+    required this.sigma,
+    required this.color,
+  });
+
+  final double radius;
+  final double sigma;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final box = Offset.zero & size;
+    final rrect = RRect.fromRectAndRadius(box, Radius.circular(radius));
+
+    canvas.clipPath(
+      Path.combine(
+        PathOperation.difference,
+        Path()..addRect(box.inflate(sigma * 4)),
+        Path()..addRRect(rrect),
+      ),
+      doAntiAlias: true,
+    );
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = color
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, sigma),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _SheetShadowPainter oldDelegate) =>
+      oldDelegate.radius != radius ||
+      oldDelegate.sigma != sigma ||
+      oldDelegate.color != color;
 }

@@ -201,7 +201,7 @@ class _ClassTableViewState extends State<ClassTableView> {
             textAlign: TextAlign.center,
           ).center();
         } else {
-          final Widget timeColumn = Column(
+          cell = Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -217,13 +217,6 @@ class _ClassTableViewState extends State<ClassTableView> {
               ),
             ],
           );
-
-          /// 最后一节的下课时间贴着 sheet 的底边，会被它自己的圆角裁掉，
-          /// 所以这一格的内容往上收一个圆角的高度 —— 底色照旧铺到底，
-          /// 圆角还是裁得出来的。
-          cell = indexOfChar == timeList.length ~/ 2 - 1
-              ? timeColumn.padding(bottom: classTableSheetRadius)
-              : timeColumn;
         }
 
         return DefaultTextStyle.merge(
@@ -293,7 +286,12 @@ class _ClassTableViewState extends State<ClassTableView> {
             ...classSubRow(true),
           ]
           .toStack()
-          .constrained(height: blockheight(61), width: size.maxWidth)
+          .constrained(
+            /// 末尾留一点点余地（“虚空的第 12 节”）：滚到底时最后一节的下课
+            /// 时间能躲开面板自己的圆角，又不会留下一大条空档。
+            height: blockheight(61) + classTableSheetEndGap,
+            width: size.maxWidth,
+          )
           .scrollable(
             /// The safe area of the screen is handled by the page which hosts
             /// the table, the sheet itself only has to be scrollable here.

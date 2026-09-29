@@ -73,6 +73,17 @@ const double classTableMaximumBottomInset = 40.0;
 /// are rounded as well.
 const double classTableSheetRadius = 14.0;
 
+/// 面板外侧那圈阴影的模糊程度。
+///
+/// 这是 sigma，大约等于 `BoxShadow` 里 blurRadius 的一半。
+const double classTableSheetShadowSigma = 8.0;
+
+/// 课表内容末尾留出的那点余地。
+///
+/// 滚到底时最后一节的下课时间会贴到面板底边、被自己的圆角切到，留一点就够它
+/// 躲开；留太多的话，滚到底时会看见一条明显的空档。
+const double classTableSheetEndGap = 6.0;
+
 /// The largest blur which can be applied to a user defined background image.
 const double maxClassTableBackgroundBlur = 30.0;
 
