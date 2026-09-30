@@ -282,13 +282,15 @@ class _ClassTableViewState extends State<ClassTableView> {
                   ).colorScheme.surface.withValues(alpha: 0.75),
                 )
                 .constrained(width: leftRow)
-                .positioned(left: 0),
+                /// 时间轴的底色一直铺到最底下（`top`/`bottom` 一起给就是拉满
+                /// 高度），这样末尾那点余地不会有"断了一截"的缝。
+                .positioned(left: 0, top: 0, bottom: 0),
             ...classSubRow(true),
           ]
           .toStack()
           .constrained(
-            /// 末尾留一点点余地（“虚空的第 12 节”）：滚到底时最后一节的下课
-            /// 时间能躲开面板自己的圆角，又不会留下一大条空档。
+            /// 末尾留一点点余地：滚到底时最后一节的下课时间能躲开面板自己的
+            /// 圆角，又不会留下一大条空档。这一小条由时间轴的底色接着。
             height: blockheight(61) + classTableSheetEndGap,
             width: size.maxWidth,
           )
