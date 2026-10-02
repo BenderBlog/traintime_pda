@@ -288,6 +288,7 @@ club_promotion:
 electricity:
   title: 水電信息
   power_title: 電量信息
+  power_metid_title: 電錶 {code}
   cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
   cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
   cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
@@ -300,7 +301,7 @@ electricity:
   not_enough_data: 數據量不足以用於渲染
   info: 歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。
   fetching_hint: 正在獲取最新電費信息
-  fetch_error: 電費信息獲取失敗，請重試。
+  fetch_error: 電費信息獲取失敗，請重試
   date: 日期
   power: 該日0點電量
   update: 刷新信息
@@ -309,8 +310,9 @@ electricity:
   water_usage_read_now: 本次讀數
   water_usage: 熱水用量
   water_title: 水費信息
+  weter_metid_title: 水錶 {code}
   water_loading: 正在加載水費信息
-  water_unavailable: 水費信息暫不可用，請在電費卡片重試。
+  water_unavailable: 水費信息暫不可用，請點擊右上角刷新重試。
   water_empty: 暫無水費信息
   not_school_network: 非校園網訪問
   aircon_title: 空調用電
@@ -1205,6 +1207,7 @@ electricity_status:
   need_account: 需要填寫電費賬號
   captcha_failed: 驗證碼識別失敗
   other_issue: 程序故障
+  no_electricity_info: 沒有電錶信息
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗

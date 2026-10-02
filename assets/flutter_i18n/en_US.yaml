@@ -325,6 +325,7 @@ club_promotion:
 electricity:
   title: Power Info
   power_title: Infomation
+  power_metid_title: Electricity meter {code}
   cache_hint_login_failed:
     Failed to log in to the electricity service, showing cached
     data.
@@ -352,8 +353,9 @@ electricity:
   water_usage_read_now: This time
   water_usage: Bath water usage
   water_title: Water usage
+  weter_metid_title: Watermeter {code}
   water_loading: Loading water usage information
-  water_unavailable: Water usage is unavailable. Retry from the electricity card.
+  water_unavailable: Water usage is unavailable. Retry using the refresh button in the top right.
   water_empty: No water usage information
   not_school_network: Not school network
   aircon_title: Aircon Electricity
@@ -1347,6 +1349,7 @@ electricity_status:
   need_account: Need to input electricity account
   captcha_failed: Failed to check captcha
   other_issue: Program malfunction
+  no_electricity_info: No electricity meter info
 school_card_status:
   failed_to_fetch: Failed fetching
   failed_to_query: Failed querying
