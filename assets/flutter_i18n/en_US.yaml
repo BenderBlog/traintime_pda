@@ -371,6 +371,9 @@ electricity:
   aircon_remote: Aircon Remote
   aircon_control_error: Unable to fetch the aircon state
   aircon_command_ok: Aircon command completed
+  aircon_control_section: Basic controls
+  aircon_operation_section: Operation
+  aircon_other_settings_section: Other settings
   aircon_power: Power
   aircon_target_temperature: Target temperature
   aircon_temperature_range: Temperature must be between 18 and 32 ℃

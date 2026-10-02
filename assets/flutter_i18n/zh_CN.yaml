@@ -329,6 +329,9 @@ electricity:
   aircon_remote: 空调遥控
   aircon_control_error: 无法获取空调状态
   aircon_command_ok: 空调指令已执行
+  aircon_control_section: 基本控制
+  aircon_operation_section: 运行设置
+  aircon_other_settings_section: 其他设置
   aircon_power: 电源
   aircon_target_temperature: 设定温度
   aircon_temperature_range: 温度必须在 18–32 ℃ 之间

@@ -1,12 +1,14 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/model/aircon_state.dart';
+import 'package:watermeter/page/public_widget/setting/setting_header.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
 import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
@@ -20,6 +22,7 @@ class AirconRemotePage extends StatefulWidget {
 
 class _AirconRemotePageState extends State<AirconRemotePage> {
   final _controller = AirconController.i;
+  final _temperatureFocusNode = FocusNode();
   AirconState? _state;
   Object? _error;
   bool _isFetching = false;
@@ -27,6 +30,12 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
 
   static const _pollInterval = Duration(milliseconds: 300);
   static const _pollAttempts = 12;
+
+  @override
+  void dispose() {
+    _temperatureFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -248,220 +257,335 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
               ),
             ),
           ),
-        Card(
-          child: Column(
-            children: [
-              SwitchListTile(
-                secondary: const Icon(Icons.power_settings_new),
-                title: Text(
-                  FlutterI18n.translate(context, "electricity.aircon_power"),
-                ),
-                value: state.isOn,
-                onChanged: busy
-                    ? null
-                    : (value) => _sendCommand(
-                        command: value
-                            ? {"switchStatus": 1}
-                            : {
-                                "switchStatus": 0,
-                                "indoorClean": 0,
-                                "outdoorClean": 0,
-                                "electricHeating": 0,
-                              },
-                        optimisticState: state.copyWith(
-                          isOn: value,
-                          electricHeating: value
-                              ? state.electricHeating
-                              : false,
-                        ),
-                        matches: (state) => state.isOn == value,
-                      ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.device_thermostat),
-                title: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "electricity.aircon_target_temperature",
-                  ),
-                ),
-                subtitle: state.isOn
-                    ? Text(
-                        FlutterI18n.translate(
-                          context,
-                          "electricity.aircon_indoor_temperature",
-                          translationParams: {
-                            "temperature": state.indoorTemperature.toString(),
-                          },
-                        ),
-                      )
-                    : null,
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      onPressed: busy || state.targetTemperature <= 18
-                          ? null
-                          : () => setTemperature(state.targetTemperature - 1),
-                      icon: const Icon(Icons.remove),
-                    ),
-                    SizedBox(
-                      width: 68,
-                      child: TextFormField(
-                        key: ValueKey(state.targetTemperature),
-                        initialValue: state.targetTemperature.toString(),
-                        enabled: !busy,
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.done,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(2),
-                        ],
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          suffixText: "℃",
-                        ),
-                        onFieldSubmitted: (value) {
-                          final temperature = int.tryParse(value);
-                          if (temperature == null ||
-                              temperature < 18 ||
-                              temperature > 32) {
-                            showToast(
-                              context: context,
-                              msg: FlutterI18n.translate(
-                                context,
-                                "electricity.aircon_temperature_range",
-                              ),
-                            );
-                            return;
-                          }
-                          if (temperature != state.targetTemperature) {
-                            setTemperature(temperature);
-                          }
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: busy || state.targetTemperature >= 32
-                          ? null
-                          : () => setTemperature(state.targetTemperature + 1),
-                      icon: const Icon(Icons.add),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        SettingHeader(
+          title: FlutterI18n.translate(
+            context,
+            "electricity.aircon_control_section",
           ),
+          icon: Icons.power_settings_new,
         ),
-        _choiceSection<AirconMode>(
-          context,
-          titleKey: "electricity.aircon_mode",
-          values: AirconMode.values,
-          selected: state.mode,
-          enabled: !busy,
-          labelKey: (mode) => mode.labelKey,
-          onSelected: (mode) {
-            final temperature = switch (mode) {
-              AirconMode.heat => 23,
-              AirconMode.cool => 26,
-              _ => 25,
-            };
-            final windSpeed = mode == AirconMode.fan
-                ? AirconWindSpeed.medium
-                : AirconWindSpeed.auto;
-            _sendCommand(
-              command: {
-                "runMode": mode.value.toString(),
-                "indoorClean": 0,
-                "outdoorClean": 0,
-                "strongMode": 0,
-                "electricHeating": 0,
-                "tempView": temperature,
-                "tempSet": temperature,
-                "windSpeed": windSpeed.value,
-              },
-              optimisticState: state.copyWith(
-                mode: mode,
-                targetTemperature: temperature,
-                windSpeed: windSpeed,
-                strongMode: false,
-                electricHeating: false,
+        _AirconSegmentedSwitchGroup(
+          items: [
+            _AirconSwitchItem(
+              icon: Icons.power_settings_new,
+              title: FlutterI18n.translate(context, "electricity.aircon_power"),
+              value: state.isOn,
+              onChanged: (value) => _sendCommand(
+                command: value
+                    ? {"switchStatus": 1}
+                    : {
+                        "switchStatus": 0,
+                        "indoorClean": 0,
+                        "outdoorClean": 0,
+                        "electricHeating": 0,
+                      },
+                optimisticState: state.copyWith(
+                  isOn: value,
+                  electricHeating: value ? state.electricHeating : false,
+                ),
+                matches: (state) => state.isOn == value,
               ),
-              matches: (state) =>
-                  state.mode == mode &&
-                  state.targetTemperature == temperature &&
-                  state.windSpeed == windSpeed &&
-                  !state.strongMode &&
-                  !state.electricHeating,
-            );
-          },
-        ),
-        _choiceSection<AirconWindSpeed>(
-          context,
-          titleKey: "electricity.aircon_wind_speed",
-          values: AirconWindSpeed.values,
-          selected: state.windSpeed,
-          enabled: !busy,
-          labelKey: (speed) => speed.labelKey,
-          onSelected: (speed) => _sendCommand(
-            command: {"windSpeed": speed.value.toString(), "strongMode": 0},
-            optimisticState: state.copyWith(
-              windSpeed: speed,
-              strongMode: false,
             ),
-            matches: (state) => state.windSpeed == speed && !state.strongMode,
+          ],
+          enabled: !busy,
+        ),
+        const SizedBox(height: 8),
+        M3ESegmentedList(
+          itemCount: 1,
+          outerRadius: 28,
+          padding: EdgeInsets.zero,
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          isEnabled: (index) => !busy,
+          onTap: (index) => _temperatureFocusNode.requestFocus(),
+          itemBuilder: (context, index) => ListTile(
+            leading: const Icon(Icons.device_thermostat),
+            title: Text(
+              FlutterI18n.translate(
+                context,
+                "electricity.aircon_target_temperature",
+              ),
+            ),
+            subtitle: state.indoorTemperature != null
+                ? Text(
+                    FlutterI18n.translate(
+                      context,
+                      "electricity.aircon_indoor_temperature",
+                      translationParams: {
+                        "temperature": state.indoorTemperature.toString(),
+                      },
+                    ),
+                  )
+                : null,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: busy || state.targetTemperature <= 18
+                      ? null
+                      : () => setTemperature(state.targetTemperature - 1),
+                  icon: const Icon(Icons.remove),
+                ),
+                SizedBox(
+                  width: 80,
+                  child: TextFormField(
+                    key: ValueKey(state.targetTemperature),
+                    focusNode: _temperatureFocusNode,
+                    initialValue: state.targetTemperature.toString(),
+                    enabled: !busy,
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.done,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(2),
+                    ],
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      suffixText: "℃",
+                    ),
+                    onFieldSubmitted: (value) {
+                      final temperature = int.tryParse(value);
+                      if (temperature == null ||
+                          temperature < 18 ||
+                          temperature > 32) {
+                        showToast(
+                          context: context,
+                          msg: FlutterI18n.translate(
+                            context,
+                            "electricity.aircon_temperature_range",
+                          ),
+                        );
+                        return;
+                      }
+                      if (temperature != state.targetTemperature) {
+                        setTemperature(temperature);
+                      }
+                    },
+                  ),
+                ),
+                IconButton(
+                  onPressed: busy || state.targetTemperature >= 32
+                      ? null
+                      : () => setTemperature(state.targetTemperature + 1),
+                  icon: const Icon(Icons.add),
+                ),
+              ],
+            ),
           ),
         ),
-        Card(
-          child: Column(
-            children: [
-              _featureSwitch(
-                context,
-                icon: Icons.swap_vert,
-                labelKey: "electricity.aircon_vertical_swing",
-                value: state.verticalSwing,
-                enabled: !busy,
-                onChanged: (value) => _sendCommand(
-                  command: {"verticalSwing": value ? 1 : 0},
-                  optimisticState: state.copyWith(verticalSwing: value),
-                  matches: (state) => state.verticalSwing == value,
-                ),
-              ),
-              _featureSwitch(
-                context,
-                icon: Icons.air,
-                labelKey: "electricity.aircon_strong_mode",
-                value: state.strongMode,
-                enabled: !busy,
-                onChanged: (value) => _sendCommand(
-                  command: {
-                    "strongMode": value ? 1 : 0,
-                    if (value) "windSpeed": AirconWindSpeed.auto.value,
-                  },
-                  optimisticState: state.copyWith(
-                    strongMode: value,
-                    windSpeed: value ? AirconWindSpeed.auto : state.windSpeed,
-                  ),
-                  matches: (state) =>
-                      state.strongMode == value &&
-                      (!value || state.windSpeed == AirconWindSpeed.auto),
-                ),
-              ),
-              _featureSwitch(
-                context,
-                icon: Icons.local_fire_department,
-                labelKey: "electricity.aircon_electric_heating",
-                value: state.electricHeating,
-                enabled: !busy,
-                onChanged: (value) => _sendCommand(
-                  command: {"electricHeating": value ? 1 : 0},
-                  optimisticState: state.copyWith(electricHeating: value),
-                  matches: (state) => state.electricHeating == value,
-                ),
-              ),
-            ],
+        SettingHeader(
+          title: FlutterI18n.translate(
+            context,
+            "electricity.aircon_operation_section",
           ),
+          icon: Icons.settings_remote,
+        ),
+        M3ESegmentedList(
+          itemCount: 2,
+          outerRadius: 28,
+          innerRadius: 6,
+          gap: 3,
+          padding: EdgeInsets.zero,
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 6, 16, 10),
+            child: switch (index) {
+              0 => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.ac_unit),
+                    title: Text(
+                      FlutterI18n.translate(context, "electricity.aircon_mode"),
+                    ),
+                  ),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final buttonWidth =
+                          constraints.maxWidth / AirconMode.values.length;
+                      return M3EToggleButtonGroup(
+                        type: M3EButtonGroupType.standard,
+                        size: M3EButtonSize.xs,
+                        spacing: 0,
+                        actions: AirconMode.values
+                            .map(
+                              (mode) => M3EToggleButtonGroupAction(
+                                label: Text(
+                                  FlutterI18n.translate(context, mode.labelKey),
+                                ),
+                                enabled: !busy,
+                                width: buttonWidth,
+                              ),
+                            )
+                            .toList(),
+                        selectedIndex: AirconMode.values.indexOf(state.mode),
+                        onSelectedIndexChanged: (index) {
+                          if (index == null || busy) return;
+                          final mode = AirconMode.values[index];
+                          final temperature = switch (mode) {
+                            AirconMode.heat => 23,
+                            AirconMode.cool => 26,
+                            _ => 25,
+                          };
+                          final windSpeed = mode == AirconMode.fan
+                              ? AirconWindSpeed.medium
+                              : AirconWindSpeed.auto;
+                          _sendCommand(
+                            command: {
+                              "runMode": mode.value.toString(),
+                              "indoorClean": 0,
+                              "outdoorClean": 0,
+                              "strongMode": 0,
+                              "electricHeating": 0,
+                              "tempView": temperature,
+                              "tempSet": temperature,
+                              "windSpeed": windSpeed.value,
+                            },
+                            optimisticState: state.copyWith(
+                              mode: mode,
+                              targetTemperature: temperature,
+                              windSpeed: windSpeed,
+                              strongMode: false,
+                              electricHeating: false,
+                            ),
+                            matches: (state) =>
+                                state.mode == mode &&
+                                state.targetTemperature == temperature &&
+                                state.windSpeed == windSpeed &&
+                                !state.strongMode &&
+                                !state.electricHeating,
+                          );
+                        },
+                        overflow: M3EButtonGroupOverflow.none,
+                        neighborSquish: true,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              _ => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.air),
+                    title: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "electricity.aircon_wind_speed",
+                      ),
+                    ),
+                  ),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final buttonWidth =
+                          constraints.maxWidth / AirconWindSpeed.values.length;
+                      return M3EToggleButtonGroup(
+                        type: M3EButtonGroupType.standard,
+                        size: M3EButtonSize.xs,
+                        spacing: 0,
+                        actions: AirconWindSpeed.values
+                            .map(
+                              (speed) => M3EToggleButtonGroupAction(
+                                label: Text(
+                                  FlutterI18n.translate(
+                                    context,
+                                    speed.labelKey,
+                                  ),
+                                ),
+                                enabled: !busy,
+                                width: buttonWidth,
+                              ),
+                            )
+                            .toList(),
+                        selectedIndex: AirconWindSpeed.values.indexOf(
+                          state.windSpeed,
+                        ),
+                        onSelectedIndexChanged: (index) {
+                          if (index == null || busy) return;
+                          final speed = AirconWindSpeed.values[index];
+                          _sendCommand(
+                            command: {
+                              "windSpeed": speed.value.toString(),
+                              "strongMode": 0,
+                            },
+                            optimisticState: state.copyWith(
+                              windSpeed: speed,
+                              strongMode: false,
+                            ),
+                            matches: (state) =>
+                                state.windSpeed == speed && !state.strongMode,
+                          );
+                        },
+                        overflow: M3EButtonGroupOverflow.none,
+                        neighborSquish: true,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            },
+          ),
+        ),
+        SettingHeader(
+          title: FlutterI18n.translate(
+            context,
+            "electricity.aircon_other_settings_section",
+          ),
+          icon: Icons.tune,
+        ),
+        _AirconSegmentedSwitchGroup(
+          enabled: !busy,
+          items: [
+            _AirconSwitchItem(
+              icon: Icons.swap_vert,
+              title: FlutterI18n.translate(
+                context,
+                "electricity.aircon_vertical_swing",
+              ),
+              value: state.verticalSwing,
+              onChanged: (value) => _sendCommand(
+                command: {"verticalSwing": value ? 1 : 0},
+                optimisticState: state.copyWith(verticalSwing: value),
+                matches: (state) => state.verticalSwing == value,
+              ),
+            ),
+            _AirconSwitchItem(
+              icon: Icons.air,
+              title: FlutterI18n.translate(
+                context,
+                "electricity.aircon_strong_mode",
+              ),
+              value: state.strongMode,
+              onChanged: (value) => _sendCommand(
+                command: {
+                  "strongMode": value ? 1 : 0,
+                  if (value) "windSpeed": AirconWindSpeed.auto.value,
+                },
+                optimisticState: state.copyWith(
+                  strongMode: value,
+                  windSpeed: value ? AirconWindSpeed.auto : state.windSpeed,
+                ),
+                matches: (state) =>
+                    state.strongMode == value &&
+                    (!value || state.windSpeed == AirconWindSpeed.auto),
+              ),
+            ),
+            _AirconSwitchItem(
+              icon: Icons.local_fire_department,
+              title: FlutterI18n.translate(
+                context,
+                "electricity.aircon_electric_heating",
+              ),
+              value: state.electricHeating,
+              onChanged: (value) => _sendCommand(
+                command: {"electricHeating": value ? 1 : 0},
+                optimisticState: state.copyWith(electricHeating: value),
+                matches: (state) => state.electricHeating == value,
+              ),
+            ),
+          ],
         ),
         // if (state.electricAmount != null)
         //   ListTile(
@@ -472,63 +596,6 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         //     trailing: Text(state.electricAmount.toString()),
         //   ),
       ],
-    );
-  }
-
-  Widget _featureSwitch(
-    BuildContext context, {
-    required IconData icon,
-    required String labelKey,
-    required bool value,
-    required bool enabled,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return SwitchListTile(
-      secondary: Icon(icon),
-      title: Text(FlutterI18n.translate(context, labelKey)),
-      value: value,
-      onChanged: enabled ? onChanged : null,
-    );
-  }
-
-  Widget _choiceSection<T>(
-    BuildContext context, {
-    required String titleKey,
-    required List<T> values,
-    required T selected,
-    required bool enabled,
-    required String Function(T value) labelKey,
-    required ValueChanged<T> onSelected,
-  }) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              FlutterI18n.translate(context, titleKey),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              children: values
-                  .map(
-                    (value) => ChoiceChip(
-                      label: Text(
-                        FlutterI18n.translate(context, labelKey(value)),
-                      ),
-                      selected: value == selected,
-                      onSelected: enabled ? (_) => onSelected(value) : null,
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -569,6 +636,75 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AirconSwitchItem {
+  const _AirconSwitchItem({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final IconData icon;
+  final String title;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+}
+
+class _AirconSegmentedSwitchGroup extends StatelessWidget {
+  const _AirconSegmentedSwitchGroup({
+    required this.items,
+    required this.enabled,
+  });
+
+  final List<_AirconSwitchItem> items;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return M3ESegmentedColumn(
+      children: [
+        for (final item in items)
+          Row(
+            children: [
+              Icon(item.icon, color: colorScheme.onSurfaceVariant),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  item.title,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+              const SizedBox(width: 8),
+              IgnorePointer(
+                child: Switch(
+                  value: item.value,
+                  onChanged: enabled ? item.onChanged : null,
+                ),
+              ),
+            ],
+          ),
+      ],
+      outerRadius: 28,
+      innerRadius: 6,
+      gap: 3,
+      color: colorScheme.surfaceContainerLow,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      selectionMode: M3ESelectionMode.multiple,
+      selectionTrigger: M3ESelectionTrigger.none,
+      isSelected: (index) => items[index].value,
+      selectedColor: colorScheme.primaryContainer.withValues(alpha: 0.4),
+      selectedRadius: 20,
+      pressedRadius: 4,
+      pressedScale: 0.98,
+      splashFactory: InkSparkle.splashFactory,
+      isEnabled: (index) => enabled,
+      onTap: (index) => items[index].onChanged(!items[index].value),
     );
   }
 }
