@@ -463,14 +463,14 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             ],
           ),
         ),
-        if (state.electricAmount != null)
-          ListTile(
-            leading: const Icon(Icons.electric_bolt),
-            title: Text(
-              FlutterI18n.translate(context, "electricity.aircon_amount"),
-            ),
-            trailing: Text(state.electricAmount.toString()),
-          ),
+        // if (state.electricAmount != null)
+        //   ListTile(
+        //     leading: const Icon(Icons.electric_bolt),
+        //     title: Text(
+        //       FlutterI18n.translate(context, "electricity.aircon_amount"),
+        //     ),
+        //     trailing: Text(state.electricAmount.toString()),
+        //   ),
       ],
     );
   }

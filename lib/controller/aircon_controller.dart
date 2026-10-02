@@ -31,7 +31,7 @@ class AirconController {
       ..addAll(session.getEnergyHistory());
 
     if (imei.isNotEmpty) {
-      Future.microtask(refreshEnergyInfo);
+      // Future.microtask(refreshEnergyInfo);
       Future.microtask(refreshDeviceState);
     }
   }
@@ -172,7 +172,7 @@ class AirconController {
     }
     await preference.setString(preference.Preference.airconImei, imei);
     imeiSignal.value = imei;
-    await refreshEnergyInfo();
+    // await refreshEnergyInfo();
     await refreshDeviceState();
   }
 
