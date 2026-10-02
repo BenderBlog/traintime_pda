@@ -22,6 +22,8 @@ import 'package:watermeter/repository/preference.dart' as preference;
 class ClassTableView extends StatefulWidget {
   final int index;
   final BoxConstraints constraint;
+
+  /// When disabled, the table expands to its full height for an outer scroll view.
   final bool enableVerticalScrolling;
 
   const ClassTableView({
@@ -270,6 +272,23 @@ class _ClassTableViewState extends State<ClassTableView> {
   @override
   Widget build(BuildContext context) {
     _timeColumnLayout = ClassTableTimeColumnLayout.of(context);
+    final sheet =
+        [
+          classSubRow(false)
+              .toColumn()
+              .decorated(
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface.withValues(alpha: 0.75),
+              )
+              .constrained(width: _timeColumnWidth)
+              // Fill the time axis background through the gap below the last class.
+              .positioned(left: 0, top: 0, bottom: 0),
+          ...classSubRow(true),
+        ].toStack().constrained(
+          height: blockheight(61) + classTableSheetEndGap,
+          width: size.maxWidth,
+        );
     return [
       /// The main class table.
       ClassTableDateRow(
@@ -280,36 +299,12 @@ class _ClassTableViewState extends State<ClassTableView> {
         dayColumnWidth: blockwidth,
       ),
 
-      /// The rest of the table.
-      [
-            classSubRow(false)
-                .toColumn()
-                .decorated(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.surface.withValues(alpha: 0.75),
-                )
-                .constrained(width: _timeColumnWidth)
-                /// 时间轴的底色一直铺到最底下（`top`/`bottom` 一起给就是拉满
-                /// 高度），这样末尾那点余地不会有"断了一截"的缝。
-                .positioned(left: 0, top: 0, bottom: 0),
-            ...classSubRow(true),
-          ]
-          .toStack()
-          .constrained(
-            /// 末尾留一点点余地：滚到底时最后一节的下课时间能躲开面板自己的
-            /// 圆角，又不会留下一大条空档。这一小条由时间轴的底色接着。
-            height: blockheight(61) + classTableSheetEndGap,
-            width: size.maxWidth,
-          )
-          .scrollable(
-            /// The safe area of the screen is handled by the page which hosts
-            /// the table, the sheet itself only has to be scrollable here.
-            physics: widget.enableVerticalScrolling
-                ? null
-                : const NeverScrollableScrollPhysics(),
-          )
-          .expanded(),
+      // Settings previews expand fully and use the page's outer scroll view.
+      // The main timetable keeps its own viewport and vertical scrolling.
+      if (widget.enableVerticalScrolling)
+        sheet.scrollable().expanded()
+      else
+        sheet,
     ].toColumn();
   }
 }
