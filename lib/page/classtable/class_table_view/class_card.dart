@@ -13,6 +13,7 @@ import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
+import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -59,6 +60,25 @@ class ClassCard extends StatelessWidget {
             final isCompleted = splitHeight >= constraints.maxHeight - 0.5;
             final textStyle = isCompleted ? completedStyle : activeStyle;
             final borderStyle = isCompleted ? completedStyle : activeStyle;
+
+            /// Seven days have to fit next to the index row, and in a floating
+            /// window or in a split screen much less room is left for each of
+            /// them. The regular sizes would then break the name of a class
+            /// into one or two characters per line, and the lines which do not
+            /// fit in the card are cut off, so the text shrinks with the card.
+            final cardWidth = constraints.maxWidth;
+            final isNarrowCard = cardWidth < narrowClassCardWidth;
+            final isTinyCard = cardWidth < tinyClassCardWidth;
+            final nameFontSize = isTinyCard
+                ? 9.0
+                : isNarrowCard
+                ? 10.0
+                : (isPhone(context) ? 12.0 : 14.0);
+            final detailFontSize = isTinyCard
+                ? 7.0
+                : isNarrowCard
+                ? 9.0
+                : (isPhone(context) ? 10.0 : 12.0);
 
             return Stack(
               fit: StackFit.expand,
@@ -184,7 +204,7 @@ class ClassCard extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: isPhone(context) ? 2 : 4,
-                      vertical: 4,
+                      vertical: isNarrowCard ? 2 : 4,
                     ),
                     child: Align(
                       alignment: Alignment.topLeft,
@@ -196,7 +216,7 @@ class ClassCard extends StatelessWidget {
                               name,
                               style: TextStyle(
                                 color: textStyle.textColor,
-                                fontSize: isPhone(context) ? 12 : 14,
+                                fontSize: nameFontSize,
                               ),
                               maxLines: 3,
                               overflow: TextOverflow.clip,
@@ -206,7 +226,7 @@ class ClassCard extends StatelessWidget {
                             "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
                             style: TextStyle(
                               color: textStyle.textColor,
-                              fontSize: isPhone(context) ? 10 : 12,
+                              fontSize: detailFontSize,
                             ),
                           ),
                           if (data.length > 1)
@@ -220,7 +240,7 @@ class ClassCard extends StatelessWidget {
                               ),
                               style: TextStyle(
                                 color: textStyle.textColor,
-                                fontSize: isPhone(context) ? 10 : 12,
+                                fontSize: detailFontSize,
                               ),
                             ),
                         ],

@@ -10,6 +10,7 @@ import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/class_table_style_page.dart';
@@ -100,6 +101,35 @@ class _ClasstableSectionState extends State<ClasstableSection> {
     }
   }
 
+  /// Whether a background image is set at all.
+  bool get _hasBackground =>
+      preference.getBool(preference.Preference.decoration);
+
+  /// The blur which is being dragged. It is mirrored here because the preference
+  /// store is written asynchronously: without it the slider would not move
+  /// under the finger.
+  double _backgroundBlur = preference.getDouble(
+    preference.Preference.classTableBackgroundBlur,
+  );
+
+  void _previewBackgroundBlur(double value) {
+    setState(() => _backgroundBlur = value);
+  }
+
+  Future<void> _saveBackgroundBlur(double value) async {
+    await preference.setDouble(
+      preference.Preference.classTableBackgroundBlur,
+      value,
+    );
+    if (mounted) {
+      setState(() => _backgroundBlur = value);
+    }
+  }
+
+  String _backgroundBlurLabel(BuildContext context) => _backgroundBlur <= 0
+      ? FlutterI18n.translate(context, "setting.background_blur_off")
+      : _backgroundBlur.round().toString();
+
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
@@ -110,8 +140,7 @@ class _ClasstableSectionState extends State<ClasstableSection> {
           trailing: Switch(
             value: preference.getBool(preference.Preference.decorated),
             onChanged: (bool value) {
-              if (value == true &&
-                  !preference.getBool(preference.Preference.decoration)) {
+              if (value == true && !_hasBackground) {
                 showToast(
                   context: context,
                   msg: FlutterI18n.translate(context, "setting.no_background"),
@@ -127,6 +156,25 @@ class _ClasstableSectionState extends State<ClasstableSection> {
                 }
               });
             },
+          ),
+        ),
+        ListTile(
+          title: Text(
+            FlutterI18n.translate(
+              context,
+              "setting.background_blur",
+              translationParams: {"value": _backgroundBlurLabel(context)},
+            ),
+          ),
+          subtitle: Slider(
+            value: _backgroundBlur.clamp(0.0, maxClassTableBackgroundBlur),
+            min: 0,
+            max: maxClassTableBackgroundBlur,
+            divisions: maxClassTableBackgroundBlur.round(),
+            onChanged: _hasBackground ? _previewBackgroundBlur : null,
+            onChangeEnd: _hasBackground
+                ? (value) => _saveBackgroundBlur(value)
+                : null,
           ),
         ),
         ListTile(
@@ -151,13 +199,18 @@ class _ClasstableSectionState extends State<ClasstableSection> {
               final saved =
                   selectedFile != null && await _saveBackground(selectedFile);
               if (saved) {
-                preference.setBool(preference.Preference.decoration, true).then(
-                  (_) {
-                    if (mounted) {
-                      setState(() {});
-                    }
-                  },
+                await preference.setBool(
+                  preference.Preference.decoration,
+                  true,
                 );
+
+                /// Choosing an image is the obvious way of switching the
+                /// background on, so turn it on here instead of asking the user
+                /// to flip the switch afterwards.
+                await preference.setBool(preference.Preference.decorated, true);
+                if (mounted) {
+                  setState(() {});
+                }
                 if (context.mounted) {
                   showToast(
                     context: context,

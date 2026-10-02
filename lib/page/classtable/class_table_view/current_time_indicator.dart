@@ -15,7 +15,7 @@ class CurrentTimeIndicatorConfig {
   static double lineThickness = 2;
   static double labelHeight = 13;
   static double labelFontSize = 7;
-  static double labelBackgroundAlpha = 0.75;
+  static double labelBackgroundAlpha = 1.0;
   static double labelHorizontalPadding = 1;
   static double labelVerticalPadding = 1;
   static double labelBorderRadius = 4;
