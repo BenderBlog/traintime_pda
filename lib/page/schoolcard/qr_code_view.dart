@@ -4,7 +4,7 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 

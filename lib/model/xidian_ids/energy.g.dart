@@ -10,7 +10,10 @@ ElectricityHistoryInfo _$ElectricityHistoryInfoFromJson(
   Map<String, dynamic> json,
 ) => ElectricityHistoryInfo(
   fetchDay: DateTime.parse(json['fetchDay'] as String),
-  remain: json['remain'] as String,
+  historyInfo: (json['historyInfo'] as List<dynamic>)
+      .map((e) => MeterInfo.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  remain: json['remain'] as num,
 );
 
 Map<String, dynamic> _$ElectricityHistoryInfoToJson(
@@ -18,6 +21,7 @@ Map<String, dynamic> _$ElectricityHistoryInfoToJson(
 ) => <String, dynamic>{
   'fetchDay': instance.fetchDay.toIso8601String(),
   'remain': instance.remain,
+  'historyInfo': instance.historyInfo,
 };
 
 MeterInfo _$MeterInfoFromJson(Map<String, dynamic> json) => MeterInfo(
@@ -35,20 +39,25 @@ Map<String, dynamic> _$MeterInfoToJson(MeterInfo instance) => <String, dynamic>{
 };
 
 EnergyInfo _$EnergyInfoFromJson(Map<String, dynamic> json) => EnergyInfo(
-  lastReadDate: DateTime.parse(json['lastReadDate'] as String),
-  electricityRemain: json['electricityRemain'] as num,
-  electricityMeterList: (json['electricityMeterList'] as List<dynamic>)
-      .map((e) => MeterInfo.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  waterMeterList: (json['waterMeterList'] as List<dynamic>?)
-      ?.map((e) => MeterInfo.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  electricityMeterList: (json['electricityMeterList'] as Map<String, dynamic>)
+      .map(
+        (k, e) => MapEntry(
+          k,
+          ElectricityHistoryInfo.fromJson(e as Map<String, dynamic>),
+        ),
+      ),
+  waterMeterList: (json['waterMeterList'] as Map<String, dynamic>).map(
+    (k, e) => MapEntry(
+      k,
+      (e as List<dynamic>)
+          .map((e) => MeterInfo.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    ),
+  ),
 );
 
 Map<String, dynamic> _$EnergyInfoToJson(EnergyInfo instance) =>
     <String, dynamic>{
-      'lastReadDate': instance.lastReadDate.toIso8601String(),
-      'electricityRemain': instance.electricityRemain,
       'electricityMeterList': instance.electricityMeterList,
       'waterMeterList': instance.waterMeterList,
     };

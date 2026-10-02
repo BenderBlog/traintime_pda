@@ -15,12 +15,16 @@ import 'package:watermeter/repository/preference.dart';
 
 class DormWaterSession {
   static const String apiBaseUrl = 'https://i.ilife798.com';
+  static const String appVersion = '3.1.9';
 
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: apiBaseUrl,
       contentType: Headers.formUrlEncodedContentType,
-      headers: {HttpHeaders.userAgentHeader: _getUserAgent()},
+      headers: {
+        HttpHeaders.userAgentHeader: _getUserAgent(),
+        'VersionCode': appVersion,
+      },
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 30),
       followRedirects: false,
@@ -35,18 +39,18 @@ class DormWaterSession {
   /// Get User-Agent based on platform
   ///
   /// iOS:
-  ///   - Captcha: iLife798/3.1.1 (iPhone; iOS 26.2; Scale/3.00)
-  ///   - Others: iOS_ilife798_3.1.1
+  ///   - Captcha: iLife798/3.1.9 (iPhone; iOS 26.2; Scale/3.00)
+  ///   - Others: iOS_ilife798_3.1.9
   /// Android:
-  ///   - All: Android_ilife798_2.0.11
+  ///   - All: Android_ilife798_3.1.9
   /// Other platforms: Same as iOS
   static String _getUserAgent({bool isCaptcha = false}) {
     if (Platform.isAndroid) {
-      return 'Android_ilife798_2.0.11';
+      return 'Android_ilife798_$appVersion';
     }
     return isCaptcha
-        ? 'iLife798/3.1.1 (iPhone; iOS 26.2; Scale/3.00)'
-        : 'iOS_ilife798_3.1.1';
+        ? 'iLife798/$appVersion (iPhone; iOS 26.2; Scale/3.00)'
+        : 'iOS_ilife798_$appVersion';
   }
 
   /// Generate a random numeric session ID for captcha
@@ -348,7 +352,7 @@ class DormWaterSession {
           'args': '',
           'cnt': '1',
           'did': deviceId,
-          'pip': '21',
+          'ptype': '91',
           'rcp': '0',
           'upgrade': '1',
         },
@@ -356,6 +360,7 @@ class DormWaterSession {
           headers: {
             'accept': '*/*',
             'Authorization': token,
+            'ApplicationType': '1,1',
             'accept-encoding': 'gzip, deflate, br',
             'priority': 'u=3, i',
             'accept-language': 'zh-Hans-US;q=1, el-US;q=0.9, en-US;q=0.8',

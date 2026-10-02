@@ -6,7 +6,7 @@ import 'dart:math';
 
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';

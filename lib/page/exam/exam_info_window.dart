@@ -5,7 +5,7 @@
 // Exam Infomation Interface.
 
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/exam_controller.dart';

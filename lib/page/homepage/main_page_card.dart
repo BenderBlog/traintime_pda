@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 
 class MainPageCard extends StatelessWidget {

@@ -68,9 +68,12 @@ class SchoolnetSession {
       parse(page).getElementsByTagName("tr").forEach((value) {
         var tdList = value.getElementsByTagName("td");
         if (tdList.length == 7) {
-          String usedT = tdList[2].innerHtml;
+          /// 表格的列是「用户名 | IP地址 | 上线时间 | v4入流量 | 产品名称」，
+          /// 所以第 3 列是上线时间、第 4 列才是流量。以前这两列取反了，
+          /// 页面上「上线时间」一栏显示的是流量。
+          String usedT = tdList[3].innerHtml;
           if (usedT.isNotEmpty) {
-            ipList.add((tdList[1].innerHtml, tdList[3].innerHtml, usedT));
+            ipList.add((tdList[1].innerHtml, tdList[2].innerHtml, usedT));
           }
         } else if (tdList.length == 4) {
           // 改为排除法：当 productName 中不包含运营商关键词（联通/移动/电信）时才保存，

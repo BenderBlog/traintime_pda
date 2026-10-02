@@ -38,7 +38,7 @@ class EnergyController {
 
   final electricityWarning = signal<int>(defaultLowElectricityWarningThreshold);
 
-  final historyElectricityInfoList = <ElectricityHistoryInfo>[];
+  final historyElectricityInfoList = <String, List<ElectricityHistoryInfo>>{};
 
   /// ============================================
   ///  Electricity Warning Function and Threshold
@@ -93,25 +93,29 @@ class EnergyController {
 
     final info = result.data;
 
-    final newHistoryInfo = List<ElectricityHistoryInfo>.from(
+    final newHistoryInfo = Map<String, List<ElectricityHistoryInfo>>.from(
       historyElectricityInfoList,
     );
-    if (newHistoryInfo.isNotEmpty) {
-      final last = newHistoryInfo.last;
-      if (last.fetchDay.isAtSameDayAs(info.lastReadDate)) {
-        return;
+    var hasNewHistory = false;
+    for (final meter in info.electricityMeterList.entries) {
+      final history = List<ElectricityHistoryInfo>.from(
+        newHistoryInfo[meter.key] ?? const <ElectricityHistoryInfo>[],
+      );
+      if (history.isNotEmpty) {
+        final last = history.last;
+        if (last.fetchDay.isAtSameDayAs(meter.value.fetchDay)) {
+          continue;
+        }
       }
-    }
 
-    if (newHistoryInfo.length > 14) {
-      newHistoryInfo.removeAt(0);
+      if (history.length > 14) {
+        history.removeAt(0);
+      }
+      history.add(meter.value);
+      newHistoryInfo[meter.key] = history;
+      hasNewHistory = true;
     }
-    newHistoryInfo.add(
-      ElectricityHistoryInfo(
-        fetchDay: info.lastReadDate,
-        remain: info.electricityRemain.toString(),
-      ),
-    );
+    if (!hasNewHistory) return;
     session.saveElectricityHistory(newHistoryInfo);
     historyElectricityInfoList.clear();
     historyElectricityInfoList.addAll(newHistoryInfo);

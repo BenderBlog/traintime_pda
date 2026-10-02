@@ -1,7 +1,7 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/repository/preference.dart';
 
 extension RuisiBranchNavigation on BuildContext {

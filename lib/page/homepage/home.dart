@@ -7,7 +7,7 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:based_split_view/based_split_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/external/ruisi_flutter/ruisi_flutter.dart';

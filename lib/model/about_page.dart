@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 const String urlOthers = "https://www.bilibili.com/video/BV1tW411n7eW";
 

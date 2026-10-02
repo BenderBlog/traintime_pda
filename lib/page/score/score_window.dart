@@ -4,7 +4,7 @@
 
 // Score Window
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';

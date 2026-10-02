@@ -1,7 +1,7 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 编辑态下可长按拖拽、相互交换位置的卡片包装。
 ///

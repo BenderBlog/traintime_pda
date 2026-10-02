@@ -288,6 +288,7 @@ club_promotion:
 electricity:
   title: 水電信息
   power_title: 電量信息
+  power_metid_title: 電錶 {code}
   cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
   cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
   cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
@@ -300,7 +301,7 @@ electricity:
   not_enough_data: 數據量不足以用於渲染
   info: 歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。
   fetching_hint: 正在獲取最新電費信息
-  fetch_error: 電費信息獲取失敗，請重試。
+  fetch_error: 電費信息獲取失敗，請重試
   date: 日期
   power: 該日0點電量
   update: 刷新信息
@@ -309,8 +310,9 @@ electricity:
   water_usage_read_now: 本次讀數
   water_usage: 熱水用量
   water_title: 水費信息
+  weter_metid_title: 水錶 {code}
   water_loading: 正在加載水費信息
-  water_unavailable: 水費信息暫不可用，請在電費卡片重試。
+  water_unavailable: 水費信息暫不可用，請點擊右上角刷新重試。
   water_empty: 暫無水費信息
   not_school_network: 非校園網訪問
   aircon_title: 空調用電
@@ -320,9 +322,34 @@ electricity:
   aircon_waiting: 等待獲取空調用電信息
   aircon_error: 空調用電獲取失敗
   aircon_retry: 重試
-  aircon_imei_missing: 尚未添加空調 IMEI，添加後即可查看空調用電信息。
-  aircon_add_imei: 添加空調 IMEI
+  aircon_imei_missing: 掃描空調二維碼即可添加，也可以從相冊選擇二維碼圖片
+  aircon_add_imei: 添加空調信息
   aircon_cache_notice: 當前顯示空調緩存數據，緩存時間：{time}
+  aircon_remote: 空調遙控
+  aircon_control_error: 無法獲取空調狀態
+  aircon_command_ok: 空調指令已執行
+  aircon_control_section: 基本控制
+  aircon_operation_section: 運行設定
+  aircon_other_settings_section: 其他設定
+  aircon_power: 電源
+  aircon_target_temperature: 設定溫度
+  aircon_temperature_range: 溫度必須在 18–32 ℃ 之間
+  aircon_indoor_temperature: 室內溫度：{temperature} ℃
+  aircon_mode: 運行模式
+  aircon_mode_fan: 送風
+  aircon_mode_heat: 制熱
+  aircon_mode_cool: 製冷
+  aircon_mode_dry: 除溼
+  aircon_mode_auto: 自動
+  aircon_wind_speed: 風速
+  aircon_wind_auto: 自動
+  aircon_wind_silent: 靜音
+  aircon_wind_low: 低
+  aircon_wind_medium: 中
+  aircon_wind_high: 高
+  aircon_vertical_swing: 上下掃風
+  aircon_strong_mode: 強力模式
+  aircon_electric_heating: 輔助電熱
 empty_classroom:
   title: 空閒教室
   date: 日期 {date}
@@ -331,6 +358,12 @@ empty_classroom:
   classroom: 教室
   empty: 空閒
   occupied: 佔用
+  now_ongoing: 現在 · 第 {period} 節 {start}-{end}
+  now_upcoming: 即將 · 第 {period} 節 {start}-{end}
+  now_free: 空閒 {free}/{total} 間
+  only_free_now: 只看現在空閒
+  no_free_now: 現在沒有空閒教室
+  classes_over: 今天的課已經結束了
 exam:
   title: 考試安排
   cache_hint: 已顯示緩存考試安排信息
@@ -469,6 +502,17 @@ homepage:
     title: 水電信息
     current_electricity: 餘額 {amount} 度
     cache_notice: 最後一次讀表：{date}
+  aircon_card:
+    title: 空調遙控
+    not_configured: 尚未配置空調
+    configure_hint: 點擊添加空調 IMEI
+    running: '{mode} · {temperature} ℃'
+    power_off: 空調已關閉
+    indoor_and_wind: 室內 {temperature} ℃ · 風速 {wind}
+    wind: 風速 {wind}
+    fetching: 正在獲取空調狀態
+    error: 空調狀態獲取失敗
+    open_remote: 點擊進入空調遙控
   library_card:
     title: 圖書借閱
     current_borrow: 借書 {count} 本
@@ -801,9 +845,9 @@ setting:
   electricity_account_setting: 電費賬號設置
   schoolnet_password_setting: 校園網帳號密碼設置
   schoolnet_password_description: 不設置查看不了網費
-  aircon_imei_title: 空調用電數據源
+  aircon_imei_title: 空調設備
   aircon_imei: 空調 IMEI
-  aircon_imei_not_set: 未設置，電費頁不顯示空調用電
+  aircon_imei_not_set: 未設置，無法查詢或遙控空調
   aircon_imei_current: 當前 IMEI：{imei}
   aircon_imei_saved: 空調 IMEI 已保存
   aircon_imei_cleared: 空調 IMEI 已清除
@@ -1201,6 +1245,7 @@ electricity_status:
   need_account: 需要填寫電費賬號
   captcha_failed: 驗證碼識別失敗
   other_issue: 程序故障
+  no_electricity_info: 沒有電錶信息
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗
