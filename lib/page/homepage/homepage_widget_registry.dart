@@ -4,6 +4,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/homepage/info_widget/aircon_card.dart';
 import 'package:watermeter/page/homepage/info_widget/energy_card.dart';
 import 'package:watermeter/page/homepage/info_widget/library_card.dart';
 import 'package:watermeter/page/homepage/info_widget/school_card_info_card.dart';
@@ -38,6 +39,7 @@ class HomepageWidgetEntry {
 
 const defaultAllOrder = [
   'energy',
+  'aircon',
   'library',
   'schoolcard',
   'score',
@@ -57,6 +59,12 @@ final homepageRegistry = <HomepageWidgetEntry>[
     titleKey: 'homepage.electricity_card.title',
     gridSpan: 4,
     builder: (_, _) => EnergyCard(),
+  ),
+  HomepageWidgetEntry(
+    id: 'aircon',
+    titleKey: 'homepage.aircon_card.title',
+    gridSpan: 4,
+    builder: (_, _) => const AirconCard(),
   ),
   HomepageWidgetEntry(
     id: 'library',

@@ -3,6 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:watermeter/controller/aircon_controller.dart';
+import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
 import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
@@ -70,39 +73,36 @@ class AccountSection extends StatelessWidget {
             );
           },
         ),
-        // const Divider(),
-        // ListTile(
-        //   title: Text(
-        //     FlutterI18n.translate(context, "setting.aircon_imei_title"),
-        //   ),
-        //   subtitle: Text(
-        //     preference
-        //             .getString(preference.Preference.airconImei)
-        //             .isEmpty
-        //         ? FlutterI18n.translate(
-        //             context,
-        //             "setting.aircon_imei_not_set",
-        //           )
-        //         : FlutterI18n.translate(
-        //             context,
-        //             "setting.aircon_imei_current",
-        //             translationParams: {
-        //               "imei": preference.getString(
-        //                 preference.Preference.airconImei,
-        //               ),
-        //             },
-        //           ),
-        //   ),
-        //   trailing: const Icon(Icons.qr_code_scanner),
-        //   onTap: () {
-        //     showDialog(
-        //       context: context,
-        //       builder: (context) => const AirconImeiDialog(),
-        //     ).then((_) {
-        //       if (mounted) setState(() {});
-        //     });
-        //   },
-        // ),
+        const Divider(),
+        ListTile(
+          title: Text(
+            FlutterI18n.translate(context, "setting.aircon_imei_title"),
+          ),
+          subtitle: SignalBuilder(
+            builder: (context) {
+              final imei = AirconController.i.imeiSignal.value;
+              return Text(
+                imei.isEmpty
+                    ? FlutterI18n.translate(
+                        context,
+                        "setting.aircon_imei_not_set",
+                      )
+                    : FlutterI18n.translate(
+                        context,
+                        "setting.aircon_imei_current",
+                        translationParams: {"imei": imei},
+                      ),
+              );
+            },
+          ),
+          trailing: const Icon(Icons.qr_code_scanner),
+          onTap: () {
+            showDialog<void>(
+              context: context,
+              builder: (context) => const AirconImeiDialog(),
+            );
+          },
+        ),
       ],
     );
   }

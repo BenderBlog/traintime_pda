@@ -1,14 +1,12 @@
 // Copyright 2026 Traintime PDA Authours, originally by aqqkad.
 // SPDX-License-Identifier: MPL-2.0
 
-// TODO: Fully implement it.
-
-/*
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:watermeter/model/aircon_energy.dart';
+import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -16,6 +14,14 @@ import 'package:watermeter/repository/network_client.dart';
 
 class AirconSession {
   static const host = "gxkt.juhaolian.cn";
+  static const _userAgent =
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 26_5 like Mac OS X) "
+      "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 "
+      "MicroMessenger/8.0.73(0x18004939) NetType/WIFI Language/zh_CN";
+
+  AirconSession({Dio? client}) : _client = client ?? NetworkClients.otherDio;
+
+  final Dio _client;
 
   static const airconEnergyCache = "AirconEnergyCache.json";
   static File fileCache = File("${supportPath.path}/$airconEnergyCache");
@@ -95,32 +101,70 @@ class AirconSession {
     }
   }
 
-  Future<AirconEnergyInfo> getEnergyInfo(String imei) async {
-    final response = await NetworkClients.otherDio.get(
+  Future<AirconState> getDeviceState(String imei) async {
+    final result = await _requestDeviceState(imei);
+    return AirconState.fromJson(result);
+  }
+
+  Future<Map<String, dynamic>> _requestDeviceState(String imei) async {
+    final response = await _client.get(
       "https://$host/api/device/direct/state",
       queryParameters: {"imei": imei},
-      options: Options(contentType: Headers.jsonContentType),
+      options: Options(headers: _headers),
     );
-
-    final data = response.data;
-
-    if (data is! Map) {
-      log.error("[AirconSession][getEnergyInfo] response is not a map: $data");
-      throw const AirconEnergyParseException("response is not a map");
+    final data = _ensureSuccess(response.data);
+    final result = data["result"];
+    if (result is! Map) {
+      throw const AirconResponseException("返回结果不是设备状态");
     }
+    return Map<String, dynamic>.from(result);
+  }
 
-    if (data["success"] != true) {
-      throw AirconEnergyParseException(data["message"]?.toString() ?? "");
+  Future<void> sendCommand({
+    required String imei,
+    required Map<String, dynamic> command,
+  }) async {
+    final response = await _client.post(
+      "https://$host/api/device/direct/command",
+      data: {...command, "imei": imei},
+      options: Options(headers: _headers),
+    );
+    _ensureSuccess(response.data);
+  }
+
+  Future<AirconEnergyInfo> getEnergyInfo(String imei) async {
+    final state = await _requestDeviceState(imei);
+    final timestamp = state["timestamp"] is num
+        ? (state["timestamp"] as num).toInt()
+        : int.tryParse(state["timestamp"]?.toString() ?? "");
+    final electricAmount = state["electricAmount"] is num
+        ? state["electricAmount"] as num
+        : num.tryParse(state["electricAmount"]?.toString() ?? "");
+    if (timestamp == null || electricAmount == null) {
+      throw const AirconResponseException("空调用电数据不完整");
     }
 
     return AirconEnergyInfo(
-      imei: data["result"]["imei"] ?? "",
-      fetchTime: DateTime.fromMillisecondsSinceEpoch(data["timestamp"] as int),
-      stateTime: DateTime.fromMillisecondsSinceEpoch(
-        (data["result"]["timestamp"] as int) * 1000,
-      ),
-      electricAmount: data["result"]["electricAmount"],
+      imei: state["imei"]?.toString() ?? "",
+      fetchTime: DateTime.now(),
+      stateTime: DateTime.fromMillisecondsSinceEpoch(timestamp * 1000),
+      electricAmount: electricAmount,
     );
+  }
+
+  Map<String, String> get _headers => {
+    HttpHeaders.contentTypeHeader: Headers.jsonContentType,
+    HttpHeaders.userAgentHeader: _userAgent,
+  };
+
+  Map<dynamic, dynamic> _ensureSuccess(dynamic data) {
+    if (data is! Map) {
+      throw const AirconResponseException("服务器返回格式错误");
+    }
+    if (data["success"] != true) {
+      throw AirconResponseException(data["message"]?.toString() ?? "");
+    }
+    return data;
   }
 
   Future<FetchResult<AirconEnergyInfo>> getAirconEnergyInfo(String imei) async {
@@ -131,7 +175,7 @@ class AirconSession {
 
     try {
       log.info("[AirconSession][update] Fetching from Internet.");
-      var toReturn = await AirconSession().getEnergyInfo(imei);
+      var toReturn = await getEnergyInfo(imei);
       saveCache(toReturn);
       return FetchResult.fresh(fetchTime: fetchDay, data: toReturn);
     } catch (e, s) {
@@ -148,14 +192,13 @@ class AirconSession {
   }
 }
 
-class AirconEnergyParseException implements Exception {
+class AirconResponseException implements Exception {
   final String message;
 
-  const AirconEnergyParseException(this.message);
+  const AirconResponseException(this.message);
 
   @override
   String toString() => message.isEmpty
-      ? "Aircon energy response parse failed"
-      : "Aircon energy response parse failed: $message";
+      ? "Aircon request failed"
+      : "Aircon request failed: $message";
 }
-*/
