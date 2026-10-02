@@ -7,10 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/setting/class_table_preview.dart';
 import 'package:watermeter/themes/font_setting.dart';
 
 class FontSizePage extends StatefulWidget {
@@ -133,7 +132,13 @@ class _FontSizePageState extends State<FontSizePage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
-          const _ClassTablePreview(),
+          SignalBuilder(
+            builder: (context) {
+              ThemeController.i.fontScaleSignal.value;
+              ThemeController.i.fontWeightSignal.value;
+              return const ClassTablePreview();
+            },
+          ),
           SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -172,38 +177,4 @@ I'm worried for you all, truly. Your people are good at one thing. Running all o
       ),
     );
   }
-}
-
-/// A static (non-interactive) preview of the real second-week class table.
-class _ClassTablePreview extends StatelessWidget {
-  const _ClassTablePreview();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 560,
-      child: LayoutBuilder(
-        builder: (context, constraint) => ClassTableState(
-          constraints: constraint,
-          controllers: _PreviewClassTableState(),
-          child: IgnorePointer(
-            child: ClassTableView(index: 1, constraint: constraint),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// A class table state served from the real controller, without live marks.
-class _PreviewClassTableState extends ClassTableWidgetState {
-  _PreviewClassTableState();
-
-  /// Show the second week directly, ignore the user's week offset.
-  @override
-  int get offset => 0;
-
-  /// A fixed time in the past, hides the timeline and completion marks.
-  @override
-  DateTime get currentTime => DateTime(2000, 1, 1);
 }

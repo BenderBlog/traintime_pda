@@ -43,6 +43,7 @@ class ClassCard extends StatelessWidget {
       palette: color,
       isCompleted: true,
     );
+    final isInteractive = classTableState.isClassCardInteractive(detail);
 
     const borderRadius = BorderRadius.all(Radius.circular(8));
     return Padding(
@@ -91,89 +92,95 @@ class ClassCard extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     overlayColor: Colors.transparent,
                   ),
-                  onPressed: () async {
-                    final controller = ClassTableState.of(context)!.controllers;
+                  onPressed: isInteractive
+                      ? () async {
+                          final controller = ClassTableState.of(
+                            context,
+                          )!.controllers;
 
-                    /// The way to show the class info of the period.
-                    /// The last one indicate whether to delete this stuff.
-                    final action = await BothSideSheet.show(
-                      title: FlutterI18n.translate(
-                        context,
-                        "classtable.class_card.title",
-                      ),
-                      child: ArrangementDetail(
-                        information: List.generate(data.length, (index) {
-                          if (data.elementAt(index) is Subject ||
-                              data.elementAt(index) is ExperimentData) {
-                            return data.elementAt(index);
-                          } else if (data.elementAt(index)
-                              is (
-                                CustomClass,
-                                CustomClassTimeRange,
-                                MaterialColor,
-                              )) {
-                            return data.elementAt(index);
-                          } else if (data.elementAt(index)
-                              is (CustomClass, CustomClassTimeRange)) {
-                            return data.elementAt(index);
-                          } else if (data.elementAt(index) is TimeArrangement) {
-                            final TimeArrangement arrangement =
-                                data.elementAt(index);
-                            return (
-                              classTableState.getClassDetail(
-                                classTableState.timeArrangement.indexOf(
-                                  arrangement,
-                                ),
-                              ),
-                              arrangement,
-                            );
-                          } else {
-                            return data.elementAt(index);
+                          /// The way to show the class info of the period.
+                          /// The last one indicate whether to delete this stuff.
+                          final action = await BothSideSheet.show(
+                            title: FlutterI18n.translate(
+                              context,
+                              "classtable.class_card.title",
+                            ),
+                            child: ArrangementDetail(
+                              information: List.generate(data.length, (index) {
+                                if (data.elementAt(index) is Subject ||
+                                    data.elementAt(index) is ExperimentData) {
+                                  return data.elementAt(index);
+                                } else if (data.elementAt(index)
+                                    is (
+                                      CustomClass,
+                                      CustomClassTimeRange,
+                                      MaterialColor,
+                                    )) {
+                                  return data.elementAt(index);
+                                } else if (data.elementAt(index)
+                                    is (CustomClass, CustomClassTimeRange)) {
+                                  return data.elementAt(index);
+                                } else if (data.elementAt(index)
+                                    is TimeArrangement) {
+                                  final TimeArrangement arrangement = data
+                                      .elementAt(index);
+                                  return (
+                                    classTableState.getClassDetail(
+                                      classTableState.timeArrangement.indexOf(
+                                        arrangement,
+                                      ),
+                                    ),
+                                    arrangement,
+                                  );
+                                } else {
+                                  return data.elementAt(index);
+                                }
+                              }),
+                              currentWeek: classTableState.currentWeek,
+                            ),
+                            context: context,
+                          );
+                          if (!context.mounted || action == null) return;
+
+                          if (action is (String, String?, String)) {
+                            final int customIndex = controller.customClasses
+                                .indexWhere((custom) => custom.id == action.$1);
+                            if (customIndex < 0) return;
+
+                            if (action.$3 == 'delete_all') {
+                              await controller.deleteCustomClassById(action.$1);
+                            } else if (action.$3 == 'delete_one') {
+                              final String? timeRangeId = action.$2;
+                              if (timeRangeId == null) return;
+                              await controller.deleteCustomClassTimeRange(
+                                customClassId: action.$1,
+                                timeRangeId: timeRangeId,
+                              );
+                            } else if (action.$3 == 'edit') {
+                              final CustomClass customClass =
+                                  controller.customClasses[customIndex];
+                              await Navigator.of(context)
+                                  .push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ClassAddWindow(
+                                        customToChange: customClass,
+                                        semesterLength:
+                                            controller.semesterLength,
+                                      ),
+                                    ),
+                                  )
+                                  .then((value) async {
+                                    if (value is CustomClass) {
+                                      await controller.editCustomClassById(
+                                        action.$1,
+                                        value,
+                                      );
+                                    }
+                                  });
+                            }
                           }
-                        }),
-                        currentWeek: classTableState.currentWeek,
-                      ),
-                      context: context,
-                    );
-                    if (!context.mounted || action == null) return;
-
-                    if (action is (String, String?, String)) {
-                      final int customIndex = controller.customClasses
-                          .indexWhere((custom) => custom.id == action.$1);
-                      if (customIndex < 0) return;
-
-                      if (action.$3 == 'delete_all') {
-                        await controller.deleteCustomClassById(action.$1);
-                      } else if (action.$3 == 'delete_one') {
-                        final String? timeRangeId = action.$2;
-                        if (timeRangeId == null) return;
-                        await controller.deleteCustomClassTimeRange(
-                          customClassId: action.$1,
-                          timeRangeId: timeRangeId,
-                        );
-                      } else if (action.$3 == 'edit') {
-                        final CustomClass customClass =
-                            controller.customClasses[customIndex];
-                        await Navigator.of(context)
-                            .push(
-                              MaterialPageRoute(
-                                builder: (context) => ClassAddWindow(
-                                  customToChange: customClass,
-                                  semesterLength: controller.semesterLength,
-                                ),
-                              ),
-                            )
-                            .then((value) async {
-                              if (value is CustomClass) {
-                                await controller.editCustomClassById(
-                                  action.$1,
-                                  value,
-                                );
-                              }
-                            });
-                      }
-                    }
-                  },
+                        }
+                      : null,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: isPhone(context) ? 2 : 4,

@@ -148,24 +148,6 @@ classtable:
     switch_semester: 切换课程表学期
     current_time_settings: 时间指示设置
     class_color_settings: 课表样式设置
-  visual_settings:
-    current_time_settings_title: 时间指示设置
-    class_color_settings_title: 课表样式设置
-    completed_style_enabled: 已结束课程样式区分
-    current_time_section: 时间指示
-    show_current_time_indicator: 显示当前时间指示线
-    show_current_time_label: 显示迷你数字时钟
-    show_today_column_highlight: 强调显示今天的纵列
-    unfinished_section: 课程样式
-    active_brightness_factor: "亮度: {value}"
-    active_border_alpha: "边框透明度: {value}"
-    active_inner_alpha: "底色透明度: {value}"
-    completed_section: 已结束课程样式
-    completed_saturation_factor: "底色饱和度: {value}"
-    completed_brightness_factor: "亮度: {value}"
-    completed_text_saturation_factor: "文字饱和度: {value}"
-    completed_border_alpha: "边框透明度: {value}"
-    completed_inner_alpha: "底色透明度: {value}"
   status_source:
     class_table: 课表
     exam: 考试
@@ -307,6 +289,7 @@ club_promotion:
 electricity:
   title: 水电信息
   power_title: 电量信息
+  power_metid_title: 电表 {code}
   cache_hint_login_failed: 登录电费服务失败，正在显示缓存数据。
   cache_hint_network_failed: 电费服务网络请求失败，正在显示缓存数据。
   cache_hint_unknown_error: 在线获取电费失败，正在显示缓存数据。详细错误请查看日志。
@@ -319,7 +302,7 @@ electricity:
   not_enough_data: 数据量不足以用于渲染
   info: "历史记录依旧为本地记录，平均日用量基于抄表记录计算。"
   fetching_hint: 正在获取最新电费信息
-  fetch_error: 电费信息获取失败，请重试。
+  fetch_error: 电费信息获取失败，请重试
   date: 日期
   power: 该日0点电量
   update: 刷新信息
@@ -328,8 +311,9 @@ electricity:
   water_usage_read_now: 本次读数
   water_usage: 热水用量
   water_title: 水费信息
+  weter_metid_title: 水表 {code}
   water_loading: 正在加载水费信息
-  water_unavailable: 水费信息暂不可用，请在电费卡片重试。
+  water_unavailable: 水费信息暂不可用，请点击右上角刷新重试。
   water_empty: 暂无水费信息
   not_school_network: 非校园网访问
   aircon_title: 空调用电
@@ -372,6 +356,12 @@ empty_classroom:
   classroom: 教室
   empty: 空闲
   occupied: 占用
+  now_ongoing: 现在 · 第 {period} 节 {start}-{end}
+  now_upcoming: 即将 · 第 {period} 节 {start}-{end}
+  now_free: 空闲 {free}/{total} 间
+  only_free_now: 只看现在空闲
+  no_free_now: 现在没有空闲教室
+  classes_over: 今天的课已经结束了
 exam:
   title: 考试安排
   cache_hint: 已显示缓存考试安排信息
@@ -931,6 +921,27 @@ setting:
   background: 开启课表背景图
   no_background: 你先选个图片罢，就在下面
   choose_background: 课表背景图选择
+  class_table_style_setting: 课表显示与样式
+  class_table_style_description: 时间指示和课程卡片样式
+  class_table_style_page:
+    current_time_settings_title: 时间指示设置
+    class_color_settings_title: 课表样式设置
+    current_time_section: 时间指示设置
+    show_current_time_indicator: 显示当前时间指示线
+    show_current_time_label: 显示迷你数字时钟
+    show_today_column_highlight: 强调显示今天的纵列
+    active_section: 课程卡片样式
+    unfinished_section: 课程卡片样式
+    active_brightness_factor: "亮度: {value}"
+    active_border_alpha: "边框透明度: {value}"
+    active_inner_alpha: "底色透明度: {value}"
+    completed_section: 已结束课程样式
+    completed_style_enabled: 已结束课程样式区分
+    completed_saturation_factor: "底色饱和度: {value}"
+    completed_brightness_factor: "亮度: {value}"
+    completed_text_saturation_factor: "文字饱和度: {value}"
+    completed_border_alpha: "边框透明度: {value}"
+    completed_inner_alpha: "底色透明度: {value}"
   no_permission: 未获取存储权限，无法读取文件
   successful_setting: 设定成功
   failure_setting: 你没有选图片捏
@@ -1233,6 +1244,7 @@ electricity_status:
   need_account: 需要填写电费账号
   captcha_failed: 验证码识别失败
   other_issue: 程序故障
+  no_electricity_info: 没有电表信息
 school_card_status:
   failed_to_fetch: 获取失败
   failed_to_query: 查询失败

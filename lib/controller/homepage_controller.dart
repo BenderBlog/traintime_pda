@@ -14,6 +14,7 @@ import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
+import 'package:watermeter/controller/sport_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/password_exceptions.dart';
@@ -45,8 +46,10 @@ class HomepageController {
     WeekSwiftController.i;
     ClassTableController.i;
     ExamController.i;
-    OtherExperimentController.i;
-    PhysicsExperimentController.i;
+    if (!preference.getBool(preference.Preference.role)) {
+      OtherExperimentController.i;
+      PhysicsExperimentController.i;
+    }
   }
 
   Future<void> _comboLogin({
@@ -111,14 +114,19 @@ class HomepageController {
     await Future.wait([
       _safeReload("Classtable", ClassTableController.i.reloadClassTable),
       _safeReload("Exam", ExamController.i.reloadExamInfo),
-      _safeReload(
-        "PhysicsExperiment",
-        PhysicsExperimentController.i.reloadPhysicsExperiment,
-      ),
-      _safeReload(
-        "OtherExperiment",
-        OtherExperimentController.i.reloadOtherExperiment,
-      ),
+      if (!preference.getBool(preference.Preference.role)) ...[
+        _safeReload(
+          "PhysicsExperiment",
+          PhysicsExperimentController.i.reloadPhysicsExperiment,
+        ),
+        _safeReload(
+          "OtherExperiment",
+          OtherExperimentController.i.reloadOtherExperiment,
+        ),
+        _safeReload("Sport", () async {
+          await SportController.i.reloadClass();
+        }),
+      ],
       _safeReload("Library", LibraryController.i.reloadBorrowList),
       _safeReload("SchoolCard", SchoolCardController.i.reloadOverview),
       _safeReload("Electricity", EnergyController.i.refreshElectricityInfo),
@@ -208,6 +216,10 @@ class HomepageController {
 
   late final physicsExperimentSourceStateComputedSignal =
       computed<HomepageSourceState>(() {
+        if (preference.getBool(preference.Preference.role)) {
+          return HomepageSourceState.none;
+        }
+
         final state =
             PhysicsExperimentController.i.physicsExperimentStateSignal.value;
         if (state.isLoading) {
@@ -229,6 +241,10 @@ class HomepageController {
 
   late final otherExperimentSourceStateComputedSignal =
       computed<HomepageSourceState>(() {
+        if (preference.getBool(preference.Preference.role)) {
+          return HomepageSourceState.none;
+        }
+
         final state =
             OtherExperimentController.i.otherExperimentStateSignal.value;
         if (state.isLoading) {
@@ -262,11 +278,16 @@ class HomepageController {
       ...ClassTableController.i.arrangementOfTodayComputedSignal.value,
       ..._getCustomClassOfDay(GlobalTimerController.i.currentTimeSignal.value),
       ...ExamController.i.todayExams.value,
-      ...PhysicsExperimentController
-          .i
-          .physicsExperimentOfTodayComputedSignal
-          .value,
-      ...OtherExperimentController.i.otherExperimentOfTodayComputedSignal.value,
+      if (!preference.getBool(preference.Preference.role)) ...[
+        ...PhysicsExperimentController
+            .i
+            .physicsExperimentOfTodayComputedSignal
+            .value,
+        ...OtherExperimentController
+            .i
+            .otherExperimentOfTodayComputedSignal
+            .value,
+      ],
     ]),
   );
 
@@ -280,14 +301,16 @@ class HomepageController {
             ),
           ),
           ...ExamController.i.tomorrowExams.value,
-          ...PhysicsExperimentController
-              .i
-              .physicsExperimentOfTomorrowComputedSignal
-              .value,
-          ...OtherExperimentController
-              .i
-              .otherExperimentOfTomorrowComputedSignal
-              .value,
+          if (!preference.getBool(preference.Preference.role)) ...[
+            ...PhysicsExperimentController
+                .i
+                .physicsExperimentOfTomorrowComputedSignal
+                .value,
+            ...OtherExperimentController
+                .i
+                .otherExperimentOfTomorrowComputedSignal
+                .value,
+          ],
         ]),
       );
 

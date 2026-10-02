@@ -76,12 +76,14 @@ class InfoItem extends StatelessWidget {
   final String label;
   final String? value;
   final Color? valueColor;
+  final bool isWhiteBackground;
   const InfoItem({
     super.key,
     required this.icon,
     required this.label,
     this.value,
     this.valueColor,
+    this.isWhiteBackground = true,
   });
 
   @override

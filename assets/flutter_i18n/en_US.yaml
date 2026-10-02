@@ -160,24 +160,6 @@ classtable:
     switch_semester: Switch classtable semester
     current_time_settings: Time indicator settings
     class_color_settings: Class color settings
-  visual_settings:
-    current_time_settings_title: Time indicator settings
-    class_color_settings_title: Class color settings
-    completed_style_enabled: Completed class styling distinction
-    current_time_section: Time indicators
-    show_current_time_indicator: Show current time indicator
-    show_current_time_label: Show mini time label
-    show_today_column_highlight: Highlight today's column
-    unfinished_section: Class style
-    active_brightness_factor: "Brightness: {value}"
-    active_border_alpha: "Border opacity: {value}"
-    active_inner_alpha: "Fill opacity: {value}"
-    completed_section: Completed class style
-    completed_saturation_factor: "Fill saturation: {value}"
-    completed_brightness_factor: "Brightness: {value}"
-    completed_text_saturation_factor: "Text saturation: {value}"
-    completed_border_alpha: "Border opacity: {value}"
-    completed_inner_alpha: "Fill opacity: {value}"
   status_source:
     class_table: Class Table
     exam: Exams
@@ -343,6 +325,7 @@ club_promotion:
 electricity:
   title: Power Info
   power_title: Infomation
+  power_metid_title: Electricity meter {code}
   cache_hint_login_failed:
     Failed to log in to the electricity service, showing cached
     data.
@@ -370,8 +353,9 @@ electricity:
   water_usage_read_now: This time
   water_usage: Bath water usage
   water_title: Water usage
+  weter_metid_title: Watermeter {code}
   water_loading: Loading water usage information
-  water_unavailable: Water usage is unavailable. Retry from the electricity card.
+  water_unavailable: Water usage is unavailable. Retry using the refresh button in the top right.
   water_empty: No water usage information
   not_school_network: Not school network
   aircon_title: Aircon Electricity
@@ -414,6 +398,12 @@ empty_classroom:
   classroom: Classroom
   empty: Available
   occupied: Occupied
+  now_ongoing: "Now · Period {period} {start}-{end}"
+  now_upcoming: "Next · Period {period} {start}-{end}"
+  now_free: "{free} of {total} free"
+  only_free_now: Only free ones now
+  no_free_now: No classroom is free right now
+  classes_over: The classes of today are over
 exam:
   title: Exam Schedule
   cache_hint: Displaying cached exam schedule info
@@ -1022,6 +1012,27 @@ setting:
   background: Background image
   no_background: You need to select an image first, it's at below
   choose_background: Choose background image
+  class_table_style_setting: Class schedule display & style
+  class_table_style_description: Time indicator and course card style
+  class_table_style_page:
+    current_time_settings_title: Time indicator settings
+    class_color_settings_title: Class schedule style settings
+    current_time_section: Time indicator settings
+    show_current_time_indicator: Show current time indicator
+    show_current_time_label: Show mini time label
+    show_today_column_highlight: Highlight today's column
+    active_section: Course card style
+    unfinished_section: Course card style
+    active_brightness_factor: "Brightness: {value}"
+    active_border_alpha: "Border opacity: {value}"
+    active_inner_alpha: "Fill opacity: {value}"
+    completed_section: Completed class style
+    completed_style_enabled: Completed class styling distinction
+    completed_saturation_factor: "Fill saturation: {value}"
+    completed_brightness_factor: "Brightness: {value}"
+    completed_text_saturation_factor: "Text saturation: {value}"
+    completed_border_alpha: "Border opacity: {value}"
+    completed_inner_alpha: "Fill opacity: {value}"
   no_permission: No storage permission obtained, cannot read files
   successful_setting: Successfully set
   failure_setting: You did not select an image
@@ -1371,6 +1382,7 @@ electricity_status:
   need_account: Need to input electricity account
   captcha_failed: Failed to check captcha
   other_issue: Program malfunction
+  no_electricity_info: No electricity meter info
 school_card_status:
   failed_to_fetch: Failed fetching
   failed_to_query: Failed querying

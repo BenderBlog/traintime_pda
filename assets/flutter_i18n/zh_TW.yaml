@@ -149,24 +149,6 @@ classtable:
     switch_semester: 切換課程表學期
     current_time_settings: 時間指示設置
     class_color_settings: 課表樣式設置
-  visual_settings:
-    current_time_settings_title: 時間指示設置
-    class_color_settings_title: 課表樣式設置
-    completed_style_enabled: 已結束課程樣式區分
-    current_time_section: 時間指示
-    show_current_time_indicator: 顯示當前時間指示線
-    show_current_time_label: 顯示迷你數字時鐘
-    show_today_column_highlight: 強調顯示今天的縱列
-    unfinished_section: 課程樣式
-    active_brightness_factor: '亮度: {value}'
-    active_border_alpha: '邊框透明度: {value}'
-    active_inner_alpha: '底色透明度: {value}'
-    completed_section: 已結束課程樣式
-    completed_saturation_factor: '底色飽和度: {value}'
-    completed_brightness_factor: '亮度: {value}'
-    completed_text_saturation_factor: '文字飽和度: {value}'
-    completed_border_alpha: '邊框透明度: {value}'
-    completed_inner_alpha: '底色透明度: {value}'
   status_source:
     class_table: 課表
     exam: 考試
@@ -306,6 +288,7 @@ club_promotion:
 electricity:
   title: 水電信息
   power_title: 電量信息
+  power_metid_title: 電錶 {code}
   cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
   cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
   cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
@@ -318,7 +301,7 @@ electricity:
   not_enough_data: 數據量不足以用於渲染
   info: 歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。
   fetching_hint: 正在獲取最新電費信息
-  fetch_error: 電費信息獲取失敗，請重試。
+  fetch_error: 電費信息獲取失敗，請重試
   date: 日期
   power: 該日0點電量
   update: 刷新信息
@@ -327,8 +310,9 @@ electricity:
   water_usage_read_now: 本次讀數
   water_usage: 熱水用量
   water_title: 水費信息
+  weter_metid_title: 水錶 {code}
   water_loading: 正在加載水費信息
-  water_unavailable: 水費信息暫不可用，請在電費卡片重試。
+  water_unavailable: 水費信息暫不可用，請點擊右上角刷新重試。
   water_empty: 暫無水費信息
   not_school_network: 非校園網訪問
   aircon_title: 空調用電
@@ -371,6 +355,12 @@ empty_classroom:
   classroom: 教室
   empty: 空閒
   occupied: 佔用
+  now_ongoing: 現在 · 第 {period} 節 {start}-{end}
+  now_upcoming: 即將 · 第 {period} 節 {start}-{end}
+  now_free: 空閒 {free}/{total} 間
+  only_free_now: 只看現在空閒
+  no_free_now: 現在沒有空閒教室
+  classes_over: 今天的課已經結束了
 exam:
   title: 考試安排
   cache_hint: 已顯示緩存考試安排信息
@@ -929,6 +919,27 @@ setting:
   background: 開啟課表背景圖
   no_background: 你先選個圖片罷，就在下面
   choose_background: 課表背景圖選擇
+  class_table_style_setting: 課表顯示與樣式
+  class_table_style_description: 時間指示和課程卡片樣式
+  class_table_style_page:
+    current_time_settings_title: 時間指示設置
+    class_color_settings_title: 課表樣式設置
+    current_time_section: 時間指示設置
+    show_current_time_indicator: 顯示當前時間指示線
+    show_current_time_label: 顯示迷你數字時鐘
+    show_today_column_highlight: 強調顯示今天的縱列
+    active_section: 課程卡片樣式
+    unfinished_section: 課程卡片樣式
+    active_brightness_factor: '亮度: {value}'
+    active_border_alpha: '邊框透明度: {value}'
+    active_inner_alpha: '底色透明度: {value}'
+    completed_section: 已結束課程樣式
+    completed_style_enabled: 已結束課程樣式區分
+    completed_saturation_factor: '底色飽和度: {value}'
+    completed_brightness_factor: '亮度: {value}'
+    completed_text_saturation_factor: '文字飽和度: {value}'
+    completed_border_alpha: '邊框透明度: {value}'
+    completed_inner_alpha: '底色透明度: {value}'
   no_permission: 未獲取存儲權限，無法讀取文件
   successful_setting: 設定成功
   failure_setting: 你沒有選圖片捏
@@ -1229,6 +1240,7 @@ electricity_status:
   need_account: 需要填寫電費賬號
   captcha_failed: 驗證碼識別失敗
   other_issue: 程序故障
+  no_electricity_info: 沒有電錶信息
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗

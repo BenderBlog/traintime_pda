@@ -13,12 +13,18 @@ import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/ids_session/sysj_session.dart';
+import 'package:watermeter/repository/preference.dart' as pref;
 
 class OtherExperimentController {
   static final OtherExperimentController i = OtherExperimentController._();
   final session = SysjSession();
 
   OtherExperimentController._() {
+    if (pref.getBool(pref.Preference.role)) {
+      _setUnavailableForPostgraduate();
+      return;
+    }
+
     /// Load from cache at the beginning
     final cache = session.getCache();
     if (cache != null) {
@@ -27,6 +33,16 @@ class OtherExperimentController {
       otherExperimentStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
+  }
+
+  void _setUnavailableForPostgraduate() {
+    _lastValidOtherExperiment.value = null;
+    otherExperimentStateSignal.value = AsyncState.data(
+      FetchResult.fresh(
+        fetchTime: DateTime.now(),
+        data: const <ExperimentData>[],
+      ),
+    );
   }
 
   final _lastValidOtherExperiment = signal<FetchResult<List<ExperimentData>>?>(
@@ -40,6 +56,11 @@ class OtherExperimentController {
 
   void _initEffects() {
     effect(() {
+      if (pref.getBool(pref.Preference.role)) {
+        _setUnavailableForPostgraduate();
+        return;
+      }
+
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
       if (semesterChangeEvent == null ||
@@ -57,6 +78,11 @@ class OtherExperimentController {
   }
 
   Future<void> reloadOtherExperiment() async {
+    if (pref.getBool(pref.Preference.role)) {
+      _setUnavailableForPostgraduate();
+      return;
+    }
+
     final previous = _lastValidOtherExperiment.value;
     otherExperimentStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
