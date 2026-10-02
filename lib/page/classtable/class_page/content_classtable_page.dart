@@ -26,7 +26,6 @@ import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/display_corner.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -37,8 +36,7 @@ class ContentClassTablePage extends StatefulWidget {
   State<StatefulWidget> createState() => _ContentClassTablePageState();
 }
 
-class _ContentClassTablePageState extends State<ContentClassTablePage>
-    with WidgetsBindingObserver {
+class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// Check whether listener is pushed...
   //bool isPushedListener = false;
 
@@ -55,33 +53,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage>
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
   bool _didLoadVisualSettings = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    /// The corners of the display are not part of the window insets, they have
-    /// to be queried from the platform. The sheet is laid out again once they
-    /// are known.
-    _loadDisplayCorner();
-  }
-
-  /// The window just changed size, which is also what happens when the app goes
-  /// into a floating window or into a split screen. The corners of the display
-  /// no longer cover anything there, so the sheet has to be measured again.
-  @override
-  void didChangeMetrics() {
-    _loadDisplayCorner();
-  }
-
-  void _loadDisplayCorner() {
-    DisplayCorner.refresh().then((_) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-  }
 
   void _switchPage() {
     if (!mounted) {
@@ -108,7 +79,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     classTableState.removeListener(_switchPage);
     super.dispose();
   }
@@ -164,9 +134,18 @@ class _ContentClassTablePageState extends State<ContentClassTablePage>
     /// screen only reaches in about half of its radius where the sheet starts.
     /// Keeping the whole radius free left a lot of empty room on devices with
     /// round corners, so only half of it is kept, within sane limits.
-    final corners = DisplayCorner.radii;
+    ///
+    /// The radii come from [MediaQuery.displayCornerRadiiOf], which the platform
+    /// fills in on Android 12 and later and leaves null everywhere else. Reading
+    /// them there also means this page is rebuilt whenever they change, so the
+    /// window does not have to be watched by hand.
+    final corners = MediaQuery.displayCornerRadiiOf(context);
+    final cornerRadius = math.max(
+      corners?.bottomLeft.y ?? 0,
+      corners?.bottomRight.y ?? 0,
+    );
     final cornerInset = math.min(
-      math.max(corners.bottom / 2, classTableMinimumBottomInset),
+      math.max(cornerRadius / 2, classTableMinimumBottomInset),
       classTableMaximumBottomInset,
     );
     return EdgeInsets.fromLTRB(
