@@ -9,7 +9,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/display_corner.dart';
 import 'package:watermeter/repository/notification/course_live_update_service.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 
@@ -27,7 +26,8 @@ class _CourseLiveUpdateDebugCardState extends State<CourseLiveUpdateDebugCard> {
   bool _hasNotificationPermission = false;
   bool _isBusy = false;
 
-  DisplayCornerRadii _corners = DisplayCornerRadii.zero;
+  /// 屏幕圆角，由系统的 MediaQuery 提供（只在 Android 12+ 有值）。
+  BorderRadius? _corners = BorderRadius.zero;
   EdgeInsets _systemInsets = EdgeInsets.zero;
 
   List<CourseLiveUpdateEvent> _upcoming = [];
@@ -61,7 +61,6 @@ class _CourseLiveUpdateDebugCardState extends State<CourseLiveUpdateDebugCard> {
     final diagnostics = supported
         ? await service.diagnostics()
         : const <String, dynamic>{};
-    await DisplayCorner.refresh();
 
     if (!mounted) {
       return;
@@ -72,7 +71,7 @@ class _CourseLiveUpdateDebugCardState extends State<CourseLiveUpdateDebugCard> {
       _isSupported = supported;
       _hasNotificationPermission = permission;
       _diagnostics = diagnostics;
-      _corners = DisplayCorner.radii;
+      _corners = media.displayCornerRadii;
       _systemInsets = media.viewPadding;
       _badgeStyle = CourseLiveUpdateBadgeStyle.fromIndex(
         diagnostics["badgeStyle"],
@@ -296,10 +295,12 @@ class _CourseLiveUpdateDebugCardState extends State<CourseLiveUpdateDebugCard> {
             ),
             _infoRow(
               "屏幕圆角半径",
-              "左上 ${_corners.topLeft.toStringAsFixed(1)} / "
-                  "右上 ${_corners.topRight.toStringAsFixed(1)} / "
-                  "左下 ${_corners.bottomLeft.toStringAsFixed(1)} / "
-                  "右下 ${_corners.bottomRight.toStringAsFixed(1)} dp",
+              _corners == null
+                  ? "系统没有提供（非 Android 12+）"
+                  : "左上 ${_corners!.topLeft.x.toStringAsFixed(1)} / "
+                        "右上 ${_corners!.topRight.x.toStringAsFixed(1)} / "
+                        "左下 ${_corners!.bottomLeft.x.toStringAsFixed(1)} / "
+                        "右下 ${_corners!.bottomRight.x.toStringAsFixed(1)} dp",
             ),
 
             /// 徽标由平台侧的代码决定，iOS 上没有这个设置。
