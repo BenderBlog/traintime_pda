@@ -61,3 +61,7 @@ app.*.map.json
 docs/superpowers/plans/2026-07-26-aircon-meter-logger.md
 # Widget Preview related
 .widget_preview/
+
+# Local research and audit notes
+/docs/apple_watch_code_audit.md
+/docs/dlut_*

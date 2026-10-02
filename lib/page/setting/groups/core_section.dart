@@ -25,6 +25,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/repository/watch/watch_schedule_sync_service.dart';
 
 class CoreSection extends StatelessWidget {
   const CoreSection({super.key});
@@ -79,6 +80,8 @@ class CoreSection extends StatelessWidget {
                         "setting.clear_and_restart_dialog.cleaning",
                       ),
                     );
+
+                    await WatchScheduleSyncService.instance.clear();
 
                     /// Clean Cookie
                     try {
@@ -161,6 +164,8 @@ class CoreSection extends StatelessWidget {
                       ),
                     );
 
+                    await syncWidgetLoginState(false);
+
                     /// Clean Cookie
                     try {
                       await NetworkCookieJars.ids.deleteAll();
@@ -199,9 +204,6 @@ class CoreSection extends StatelessWidget {
 
                     /// Theme back to default
                     ThemeController.i.updateTheme();
-
-                    /// Sync widget login state
-                    await syncWidgetLoginState(false);
 
                     /// Clean iOS widget data files
                     await clearWidgetFiles();
