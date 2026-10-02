@@ -10,6 +10,7 @@ import 'package:watermeter/model/time_list.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_table_time_column_layout.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
@@ -46,7 +47,10 @@ class ClassTableView extends StatefulWidget {
 class _ClassTableViewState extends State<ClassTableView> {
   late ClassTableWidgetState classTableState;
   late BoxConstraints size;
+  late ClassTableTimeColumnLayout _timeColumnLayout;
   bool _isListening = false;
+
+  double get _timeColumnWidth => _timeColumnLayout.width;
 
   DateTime get _visibleWeekStart => classTableState.startDay
       .add(Duration(days: 7 * classTableState.offset))
@@ -80,7 +84,7 @@ class _ClassTableViewState extends State<ClassTableView> {
     context: context,
     now: classTableState.currentTime,
     weekStart: _visibleWeekStart,
-    leftRow: leftRow,
+    leftRow: _timeColumnWidth,
     blockWidth: blockwidth,
     blockHeight: blockheight,
   );
@@ -89,25 +93,23 @@ class _ClassTableViewState extends State<ClassTableView> {
     context: context,
     now: classTableState.currentTime,
     weekStart: _visibleWeekStart,
-    leftRow: leftRow,
+    leftRow: _timeColumnWidth,
     blockWidth: blockwidth,
     blockHeight: blockheight,
   );
 
   /// The height of one of the 61 blocks of a day.
   ///
-  /// It never falls below [minBlockUnitHeight]: in a window which is much
-  /// shorter than the display of a phone the blocks would otherwise be squeezed
-  /// until the cards of the classes lose their text.
+  /// Its minimum also accounts for the time labels at the current font scale.
   double get _blockUnit => math.max(
     (widget.constraint.minHeight - midRowHeight) / (isPhone(context) ? 48 : 61),
-    minBlockUnitHeight,
+    _timeColumnLayout.minimumBlockHeight,
   );
 
   /// The height of the class card.
   double blockheight(double count) => count * _blockUnit;
 
-  double get blockwidth => (size.maxWidth - leftRow) / 7;
+  double get blockwidth => (size.maxWidth - _timeColumnWidth) / 7;
 
   /// The class table are divided into 8 rows, the leftest row is the index row.
   List<Widget> classSubRow(bool isRest) {
@@ -130,7 +132,7 @@ class _ClassTableViewState extends State<ClassTableView> {
             Positioned(
               top: blockheight(i.start),
               height: blockheight(i.stop - i.start),
-              left: leftRow + blockwidth * (index - 1),
+              left: _timeColumnWidth + blockwidth * (index - 1),
               width: blockwidth,
               child: ClassCard(detail: i, completedHeight: completedHeight),
             ),
@@ -158,7 +160,7 @@ class _ClassTableViewState extends State<ClassTableView> {
                 ).split("\n").map((e) => Text(e)),
               ],
             ),
-          ).padding(left: leftRow),
+          ).padding(left: _timeColumnWidth),
         );
       }
 
@@ -196,7 +198,7 @@ class _ClassTableViewState extends State<ClassTableView> {
                   ? "classtable.noon_break"
                   : "classtable.supper_break",
             ),
-            style: const TextStyle(fontSize: 12),
+            style: _timeColumnLayout.breakStyle,
             textAlign: TextAlign.center,
           ).center();
         } else {
@@ -205,26 +207,30 @@ class _ClassTableViewState extends State<ClassTableView> {
             children: [
               Text(
                 timeList[indexOfChar * 2],
-                style: const TextStyle(fontSize: 8),
+                style: _timeColumnLayout.timeStyle,
                 textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
               ),
-              Text("${indexOfChar + 1}", textAlign: TextAlign.center),
+              Text(
+                "${indexOfChar + 1}",
+                style: _timeColumnLayout.periodStyle,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+              ),
               Text(
                 timeList[indexOfChar * 2 + 1],
-                style: const TextStyle(fontSize: 8),
+                style: _timeColumnLayout.timeStyle,
                 textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
               ),
             ],
           );
         }
 
-        return DefaultTextStyle.merge(
-          style: TextStyle(
-            fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          child: SizedBox(width: leftRow, height: height, child: cell),
-        );
+        return SizedBox(width: _timeColumnWidth, height: height, child: cell);
       });
     }
   }
@@ -263,12 +269,15 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   @override
   Widget build(BuildContext context) {
+    _timeColumnLayout = ClassTableTimeColumnLayout.of(context);
     return [
       /// The main class table.
       ClassTableDateRow(
         firstDay: classTableState.startDay
             .add(Duration(days: 7 * classTableState.offset))
             .add(Duration(days: 7 * widget.index)),
+        timeColumnWidth: _timeColumnWidth,
+        dayColumnWidth: blockwidth,
       ),
 
       /// The rest of the table.
@@ -280,7 +289,7 @@ class _ClassTableViewState extends State<ClassTableView> {
                     context,
                   ).colorScheme.surface.withValues(alpha: 0.75),
                 )
-                .constrained(width: leftRow)
+                .constrained(width: _timeColumnWidth)
                 /// 时间轴的底色一直铺到最底下（`top`/`bottom` 一起给就是拉满
                 /// 高度），这样末尾那点余地不会有"断了一截"的缝。
                 .positioned(left: 0, top: 0, bottom: 0),
