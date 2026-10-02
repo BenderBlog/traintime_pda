@@ -365,8 +365,8 @@ electricity:
   aircon_waiting: Waiting to fetch aircon electricity data
   aircon_error: Failed to fetch aircon electricity data
   aircon_retry: Retry
-  aircon_imei_missing: Add the aircon IMEI to view its electricity usage.
-  aircon_add_imei: Add aircon IMEI
+  aircon_imei_missing: Scan the air conditioner's QR code to add it, or select a QR code image.
+  aircon_add_imei: Add aircon information
   aircon_cache_notice: "Showing cached aircon data from {time}"
   aircon_remote: Aircon Remote
   aircon_control_error: Unable to fetch the aircon state

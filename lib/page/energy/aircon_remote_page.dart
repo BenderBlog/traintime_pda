@@ -285,9 +285,8 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                     "electricity.aircon_target_temperature",
                   ),
                 ),
-                subtitle: state.indoorTemperature == null
-                    ? null
-                    : Text(
+                subtitle: state.isOn
+                    ? Text(
                         FlutterI18n.translate(
                           context,
                           "electricity.aircon_indoor_temperature",
@@ -295,7 +294,8 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                             "temperature": state.indoorTemperature.toString(),
                           },
                         ),
-                      ),
+                      )
+                    : null,
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

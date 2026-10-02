@@ -323,8 +323,8 @@ electricity:
   aircon_waiting: 等待获取空调用电信息
   aircon_error: 空调用电获取失败
   aircon_retry: 重试
-  aircon_imei_missing: 尚未添加空调 IMEI，添加后即可查看空调用电信息。
-  aircon_add_imei: 添加空调 IMEI
+  aircon_imei_missing: 扫描空调二维码即可添加，也可以从相册选择二维码图片
+  aircon_add_imei: 添加空调信息
   aircon_cache_notice: 当前显示空调缓存数据，缓存时间：{time}
   aircon_remote: 空调遥控
   aircon_control_error: 无法获取空调状态

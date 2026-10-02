@@ -322,21 +322,21 @@ electricity:
   aircon_waiting: 等待獲取空調用電信息
   aircon_error: 空調用電獲取失敗
   aircon_retry: 重試
-  aircon_imei_missing: 尚未添加空調 IMEI，添加後即可查看空調用電信息。
-  aircon_add_imei: 添加空調 IMEI
+  aircon_imei_missing: 掃描空調二維碼即可添加，也可以從相冊選擇二維碼圖片
+  aircon_add_imei: 添加空調信息
   aircon_cache_notice: 當前顯示空調緩存數據，緩存時間：{time}
   aircon_remote: 空調遙控
-  aircon_control_error: 無法取得空調狀態
+  aircon_control_error: 無法獲取空調狀態
   aircon_command_ok: 空調指令已執行
   aircon_power: 電源
   aircon_target_temperature: 設定溫度
   aircon_temperature_range: 溫度必須在 18–32 ℃ 之間
-  aircon_indoor_temperature: "室內溫度：{temperature} ℃"
+  aircon_indoor_temperature: 室內溫度：{temperature} ℃
   aircon_mode: 運行模式
   aircon_mode_fan: 送風
   aircon_mode_heat: 制熱
   aircon_mode_cool: 製冷
-  aircon_mode_dry: 除濕
+  aircon_mode_dry: 除溼
   aircon_mode_auto: 自動
   aircon_wind_speed: 風速
   aircon_wind_auto: 自動
@@ -503,10 +503,10 @@ homepage:
     title: 空調遙控
     not_configured: 尚未配置空調
     configure_hint: 點擊添加空調 IMEI
-    running: "{mode} · {temperature} ℃"
+    running: '{mode} · {temperature} ℃'
     power_off: 空調已關閉
-    indoor_and_wind: "室內 {temperature} ℃ · 風速 {wind}"
-    wind: "風速 {wind}"
+    indoor_and_wind: 室內 {temperature} ℃ · 風速 {wind}
+    wind: 風速 {wind}
     fetching: 正在獲取空調狀態
     error: 空調狀態獲取失敗
     open_remote: 點擊進入空調遙控

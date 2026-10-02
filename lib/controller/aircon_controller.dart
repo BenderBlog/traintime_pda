@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:signals/signals.dart';
-import 'package:time/time.dart';
 import 'package:watermeter/model/aircon_energy.dart';
 import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/model/fetch_result.dart';
@@ -63,6 +62,7 @@ class AirconController {
     return parsed;
   }
 
+  /*
   void _syncEnergyHistory(FetchResult<AirconEnergyInfo> info) {
     if (info.isCache) return;
 
@@ -97,7 +97,7 @@ class AirconController {
       ..clear()
       ..addAll(newHistoryInfo);
   }
-
+  */
   Future<void> refreshEnergyInfo() async {
     final imei = imeiSignal.value;
     if (imei.isEmpty || _isEnergyReloading) return;
@@ -112,7 +112,7 @@ class AirconController {
       final result = await session.getAirconEnergyInfo(imei);
       if (imei != imeiSignal.value) return;
       _lastValidInfo.value = result;
-      _syncEnergyHistory(result);
+      // _syncEnergyHistory(result);
       energyInfoStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       if (imei != imeiSignal.value) return;

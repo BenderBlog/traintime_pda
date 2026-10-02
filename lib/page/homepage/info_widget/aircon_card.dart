@@ -7,6 +7,7 @@ import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/page/energy/aircon_remote_page.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 
 class AirconCard extends StatelessWidget {
   const AirconCard({super.key});
@@ -85,11 +86,7 @@ class AirconCard extends StatelessWidget {
               );
 
         return MainPageCard(
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => const AirconRemotePage(),
-            ),
-          ),
+          onPressed: () => context.push(const AirconRemotePage()),
           isLoad: imei.isNotEmpty && state.isLoading,
           icon: Icons.ac_unit,
           text: FlutterI18n.translate(context, "homepage.aircon_card.title"),
