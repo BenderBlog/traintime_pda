@@ -1,7 +1,7 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
@@ -92,7 +92,6 @@ class AirconCard extends StatelessWidget {
           text: FlutterI18n.translate(context, "homepage.aircon_card.title"),
           infoText: Text(display.status, style: const TextStyle(fontSize: 20)),
           bottomText: Text(display.detail, overflow: TextOverflow.ellipsis),
-          rightButton: const Icon(Icons.chevron_right),
         );
       },
     );

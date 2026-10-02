@@ -3,7 +3,7 @@
 
 // Font size / weight global settings, used by the font size page.
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The range of the font scale slider.
 const minFontScale = 0.8;
@@ -23,13 +23,7 @@ const maxFontWeight = 1.0;
 const fontWeightSliderDivisions = 4;
 
 /// Font weight label keys for i18n, aligned with slider levels.
-const fontWeightLabels = [
-  'thin',
-  'regular',
-  'medium',
-  'semibold',
-  'bold',
-];
+const fontWeightLabels = ['thin', 'regular', 'medium', 'semibold', 'bold'];
 
 /// Map the slider value to a [FontWeight] in w300..w700.
 FontWeight fontWeightFromSlider(double value) {
@@ -66,7 +60,6 @@ TextTheme applyFontWeightToTheme(TextTheme theme, FontWeight weight) {
 
 extension FontWeightThemeData on ThemeData {
   /// Returns a copy of this theme with the global font weight applied.
-  ThemeData applyFontWeight(FontWeight weight) => copyWith(
-    textTheme: applyFontWeightToTheme(textTheme, weight),
-  );
+  ThemeData applyFontWeight(FontWeight weight) =>
+      copyWith(textTheme: applyFontWeightToTheme(textTheme, weight));
 }
