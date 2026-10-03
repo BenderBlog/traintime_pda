@@ -43,9 +43,6 @@ const double timeLineInset = 4;
 /// Corner radius of the floating time-line panel.
 const double timeLineRadius = 8;
 
-/// Width of the floating time-line panel once it is inset.
-const double timeLineWidth = leftRow - 2 * timeLineInset;
-
 /// Opacity of the floating time-line panel. Kept well below 1 so the blurred wallpaper underneath
 /// reads through it: that, not a filter of its own, is what makes the panel look like frosted glass.
 const double timeLineSurfaceAlpha = 0.72;
@@ -104,38 +101,6 @@ const double narrowClassCardWidth = 46.0;
 
 /// The width below which a class card uses the smallest text it has.
 const double tinyClassCardWidth = 32.0;
-
-/// The gap kept between the classtable sheet and the edges of the display.
-///
-/// The sheet gets the window insets of the system bars as well, this is only
-/// the breathing room on top of them.
-const double classTableSheetMargin = 8.0;
-
-/// The least amount of room kept below the sheet.
-///
-/// The sheet does not reach the edges of the display, so the corner of the
-/// screen only reaches in about half of its radius where the sheet starts. This
-/// is the floor of that half, so that devices which do not report their corners
-/// still get some breathing room.
-const double classTableMinimumBottomInset = 24.0;
-
-/// The most room the rounded corner of a display may push the sheet up by.
-///
-/// Half of the corner radius is enough to keep the last class of the day clear
-/// of it, and this keeps a device with an unusually round screen from wasting
-/// a lot of room.
-const double classTableMaximumBottomInset = 40.0;
-
-/// The corner radius of the classtable sheet.
-///
-/// The sheet no longer reaches the edges of the display, so its own corners
-/// are rounded as well.
-const double classTableSheetRadius = 14.0;
-
-/// 面板外侧那圈阴影的模糊程度。
-///
-/// 这是 sigma，大约等于 `BoxShadow` 里 blurRadius 的一半。
-const double classTableSheetShadowSigma = 8.0;
 
 /// 课表内容末尾留出的那点余地。
 ///
