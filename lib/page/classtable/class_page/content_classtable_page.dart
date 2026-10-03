@@ -4,7 +4,9 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui' show ImageFilter;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -78,10 +80,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   /// The page offset the watch last saw, which is how it tells "still moving" from "stopped".
   double _lastPagePixels = 0;
-
-  /// The wallpaper behind the table. It stays sharp: the frosted look belongs to the backgrounds of
-  /// the controls on top of it, not to the wallpaper itself.
-  late BoxDecoration decoration;
 
   /// The week on show. Published as a listenable so the week bar's highlight can follow it
   /// without the bar being rebuilt on the last frame of a swipe.
@@ -333,18 +331,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     final bool decorated =
         preference.getBool(preference.Preference.decorated) &&
         image.existsSync();
-    decoration = BoxDecoration(
-      image:
-          decorated
-          ? DecorationImage(
-              image: FileImage(image),
-              fit: BoxFit.cover,
-              opacity: Theme.of(context).brightness == Brightness.dark
-                  ? 0.4
-                  : 1.0,
-            )
-          : null,
-    );
     super.didChangeDependencies();
     precacheImage(
       const AssetImage("assets/art/pda_classtable_empty.webp"),
@@ -353,6 +339,104 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     if (decorated) {
       precacheImage(FileImage(image), context);
     }
+  }
+
+  /// The user defined background image, blurred by as much as the settings ask for.
+  ///
+  /// It is drawn as one layer behind everything — the week bar, the sheet and every frosted control
+  /// lie over it — and it is blurred here rather than per control: the frosted look of the controls
+  /// is a blur of this very layer inside their own bounds, so a sharp copy has to stay underneath.
+  Widget _backgroundLayer(BuildContext context) {
+    if (!preference.getBool(preference.Preference.decorated)) {
+      return const SizedBox.shrink();
+    }
+
+    final File image = File(
+      "${supportPath.path}/${classTableState.decorationName}",
+    );
+    if (!image.existsSync()) {
+      return const SizedBox.shrink();
+    }
+
+    final double blur = preference
+        .getDouble(preference.Preference.classTableBackgroundBlur)
+        .clamp(0.0, maxClassTableBackgroundBlur)
+        .toDouble();
+
+    Widget layer = Image.file(
+      image,
+      fit: BoxFit.cover,
+      gaplessPlayback: true,
+      opacity: AlwaysStoppedAnimation<double>(
+        Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
+      ),
+    );
+
+    if (blur > 0) {
+      /// Blurring pulls in the pixels outside of the image, which would leave the edges
+      /// translucent. The image is scaled up a little to make sure the whole background stays
+      /// covered.
+      layer = ClipRect(
+        child: Transform.scale(
+          scale: 1 + blur / 50,
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: blur,
+              sigmaY: blur,
+              tileMode: TileMode.clamp,
+            ),
+            child: layer,
+          ),
+        ),
+      );
+    }
+
+    return Positioned.fill(child: layer);
+  }
+
+  /// The room the class table keeps after its last period, for the bottom of the display.
+  ///
+  /// The sheet scrolls down to its very last row, and the bottom of the screen is where the system
+  /// navigation bar and the rounded corners of the display are. Neither becomes a margin around the
+  /// table — it stays borderless and reaches the edges — so the room is handed to the sheet and
+  /// spent as a blank stretch at the end of the time line.
+  ///
+  /// Sizing it is a question of how far the corner reaches *inwards* at the height of the lowest
+  /// thing the table draws down there: the current time capsule and the time labels of the last
+  /// period, which sit along the left edge [timeLineInset] in from the screen. A corner of radius
+  /// `r` only cuts away what is farther out than `r - sqrt(r² - (r - inset)²)` above the bottom at
+  /// that inset, so that height is exactly the room needed — no more, which is why the whole radius
+  /// is not used. The system bar may ask for more on its own, and the sheet already keeps
+  /// [classTableSheetEndGap] of it.
+  double _sheetBottomClearance(BuildContext context) {
+    /// `viewPadding` keeps the real size of the system bars, while `padding` gives up the bottom one
+    /// as soon as the keyboard is around — and the table still must not crawl under the navigation
+    /// bar in that case.
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+
+    /// The radii come from [MediaQuery.displayCornerRadiiOf], which the platform fills in on
+    /// Android 12 and later and leaves null everywhere else. Reading them there also means this page
+    /// is rebuilt whenever they change, so the window does not have to be watched by hand.
+    final corners = MediaQuery.displayCornerRadiiOf(context);
+    final double radius = math.max(
+      corners?.bottomLeft.y ?? 0,
+      corners?.bottomRight.y ?? 0,
+    );
+
+    /// Where the curve passes the inset of that content: at the corner's own radius the curve has
+    /// already left that inset behind, so nothing is cut away there.
+    final double cornerReach = radius <= timeLineInset
+        ? 0
+        : radius -
+              math.sqrt(
+                radius * radius -
+                    (radius - timeLineInset) * (radius - timeLineInset),
+              );
+
+    return math.max(
+      0,
+      math.max(viewPadding.bottom, cornerReach) - classTableSheetEndGap,
+    );
   }
 
   /// A row shows a series of buttons about the classtable's index.
@@ -1278,9 +1362,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         clipBehavior: Clip.hardEdge,
         children: [
           /// The wallpaper. It spans the whole body, under the week bar as well as the table, and it
-          /// is never blurred itself: every frosted control blurs its own copy of it inside its own
-          /// bounds.
-          DecoratedBox(decoration: decoration),
+          /// is blurred by as much as the settings ask for; the frosted controls above it blur their
+          /// own copy of it inside their own bounds.
+          _backgroundLayer(context),
 
           /// The page. While the bar floats it starts at the top and the bar covers it; once the bar
           /// is pinned it slides down to leave the bar a strip of its own.
@@ -1323,6 +1407,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       pageControl: pageControl,
                       semesterLength: classTableState.semesterLength,
                       onPageChanged: _onPageChanged,
+                      bottomClearance: _sheetBottomClearance(context),
                     ).expanded(),
                   ],
                 ),

@@ -8,9 +8,7 @@ import 'package:styled_widget/styled_widget.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
-import 'package:watermeter/page/classtable/class_table_view/class_table_time_line.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -33,10 +31,19 @@ class ClassTableView extends StatefulWidget {
   /// The week this page shows.
   final int index;
 
-  /// The height of the whole class table area, which the blocks are scaled to.
-  final double available;
+  /// The width of the time column, which the seven day columns share what is left of.
+  final double timeColumnWidth;
 
-  const ClassTableView({super.key, required this.index, required this.available});
+  /// The height of one of the 61 blocks of a day, measured by the sheet so that the grid, the time
+  /// line and the settings preview all size a block the same way.
+  final double blockUnit;
+
+  const ClassTableView({
+    super.key,
+    required this.index,
+    required this.timeColumnWidth,
+    required this.blockUnit,
+  });
 
   @override
   State<ClassTableView> createState() => _ClassTableViewState();
@@ -83,16 +90,14 @@ class _ClassTableViewState extends State<ClassTableView>
     context: context,
     now: classTableState.currentTime,
     weekStart: _visibleWeekStart,
-    leftRow: leftRow,
+    leftRow: widget.timeColumnWidth,
     blockWidth: blockwidth,
-    blockHeight: blockheight,
   );
 
   /// The height of the class card.
-  double blockheight(double count) =>
-      classTableBlockHeight(context, widget.available, count);
+  double blockheight(double count) => count * widget.blockUnit;
 
-  double get blockwidth => (size.maxWidth - leftRow) / 7;
+  double get blockwidth => (size.maxWidth - widget.timeColumnWidth) / 7;
 
   /// The class cards of this week, plus the highlight and the current-time indicator over them.
   List<Widget> _classLayer() {
@@ -112,7 +117,8 @@ class _ClassTableViewState extends State<ClassTableView>
         /// Generate the row.
         final double cardHeight = blockheight(i.stop - i.start);
         final double cardTop = blockheight(i.start);
-        final double cardLeft = leftRow + blockwidth * (index - 1);
+        final double cardLeft =
+            widget.timeColumnWidth + blockwidth * (index - 1);
         final completedHeight = _completedHeight(i, index);
         thisRow.add(
           Positioned(
@@ -148,7 +154,7 @@ class _ClassTableViewState extends State<ClassTableView>
               ).split("\n").map((e) => Text(e)),
             ],
           ),
-        ).padding(left: leftRow),
+        ).padding(left: widget.timeColumnWidth),
       );
     }
 

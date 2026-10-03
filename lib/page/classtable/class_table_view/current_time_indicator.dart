@@ -225,8 +225,11 @@ class CurrentTimeIndicator {
     }
 
     final hasLabel = geometry.hasLabel;
-    final double lineStart =
-        hasLabel ? (timeLineInset + timeLineWidth) : leftRow;
+
+    /// The buoy floats inside the time column's floating panel, which is inset from the column's
+    /// own edges, so its width follows the measured column rather than a constant.
+    final double buoyWidth = leftRow - 2 * timeLineInset;
+    final double lineStart = hasLabel ? (timeLineInset + buoyWidth) : leftRow;
     final double todayColumnStart =
         geometry.leftRow + geometry.blockWidth * geometry.dayOffset;
     final double totalWidth =
@@ -240,7 +243,7 @@ class CurrentTimeIndicator {
             Positioned(
               top: geometry.labelTop,
               left: timeLineInset,
-              width: timeLineWidth,
+              width: buoyWidth,
               height: CurrentTimeIndicatorConfig.labelHeight,
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -321,13 +324,17 @@ class CurrentTimeIndicator {
     );
   }
 
+  /// The box behind today's column.
+  ///
+  /// It spans exactly what the time line's panel spans — the same [timeLineInset] in from the top
+  /// and the bottom of the table — so the two bands end level with each other, including over the
+  /// blank room the table keeps after its last period for the bottom of the display.
   static Positioned? buildDayColumnBox({
     required BuildContext context,
     required DateTime now,
     required DateTime weekStart,
     required double leftRow,
     required double blockWidth,
-    required double Function(double) blockHeight,
   }) {
     if (!CurrentTimeIndicatorConfig.showTodayColumnHighlight) {
       return null;
@@ -350,9 +357,9 @@ class CurrentTimeIndicator {
 
     return Positioned(
       left: leftRow + blockWidth * dayOffset,
-      top: 0,
+      top: timeLineInset,
+      bottom: timeLineInset,
       width: blockWidth,
-      height: blockHeight(61),
       child: IgnorePointer(
         child: DecoratedBox(
           decoration: BoxDecoration(

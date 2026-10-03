@@ -3,6 +3,8 @@
 
 // The time line down the left side of the class table.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -12,26 +14,44 @@ import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
-/// Pixel height of [count] blocks of the class grid.
+/// The height of one of the 61 blocks of a day.
 ///
 /// [available] is the height of the whole class table area. Scaling to it is what keeps a block the
 /// same size in the grid, in the time line and in the settings preview.
-double classTableBlockHeight(
+///
+/// [minimumUnit] is the smallest a block may get. In a short window — a floating window, a split
+/// screen, the landscape orientation — scaling alone would squeeze a class into a couple of pixels
+/// and the text of its card would be cut off; the table then grows past the window and scrolls
+/// instead. The time line measures the least room its own labels need and hands it in.
+double classTableBlockUnit(
   BuildContext context,
-  double available,
-  double count,
-) =>
-    count * (available - midRowHeight) / (isPhone(context) ? 48 : 61);
+  double available, {
+  double minimumUnit = 0,
+}) => math.max(
+  (available - midRowHeight) / (isPhone(context) ? 48 : 61),
+  minimumUnit,
+);
 
 /// The time line: the period numbers with their start and end times.
 ///
 /// It is laid out once for the whole table instead of once per week page, so it stays still while
 /// the weeks page horizontally. It still moves with the vertical scroll, which the sheet owns.
 class ClassTableTimeLine extends StatelessWidget {
-  const ClassTableTimeLine({super.key, required this.available});
+  const ClassTableTimeLine({
+    super.key,
+    required this.timeColumnWidth,
+    required this.blockUnit,
+  });
 
-  /// The height of the class table area, used to scale the blocks.
-  final double available;
+  /// The width of the time column, measured from the labels themselves so they are not clipped at a
+  /// large font scale.
+  final double timeColumnWidth;
+
+  /// The height of one of the 61 blocks of a day.
+  final double blockUnit;
+
+  /// The width of the floating panel once it is inset from the column's edges.
+  double get _panelWidth => timeColumnWidth - 2 * timeLineInset;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +67,7 @@ class ClassTableTimeLine extends StatelessWidget {
           left: timeLineInset,
           top: timeLineInset,
           bottom: timeLineInset,
-          width: timeLineWidth,
+          width: _panelWidth,
           child: DecoratedBox(
             /// The shadow is painted outside the clip so it is not blurred away with the backdrop.
             decoration: BoxDecoration(
@@ -79,7 +99,7 @@ class ClassTableTimeLine extends StatelessWidget {
         Positioned(
           left: 0,
           top: 0,
-          width: leftRow,
+          width: timeColumnWidth,
           child: Column(children: _labels(context)),
         ),
       ],
@@ -89,11 +109,7 @@ class ClassTableTimeLine extends StatelessWidget {
   /// Thirteen rows: eleven periods and the two breaks, sized in grid blocks.
   List<Widget> _labels(BuildContext context) {
     return List.generate(13, (index) {
-      final double height = classTableBlockHeight(
-        context,
-        available,
-        index != 4 && index != 9 ? 5 : 3,
-      );
+      final double height = blockUnit * (index != 4 && index != 9 ? 5 : 3);
 
       late int indexOfChar;
       if ([0, 1, 2, 3].contains(index)) {
@@ -148,7 +164,7 @@ class ClassTableTimeLine extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-      ).center().constrained(width: leftRow, height: height);
+      ).center().constrained(width: timeColumnWidth, height: height);
     });
   }
 }

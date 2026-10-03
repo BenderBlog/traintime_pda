@@ -20,6 +20,7 @@ class ClassTableDateRow extends StatefulWidget {
     super.key,
     required this.index,
     required this.firstDayOfWeek,
+    required this.timeColumnWidth,
     this.pageControl,
     this.semesterLength = 1,
   });
@@ -29,6 +30,9 @@ class ClassTableDateRow extends StatefulWidget {
 
   /// First day of the week at the given index.
   final DateTime Function(int index) firstDayOfWeek;
+
+  /// The width of the time column, so the month cell stays aligned with the labels underneath.
+  final double timeColumnWidth;
 
   /// The week pages. When set, the headers slide with them.
   final PageController? pageControl;
@@ -61,7 +65,7 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
     }
     _cachedWidth = maxWidth;
     _cachedSemesterLength = widget.semesterLength;
-    final double dayWidth = (maxWidth - leftRow) / 7;
+    final double dayWidth = (maxWidth - widget.timeColumnWidth) / 7;
 
     _cachedHeadersChild = RepaintBoundary(
       child: _HorizontalStrip(
@@ -141,7 +145,7 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
 
   Widget _buildHeadersWithWidth(BuildContext context, double maxWidth) {
     if (widget.pageControl == null) {
-      final double dayWidth = (maxWidth - leftRow) / 7;
+      final double dayWidth = (maxWidth - widget.timeColumnWidth) / 7;
       return _weekRow(context, widget.index, dayWidth);
     }
 
@@ -185,7 +189,7 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
             fontSize: 14,
             color: Theme.of(context).colorScheme.onSurface,
           ),
-        ).center().constrained(width: leftRow),
+        ).center().constrained(width: widget.timeColumnWidth),
         ...List.generate(
           7,
           (index) => WeekInfomation(time: dateList[index], width: dayWidth),

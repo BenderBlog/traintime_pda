@@ -4,6 +4,7 @@
 // The class table sheet: the static time line and date row, plus the week pages.
 
 import 'package:flutter/material.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_table_time_column_layout.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_time_line.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
@@ -25,6 +26,8 @@ class ClassTableSheet extends StatefulWidget {
     this.semesterLength = 1,
     this.onPageChanged,
     this.enableVerticalScrolling = true,
+    this.heightReference,
+    this.bottomClearance = 0,
   });
 
   /// The week shown when [pageControl] is null.
@@ -35,6 +38,21 @@ class ClassTableSheet extends StatefulWidget {
   final int semesterLength;
   final ValueChanged<int>? onPageChanged;
   final bool enableVerticalScrolling;
+
+  /// The height the blocks are scaled against when the sheet is not given a bounded box of its own.
+  ///
+  /// A settings preview expands to the table's full height and lets the surrounding page scroll, so
+  /// it has no viewport height to scale against and hands in the familiar 560 instead.
+  final double? heightReference;
+
+  /// The room kept after the last period, for the bottom of the display.
+  ///
+  /// It is a blank stretch at the end of the time line rather than a padding around the sheet: the
+  /// table stays borderless and reaches the edges, and the last period simply has that much empty
+  /// room after it. Scrolled all the way down, the room is what holds the last time, the last class
+  /// card and the current time indicator clear of the navigation bar and of the rounded corners of
+  /// the screen, which curve inwards over exactly this much at the very bottom.
+  final double bottomClearance;
 
   @override
   State<ClassTableSheet> createState() => _ClassTableSheetState();
@@ -91,14 +109,30 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double available = constraints.maxHeight;
-        final double gridHeight = classTableBlockHeight(
+        final double available =
+            widget.heightReference ?? constraints.maxHeight;
+
+        /// Measured once and handed down, so the time line, the grid and the floating indicators
+        /// cannot drift apart: the column is as wide as its widest label needs, and a block is never
+        /// shorter than the labels stacked inside it.
+        final ClassTableTimeColumnLayout timeColumnLayout =
+            ClassTableTimeColumnLayout.of(context);
+        final double timeColumnWidth = timeColumnLayout.width;
+        final double blockUnit = classTableBlockUnit(
           context,
           available,
-          61,
+          minimumUnit: timeColumnLayout.minimumBlockHeight,
         );
 
-        return Stack(
+        /// The room the last period still needs below itself: the rounded corner of the sheet
+        /// reaches in at the bottom, and without it the end of the 11th class is cut off at the
+        /// very end of the scroll. [ClassTableSheet.bottomClearance] adds the room the bottom of the
+        /// display itself needs, which is what keeps the last time and the current time indicator
+        /// clear of the navigation bar and of the screen's own rounded corners.
+        final double gridHeight =
+            61 * blockUnit + classTableSheetEndGap + widget.bottomClearance;
+
+        final Widget content = Stack(
           fit: StackFit.expand,
           children: [
             /// The sheet fills the whole area, so its content slides underneath the date row
@@ -127,17 +161,21 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                         children: [
                           /// The classes, below everything else, so a card sliding in from the
                           /// next week passes behind the time line rather than over it.
-                          _pages(available),
+                          _pages(timeColumnWidth, blockUnit),
 
                           /// Laid out once for the whole table, so it does not page with the weeks.
-                          ClassTableTimeLine(available: available),
+                          ClassTableTimeLine(
+                            timeColumnWidth: timeColumnWidth,
+                            blockUnit: blockUnit,
+                          ),
 
                           /// The current-time indicator (time buoy + horizontal line) as a connected whole.
                           Positioned.fill(
                             child: _CurrentTimeIndicatorLayer(
                               pageControl: widget.pageControl,
                               singleIndex: widget.singleIndex,
-                              available: available,
+                              timeColumnWidth: timeColumnWidth,
+                              blockUnit: blockUnit,
                               maxWidth: constraints.maxWidth,
                             ),
                           ),
@@ -164,6 +202,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                 key: _dateRowKey,
                 index: widget.singleIndex,
                 firstDayOfWeek: _firstDayOfWeek,
+                timeColumnWidth: timeColumnWidth,
 
                 /// Handed the pages so the headers can slide with them rather than flipping over
                 /// once the week has already changed.
@@ -173,21 +212,40 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
             ),
           ],
         );
+
+        if (!widget.enableVerticalScrolling) {
+          /// Nothing scrolls in here, so the sheet takes its full height and the page around it does
+          /// the scrolling. Confining it to the box it was given is what used to hide the last
+          /// periods of the settings preview.
+          return SizedBox(
+            height: _dateRowHeight + gridHeight,
+            child: content,
+          );
+        }
+
+        return content;
       },
     );
   }
 
-  Widget _pages(double available) {
+  Widget _pages(double timeColumnWidth, double blockUnit) {
     final PageController? control = widget.pageControl;
     if (control == null) {
-      return ClassTableView(index: widget.singleIndex, available: available);
+      return ClassTableView(
+        index: widget.singleIndex,
+        timeColumnWidth: timeColumnWidth,
+        blockUnit: blockUnit,
+      );
     }
     return PageView.builder(
       controller: control,
       onPageChanged: widget.onPageChanged,
       itemCount: widget.semesterLength,
-      itemBuilder: (context, index) =>
-          ClassTableView(index: index, available: available),
+      itemBuilder: (context, index) => ClassTableView(
+        index: index,
+        timeColumnWidth: timeColumnWidth,
+        blockUnit: blockUnit,
+      ),
     );
   }
 }
@@ -233,13 +291,15 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
   const _CurrentTimeIndicatorLayer({
     required this.pageControl,
     required this.singleIndex,
-    required this.available,
+    required this.timeColumnWidth,
+    required this.blockUnit,
     required this.maxWidth,
   });
 
   final PageController? pageControl;
   final int singleIndex;
-  final double available;
+  final double timeColumnWidth;
+  final double blockUnit;
   final double maxWidth;
 
   /// Fraction of a page swipe over which the indicator fades out/in.
@@ -341,10 +401,9 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
       context: context,
       now: controllers.currentTime,
       weekStart: weekStart,
-      leftRow: leftRow,
-      blockWidth: (maxWidth - leftRow) / 7,
-      blockHeight: (double count) =>
-          classTableBlockHeight(context, available, count),
+      leftRow: timeColumnWidth,
+      blockWidth: (maxWidth - timeColumnWidth) / 7,
+      blockHeight: (double count) => count * blockUnit,
       opacity: opacity,
     );
   }
