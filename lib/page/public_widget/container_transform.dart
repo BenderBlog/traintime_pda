@@ -40,6 +40,9 @@ class ContainerTransformSource {
 /// 路由的转场驱动这个值，首页用 [ContainerTransformSink] 监听。
 final ValueNotifier<double> containerTransformSink = ValueNotifier<double>(0);
 
+/// 包住首页的那个 Sink 自己的 key：BasedSplitView 要求 leftWidget 必须带 key。
+final GlobalKey containerTransformSinkKey = GlobalKey();
+
 /// 包在首页外面，跟着 [containerTransformSink] 缩放。
 class ContainerTransformSink extends StatelessWidget {
   const ContainerTransformSink({super.key, required this.child});
@@ -82,11 +85,19 @@ class _SinkDriver extends StatefulWidget {
 class _SinkDriverState extends State<_SinkDriver> {
   void _sync() => containerTransformSink.value = widget.animation.value;
 
+  /// 帧后再通知：initState / dispose 期间同步改这个值，
+  /// 会让首页那棵兄弟子树在构建或拆卸过程中被要求 setState，debug 下会断言。
+  void _syncLater() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _sync();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     widget.animation.addListener(_sync);
-    _sync();
+    _syncLater();
   }
 
   @override
@@ -178,7 +189,15 @@ class _ContainerTransformSurfaceState extends State<_ContainerTransformSurface> 
           child: RepaintBoundary(key: _boundaryKey, child: widget.child),
         ),
         if (useSnapshot)
-          RawImage(image: snapshot, fit: BoxFit.fill),
+          // 收尾这段 120ms 的淡出很关键：快照是"第一帧那一刻"的画面，
+          // 而真实页面在这 420ms 里可能刚把异步内容（比如课表壁纸）画出来。
+          // 直接硬切会看到那些内容突然出现，淡出就看不出来了。
+          AnimatedOpacity(
+            opacity: widget.showSnapshot ? 1 : 0,
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOut,
+            child: RawImage(image: snapshot, fit: BoxFit.fill),
+          ),
       ],
     );
   }
@@ -266,9 +285,10 @@ PageRouteBuilder<T> containerTransformRoute<T>({
             ),
             builder: (context, page) {
               final raw = animation.value;
-              // 收尾这一帧直接交还真页面：否则会从"缩放版"切到真页面，
-              // 中间闪一下底下的首页。
-              if (raw >= 0.999) return page!;
+              // 不要在收尾处直接交回 child：那样会把 _SinkDriver 一起卸掉
+              // （下沉值归零会打断首页），而且从"快照版"硬切到真页面时，
+              // 异步才画出来的内容（比如课表壁纸）会突然出现。
+              // 现在整条路由保持同一棵树，收尾由 surface 自己做 120ms 淡出。
               final t = Curves.fastOutSlowIn.transform(raw);
               final window = rectTween.lerp(t)!;
               // 等比铺满窗口所需的最小缩放（相当于 BoxFit.cover）。
