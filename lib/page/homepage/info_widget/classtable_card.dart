@@ -103,7 +103,8 @@ class _ClassTableCardState extends State<ClassTableCard> {
         )
         .paddingDirectional(horizontal: 16, vertical: 8)
         .withHomeCardStyle(
-          context,
+enableContainerTransform: true,
+context,
           onPressed: () {
             context.pushReplacementNamed(Routes.classTable);
           },
