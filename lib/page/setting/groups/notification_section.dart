@@ -1,6 +1,7 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -14,9 +15,9 @@ class NotificationSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.notification_setting"),
       items: [
         ListTile(
+          leading: const Icon(MingCuteIcons.mgc_notification_line),
           title: Text(
             FlutterI18n.translate(context, "setting.course_reminder_setting"),
           ),
@@ -28,10 +29,11 @@ class NotificationSection extends StatelessWidget {
           ),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
-            context.pushReplacement(const NotificationSettingsPage());
+            context.push(const NotificationSettingsPage());
           },
         ),
         ListTile(
+          leading: const Icon(MingCuteIcons.mgc_settings_2_line),
           title: Text(
             FlutterI18n.translate(context, "setting.notification_debug_page"),
           ),

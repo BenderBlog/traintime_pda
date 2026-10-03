@@ -1,6 +1,7 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
@@ -18,10 +19,10 @@ class AccountSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, "setting.account_setting"),
       items: [
         if (!preference.getBool(preference.Preference.role)) ...[
           ListTile(
+            leading: const Icon(MingCuteIcons.mgc_run_line),
             title: Text(
               FlutterI18n.translate(context, "setting.sport_password_setting"),
             ),
@@ -35,6 +36,7 @@ class AccountSection extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(MingCuteIcons.mgc_flask_line),
             title: Text(
               FlutterI18n.translate(
                 context,
@@ -53,6 +55,7 @@ class AccountSection extends StatelessWidget {
         ],
 
         ListTile(
+          leading: const Icon(MingCuteIcons.mgc_wifi_line),
           title: Text(
             FlutterI18n.translate(
               context,
