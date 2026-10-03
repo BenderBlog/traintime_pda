@@ -87,8 +87,15 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
 
           final data = snapshot.data!;
           return [
+                // Text(
+                //   FlutterI18n.translate(context, "new_homepage_hint"),
+                //   textAlign: TextAlign.center,
+                // ),
+                // const SizedBox(height: 12),
                 Text(
-                  FlutterI18n.translate(context, "new_homepage_hint"),
+                  "There are ${snapshot.data!.length} pigs in the Animal Farm. \n"
+                  "Better stay at home and do as you're told. \n"
+                  "Get out of the road if you want to grow old!",
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
