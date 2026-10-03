@@ -1,20 +1,35 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+// 空调遥控页。
+//
+// 界面照米家（Mi Home）的空调遥控页复刻：顶上一个大温度加一行运行模式，
+// 下面依次是用电信息、电源、温度调节（滑条）、风速、扫风/强力/电辅热、
+// 运行模式，都是一张张白卡片，蓝色做强调色、橙色点电源。
+//
+// 下发的指令载荷和"乐观更新 + 轮询确认"那套逻辑沿用原来的实现，只换了外观。
+
+import 'package:flutter/services.dart';
 import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/services.dart';
-
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/model/aircon_state.dart';
-import 'package:watermeter/page/public_widget/setting/setting_header.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/aircon_imei_page.dart';
 import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
+
+/// 米家那套蓝色与橙色。
+const _miBlue = Color(0xFF2F73EA);
+const _miOrange = Color(0xFFFF6B3D);
+
+/// 温度的可调范围，和设备本身一致。
+const _minTemperature = 18;
+const _maxTemperature = 32;
+const _stateMotionDuration = Duration(milliseconds: 260);
+const _pressMotionDuration = Duration(milliseconds: 120);
 
 class AirconRemotePage extends StatefulWidget {
   const AirconRemotePage({super.key});
@@ -25,34 +40,54 @@ class AirconRemotePage extends StatefulWidget {
 
 class _AirconRemotePageState extends State<AirconRemotePage> {
   final _controller = AirconController.i;
-  final _temperatureFocusNode = FocusNode();
   AirconState? _state;
   Object? _error;
   bool _isFetching = false;
   bool Function(AirconState state)? _pendingMatches;
+  int _generation = 0;
+  late String _lastImei;
+  late final void Function() _disposeImeiEffect;
 
   static const _pollInterval = Duration(milliseconds: 300);
   static const _pollAttempts = 12;
 
   @override
-  void dispose() {
-    _temperatureFocusNode.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _lastImei = _controller.imeiSignal.peek();
+    _state = _controller.deviceStateSignal.peek().value;
+    _disposeImeiEffect = effect(() {
+      final imei = _controller.imeiSignal.value;
+      if (imei == _lastImei) return;
+      _lastImei = imei;
+      _generation++;
+      if (!mounted) return;
+      setState(() {
+        _state = null;
+        _error = null;
+        _pendingMatches = null;
+        _isFetching = false;
+      });
+      if (imei.isNotEmpty) Future.microtask(_refreshDeviceState);
+    });
+    Future.microtask(_refreshDeviceState);
   }
 
   @override
-  void initState() {
-    super.initState();
-    _state = _controller.deviceStateSignal.peek().value;
-    Future.microtask(_refreshDeviceState);
+  void dispose() {
+    _disposeImeiEffect();
+    super.dispose();
   }
 
   Future<void> _configure() async {
     await context.push<void>(const AirconImeiPage());
     if (!mounted) return;
+    _generation++;
     setState(() {
       _state = null;
       _error = null;
+      _pendingMatches = null;
+      _isFetching = false;
     });
     await _refreshDeviceState();
   }
@@ -60,6 +95,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   Future<void> _refreshDeviceState() async {
     final imei = _controller.imeiSignal.value;
     if (imei.isEmpty || _isFetching) return;
+    final generation = ++_generation;
 
     setState(() {
       _isFetching = true;
@@ -68,13 +104,28 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
 
     try {
       final state = await _controller.session.getDeviceState(imei);
-      if (!mounted || imei != _controller.imeiSignal.value) return;
+      if (!mounted) return;
+      if (generation != _generation) return;
+      if (imei != _controller.imeiSignal.value) {
+        setState(() {
+          _isFetching = false;
+          _pendingMatches = null;
+        });
+        return;
+      }
+      if (state.imei != imei) {
+        throw const AirconResponseException("设备状态归属不匹配");
+      }
 
       final matches = _pendingMatches;
       if (matches != null && !matches(state)) {
         setState(() {
           _error = const AirconResponseException("设备状态仍未确认");
           _isFetching = false;
+
+          /// 这一趟没对上，得把待确认的条件放掉，不然页面会一直卡在
+          /// "正在执行"，所有控件都点不动。
+          _pendingMatches = null;
         });
         return;
       }
@@ -88,9 +139,18 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
       _controller.setDeviceState(state);
     } catch (error) {
       if (!mounted) return;
+      if (generation != _generation) return;
+      if (imei != _controller.imeiSignal.value) {
+        setState(() {
+          _isFetching = false;
+          _pendingMatches = null;
+        });
+        return;
+      }
       setState(() {
         _error = error;
         _isFetching = false;
+        _pendingMatches = null;
       });
     }
   }
@@ -108,7 +168,9 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         _isFetching) {
       return;
     }
+    final generation = ++_generation;
 
+    HapticFeedback.selectionClick();
     setState(() {
       _state = optimisticState;
       _error = null;
@@ -125,11 +187,28 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
 
       for (var attempt = 0; attempt < _pollAttempts; attempt++) {
         if (attempt > 0) await Future<void>.delayed(_pollInterval);
-        if (!mounted || imei != _controller.imeiSignal.value) return;
+        if (!mounted) return;
+        if (generation != _generation) return;
+        if (imei != _controller.imeiSignal.value) {
+          setState(() {
+            _isFetching = false;
+            _pendingMatches = null;
+          });
+          return;
+        }
 
         try {
           final state = await _controller.session.getDeviceState(imei);
-          if (matches(state)) {
+          if (!mounted) return;
+          if (generation != _generation) return;
+          if (imei != _controller.imeiSignal.value) {
+            setState(() {
+              _isFetching = false;
+              _pendingMatches = null;
+            });
+            return;
+          }
+          if (state.imei == imei && matches(state)) {
             confirmedState = state;
             break;
           }
@@ -138,7 +217,15 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         }
       }
 
-      if (!mounted || imei != _controller.imeiSignal.value) return;
+      if (!mounted) return;
+      if (generation != _generation) return;
+      if (imei != _controller.imeiSignal.value) {
+        setState(() {
+          _isFetching = false;
+          _pendingMatches = null;
+        });
+        return;
+      }
       if (confirmedState == null) {
         throw pollError ?? const AirconResponseException("设备状态未确认");
       }
@@ -152,39 +239,173 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
       _controller.setDeviceState(confirmedState);
       showToast(context: context, msg: context.t.electricity.airconCommandOk);
     } catch (error) {
-      if (!mounted || imei != _controller.imeiSignal.value) return;
+      if (!mounted) return;
+      if (generation != _generation) return;
+      if (imei != _controller.imeiSignal.value) {
+        setState(() {
+          _isFetching = false;
+          _pendingMatches = null;
+        });
+        return;
+      }
       setState(() {
         _error = error;
         _isFetching = false;
+
+        /// 指令已经发出去的话，设备那边可能真的动了，所以乐观状态留着，
+        /// 但"待确认"的条件必须放掉 —— 否则页面会一直卡在"正在执行"，
+        /// 所有控件都点不动。
+        _pendingMatches = null;
         if (!commandSent) {
           _state = previous;
-          _pendingMatches = null;
         }
       });
       showToast(context: context, msg: error.toString());
     }
   }
 
+  // --- 各个控件的下发 ---
+
+  void _setPower(AirconState state, bool value) => _sendCommand(
+    command: value
+        ? {"switchStatus": 1}
+        : {
+            "switchStatus": 0,
+            "indoorClean": 0,
+            "outdoorClean": 0,
+            "electricHeating": 0,
+          },
+    optimisticState: state.copyWith(
+      isOn: value,
+      electricHeating: value ? state.electricHeating : false,
+    ),
+    matches: (state) => state.isOn == value,
+  );
+
+  void _setTemperature(AirconState state, int value) {
+    if (value < _minTemperature || value > _maxTemperature) {
+      showToast(
+        context: context,
+        msg: FlutterI18n.translate(
+          context,
+          "electricity.aircon_temperature_range",
+        ),
+      );
+      return;
+    }
+    _sendCommand(
+      command: {"tempSet": value},
+      optimisticState: state.copyWith(targetTemperature: value),
+      matches: (state) => state.targetTemperature == value,
+    );
+  }
+
+  void _setMode(AirconState state, AirconMode mode) {
+    if (mode == state.mode) return;
+
+    /// 换模式时设备会顺手改温度和风速，这里跟着一起报上去，
+    /// 免得轮询确认时对不上。
+    final temperature = switch (mode) {
+      AirconMode.heat => 23,
+      AirconMode.cool => 26,
+      _ => 25,
+    };
+    final windSpeed = mode == AirconMode.fan
+        ? AirconWindSpeed.medium
+        : AirconWindSpeed.auto;
+    _sendCommand(
+      command: {
+        "runMode": mode.value.toString(),
+        "indoorClean": 0,
+        "outdoorClean": 0,
+        "strongMode": 0,
+        "electricHeating": 0,
+        "tempView": temperature,
+        "tempSet": temperature,
+        "windSpeed": windSpeed.value,
+      },
+      optimisticState: state.copyWith(
+        mode: mode,
+        targetTemperature: temperature,
+        windSpeed: windSpeed,
+        strongMode: false,
+        electricHeating: false,
+      ),
+      matches: (state) =>
+          state.mode == mode &&
+          state.targetTemperature == temperature &&
+          state.windSpeed == windSpeed &&
+          !state.strongMode &&
+          !state.electricHeating,
+    );
+  }
+
+  void _setWindSpeed(AirconState state, AirconWindSpeed speed) {
+    if (speed == state.windSpeed && !state.strongMode) return;
+    _sendCommand(
+      command: {"windSpeed": speed.value.toString(), "strongMode": 0},
+      optimisticState: state.copyWith(windSpeed: speed, strongMode: false),
+      matches: (state) => state.windSpeed == speed && !state.strongMode,
+    );
+  }
+
+  void _setVerticalSwing(AirconState state, bool value) => _sendCommand(
+    command: {"verticalSwing": value ? 1 : 0},
+    optimisticState: state.copyWith(verticalSwing: value),
+    matches: (state) => state.verticalSwing == value,
+  );
+
+  void _setStrongMode(AirconState state, bool value) => _sendCommand(
+    command: {
+      "strongMode": value ? 1 : 0,
+      if (value) "windSpeed": AirconWindSpeed.auto.value,
+    },
+    optimisticState: state.copyWith(
+      strongMode: value,
+      windSpeed: value ? AirconWindSpeed.auto : state.windSpeed,
+    ),
+    matches: (state) =>
+        state.strongMode == value &&
+        (!value || state.windSpeed == AirconWindSpeed.auto),
+  );
+
+  void _setElectricHeating(AirconState state, bool value) => _sendCommand(
+    command: {"electricHeating": value ? 1 : 0},
+    optimisticState: state.copyWith(electricHeating: value),
+    matches: (state) => state.electricHeating == value,
+  );
+
+  // --- 外观 ---
+
+  /// 顶上那层渐变跟着运行模式走，开关机时也会淡下去，和米家一样。
+  List<Color> _gradientColors(AirconState? state) {
+    if (state == null || !state.isOn) {
+      return const [Color(0xFFF0F3F8), Color(0xFFF9FAFC)];
+    }
+    return switch (state.mode) {
+      AirconMode.cool => const [Color(0xFFC4D9F4), Color(0xFFF6F9FD)],
+      AirconMode.heat => const [Color(0xFFF9DACA), Color(0xFFFDF6F0)],
+      AirconMode.dry => const [Color(0xFFCDE6E6), Color(0xFFF4FAFA)],
+      AirconMode.fan => const [Color(0xFFDEE5ED), Color(0xFFF6F8FB)],
+      AirconMode.auto => const [Color(0xFFD5EDE2), Color(0xFFF5FBF8)],
+    };
+  }
+
+  IconData _modeIcon(AirconMode mode) => switch (mode) {
+    AirconMode.cool => Icons.ac_unit,
+    AirconMode.heat => Icons.wb_sunny_outlined,
+    AirconMode.dry => Icons.water_drop_outlined,
+    AirconMode.fan => Icons.air,
+    AirconMode.auto => Icons.auto_mode,
+  };
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.electricity.airconRemote),
-        actions: [
-          IconButton(
-            onPressed: _isFetching ? null : _refreshDeviceState,
-            tooltip: context.t.electricity.update,
-            icon: const Icon(Icons.refresh),
-          ),
-          IconButton(
-            onPressed: _isFetching || _pendingMatches != null
-                ? null
-                : _configure,
-            tooltip: context.t.setting.airconImeiTitle,
-            icon: const Icon(Icons.settings),
-          ),
-        ],
-      ),
+      extendBodyBehindAppBar: true,
       body: SignalBuilder(
         builder: (context) {
           if (_controller.imeiSignal.value.isEmpty) {
@@ -193,7 +414,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
               "electricity.aircon_imei_missing",
               onPressed: _configure,
               actionKey: "electricity.aircon_add_imei",
-              actionIcon: Icons.settings,
+              actionIcon: Icons.settings_outlined,
             );
           }
 
@@ -211,10 +432,111 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           }
 
           final busy = _isFetching || _pendingMatches != null;
+          final gradient = _gradientColors(state);
+
           return Stack(
             children: [
-              _controls(context, state, busy, _error),
-              if (busy) const LinearProgressIndicator(),
+              /// 背景渐变随模式变化，AnimatedContainer 会把颜色揉过去。
+              Positioned.fill(
+                child: AnimatedContainer(
+                  duration: _stateMotionDuration,
+                  curve: Curves.easeOutCubic,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: isDark
+                          ? [
+                              Color.lerp(gradient.first, Colors.black, 0.72)!,
+                              scheme.surface,
+                            ]
+                          : gradient,
+                      stops: const [0, 0.55],
+                    ),
+                  ),
+                ),
+              ),
+              ListView(
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  MediaQuery.paddingOf(context).top + 12,
+                  16,
+                  32,
+                ),
+                children: [
+                  _hero(context, state),
+                  if (_error != null)
+                    _CardEntrance(
+                      index: 1,
+                      child: _errorCard(context, _error!),
+                    ),
+                  const SizedBox(height: 4),
+                  _CardEntrance(index: 2, child: _energyCard(context)),
+                  _CardEntrance(
+                    index: 3,
+                    child: _powerCard(context, state, busy),
+                  ),
+                  _CardEntrance(
+                    index: 4,
+                    child: _temperatureCard(context, state, busy),
+                  ),
+                  _CardEntrance(
+                    index: 5,
+                    child: _windCard(context, state, busy),
+                  ),
+                  _CardEntrance(
+                    index: 6,
+                    child: _swingCard(context, state, busy),
+                  ),
+                  _CardEntrance(
+                    index: 7,
+                    child: _otherCard(context, state, busy),
+                  ),
+                  _CardEntrance(
+                    index: 8,
+                    child: _modeCard(context, state, busy),
+                  ),
+                ],
+              ),
+              Positioned(
+                top: MediaQuery.paddingOf(context).top + 2,
+                left: 4,
+                child: _PressScaleFeedback(
+                  child: IconButton(
+                    onPressed: _isFetching ? null : _refreshDeviceState,
+                    tooltip: FlutterI18n.translate(
+                      context,
+                      "electricity.update",
+                    ),
+                    color: scheme.onSurfaceVariant,
+                    icon: const Icon(Icons.refresh),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: MediaQuery.paddingOf(context).top + 2,
+                right: 4,
+                child: _PressScaleFeedback(
+                  child: IconButton(
+                    onPressed: _isFetching || _pendingMatches != null
+                        ? null
+                        : _configure,
+                    tooltip: FlutterI18n.translate(
+                      context,
+                      "setting.aircon_imei_title",
+                    ),
+                    color: scheme.onSurfaceVariant,
+                    icon: const Icon(Icons.settings_outlined),
+                  ),
+                ),
+              ),
+              if (busy)
+                const Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: LinearProgressIndicator(minHeight: 2),
+                ),
             ],
           );
         },
@@ -222,332 +544,485 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
     );
   }
 
-  Widget _controls(
-    BuildContext context,
-    AirconState state,
-    bool busy,
-    Object? error,
-  ) {
-    void setTemperature(int value) => _sendCommand(
-      command: {"tempSet": value},
-      optimisticState: state.copyWith(targetTemperature: value),
-      matches: (state) => state.targetTemperature == value,
-    );
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        if (error != null)
-          Card(
-            color: Theme.of(context).colorScheme.errorContainer,
-            child: ListTile(
-              leading: const Icon(Icons.error_outline),
-              title: Text(error.toString()),
-              trailing: IconButton(
-                onPressed: _isFetching ? null : _refreshDeviceState,
-                icon: const Icon(Icons.refresh),
-              ),
-            ),
-          ),
-        SettingHeader(
-          title: context.t.electricity.airconControlSection,
-          icon: Icons.power_settings_new,
-        ),
-        _AirconSegmentedSwitchGroup(
-          items: [
-            _AirconSwitchItem(
-              icon: Icons.power_settings_new,
-              title: context.t.electricity.airconPower,
-              value: state.isOn,
-              onChanged: (value) => _sendCommand(
-                command: value
-                    ? {"switchStatus": 1}
-                    : {
-                        "switchStatus": 0,
-                        "indoorClean": 0,
-                        "outdoorClean": 0,
-                        "electricHeating": 0,
-                      },
-                optimisticState: state.copyWith(
-                  isOn: value,
-                  electricHeating: value ? state.electricHeating : false,
-                ),
-                matches: (state) => state.isOn == value,
-              ),
-            ),
-          ],
-          enabled: !busy,
-        ),
-        const SizedBox(height: 8),
-        M3ESegmentedList(
-          itemCount: 1,
-          outerRadius: 28,
-          padding: EdgeInsets.zero,
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
-          isEnabled: (index) => !busy,
-          onTap: (index) => _temperatureFocusNode.requestFocus(),
-          itemBuilder: (context, index) => ListTile(
-            leading: const Icon(Icons.device_thermostat),
-            title: Text(context.t.electricity.airconTargetTemperature),
-            subtitle: state.indoorTemperature != null
-                ? Text(
-                    context.t.electricity.airconIndoorTemperature(
-                      temperature: state.indoorTemperature.toString(),
+  Widget _hero(BuildContext context, AirconState state) {
+    final textTheme = Theme.of(context).textTheme;
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Material(
+      color: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 28),
+        child: Column(
+          children: [
+            if (!state.isOn)
+              Text(
+                FlutterI18n.translate(context, "electricity.aircon_power"),
+                style: textTheme.titleMedium?.copyWith(color: color),
+              )
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    state.targetTemperature.toString(),
+                    style: textTheme.displayLarge?.copyWith(
+                      fontSize: 92,
+                      height: 1,
+                      fontWeight: FontWeight.w600,
                     ),
-                  )
-                : null,
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: busy || state.targetTemperature <= 18
-                      ? null
-                      : () => setTemperature(state.targetTemperature - 1),
-                  icon: const Icon(Icons.remove),
-                ),
-                SizedBox(
-                  width: 80,
-                  child: TextFormField(
-                    key: ValueKey(state.targetTemperature),
-                    focusNode: _temperatureFocusNode,
-                    initialValue: state.targetTemperature.toString(),
-                    enabled: !busy,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    textInputAction: TextInputAction.done,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(2),
-                    ],
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      suffixText: "℃",
-                    ),
-                    onFieldSubmitted: (value) {
-                      final temperature = int.tryParse(value);
-                      if (temperature == null ||
-                          temperature < 18 ||
-                          temperature > 32) {
-                        showToast(
-                          context: context,
-                          msg: context.t.electricity.airconTemperatureRange,
-                        );
-                        return;
-                      }
-                      if (temperature != state.targetTemperature) {
-                        setTemperature(temperature);
-                      }
-                    },
                   ),
-                ),
-                IconButton(
-                  onPressed: busy || state.targetTemperature >= 32
-                      ? null
-                      : () => setTemperature(state.targetTemperature + 1),
-                  icon: const Icon(Icons.add),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 2),
+                    child: Text(
+                      "℃",
+                      style: textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(_modeIcon(state.mode), size: 20, color: color),
+                const SizedBox(width: 6),
+                Text(
+                  FlutterI18n.translate(context, state.mode.labelKey),
+                  style: textTheme.titleMedium?.copyWith(color: color),
                 ),
               ],
             ),
-          ),
-        ),
-        SettingHeader(
-          title: context.t.electricity.airconOperationSection,
-          icon: Icons.settings_remote,
-        ),
-        M3ESegmentedList(
-          itemCount: 2,
-          outerRadius: 28,
-          innerRadius: 6,
-          gap: 3,
-          padding: EdgeInsets.zero,
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
-          itemBuilder: (context, index) => Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(16, 6, 16, 10),
-            child: switch (index) {
-              0 => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.ac_unit),
-                    title: Text(context.t.electricity.airconMode),
-                  ),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final buttonWidth =
-                          constraints.maxWidth / AirconMode.values.length;
-                      return M3EToggleButtonGroup(
-                        type: M3EButtonGroupType.standard,
-                        size: M3EButtonSize.xs,
-                        spacing: 0,
-                        actions: AirconMode.values
-                            .map(
-                              (mode) => M3EToggleButtonGroupAction(
-                                label: Text(
-                                  context.t.resolveKey(mode.labelKey),
-                                ),
-                                enabled: !busy,
-                                width: buttonWidth,
-                              ),
-                            )
-                            .toList(),
-                        selectedIndex: AirconMode.values.indexOf(state.mode),
-                        onSelectedIndexChanged: (index) {
-                          if (index == null || busy) return;
-                          final mode = AirconMode.values[index];
-                          final temperature = switch (mode) {
-                            AirconMode.heat => 23,
-                            AirconMode.cool => 26,
-                            _ => 25,
-                          };
-                          final windSpeed = mode == AirconMode.fan
-                              ? AirconWindSpeed.medium
-                              : AirconWindSpeed.auto;
-                          _sendCommand(
-                            command: {
-                              "runMode": mode.value.toString(),
-                              "indoorClean": 0,
-                              "outdoorClean": 0,
-                              "strongMode": 0,
-                              "electricHeating": 0,
-                              "tempView": temperature,
-                              "tempSet": temperature,
-                              "windSpeed": windSpeed.value,
-                            },
-                            optimisticState: state.copyWith(
-                              mode: mode,
-                              targetTemperature: temperature,
-                              windSpeed: windSpeed,
-                              strongMode: false,
-                              electricHeating: false,
-                            ),
-                            matches: (state) =>
-                                state.mode == mode &&
-                                state.targetTemperature == temperature &&
-                                state.windSpeed == windSpeed &&
-                                !state.strongMode &&
-                                !state.electricHeating,
-                          );
-                        },
-                        overflow: M3EButtonGroupOverflow.none,
-                        neighborSquish: true,
-                      );
-                    },
-                  ),
-                ],
-              ),
-              _ => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.air),
-                    title: Text(context.t.electricity.airconWindSpeed),
-                  ),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final buttonWidth =
-                          constraints.maxWidth / AirconWindSpeed.values.length;
-                      return M3EToggleButtonGroup(
-                        type: M3EButtonGroupType.standard,
-                        size: M3EButtonSize.xs,
-                        spacing: 0,
-                        actions: AirconWindSpeed.values
-                            .map(
-                              (speed) => M3EToggleButtonGroupAction(
-                                label: Text(
-                                  context.t.resolveKey(speed.labelKey),
-                                ),
-                                enabled: !busy,
-                                width: buttonWidth,
-                              ),
-                            )
-                            .toList(),
-                        selectedIndex: AirconWindSpeed.values.indexOf(
-                          state.windSpeed,
-                        ),
-                        onSelectedIndexChanged: (index) {
-                          if (index == null || busy) return;
-                          final speed = AirconWindSpeed.values[index];
-                          _sendCommand(
-                            command: {
-                              "windSpeed": speed.value.toString(),
-                              "strongMode": 0,
-                            },
-                            optimisticState: state.copyWith(
-                              windSpeed: speed,
-                              strongMode: false,
-                            ),
-                            matches: (state) =>
-                                state.windSpeed == speed && !state.strongMode,
-                          );
-                        },
-                        overflow: M3EButtonGroupOverflow.none,
-                        neighborSquish: true,
-                      );
-                    },
-                  ),
-                ],
-              ),
-            },
-          ),
-        ),
-        SettingHeader(
-          title: context.t.electricity.airconOtherSettingsSection,
-          icon: Icons.tune,
-        ),
-        _AirconSegmentedSwitchGroup(
-          enabled: !busy,
-          items: [
-            _AirconSwitchItem(
-              icon: Icons.swap_vert,
-              title: context.t.electricity.airconVerticalSwing,
-              value: state.verticalSwing,
-              onChanged: (value) => _sendCommand(
-                command: {"verticalSwing": value ? 1 : 0},
-                optimisticState: state.copyWith(verticalSwing: value),
-                matches: (state) => state.verticalSwing == value,
-              ),
-            ),
-            _AirconSwitchItem(
-              icon: Icons.air,
-              title: context.t.electricity.airconStrongMode,
-              value: state.strongMode,
-              onChanged: (value) => _sendCommand(
-                command: {
-                  "strongMode": value ? 1 : 0,
-                  if (value) "windSpeed": AirconWindSpeed.auto.value,
-                },
-                optimisticState: state.copyWith(
-                  strongMode: value,
-                  windSpeed: value ? AirconWindSpeed.auto : state.windSpeed,
-                ),
-                matches: (state) =>
-                    state.strongMode == value &&
-                    (!value || state.windSpeed == AirconWindSpeed.auto),
-              ),
-            ),
-            _AirconSwitchItem(
-              icon: Icons.local_fire_department,
-              title: context.t.electricity.airconElectricHeating,
-              value: state.electricHeating,
-              onChanged: (value) => _sendCommand(
-                command: {"electricHeating": value ? 1 : 0},
-                optimisticState: state.copyWith(electricHeating: value),
-                matches: (state) => state.electricHeating == value,
-              ),
-            ),
           ],
         ),
-        // if (state.electricAmount != null)
-        //   ListTile(
-        //     leading: const Icon(Icons.electric_bolt),
-        //     title: Text(
-        //       context.t.electricity.airconAmount,
-        //     ),
-        //     trailing: Text(state.electricAmount.toString()),
-        //   ),
-      ],
+      ),
+    );
+  }
+
+  Widget _errorCard(BuildContext context, Object error) {
+    final scheme = Theme.of(context).colorScheme;
+    return _MiCard(
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, color: scheme.error),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              error.toString(),
+              style: TextStyle(color: scheme.error, fontSize: 13),
+            ),
+          ),
+          IconButton(
+            onPressed: _isFetching ? null : _refreshDeviceState,
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 用电信息：平台用电量、室内温度、更新时间。
+  Widget _energyCard(BuildContext context) {
+    return SignalBuilder(
+      builder: (context) {
+        final async = _controller.energyInfoStateSignal.value;
+        final info = async.value?.data;
+        final state = _state;
+
+        String amount = "--";
+        String update = "--";
+        if (info != null) {
+          amount = info.electricAmount.toString();
+          final time = info.stateTime;
+          update =
+              "${time.hour.toString().padLeft(2, "0")}:"
+              "${time.minute.toString().padLeft(2, "0")}";
+        }
+        final indoor = state?.indoorTemperature;
+
+        return _MiCard(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+          onTap: _isFetching ? null : _controller.refreshEnergyInfo,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "electricity.aircon_title",
+                      ),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _energyValue(
+                    context,
+                    amount,
+                    FlutterI18n.translate(context, "electricity.aircon_amount"),
+                  ),
+                  _energyValue(
+                    context,
+                    indoor == null ? "--" : indoor.toString(),
+                    FlutterI18n.translate(context, "electricity.aircon_indoor"),
+                  ),
+                  _energyValue(
+                    context,
+                    update,
+                    FlutterI18n.translate(
+                      context,
+                      "electricity.aircon_update_time",
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _energyValue(BuildContext context, String value, String label) {
+    final scheme = Theme.of(context).colorScheme;
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 电源：一个圆钮，按下去会缩一下。
+  Widget _powerCard(BuildContext context, AirconState state, bool busy) {
+    return _MiCard(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          _RoundButton(
+            icon: Icons.power_settings_new,
+            size: 64,
+            selected: state.isOn,
+            accent: state.isOn ? _miOrange : _miBlue,
+            enabled: !busy,
+            onTap: () => _setPower(state, !state.isOn),
+          ),
+          const SizedBox(width: 14),
+          Text(
+            FlutterI18n.translate(context, "electricity.aircon_power"),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 温度调节：减号、滑条、加号。
+  Widget _temperatureCard(BuildContext context, AirconState state, bool busy) {
+    final scheme = Theme.of(context).colorScheme;
+    final fraction =
+        (state.targetTemperature - _minTemperature) /
+        (_maxTemperature - _minTemperature);
+
+    return _MiCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                FlutterI18n.translate(
+                  context,
+                  "electricity.aircon_target_temperature",
+                ),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: 1,
+                height: 16,
+                child: ColoredBox(color: scheme.outlineVariant),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                "$_minTemperature-$_maxTemperature℃",
+                style: TextStyle(fontSize: 13, color: scheme.outline),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              _RoundButton(
+                icon: Icons.remove,
+                selected: false,
+                accent: _miBlue,
+                enabled: !busy && state.targetTemperature > _minTemperature,
+                onTap: () =>
+                    _setTemperature(state, state.targetTemperature - 1),
+              ),
+              const SizedBox(width: 12),
+
+              /// 滑条：底槽是灰的，填充是蓝的，中间写着当前温度。
+              Expanded(
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(end: fraction.clamp(0.0, 1.0)),
+                  duration: _stateMotionDuration,
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, _) => Container(
+                    height: 58,
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(27),
+                    ),
+                    child: Stack(
+                      children: [
+                        FractionallySizedBox(
+                          widthFactor: value,
+                          child: AnimatedContainer(
+                            duration: _stateMotionDuration,
+                            curve: Curves.easeOutCubic,
+                            decoration: BoxDecoration(
+                              color: state.isOn
+                                  ? _miBlue
+                                  : scheme.outlineVariant,
+                              borderRadius: BorderRadius.circular(27),
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: _DirectionalTemperature(
+                            value: state.targetTemperature,
+                            suffix: "℃",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              _RoundButton(
+                icon: Icons.add,
+                selected: false,
+                accent: _miBlue,
+                enabled: !busy && state.targetTemperature < _maxTemperature,
+                onTap: () =>
+                    _setTemperature(state, state.targetTemperature + 1),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 风速：一排圆钮，选中的是蓝底白字。
+  Widget _windCard(BuildContext context, AirconState state, bool busy) {
+    final scheme = Theme.of(context).colorScheme;
+    return _MiCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                FlutterI18n.translate(context, "electricity.aircon_wind_speed"),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: 1,
+                height: 16,
+                child: ColoredBox(color: scheme.outlineVariant),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                FlutterI18n.translate(context, state.windSpeed.labelKey),
+                style: TextStyle(fontSize: 13, color: scheme.outline),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _SlidingOptionRow(
+            items: [
+              for (final speed in AirconWindSpeed.values)
+                _SlidingOptionItem(
+                  letter: _windLetter(speed),
+                  label: FlutterI18n.translate(context, speed.labelKey),
+                  selected: state.windSpeed == speed && !state.strongMode,
+                  onTap: () => _setWindSpeed(state, speed),
+                ),
+            ],
+            selectedIndex: state.strongMode
+                ? -1
+                : AirconWindSpeed.values.indexOf(state.windSpeed),
+            enabled: !busy,
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _windLetter(AirconWindSpeed speed) => switch (speed) {
+    AirconWindSpeed.auto => "A",
+    AirconWindSpeed.silent => "S",
+    AirconWindSpeed.low => "L",
+    AirconWindSpeed.medium => "M",
+    AirconWindSpeed.high => "H",
+  };
+
+  /// 扫风：照米家做成一张单独的卡片，左边一个大圆钮、右边开关。
+  ///
+  /// 米家那张卡下面还有一个「风向」按钮，我们这台设备只提供上下扫风，
+  /// 没有左右风向的指令，就不摆一个按不动的按钮了。
+  Widget _swingCard(BuildContext context, AirconState state, bool busy) {
+    return _MiCard(
+      padding: const EdgeInsets.fromLTRB(18, 14, 12, 14),
+      child: Row(
+        children: [
+          _RoundButton(
+            icon: Icons.swap_vert,
+            selected: state.verticalSwing,
+            accent: _miBlue,
+            enabled: !busy,
+            size: 52,
+            onTap: () => _setVerticalSwing(state, !state.verticalSwing),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              FlutterI18n.translate(
+                context,
+                "electricity.aircon_vertical_swing",
+              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+          ),
+          Switch(
+            value: state.verticalSwing,
+            onChanged: busy ? null : (value) => _setVerticalSwing(state, value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 强力模式和辅助电热：米家页面上没有，单独放一张卡，功能不丢。
+  Widget _otherCard(BuildContext context, AirconState state, bool busy) {
+    Widget row({
+      required IconData icon,
+      required String key,
+      required bool value,
+      required ValueChanged<bool> onChanged,
+    }) {
+      return _SwitchRow(
+        icon: icon,
+        label: FlutterI18n.translate(context, key),
+        value: value,
+        enabled: !busy,
+        onChanged: onChanged,
+      );
+    }
+
+    return _MiCard(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+      child: Column(
+        children: [
+          row(
+            icon: Icons.bolt_outlined,
+            key: "electricity.aircon_strong_mode",
+            value: state.strongMode,
+            onChanged: (value) => _setStrongMode(state, value),
+          ),
+          const Divider(height: 1),
+          row(
+            icon: Icons.local_fire_department_outlined,
+            key: "electricity.aircon_electric_heating",
+            value: state.electricHeating,
+            onChanged: (value) => _setElectricHeating(state, value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 运行模式：一排圆钮。
+  Widget _modeCard(BuildContext context, AirconState state, bool busy) {
+    /// 顺序照米家：制冷、制热、自动、送风、除湿。
+    const order = [
+      AirconMode.cool,
+      AirconMode.heat,
+      AirconMode.auto,
+      AirconMode.fan,
+      AirconMode.dry,
+    ];
+
+    return _MiCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            FlutterI18n.translate(context, "electricity.aircon_mode"),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 14),
+          _SlidingOptionRow(
+            items: [
+              for (final mode in order)
+                _SlidingOptionItem(
+                  icon: _modeIcon(mode),
+                  label: FlutterI18n.translate(context, mode.labelKey),
+                  selected: state.mode == mode,
+                  onTap: () => _setMode(state, mode),
+                ),
+            ],
+            selectedIndex: order.indexOf(state.mode),
+            enabled: !busy,
+          ),
+        ],
+      ),
     );
   }
 
@@ -589,71 +1064,431 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   }
 }
 
-class _AirconSwitchItem {
-  const _AirconSwitchItem({
+class _PressScaleFeedback extends StatefulWidget {
+  const _PressScaleFeedback({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_PressScaleFeedback> createState() => _PressScaleFeedbackState();
+}
+
+class _PressScaleFeedbackState extends State<_PressScaleFeedback> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (_) => setState(() => _pressed = true),
+      onPointerUp: (_) => setState(() => _pressed = false),
+      onPointerCancel: (_) => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.9 : 1,
+        duration: _pressMotionDuration,
+        curve: Curves.easeOutCubic,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+class _CardEntrance extends StatefulWidget {
+  const _CardEntrance({required this.index, required this.child});
+  final int index;
+  final Widget child;
+
+  @override
+  State<_CardEntrance> createState() => _CardEntranceState();
+}
+
+class _CardEntranceState extends State<_CardEntrance> {
+  bool _started = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _started = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
+    final delay = widget.index * 40;
+    final total = delay + 260;
+    // 先提交一个可见首帧，再开始错峰入场。
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: _started ? 1 : 0),
+      duration: Duration(milliseconds: total),
+      curve: Interval(delay / total, 1, curve: Curves.easeOutCubic),
+      child: widget.child,
+      builder: (context, value, child) => Transform.translate(
+        offset: Offset(0, 12 * (1 - value)),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _DirectionalTemperature extends StatefulWidget {
+  const _DirectionalTemperature({
+    required this.value,
+    required this.style,
+    this.suffix = "",
+  });
+  final int value;
+  final TextStyle? style;
+  final String suffix;
+  @override
+  State<_DirectionalTemperature> createState() =>
+      _DirectionalTemperatureState();
+}
+
+class _DirectionalTemperatureState extends State<_DirectionalTemperature> {
+  late int _oldValue = widget.value;
+  @override
+  void didUpdateWidget(covariant _DirectionalTemperature oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value) _oldValue = oldWidget.value;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final increasing = widget.value > _oldValue;
+    return AnimatedSwitcher(
+      duration: _stateMotionDuration,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        final childValue = (child.key as ValueKey<int>).value;
+        final incoming = childValue == widget.value;
+        final offset = increasing
+            ? (incoming ? const Offset(0, 1) : const Offset(0, -1))
+            : (incoming ? const Offset(0, -1) : const Offset(0, 1));
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween(begin: offset, end: Offset.zero).animate(animation),
+            child: child,
+          ),
+        );
+      },
+      child: Text(
+        "${widget.value}${widget.suffix}",
+        key: ValueKey(widget.value),
+        style: widget.style,
+      ),
+    );
+  }
+}
+
+class _SlidingOptionItem {
+  const _SlidingOptionItem({
+    this.icon,
+    this.letter,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+  final IconData? icon;
+  final String? letter;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+}
+
+class _SlidingOptionRow extends StatelessWidget {
+  const _SlidingOptionRow({
+    required this.items,
+    required this.selectedIndex,
+    required this.enabled,
+  });
+  final List<_SlidingOptionItem> items;
+  final int selectedIndex;
+  final bool enabled;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 84,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final slot = constraints.maxWidth / items.length;
+          return Stack(
+            children: [
+              if (selectedIndex >= 0)
+                AnimatedPositioned(
+                  duration: _stateMotionDuration,
+                  curve: Curves.easeOutCubic,
+                  left: selectedIndex * slot + (slot - 54) / 2,
+                  top: 0,
+                  width: 54,
+                  height: 54,
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: _miBlue,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              for (var i = 0; i < items.length; i++)
+                Positioned(
+                  left: i * slot,
+                  width: slot,
+                  top: 0,
+                  child: _SlidingOptionCell(
+                    item: items[i],
+                    selected: i == selectedIndex,
+                    enabled: enabled,
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SlidingOptionCell extends StatefulWidget {
+  const _SlidingOptionCell({
+    required this.item,
+    required this.selected,
+    required this.enabled,
+  });
+  final _SlidingOptionItem item;
+  final bool selected;
+  final bool enabled;
+  @override
+  State<_SlidingOptionCell> createState() => _SlidingOptionCellState();
+}
+
+class _SlidingOptionCellState extends State<_SlidingOptionCell> {
+  bool _pressed = false;
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final color = widget.selected
+        ? Colors.white
+        : (widget.enabled ? scheme.onSurfaceVariant : scheme.outline);
+    return GestureDetector(
+      onTap: widget.enabled ? widget.item.onTap : null,
+      onTapDown: widget.enabled ? (_) => setState(() => _pressed = true) : null,
+      onTapUp: widget.enabled ? (_) => setState(() => _pressed = false) : null,
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.9 : 1,
+        duration: _pressMotionDuration,
+        curve: Curves.easeOutCubic,
+        child: Column(
+          children: [
+            SizedBox(
+              height: 54,
+              child: Center(
+                child: AnimatedDefaultTextStyle(
+                  duration: _stateMotionDuration,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  child: widget.item.letter != null
+                      ? Text(widget.item.letter!)
+                      : TweenAnimationBuilder<Color?>(
+                          tween: ColorTween(end: color),
+                          duration: _stateMotionDuration,
+                          curve: Curves.easeOutCubic,
+                          builder: (context, animatedColor, _) => Icon(
+                            widget.item.icon,
+                            size: 24,
+                            color: animatedColor,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            AnimatedDefaultTextStyle(
+              duration: _stateMotionDuration,
+              style: TextStyle(
+                fontSize: 12,
+                color: widget.selected ? _miBlue : scheme.onSurfaceVariant,
+                fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w400,
+              ),
+              child: Text(
+                widget.item.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 米家那种白卡片：大圆角、很淡的阴影。
+class _MiCard extends StatelessWidget {
+  const _MiCard({required this.child, this.padding, this.onTap});
+
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final content = Padding(
+      padding: padding ?? const EdgeInsets.all(20),
+      child: child,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? scheme.surface
+              : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: onTap == null
+            ? content
+            : Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: onTap,
+                  child: content,
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+/// 圆形按钮：选中是实心蓝，未选中是浅灰底。
+class _RoundButton extends StatefulWidget {
+  const _RoundButton({
+    this.icon,
+    required this.selected,
+    required this.accent,
+    required this.onTap,
+    this.enabled = true,
+    this.size = 56,
+  });
+
+  final IconData? icon;
+
+  final bool selected;
+  final Color accent;
+  final VoidCallback onTap;
+  final bool enabled;
+  final double size;
+
+  @override
+  State<_RoundButton> createState() => _RoundButtonState();
+}
+
+class _RoundButtonState extends State<_RoundButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final background = !widget.enabled
+        ? scheme.surfaceContainerHighest
+        : widget.selected
+        ? widget.accent
+        : scheme.surfaceContainerHighest;
+    final foreground = !widget.enabled
+        ? scheme.outline
+        : widget.selected
+        ? Colors.white
+        : scheme.onSurfaceVariant;
+
+    return GestureDetector(
+      onTapDown: widget.enabled ? (_) => setState(() => _pressed = true) : null,
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: widget.enabled ? (_) => setState(() => _pressed = false) : null,
+      onTap: widget.enabled ? widget.onTap : null,
+      child: AnimatedScale(
+        scale: _pressed ? 0.9 : 1,
+        duration: _pressMotionDuration,
+        curve: Curves.easeOutCubic,
+        child: AnimatedContainer(
+          duration: _stateMotionDuration,
+          curve: Curves.easeOutCubic,
+          width: widget.size,
+          height: widget.size,
+          decoration: BoxDecoration(color: background, shape: BoxShape.circle),
+          child: Icon(
+            widget.icon ?? Icons.circle,
+            size: widget.size * 0.5,
+            color: foreground,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 一行开关，左边一个圆图标、中间文字、右边开关。
+class _SwitchRow extends StatelessWidget {
+  const _SwitchRow({
     required this.icon,
-    required this.title,
+    required this.label,
     required this.value,
     required this.onChanged,
+    this.enabled = true,
   });
 
   final IconData icon;
-  final String title;
+  final String label;
   final bool value;
   final ValueChanged<bool> onChanged;
-}
-
-class _AirconSegmentedSwitchGroup extends StatelessWidget {
-  const _AirconSegmentedSwitchGroup({
-    required this.items,
-    required this.enabled,
-  });
-
-  final List<_AirconSwitchItem> items;
   final bool enabled;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return M3ESegmentedColumn(
-      outerRadius: 28,
-      innerRadius: 6,
-      gap: 3,
-      color: colorScheme.surfaceContainerLow,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      selectionMode: M3ESelectionMode.multiple,
-      selectionTrigger: M3ESelectionTrigger.none,
-      isSelected: (index) => items[index].value,
-      selectedColor: colorScheme.primaryContainer.withValues(alpha: 0.4),
-      selectedRadius: 20,
-      pressedRadius: 4,
-      pressedScale: 0.98,
-      splashFactory: InkSparkle.splashFactory,
-      isEnabled: (index) => enabled,
-      onTap: (index) => items[index].onChanged(!items[index].value),
-      children: [
-        for (final item in items)
-          Row(
-            children: [
-              Icon(item.icon, color: colorScheme.onSurfaceVariant),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  item.title,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-              const SizedBox(width: 8),
-              IgnorePointer(
-                child: Switch(
-                  value: item.value,
-                  onChanged: enabled ? item.onChanged : null,
-                ),
-              ),
-            ],
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          AnimatedContainer(
+            duration: _stateMotionDuration,
+            curve: Curves.easeOutCubic,
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: value ? _miBlue : scheme.surfaceContainerHighest,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: value ? Colors.white : scheme.onSurfaceVariant,
+            ),
           ),
-      ],
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+          ),
+          Switch(value: value, onChanged: enabled ? onChanged : null),
+        ],
+      ),
     );
   }
 }
