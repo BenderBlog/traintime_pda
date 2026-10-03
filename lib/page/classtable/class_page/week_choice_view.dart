@@ -86,8 +86,14 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
     if (isOccupied) {
       opacity = isCompleted ? _completedOpacity : _occupiedOpacity;
     }
-    return ClipOval(
-      child: ColoredBox(color: dotColor.withValues(alpha: opacity)),
+    return SizedBox.square(
+      dimension: 7.0,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: dotColor.withValues(alpha: opacity),
+        ),
+      ),
     );
   }
 
@@ -107,14 +113,13 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
       final weekStart = controller.startDay
           .add(Duration(days: 7 * controller.offset))
           .add(Duration(days: 7 * widget.index));
-      final currentBlockIndex =
-          CurrentTimeIndicator.transferTimeToBlockIndex(now);
+      final currentBlockIndex = CurrentTimeIndicator.transferTimeToBlockIndex(
+        now,
+      );
       final dayArrangements = List.generate(
         5,
-        (d) => controller.getArrangement(
-          weekIndex: widget.index,
-          dayIndex: d + 1,
-        ),
+        (d) =>
+            controller.getArrangement(weekIndex: widget.index, dayIndex: d + 1),
       );
 
       overviewChildren = List.generate(25, (i) {
@@ -165,6 +170,7 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
       });
     }
 
+    final children = overviewChildren;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -185,17 +191,30 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
 
         /// These code are used to render the overview of the week,
         /// as long as the height of the page is over 500.
-        if (showOverview && overviewChildren != null)
+        if (showOverview && children != null)
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(6, 4, 6, 2),
-              child: GridView.count(
-                shrinkWrap: true,
-                crossAxisCount: 5,
-                mainAxisSpacing: 2,
-                crossAxisSpacing: 2,
-                physics: const NeverScrollableScrollPhysics(),
-                children: overviewChildren,
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(5, (time) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(5, (dayIndex) {
+                            final i = time * 5 + dayIndex;
+                            return children[i];
+                          }),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

@@ -161,19 +161,22 @@ class CurrentTimeIndicator {
     }
 
     final firstStart = timeList.isNotEmpty ? parseMinute(timeList.first) : 0;
-    final endMinute =
-        timeList.isNotEmpty ? parseMinute(timeList.last) : 24 * 60;
+    final endMinute = timeList.isNotEmpty
+        ? parseMinute(timeList.last)
+        : 24 * 60;
 
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
     final labelHeight = CurrentTimeIndicatorConfig.labelHeight;
     final lineThickness = CurrentTimeIndicatorConfig.lineThickness;
 
     // Minimum lineTop ensures the time capsule is not cut off at the start (starts at y >= 1.0)
-    final double minLineTop =
-        hasLabel ? (labelHeight / 2 + 1.0) : (lineThickness / 2 + 1.0);
+    final double minLineTop = hasLabel
+        ? (labelHeight / 2 + 1.0)
+        : (lineThickness / 2 + 1.0);
 
     // Maximum lineTop positions the time capsule below period 11 text ("21:25") so it does not block the text
-    final double maxLineTop = blockHeight(61) +
+    final double maxLineTop =
+        blockHeight(61) +
         (hasLabel ? (labelHeight / 2 + 3.0) : (lineThickness / 2 + 3.0));
 
     double lineTop = blockHeight(_transferIndex(now));
@@ -185,8 +188,9 @@ class CurrentTimeIndicator {
       lineTop = lineTop.clamp(minLineTop, maxLineTop);
     }
 
-    final double halfHeight =
-        hasLabel ? (labelHeight / 2) : (lineThickness / 2);
+    final double halfHeight = hasLabel
+        ? (labelHeight / 2)
+        : (lineThickness / 2);
     final indicatorTop = lineTop - halfHeight;
     final indicatorHeight = hasLabel ? labelHeight : lineThickness;
     final labelTop = 0.0;
@@ -210,9 +214,7 @@ class CurrentTimeIndicator {
       connectorColor: color.withValues(
         alpha: CurrentTimeIndicatorConfig.lineAlpha * 0.35,
       ),
-      lineColor: color.withValues(
-        alpha: CurrentTimeIndicatorConfig.lineAlpha,
-      ),
+      lineColor: color.withValues(alpha: CurrentTimeIndicatorConfig.lineAlpha),
       labelBackgroundColor: colorScheme.surface.withValues(
         alpha: CurrentTimeIndicatorConfig.labelBackgroundAlpha,
       ),
@@ -283,8 +285,7 @@ class CurrentTimeIndicator {
                   padding: EdgeInsets.symmetric(
                     horizontal:
                         CurrentTimeIndicatorConfig.labelHorizontalPadding,
-                    vertical:
-                        CurrentTimeIndicatorConfig.labelVerticalPadding,
+                    vertical: CurrentTimeIndicatorConfig.labelVerticalPadding,
                   ),
                   child: Center(
                     child: Text(
@@ -333,10 +334,7 @@ class CurrentTimeIndicator {
     );
 
     if (opacity < 1.0) {
-      content = Opacity(
-        opacity: opacity.clamp(0.0, 1.0),
-        child: content,
-      );
+      content = Opacity(opacity: opacity.clamp(0.0, 1.0), child: content);
     }
 
     return Positioned(
@@ -349,9 +347,9 @@ class CurrentTimeIndicator {
 
   /// The box behind today's column.
   ///
-  /// It spans exactly what the time line's panel spans — the same [timeLineInset] in from the top
-  /// and the bottom of the table — so the two bands end level with each other, including over the
-  /// blank room the table keeps after its last period for the bottom of the display.
+  /// It spans the full height of the grid, like the time line's panel, so the two bands end level
+  /// with each other, including over the blank room the table keeps after its last period for the
+  /// bottom of the display.
   static Positioned? buildDayColumnBox({
     required BuildContext context,
     required DateTime now,

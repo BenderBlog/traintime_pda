@@ -54,12 +54,11 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
             enabled: false,
             child: ClassTableSheet(
               singleIndex: previewState.currentWeek,
-              enableVerticalScrolling: false,
 
               /// The sheet is not given a viewport of its own here: it expands to the table's full
               /// height and the settings page around it scrolls, so the last periods of the day are
               /// reachable in the sample too.
-              heightReference: 560,
+              enableVerticalScrolling: false,
             ),
           ),
         );

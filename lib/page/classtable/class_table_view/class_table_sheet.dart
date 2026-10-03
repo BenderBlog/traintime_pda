@@ -39,10 +39,10 @@ class ClassTableSheet extends StatefulWidget {
   final ValueChanged<int>? onPageChanged;
   final bool enableVerticalScrolling;
 
-  /// The height the blocks are scaled against when the sheet is not given a bounded box of its own.
+  /// The height the blocks are scaled against, [classTableHeightReference] when null.
   ///
-  /// A settings preview expands to the table's full height and lets the surrounding page scroll, so
-  /// it has no viewport height to scale against and hands in the familiar 560 instead.
+  /// A fixed reference rather than the viewport, so the blocks keep their size whether the week bar
+  /// is docked or collapsed, and in the settings preview, which has no viewport of its own.
   final double? heightReference;
 
   /// The room kept after the last period, for the bottom of the display.
@@ -217,10 +217,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
           /// Nothing scrolls in here, so the sheet takes its full height and the page around it does
           /// the scrolling. Confining it to the box it was given is what used to hide the last
           /// periods of the settings preview.
-          return SizedBox(
-            height: _dateRowHeight + gridHeight,
-            child: content,
-          );
+          return SizedBox(height: _dateRowHeight + gridHeight, child: content);
         }
 
         return content;
@@ -257,9 +254,11 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
 /// when scrolling vertically.
 ///
 /// - For a quick flick to turn pages, the user must exceed a deliberate velocity threshold
-///   (350 px/s) AND have moved at least 15% of the page in that direction.
-/// - For a slow drag without a quick flick, the page must be dragged past the midpoint (50%)
-///   to settle onto the next page, otherwise it smoothly springs back.
+///   ([_kMinFlingVelocity]) AND have moved at least [_kMinDragFractionForFling] of the page in
+///   that direction.
+/// - For a slow drag without a quick flick, the page must be dragged past
+///   [_kSlowDragCommitThreshold] (the midpoint) in either direction to settle onto the
+///   neighbouring page, otherwise it springs back.
 class ClassTablePageScrollPhysics extends PageScrollPhysics {
   const ClassTablePageScrollPhysics({super.parent});
 
@@ -276,8 +275,12 @@ class ClassTablePageScrollPhysics extends PageScrollPhysics {
   static const double _kMinDragFractionForFling = 0.20;
 
   /// Fraction of page width dragged required to commit to flipping page during slow dragging.
-  /// Must be pulled past 60% of width to advance; otherwise, it firmly springs back to the current week.
-  static const double _kSlowDragCommitThreshold = 0.60;
+  ///
+  /// The physics only sees where the pages are, not which page the drag started on, so this is the
+  /// point where the drag lands on the nearer page. Only 0.5 is symmetric: any other value would
+  /// make one direction need more than this and the other direction less (at 0.6, forward needed
+  /// 60% while backward flipped at 40%).
+  static const double _kSlowDragCommitThreshold = 0.5;
 
   @override
   SpringDescription get spring => SpringDescription.withDampingRatio(
@@ -306,22 +309,25 @@ class ClassTablePageScrollPhysics extends PageScrollPhysics {
 
     final int targetPage;
     if (velocity > _kMinFlingVelocity) {
-      targetPage =
-          fraction >= _kMinDragFractionForFling ? pageFloor + 1 : pageFloor;
+      targetPage = fraction >= _kMinDragFractionForFling
+          ? pageFloor + 1
+          : pageFloor;
     } else if (velocity < -_kMinFlingVelocity) {
-      targetPage =
-          fraction <= (1.0 - _kMinDragFractionForFling)
-              ? pageFloor
-              : pageFloor + 1;
+      targetPage = fraction <= (1.0 - _kMinDragFractionForFling)
+          ? pageFloor
+          : pageFloor + 1;
     } else {
-      // Slow drag: requires crossing 60% threshold to commit forward.
-      targetPage =
-          fraction >= _kSlowDragCommitThreshold ? pageFloor + 1 : pageFloor;
+      // Slow drag: settle onto whichever page is more than half in view, in either direction.
+      targetPage = fraction >= _kSlowDragCommitThreshold
+          ? pageFloor + 1
+          : pageFloor;
     }
 
     final Tolerance tolerance = toleranceFor(position);
-    final double targetPixels = (targetPage * position.viewportDimension)
-        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    final double targetPixels = (targetPage * position.viewportDimension).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
 
     if (targetPixels != position.pixels) {
       return ScrollSpringSimulation(
@@ -414,11 +420,7 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
             opacity: 1.0,
           );
           if (indicator == null) return const SizedBox.shrink();
-          return IgnorePointer(
-            child: Stack(
-              children: [indicator],
-            ),
-          );
+          return IgnorePointer(child: Stack(children: [indicator]));
         },
       );
     }
@@ -428,9 +430,10 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
     return AnimatedBuilder(
       animation: Listenable.merge([pages, controllers.timeTickNotifier]),
       builder: (context, _) {
-        double page = currentWeek.toDouble();
+        final double page;
         if (pages.hasClients && pages.position.hasPixels) {
-          page = pages.page ??
+          page =
+              pages.page ??
               (maxWidth > 0
                   ? pages.position.pixels / maxWidth
                   : singleIndex.toDouble());
@@ -464,11 +467,7 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return IgnorePointer(
-          child: Stack(
-            children: [indicator],
-          ),
-        );
+        return IgnorePointer(child: Stack(children: [indicator]));
       },
     );
   }

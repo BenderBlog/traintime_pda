@@ -45,26 +45,25 @@ class ClassTableDateRow extends StatefulWidget {
 }
 
 class _ClassTableDateRowState extends State<ClassTableDateRow> {
-  double? _cachedWidth;
-  int? _cachedSemesterLength;
+  /// Everything baked into [_cachedHeadersChild]: the strip is reused only while all of it holds,
+  /// so a week offset, a reloaded semester, a font scale, a theme or a locale change still redraws
+  /// the headers.
+  Object? _cacheKey;
   Widget? _cachedHeadersChild;
 
-  @override
-  void didUpdateWidget(covariant ClassTableDateRow oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.semesterLength != widget.semesterLength) {
-      _cachedHeadersChild = null;
-    }
-  }
-
   Widget _buildHeadersStrip(BuildContext context, double maxWidth) {
-    if (_cachedWidth == maxWidth &&
-        _cachedSemesterLength == widget.semesterLength &&
-        _cachedHeadersChild != null) {
+    final Object key = (
+      maxWidth,
+      widget.semesterLength,
+      widget.timeColumnWidth,
+      widget.firstDayOfWeek(0),
+      Theme.of(context).colorScheme.onSurface,
+      Localizations.localeOf(context),
+    );
+    if (_cacheKey == key && _cachedHeadersChild != null) {
       return _cachedHeadersChild!;
     }
-    _cachedWidth = maxWidth;
-    _cachedSemesterLength = widget.semesterLength;
+    _cacheKey = key;
     final double dayWidth = (maxWidth - widget.timeColumnWidth) / 7;
 
     _cachedHeadersChild = RepaintBoundary(
@@ -132,8 +131,9 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
 
   /// The headers, one week wide each, sliding with the pages when there are pages to follow.
   Widget _headers(BuildContext context) {
-    final double? stateWidth =
-        ClassTableState.of(context)?.constraints.maxWidth;
+    final double? stateWidth = ClassTableState.of(
+      context,
+    )?.constraints.maxWidth;
     if (stateWidth != null && stateWidth > 0) {
       return _buildHeadersWithWidth(context, stateWidth);
     }
@@ -155,14 +155,10 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
         animation: pages,
         child: _buildHeadersStrip(context, maxWidth),
         builder: (context, child) {
-          final double offset =
-              pages.hasClients && pages.position.hasPixels
-                  ? pages.position.pixels
-                  : widget.index * maxWidth;
-          return Transform.translate(
-            offset: Offset(-offset, 0),
-            child: child,
-          );
+          final double offset = pages.hasClients && pages.position.hasPixels
+              ? pages.position.pixels
+              : widget.index * maxWidth;
+          return Transform.translate(offset: Offset(-offset, 0), child: child);
         },
       ),
     );
@@ -254,12 +250,8 @@ class _HeaderClip extends CustomClipper<Rect> {
   const _HeaderClip();
 
   @override
-  Rect getClip(Size size) => Rect.fromLTRB(
-    timeLineInset,
-    0,
-    size.width - timeLineInset,
-    size.height,
-  );
+  Rect getClip(Size size) =>
+      Rect.fromLTRB(timeLineInset, 0, size.width - timeLineInset, size.height);
 
   @override
   bool shouldReclip(covariant CustomClipper<Rect> oldClipper) => false;
@@ -306,7 +298,8 @@ class _RenderHorizontalStrip extends RenderProxyBox {
       ),
       parentUsesSize: true,
     );
-    size = constraints.constrain(Size(constraints.maxWidth, child!.size.height));
+    size = constraints.constrain(
+      Size(constraints.maxWidth, child!.size.height),
+    );
   }
 }
-

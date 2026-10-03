@@ -88,6 +88,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
   bool _didLoadVisualSettings = false;
+
   /// Whether the week bar is tucked into the app bar.
   ///
   /// Pinned is the default, so the stored flag is the opposite of it and an unset preference reads
@@ -98,6 +99,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   /// Whether the collapsed bar is currently opened over the table. Only meaningful while collapsed.
   bool _weekBarExpanded = false;
+
+  /// Whether the collapsed floating bar is fully off-stage to stop rendering and layout completely.
+  late bool _weekBarOffstage = _weekBarCollapsed;
 
   /// The height the week bar takes, either in the page or floating.
   double get _weekBarHeight => MediaQuery.sizeOf(context).height >= 500
@@ -177,7 +181,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       pagePosition.pixels / pagePosition.viewportDimension,
     );
     if (offset != null) {
-      final bool needsJump = !rowControl.hasClients ||
+      final bool needsJump =
+          !rowControl.hasClients ||
           !rowControl.position.hasPixels ||
           (rowControl.offset - offset).abs() > 0.01;
       if (needsJump) {
@@ -255,14 +260,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     if (!rowPosition.hasContentDimensions) {
       return;
     }
+    const double edgePadding = 12.0;
     final double left = week * weekChoiceItemExtent;
     final double right = left + weekChoiceItemExtent;
     final double offset = rowControl.offset;
     double? target;
-    if (left < offset) {
-      target = left;
-    } else if (right > offset + rowPosition.viewportDimension) {
-      target = right - rowPosition.viewportDimension;
+    if (left - edgePadding < offset) {
+      target = left - edgePadding;
+    } else if (right + edgePadding > offset + rowPosition.viewportDimension) {
+      target = right + edgePadding - rowPosition.viewportDimension;
     }
     if (target == null) {
       return;
@@ -348,15 +354,24 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// lie over it — and it is blurred here rather than per control: the frosted look of the controls
   /// is a blur of this very layer inside their own bounds, so a sharp copy has to stay underneath.
   Widget _backgroundLayer(BuildContext context) {
-    if (!preference.getBool(preference.Preference.decorated)) {
-      return const SizedBox.shrink();
+    final bool isDecorated = preference.getBool(
+      preference.Preference.decorated,
+    );
+    if (!isDecorated) {
+      return const Positioned.fill(
+        key: ValueKey('class_table_background_layer_empty'),
+        child: SizedBox.shrink(),
+      );
     }
 
     final File image = File(
       "${supportPath.path}/${classTableState.decorationName}",
     );
     if (!image.existsSync()) {
-      return const SizedBox.shrink();
+      return const Positioned.fill(
+        key: ValueKey('class_table_background_layer_empty'),
+        child: SizedBox.shrink(),
+      );
     }
 
     final double blur = preference
@@ -369,6 +384,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       key: ValueKey<String>(image.path),
       fit: BoxFit.cover,
       gaplessPlayback: true,
+      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
       opacity: AlwaysStoppedAnimation<double>(
         Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
       ),
@@ -395,7 +411,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     return Positioned.fill(
       key: const ValueKey('class_table_background_layer'),
-      child: layer,
+      child: RepaintBoundary(child: layer),
     );
   }
 
@@ -452,53 +468,66 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// When user click on the button, the pageview will show the class table of the
   /// week the button suggested.
   Widget _weekRow() {
-    return Stack(
-      children: [
-        /// The highlight sits behind the buttons, sliding from week to week.
-        Positioned.fill(
-          child: IgnorePointer(
-            child: WeekSelectionHighlight(
-              week: _chosenWeek,
-              rowControl: rowControl,
-            ),
+    return ClipRect(
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          overscroll: false,
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
           ),
         ),
-        ListView.builder(
-          controller: rowControl,
-          physics: const ClampingScrollPhysics(),
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.zero,
-          itemExtent: weekChoiceItemExtent,
-          itemCount: classTableState.semesterLength,
-          itemBuilder: (BuildContext context, int index) {
-            return Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: weekButtonHorizontalPadding,
-              ),
-              child: Card(
-                /// Transparent: the highlight is the box behind the row, not a tint per button.
-                color: Colors.transparent,
-                elevation: 0.0,
-                child: InkWell(
-                  /// The following themes are the same as the Material 3 Card Radius.
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(weekChoiceCardRadius),
-                  ),
-                  onTap: () {
-                    if (isTopRowLocked == false) {
-                      classTableState.chosenWeek = index;
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: WeekChoiceView(index: index),
-                  ),
+        child: Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            /// The highlight sits behind the buttons, sliding from week to week.
+            Positioned.fill(
+              child: IgnorePointer(
+                child: WeekSelectionHighlight(
+                  week: _chosenWeek,
+                  rowControl: rowControl,
                 ),
               ),
-            );
-          },
+            ),
+            ListView.builder(
+              controller: rowControl,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              itemExtent: weekChoiceItemExtent,
+              itemCount: classTableState.semesterLength,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: weekButtonHorizontalPadding,
+                  ),
+                  child: Card(
+                    /// Transparent: the highlight is the box behind the row, not a tint per button.
+                    color: Colors.transparent,
+                    elevation: 0.0,
+                    child: InkWell(
+                      /// The following themes are the same as the Material 3 Card Radius.
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(weekChoiceCardRadius),
+                      ),
+                      onTap: () {
+                        if (isTopRowLocked == false) {
+                          classTableState.chosenWeek = index;
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: WeekChoiceView(index: index),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -519,7 +548,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   Widget _weekBarContents() {
     return Padding(
       padding: const EdgeInsets.only(top: 2, bottom: 4),
-      child: Row(children: [Expanded(child: _weekRow()), _pinToggle()]),
+      child: Row(
+        children: [
+          Expanded(child: _weekRow()),
+          _pinToggle(),
+        ],
+      ),
     );
   }
 
@@ -550,6 +584,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     setState(() {
       _weekBarCollapsed = collapsed;
       _weekBarExpanded = false;
+      if (!collapsed) {
+        _weekBarOffstage = false;
+      }
     });
   }
 
@@ -563,15 +600,19 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Material(
-              color: Theme.of(
-                context,
-              ).colorScheme.surfaceContainerHigh.withValues(
-                alpha: timeLineSurfaceAlpha,
-              ),
+              color: Theme.of(context).colorScheme.surfaceContainerHigh
+                  .withValues(alpha: timeLineSurfaceAlpha),
               borderRadius: BorderRadius.circular(timeLineRadius),
               child: InkWell(
                 borderRadius: BorderRadius.circular(timeLineRadius),
-                onTap: () => setState(() => _weekBarExpanded = !_weekBarExpanded),
+                onTap: () {
+                  setState(() {
+                    if (!_weekBarExpanded) {
+                      _weekBarOffstage = false;
+                    }
+                    _weekBarExpanded = !_weekBarExpanded;
+                  });
+                },
                 child: Container(
                   height: 32,
                   alignment: Alignment.center,
@@ -580,9 +621,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     FlutterI18n.translate(
                       context,
                       "classtable.week_title",
-                      translationParams: {
-                        "week": (chosenWeek + 1).toString(),
-                      },
+                      translationParams: {"week": (chosenWeek + 1).toString()},
                     ),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
@@ -834,7 +873,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_brightness_factor",
+                          "setting.class_table_style_page.active_brightness_factor",
                           translationParams: {
                             "value": _formatPercent(activeBrightnessFactor),
                           },
@@ -852,7 +891,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_border_alpha",
+                          "setting.class_table_style_page.active_border_alpha",
                           translationParams: {
                             "value": _formatPercent(activeBorderAlpha),
                           },
@@ -869,7 +908,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_inner_alpha",
+                          "setting.class_table_style_page.active_inner_alpha",
                           translationParams: {
                             "value": _formatPercent(activeInnerAlpha),
                           },
@@ -1031,10 +1070,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   @override
   Widget build(BuildContext context) {
-    CurrentTimeIndicatorConfig.loadFromPreference();
-    CompletedClassStyleConfig.loadFromPreference();
-    GlassStyleConfig.loadFromPreference();
-
     final state = ClassTableState.of(context)!.controllers;
 
     final hasError =
@@ -1043,30 +1078,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     final double statusBarHeight = MediaQuery.paddingOf(context).top;
     final double appBarHeight = statusBarHeight + kToolbarHeight;
-    final bool appBarGlass =
-        GlassStyleConfig.enabled && GlassStyleConfig.appBarSigma > 0;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: appBarGlass ? Colors.transparent : null,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        flexibleSpace: appBarGlass
-            ? SizedBox.expand(
-                child: GlassBlur(
-                  sigma: GlassStyleConfig.appBarSigma,
-                  child: SizedBox.expand(
-                    child: ColoredBox(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHigh
-                          .withValues(alpha: weekBarSurfaceAlpha),
-                    ),
-                  ),
-                ),
-              )
-            : null,
         title: Text(FlutterI18n.translate(context, "classtable.page_title")),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
@@ -1076,6 +1094,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               icon: const Icon(Icons.error_outline),
               tooltip: FlutterI18n.translate(context, "load_error"),
             ),
+
           /// While collapsed, the week number is all that is left of the bar.
           AnimatedSwitcher(
             duration: weekBarPopDuration,
@@ -1424,6 +1443,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                 }
                 return false;
               },
+
               /// Everything above the wallpaper that wants a frosted background shares one blur of
               /// it: the status banner and every control in the table.
               child: BackdropGroup(
@@ -1441,7 +1461,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       semesterLength: classTableState.semesterLength,
                       onPageChanged: _onPageChanged,
                       bottomClearance: _sheetBottomClearance(context),
-                      heightReference: classTableHeightReference,
                     ).expanded(),
                   ],
                 ),
@@ -1469,6 +1488,34 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             ),
           ),
 
+          /// The unified frosted header glass behind the navigation bar and docked week bar.
+          ///
+          /// While docked, this single continuous frosted layer spans from the very top of the
+          /// screen (y = 0) through the AppBar and down through the docked week bar (appBarHeight + _weekBarHeight).
+          /// Because it is one unbroken piece of frosted glass, there is zero seam, zero subpixel gap,
+          /// and zero Gaussian blur boundary artifact between the navigation bar and the week bar.
+          ///
+          /// When the week bar is floating or tucked away, this layer seamlessly sizes to [appBarHeight],
+          /// continuing to provide the frosted backdrop for the navigation bar alone, while the
+          /// floating week bar carries its own independent floating frosted capsule below.
+          AnimatedPositioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            height: appBarHeight + (!_weekBarCollapsed ? _weekBarHeight : 0),
+            duration: weekBarDockDuration,
+            curve: Curves.easeOutCubic,
+            child: IgnorePointer(
+              child: GlassBlur(
+                sigma: GlassStyleConfig.appBarSigma,
+                child: ColoredBox(
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh
+                      .withValues(alpha: weekBarSurfaceAlpha),
+                ),
+              ),
+            ),
+          ),
+
           /// The bar itself, one element for both modes.
           ///
           /// Collapsed it is inset, rounded and shadowed so it reads as floating over the table;
@@ -1484,75 +1531,78 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             curve: _weekBarVisible
                 ? Curves.easeOutCubic
                 : Curves.easeInOutCubic,
-            child: IgnorePointer(
-              ignoring: !_weekBarVisible,
-              child: AnimatedSlide(
-                offset: _weekBarVisible
-                    ? Offset.zero
-                    : const Offset(0, -1.35),
-                duration: weekBarPopDuration,
-                curve: _weekBarVisible
-                    ? Curves.easeOutCubic
-                    : Curves.easeInOutCubic,
-                child: AnimatedContainer(
-                  duration: weekBarPopDuration,
-                  curve: _weekBarVisible
-                      ? Curves.easeOutCubic
-                      : Curves.easeInOutCubic,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                      _weekBarFloating ? timeLineRadius : 0,
-                    ),
-                    boxShadow: _weekBarFloating
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withValues(
-                                alpha: timeLineShadowAlpha,
+            child: Offstage(
+              offstage: _weekBarOffstage,
+              child: IgnorePointer(
+                ignoring: !_weekBarVisible,
+                child: ClipRect(
+                  clipper: const _WeekBarTopClipper(),
+                  child: AnimatedSlide(
+                    offset: _weekBarVisible
+                        ? Offset.zero
+                        : const Offset(0, -1.35),
+                    duration: weekBarPopDuration,
+                    curve: _weekBarVisible
+                        ? Curves.easeOutCubic
+                        : Curves.easeInOutCubic,
+                    onEnd: () {
+                      if (!_weekBarVisible && mounted) {
+                        setState(() => _weekBarOffstage = true);
+                      }
+                    },
+                    child: AnimatedContainer(
+                      duration: weekBarPopDuration,
+                      curve: _weekBarVisible
+                          ? Curves.easeOutCubic
+                          : Curves.easeInOutCubic,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          _weekBarFloating ? timeLineRadius : 0,
+                        ),
+                        boxShadow: _weekBarFloating
+                            ? [
+                                BoxShadow(
+                                  color: Colors.black.withValues(
+                                    alpha: timeLineShadowAlpha,
+                                  ),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Stack(
+                        children: [
+                          if (_weekBarFloating)
+                            Positioned.fill(
+                              child: GlassBlur(
+                                borderRadius: BorderRadius.circular(
+                                  timeLineRadius,
+                                ),
+                                sigma: GlassStyleConfig.weekBarSigma,
+                                child: ColoredBox(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHigh
+                                      .withValues(alpha: weekBarSurfaceAlpha),
+                                ),
                               ),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
                             ),
-                          ]
-                        : null,
-                  ),
-                  child: Stack(
-                    children: [
-                      /// Frosted, like the panels in the table: the bar's own background blurs
-                      /// the wallpaper behind it while the wallpaper itself stays sharp.
-                      ///
-                      /// The tint is the filter's child, not a colour under it, so what gets
-                      /// blurred is the raw wallpaper — the same order the class cards use.
-                      ///
-                      /// Keep the filter mounted throughout the pop so the backdrop is blurred
-                      /// from the first frame rather than appearing only after the bar settles.
-                      Positioned.fill(
-                        child: GlassBlur(
-                          borderRadius: BorderRadius.circular(
-                            _weekBarFloating ? timeLineRadius : 0,
+
+                          /// Taps on the bar's own body keep it open: putting it away is for taps
+                          /// outside it. Translucent rather than opaque, so a drag that starts on
+                          /// the bar still reaches the table underneath.
+                          Positioned.fill(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {},
+                            ),
                           ),
-                          sigma: _weekBarVisible
-                              ? GlassStyleConfig.weekBarSigma
-                              : 0,
-                          child: ColoredBox(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerHigh
-                                .withValues(alpha: weekBarSurfaceAlpha),
-                          ),
-                        ),
+                          _weekBarContents(),
+                        ],
                       ),
-                      /// Taps on the bar's own body keep it open: putting it away is for taps
-                      /// outside it. Translucent rather than opaque, so a drag that starts on
-                      /// the bar still reaches the table underneath.
-                      Positioned.fill(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {},
-                        ),
-                      ),
-                      _weekBarContents(),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -1584,4 +1634,19 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       }
     }
   }
+}
+
+/// Clips the week bar strictly at top: 0 to prevent any portion of it or its shadow
+/// from bleeding behind the frosted AppBar during slide animations, while leaving
+/// left, right, and bottom unclipped so its drop shadow remains intact.
+class _WeekBarTopClipper extends CustomClipper<Rect> {
+  const _WeekBarTopClipper();
+
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromLTRB(-24, 0, size.width + 24, size.height + 24);
+  }
+
+  @override
+  bool shouldReclip(covariant _WeekBarTopClipper oldClipper) => false;
 }

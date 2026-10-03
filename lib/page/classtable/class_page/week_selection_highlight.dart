@@ -73,11 +73,10 @@ class _WeekSelectionHighlightState extends State<WeekSelectionHighlight>
 
   void _onWeekChanged() {
     /// From wherever it is now, which may be halfway through an earlier slide.
-    _weeks =
-        Tween<double>(begin: _weeks.value, end: widget.week.value.toDouble())
-            .animate(
-              CurvedAnimation(parent: _slide, curve: Curves.easeInOutCubic),
-            );
+    _weeks = Tween<double>(
+      begin: _weeks.value,
+      end: widget.week.value.toDouble(),
+    ).animate(CurvedAnimation(parent: _slide, curve: Curves.easeInOutCubic));
     _slide.forward(from: 0);
   }
 
@@ -90,6 +89,7 @@ class _WeekSelectionHighlightState extends State<WeekSelectionHighlight>
             ? widget.rowControl.offset
             : 0;
         return Stack(
+          clipBehavior: Clip.hardEdge,
           children: [
             Positioned(
               left:
@@ -101,9 +101,9 @@ class _WeekSelectionHighlightState extends State<WeekSelectionHighlight>
               width: weekChoiceItemExtent - 2 * weekChoiceCardInset,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).highlightColor.withValues(
-                    alpha: weekChoiceHighlightAlpha,
-                  ),
+                  color: Theme.of(
+                    context,
+                  ).highlightColor.withValues(alpha: weekChoiceHighlightAlpha),
                   borderRadius: BorderRadius.circular(weekChoiceCardRadius),
                 ),
               ),

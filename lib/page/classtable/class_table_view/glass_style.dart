@@ -45,7 +45,9 @@ class GlassStyleConfig {
 
   static void loadFromPreference() {
     if (preference.contains(preference.Preference.classStyleGlassEnabled)) {
-      enabled = preference.getBool(preference.Preference.classStyleGlassEnabled);
+      enabled = preference.getBool(
+        preference.Preference.classStyleGlassEnabled,
+      );
     }
     if (preference.contains(preference.Preference.classStyleGlassCardSigma)) {
       cardSigma = _clamp(
@@ -56,15 +58,21 @@ class GlassStyleConfig {
       preference.Preference.classStyleGlassTimeLineSigma,
     )) {
       timeLineSigma = _clamp(
-        preference.getDouble(preference.Preference.classStyleGlassTimeLineSigma),
+        preference.getDouble(
+          preference.Preference.classStyleGlassTimeLineSigma,
+        ),
       );
     }
-    if (preference.contains(preference.Preference.classStyleGlassDateRowSigma)) {
+    if (preference.contains(
+      preference.Preference.classStyleGlassDateRowSigma,
+    )) {
       dateRowSigma = _clamp(
         preference.getDouble(preference.Preference.classStyleGlassDateRowSigma),
       );
     }
-    if (preference.contains(preference.Preference.classStyleGlassWeekBarSigma)) {
+    if (preference.contains(
+      preference.Preference.classStyleGlassWeekBarSigma,
+    )) {
       weekBarSigma = _clamp(
         preference.getDouble(preference.Preference.classStyleGlassWeekBarSigma),
       );

@@ -302,9 +302,6 @@ class ClassTableWidgetState with ChangeNotifier {
 
   Future<void> addCustomClass(CustomClass customClass) =>
       customClassController.addCustomClass(customClass).then((_) {
-        clearArrangementCache();
-        _scheduleVersion++;
-        preloadArrangements();
         notifyListeners();
       });
 
@@ -314,17 +311,11 @@ class ClassTableWidgetState with ChangeNotifier {
   ) => customClassController
       .editCustomClassById(customClassId, customClass)
       .then((_) {
-        clearArrangementCache();
-        _scheduleVersion++;
-        preloadArrangements();
         notifyListeners();
       });
 
   Future<void> deleteCustomClassById(String customClassId) =>
       customClassController.deleteCustomClassById(customClassId).then((_) {
-        clearArrangementCache();
-        _scheduleVersion++;
-        preloadArrangements();
         notifyListeners();
       });
 
@@ -337,9 +328,6 @@ class ClassTableWidgetState with ChangeNotifier {
         timeRangeId: timeRangeId,
       )
       .then((_) {
-        clearArrangementCache();
-        _scheduleVersion++;
-        preloadArrangements();
         notifyListeners();
       });
 
@@ -374,7 +362,6 @@ class ClassTableWidgetState with ChangeNotifier {
       ],
     ]);
     await maybeAutoSyncSystemCalendar();
-    clearArrangementCache();
     notifyListeners();
   }
 
@@ -401,45 +388,38 @@ class ClassTableWidgetState with ChangeNotifier {
 
   ClassTableWidgetState() {
     _effectCleanup.add(
-      effect(
-        () {
-          classTableController.schoolClassTableStateSignal.value;
-          classTableController.classTableComputedSignal.value;
-          classTableController.isClassTableFromCacheComputedSignal.value;
-          classTableController.classTableCacheHintKeyComputedSignal.value;
-          examController.examInfoStateSignal.value;
-          examController.subjects.value;
-          examController.isExamFromCache.value;
-          examController.examCacheHintKey.value;
-          physicsExperimentController.physicsExperimentStateSignal.value;
-          physicsExperimentController.physicsExperiments.value;
-          physicsExperimentController.isPhysicsExperimentFromCache.value;
-          physicsExperimentController.physicsExperimentCacheHintKey.value;
-          otherExperimentController.otherExperimentStateSignal.value;
-          otherExperimentController.otherExperiments.value;
-          otherExperimentController.isOtherExperimentFromCache.value;
-          otherExperimentController.otherExperimentCacheHintKey.value;
-          weekSwiftController.weekSwiftSignal.value;
-          clearArrangementCache();
-          _scheduleVersion++;
-          preloadArrangements();
-          notifyListeners();
-        },
-
-        options: EffectOptions(name: "ClassTableWidgetStateScheduleEffect"),
-      ),
+      effect(() {
+        classTableController.schoolClassTableStateSignal.value;
+        classTableController.classTableComputedSignal.value;
+        classTableController.isClassTableFromCacheComputedSignal.value;
+        classTableController.classTableCacheHintKeyComputedSignal.value;
+        examController.examInfoStateSignal.value;
+        examController.subjects.value;
+        examController.isExamFromCache.value;
+        examController.examCacheHintKey.value;
+        physicsExperimentController.physicsExperimentStateSignal.value;
+        physicsExperimentController.physicsExperiments.value;
+        physicsExperimentController.isPhysicsExperimentFromCache.value;
+        physicsExperimentController.physicsExperimentCacheHintKey.value;
+        otherExperimentController.otherExperimentStateSignal.value;
+        otherExperimentController.otherExperiments.value;
+        otherExperimentController.isOtherExperimentFromCache.value;
+        otherExperimentController.otherExperimentCacheHintKey.value;
+        weekSwiftController.weekSwiftSignal.value;
+        customClassController.customClassesSignal.value;
+        clearArrangementCache();
+        _scheduleVersion++;
+        preloadArrangements();
+        notifyListeners();
+      }, options: EffectOptions(name: "ClassTableWidgetStateScheduleEffect")),
     );
     _effectCleanup.add(
-      effect(
-        () {
-          globalTimerController.currentTimeSignal.value;
-          // Time tick: DO NOT clear arrangement cache.
-          // Notify only timeTickNotifier so only the current week and time indicator update.
-          timeTickNotifier.tick();
-        },
-
-        options: EffectOptions(name: "ClassTableWidgetStateTimeTickEffect"),
-      ),
+      effect(() {
+        globalTimerController.currentTimeSignal.value;
+        // Time tick: DO NOT clear arrangement cache.
+        // Notify only timeTickNotifier so only the current week and time indicator update.
+        timeTickNotifier.tick();
+      }, options: EffectOptions(name: "ClassTableWidgetStateTimeTickEffect")),
     );
     // Init current week info
     if (currentWeek < 0) {
@@ -450,9 +430,6 @@ class ClassTableWidgetState with ChangeNotifier {
       _chosenWeek = currentWeek;
     }
     weekNavigationNotifier.value = _chosenWeek;
-
-    // Preload arrangements in background microtask so initial frame is not blocked
-    scheduleMicrotask(preloadArrangements);
   }
 
   bool _checkIsOverlapping(

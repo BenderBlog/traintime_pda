@@ -172,12 +172,20 @@ class _ClassTableViewState extends State<ClassTableView>
     }
   }
 
+  /// Whether this page was the current week at the last tick.
+  bool _wasCurrentWeek = false;
+
   /// Triggered on minute time ticks: only the current week updates its time indicator and progress.
+  ///
+  /// The page that just stopped being the current week redraws once more as well, or it would keep
+  /// last Sunday's day-column highlight after midnight.
   void _onTimeTick() {
     if (!mounted) return;
-    if (widget.index == classTableState.currentWeek) {
+    final bool isCurrentWeek = widget.index == classTableState.currentWeek;
+    if (isCurrentWeek || _wasCurrentWeek) {
       setState(() {});
     }
+    _wasCurrentWeek = isCurrentWeek;
   }
 
   void updateSize() => size = ClassTableState.of(context)!.constraints;
@@ -188,6 +196,7 @@ class _ClassTableViewState extends State<ClassTableView>
     if (!_isListening) {
       classTableState = ClassTableState.of(context)!.controllers;
       _lastScheduleVersion = classTableState.scheduleVersion;
+      _wasCurrentWeek = widget.index == classTableState.currentWeek;
       classTableState.addListener(_reload);
       classTableState.timeTickNotifier.addListener(_onTimeTick);
       _isListening = true;

@@ -60,9 +60,9 @@ class ClassTableTimeLine extends StatelessWidget {
         /// The panel. Frosted, like the other controls over the table: the wallpaper behind it is
         /// blurred inside the panel's own rounded bounds while it stays sharp everywhere else.
         ///
-        /// Grouped with the other controls under [BackdropGroup] because this panel sits alongside
-        /// the class cards without overlapping them (x: [4, 36] vs x: [40, width]), allowing a single
-        /// blur pass for the entire table.
+        /// Grouped with the other controls under [BackdropGroup]: at rest the panel sits beside the
+        /// class cards rather than over them, so the whole table shares a single blur pass. A card
+        /// sliding under it mid-swipe is not part of that shared backdrop.
         Positioned(
           left: timeLineInset,
           top: 0,
@@ -180,11 +180,7 @@ class ClassTableTimeLine extends StatelessWidget {
         );
       }
 
-      return SizedBox(
-        width: timeColumnWidth,
-        height: height,
-        child: cell,
-      );
+      return SizedBox(width: timeColumnWidth, height: height, child: cell);
     });
   }
 }
