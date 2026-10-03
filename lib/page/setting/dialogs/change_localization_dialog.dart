@@ -4,7 +4,7 @@
 
 // Change app brightness.
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 
 import 'package:watermeter/repository/localization.dart';

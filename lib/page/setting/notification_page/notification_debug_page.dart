@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/page/setting/notification_page/notification_test_widget.dart';
 import 'package:watermeter/repository/notification/notification_registrar.dart';

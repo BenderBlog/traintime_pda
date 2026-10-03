@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/themes/default.dart';
 import 'package:watermeter/themes/green.dart';
 import 'package:watermeter/themes/orange.dart';

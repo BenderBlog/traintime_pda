@@ -1,10 +1,9 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
-/*
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
@@ -45,7 +44,6 @@ class _AirconImeiDialogState extends State<AirconImeiDialog> {
   late final TextEditingController _controller = TextEditingController(
     text: preference.getString(preference.Preference.airconImei),
   );
-
   @override
   void dispose() {
     _controller.dispose();
@@ -252,4 +250,3 @@ class _AirconImeiScannerPageState extends State<_AirconImeiScannerPage> {
     );
   }
 }
-*/

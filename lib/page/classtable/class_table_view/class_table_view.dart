@@ -2,13 +2,15 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:flutter/material.dart';
+import 'dart:math' as math;
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/time_list.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_table_time_column_layout.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
@@ -20,6 +22,8 @@ import 'package:watermeter/repository/preference.dart' as preference;
 class ClassTableView extends StatefulWidget {
   final int index;
   final BoxConstraints constraint;
+
+  /// When disabled, the table expands to its full height for an outer scroll view.
   final bool enableVerticalScrolling;
 
   const ClassTableView({
@@ -45,7 +49,10 @@ class ClassTableView extends StatefulWidget {
 class _ClassTableViewState extends State<ClassTableView> {
   late ClassTableWidgetState classTableState;
   late BoxConstraints size;
+  late ClassTableTimeColumnLayout _timeColumnLayout;
   bool _isListening = false;
+
+  double get _timeColumnWidth => _timeColumnLayout.width;
 
   DateTime get _visibleWeekStart => classTableState.startDay
       .add(Duration(days: 7 * classTableState.offset))
@@ -79,7 +86,7 @@ class _ClassTableViewState extends State<ClassTableView> {
     context: context,
     now: classTableState.currentTime,
     weekStart: _visibleWeekStart,
-    leftRow: leftRow,
+    leftRow: _timeColumnWidth,
     blockWidth: blockwidth,
     blockHeight: blockheight,
   );
@@ -88,18 +95,23 @@ class _ClassTableViewState extends State<ClassTableView> {
     context: context,
     now: classTableState.currentTime,
     weekStart: _visibleWeekStart,
-    leftRow: leftRow,
+    leftRow: _timeColumnWidth,
     blockWidth: blockwidth,
     blockHeight: blockheight,
   );
 
-  /// The height of the class card.
-  double blockheight(double count) =>
-      count *
-      (widget.constraint.minHeight - midRowHeight) /
-      (isPhone(context) ? 48 : 61);
+  /// The height of one of the 61 blocks of a day.
+  ///
+  /// Its minimum also accounts for the time labels at the current font scale.
+  double get _blockUnit => math.max(
+    (widget.constraint.minHeight - midRowHeight) / (isPhone(context) ? 48 : 61),
+    _timeColumnLayout.minimumBlockHeight,
+  );
 
-  double get blockwidth => (size.maxWidth - leftRow) / 7;
+  /// The height of the class card.
+  double blockheight(double count) => count * _blockUnit;
+
+  double get blockwidth => (size.maxWidth - _timeColumnWidth) / 7;
 
   /// The class table are divided into 8 rows, the leftest row is the index row.
   List<Widget> classSubRow(bool isRest) {
@@ -122,7 +134,7 @@ class _ClassTableViewState extends State<ClassTableView> {
             Positioned(
               top: blockheight(i.start),
               height: blockheight(i.stop - i.start),
-              left: leftRow + blockwidth * (index - 1),
+              left: _timeColumnWidth + blockwidth * (index - 1),
               width: blockwidth,
               child: ClassCard(detail: i, completedHeight: completedHeight),
             ),
@@ -150,7 +162,7 @@ class _ClassTableViewState extends State<ClassTableView> {
                 ).split("\n").map((e) => Text(e)),
               ],
             ),
-          ).padding(left: leftRow),
+          ).padding(left: _timeColumnWidth),
         );
       }
 
@@ -174,46 +186,53 @@ class _ClassTableViewState extends State<ClassTableView> {
           indexOfChar = index - 2;
         }
 
-        return DefaultTextStyle.merge(
-          style: TextStyle(
-            fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          child: Text.rich(
-            TextSpan(
-              children: [
-                if (indexOfChar == -1)
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "classtable.noon_break",
-                    ),
-                    style: const TextStyle(fontSize: 12),
-                  )
-                else if (indexOfChar == -2)
-                  TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "classtable.supper_break",
-                    ),
-                    style: const TextStyle(fontSize: 12),
-                  )
-                else ...[
-                  TextSpan(text: "${indexOfChar + 1}\n"),
-                  TextSpan(
-                    text: "${timeList[indexOfChar * 2]}\n",
-                    style: const TextStyle(fontSize: 8),
-                  ),
-                  TextSpan(
-                    text: timeList[indexOfChar * 2 + 1],
-                    style: const TextStyle(fontSize: 8),
-                  ),
-                ],
-              ],
+        /// 每一节的上下课时间贴着这一格的上下边，节次写在中间。
+        ///
+        /// 三行都挤在格子中间时，当前时间线落在格子的哪一段是看不出来的 ——
+        /// 它压在中间那几行字上，很容易被读成压在两个节次的分界上。贴着边写，
+        /// 线夹在哪两条时间之间，就是哪一节。
+        final Widget cell;
+        if (indexOfChar == -1 || indexOfChar == -2) {
+          cell = Text(
+            FlutterI18n.translate(
+              context,
+              indexOfChar == -1
+                  ? "classtable.noon_break"
+                  : "classtable.supper_break",
             ),
+            style: _timeColumnLayout.breakStyle,
             textAlign: TextAlign.center,
-          ),
-        ).center().constrained(width: leftRow, height: height);
+          ).center();
+        } else {
+          cell = Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                timeList[indexOfChar * 2],
+                style: _timeColumnLayout.timeStyle,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+              ),
+              Text(
+                "${indexOfChar + 1}",
+                style: _timeColumnLayout.periodStyle,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+              ),
+              Text(
+                timeList[indexOfChar * 2 + 1],
+                style: _timeColumnLayout.timeStyle,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+              ),
+            ],
+          );
+        }
+
+        return SizedBox(width: _timeColumnWidth, height: height, child: cell);
       });
     }
   }
@@ -252,35 +271,40 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   @override
   Widget build(BuildContext context) {
+    _timeColumnLayout = ClassTableTimeColumnLayout.of(context);
+    final sheet =
+        [
+          classSubRow(false)
+              .toColumn()
+              .decorated(
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface.withValues(alpha: 0.75),
+              )
+              .constrained(width: _timeColumnWidth)
+              // Fill the time axis background through the gap below the last class.
+              .positioned(left: 0, top: 0, bottom: 0),
+          ...classSubRow(true),
+        ].toStack().constrained(
+          height: blockheight(61) + classTableSheetEndGap,
+          width: size.maxWidth,
+        );
     return [
       /// The main class table.
       ClassTableDateRow(
         firstDay: classTableState.startDay
             .add(Duration(days: 7 * classTableState.offset))
             .add(Duration(days: 7 * widget.index)),
+        timeColumnWidth: _timeColumnWidth,
+        dayColumnWidth: blockwidth,
       ),
 
-      /// The rest of the table.
-      [
-            classSubRow(false)
-                .toColumn()
-                .decorated(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.surface.withValues(alpha: 0.75),
-                )
-                .constrained(width: leftRow)
-                .positioned(left: 0),
-            ...classSubRow(true),
-          ]
-          .toStack()
-          .constrained(height: blockheight(61), width: size.maxWidth)
-          .scrollable(
-            physics: widget.enableVerticalScrolling
-                ? null
-                : const NeverScrollableScrollPhysics(),
-          )
-          .expanded(),
+      // Settings previews expand fully and use the page's outer scroll view.
+      // The main timetable keeps its own viewport and vertical scrolling.
+      if (widget.enableVerticalScrolling)
+        sheet.scrollable().expanded()
+      else
+        sheet,
     ].toColumn();
   }
 }

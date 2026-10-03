@@ -4,7 +4,7 @@
 
 // Borrow list, shows the user's borrowlist.
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';

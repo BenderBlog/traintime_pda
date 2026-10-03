@@ -4,10 +4,12 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui' show BlurStyle, ImageFilter, MaskFilter;
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 
@@ -48,7 +50,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// Week choice row controller.
   late PageController rowControl;
 
-  late BoxDecoration decoration;
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
   bool _didLoadVisualSettings = false;
@@ -111,23 +112,95 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       keepPage: true,
     );
 
-    /// Let controllers listen to the currentWeek's change.
-    /// Init the background.
-    File image = File("${supportPath.path}/${classTableState.decorationName}");
-    decoration = BoxDecoration(
-      image:
-          (preference.getBool(preference.Preference.decorated) &&
-              image.existsSync())
-          ? DecorationImage(
-              image: FileImage(image),
-              fit: BoxFit.cover,
-              opacity: Theme.of(context).brightness == Brightness.dark
-                  ? 0.4
-                  : 1.0,
-            )
-          : null,
-    );
     super.didChangeDependencies();
+  }
+
+  /// Padding which keeps the classtable sheet away from the edges of the
+  /// display.
+  ///
+  /// The sheet is scrollable down to its very last row, and the bottom of the
+  /// screen is where the system navigation bar and the rounded corners of the
+  /// display are. Both are honoured here, so the last block of the day (the
+  /// time of the 11th class) stays readable.
+  EdgeInsets _sheetSafeInsets(BuildContext context) {
+    /// `padding` already has the top inset of the app bar taken out, while
+    /// `viewPadding` keeps the real size of the system bars. The bottom one
+    /// has to come from `viewPadding`, otherwise the sheet would crawl under
+    /// the navigation bar whenever the keyboard is around.
+    final padding = MediaQuery.paddingOf(context);
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+
+    /// The sheet does not reach the edges of the display, so the corner of the
+    /// screen only reaches in about half of its radius where the sheet starts.
+    /// Keeping the whole radius free left a lot of empty room on devices with
+    /// round corners, so only half of it is kept, within sane limits.
+    ///
+    /// The radii come from [MediaQuery.displayCornerRadiiOf], which the platform
+    /// fills in on Android 12 and later and leaves null everywhere else. Reading
+    /// them there also means this page is rebuilt whenever they change, so the
+    /// window does not have to be watched by hand.
+    final corners = MediaQuery.displayCornerRadiiOf(context);
+    final cornerRadius = math.max(
+      corners?.bottomLeft.y ?? 0,
+      corners?.bottomRight.y ?? 0,
+    );
+    final cornerInset = math.min(
+      math.max(cornerRadius / 2, classTableMinimumBottomInset),
+      classTableMaximumBottomInset,
+    );
+    return EdgeInsets.fromLTRB(
+      padding.left + classTableSheetMargin,
+      padding.top + classTableSheetMargin,
+      padding.right + classTableSheetMargin,
+      math.max(viewPadding.bottom, cornerInset) + classTableSheetMargin,
+    );
+  }
+
+  /// The user defined background image, blurred as configured.
+  Widget _backgroundLayer(BuildContext context) {
+    if (!preference.getBool(preference.Preference.decorated)) {
+      return const SizedBox.shrink();
+    }
+
+    final image = File("${supportPath.path}/${classTableState.decorationName}");
+    if (!image.existsSync()) {
+      return const SizedBox.shrink();
+    }
+
+    final blur = preference
+        .getDouble(preference.Preference.classTableBackgroundBlur)
+        .clamp(0.0, maxClassTableBackgroundBlur)
+        .toDouble();
+
+    Widget layer = Image.file(
+      image,
+      fit: BoxFit.cover,
+      gaplessPlayback: true,
+      opacity: AlwaysStoppedAnimation<double>(
+        Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
+      ),
+    );
+
+    if (blur > 0) {
+      /// Blurring pulls in the pixels outside of the image, which would leave
+      /// the edges translucent. The image is scaled up a little to make sure
+      /// the whole background stays covered.
+      layer = ClipRect(
+        child: Transform.scale(
+          scale: 1 + blur / 50,
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: blur,
+              sigmaY: blur,
+              tileMode: TileMode.clamp,
+            ),
+            child: layer,
+          ),
+        ),
+      );
+    }
+
+    return Positioned.fill(child: layer);
   }
 
   /// A row shows a series of buttons about the classtable's index.
@@ -423,7 +496,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_brightness_factor",
+                          "setting.class_table_style_page.active_brightness_factor",
                           translationParams: {
                             "value": _formatPercent(activeBrightnessFactor),
                           },
@@ -441,7 +514,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_border_alpha",
+                          "setting.class_table_style_page.active_border_alpha",
                           translationParams: {
                             "value": _formatPercent(activeBorderAlpha),
                           },
@@ -458,7 +531,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       Text(
                         FlutterI18n.translate(
                           context,
-                            "setting.class_table_style_page.active_inner_alpha",
+                          "setting.class_table_style_page.active_inner_alpha",
                           translationParams: {
                             "value": _formatPercent(activeInnerAlpha),
                           },
@@ -935,25 +1008,97 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          PreferredSize(
-            preferredSize: Size.fromHeight(
-              MediaQuery.sizeOf(context).height >= 500
-                  ? topRowHeightBig
-                  : topRowHeightSmall,
+      body: Builder(
+        /// The safe area has to be measured below the app bar: the insets of
+        /// the context above the scaffold still contain the status bar the app
+        /// bar has already taken care of.
+        builder: (context) => Stack(
+          fit: StackFit.expand,
+          children: [
+            /// The background image is drawn behind everything, so the
+            /// decorated area still reaches the edges of the screen while the
+            /// sheet below respects the safe area.
+            _backgroundLayer(context),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                PreferredSize(
+                  preferredSize: Size.fromHeight(
+                    MediaQuery.sizeOf(context).height >= 500
+                        ? topRowHeightBig
+                        : topRowHeightSmall,
+                  ),
+                  child: _topView(),
+                ),
+                ClassTableInlineBanner(
+                  loadingSources: state.loadingSources,
+                  cacheSources: state.cacheSources,
+                ),
+                _sheet(context).expanded(),
+              ],
             ),
-            child: _topView(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The sheet of the classtable: it is kept inside the safe area of the
+  /// display and gets rounded corners of its own, since it does not reach the
+  /// edges of the screen any more.
+  ///
+  /// A shadow drawn only outside of it, plus a hairline around it, lift it off
+  /// the screen, so the table reads as one card floating over the picture and
+  /// the room kept below it reads as the margin of that card instead of a gap.
+  ///
+  /// The picture itself is left alone: a colour laid over it would hide the
+  /// background image, and blurring it here would only repeat what the
+  /// background blur already does.
+  Widget _sheet(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final borderRadius = BorderRadius.circular(classTableSheetRadius);
+    return Padding(
+      padding: _sheetSafeInsets(context),
+      child: Stack(
+        /// 阴影要画到面板外面去，所以这一层不能裁。
+        clipBehavior: Clip.none,
+        children: [
+          /// 阴影单独一层，而且**只画面板外侧**：面板本身是透明的，
+          /// 用普通的 BoxShadow 会在面板内部透出来一圈黑。
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _SheetShadowPainter(
+                radius: classTableSheetRadius,
+                sigma: classTableSheetShadowSigma,
+                color: scheme.shadow.withValues(alpha: 0.5),
+              ),
+            ),
           ),
-          ClassTableInlineBanner(
-            loadingSources: state.loadingSources,
-            cacheSources: state.cacheSources,
+          Positioned.fill(
+            child: DecoratedBox(
+              /// 紧贴着边缘描一圈极细的线：花壁纸上只靠阴影，边角是"站不住"的。
+              position: DecorationPosition.foreground,
+              decoration: BoxDecoration(
+                borderRadius: borderRadius,
+                border: Border.all(
+                  color: scheme.outlineVariant.withValues(alpha: 0.6),
+                  width: 0.8,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: borderRadius,
+                child: LayoutBuilder(
+                  /// The table measures itself against the room which is really
+                  /// left for it, instead of the whole window.
+                  builder: (context, constraints) => ClassTableState(
+                    constraints: constraints,
+                    controllers: classTableState,
+                    child: _classTablePage(),
+                  ),
+                ),
+              ),
+            ),
           ),
-          DecoratedBox(
-            decoration: decoration,
-            child: _classTablePage(),
-          ).expanded(),
         ],
       ),
     );
@@ -982,4 +1127,48 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           ClassTableView(constraint: constraint, index: index),
     ),
   );
+}
+
+/// 画课表面板外侧的一圈阴影。
+///
+/// 面板里面是透的（能看见壁纸），所以不能直接用 `BoxShadow` —— 它的模糊会从
+/// 面板内部透出来，看着就是"里面一圈黑"。这里先把面板那块从画布上挖掉，
+/// 再画模糊的圆角矩形，于是只有外侧那一圈留下来。
+class _SheetShadowPainter extends CustomPainter {
+  const _SheetShadowPainter({
+    required this.radius,
+    required this.sigma,
+    required this.color,
+  });
+
+  final double radius;
+  final double sigma;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final box = Offset.zero & size;
+    final rrect = RRect.fromRectAndRadius(box, Radius.circular(radius));
+
+    canvas.clipPath(
+      Path.combine(
+        PathOperation.difference,
+        Path()..addRect(box.inflate(sigma * 4)),
+        Path()..addRRect(rrect),
+      ),
+      doAntiAlias: true,
+    );
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = color
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, sigma),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _SheetShadowPainter oldDelegate) =>
+      oldDelegate.radius != radius ||
+      oldDelegate.sigma != sigma ||
+      oldDelegate.color != color;
 }

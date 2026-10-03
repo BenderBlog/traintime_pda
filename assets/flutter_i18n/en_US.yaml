@@ -325,6 +325,7 @@ club_promotion:
 electricity:
   title: Power Info
   power_title: Infomation
+  power_metid_title: Electricity meter {code}
   cache_hint_login_failed:
     Failed to log in to the electricity service, showing cached
     data.
@@ -352,8 +353,9 @@ electricity:
   water_usage_read_now: This time
   water_usage: Bath water usage
   water_title: Water usage
+  weter_metid_title: Watermeter {code}
   water_loading: Loading water usage information
-  water_unavailable: Water usage is unavailable. Retry from the electricity card.
+  water_unavailable: Water usage is unavailable. Retry using the refresh button in the top right.
   water_empty: No water usage information
   not_school_network: Not school network
   aircon_title: Aircon Electricity
@@ -363,9 +365,34 @@ electricity:
   aircon_waiting: Waiting to fetch aircon electricity data
   aircon_error: Failed to fetch aircon electricity data
   aircon_retry: Retry
-  aircon_imei_missing: Add the aircon IMEI to view its electricity usage.
-  aircon_add_imei: Add aircon IMEI
+  aircon_imei_missing: Scan the air conditioner's QR code to add it, or select a QR code image.
+  aircon_add_imei: Add aircon information
   aircon_cache_notice: "Showing cached aircon data from {time}"
+  aircon_remote: Aircon Remote
+  aircon_control_error: Unable to fetch the aircon state
+  aircon_command_ok: Aircon command completed
+  aircon_control_section: Basic controls
+  aircon_operation_section: Operation
+  aircon_other_settings_section: Other settings
+  aircon_power: Power
+  aircon_target_temperature: Target temperature
+  aircon_temperature_range: Temperature must be between 18 and 32 ℃
+  aircon_indoor_temperature: "Indoor temperature: {temperature} ℃"
+  aircon_mode: Mode
+  aircon_mode_fan: Fan
+  aircon_mode_heat: Heat
+  aircon_mode_cool: Cool
+  aircon_mode_dry: Dry
+  aircon_mode_auto: Auto
+  aircon_wind_speed: Fan speed
+  aircon_wind_auto: Auto
+  aircon_wind_silent: Silent
+  aircon_wind_low: Low
+  aircon_wind_medium: Medium
+  aircon_wind_high: High
+  aircon_vertical_swing: Vertical swing
+  aircon_strong_mode: Turbo mode
+  aircon_electric_heating: Auxiliary heating
 empty_classroom:
   title: Empty Classrooms
   date: Date {date}
@@ -374,6 +401,12 @@ empty_classroom:
   classroom: Classroom
   empty: Available
   occupied: Occupied
+  now_ongoing: "Now · Period {period} {start}-{end}"
+  now_upcoming: "Next · Period {period} {start}-{end}"
+  now_free: "{free} of {total} free"
+  only_free_now: Only free ones now
+  no_free_now: No classroom is free right now
+  classes_over: The classes of today are over
 exam:
   title: Exam Schedule
   cache_hint: Displaying cached exam schedule info
@@ -540,6 +573,17 @@ homepage:
     title: Electricity and Hydroenergy Information
     current_electricity: "{amount} kWh remains"
     cache_notice: "Last fetch date: {date}"
+  aircon_card:
+    title: Aircon Remote
+    not_configured: Aircon not configured
+    configure_hint: Tap to add an aircon IMEI
+    running: "{mode} · {temperature} ℃"
+    power_off: Aircon is off
+    indoor_and_wind: "Indoor {temperature} ℃ · Fan {wind}"
+    wind: "Fan {wind}"
+    fetching: Fetching aircon status
+    error: Unable to fetch aircon status
+    open_remote: Tap to open the aircon remote
   library_card:
     title: Library Info
     current_borrow: Borrowing {count} book(s)
@@ -892,9 +936,9 @@ setting:
   electricity_account_setting: Electricity account setting
   schoolnet_password_setting: Campus net password
   schoolnet_password_description: If you have not setted it, you cannot query it.
-  aircon_imei_title: Aircon electricity data source
+  aircon_imei_title: Aircon device
   aircon_imei: Aircon IMEI
-  aircon_imei_not_set: Not set. Aircon electricity will be hidden on the power page.
+  aircon_imei_not_set: Not set. Aircon data and remote control are unavailable.
   aircon_imei_current: "Current IMEI: {imei}"
   aircon_imei_saved: Aircon IMEI saved
   aircon_imei_cleared: Aircon IMEI cleared
@@ -983,6 +1027,8 @@ setting:
   classtable_setting: Class Schedule Related
   background: Background image
   no_background: You need to select an image first, it's at below
+  background_blur: "Background blur: {value}"
+  background_blur_off: Off
   choose_background: Choose background image
   class_table_style_setting: Class schedule display & style
   class_table_style_description: Time indicator and course card style
@@ -1355,6 +1401,7 @@ electricity_status:
   need_account: Need to input electricity account
   captcha_failed: Failed to check captcha
   other_issue: Program malfunction
+  no_electricity_info: No electricity meter info
 school_card_status:
   failed_to_fetch: Failed fetching
   failed_to_query: Failed querying

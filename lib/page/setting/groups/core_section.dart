@@ -3,8 +3,8 @@
 
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:restart_app/restart_app.dart';

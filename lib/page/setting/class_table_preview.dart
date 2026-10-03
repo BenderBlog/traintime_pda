@@ -1,7 +1,7 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -33,22 +33,25 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 560,
-      child: LayoutBuilder(
-        builder: (context, constraint) {
-          final previewState = _PreviewClassTableState();
-          return ClassTableState(
-            constraints: constraint,
-            controllers: previewState,
-            child: ClassTableView(
-              index: previewState.currentWeek,
-              constraint: constraint,
-              enableVerticalScrolling: false,
-            ),
-          );
-        },
-      ),
+    return LayoutBuilder(
+      builder: (context, constraint) {
+        // Keep the familiar row spacing, while letting the complete table
+        // determine its height and scroll with the surrounding settings page.
+        final tableConstraint = BoxConstraints.tightFor(
+          width: constraint.maxWidth,
+          height: 560,
+        );
+        final previewState = _PreviewClassTableState();
+        return ClassTableState(
+          constraints: tableConstraint,
+          controllers: previewState,
+          child: ClassTableView(
+            index: previewState.currentWeek,
+            constraint: tableConstraint,
+            enableVerticalScrolling: false,
+          ),
+        );
+      },
     );
   }
 }

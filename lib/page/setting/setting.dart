@@ -6,11 +6,11 @@
 
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/setting/groups/about_section.dart';
 import 'package:watermeter/page/setting/groups/account_section.dart';
 import 'package:watermeter/page/setting/groups/classtable_section.dart';

@@ -4,7 +4,7 @@
 
 // School card log list.
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
 import 'package:watermeter/page/exam/exam_info_window.dart';

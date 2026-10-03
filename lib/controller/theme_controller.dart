@@ -7,7 +7,7 @@
 import 'dart:io';
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals.dart';
 import 'package:watermeter/repository/logger.dart';

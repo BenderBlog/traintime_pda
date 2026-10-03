@@ -1,7 +1,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -15,7 +15,7 @@ class CurrentTimeIndicatorConfig {
   static double lineThickness = 2;
   static double labelHeight = 13;
   static double labelFontSize = 7;
-  static double labelBackgroundAlpha = 0.75;
+  static double labelBackgroundAlpha = 1.0;
   static double labelHorizontalPadding = 1;
   static double labelVerticalPadding = 1;
   static double labelBorderRadius = 4;
