@@ -802,6 +802,7 @@ score:
 setting:
   sections:
     display: 顯示
+    language_and_text: 語言與文字
     home: 首頁
     electricity: 電量提醒
     timetable_appearance: 課表外觀

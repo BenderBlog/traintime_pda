@@ -878,6 +878,7 @@ score:
 setting:
   sections:
     display: Display
+    language_and_text: Language and text
     home: Home screen
     electricity: Electricity alerts
     timetable_appearance: Timetable appearance

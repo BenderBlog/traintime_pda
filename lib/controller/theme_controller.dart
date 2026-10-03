@@ -52,7 +52,9 @@ class ThemeController {
 
     log.info("[ThemeController] Changing brightness...");
     colorStateSignal.value =
-        demoBlueModeMap[preference.getInt(preference.Preference.brightness)]!;
+        brightnessModeList[preference.getInt(
+          preference.Preference.brightness,
+        )]!;
     log.info("[ThemeController] Changing font scale...");
     fontScaleSignal.value = preference.contains(preference.Preference.fontScale)
         ? preference

@@ -64,33 +64,3 @@ class SettingHeader extends StatelessWidget {
     );
   }
 }
-
-/// Reusable card container for playground control knobs.
-class ControlCard extends StatelessWidget {
-  const ControlCard({
-    super.key,
-    required this.children,
-    this.padding = const EdgeInsets.all(16.0),
-  });
-
-  final List<Widget> children;
-  final EdgeInsetsGeometry padding;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Card(
-      elevation: 0,
-      color: cs.surfaceContainerLow,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: padding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: children,
-        ),
-      ),
-    );
-  }
-}

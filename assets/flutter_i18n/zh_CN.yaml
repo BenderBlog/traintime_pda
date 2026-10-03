@@ -804,6 +804,7 @@ score:
 setting:
   sections:
     display: 显示
+    language_and_text: 语言和文字
     home: 首页
     electricity: 电量提醒
     timetable_appearance: 课表外观
