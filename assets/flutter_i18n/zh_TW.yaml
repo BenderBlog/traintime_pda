@@ -934,6 +934,7 @@ setting:
   notification_debug_page: 通知狀態與測試
   classtable_setting: 課表相關設置
   background: 開啟課表背景圖
+  class_table_background_section: 課表背景
   no_background: 你先選個圖片罷，就在下面
   background_blur: "背景模糊: {value}"
   background_blur_off: 關閉

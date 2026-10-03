@@ -1027,6 +1027,7 @@ setting:
   notification_debug_page: Notification status and test
   classtable_setting: Class Schedule Related
   background: Background image
+  class_table_background_section: Class schedule background
   no_background: You need to select an image first, it's at below
   background_blur: "Background blur: {value}"
   background_blur_off: Off

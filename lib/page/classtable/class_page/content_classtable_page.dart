@@ -167,6 +167,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       return const SizedBox.shrink();
     }
 
+    final viewport = MediaQuery.sizeOf(context);
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final cacheWidth = (math.max(viewport.width, viewport.height) * pixelRatio)
+        .round()
+        .clamp(1, 2560)
+        .toInt();
+    final imageRevision =
+        "${image.lengthSync()}:${image.lastModifiedSync().microsecondsSinceEpoch}";
+
     final blur = preference
         .getDouble(preference.Preference.classTableBackgroundBlur)
         .clamp(0.0, maxClassTableBackgroundBlur)
@@ -174,7 +183,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     Widget layer = Image.file(
       image,
+      key: ValueKey("${image.path}:$imageRevision"),
       fit: BoxFit.cover,
+      cacheWidth: cacheWidth,
       gaplessPlayback: true,
       opacity: AlwaysStoppedAnimation<double>(
         Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,

@@ -1,6 +1,10 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
+
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -9,22 +13,100 @@ import 'package:watermeter/page/classtable/class_table_view/class_table_view.dar
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/repository/network_client.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
 
 class ClassTablePreview extends StatefulWidget {
   final bool loadStylePreferences;
+  final bool enableVerticalScrolling;
+  final double? backgroundBlur;
 
-  const ClassTablePreview({super.key, this.loadStylePreferences = true});
+  const ClassTablePreview({
+    super.key,
+    this.loadStylePreferences = true,
+    this.enableVerticalScrolling = false,
+    this.backgroundBlur,
+  });
 
   @override
   State<ClassTablePreview> createState() => _ClassTablePreviewState();
 }
 
 class _ClassTablePreviewState extends State<ClassTablePreview> {
+  /// Reuse the signal-backed controller across builds and dispose its effect
+  /// when the preview leaves the tree.
+  late final _PreviewClassTableState _previewState;
+
+  Widget _backgroundLayer(
+    BuildContext context,
+    String decorationName,
+    double? backgroundBlur,
+  ) {
+    final isDecorated = preference.getBool(preference.Preference.decorated);
+    if (!isDecorated) {
+      return const SizedBox.shrink();
+    }
+
+    final image = File("${supportPath.path}/$decorationName");
+    final exists = image.existsSync();
+    if (!exists) {
+      return const SizedBox.shrink();
+    }
+
+    final viewport = MediaQuery.sizeOf(context);
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final cacheWidth = (math.max(viewport.width, viewport.height) * pixelRatio)
+        .round()
+        .clamp(1, 2560)
+        .toInt();
+    final imageRevision =
+        "${image.lengthSync()}:${image.lastModifiedSync().microsecondsSinceEpoch}";
+
+    final blur =
+        (backgroundBlur ??
+                preference.getDouble(
+                  preference.Preference.classTableBackgroundBlur,
+                ))
+            .clamp(0.0, maxClassTableBackgroundBlur)
+            .toDouble();
+
+    Widget layer = Image.file(
+      image,
+      key: ValueKey("${image.path}:$imageRevision"),
+      fit: BoxFit.cover,
+      cacheWidth: cacheWidth,
+      gaplessPlayback: true,
+      opacity: AlwaysStoppedAnimation<double>(
+        Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
+      ),
+    );
+
+    if (blur > 0) {
+      layer = ClipRect(
+        child: Transform.scale(
+          scale: 1 + blur / 50,
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: blur,
+              sigmaY: blur,
+              tileMode: TileMode.clamp,
+            ),
+            child: layer,
+          ),
+        ),
+      );
+    }
+
+    return Positioned.fill(child: layer);
+  }
+
   @override
   void initState() {
     super.initState();
+    _previewState = _PreviewClassTableState();
     if (widget.loadStylePreferences) {
       CurrentTimeIndicatorConfig.loadFromPreference();
       CompletedClassStyleConfig.loadFromPreference();
@@ -32,23 +114,41 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
   }
 
   @override
+  void dispose() {
+    _previewState.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraint) {
-        // Keep the familiar row spacing, while letting the complete table
-        // determine its height and scroll with the surrounding settings page.
+        // Embedded previews scroll inside their allotted pane. Other preview
+        // pages keep the full-height table and scroll with their parent.
+        final tableHeight = widget.enableVerticalScrolling
+            ? constraint.maxHeight
+            : 560.0;
         final tableConstraint = BoxConstraints.tightFor(
           width: constraint.maxWidth,
-          height: 560,
+          height: tableHeight,
         );
-        final previewState = _PreviewClassTableState();
         return ClassTableState(
           constraints: tableConstraint,
-          controllers: previewState,
-          child: ClassTableView(
-            index: previewState.currentWeek,
-            constraint: tableConstraint,
-            enableVerticalScrolling: false,
+          controllers: _previewState,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _backgroundLayer(
+                context,
+                _previewState.decorationName,
+                widget.backgroundBlur,
+              ),
+              ClassTableView(
+                index: _previewState.currentWeek,
+                constraint: tableConstraint,
+                enableVerticalScrolling: widget.enableVerticalScrolling,
+              ),
+            ],
           ),
         );
       },

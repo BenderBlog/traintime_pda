@@ -936,6 +936,7 @@ setting:
   notification_debug_page: 通知状态与测试
   classtable_setting: 课表相关设置
   background: 开启课表背景图
+  class_table_background_section: 课表背景
   no_background: 你先选个图片罢，就在下面
   background_blur: "背景模糊: {value}"
   background_blur_off: 关闭

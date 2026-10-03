@@ -13,7 +13,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:watermeter/page/setting/groups/about_section.dart';
 import 'package:watermeter/page/setting/groups/account_section.dart';
-import 'package:watermeter/page/setting/groups/classtable_section.dart';
+import 'package:watermeter/page/setting/groups/classtable_section/classtable_section.dart';
 import 'package:watermeter/page/setting/groups/core_section.dart';
 import 'package:watermeter/page/setting/groups/notification_section.dart';
 import 'package:watermeter/page/setting/groups/ui_section/ui_section.dart';

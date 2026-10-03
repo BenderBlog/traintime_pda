@@ -85,7 +85,7 @@ const double classTableSheetShadowSigma = 8.0;
 const double classTableSheetEndGap = 6.0;
 
 /// The largest blur which can be applied to a user defined background image.
-const double maxClassTableBackgroundBlur = 30.0;
+const double maxClassTableBackgroundBlur = 20.0;
 
 String getWeekString(BuildContext context, int index) {
   List<String> weekList = [
