@@ -15,6 +15,7 @@ import 'package:watermeter/page/pig/pig_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/page/public_widget/container_transform.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watermeter/repository/network_client.dart';
@@ -54,7 +55,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BasedSplitView(
       navigatorKey: splitViewKey,
-      leftWidget: HomePageMaster(key: leftKey),
+      leftWidget: ContainerTransformSink(
+          child: RepaintBoundary(child: HomePageMaster(key: leftKey)),
+        ),
       rightPlaceholder: const SplitPagePlaceholder(),
     );
   }
