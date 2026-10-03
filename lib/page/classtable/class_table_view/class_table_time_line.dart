@@ -60,9 +60,9 @@ class ClassTableTimeLine extends StatelessWidget {
         /// The panel. Frosted, like the other controls over the table: the wallpaper behind it is
         /// blurred inside the panel's own rounded bounds while it stays sharp everywhere else.
         ///
-        /// Grouped with the other controls under [BackdropGroup]: at rest the panel sits beside the
-        /// class cards rather than over them, so the whole table shares a single blur pass. A card
-        /// sliding under it mid-swipe is not part of that shared backdrop.
+        /// Kept separate from the class-card blur group so this panel has its own blur pass
+        /// and does not share a blur cache with the cards, especially when cards slide behind
+        /// it during horizontal page swipes.
         Positioned(
           left: timeLineInset,
           top: 0,
@@ -83,7 +83,6 @@ class ClassTableTimeLine extends StatelessWidget {
             child: GlassBlur(
               borderRadius: BorderRadius.circular(timeLineRadius),
               sigma: GlassStyleConfig.timeLineSigma,
-              grouped: true,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerHigh

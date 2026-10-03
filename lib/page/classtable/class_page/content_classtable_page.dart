@@ -1444,8 +1444,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                 return false;
               },
 
-              /// Everything above the wallpaper that wants a frosted background shares one blur of
-              /// it: the status banner and every control in the table.
+              /// Controls that opt into grouping share one blur of the backdrop: the status banner
+              /// and the class cards. Panels with their own independent blur (such as the date row
+              /// and time line) maintain their own blur caches.
               child: BackdropGroup(
                 backdropKey: _backdropKey,
                 child: Column(
