@@ -110,7 +110,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double available =
-            widget.heightReference ?? constraints.maxHeight;
+            widget.heightReference ?? classTableHeightReference;
 
         /// Measured once and handed down, so the time line, the grid and the floating indicators
         /// cannot drift apart: the column is as wide as its widest label needs, and a block is never
@@ -239,6 +239,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
     }
     return PageView.builder(
       controller: control,
+      physics: const ClassTablePageScrollPhysics(),
       onPageChanged: widget.onPageChanged,
       itemCount: widget.semesterLength,
       itemBuilder: (context, index) => ClassTableView(
@@ -247,6 +248,91 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
         blockUnit: blockUnit,
       ),
     );
+  }
+}
+
+/// Custom scroll physics for week page swiping in the class table.
+///
+/// Reduces accidental page flips caused by slight diagonal drags or tiny release flings
+/// when scrolling vertically.
+///
+/// - For a quick flick to turn pages, the user must exceed a deliberate velocity threshold
+///   (350 px/s) AND have moved at least 15% of the page in that direction.
+/// - For a slow drag without a quick flick, the page must be dragged past the midpoint (50%)
+///   to settle onto the next page, otherwise it smoothly springs back.
+class ClassTablePageScrollPhysics extends PageScrollPhysics {
+  const ClassTablePageScrollPhysics({super.parent});
+
+  @override
+  ClassTablePageScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return ClassTablePageScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  /// Minimum fling velocity in logical pixels/second required to flip page
+  /// with a short swipe.
+  static const double _kMinFlingVelocity = 400.0;
+
+  /// Minimum fraction of page width dragged before a flick is allowed to flip pages.
+  static const double _kMinDragFractionForFling = 0.20;
+
+  /// Fraction of page width dragged required to commit to flipping page during slow dragging.
+  /// Must be pulled past 60% of width to advance; otherwise, it firmly springs back to the current week.
+  static const double _kSlowDragCommitThreshold = 0.60;
+
+  @override
+  SpringDescription get spring => SpringDescription.withDampingRatio(
+    mass: 0.8,
+    stiffness: 120.0,
+    ratio: 1.2,
+  );
+
+  @override
+  Simulation? createBallisticSimulation(
+    ScrollMetrics position,
+    double velocity,
+  ) {
+    if (!position.hasPixels || position.viewportDimension <= 0) {
+      return null;
+    }
+
+    if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
+        (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
+      return super.createBallisticSimulation(position, velocity);
+    }
+
+    final double page = position.pixels / position.viewportDimension;
+    final int pageFloor = page.floor();
+    final double fraction = page - pageFloor;
+
+    final int targetPage;
+    if (velocity > _kMinFlingVelocity) {
+      targetPage =
+          fraction >= _kMinDragFractionForFling ? pageFloor + 1 : pageFloor;
+    } else if (velocity < -_kMinFlingVelocity) {
+      targetPage =
+          fraction <= (1.0 - _kMinDragFractionForFling)
+              ? pageFloor
+              : pageFloor + 1;
+    } else {
+      // Slow drag: requires crossing 60% threshold to commit forward.
+      targetPage =
+          fraction >= _kSlowDragCommitThreshold ? pageFloor + 1 : pageFloor;
+    }
+
+    final Tolerance tolerance = toleranceFor(position);
+    final double targetPixels = (targetPage * position.viewportDimension)
+        .clamp(position.minScrollExtent, position.maxScrollExtent);
+
+    if (targetPixels != position.pixels) {
+      return ScrollSpringSimulation(
+        spring,
+        position.pixels,
+        targetPixels,
+        velocity,
+        tolerance: tolerance,
+      );
+    }
+    return null;
   }
 }
 

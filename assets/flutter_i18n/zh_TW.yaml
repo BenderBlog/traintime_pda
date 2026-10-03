@@ -956,6 +956,7 @@ setting:
     frosted_date_row_sigma: '日期欄模糊: {value}'
     frosted_week_bar_sigma: '週次欄模糊: {value}'
     frosted_banner_sigma: '狀態橫幅模糊: {value}'
+    frosted_app_bar_sigma: '導航欄模糊: {value}'
   no_permission: 未獲取存儲權限，無法讀取文件
   successful_setting: 設定成功
   failure_setting: 你沒有選圖片捏

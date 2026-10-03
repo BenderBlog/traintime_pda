@@ -102,11 +102,15 @@ const double narrowClassCardWidth = 46.0;
 /// The width below which a class card uses the smallest text it has.
 const double tinyClassCardWidth = 32.0;
 
+/// The height the blocks are scaled against by default, keeping card heights consistent
+/// and independent of whether the week bar is docked or collapsed.
+const double classTableHeightReference = 560.0;
+
 /// 课表内容末尾留出的那点余地。
 ///
 /// 滚到底时最后一节的下课时间会贴到面板底边、被自己的圆角切到，留一点就够它
-/// 躲开；留太多的话，滚到底时会看见一条明显的空档。
-const double classTableSheetEndGap = 6.0;
+/// 躲开；末尾的时间滑块也会停在该避让区域上方以避免遮挡文字。
+const double classTableSheetEndGap = 20.0;
 
 /// The largest blur which can be applied to a user defined background image.
 const double maxClassTableBackgroundBlur = 30.0;

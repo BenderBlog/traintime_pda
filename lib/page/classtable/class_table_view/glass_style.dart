@@ -33,6 +33,9 @@ class GlassStyleConfig {
   /// The inline loading/cache banner.
   static double bannerSigma = 12;
 
+  /// The top navigation/app bar.
+  static double appBarSigma = 12;
+
   /// Range the settings dialog offers.
   static const double minSigma = 0;
   static const double maxSigma = 40;
@@ -71,6 +74,11 @@ class GlassStyleConfig {
         preference.getDouble(preference.Preference.classStyleGlassBannerSigma),
       );
     }
+    if (preference.contains(preference.Preference.classStyleGlassAppBarSigma)) {
+      appBarSigma = _clamp(
+        preference.getDouble(preference.Preference.classStyleGlassAppBarSigma),
+      );
+    }
   }
 
   static Future<void> saveToPreference() async {
@@ -97,6 +105,10 @@ class GlassStyleConfig {
     await preference.setDouble(
       preference.Preference.classStyleGlassBannerSigma,
       _clamp(bannerSigma),
+    );
+    await preference.setDouble(
+      preference.Preference.classStyleGlassAppBarSigma,
+      _clamp(appBarSigma),
     );
   }
 }

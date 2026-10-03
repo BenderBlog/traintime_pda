@@ -1049,6 +1049,7 @@ setting:
     frosted_date_row_sigma: "Date row blur: {value}"
     frosted_week_bar_sigma: "Week bar blur: {value}"
     frosted_banner_sigma: "Status banner blur: {value}"
+    frosted_app_bar_sigma: "Navigation bar blur: {value}"
   no_permission: No storage permission obtained, cannot read files
   successful_setting: Successfully set
   failure_setting: You did not select an image

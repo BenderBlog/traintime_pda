@@ -87,7 +87,7 @@ class GlassBlur extends StatelessWidget {
         : BackdropFilter(filter: filter, child: child);
 
     if (borderRadius == null) {
-      return blurred;
+      return ClipRect(child: blurred);
     }
     return ClipRRect(borderRadius: borderRadius!, child: blurred);
   }

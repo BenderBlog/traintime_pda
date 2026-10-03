@@ -154,27 +154,50 @@ class CurrentTimeIndicator {
       return null;
     }
 
-    final lineTop = blockHeight(_transferIndex(now));
-    final colorScheme = Theme.of(context).colorScheme;
-    final color = colorScheme.primary;
+    final int timeInMin = now.hour * 60 + now.minute;
+    int parseMinute(String hhmm) {
+      final parts = hhmm.split(':');
+      return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+    }
+
+    final firstStart = timeList.isNotEmpty ? parseMinute(timeList.first) : 0;
+    final endMinute =
+        timeList.isNotEmpty ? parseMinute(timeList.last) : 24 * 60;
+
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
     final labelHeight = CurrentTimeIndicatorConfig.labelHeight;
-    final indicatorTop = lineTop - labelHeight;
-    final lineOffset = lineTop - indicatorTop;
-    final lineTopOffset =
-        lineOffset - CurrentTimeIndicatorConfig.lineThickness / 2;
-    final labelTop = lineOffset - labelHeight / 2;
-    final labelBottom = labelTop + labelHeight;
-    final lineBottom = lineTopOffset + CurrentTimeIndicatorConfig.lineThickness;
+    final lineThickness = CurrentTimeIndicatorConfig.lineThickness;
+
+    // Minimum lineTop ensures the time capsule is not cut off at the start (starts at y >= 1.0)
+    final double minLineTop =
+        hasLabel ? (labelHeight / 2 + 1.0) : (lineThickness / 2 + 1.0);
+
+    // Maximum lineTop positions the time capsule below period 11 text ("21:25") so it does not block the text
+    final double maxLineTop = blockHeight(61) +
+        (hasLabel ? (labelHeight / 2 + 3.0) : (lineThickness / 2 + 3.0));
+
+    double lineTop = blockHeight(_transferIndex(now));
+    if (timeInMin < firstStart) {
+      lineTop = minLineTop;
+    } else if (timeInMin >= endMinute) {
+      lineTop = maxLineTop;
+    } else {
+      lineTop = lineTop.clamp(minLineTop, maxLineTop);
+    }
+
+    final double halfHeight =
+        hasLabel ? (labelHeight / 2) : (lineThickness / 2);
+    final indicatorTop = lineTop - halfHeight;
+    final indicatorHeight = hasLabel ? labelHeight : lineThickness;
+    final labelTop = 0.0;
+    final lineTopOffset = (indicatorHeight - lineThickness) / 2;
+
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = colorScheme.primary;
 
     return _IndicatorGeometry(
       indicatorTop: indicatorTop,
-      indicatorHeight:
-          (hasLabel
-                  ? (labelBottom > lineBottom ? labelBottom : lineBottom)
-                  : lineBottom)
-              .clamp(0.0, double.infinity)
-              .toDouble(),
+      indicatorHeight: indicatorHeight,
       labelTop: labelTop,
       lineTopOffset: lineTopOffset,
       dayOffset: dayOffset,
@@ -357,8 +380,8 @@ class CurrentTimeIndicator {
 
     return Positioned(
       left: leftRow + blockWidth * dayOffset,
-      top: timeLineInset,
-      bottom: timeLineInset,
+      top: 0,
+      bottom: 0,
       width: blockWidth,
       child: IgnorePointer(
         child: DecoratedBox(

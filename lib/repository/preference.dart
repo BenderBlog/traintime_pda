@@ -184,6 +184,10 @@ enum Preference {
     key: "classStyleGlassBannerSigma",
     type: "double",
   ), // 状态横幅背景模糊
+  classStyleGlassAppBarSigma(
+    key: "classStyleGlassAppBarSigma",
+    type: "double",
+  ), // 导航栏背景模糊
   lowElectricityWarningEnabled(
     key: "lowElectricityWarningEnabled",
     type: "bool",

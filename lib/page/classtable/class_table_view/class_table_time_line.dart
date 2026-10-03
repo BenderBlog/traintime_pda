@@ -7,8 +7,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/time_list.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_table_time_column_layout.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
@@ -65,8 +65,8 @@ class ClassTableTimeLine extends StatelessWidget {
         /// blur pass for the entire table.
         Positioned(
           left: timeLineInset,
-          top: timeLineInset,
-          bottom: timeLineInset,
+          top: 0,
+          bottom: 0,
           width: _panelWidth,
           child: DecoratedBox(
             /// The shadow is painted outside the clip so it is not blurred away with the backdrop.
@@ -108,6 +108,7 @@ class ClassTableTimeLine extends StatelessWidget {
 
   /// Thirteen rows: eleven periods and the two breaks, sized in grid blocks.
   List<Widget> _labels(BuildContext context) {
+    final layout = ClassTableTimeColumnLayout.of(context);
     return List.generate(13, (index) {
       final double height = blockUnit * (index != 4 && index != 9 ? 5 : 3);
 
@@ -125,46 +126,65 @@ class ClassTableTimeLine extends StatelessWidget {
         indexOfChar = index - 2;
       }
 
-      return DefaultTextStyle.merge(
-        style: TextStyle(
-          fontSize: 14,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        child: Text.rich(
-          TextSpan(
+      final Widget cell;
+      if (indexOfChar == -1 || indexOfChar == -2) {
+        cell = Center(
+          child: Text(
+            FlutterI18n.translate(
+              context,
+              indexOfChar == -1
+                  ? "classtable.noon_break"
+                  : "classtable.supper_break",
+            ),
+            style: layout.breakStyle,
+            textAlign: TextAlign.center,
+          ),
+        );
+      } else {
+        final bool isFirstPeriod = indexOfChar == 0;
+        final bool isLastPeriod = indexOfChar == 10;
+        final EdgeInsets cellPadding = isFirstPeriod
+            ? const EdgeInsets.only(top: 4.5, bottom: 1.0)
+            : isLastPeriod
+            ? const EdgeInsets.only(top: 1.0, bottom: 4.5)
+            : const EdgeInsets.symmetric(vertical: 1.0);
+
+        cell = Padding(
+          padding: cellPadding,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (indexOfChar == -1)
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "classtable.noon_break",
-                  ),
-                  style: const TextStyle(fontSize: 12),
-                )
-              else if (indexOfChar == -2)
-                TextSpan(
-                  text: FlutterI18n.translate(
-                    context,
-                    "classtable.supper_break",
-                  ),
-                  style: const TextStyle(fontSize: 12),
-                )
-              else ...[
-                TextSpan(text: "${indexOfChar + 1}\n"),
-                TextSpan(
-                  text: "${timeList[indexOfChar * 2]}\n",
-                  style: const TextStyle(fontSize: 8),
-                ),
-                TextSpan(
-                  text: timeList[indexOfChar * 2 + 1],
-                  style: const TextStyle(fontSize: 8),
-                ),
-              ],
+              Text(
+                timeList[indexOfChar * 2],
+                style: layout.timeStyle,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+              ),
+              Text(
+                "${indexOfChar + 1}",
+                style: layout.periodStyle,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+              ),
+              Text(
+                timeList[indexOfChar * 2 + 1],
+                style: layout.timeStyle,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+              ),
             ],
           ),
-          textAlign: TextAlign.center,
-        ),
-      ).center().constrained(width: timeColumnWidth, height: height);
+        );
+      }
+
+      return SizedBox(
+        width: timeColumnWidth,
+        height: height,
+        child: cell,
+      );
     });
   }
 }

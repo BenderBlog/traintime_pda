@@ -292,6 +292,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     if (!_didLoadVisualSettings) {
       CurrentTimeIndicatorConfig.loadFromPreference();
       CompletedClassStyleConfig.loadFromPreference();
+      GlassStyleConfig.loadFromPreference();
       _didLoadVisualSettings = true;
     }
 
@@ -365,6 +366,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     Widget layer = Image.file(
       image,
+      key: ValueKey<String>(image.path),
       fit: BoxFit.cover,
       gaplessPlayback: true,
       opacity: AlwaysStoppedAnimation<double>(
@@ -391,7 +393,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       );
     }
 
-    return Positioned.fill(child: layer);
+    return Positioned.fill(
+      key: const ValueKey('class_table_background_layer'),
+      child: layer,
+    );
   }
 
   /// The room the class table keeps after its last period, for the bottom of the display.
@@ -1026,14 +1031,42 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   @override
   Widget build(BuildContext context) {
+    CurrentTimeIndicatorConfig.loadFromPreference();
+    CompletedClassStyleConfig.loadFromPreference();
+    GlassStyleConfig.loadFromPreference();
+
     final state = ClassTableState.of(context)!.controllers;
 
     final hasError =
         state.errorWithoutCacheSources.isNotEmpty ||
         state.errorWithCacheSources.isNotEmpty;
 
+    final double statusBarHeight = MediaQuery.paddingOf(context).top;
+    final double appBarHeight = statusBarHeight + kToolbarHeight;
+    final bool appBarGlass =
+        GlassStyleConfig.enabled && GlassStyleConfig.appBarSigma > 0;
+
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: appBarGlass ? Colors.transparent : null,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        flexibleSpace: appBarGlass
+            ? SizedBox.expand(
+                child: GlassBlur(
+                  sigma: GlassStyleConfig.appBarSigma,
+                  child: SizedBox.expand(
+                    child: ColoredBox(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHigh
+                          .withValues(alpha: weekBarSurfaceAlpha),
+                    ),
+                  ),
+                ),
+              )
+            : null,
         title: Text(FlutterI18n.translate(context, "classtable.page_title")),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
@@ -1371,7 +1404,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           AnimatedPositioned(
             left: 0,
             right: 0,
-            top: _weekBarCollapsed ? 0 : _weekBarHeight,
+            top: appBarHeight + (_weekBarCollapsed ? 0 : _weekBarHeight),
             bottom: 0,
             duration: weekBarDockDuration,
             curve: Curves.easeOutCubic,
@@ -1408,6 +1441,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       semesterLength: classTableState.semesterLength,
                       onPageChanged: _onPageChanged,
                       bottomClearance: _sheetBottomClearance(context),
+                      heightReference: classTableHeightReference,
                     ).expanded(),
                   ],
                 ),
@@ -1444,7 +1478,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           AnimatedPositioned(
             left: _weekBarFloating ? timeLineInset : 0,
             right: _weekBarFloating ? timeLineInset : 0,
-            top: _weekBarFloating ? timeLineInset : 0,
+            top: appBarHeight + (_weekBarFloating ? timeLineInset : 0),
             height: _weekBarHeight,
             duration: weekBarPopDuration,
             curve: _weekBarVisible
@@ -1494,7 +1528,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       /// from the first frame rather than appearing only after the bar settles.
                       Positioned.fill(
                         child: GlassBlur(
-                          sigma: GlassStyleConfig.weekBarSigma,
+                          borderRadius: BorderRadius.circular(
+                            _weekBarFloating ? timeLineRadius : 0,
+                          ),
+                          sigma: _weekBarVisible
+                              ? GlassStyleConfig.weekBarSigma
+                              : 0,
                           child: ColoredBox(
                             color: Theme.of(context)
                                 .colorScheme

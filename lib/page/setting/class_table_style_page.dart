@@ -446,6 +446,23 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
                     _update(() => GlassStyleConfig.bannerSigma = value),
                 onChangeEnd: _saveGlassSettings,
               ),
+              _slider(
+                enabled: GlassStyleConfig.enabled,
+                label: FlutterI18n.translate(
+                  context,
+                  "setting.class_table_style_page.frosted_app_bar_sigma",
+                  translationParams: {
+                    "value": "${GlassStyleConfig.appBarSigma.round()}",
+                  },
+                ),
+                value: GlassStyleConfig.appBarSigma,
+                min: GlassStyleConfig.minSigma,
+                max: GlassStyleConfig.maxSigma,
+                divisions: 40,
+                onChanged: (value) =>
+                    _update(() => GlassStyleConfig.appBarSigma = value),
+                onChangeEnd: _saveGlassSettings,
+              ),
             ],
           ),
           const SizedBox(height: 24),
