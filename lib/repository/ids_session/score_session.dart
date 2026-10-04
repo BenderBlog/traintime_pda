@@ -30,7 +30,7 @@ enum ScoreCacheHint implements CacheHint {
   @override
   String resolve(Translations tr) => switch (this) {
     passwordWrong => tr.score.cacheHintPasswordWrong,
-    loginFailed  => tr.score.cacheHintLoginFailed,
+    loginFailed => tr.score.cacheHintLoginFailed,
     networkFailed => tr.score.cacheHintNetworkFailed,
     unknownError => tr.score.cacheHintUnknownError,
   };
@@ -48,7 +48,6 @@ ScoreCacheHint _cacheHintFromError(Object error) {
   }
   return ScoreCacheHint.unknownError;
 }
-
 
 /// 考试成绩 4768574631264620
 class ScoreSession extends IDSSession {

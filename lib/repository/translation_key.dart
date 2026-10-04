@@ -12,16 +12,17 @@ extension TranslationKey on Translations {
     final path = parts
         .map((part) {
           final words = part.split('_');
-      final name = words.first +
-          words
+          final name =
+              words.first +
+              words
                   .skip(1)
                   .map(
                     (word) => word.isEmpty
                         ? ''
                         : word[0].toUpperCase() + word.substring(1),
                   )
-              .join();
-      return name == 'default' ? 'kDefault' : name;
+                  .join();
+          return name == 'default' ? 'kDefault' : name;
         })
         .join('.');
 

@@ -30,7 +30,7 @@ enum ExamCacheHint implements CacheHint {
   @override
   String resolve(Translations tr) => switch (this) {
     passwordWrong => tr.exam.cacheHintPasswordWrong,
-    loginFailed  => tr.exam.cacheHintLoginFailed,
+    loginFailed => tr.exam.cacheHintLoginFailed,
     networkFailed => tr.exam.cacheHintNetworkFailed,
     unknownError => tr.exam.cacheHintUnknownError,
   };

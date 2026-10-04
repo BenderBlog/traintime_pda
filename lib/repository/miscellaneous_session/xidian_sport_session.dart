@@ -27,13 +27,13 @@ enum SportCacheHint implements CacheHint {
 
   @override
   String resolve(Translations tr) => switch (this) {
-    missingPassword    => tr.sport.cacheHintMissingPassword,
-    credentialInvalid  => tr.sport.cacheHintCredentialInvalid,
-    maintain           => tr.sport.cacheHintMaintain,
-    loginFailed        => tr.sport.cacheHintLoginFailed,
-    queryFailed        => tr.sport.cacheHintQueryFailed,
-    networkFailed      => tr.sport.cacheHintNetwork,
-    unknownError       => tr.sport.cacheHintUnknown,
+    missingPassword => tr.sport.cacheHintMissingPassword,
+    credentialInvalid => tr.sport.cacheHintCredentialInvalid,
+    maintain => tr.sport.cacheHintMaintain,
+    loginFailed => tr.sport.cacheHintLoginFailed,
+    queryFailed => tr.sport.cacheHintQueryFailed,
+    networkFailed => tr.sport.cacheHintNetwork,
+    unknownError => tr.sport.cacheHintUnknown,
   };
 }
 
@@ -305,7 +305,7 @@ awb4B45zUwIDAQAB
     return _wrongPasswordKeywords.any(message.contains);
   }
 
-SportCacheHint? _cacheHintFromError(Object error) {
+  SportCacheHint? _cacheHintFromError(Object error) {
     if (error is SportCredentialMissingException) {
       return SportCacheHint.missingPassword;
     }

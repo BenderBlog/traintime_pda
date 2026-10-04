@@ -24,15 +24,10 @@ class SponsorshipCard extends StatelessWidget {
                 content: Text(context.t.sponsorship.dialogContent).scrollable(),
                 actions: [
                   TextButton(
-                    onPressed: () =>
-                        launchUrlString("https://join.geek-tech.club"),
-                    child: Text(context.t.sponsorship.buttonJichuang),
-                  ),
-                  TextButton(
                     onPressed: () => launchUrlString(
-                      "https://docs.qq.com/form/page/DRkFFcFJmc3FydVRF",
+                      "https://appgallery.huawei.com/app/detail?id=com.xdyou.hmos",
                     ),
-                    child: Text(context.t.sponsorship.buttonXduna),
+                    child: Text(context.t.sponsorship.button),
                   ),
                 ],
               ),

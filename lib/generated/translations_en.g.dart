@@ -878,11 +878,10 @@ class _Translations$sponsorship$en extends Translations$sponsorship$zh {
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'This version is sponsored and released by Jichuang Studio and the Network Management Committee.';
-	@override String get dialogTitle => 'Sponsorship Information';
-	@override String get dialogContent => 'Introduction to Jichuang Studio: Jichuang Studio is a tech innovation club supported and established by the Xidian University Innovation and Entrepreneurship College. It aims to walk alongside the campus\'s most outstanding innovation and entrepreneurship talent, focusing on technological innovation and product research and development in fields such as artificial intelligence. Currently, the studio collaborates with manufacturers like Huawei, deeply cultivating cutting-edge directions related to large language models, and has incubated over dozens of AI-related sci-tech innovation products, 8 of which have successfully achieved commercial deployment. The studio\'s best-known products include SwanLab, LLMOne, and NexusGate.\n\nIntroduction to the XDUNA: The XDUNA operates under the Xidian University Information Network Technology Center. It primarily assists in handling campus network usage issues for faculty and students, and participates in campus network maintenance, online consultation, offline processing, and technical support. We welcome responsible students who are eager to learn and interested in network and technical practices to join us in serving fellow students, improving abilities, and gaining experience.\n\nNote from the XDYou Software Developer: Jichuang provided significant help during the early development of XDYou. I joined the Network Management Committee back in my admission year in 2020, though unfortunately they didn\'t accept me. As I\'ve recently been looking for a job and consulted some of their members for information, this page has been created as a consultation fee in accordance with our agreement.\nBender Rodriguez 6/9/2026';
-	@override String get buttonJichuang => 'About Jichuang';
-	@override String get buttonXduna => 'About XDUNA';
+	@override String get title => 'Welcome to XDYou for HarmonyOS';
+	@override String get dialogTitle => 'More information';
+	@override String get dialogContent => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from the Class of 2025, with the help of AI. In essence, the app was recompiled for HarmonyOS. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026';
+	@override String get button => 'Huawei AppGallery';
 }
 
 // Path: sport
@@ -3635,11 +3634,10 @@ extension on TranslationsEn {
 			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => 'Border opacity: ${value}',
 			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => 'Fill opacity: ${value}',
 			'setting.classSwiftExplain' => 'Positive number delays the start date, negative number advances the start date',
-			'sponsorship.title' => 'This version is sponsored and released by Jichuang Studio and the Network Management Committee.',
-			'sponsorship.dialogTitle' => 'Sponsorship Information',
-			'sponsorship.dialogContent' => 'Introduction to Jichuang Studio: Jichuang Studio is a tech innovation club supported and established by the Xidian University Innovation and Entrepreneurship College. It aims to walk alongside the campus\'s most outstanding innovation and entrepreneurship talent, focusing on technological innovation and product research and development in fields such as artificial intelligence. Currently, the studio collaborates with manufacturers like Huawei, deeply cultivating cutting-edge directions related to large language models, and has incubated over dozens of AI-related sci-tech innovation products, 8 of which have successfully achieved commercial deployment. The studio\'s best-known products include SwanLab, LLMOne, and NexusGate.\n\nIntroduction to the XDUNA: The XDUNA operates under the Xidian University Information Network Technology Center. It primarily assists in handling campus network usage issues for faculty and students, and participates in campus network maintenance, online consultation, offline processing, and technical support. We welcome responsible students who are eager to learn and interested in network and technical practices to join us in serving fellow students, improving abilities, and gaining experience.\n\nNote from the XDYou Software Developer: Jichuang provided significant help during the early development of XDYou. I joined the Network Management Committee back in my admission year in 2020, though unfortunately they didn\'t accept me. As I\'ve recently been looking for a job and consulted some of their members for information, this page has been created as a consultation fee in accordance with our agreement.\nBender Rodriguez 6/9/2026',
-			'sponsorship.buttonJichuang' => 'About Jichuang',
-			'sponsorship.buttonXduna' => 'About XDUNA',
+			'sponsorship.title' => 'Welcome to XDYou for HarmonyOS',
+			'sponsorship.dialogTitle' => 'More information',
+			'sponsorship.dialogContent' => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from the Class of 2025, with the help of AI. In essence, the app was recompiled for HarmonyOS. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026',
+			'sponsorship.button' => 'Huawei AppGallery',
 			'sport.title' => 'Sport Query',
 			'sport.classInfo' => 'Class information',
 			'sport.emptyClassInfo' => 'No class information found',

@@ -29,10 +29,10 @@ enum OtherExperimentCacheHint implements CacheHint {
 
   @override
   String resolve(Translations tr) => switch (this) {
-    loginFailed      => tr.experiment.otherCacheHintLoginFailed,
+    loginFailed => tr.experiment.otherCacheHintLoginFailed,
     notSchoolNetwork => tr.experiment.otherCacheHintNotSchoolNetwork,
-    networkFailed    => tr.experiment.otherCacheHintNetworkFailed,
-    unknownError     => tr.experiment.otherCacheHintUnknownError,
+    networkFailed => tr.experiment.otherCacheHintNetworkFailed,
+    unknownError => tr.experiment.otherCacheHintUnknownError,
   };
 }
 

@@ -42,6 +42,5 @@ class SportScore {
 
   bool get isFourYearsComplete => list.length >= 4;
   bool get isQualified => !rank.contains("不");
-  String? get scoreRankI18nStr =>
-      list.length < 4 ? null : rank;
+  String? get scoreRankI18nStr => list.length < 4 ? null : rank;
 }

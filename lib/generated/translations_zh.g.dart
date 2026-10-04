@@ -1887,20 +1887,17 @@ class Translations$sponsorship$zh {
 
 	// Translations
 
-	/// zh: '本版本由极创工作室和网管会赞助发布'
-	String get title => '本版本由极创工作室和网管会赞助发布';
+	/// zh: '欢迎使用 XDYou 的鸿蒙版本'
+	String get title => '欢迎使用 XDYou 的鸿蒙版本';
 
-	/// zh: '赞助信息'
-	String get dialogTitle => '赞助信息';
+	/// zh: '详细信息'
+	String get dialogTitle => '详细信息';
 
-	/// zh: '极创工作室介绍辞：极创工作室是一个由西电创新创业学院支持建设的科技创新俱乐部，旨在与校内最优秀的创新创业人才同行，专注于人工智能等领域的技术创新与产品研发。目前工作室和华为等厂家合作，深耕大语言模型相关前沿方向，已孵化超过数十个人工智能领域科创产品，其中8项产品成功落地商用。工作室最知名的产品包括SwanLab、LLMOne、NexusGate。 网管会介绍辞：学生网管会隶属于西电信息网络技术中心，主要协助处理师生校园网络使用问题，参与校园网络维护、线上咨询、线下处理和技术支持等工作。我们欢迎认真负责、愿意学习、对网络与技术实践感兴趣的同学加入，一起服务同学、提升能力、积累经验。 XDYou软件开发者辞：极创在XDYou早期开发期间给了相当大的帮助，网管会我在20年入学期间加入过，可惜他们没要我。应我最近找工作，找了他们的人了解了一些信息，按照约定制作本页面作为咨询费。 Bender Rodriguez 6/9/2026'
-	String get dialogContent => '极创工作室介绍辞：极创工作室是一个由西电创新创业学院支持建设的科技创新俱乐部，旨在与校内最优秀的创新创业人才同行，专注于人工智能等领域的技术创新与产品研发。目前工作室和华为等厂家合作，深耕大语言模型相关前沿方向，已孵化超过数十个人工智能领域科创产品，其中8项产品成功落地商用。工作室最知名的产品包括SwanLab、LLMOne、NexusGate。\n\n网管会介绍辞：学生网管会隶属于西电信息网络技术中心，主要协助处理师生校园网络使用问题，参与校园网络维护、线上咨询、线下处理和技术支持等工作。我们欢迎认真负责、愿意学习、对网络与技术实践感兴趣的同学加入，一起服务同学、提升能力、积累经验。\n\nXDYou软件开发者辞：极创在XDYou早期开发期间给了相当大的帮助，网管会我在20年入学期间加入过，可惜他们没要我。应我最近找工作，找了他们的人了解了一些信息，按照约定制作本页面作为咨询费。\nBender Rodriguez 6/9/2026';
+	/// zh: '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。 注意：由于上架限制，部分功能被迫移除。 另外，本程序彩蛋是某个抱枕。 BenderBlog Rodriguez 4/10/2026'
+	String get dialogContent => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026';
 
-	/// zh: '了解极创'
-	String get buttonJichuang => '了解极创';
-
-	/// zh: '了解网管会'
-	String get buttonXduna => '了解网管会';
+	/// zh: '华为应用商店网址'
+	String get button => '华为应用商店网址';
 }
 
 // Path: sport
@@ -6225,11 +6222,10 @@ extension on Translations {
 			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
 			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
 			'setting.classSwiftExplain' => '正数错后开学日期 负数提前开学日期',
-			'sponsorship.title' => '本版本由极创工作室和网管会赞助发布',
-			'sponsorship.dialogTitle' => '赞助信息',
-			'sponsorship.dialogContent' => '极创工作室介绍辞：极创工作室是一个由西电创新创业学院支持建设的科技创新俱乐部，旨在与校内最优秀的创新创业人才同行，专注于人工智能等领域的技术创新与产品研发。目前工作室和华为等厂家合作，深耕大语言模型相关前沿方向，已孵化超过数十个人工智能领域科创产品，其中8项产品成功落地商用。工作室最知名的产品包括SwanLab、LLMOne、NexusGate。\n\n网管会介绍辞：学生网管会隶属于西电信息网络技术中心，主要协助处理师生校园网络使用问题，参与校园网络维护、线上咨询、线下处理和技术支持等工作。我们欢迎认真负责、愿意学习、对网络与技术实践感兴趣的同学加入，一起服务同学、提升能力、积累经验。\n\nXDYou软件开发者辞：极创在XDYou早期开发期间给了相当大的帮助，网管会我在20年入学期间加入过，可惜他们没要我。应我最近找工作，找了他们的人了解了一些信息，按照约定制作本页面作为咨询费。\nBender Rodriguez 6/9/2026',
-			'sponsorship.buttonJichuang' => '了解极创',
-			'sponsorship.buttonXduna' => '了解网管会',
+			'sponsorship.title' => '欢迎使用 XDYou 的鸿蒙版本',
+			'sponsorship.dialogTitle' => '详细信息',
+			'sponsorship.dialogContent' => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026',
+			'sponsorship.button' => '华为应用商店网址',
 			'sport.title' => '体育查询',
 			'sport.classInfo' => '课程信息',
 			'sport.emptyClassInfo' => '未查询到课程信息',

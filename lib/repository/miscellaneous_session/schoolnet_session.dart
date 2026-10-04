@@ -117,7 +117,7 @@ class SchoolnetSession extends NetworkClients {
         error == "homepage.school_net.failed";
   }
 
-SchoolnetCacheHint? _cacheHintFromError(Object error) {
+  SchoolnetCacheHint? _cacheHintFromError(Object error) {
     if (error == "school_net.captcha_failed") {
       return SchoolnetCacheHint.captchaFailed;
     }

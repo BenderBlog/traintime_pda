@@ -825,10 +825,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_android
-      sha256: "0a55d645a670d6ae11efa948f955ae904afa472f1344fc15a7ddacc20c1e7219"
+      sha256: "8a7823d5d3e884f7780829d85d92110d072bdcd9ed48e2be158d2abe91a912d4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.13+23"
+    version: "0.8.13+25"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -1373,7 +1373,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.30.1"
-<<<<<<< HEAD
   serial_csv:
     dependency: transitive
     description:
@@ -1382,8 +1381,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.2"
-=======
->>>>>>> main
   share_plus:
     dependency: "direct main"
     description:
@@ -1725,17 +1722,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
-<<<<<<< HEAD
-=======
-  toml:
-    dependency: transitive
-    description:
-      name: toml
-      sha256: "35cd2a1351c14bd213f130f8efcbd3e0c18181bff0c8ca7a08f6822a2bede786"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.17.0"
->>>>>>> main
   typed_data:
     dependency: transitive
     description:
@@ -1764,10 +1750,10 @@ packages:
     dependency: "direct main"
     description:
       name: url_launcher
-      sha256: f6a7e5c4835bb4e3026a04793a4199ca2d14c739ec378fdfe23fc8075d0439f8
+      sha256: e8cc955c97e06df9879140a1fe301f3d493f01b7c62dec7f46834be31d7e9fda
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.2"
+    version: "6.3.3"
   url_launcher_android:
     dependency: transitive
     description:
@@ -1920,17 +1906,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.1.0"
-<<<<<<< HEAD
-=======
-  xml2json:
-    dependency: transitive
-    description:
-      name: xml2json
-      sha256: "0c1cb4e84105bdc3a8c67efc4673d317932f6fd7cc9a46cb4438bea375b7bb9b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.2.9"
->>>>>>> main
   yaml:
     dependency: "direct dev"
     description:

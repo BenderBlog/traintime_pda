@@ -878,11 +878,10 @@ class _Translations$sponsorship$zh_TW extends Translations$sponsorship$zh {
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '本版本由極創工作室和網管會贊助發佈';
-	@override String get dialogTitle => '贊助信息';
-	@override String get dialogContent => '極創工作室介紹辭：極創工作室是一個由西電創新創業學院支持建設的科技創新俱樂部，旨在與校內最優秀的創新創業人才同行，專注於人工智能等領域的技術創新與產品研發。目前工作室和華為等廠家合作，深耕大語言模型相關前沿方向，已孵化超過數十個人工智能領域科創產品，其中8項產品成功落地商用。工作室最知名的產品包括SwanLab、LLMOne、NexusGate。\n\n網管會介紹辭：學生網管會隸屬於西電信息網絡技術中心，主要協助處理師生校園網絡使用問題，參與校園網絡維護、線上諮詢、線下處理和技術支持等工作。我們歡迎認真負責、願意學習、對網絡與技術實踐感興趣的同學加入，一起服務同學、提升能力、積累經驗。\n\nXDYou軟件開發者辭：極創在XDYou早期開發期間給了相當大的幫助，網管會我在20年入學期間加入過，可惜他們沒要我。應我最近找工作，找了他們的人瞭解了一些信息，按照約定製作本頁面作為諮詢費。\nBender Rodriguez 6/9/2026';
-	@override String get buttonJichuang => '瞭解極創';
-	@override String get buttonXduna => '瞭解網管會';
+	@override String get title => '歡迎使用 XDYou 的鴻蒙版本';
+	@override String get dialogTitle => '詳細資訊';
+	@override String get dialogContent => '25 級學生 SixTeenForever 使用 AI 技術將本程式移植到鴻蒙系統，基本上就是重新編譯了一遍。似乎還新增了一個原生小工具，但我沒有看過原始碼，所以也不清楚。如果他公開原始碼，預計接下來會由我接手維護一段時間。\n\n注意：由於上架限制，部分功能不得不移除。\n\n另外，本程式的彩蛋是某個抱枕。\n\nBenderBlog Rodriguez 4/10/2026';
+	@override String get button => '華為應用程式商店';
 }
 
 // Path: sport
@@ -3635,11 +3634,10 @@ extension on TranslationsZhTw {
 			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
 			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
 			'setting.classSwiftExplain' => '正數錯後開學日期 負數提前開學日期',
-			'sponsorship.title' => '本版本由極創工作室和網管會贊助發佈',
-			'sponsorship.dialogTitle' => '贊助信息',
-			'sponsorship.dialogContent' => '極創工作室介紹辭：極創工作室是一個由西電創新創業學院支持建設的科技創新俱樂部，旨在與校內最優秀的創新創業人才同行，專注於人工智能等領域的技術創新與產品研發。目前工作室和華為等廠家合作，深耕大語言模型相關前沿方向，已孵化超過數十個人工智能領域科創產品，其中8項產品成功落地商用。工作室最知名的產品包括SwanLab、LLMOne、NexusGate。\n\n網管會介紹辭：學生網管會隸屬於西電信息網絡技術中心，主要協助處理師生校園網絡使用問題，參與校園網絡維護、線上諮詢、線下處理和技術支持等工作。我們歡迎認真負責、願意學習、對網絡與技術實踐感興趣的同學加入，一起服務同學、提升能力、積累經驗。\n\nXDYou軟件開發者辭：極創在XDYou早期開發期間給了相當大的幫助，網管會我在20年入學期間加入過，可惜他們沒要我。應我最近找工作，找了他們的人瞭解了一些信息，按照約定製作本頁面作為諮詢費。\nBender Rodriguez 6/9/2026',
-			'sponsorship.buttonJichuang' => '瞭解極創',
-			'sponsorship.buttonXduna' => '瞭解網管會',
+			'sponsorship.title' => '歡迎使用 XDYou 的鴻蒙版本',
+			'sponsorship.dialogTitle' => '詳細資訊',
+			'sponsorship.dialogContent' => '25 級學生 SixTeenForever 使用 AI 技術將本程式移植到鴻蒙系統，基本上就是重新編譯了一遍。似乎還新增了一個原生小工具，但我沒有看過原始碼，所以也不清楚。如果他公開原始碼，預計接下來會由我接手維護一段時間。\n\n注意：由於上架限制，部分功能不得不移除。\n\n另外，本程式的彩蛋是某個抱枕。\n\nBenderBlog Rodriguez 4/10/2026',
+			'sponsorship.button' => '華為應用程式商店',
 			'sport.title' => '體育查詢',
 			'sport.classInfo' => '課程信息',
 			'sport.emptyClassInfo' => '未查詢到課程信息',
