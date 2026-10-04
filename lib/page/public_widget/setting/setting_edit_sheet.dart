@@ -20,14 +20,20 @@ Future<T?> showSettingSheet<T>({
 }
 
 class SettingSheet extends StatelessWidget {
-  const SettingSheet({super.key, required this.title, required this.child});
+  const SettingSheet({
+    super.key,
+    required this.title,
+    required this.child,
+    this.style,
+  });
 
   final String title;
   final Widget child;
+  final M3EBottomSheetStyle? style;
 
   @override
   Widget build(BuildContext context) {
-    return M3EBottomSheet(title: Text(title), child: child);
+    return M3EBottomSheet(title: Text(title), style: style, child: child);
   }
 }
 
@@ -126,6 +132,10 @@ class _SettingTextEditSheetState extends State<SettingTextEditSheet> {
       canPop: !_saving,
       child: SettingSheet(
         title: widget.title,
+        style: const M3EBottomSheetStyle(
+          dragHandlePadding: EdgeInsets.symmetric(vertical: 12),
+          padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -135,7 +145,7 @@ class _SettingTextEditSheetState extends State<SettingTextEditSheet> {
                 widget.description!,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
             ],
             TextField(
               autofocus: true,
@@ -182,7 +192,7 @@ class _SettingTextEditSheetState extends State<SettingTextEditSheet> {
                     : null,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             OverflowBar(
               alignment: MainAxisAlignment.end,
               spacing: 8,

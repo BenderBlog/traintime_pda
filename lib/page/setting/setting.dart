@@ -11,12 +11,13 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/setting/groups/about_section.dart';
 import 'package:watermeter/page/setting/groups/account_section.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/classtable_section.dart';
 import 'package:watermeter/page/setting/groups/core_section.dart';
-import 'package:watermeter/page/setting/groups/notification_section.dart';
+import 'package:watermeter/page/setting/groups/notification_section/notification_section.dart';
 import 'package:watermeter/page/setting/groups/ui_section/ui_section.dart';
 import 'package:watermeter/page/setting/settings_category_page.dart';
 
@@ -55,16 +56,10 @@ class _SettingWindowState extends State<SettingWindow>
     if (Platform.isAndroid || Platform.isIOS)
       const _SettingsCategory(
         'notifications',
-        'setting.notification_setting',
+        'setting.course_reminder_setting',
         MingCuteIcons.mgc_notification_line,
         NotificationSection(),
       ),
-    const _SettingsCategory(
-      'core',
-      'setting.core_setting',
-      MingCuteIcons.mgc_storage_line,
-      CoreSection(),
-    ),
   ];
 
   @override
@@ -79,37 +74,39 @@ class _SettingWindowState extends State<SettingWindow>
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
           child: ListView(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
             physics: ClampingScrollPhysics(),
             children: [
               const AboutSection(),
-              const SizedBox(height: 16),
-              SettingSegmentedList(
-                items: categories
-                    .map(
-                      (category) => ListTile(
-                        key: ValueKey('settings-category-${category.id}'),
-                        leading: Icon(category.icon),
-                        title: Text(
-                          FlutterI18n.translate(context, category.titleKey),
-                        ),
-                        subtitle: Text(
-                          FlutterI18n.translate(
-                            context,
-                            'setting.navigation.${category.id}_description',
+              SectionSettingScaffold(
+                items: SettingSegmentedList(
+                  items: categories
+                      .map(
+                        (category) => ListTile(
+                          key: ValueKey('settings-category-${category.id}'),
+                          leading: Icon(category.icon),
+                          title: Text(
+                            FlutterI18n.translate(context, category.titleKey),
+                          ),
+                          subtitle: Text(
+                            FlutterI18n.translate(
+                              context,
+                              'setting.navigation.${category.id}_description',
+                            ),
+                          ),
+                          trailing: const Icon(Icons.navigate_next),
+                          onTap: () => context.pushReplacement(
+                            SettingsCategoryPage(
+                              titleKey: category.titleKey,
+                              child: category.child,
+                            ),
                           ),
                         ),
-                        trailing: const Icon(Icons.navigate_next),
-                        onTap: () => context.pushReplacement(
-                          SettingsCategoryPage(
-                            titleKey: category.titleKey,
-                            child: category.child,
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
+                      )
+                      .toList(),
+                ),
               ),
+              const CoreSection(),
             ],
           ),
         ),

@@ -951,6 +951,8 @@ setting:
     title: Set low electricity threshold
     input_hint: Input remaining electricity
   account_setting: Account Settings
+  general_account_settings: General accounts
+  undergraduate_system_accounts: Undergraduate system accounts
   sport_password_setting: PE system password
   experiment_password_setting: Physics experiment password
   electricity_password_setting: Electricity account password
@@ -1214,9 +1216,12 @@ setting:
   semester_update_data: Applying new semester setting
   easter_egg_page: You found an Easter egg
   about_page:
+    contributors: Contributors & acknowledgements
+    licenses: Open source licenses
+    extras: More
     benderblog: Main developer, iOS widget
-    alnair: "Development: Library search and cover"
-    aqqkad: "Development: Class attandance history"
+    alnair: "Development: Library search and covers, library layout fixes, water dispenser functionality and API updates"
+    aqqkad: "Development: Class attendance history, air conditioner remote control and electricity data integration, library API updates"
     bellssgit: "Support: best and longest feedback source"
     brackrat: "Design: homepage, login page, color scheme, iOS widgets, etc."
     breezeline:
@@ -1227,6 +1232,7 @@ setting:
       '26"
     chitao1234: "Development: fix slider misalignment issue"
     copperkoi: "Development: latest time arrangement sync to calendar"
+    dami: "Development: Fix negative course offset input and input validation on iOS"
     dimole: "Development support: assist in fixing slider issue"
     elitewars: "Design: sports score page"
     elliot:
@@ -1243,8 +1249,9 @@ setting:
     imaginary_17: "Developement: Ruisi navigator stack fix"
     imoscarz:
       "Development: Homepage for software / Development: Checkin check for
-      pad / Development: Sport UI Change"
+      pad / Development: Sport UI Change / Development: Settings category refactoring and master-detail layout adaptation"
     ka-mate-ka-ora: "Internationalization: English correction"
+    l1angyun: "Development: Live availability of classrooms, timetable background blur, timetable layout and screen corner adaptation; fix campus network data display"
     lagrange-x:
       "Development: Class progress indicator (adopted) / Development: Gray
       cover on attended class and other classtable design"
@@ -1254,6 +1261,7 @@ setting:
     lichtyy:
       "Design: color pattern and blank page picture / Development: HTML reader
       for the experiment system"
+    littlestejan: "Development: Campus network captcha refresh and captcha input dialog improvements"
     lqsy-h: "Support: Promotion Picture"
     lsy223622: "Design: iOS and Android icons / Support: titled XDYou"
     mrbrilliant2046:
@@ -1277,6 +1285,7 @@ setting:
       partner classtable development (This function has been removed) / Internationalization:
       English correction"
     shadowyingyi: "Support: two times of pigeon house official account publicity"
+    sixteenforever: "Development: HarmonyOS port"
     stalomeow:
       "Design: homepage timeline / Development: asynchronous login and captcha
       predict"

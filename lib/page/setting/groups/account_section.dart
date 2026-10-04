@@ -40,98 +40,114 @@ class _AccountSectionState extends State<AccountSection> {
 
   @override
   Widget build(BuildContext context) {
-    return SectionSettingScaffold(
-      items: SettingSegmentedList(
-        items: [
-          if (!preference.getBool(preference.Preference.role)) ...[
-            ListTile(
-              leading: const Icon(MingCuteIcons.mgc_run_line),
-              title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.sport_password_setting",
-                ),
-              ),
-              subtitle: Text(
-                _passwordStatus(preference.Preference.sportPassword),
-              ),
-              trailing: const Icon(Icons.navigate_next),
-              onTap: () {
-                _editPassword(
-                  preference.Preference.sportPassword,
-                  'setting.change_sport_title',
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(MingCuteIcons.mgc_flask_line),
-              title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.experiment_password_setting",
-                ),
-              ),
-              subtitle: Text(
-                _passwordStatus(preference.Preference.experimentPassword),
-              ),
-              trailing: const Icon(Icons.navigate_next),
-              onTap: () {
-                _editPassword(
-                  preference.Preference.experimentPassword,
-                  'setting.change_experiment_title',
-                );
-              },
-            ),
-          ],
-
-          ListTile(
-            leading: const Icon(MingCuteIcons.mgc_wifi_line),
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.schoolnet_password_setting",
-              ),
-            ),
-            subtitle: Text(
-              '${_passwordStatus(preference.Preference.schoolNetQueryPassword)} · ${FlutterI18n.translate(context, "setting.schoolnet_password_description")}',
-            ),
-            trailing: const Icon(Icons.navigate_next),
-            onTap: () {
-              _editPassword(
-                preference.Preference.schoolNetQueryPassword,
-                'setting.change_schoolnet_password_title',
-              );
-            },
+    return Column(
+      children: [
+        SectionSettingScaffold(
+          title: FlutterI18n.translate(
+            context,
+            "setting.general_account_settings",
           ),
-          ListTile(
-            title: Text(
-              FlutterI18n.translate(context, "setting.aircon_imei_title"),
-            ),
-            subtitle: SignalBuilder(
-              builder: (context) {
-                final imei = AirconController.i.imeiSignal.value;
-                return Text(
-                  imei.isEmpty
-                      ? FlutterI18n.translate(
-                          context,
-                          "setting.aircon_imei_not_set",
-                        )
-                      : FlutterI18n.translate(
-                          context,
-                          "setting.aircon_imei_current",
-                          translationParams: {"imei": imei},
-                        ),
-                );
-              },
-            ),
-            leading: const Icon(Icons.ac_unit),
-            trailing: const Icon(Icons.navigate_next),
-            onTap: () {
-              context.push<void>(const AirconImeiPage());
-            },
+          items: SettingSegmentedList(
+            items: [
+              ListTile(
+                leading: const Icon(MingCuteIcons.mgc_wifi_line),
+                title: Text(
+                  FlutterI18n.translate(
+                    context,
+                    "setting.schoolnet_password_setting",
+                  ),
+                ),
+                subtitle: Text(
+                  '${_passwordStatus(preference.Preference.schoolNetQueryPassword)} · ${FlutterI18n.translate(context, "setting.schoolnet_password_description")}',
+                ),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  _editPassword(
+                    preference.Preference.schoolNetQueryPassword,
+                    'setting.change_schoolnet_password_title',
+                  );
+                },
+              ),
+              ListTile(
+                title: Text(
+                  FlutterI18n.translate(context, "setting.aircon_imei_title"),
+                ),
+                subtitle: SignalBuilder(
+                  builder: (context) {
+                    final imei = AirconController.i.imeiSignal.value;
+                    return Text(
+                      imei.isEmpty
+                          ? FlutterI18n.translate(
+                              context,
+                              "setting.aircon_imei_not_set",
+                            )
+                          : FlutterI18n.translate(
+                              context,
+                              "setting.aircon_imei_current",
+                              translationParams: {"imei": imei},
+                            ),
+                    );
+                  },
+                ),
+                leading: const Icon(Icons.ac_unit),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  context.push<void>(const AirconImeiPage());
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        if (!preference.getBool(preference.Preference.role))
+          SectionSettingScaffold(
+            title: FlutterI18n.translate(
+              context,
+              "setting.undergraduate_system_accounts",
+            ),
+            items: SettingSegmentedList(
+              items: [
+                ListTile(
+                  leading: const Icon(MingCuteIcons.mgc_run_line),
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.sport_password_setting",
+                    ),
+                  ),
+                  subtitle: Text(
+                    _passwordStatus(preference.Preference.sportPassword),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    _editPassword(
+                      preference.Preference.sportPassword,
+                      'setting.change_sport_title',
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(MingCuteIcons.mgc_flask_line),
+                  title: Text(
+                    FlutterI18n.translate(
+                      context,
+                      "setting.experiment_password_setting",
+                    ),
+                  ),
+                  subtitle: Text(
+                    _passwordStatus(preference.Preference.experimentPassword),
+                  ),
+                  trailing: const Icon(Icons.navigate_next),
+                  onTap: () {
+                    _editPassword(
+                      preference.Preference.experimentPassword,
+                      'setting.change_experiment_title',
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

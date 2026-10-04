@@ -40,6 +40,7 @@ class AboutSection extends StatelessWidget {
                 },
               ),
             ),
+            trailing: const Icon(Icons.navigate_next),
             onTap: () => context.pushReplacementNamed(Routes.about),
           ),
           ListTile(
@@ -62,6 +63,7 @@ class AboutSection extends StatelessWidget {
                 );
               },
             ),
+            trailing: const Icon(Icons.navigate_next),
             onTap: () {
               showToast(
                 context: context,
