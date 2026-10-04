@@ -45,7 +45,8 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
   String? _notice;
   String? _error;
 
-  String _t(String key) => context.t.resolveKey(key);
+  String _t(String key, {Map<String, Object> params = const {}}) =>
+      context.t.resolveKey(key, params: params);
 
   Future<void> _sendCode() async {
     setState(() {
@@ -196,10 +197,8 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
                 onPressed: busy || _secondsRemaining > 0 ? null : _sendCode,
                 child: Text(
                   _secondsRemaining > 0
-                      ? _t('login.second_factor.resend_countdown').replaceFirst(
-                          '{seconds}',
-                          _secondsRemaining.toString(),
-                        )
+                      ? _t('login.second_factor.resend_countdown',
+                          params: {'seconds': _secondsRemaining})
                       : _t('login.second_factor.send_code'),
                 ),
               ),

@@ -29,10 +29,19 @@ extension TranslationKey on Translations {
     final value = this[path];
     if (value is String) return value;
     if (value is Function) {
-      return Function.apply(value, const [], {
-            for (final entry in params.entries) Symbol(entry.key): entry.value,
-          })
-          as String;
+      // 带占位符的翻译在 slang 里是函数。这里必须把调用方给的参数传进去：
+      // 之前是无参调用，凡是有必填参数的键（例如 "xx 秒后可重新获取"）都会抛
+      // NoSuchMethodError: Closure call with mismatched arguments，二次认证弹窗
+      // 因此直接崩掉。另外整段包一层兜底：翻译解析失败不该让界面挂掉。
+      try {
+        return Function.apply(value, const [], {
+              for (final entry in params.entries)
+                Symbol(entry.key): entry.value,
+            })
+            as String;
+      } catch (_) {
+        return key;
+      }
     }
     // Errors returned by external services may already be human-readable.
     return key;
