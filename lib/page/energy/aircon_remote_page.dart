@@ -273,10 +273,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
     if (value < _minTemperature || value > _maxTemperature) {
       showToast(
         context: context,
-        msg: FlutterI18n.translate(
-          context,
-          "electricity.aircon_temperature_range",
-        ),
+        msg: context.t.electricity.airconTemperatureRange,
       );
       return;
     }
@@ -398,9 +395,9 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           if (_controller.imeiSignal.value.isEmpty) {
             return _message(
               context,
-              "electricity.aircon_imei_missing",
+              context.t.electricity.airconImeiMissing,
               onPressed: _configure,
-              actionKey: "electricity.aircon_add_imei",
+              actionLabel: context.t.electricity.airconAddImei,
               actionIcon: Icons.settings_outlined,
             );
           }
@@ -410,7 +407,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             if (_error != null) {
               return _message(
                 context,
-                "electricity.aircon_control_error",
+                context.t.electricity.airconControlError,
                 details: _error.toString(),
                 onPressed: _refreshDeviceState,
               );
@@ -437,10 +434,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                       child: _PressScaleFeedback(
                         child: IconButton(
                           onPressed: _isFetching ? null : _refreshDeviceState,
-                          tooltip: FlutterI18n.translate(
-                            context,
-                            "electricity.update",
-                          ),
+                          tooltip: context.t.electricity.update,
                           color: scheme.onSurfaceVariant,
                           icon: const Icon(Icons.refresh),
                         ),
@@ -450,10 +444,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                       _PressScaleFeedback(
                         child: IconButton(
                           onPressed: busy ? null : _configure,
-                          tooltip: FlutterI18n.translate(
-                            context,
-                            "setting.aircon_imei_title",
-                          ),
+                          tooltip: context.t.setting.airconImeiTitle,
                           color: scheme.onSurfaceVariant,
                           icon: const Icon(Icons.settings_outlined),
                         ),
@@ -558,7 +549,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         children: [
           if (!state.isOn)
             Text(
-              FlutterI18n.translate(context, "electricity.aircon_power"),
+              context.t.electricity.airconPower,
               style: textTheme.titleMedium?.copyWith(
                 color: scheme.onSurfaceVariant,
               ),
@@ -602,7 +593,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
               ),
               const SizedBox(width: 6),
               Text(
-                FlutterI18n.translate(context, state.mode.labelKey),
+                context.t.resolveKey(state.mode.labelKey),
                 style: textTheme.titleMedium?.copyWith(
                   fontSize: 12 + 4 * expansion,
                   color: scheme.onSurfaceVariant,
@@ -666,10 +657,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                 children: [
                   Expanded(
                     child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "electricity.aircon_title",
-                      ),
+                      context.t.electricity.airconTitle,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -690,20 +678,17 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                   _energyValue(
                     context,
                     amount,
-                    FlutterI18n.translate(context, "electricity.aircon_amount"),
+                    context.t.electricity.airconAmount,
                   ),
                   _energyValue(
                     context,
                     indoor == null ? "--" : indoor.toString(),
-                    FlutterI18n.translate(context, "electricity.aircon_indoor"),
+                    context.t.electricity.airconIndoor,
                   ),
                   _energyValue(
                     context,
                     update,
-                    FlutterI18n.translate(
-                      context,
-                      "electricity.aircon_update_time",
-                    ),
+                    context.t.electricity.airconUpdateTime,
                   ),
                 ],
               ),
@@ -759,7 +744,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           ),
           const SizedBox(width: 14),
           Text(
-            FlutterI18n.translate(context, "electricity.aircon_power"),
+            context.t.electricity.airconPower,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
         ],
@@ -781,10 +766,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           Row(
             children: [
               Text(
-                FlutterI18n.translate(
-                  context,
-                  "electricity.aircon_target_temperature",
-                ),
+                context.t.electricity.airconTargetTemperature,
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -897,7 +879,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           Row(
             children: [
               Text(
-                FlutterI18n.translate(context, "electricity.aircon_wind_speed"),
+                context.t.electricity.airconWindSpeed,
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -911,7 +893,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
               ),
               const SizedBox(width: 10),
               Text(
-                FlutterI18n.translate(context, state.windSpeed.labelKey),
+                context.t.resolveKey(state.windSpeed.labelKey),
                 style: TextStyle(fontSize: 13, color: scheme.outline),
               ),
             ],
@@ -922,7 +904,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
               for (final speed in AirconWindSpeed.values)
                 _SlidingOptionItem(
                   letter: _windLetter(speed),
-                  label: FlutterI18n.translate(context, speed.labelKey),
+                  label: context.t.resolveKey(speed.labelKey),
                   selected: state.windSpeed == speed && !state.strongMode,
                   onTap: () => _setWindSpeed(state, speed),
                 ),
@@ -962,10 +944,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              FlutterI18n.translate(
-                context,
-                "electricity.aircon_vertical_swing",
-              ),
+              context.t.electricity.airconVerticalSwing,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ),
@@ -982,13 +961,13 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   Widget _otherCard(BuildContext context, AirconState state, bool busy) {
     Widget row({
       required IconData icon,
-      required String key,
+      required String label,
       required bool value,
       required ValueChanged<bool> onChanged,
     }) {
       return _SwitchRow(
         icon: icon,
-        label: FlutterI18n.translate(context, key),
+        label: label,
         value: value,
         enabled: !busy,
         onChanged: onChanged,
@@ -1001,14 +980,14 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         children: [
           row(
             icon: Icons.bolt_outlined,
-            key: "electricity.aircon_strong_mode",
+            label: context.t.electricity.airconStrongMode,
             value: state.strongMode,
             onChanged: (value) => _setStrongMode(state, value),
           ),
           const Divider(height: 1),
           row(
             icon: Icons.local_fire_department_outlined,
-            key: "electricity.aircon_electric_heating",
+            label: context.t.electricity.airconElectricHeating,
             value: state.electricHeating,
             onChanged: (value) => _setElectricHeating(state, value),
           ),
@@ -1033,7 +1012,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            FlutterI18n.translate(context, "electricity.aircon_mode"),
+            context.t.electricity.airconMode,
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 14),
@@ -1042,7 +1021,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
               for (final mode in order)
                 _SlidingOptionItem(
                   icon: _modeIcon(mode),
-                  label: FlutterI18n.translate(context, mode.labelKey),
+                  label: context.t.resolveKey(mode.labelKey),
                   selected: state.mode == mode,
                   onTap: () => _setMode(state, mode),
                 ),
@@ -1057,10 +1036,10 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
 
   Widget _message(
     BuildContext context,
-    String key, {
+    String message, {
     String? details,
     required VoidCallback onPressed,
-    String actionKey = "electricity.aircon_retry",
+    String? actionLabel,
     IconData actionIcon = Icons.refresh,
   }) {
     return Center(
@@ -1071,7 +1050,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           children: [
             const Icon(Icons.ac_unit, size: 56),
             const SizedBox(height: 16),
-            Text(context.t.resolveKey(key), textAlign: TextAlign.center),
+            Text(message, textAlign: TextAlign.center),
             if (details != null) ...[
               const SizedBox(height: 8),
               Text(
@@ -1084,7 +1063,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             FilledButton.icon(
               onPressed: onPressed,
               icon: Icon(actionIcon),
-              label: Text(context.t.resolveKey(actionKey)),
+              label: Text(actionLabel ?? context.t.electricity.airconRetry),
             ),
           ],
         ),

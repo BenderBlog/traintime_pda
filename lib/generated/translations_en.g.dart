@@ -302,6 +302,7 @@ class _Translations$electricity$en extends Translations$electricity$zh {
 	@override String get airconTitle => 'Aircon Electricity';
 	@override String get airconImei => 'Aircon IMEI';
 	@override String get airconAmount => 'Platform usage';
+	@override String get airconIndoor => 'Indoor temperature';
 	@override String get airconUpdateTime => 'Updated at';
 	@override String get airconWaiting => 'Waiting to fetch aircon electricity data';
 	@override String get airconError => 'Failed to fetch aircon electricity data';
@@ -884,7 +885,7 @@ class _Translations$sponsorship$en extends Translations$sponsorship$zh {
 	// Translations
 	@override String get title => 'Welcome to XDYou for HarmonyOS';
 	@override String get dialogTitle => 'More information';
-	@override String get dialogContent => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from the Class of 2025, with the help of AI. In essence, the app was recompiled for HarmonyOS. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026';
+	@override String get dialogContent => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from 2025 grade, with the help of AI. The app was recompiled for HarmonyOS, using the same code as mine. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is inspired by a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026';
 	@override String get button => 'Huawei AppGallery';
 }
 
@@ -2759,6 +2760,7 @@ extension on TranslationsEn {
 			'electricity.airconTitle' => 'Aircon Electricity',
 			'electricity.airconImei' => 'Aircon IMEI',
 			'electricity.airconAmount' => 'Platform usage',
+			'electricity.airconIndoor' => 'Indoor temperature',
 			'electricity.airconUpdateTime' => 'Updated at',
 			'electricity.airconWaiting' => 'Waiting to fetch aircon electricity data',
 			'electricity.airconError' => 'Failed to fetch aircon electricity data',
@@ -2954,9 +2956,9 @@ extension on TranslationsEn {
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => 'Borrowing ${count} book(s)',
 			'homepage.libraryCard.errorOccured' => 'Error occurred while retrieving borrowing information',
 			'homepage.libraryCard.fetching' => 'Fetching borrowing information',
-			'homepage.libraryCard.noReturn' => 'Currently there\'s no book to be returned',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.libraryCard.noReturn' => 'Currently there\'s no book to be returned',
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => 'Need to return ${dued} books',
 			'homepage.libraryCard.noInfo' => 'Cannot retrieve information at the moment',
 			'homepage.libraryCard.fetchingInfo' => 'Fetching information...',
@@ -3468,9 +3470,9 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.buildingNumberHint' => 'eg: 16, 7, 55',
 			'setting.changeElectricityAccount.buildingNumberQuery' => 'Please input building No.',
 			'setting.changeElectricityAccount.yard' => 'Yard',
-			'setting.changeElectricityAccount.yardHint' => 'Select Yard',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.yardHint' => 'Select Yard',
 			'setting.changeElectricityAccount.northYard' => 'North Yard',
 			'setting.changeElectricityAccount.southYard' => 'South Yard',
 			'setting.changeElectricityAccount.yardQuery' => 'Please select yard',
@@ -3644,7 +3646,7 @@ extension on TranslationsEn {
 			'setting.classSwiftExplain' => 'Positive number delays the start date, negative number advances the start date',
 			'sponsorship.title' => 'Welcome to XDYou for HarmonyOS',
 			'sponsorship.dialogTitle' => 'More information',
-			'sponsorship.dialogContent' => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from the Class of 2025, with the help of AI. In essence, the app was recompiled for HarmonyOS. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026',
+			'sponsorship.dialogContent' => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from 2025 grade, with the help of AI. The app was recompiled for HarmonyOS, using the same code as mine. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is inspired by a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026',
 			'sponsorship.button' => 'Huawei AppGallery',
 			'sport.title' => 'Sport Query',
 			'sport.classInfo' => 'Class information',
