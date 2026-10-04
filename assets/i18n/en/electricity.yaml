@@ -1,6 +1,10 @@
 ---
 title: Power Info
 power_title: Infomation
+cache_hint_account_missing: Electricity account information is missing, showing cached data.
+cache_hint_account_parse_failed: Failed to parse the electricity account, showing cached data.
+cache_hint_captcha_failed: Captcha verification failed. Please retry. Showing cached data.
+cache_hint_password_wrong: IDS password is incorrect or expired. Update your password and retry. Showing cached data.
 cache_hint_login_failed: Failed to log in to the electricity service, showing cached
   data.
 cache_hint_network_failed: Electricity service network request failed, showing cached

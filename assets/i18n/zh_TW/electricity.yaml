@@ -1,6 +1,10 @@
 ---
 title: 水電信息
 power_title: 電量信息
+cache_hint_account_missing: 未獲取到電費賬號，正在顯示緩存數據。
+cache_hint_account_parse_failed: 電費賬號解析失敗，正在顯示緩存數據。
+cache_hint_captcha_failed: 驗證碼校驗失敗，請重試。正在顯示緩存數據。
+cache_hint_password_wrong: 統一認證密碼錯誤或已失效，請更新密碼後重試。正在顯示緩存數據。
 cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
 cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
 cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。

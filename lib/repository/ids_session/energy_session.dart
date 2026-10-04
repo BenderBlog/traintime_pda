@@ -34,10 +34,13 @@ enum EnergyCacheHint implements CacheHint {
   @override
   String resolve(Translations tr) => switch (this) {
     notSchoolNetwork => tr.electricity.notSchoolNetwork,
+    accountMissing => tr.electricity.cacheHintAccountMissing,
+    accountParseFailed => tr.electricity.cacheHintAccountParseFailed,
+    captchaFailed => tr.electricity.cacheHintCaptchaFailed,
+    passwordWrong => tr.electricity.cacheHintPasswordWrong,
     loginFailed => tr.electricity.cacheHintLoginFailed,
     networkFailed => tr.electricity.cacheHintNetworkFailed,
     unknownError => tr.electricity.cacheHintUnknownError,
-    _ => tr.common.cacheReasonDefault,
   };
 }
 
@@ -58,7 +61,9 @@ EnergyCacheHint _cacheHintFromError(Object error) {
     return EnergyCacheHint.passwordWrong;
   }
   if (error is LoginFailedException) {
-    return EnergyCacheHint.loginFailed;
+    return error.msg.contains("验证码")
+        ? EnergyCacheHint.captchaFailed
+        : EnergyCacheHint.loginFailed;
   }
   if (error is NotInitalizedException) {
     if (error.msg == "用户名或密码错误") {

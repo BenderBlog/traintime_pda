@@ -99,47 +99,40 @@ class ClassChangeList extends StatelessWidget {
                 case ChangeType.change:
                   classChange += context.t.classtable.classChangePage
                       .changeClassMessage(
-                        original_affected_weeks: toShow.originalClassRange[0]
+                        original_affected_weeks: originalAffectedWeeksStr,
+                        week_char_original_week: weekChar(toShow.originalWeek),
+                        original_class_range_start: toShow.originalClassRange[0]
                             .toString(),
-                        week_char_original_week: toShow.originalClassRange[1]
+                        original_class_range_end: toShow.originalClassRange[1]
                             .toString(),
-                        original_class_range_start: weekChar(
-                          toShow.originalWeek,
-                        ),
-                        original_class_range_end: originalAffectedWeeksStr,
-                        new_affected_weeks_list_str:
+                        new_affected_weeks_list_str: newAffectedWeeksListStr,
+                        week_char_new_week: weekChar(toShow.newWeek),
+                        new_class_range_start: toShow.newClassRange[0].toString(),
+                        new_class_range_stop: toShow.newClassRange[1].toString(),
+                        new_classroom:
                             (toShow.newClassroom ?? toShow.originalClassroom)
                                 .toString(),
-                        week_char_new_week: toShow.newClassRange[0].toString(),
-                        new_class_range_start: toShow.newClassRange[1]
-                            .toString(),
-                        new_class_range_stop: weekChar(toShow.newWeek),
-                        new_classroom: newAffectedWeeksListStr,
                       );
                   break;
                 case ChangeType.patch:
                   classChange += context.t.classtable.classChangePage
                       .patchClassMessage(
-                        new_affected_weeks_list_str: toShow.newClassroom
-                            .toString(),
-                        week_char_new_week: toShow.newClassRange[0].toString(),
-                        new_class_range_start: toShow.newClassRange[1]
-                            .toString(),
-                        new_class_range_stop: weekChar(toShow.newWeek),
-                        new_classroom: newAffectedWeeksListStr,
+                        new_affected_weeks_list_str: newAffectedWeeksListStr,
+                        week_char_new_week: weekChar(toShow.newWeek),
+                        new_class_range_start: toShow.newClassRange[0].toString(),
+                        new_class_range_stop: toShow.newClassRange[1].toString(),
+                        new_classroom: toShow.newClassroom.toString(),
                       );
                   break;
                 case ChangeType.stop:
                   classChange += context.t.classtable.classChangePage
                       .stopClassMessage(
-                        original_affected_weeks: toShow.originalClassRange[0]
+                        original_affected_weeks: originalAffectedWeeksStr,
+                        week_char_original_week: weekChar(toShow.originalWeek),
+                        original_class_range_start: toShow.originalClassRange[0]
                             .toString(),
-                        week_char_original_week: toShow.originalClassRange[1]
+                        original_class_range_end: toShow.originalClassRange[1]
                             .toString(),
-                        original_class_range_start: weekChar(
-                          toShow.originalWeek,
-                        ),
-                        original_class_range_end: originalAffectedWeeksStr,
                       );
                   break;
               }

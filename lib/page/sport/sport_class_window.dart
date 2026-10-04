@@ -32,9 +32,11 @@ class _SportClassWindowState extends State<SportClassWindow>
   Future<FetchResult<SportClass>> _future = SportController.i.reloadClass();
 
   Object? _translateError(BuildContext context, Object? error) {
-    if (error is SportCredentialMissingException ||
-        error is SportCredentialInvalidException) {
-      return context.t.resolveKey(error.toString());
+    if (error is SportCredentialMissingException) {
+      return context.t.sport.errorMissingPassword;
+    }
+    if (error is SportCredentialInvalidException) {
+      return context.t.sport.errorCredentialInvalid;
     }
     if (error is String) {
       return context.t.resolveKey(error);

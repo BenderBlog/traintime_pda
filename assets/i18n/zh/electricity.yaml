@@ -1,6 +1,10 @@
 ---
 title: 水电信息
 power_title: 电量信息
+cache_hint_account_missing: 未获取到电费账号，正在显示缓存数据。
+cache_hint_account_parse_failed: 电费账号解析失败，正在显示缓存数据。
+cache_hint_captcha_failed: 验证码校验失败，请重试。正在显示缓存数据。
+cache_hint_password_wrong: 统一认证密码错误或已失效，请更新密码后重试。正在显示缓存数据。
 cache_hint_login_failed: 登录电费服务失败，正在显示缓存数据。
 cache_hint_network_failed: 电费服务网络请求失败，正在显示缓存数据。
 cache_hint_unknown_error: 在线获取电费失败，正在显示缓存数据。详细错误请查看日志。

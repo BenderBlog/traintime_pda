@@ -270,6 +270,10 @@ class _Translations$electricity$en extends Translations$electricity$zh {
 	// Translations
 	@override String get title => 'Power Info';
 	@override String get powerTitle => 'Infomation';
+	@override String get cacheHintAccountMissing => 'Electricity account information is missing, showing cached data.';
+	@override String get cacheHintAccountParseFailed => 'Failed to parse the electricity account, showing cached data.';
+	@override String get cacheHintCaptchaFailed => 'Captcha verification failed. Please retry. Showing cached data.';
+	@override String get cacheHintPasswordWrong => 'IDS password is incorrect or expired. Update your password and retry. Showing cached data.';
 	@override String get cacheHintLoginFailed => 'Failed to log in to the electricity service, showing cached data.';
 	@override String get cacheHintNetworkFailed => 'Electricity service network request failed, showing cached data.';
 	@override String get cacheHintUnknownError => 'Failed to fetch the latest electricity data online, showing cached data. Check logs for details.';
@@ -2723,6 +2727,10 @@ extension on TranslationsEn {
 			'easterEggRobot.buttonNotice' => '\o/\o/\o/\o/\o/\o/\o/\o/',
 			'electricity.title' => 'Power Info',
 			'electricity.powerTitle' => 'Infomation',
+			'electricity.cacheHintAccountMissing' => 'Electricity account information is missing, showing cached data.',
+			'electricity.cacheHintAccountParseFailed' => 'Failed to parse the electricity account, showing cached data.',
+			'electricity.cacheHintCaptchaFailed' => 'Captcha verification failed. Please retry. Showing cached data.',
+			'electricity.cacheHintPasswordWrong' => 'IDS password is incorrect or expired. Update your password and retry. Showing cached data.',
 			'electricity.cacheHintLoginFailed' => 'Failed to log in to the electricity service, showing cached data.',
 			'electricity.cacheHintNetworkFailed' => 'Electricity service network request failed, showing cached data.',
 			'electricity.cacheHintUnknownError' => 'Failed to fetch the latest electricity data online, showing cached data. Check logs for details.',
@@ -2947,12 +2955,12 @@ extension on TranslationsEn {
 			'homepage.libraryCard.errorOccured' => 'Error occurred while retrieving borrowing information',
 			'homepage.libraryCard.fetching' => 'Fetching borrowing information',
 			'homepage.libraryCard.noReturn' => 'Currently there\'s no book to be returned',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => 'Need to return ${dued} books',
 			'homepage.libraryCard.noInfo' => 'Cannot retrieve information at the moment',
 			'homepage.libraryCard.fetchingInfo' => 'Fetching information...',
 			'homepage.schoolCardInfoCard.errorToast' => 'An error occurred, please contact the developer',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.schoolCardInfoCard.fetchingToast' => 'Fetching information, please check later',
 			'homepage.schoolCardInfoCard.bill' => 'Bill',
 			'homepage.schoolCardInfoCard.balance' => ({required Object amount}) => 'Remain ${amount} RMB',
@@ -3461,12 +3469,12 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.buildingNumberQuery' => 'Please input building No.',
 			'setting.changeElectricityAccount.yard' => 'Yard',
 			'setting.changeElectricityAccount.yardHint' => 'Select Yard',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => 'North Yard',
 			'setting.changeElectricityAccount.southYard' => 'South Yard',
 			'setting.changeElectricityAccount.yardQuery' => 'Please select yard',
 			'setting.changeElectricityAccount.apartment' => 'Apartment',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.apartmentHint' => 'Select Apartment',
 			'setting.changeElectricityAccount.northApartment' => 'North Apartment',
 			'setting.changeElectricityAccount.southApartment' => 'South Apartment',

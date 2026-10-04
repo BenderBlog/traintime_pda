@@ -270,6 +270,10 @@ class _Translations$electricity$zh_TW extends Translations$electricity$zh {
 	// Translations
 	@override String get title => '水電信息';
 	@override String get powerTitle => '電量信息';
+	@override String get cacheHintAccountMissing => '未獲取到電費賬號，正在顯示緩存數據。';
+	@override String get cacheHintAccountParseFailed => '電費賬號解析失敗，正在顯示緩存數據。';
+	@override String get cacheHintCaptchaFailed => '驗證碼校驗失敗，請重試。正在顯示緩存數據。';
+	@override String get cacheHintPasswordWrong => '統一認證密碼錯誤或已失效，請更新密碼後重試。正在顯示緩存數據。';
 	@override String get cacheHintLoginFailed => '登錄電費服務失敗，正在顯示緩存數據。';
 	@override String get cacheHintNetworkFailed => '電費服務網絡請求失敗，正在顯示緩存數據。';
 	@override String get cacheHintUnknownError => '在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。';
@@ -2723,6 +2727,10 @@ extension on TranslationsZhTw {
 			'easterEggRobot.buttonNotice' => '\o/\o/\o/\o/\o/\o/\o/\o/',
 			'electricity.title' => '水電信息',
 			'electricity.powerTitle' => '電量信息',
+			'electricity.cacheHintAccountMissing' => '未獲取到電費賬號，正在顯示緩存數據。',
+			'electricity.cacheHintAccountParseFailed' => '電費賬號解析失敗，正在顯示緩存數據。',
+			'electricity.cacheHintCaptchaFailed' => '驗證碼校驗失敗，請重試。正在顯示緩存數據。',
+			'electricity.cacheHintPasswordWrong' => '統一認證密碼錯誤或已失效，請更新密碼後重試。正在顯示緩存數據。',
 			'electricity.cacheHintLoginFailed' => '登錄電費服務失敗，正在顯示緩存數據。',
 			'electricity.cacheHintNetworkFailed' => '電費服務網絡請求失敗，正在顯示緩存數據。',
 			'electricity.cacheHintUnknownError' => '在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。',
@@ -2947,12 +2955,12 @@ extension on TranslationsZhTw {
 			'homepage.libraryCard.errorOccured' => '獲取借書信息發生錯誤',
 			'homepage.libraryCard.fetching' => '正在獲取借書信息',
 			'homepage.libraryCard.noReturn' => '目前沒有待歸還書籍',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待歸還 ${dued} 本書籍',
 			'homepage.libraryCard.noInfo' => '目前無法獲取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查詢信息中',
 			'homepage.schoolCardInfoCard.errorToast' => '遇到錯誤，請聯繫開發者',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.schoolCardInfoCard.fetchingToast' => '正在獲取信息，請稍後再來看',
 			'homepage.schoolCardInfoCard.bill' => '流水',
 			'homepage.schoolCardInfoCard.balance' => ({required Object amount}) => '卡里 ${amount} 元',
@@ -3461,12 +3469,12 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.buildingNumberQuery' => '請輸入樓號',
 			'setting.changeElectricityAccount.yard' => '院區',
 			'setting.changeElectricityAccount.yardHint' => '選擇院區',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '請選擇院區',
 			'setting.changeElectricityAccount.apartment' => '樓棟',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.apartmentHint' => '選擇樓棟',
 			'setting.changeElectricityAccount.northApartment' => '北樓',
 			'setting.changeElectricityAccount.southApartment' => '南樓',

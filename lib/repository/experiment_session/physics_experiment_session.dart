@@ -463,6 +463,9 @@ class ExperimentSession {
 
 class LoginFailedException implements Exception {
   String? msg;
+
+  @override
+  String toString() => msg?.isNotEmpty == true ? msg! : "物理实验登录失败";
 }
 
 class FailedToFetchException implements Exception {}

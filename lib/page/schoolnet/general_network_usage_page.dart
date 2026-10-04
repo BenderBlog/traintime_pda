@@ -18,6 +18,7 @@ import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/miscellaneous_session/schoolnet_session.dart';
+import 'package:watermeter/repository/translation_key.dart';
 
 class GeneralNetworkUsagePage extends StatefulWidget {
   const GeneralNetworkUsagePage({super.key});
@@ -228,7 +229,7 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
 
           return ReloadWidget(
             errorStatus: snapshot.error is String
-                ? (snapshot.error as String)
+                ? context.t.resolveKey(snapshot.error as String)
                 : snapshot.error,
             stackTrace: snapshot.stackTrace,
             function: () => setState(() {

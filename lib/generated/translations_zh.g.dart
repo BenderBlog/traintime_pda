@@ -490,6 +490,18 @@ class Translations$electricity$zh {
 	/// zh: '电量信息'
 	String get powerTitle => '电量信息';
 
+	/// zh: '未获取到电费账号，正在显示缓存数据。'
+	String get cacheHintAccountMissing => '未获取到电费账号，正在显示缓存数据。';
+
+	/// zh: '电费账号解析失败，正在显示缓存数据。'
+	String get cacheHintAccountParseFailed => '电费账号解析失败，正在显示缓存数据。';
+
+	/// zh: '验证码校验失败，请重试。正在显示缓存数据。'
+	String get cacheHintCaptchaFailed => '验证码校验失败，请重试。正在显示缓存数据。';
+
+	/// zh: '统一认证密码错误或已失效，请更新密码后重试。正在显示缓存数据。'
+	String get cacheHintPasswordWrong => '统一认证密码错误或已失效，请更新密码后重试。正在显示缓存数据。';
+
 	/// zh: '登录电费服务失败，正在显示缓存数据。'
 	String get cacheHintLoginFailed => '登录电费服务失败，正在显示缓存数据。';
 
@@ -5311,6 +5323,10 @@ extension on Translations {
 			'easterEggRobot.buttonNotice' => '\o/\o/\o/\o/\o/\o/\o/\o/',
 			'electricity.title' => '水电信息',
 			'electricity.powerTitle' => '电量信息',
+			'electricity.cacheHintAccountMissing' => '未获取到电费账号，正在显示缓存数据。',
+			'electricity.cacheHintAccountParseFailed' => '电费账号解析失败，正在显示缓存数据。',
+			'electricity.cacheHintCaptchaFailed' => '验证码校验失败，请重试。正在显示缓存数据。',
+			'electricity.cacheHintPasswordWrong' => '统一认证密码错误或已失效，请更新密码后重试。正在显示缓存数据。',
 			'electricity.cacheHintLoginFailed' => '登录电费服务失败，正在显示缓存数据。',
 			'electricity.cacheHintNetworkFailed' => '电费服务网络请求失败，正在显示缓存数据。',
 			'electricity.cacheHintUnknownError' => '在线获取电费失败，正在显示缓存数据。详细错误请查看日志。',
@@ -5535,12 +5551,12 @@ extension on Translations {
 			'homepage.libraryCard.errorOccured' => '获取借书信息发生错误',
 			'homepage.libraryCard.fetching' => '正在获取借书信息',
 			'homepage.libraryCard.noReturn' => '目前没有待归还书籍',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待归还 ${dued} 本书籍',
 			'homepage.libraryCard.noInfo' => '目前无法获取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查询信息中',
 			'homepage.schoolCardInfoCard.errorToast' => '遇到错误，请联系开发者',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.schoolCardInfoCard.fetchingToast' => '正在获取信息，请稍后再来看',
 			'homepage.schoolCardInfoCard.bill' => '流水',
 			'homepage.schoolCardInfoCard.balance' => ({required Object amount}) => '卡里 ${amount} 元',
@@ -6049,12 +6065,12 @@ extension on Translations {
 			'setting.changeElectricityAccount.buildingNumberQuery' => '请输入楼号',
 			'setting.changeElectricityAccount.yard' => '院区',
 			'setting.changeElectricityAccount.yardHint' => '选择院区',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '请选择院区',
 			'setting.changeElectricityAccount.apartment' => '楼栋',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.apartmentHint' => '选择楼栋',
 			'setting.changeElectricityAccount.northApartment' => '北楼',
 			'setting.changeElectricityAccount.southApartment' => '南楼',
