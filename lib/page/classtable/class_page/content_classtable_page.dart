@@ -21,6 +21,7 @@ import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.d
 import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/class_table_view/frosted_header_slice.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
@@ -348,26 +349,33 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     }
   }
 
-  /// The user defined background image, blurred by as much as the settings ask for.
-  ///
-  /// It is drawn as one layer behind everything — the week bar, the sheet and every frosted control
-  /// lie over it — and it is blurred here rather than per control: the frosted look of the controls
-  /// is a blur of this very layer inside their own bounds, so a sharp copy has to stay underneath.
-  Widget _backgroundLayer(BuildContext context) {
+  /// The user-defined background image file, or null if custom decoration is disabled or missing.
+  File? get _decorationImageFile {
     final bool isDecorated = preference.getBool(
       preference.Preference.decorated,
     );
-    if (!isDecorated) {
-      return const Positioned.fill(
-        key: ValueKey('class_table_background_layer_empty'),
-        child: SizedBox.shrink(),
-      );
-    }
-
+    if (!isDecorated) return null;
     final File image = File(
       "${supportPath.path}/${classTableState.decorationName}",
     );
-    if (!image.existsSync()) {
+    return image.existsSync() ? image : null;
+  }
+
+  String? get _decorationImageRevision {
+    final file = _decorationImageFile;
+    if (file == null) return null;
+    return "${file.lengthSync()}:${file.lastModifiedSync().microsecondsSinceEpoch}";
+  }
+
+  /// The user defined background image, confined to the timetable area below the fixed header.
+  ///
+  /// The fixed header area above extracts and blurs the very top edge of the wallpaper to create
+  /// an ambient frosted background. The actual, sharp wallpaper begins right at the timetable's
+  /// top edge ([tableTop]), leaving character portraits and artwork fully unobstructed in the
+  /// content area.
+  Widget _backgroundLayer(BuildContext context, double appBarHeight) {
+    final File? image = _decorationImageFile;
+    if (image == null) {
       return const Positioned.fill(
         key: ValueKey('class_table_background_layer_empty'),
         child: SizedBox.shrink(),
@@ -380,8 +388,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         .round()
         .clamp(1, 2560)
         .toInt();
-    final imageRevision =
-        "${image.lengthSync()}:${image.lastModifiedSync().microsecondsSinceEpoch}";
+    final imageRevision = _decorationImageRevision ?? '0';
 
     final double blur = preference
         .getDouble(preference.Preference.classTableBackgroundBlur)
@@ -390,10 +397,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     Widget layer = Image.file(
       image,
-      /// Upstream keys this on the file revision so a swapped decoration image is
-      /// reloaded; ours names the type explicitly. Both are wanted.
       key: ValueKey<String>("${image.path}:$imageRevision"),
       fit: BoxFit.cover,
+      alignment: Alignment.topCenter,
       cacheWidth: cacheWidth,
       gaplessPlayback: true,
       errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
@@ -403,9 +409,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
 
     if (blur > 0) {
-      /// Blurring pulls in the pixels outside of the image, which would leave the edges
-      /// translucent. The image is scaled up a little to make sure the whole background stays
-      /// covered.
       layer = ClipRect(
         child: Transform.scale(
           scale: 1 + blur / 50,
@@ -421,9 +424,53 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       );
     }
 
-    return Positioned.fill(
-      key: const ValueKey('class_table_background_layer'),
-      child: RepaintBoundary(child: layer),
+    final double tableTop =
+        appBarHeight + (_weekBarCollapsed ? 0 : _weekBarHeight);
+
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          /// 1. The sharp wallpaper, confined to the timetable area below the fixed header.
+          AnimatedPositioned(
+            key: const ValueKey('class_table_background_layer'),
+            left: 0,
+            right: 0,
+            top: tableTop,
+            bottom: 0,
+            duration: weekBarDockDuration,
+            curve: Curves.easeOutCubic,
+            child: ClipRect(
+              child: layer,
+            ),
+          ),
+
+          /// 2. The ambient top-edge stretch & blur, feathering 30dp into the timetable wallpaper.
+          /// Strictly kept at the bottom-most background layer behind all UI controls and banners.
+          AnimatedPositioned(
+            key: const ValueKey('class_table_header_ambient_blur'),
+            left: 0,
+            right: 0,
+            top: 0,
+            height: tableTop + frostedHeaderFeatherHeight,
+            duration: weekBarDockDuration,
+            curve: Curves.easeOutCubic,
+            child: IgnorePointer(
+              child: FrostedHeaderSlice(
+                headerHeight: tableTop,
+                featherHeight: frostedHeaderFeatherHeight,
+                sigma: GlassStyleConfig.appBarSigma,
+                tintColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHigh
+                    .withValues(alpha: weekBarSurfaceAlpha),
+                imageFile: image,
+                imageRevision: imageRevision,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1425,10 +1472,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         fit: StackFit.expand,
         clipBehavior: Clip.hardEdge,
         children: [
-          /// The wallpaper. It spans the whole body, under the week bar as well as the table, and it
-          /// is blurred by as much as the settings ask for; the frosted controls above it blur their
-          /// own copy of it inside their own bounds.
-          _backgroundLayer(context),
+          /// The wallpaper, confined to the timetable area below the fixed header.
+          _backgroundLayer(context, appBarHeight),
 
           /// The page. While the bar floats it starts at the top and the bar covers it; once the bar
           /// is pinned it slides down to leave the bar a strip of its own.
@@ -1503,10 +1548,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
           /// The unified frosted header glass behind the navigation bar and docked week bar.
           ///
-          /// While docked, this single continuous frosted layer spans from the very top of the
-          /// screen (y = 0) through the AppBar and down through the docked week bar (appBarHeight + _weekBarHeight).
-          /// Because it is one unbroken piece of frosted glass, there is zero seam, zero subpixel gap,
-          /// and zero Gaussian blur boundary artifact between the navigation bar and the week bar.
+          /// Sized strictly to the docked header height so that cards scrolling up pass underneath it,
+          /// while remaining completely clear of the content and banners below. Ambient edge blur
+          /// feathering is handled separately at the bottom-most background layer.
           ///
           /// When the week bar is floating or tucked away, this layer seamlessly sizes to [appBarHeight],
           /// continuing to provide the frosted backdrop for the navigation bar alone, while the
