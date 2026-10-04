@@ -7,6 +7,7 @@
 import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
+
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/generated/translations.g.dart';

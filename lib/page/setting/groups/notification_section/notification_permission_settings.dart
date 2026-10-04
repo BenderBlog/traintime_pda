@@ -1,13 +1,14 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/page/setting/groups/notification_section/notification_debug_page/notification_debug_page.dart';
 
 class NotificationPermissionSettings extends StatelessWidget {

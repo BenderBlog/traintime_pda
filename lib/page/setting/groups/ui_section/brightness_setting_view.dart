@@ -1,15 +1,16 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/theme_controller.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/setting/setting_choice_control.dart';
 import 'package:watermeter/page/public_widget/setting/setting_control_tile.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 class BrightnessSettingView extends StatelessWidget {

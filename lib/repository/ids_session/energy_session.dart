@@ -33,11 +33,11 @@ enum EnergyCacheHint implements CacheHint {
 
   @override
   String resolve(Translations tr) => switch (this) {
-    notSchoolNetwork  => tr.electricity.notSchoolNetwork,
-    loginFailed       => tr.electricity.cacheHintLoginFailed,
-    networkFailed     => tr.electricity.cacheHintNetworkFailed,
-    unknownError      => tr.electricity.cacheHintUnknownError,
-    _                 => tr.common.cacheReasonDefault,
+    notSchoolNetwork => tr.electricity.notSchoolNetwork,
+    loginFailed => tr.electricity.cacheHintLoginFailed,
+    networkFailed => tr.electricity.cacheHintNetworkFailed,
+    unknownError => tr.electricity.cacheHintUnknownError,
+    _ => tr.common.cacheReasonDefault,
   };
 }
 

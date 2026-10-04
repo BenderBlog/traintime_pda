@@ -1,11 +1,12 @@
 // Copyright 2026 Traintime PDA Authours, originally by aqqkad.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/generated/translations.g.dart';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/aircon_energy.dart';
 import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/model/fetch_result.dart';

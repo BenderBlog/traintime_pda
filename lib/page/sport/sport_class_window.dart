@@ -2,11 +2,11 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
+
 import 'package:watermeter/controller/sport_controller.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
@@ -15,6 +15,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/repository/miscellaneous_session/xidian_sport_session.dart';
+import 'package:watermeter/repository/translation_key.dart';
 
 class SportClassWindow extends StatefulWidget {
   const SportClassWindow({super.key});

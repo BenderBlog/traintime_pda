@@ -1,13 +1,16 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'dart:io';
+
+import 'package:flutter/services.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
+
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
+
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';

@@ -1,9 +1,10 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 

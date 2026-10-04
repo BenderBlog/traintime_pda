@@ -4,14 +4,15 @@
 
 // Course reminder notification settings page.
 
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/page/setting/groups/notification_section/notification_function_settings.dart';
 import 'package:watermeter/page/setting/groups/notification_section/notification_permission_settings.dart';
 import 'package:watermeter/page/setting/groups/notification_section/notification_reminder_settings.dart';
-import 'package:watermeter/repository/notification/course_reminder_service.dart';
 
 const kDefaultMinutesBeforeOptions = [5, 10, 15, 20, 30];
 const kDefaultDaysToScheduleOptions = [3, 7, 14, 30];

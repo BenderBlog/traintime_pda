@@ -1373,6 +1373,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.30.1"
+<<<<<<< HEAD
   serial_csv:
     dependency: transitive
     description:
@@ -1381,6 +1382,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.2"
+=======
+>>>>>>> main
   share_plus:
     dependency: "direct main"
     description:
@@ -1722,6 +1725,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
+<<<<<<< HEAD
+=======
+  toml:
+    dependency: transitive
+    description:
+      name: toml
+      sha256: "35cd2a1351c14bd213f130f8efcbd3e0c18181bff0c8ca7a08f6822a2bede786"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.17.0"
+>>>>>>> main
   typed_data:
     dependency: transitive
     description:
@@ -1906,6 +1920,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.1.0"
+<<<<<<< HEAD
+=======
+  xml2json:
+    dependency: transitive
+    description:
+      name: xml2json
+      sha256: "0c1cb4e84105bdc3a8c67efc4673d317932f6fd7cc9a46cb4438bea375b7bb9b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.9"
+>>>>>>> main
   yaml:
     dependency: "direct dev"
     description:

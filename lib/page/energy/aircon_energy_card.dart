@@ -14,8 +14,11 @@ import 'package:watermeter/page/energy/aircon_remote_page.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/setting/aircon_imei_page.dart';
+<<<<<<< HEAD
 import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
 import 'package:watermeter/generated/translations.g.dart';
+=======
+>>>>>>> main
 
 class AirconEnergyCard extends StatelessWidget {
   const AirconEnergyCard({super.key});
@@ -87,7 +90,11 @@ class AirconEnergyCard extends StatelessWidget {
           ),
           icon: const Icon(Icons.settings_remote),
           label: Text(
+<<<<<<< HEAD
             context.t.electricity.airconRemote,
+=======
+            FlutterI18n.translate(context, "electricity.aircon_remote"),
+>>>>>>> main
           ),
         ).padding(top: 12, horizontal: 12).width(double.infinity),
         state.map(

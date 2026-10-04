@@ -1,9 +1,9 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/page/public_widget/setting/setting_edit_sheet.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 

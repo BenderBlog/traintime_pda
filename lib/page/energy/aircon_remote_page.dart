@@ -7,6 +7,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
+
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/model/aircon_state.dart';
@@ -616,6 +617,21 @@ class _AirconSegmentedSwitchGroup extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return M3ESegmentedColumn(
+      outerRadius: 28,
+      innerRadius: 6,
+      gap: 3,
+      color: colorScheme.surfaceContainerLow,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      selectionMode: M3ESelectionMode.multiple,
+      selectionTrigger: M3ESelectionTrigger.none,
+      isSelected: (index) => items[index].value,
+      selectedColor: colorScheme.primaryContainer.withValues(alpha: 0.4),
+      selectedRadius: 20,
+      pressedRadius: 4,
+      pressedScale: 0.98,
+      splashFactory: InkSparkle.splashFactory,
+      isEnabled: (index) => enabled,
+      onTap: (index) => items[index].onChanged(!items[index].value),
       children: [
         for (final item in items)
           Row(
@@ -638,21 +654,6 @@ class _AirconSegmentedSwitchGroup extends StatelessWidget {
             ],
           ),
       ],
-      outerRadius: 28,
-      innerRadius: 6,
-      gap: 3,
-      color: colorScheme.surfaceContainerLow,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      selectionMode: M3ESelectionMode.multiple,
-      selectionTrigger: M3ESelectionTrigger.none,
-      isSelected: (index) => items[index].value,
-      selectedColor: colorScheme.primaryContainer.withValues(alpha: 0.4),
-      selectedRadius: 20,
-      pressedRadius: 4,
-      pressedScale: 0.98,
-      splashFactory: InkSparkle.splashFactory,
-      isEnabled: (index) => enabled,
-      onTap: (index) => items[index].onChanged(!items[index].value),
     );
   }
 }

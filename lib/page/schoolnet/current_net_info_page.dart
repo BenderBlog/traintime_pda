@@ -5,6 +5,7 @@
 import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
+
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/network_usage.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';

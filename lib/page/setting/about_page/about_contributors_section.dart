@@ -1,12 +1,13 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'package:watermeter/model/about_page.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 
 class AboutContributorsSection extends StatefulWidget {

@@ -8,6 +8,7 @@ import 'package:watermeter/generated/translations.g.dart';
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
+
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
@@ -72,7 +73,6 @@ class _LoginWindowState extends State<LoginWindow> {
         controller: _idsAccountController,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_user_3_fill,
-
           hintText: context.t.login.identityNumber,
         ),
       ).center(),

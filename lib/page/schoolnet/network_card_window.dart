@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
+
 import 'package:watermeter/page/schoolnet/current_net_info_page.dart';
 import 'package:watermeter/page/schoolnet/general_network_usage_page.dart';
 import 'package:watermeter/generated/translations.g.dart';

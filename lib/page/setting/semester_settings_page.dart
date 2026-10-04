@@ -1,8 +1,6 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/controller/semester_controller.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -11,6 +9,8 @@ import 'package:watermeter/page/public_widget/setting/setting_control_tile.dart'
 import 'package:watermeter/page/public_widget/setting/setting_dropdown_button.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/logger.dart' as log;
 
 class SemesterSettingsPage extends StatefulWidget {

@@ -1,18 +1,18 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
-import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/setting/password_setting_sheet.dart';
-import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
+
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/setting/aircon_imei_page.dart';
-
+import 'package:watermeter/page/setting/password_setting_sheet.dart';
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class AccountSection extends StatefulWidget {

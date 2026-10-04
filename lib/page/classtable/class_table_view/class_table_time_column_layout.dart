@@ -1,11 +1,9 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
-
+import 'dart:math' as math;
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/generated/translations.g.dart';
-import 'dart:math' as math;
-
-import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 

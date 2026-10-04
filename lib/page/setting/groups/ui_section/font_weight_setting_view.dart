@@ -1,13 +1,14 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:signals/signals_flutter.dart';
+
 import 'package:watermeter/controller/theme_controller.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/themes/font_setting.dart';
 
 class FontWeightSettingView extends StatelessWidget {
