@@ -1,12 +1,14 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/page/setting/groups/notification_section/notification_debug_page/notification_debug_page.dart';
 
 class NotificationPermissionSettings extends StatelessWidget {
@@ -28,23 +30,16 @@ class NotificationPermissionSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(
-        context,
-        'setting.notification_page.permission_section',
-      ),
+      title: context.t.setting.notificationPage.permissionSection,
       items: SettingSegmentedList(
         items: [
           ListTile(
             enabled: !isLoading,
             title: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.notification_permission',
-              ),
+              context.t.setting.notificationPage.notificationPermission,
             ),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
+              context.t.resolveKey(
                 hasNotificationPermission
                     ? 'setting.notification_page.permission_granted'
                     : 'setting.notification_page.permission_denied',
@@ -58,24 +53,17 @@ class NotificationPermissionSettings extends StatelessWidget {
                 : TextButton(
                     onPressed: isLoading ? null : onRequestPermission,
                     child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.notification_page.request_permission',
-                      ),
+                      context.t.setting.notificationPage.requestPermission,
                     ),
                   ),
           ),
           ListTile(
             enabled: !isLoading,
             title: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.exact_alarm_permission',
-              ),
+              context.t.setting.notificationPage.exactAlarmPermission,
             ),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
+              context.t.resolveKey(
                 hasExactAlarmPermission
                     ? 'setting.notification_page.permission_granted'
                     : 'setting.notification_page.permission_denied',
@@ -89,26 +77,15 @@ class NotificationPermissionSettings extends StatelessWidget {
                 : TextButton(
                     onPressed: isLoading ? null : onRequestPermission,
                     child: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.notification_page.request_permission',
-                      ),
+                      context.t.setting.notificationPage.requestPermission,
                     ),
                   ),
           ),
           ListTile(
             enabled: !isLoading,
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.system_settings',
-              ),
-            ),
+            title: Text(context.t.setting.notificationPage.systemSettings),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.system_settings_hint',
-              ),
+              context.t.setting.notificationPage.systemSettingsHint,
             ),
             trailing: const Icon(Icons.settings),
             onTap: isLoading ? null : onOpenSystemSettings,
@@ -116,9 +93,7 @@ class NotificationPermissionSettings extends StatelessWidget {
           ListTile(
             enabled: !isLoading,
             leading: const Icon(MingCuteIcons.mgc_settings_2_line),
-            title: Text(
-              FlutterI18n.translate(context, 'setting.notification_debug_page'),
-            ),
+            title: Text(context.t.setting.notificationDebugPage),
             trailing: const Icon(Icons.navigate_next),
             onTap: isLoading
                 ? null

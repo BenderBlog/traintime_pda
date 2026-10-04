@@ -1,8 +1,9 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 
@@ -33,41 +34,22 @@ class NotificationReminderSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(
-        context,
-        'setting.notification_page.reminder_section',
-      ),
+      title: context.t.setting.notificationPage.reminderSection,
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.experiment_reminder',
-              ),
-            ),
+            title: Text(context.t.setting.notificationPage.experimentReminder),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.experiment_reminder_hint',
-              ),
+              context.t.setting.notificationPage.experimentReminderHint,
             ),
             value: experimentNotificationsEnabled,
             onChanged: isLoading ? null : onExperimentNotificationsChanged,
           ),
           ListTile(
             enabled: !isLoading,
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.minutes_before',
-              ),
-            ),
+            title: Text(context.t.setting.notificationPage.minutesBefore),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.minutes_before_hint',
-              ),
+              context.t.setting.notificationPage.minutesBeforeHint,
             ),
             trailing: DropdownButton<int>(
               value: minutesBefore,
@@ -76,7 +58,7 @@ class NotificationReminderSettings extends StatelessWidget {
                     (value) => DropdownMenuItem(
                       value: value,
                       child: Text(
-                        '$value ${FlutterI18n.translate(context, "setting.notification_page.minutes_unit")}',
+                        '$value ${context.t.setting.notificationPage.minutesUnit}',
                       ),
                     ),
                   )
@@ -90,17 +72,9 @@ class NotificationReminderSettings extends StatelessWidget {
           ),
           ListTile(
             enabled: !isLoading,
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.days_to_schedule',
-              ),
-            ),
+            title: Text(context.t.setting.notificationPage.daysToSchedule),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.days_to_schedule_hint',
-              ),
+              context.t.setting.notificationPage.daysToScheduleHint,
             ),
             trailing: DropdownButton<int>(
               value: daysToSchedule,
@@ -109,7 +83,7 @@ class NotificationReminderSettings extends StatelessWidget {
                     (value) => DropdownMenuItem(
                       value: value,
                       child: Text(
-                        '$value ${FlutterI18n.translate(context, "setting.notification_page.days_unit")}',
+                        '$value ${context.t.setting.notificationPage.daysUnit}',
                       ),
                     ),
                   )

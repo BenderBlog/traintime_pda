@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/network_client.dart';
 
 class ButtomButtons extends StatelessWidget {
@@ -23,29 +24,20 @@ class ButtomButtons extends StatelessWidget {
       alignment: WrapAlignment.center,
       children: [
         TextButton(
-          child: Text(
-            FlutterI18n.translate(context, "login.clear_cache"),
-            style: _bottomTextStyle,
-          ),
+          child: Text(context.t.login.clearCache, style: _bottomTextStyle),
           onPressed: () {
             NetworkCookieJars.ids.deleteAll().then((value) {
               if (context.mounted) {
                 showToast(
                   context: context,
-                  msg: FlutterI18n.translate(
-                    context,
-                    "login.complete_clear_cache",
-                  ),
+                  msg: context.t.login.completeClearCache,
                 );
               }
             });
           },
         ),
         TextButton(
-          child: Text(
-            FlutterI18n.translate(context, "login.see_inspector"),
-            style: _bottomTextStyle,
-          ),
+          child: Text(context.t.login.seeInspector, style: _bottomTextStyle),
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(

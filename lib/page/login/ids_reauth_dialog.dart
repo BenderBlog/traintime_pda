@@ -1,11 +1,13 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
 import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 
@@ -43,7 +45,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
   String? _notice;
   String? _error;
 
-  String _t(String key) => FlutterI18n.translate(context, key);
+  String _t(String key) => context.t.resolveKey(key);
 
   Future<void> _sendCode() async {
     setState(() {

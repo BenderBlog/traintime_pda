@@ -1,3 +1,4 @@
+
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
@@ -5,7 +6,6 @@
 // No more supression for the students who want talking!
 /*
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:watermeter/model/pda_service/club_info.dart';
@@ -38,7 +38,7 @@ class _ClubSuggestionState extends State<ClubSuggestion> {
         shownType = e;
       }),
       child: Text(
-        FlutterI18n.translate(context, e.getTypeName()),
+        context.t.resolveKey(e.getTypeName()),
         style: TextStyle(
           color: shownType == e
               ? Theme.of(context).colorScheme.onPrimary

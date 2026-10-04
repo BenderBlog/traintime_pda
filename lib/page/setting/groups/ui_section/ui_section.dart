@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/setting/groups/ui_section/brightness_setting_view.dart';
@@ -23,17 +24,14 @@ class UiSection extends StatelessWidget {
       children: [
         SectionSettingScaffold(
           icon: Icons.color_lens,
-          title: FlutterI18n.translate(context, 'setting.sections.display'),
+          title: context.t.setting.sections.display,
           items: SettingSegmentedList(
             items: const [ColorSettingView(), BrightnessSettingView()],
           ),
         ),
         SectionSettingScaffold(
           icon: Icons.translate,
-          title: FlutterI18n.translate(
-            context,
-            'setting.sections.language_and_text',
-          ),
+          title: context.t.setting.sections.languageAndText,
           items: SettingSegmentedList(
             items: const [
               LocalizationSettingView(),
@@ -44,7 +42,7 @@ class UiSection extends StatelessWidget {
         ),
         SectionSettingScaffold(
           icon: Icons.home,
-          title: FlutterI18n.translate(context, 'setting.sections.home'),
+          title: context.t.setting.sections.home,
           items: const SettingSegmentedList(
             items: [
               SimplifyTimelineSettingView(),

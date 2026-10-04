@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -46,11 +46,7 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          FlutterI18n.translate(context, "setting.class_table_style_setting"),
-        ),
-      ),
+      appBar: AppBar(title: Text(context.t.setting.classTableStyleSetting)),
       body: LayoutBuilder(
         builder: ((context, constraints) {
           bool isVertical = constraints.maxWidth < sheetMaxWidth * 2;

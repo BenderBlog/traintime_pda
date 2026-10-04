@@ -1,12 +1,12 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/model/about_page.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class AboutAppHeader extends StatelessWidget {
   const AboutAppHeader({
@@ -70,7 +70,7 @@ class AboutAppHeader extends StatelessWidget {
                     ),
                     style: M3EButtonStyle.tonal,
                     icon: Icon(link.icon),
-                    label: Text(FlutterI18n.translate(context, link.nameKey)),
+                    label: Text(link.resolve(context.t)),
                   ),
               ],
             ),

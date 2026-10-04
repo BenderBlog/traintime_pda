@@ -4,9 +4,10 @@
 
 // Setting window.
 
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:io';
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:material_ui/material_ui.dart';
@@ -68,7 +69,7 @@ class _SettingWindowState extends State<SettingWindow>
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(FlutterI18n.translate(context, 'homepage.setting')),
+        title: Text(context.t.homepage.setting),
       ),
       body: Center(
         child: ConstrainedBox(
@@ -85,12 +86,9 @@ class _SettingWindowState extends State<SettingWindow>
                         (category) => ListTile(
                           key: ValueKey('settings-category-${category.id}'),
                           leading: Icon(category.icon),
-                          title: Text(
-                            FlutterI18n.translate(context, category.titleKey),
-                          ),
+                          title: Text(context.t.resolveKey(category.titleKey)),
                           subtitle: Text(
-                            FlutterI18n.translate(
-                              context,
+                            context.t.resolveKey(
                               'setting.navigation.${category.id}_description',
                             ),
                           ),

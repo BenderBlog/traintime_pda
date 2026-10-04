@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
@@ -34,19 +34,13 @@ class CurrentTimeIndicatorSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
       icon: Icons.schedule,
-      title: FlutterI18n.translate(
-        context,
-        "setting.class_table_style_page.current_time_section",
-      ),
+      title: context.t.setting.classTableStylePage.currentTimeSection,
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
             secondary: const Icon(Icons.schedule),
             title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.show_current_time_indicator",
-              ),
+              context.t.setting.classTableStylePage.showCurrentTimeIndicator,
             ),
             value: CurrentTimeIndicatorConfig.enabled,
             onChanged: _onIndicatorChanged,
@@ -54,10 +48,7 @@ class CurrentTimeIndicatorSettings extends StatelessWidget {
           SwitchListTile(
             secondary: const Icon(Icons.label_outline),
             title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.show_current_time_label",
-              ),
+              context.t.setting.classTableStylePage.showCurrentTimeLabel,
             ),
             value: CurrentTimeIndicatorConfig.showTimeLabel,
             onChanged: CurrentTimeIndicatorConfig.enabled
@@ -67,10 +58,7 @@ class CurrentTimeIndicatorSettings extends StatelessWidget {
           SwitchListTile(
             secondary: const Icon(Icons.today),
             title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.show_today_column_highlight",
-              ),
+              context.t.setting.classTableStylePage.showTodayColumnHighlight,
             ),
             value: CurrentTimeIndicatorConfig.showTodayColumnHighlight,
             onChanged: _onTodayHighlightChanged,

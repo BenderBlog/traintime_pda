@@ -19,6 +19,15 @@ import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
 import 'package:watermeter/repository/ids_session/ids_fingerprint.dart';
 import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 
+enum LoginProcessStep {
+  readyPage,
+  getEncrypt,
+  readyLogin,
+  slider,
+  secondFactor,
+  afterProcess,
+}
+
 enum IDSLoginState {
   none,
   requesting,
@@ -163,7 +172,7 @@ class IDSSession {
     required String password,
     required Future<void> Function(String) sliderCaptcha,
     bool forceReLogin = false,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
     String? target,
     IDSReAuthHandler? reAuthHandler,
   }) => _idsLock.synchronized(
@@ -183,13 +192,13 @@ class IDSSession {
     required String password,
     required Future<void> Function(String) sliderCaptcha,
     bool forceReLogin = false,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
     String? target,
     IDSReAuthHandler? reAuthHandler,
   }) async {
     /// Get the login webpage.
     if (onResponse != null) {
-      onResponse(10, "login_process.ready_page");
+      onResponse(10, LoginProcessStep.readyPage);
       log.info(
         "[IDSSession][login] "
         "Ready to get the login webpage.",
@@ -239,7 +248,7 @@ class IDSSession {
 
     /// Get AES encrypt key. There must be.
     if (onResponse != null) {
-      onResponse(30, "login_process.get_encrypt");
+      onResponse(30, LoginProcessStep.getEncrypt);
     }
     String keys = form
         .firstWhere((element) => element.id == "pwdEncryptSalt")
@@ -247,7 +256,7 @@ class IDSSession {
 
     /// Prepare for login.
     if (onResponse != null) {
-      onResponse(40, "login_process.ready_login");
+      onResponse(40, LoginProcessStep.readyLogin);
     }
     Map<String, dynamic> head = {
       'username': username,
@@ -267,7 +276,7 @@ class IDSSession {
     }
 
     if (onResponse != null) {
-      onResponse(45, "login_process.slider");
+      onResponse(45, LoginProcessStep.slider);
     }
 
     await dioNoOfflineCheck.get(
@@ -283,7 +292,7 @@ class IDSSession {
 
     /// Post login request.
     if (onResponse != null) {
-      onResponse(50, "login_process.ready_login");
+      onResponse(50, LoginProcessStep.readyLogin);
     }
     try {
       var data = await dioNoOfflineCheck.post(
@@ -387,7 +396,7 @@ class IDSSession {
     required String? target,
     required String username,
     required IDSReAuthHandler? reAuthHandler,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
   }) async {
     final location = response.headers.value(HttpHeaders.locationHeader);
     if (location == null) {
@@ -401,7 +410,7 @@ class IDSSession {
       reAuthHandler: reAuthHandler,
       onResponse: onResponse,
     );
-    onResponse?.call(80, 'login_process.after_process');
+    onResponse?.call(80, LoginProcessStep.afterProcess);
     return resolved.toString();
   }
 
@@ -410,7 +419,7 @@ class IDSSession {
     String? service,
     String? username,
     IDSReAuthHandler? reAuthHandler,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
   }) {
     if (!isIDSReAuthLocation(uri.toString())) return Future.value(uri);
     return _reAuthLock.synchronized(() async {
@@ -423,7 +432,7 @@ class IDSSession {
       }
 
       try {
-        onResponse?.call(55, 'login_process.second_factor');
+        onResponse?.call(55, LoginProcessStep.secondFactor);
         final resumedUri = await handler(
           IDSReAuthClient(
             dio: dioNoOfflineCheck,

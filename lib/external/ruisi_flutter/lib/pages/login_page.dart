@@ -1,10 +1,10 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:typed_data';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -100,9 +100,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, 'ruisi.login.title')),
-      ),
+      appBar: AppBar(title: Text(context.t.ruisi.login.title)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -130,18 +128,12 @@ class _LoginPageState extends State<LoginPage> {
               TextFormField(
                 controller: _usernameCtrl,
                 decoration: InputDecoration(
-                  labelText: FlutterI18n.translate(
-                    context,
-                    'ruisi.login.username',
-                  ),
+                  labelText: context.t.ruisi.login.username,
                   prefixIcon: const Icon(Icons.person),
                   border: const OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.isEmpty)
-                    ? FlutterI18n.translate(
-                        context,
-                        'ruisi.login.username_hint',
-                      )
+                    ? context.t.ruisi.login.usernameHint
                     : null,
               ),
               const SizedBox(height: 16),
@@ -151,18 +143,12 @@ class _LoginPageState extends State<LoginPage> {
                 controller: _passwordCtrl,
                 obscureText: true,
                 decoration: InputDecoration(
-                  labelText: FlutterI18n.translate(
-                    context,
-                    'ruisi.login.password',
-                  ),
+                  labelText: context.t.ruisi.login.password,
                   prefixIcon: const Icon(Icons.lock),
                   border: const OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.isEmpty)
-                    ? FlutterI18n.translate(
-                        context,
-                        'ruisi.login.password_hint',
-                      )
+                    ? context.t.ruisi.login.passwordHint
                     : null,
               ),
 
@@ -176,19 +162,13 @@ class _LoginPageState extends State<LoginPage> {
                         child: TextFormField(
                           controller: _captchaCtrl,
                           decoration: InputDecoration(
-                            labelText: FlutterI18n.translate(
-                              context,
-                              'ruisi.login.captcha',
-                            ),
+                            labelText: context.t.ruisi.login.captcha,
                             prefixIcon: const Icon(Icons.security),
                             border: const OutlineInputBorder(),
                           ),
                           validator: (v) =>
                               _captchaRequired && (v == null || v.isEmpty)
-                              ? FlutterI18n.translate(
-                                  context,
-                                  'ruisi.login.captcha_hint',
-                                )
+                              ? context.t.ruisi.login.captchaHint
                               : null,
                         ),
                       ),
@@ -271,12 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(
-                            FlutterI18n.translate(
-                              context,
-                              'ruisi.common.login',
-                            ),
-                          ),
+                        : Text(context.t.ruisi.common.login),
                   );
                 },
               ),
@@ -286,12 +261,7 @@ class _LoginPageState extends State<LoginPage> {
               OutlinedButton.icon(
                 onPressed: () => _handleResetLoginState(context),
                 icon: const Icon(Icons.refresh),
-                label: Text(
-                  FlutterI18n.translate(
-                    context,
-                    'ruisi.login.reset_login_state',
-                  ),
-                ),
+                label: Text(context.t.ruisi.login.resetLoginState),
               ),
               const SizedBox(height: 8),
 
@@ -299,9 +269,7 @@ class _LoginPageState extends State<LoginPage> {
               OutlinedButton.icon(
                 onPressed: () => _handleViewLogs(context),
                 icon: const Icon(Icons.bug_report),
-                label: Text(
-                  FlutterI18n.translate(context, 'ruisi.login.view_logs'),
-                ),
+                label: Text(context.t.ruisi.login.viewLogs),
               ),
             ],
           ),
@@ -341,11 +309,7 @@ class _LoginPageState extends State<LoginPage> {
     if (context.mounted) {
       _checkLoginCaptcha();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            FlutterI18n.translate(context, 'ruisi.login.reset_success'),
-          ),
-        ),
+        SnackBar(content: Text(context.t.ruisi.login.resetSuccess)),
       );
     }
   }

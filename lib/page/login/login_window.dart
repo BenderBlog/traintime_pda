@@ -4,10 +4,11 @@
 
 // Login window of the program.
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
@@ -72,8 +73,7 @@ class _LoginWindowState extends State<LoginWindow> {
         controller: _idsAccountController,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_user_3_fill,
-
-          hintText: FlutterI18n.translate(context, "login.identity_number"),
+          hintText: context.t.login.identityNumber,
         ),
       ).center(),
       const SizedBox(height: 16.0),
@@ -82,7 +82,7 @@ class _LoginWindowState extends State<LoginWindow> {
         obscureText: _couldNotView,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_safe_lock_fill,
-          hintText: FlutterI18n.translate(context, "login.password"),
+          hintText: context.t.login.password,
           suffixIcon: IconButton(
             icon: Icon(_couldNotView ? Icons.visibility : Icons.visibility_off),
             onPressed: () {
@@ -100,7 +100,7 @@ class _LoginWindowState extends State<LoginWindow> {
           maximumSize: const Size(double.infinity, 64),
         ),
         child: Text(
-          FlutterI18n.translate(context, "login.login"),
+          context.t.login.login,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
         ),
         onPressed: () async {
@@ -109,10 +109,7 @@ class _LoginWindowState extends State<LoginWindow> {
           } else {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "login.incorrect_password_pattern",
-              ),
+              msg: context.t.login.incorrectPasswordPattern,
             );
           }
         },
@@ -127,12 +124,10 @@ class _LoginWindowState extends State<LoginWindow> {
     loginState = IDSLoginState.requesting;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
-      msg: FlutterI18n.translate(context, "login.on_login_progress"),
+      msg: context.t.login.onLoginProgress,
       max: 100,
       hideValue: true,
-      completed: Completed(
-        completedMsg: FlutterI18n.translate(context, "login.complete_login"),
-      ),
+      completed: Completed(completedMsg: context.t.login.completeLogin),
     );
     IDSSession ses = IDSSession();
 
@@ -156,7 +151,7 @@ class _LoginWindowState extends State<LoginWindow> {
         final result = await showIDSReAuthDialog(context, client);
         if (mounted && !pd.isOpen()) {
           pd.show(
-            msg: FlutterI18n.translate(context, 'login_process.after_process'),
+            msg: context.t.loginProcess.afterProcess,
             max: 100,
             hideValue: true,
           );
@@ -167,10 +162,21 @@ class _LoginWindowState extends State<LoginWindow> {
       await ses.login(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
-        onResponse: (int number, String status) {
+        onResponse: (int number, LoginProcessStep status) {
           if (pd.isOpen()) {
             pd.update(
-              msg: FlutterI18n.translate(context, status),
+              msg: switch (status) {
+                LoginProcessStep.readyPage => context.t.loginProcess.readyPage,
+                LoginProcessStep.getEncrypt =>
+                  context.t.loginProcess.getEncrypt,
+                LoginProcessStep.readyLogin =>
+                  context.t.loginProcess.readyLogin,
+                LoginProcessStep.slider => context.t.loginProcess.slider,
+                LoginProcessStep.secondFactor =>
+                  context.t.loginProcess.secondFactor,
+                LoginProcessStep.afterProcess =>
+                  context.t.loginProcess.afterProcess,
+              },
               value: number,
             );
           }
@@ -181,10 +187,7 @@ class _LoginWindowState extends State<LoginWindow> {
           final result = await showIDSReAuthDialog(context, client);
           if (mounted && !pd.isOpen()) {
             pd.show(
-              msg: FlutterI18n.translate(
-                context,
-                'login_process.after_process',
-              ),
+              msg: context.t.loginProcess.afterProcess,
               max: 100,
               hideValue: true,
             );
@@ -240,16 +243,13 @@ class _LoginWindowState extends State<LoginWindow> {
           loginState = IDSLoginState.cancelled;
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              'login.second_factor.cancelled',
-            ),
+            msg: context.t.login.secondFactor.cancelled,
           );
         } else if (e is IDSReAuthExpiredException) {
           loginState = IDSLoginState.fail;
           showToast(
             context: context,
-            msg: FlutterI18n.translate(context, 'login.second_factor.expired'),
+            msg: context.t.login.secondFactor.expired,
           );
         } else if (e is LoginFailedException) {
           loginState = IDSLoginState.fail;
@@ -263,30 +263,21 @@ class _LoginWindowState extends State<LoginWindow> {
             if (e.response == null) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "login.failed_login_cannot_connect_to_server",
-                ),
+                msg: context.t.login.failedLoginCannotConnectToServer,
               );
             } else {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "login.failed_login_with_code",
-                  translationParams: {
-                    "code": e.response!.statusCode.toString(),
-                  },
+                msg: context.t.login.failedLoginWithCode(
+                  code: e.response!.statusCode.toString(),
                 ),
               );
             }
           } else {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "login.failed_login_with_message",
-                translationParams: {"message": e.message.toString()},
+              msg: context.t.login.failedLoginWithMessage(
+                message: e.message.toString(),
               ),
             );
           }
@@ -303,10 +294,7 @@ class _LoginWindowState extends State<LoginWindow> {
               ),
             ),
           );
-          showToast(
-            context: context,
-            msg: FlutterI18n.translate(context, "login.failed_login_other"),
-          );
+          showToast(context: context, msg: context.t.login.failedLoginOther);
         }
       }
     }

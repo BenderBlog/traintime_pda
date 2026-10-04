@@ -1,3 +1,4 @@
+
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
@@ -5,7 +6,6 @@
 // Content page of XDU Planet.
 /*
 import 'dart:async';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +20,7 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/xdu_planet/comment_popout.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ContentPage extends StatefulWidget {
   final Article article;
@@ -67,8 +68,8 @@ class _ContentPageState extends State<ContentPage> {
                 addon = HtmlWidget(
                   snapshot.data ??
                       '''
-  <h3>${FlutterI18n.translate(context, "xdu_planet.load_failed_title")}</h3>
-  <p>${FlutterI18n.translate(context, "xdu_planet.load_failed_bottom")}</p>
+  <h3>${context.t.xduPlanet.loadFailedTitle}</h3>
+  <p>${context.t.xduPlanet.loadFailedBottom}</p>
 ''',
                   factoryBuilder: () => MyWidgetFactory(),
                 );
@@ -120,7 +121,7 @@ class _ContentPageState extends State<ContentPage> {
                 try {
                   if (snapshot.data!.isEmpty) {
                     list = Text(
-                      FlutterI18n.translate(context, "xdu_planet.no_comment"),
+                      context.t.xduPlanet.noComment,
                     );
                   } else {
                     list = List.generate(
@@ -129,7 +130,7 @@ class _ContentPageState extends State<ContentPage> {
                         title: Text(
                           "#${snapshot.data![index].ID} "
                           "${snapshot.data![index].user_id} "
-                          "${FlutterI18n.translate(context, snapshot.data![index].statusStr)}",
+                          "${context.t.resolveKey(snapshot.data![index].statusStr)}",
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,28 +152,13 @@ class _ContentPageState extends State<ContentPage> {
                                       );
                                   if (data == null) {
                                     return Text(
-                                      FlutterI18n.translate(
-                                        context,
-                                        "xdu_planet.reply_audit",
-                                        translationParams: {
-                                          "reply_to":
-                                              snapshot.data![index].reply_to,
-                                        },
-                                      ),
+                                      context.t.xduPlanet.replyAudit(reply_to: snapshot.data![index].reply_to),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     );
                                   }
                                   return Text(
-                                    FlutterI18n.translate(
-                                      context,
-                                      "xdu_planet.reply",
-                                      translationParams: {
-                                        "reply_to":
-                                            snapshot.data![index].reply_to,
-                                        "content": data.content,
-                                      },
-                                    ),
+                                    context.t.xduPlanet.reply(reply_to: snapshot.data![index].reply_to, content: data.content),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   );
@@ -201,10 +187,7 @@ class _ContentPageState extends State<ContentPage> {
                                         context.mounted) {
                                       showToast(
                                         context: context,
-                                        msg: FlutterI18n.translate(
-                                          context,
-                                          "xdu_planet.have_been_audit",
-                                        ),
+                                        msg: context.t.xduPlanet.haveBeenAudit,
                                       );
                                       return;
                                     }
@@ -213,24 +196,15 @@ class _ContentPageState extends State<ContentPage> {
                                           context: context,
                                           builder: (BuildContext context) => AlertDialog(
                                             title: Text(
-                                              FlutterI18n.translate(
-                                                context,
-                                                "xdu_planet.confirm_audit_dialog.title",
-                                              ),
+                                              context.t.xduPlanet.confirmAuditDialog.title,
                                             ),
                                             content: Text(
-                                              FlutterI18n.translate(
-                                                context,
-                                                "xdu_planet.confirm_audit_dialog.content",
-                                              ),
+                                              context.t.xduPlanet.confirmAuditDialog.content,
                                             ),
                                             actions: <Widget>[
                                               TextButton(
                                                 child: Text(
-                                                  FlutterI18n.translate(
-                                                    context,
-                                                    "xdu_planet.confirm_audit_dialog.cancel",
-                                                  ),
+                                                  context.t.xduPlanet.confirmAuditDialog.cancel,
                                                 ),
                                                 onPressed: () => Navigator.of(
                                                   context,
@@ -238,10 +212,7 @@ class _ContentPageState extends State<ContentPage> {
                                               ),
                                               TextButton(
                                                 child: Text(
-                                                  FlutterI18n.translate(
-                                                    context,
-                                                    "confirm",
-                                                  ),
+                                                  context.t.common.confirm,
                                                 ),
                                                 onPressed: () => Navigator.of(
                                                   context,
@@ -254,10 +225,7 @@ class _ContentPageState extends State<ContentPage> {
                                     if (isConfirm && context.mounted) {
                                       var pd = ProgressDialog(context: context);
                                       pd.show(
-                                        msg: FlutterI18n.translate(
-                                          context,
-                                          "xdu_planet.confirm_audit_dialog.ongoing",
-                                        ),
+                                        msg: context.t.xduPlanet.confirmAuditDialog.ongoing,
                                       );
                                       PlanetSession()
                                           .auditComments(
@@ -269,10 +237,7 @@ class _ContentPageState extends State<ContentPage> {
                                             if (context.mounted) {
                                               showToast(
                                                 context: context,
-                                                msg: FlutterI18n.translate(
-                                                  context,
-                                                  "xdu_planet.confirm_audit_dialog.success",
-                                                ),
+                                                msg: context.t.xduPlanet.confirmAuditDialog.success,
                                               );
                                             }
                                           })
@@ -281,20 +246,14 @@ class _ContentPageState extends State<ContentPage> {
                                             if (context.mounted) {
                                               showToast(
                                                 context: context,
-                                                msg: FlutterI18n.translate(
-                                                  context,
-                                                  "xdu_planet.confirm_audit_dialog.failed",
-                                                ),
+                                                msg: context.t.xduPlanet.confirmAuditDialog.failed,
                                               );
                                             }
                                           });
                                     }
                                   },
                                   child: Text(
-                                    FlutterI18n.translate(
-                                      context,
-                                      "xdu_planet.audit",
-                                    ),
+                                    context.t.xduPlanet.audit,
                                   ),
                                 ),
                                 TextButton(
@@ -313,35 +272,23 @@ class _ContentPageState extends State<ContentPage> {
                                         _comments.update();
                                         showToast(
                                           context: context,
-                                          msg: FlutterI18n.translate(
-                                            context,
-                                            "xdu_planet.comment_success",
-                                          ),
+                                          msg: context.t.xduPlanet.commentSuccess,
                                         );
                                       } else if (result == false) {
                                         showToast(
                                           context: context,
-                                          msg: FlutterI18n.translate(
-                                            context,
-                                            "xdu_planet.comment_failed",
-                                          ),
+                                          msg: context.t.xduPlanet.commentFailed,
                                         );
                                       } else {
                                         showToast(
                                           context: context,
-                                          msg: FlutterI18n.translate(
-                                            context,
-                                            "xdu_planet.comment_canceled",
-                                          ),
+                                          msg: context.t.xduPlanet.commentCanceled,
                                         );
                                       }
                                     }
                                   },
                                   child: Text(
-                                    FlutterI18n.translate(
-                                      context,
-                                      "xdu_planet.comment",
-                                    ),
+                                    context.t.xduPlanet.comment,
                                   ),
                                 ),
                               ],
@@ -356,7 +303,7 @@ class _ContentPageState extends State<ContentPage> {
                 }
               } else {
                 return Text(
-                  FlutterI18n.translate(context, "xdu_planet.comment_loading"),
+                  context.t.xduPlanet.commentLoading,
                 );
               }
               return SelectionArea(child: list);
@@ -376,26 +323,17 @@ class _ContentPageState extends State<ContentPage> {
               _comments.update();
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "xdu_planet.comment_success",
-                ),
+                msg: context.t.xduPlanet.commentSuccess,
               );
             } else if (result == false) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "xdu_planet.comment_failed",
-                ),
+                msg: context.t.xduPlanet.commentFailed,
               );
             } else {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "xdu_planet.comment_canceled",
-                ),
+                msg: context.t.xduPlanet.commentCanceled,
               );
             }
           }

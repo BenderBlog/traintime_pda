@@ -4,13 +4,15 @@
 
 // Course reminder notification settings page.
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/page/setting/groups/notification_section/notification_function_settings.dart';
 import 'package:watermeter/page/setting/groups/notification_section/notification_permission_settings.dart';
 import 'package:watermeter/page/setting/groups/notification_section/notification_reminder_settings.dart';
-import 'package:watermeter/repository/notification/course_reminder_service.dart';
 
 const kDefaultMinutesBeforeOptions = [5, 10, 15, 20, 30];
 const kDefaultDaysToScheduleOptions = [3, 7, 14, 30];
@@ -72,10 +74,8 @@ class _NotificationSectionState extends State<NotificationSection> {
       if (mounted) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.load_failed',
-            translationParams: {'error': e.toString()},
+          msg: context.t.setting.notificationPage.loadFailed(
+            error: e.toString(),
           ),
         );
       }
@@ -115,8 +115,7 @@ class _NotificationSectionState extends State<NotificationSection> {
 
     showToast(
       context: context,
-      msg: FlutterI18n.translate(
-        context,
+      msg: context.t.resolveKey(
         notificationPermissionGranted && exactAlarmGranted
             ? 'setting.notification_page.permission_granted_msg'
             : 'setting.notification_page.permission_denied_msg',
@@ -128,52 +127,27 @@ class _NotificationSectionState extends State<NotificationSection> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
-          FlutterI18n.translate(
-            context,
-            'setting.notification_page.settings_guide_title',
-          ),
-        ),
+        title: Text(context.t.setting.notificationPage.settingsGuideTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.settings_guide_content_1',
-              ),
-            ),
+            Text(context.t.setting.notificationPage.settingsGuideContent1),
             const Divider(),
-            Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.settings_guide_content_2',
-              ),
-            ),
+            Text(context.t.setting.notificationPage.settingsGuideContent2),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.got_it',
-              ),
-            ),
+            child: Text(context.t.setting.notificationPage.gotIt),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               _courseReminder.openNotificationSettings();
             },
-            child: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.open_settings',
-              ),
-            ),
+            child: Text(context.t.setting.notificationPage.openSettings),
           ),
         ],
       ),
@@ -192,10 +166,7 @@ class _NotificationSectionState extends State<NotificationSection> {
         });
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.cancel_all_success',
-          ),
+          msg: context.t.setting.notificationPage.cancelAllSuccess,
         );
         return;
       }
@@ -209,10 +180,7 @@ class _NotificationSectionState extends State<NotificationSection> {
       if (!_courseReminder.hasSchedulableReminderSourceData) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.no_classtable_data',
-          ),
+          msg: context.t.setting.notificationPage.noClasstableData,
         );
         return;
       }
@@ -228,20 +196,16 @@ class _NotificationSectionState extends State<NotificationSection> {
         });
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.schedule_success',
-            translationParams: {'count': pendingCount.toString()},
+          msg: context.t.setting.notificationPage.scheduleSuccess(
+            count: pendingCount.toString(),
           ),
         );
       } catch (e) {
         if (mounted) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              'setting.notification_page.schedule_failed',
-              translationParams: {'error': e.toString()},
+            msg: context.t.setting.notificationPage.scheduleFailed(
+              error: e.toString(),
             ),
           );
         }
@@ -256,10 +220,8 @@ class _NotificationSectionState extends State<NotificationSection> {
     setState(() => _pendingCount = pendingCount);
     showToast(
       context: context,
-      msg: FlutterI18n.translate(
-        context,
-        'setting.notification_page.reschedule_success',
-        translationParams: {'count': pendingCount.toString()},
+      msg: context.t.setting.notificationPage.rescheduleSuccess(
+        count: pendingCount.toString(),
       ),
     );
   }
@@ -297,20 +259,16 @@ class _NotificationSectionState extends State<NotificationSection> {
         setState(() => _pendingCount = pendingCount);
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            'setting.notification_page.reschedule_success',
-            translationParams: {'count': pendingCount.toString()},
+          msg: context.t.setting.notificationPage.rescheduleSuccess(
+            count: pendingCount.toString(),
           ),
         );
       } catch (e) {
         if (mounted) {
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              'setting.notification_page.reschedule_failed',
-              translationParams: {'error': e.toString()},
+            msg: context.t.setting.notificationPage.rescheduleFailed(
+              error: e.toString(),
             ),
           );
         }
@@ -326,10 +284,7 @@ class _NotificationSectionState extends State<NotificationSection> {
       setState(() => _pendingCount = 0);
       showToast(
         context: context,
-        msg: FlutterI18n.translate(
-          context,
-          'setting.notification_page.delete_all_success',
-        ),
+        msg: context.t.setting.notificationPage.deleteAllSuccess,
       );
     });
   }

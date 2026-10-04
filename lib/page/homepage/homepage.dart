@@ -5,7 +5,7 @@
 import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/page/homepage/homepage_edit_mode.dart';
 import 'package:watermeter/page/homepage/homepage_widget_registry.dart';
@@ -17,6 +17,7 @@ import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 
 class MainPage extends StatefulWidget {
@@ -116,7 +117,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           return Padding(
             padding: const EdgeInsets.all(24),
             child: Text(
-              FlutterI18n.translate(context, "homepage.hide_empty"),
+              context.t.homepage.hideEmpty,
               textAlign: TextAlign.center,
             ),
           );
@@ -127,13 +128,13 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                FlutterI18n.translate(context, "homepage.hidden_title"),
+                context.t.homepage.hiddenTitle,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             for (final entry in hidden)
               ListTile(
-                title: Text(FlutterI18n.translate(context, entry.titleKey)),
+                title: Text(entry.titleBuilder(context)),
                 trailing: IconButton(
                   icon: const Icon(Icons.visibility),
                   onPressed: () async {
@@ -158,17 +159,17 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "homepage.title")),
+        title: Text(context.t.homepage.title),
         actions: [
           if (_editMode) ...[
             IconButton(
               icon: const Icon(Icons.visibility),
-              tooltip: FlutterI18n.translate(context, "homepage.manage_hidden"),
+              tooltip: context.t.homepage.manageHidden,
               onPressed: _showHiddenSheet,
             ),
             IconButton(
               icon: const Icon(Icons.restore),
-              tooltip: FlutterI18n.translate(context, "homepage.edit_reset"),
+              tooltip: context.t.homepage.editReset,
               onPressed: () async {
                 await resetAll();
                 setState(() => _allEntries = getOrderedEntries());
@@ -179,10 +180,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             padding: EdgeInsetsGeometry.only(right: 8),
             child: IconButton(
               icon: Icon(_editMode ? Icons.check : Icons.edit),
-              tooltip: FlutterI18n.translate(
-                context,
-                _editMode ? "homepage.edit_done" : "homepage.edit_mode",
-              ),
+              tooltip: _editMode
+                  ? context.t.homepage.editDone
+                  : context.t.homepage.editMode,
               onPressed: () {
                 if (_editMode) {
                   _exitEditMode();
@@ -205,10 +205,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          showToast(
-            context: context,
-            msg: FlutterI18n.translate(context, "homepage.loading_message"),
-          );
+          showToast(context: context, msg: context.t.homepage.loadingMessage);
           await HomepageController.i.refresh(
             sliderCaptcha: (String cookieStr) {
               return SliderCaptchaClientProvider(cookie: cookieStr).solve(
@@ -218,10 +215,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             },
           );
           if (context.mounted) {
-            showToast(
-              context: context,
-              msg: FlutterI18n.translate(context, "homepage.loaded"),
-            );
+            showToast(context: context, msg: context.t.homepage.loaded);
           }
         },
         child: ListView(
@@ -234,7 +228,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
-                  FlutterI18n.translate(context, "homepage.edit_hint"),
+                  context.t.homepage.editHint,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.secondary,
                     fontSize: 13,

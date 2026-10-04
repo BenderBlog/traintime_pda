@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
@@ -42,15 +42,12 @@ class ClassCardStyleSettings extends StatelessWidget {
 
     return SectionSettingScaffold(
       icon: Icons.play_circle_outline,
-      title: FlutterI18n.translate(
-        context,
-        "setting.class_table_style_page.active_section",
-      ),
+      title: context.t.setting.classTableStylePage.activeSection,
       items: SettingSegmentedList(
         items: [
           SettingSliderTile(
             leading: Icons.brightness_6_outlined,
-            title: FlutterI18n.translate(context, 'setting.editor.brightness'),
+            title: context.t.setting.editor.brightness,
             formatValue: _formatPercent,
             value: activeBrightness,
             min: 0.5,
@@ -61,10 +58,7 @@ class ClassCardStyleSettings extends StatelessWidget {
           ),
           SettingSliderTile(
             leading: Icons.border_outer,
-            title: FlutterI18n.translate(
-              context,
-              'setting.editor.border_opacity',
-            ),
+            title: context.t.setting.editor.borderOpacity,
             formatValue: _formatPercent,
             value: activeBorder,
             min: 0.1,
@@ -75,10 +69,7 @@ class ClassCardStyleSettings extends StatelessWidget {
           ),
           SettingSliderTile(
             leading: Icons.opacity,
-            title: FlutterI18n.translate(
-              context,
-              'setting.editor.fill_opacity',
-            ),
+            title: context.t.setting.editor.fillOpacity,
             formatValue: _formatPercent,
             value: activeInner,
             min: 0.1,

@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/user_role.dart';
 import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
@@ -19,6 +20,35 @@ import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+
+enum ScoreCacheHint implements CacheHint {
+  passwordWrong,
+  loginFailed,
+  networkFailed,
+  unknownError;
+
+  @override
+  String resolve(Translations tr) => switch (this) {
+    passwordWrong => tr.score.cacheHintPasswordWrong,
+    loginFailed  => tr.score.cacheHintLoginFailed,
+    networkFailed => tr.score.cacheHintNetworkFailed,
+    unknownError => tr.score.cacheHintUnknownError,
+  };
+}
+
+ScoreCacheHint _cacheHintFromError(Object error) {
+  if (error is PasswordWrongException) {
+    return ScoreCacheHint.passwordWrong;
+  }
+  if (error is LoginFailedException) {
+    return ScoreCacheHint.loginFailed;
+  }
+  if (error is DioException) {
+    return ScoreCacheHint.networkFailed;
+  }
+  return ScoreCacheHint.unknownError;
+}
+
 
 /// 考试成绩 4768574631264620
 class ScoreSession extends IDSSession {
@@ -84,7 +114,7 @@ class ScoreSession extends IDSSession {
         return FetchResult.cache(
           fetchTime: _file.lastModifiedSync(),
           data: cache,
-          hintKey: _cacheHintFromError(e),
+          cacheHint: _cacheHintFromError(e),
         );
       } else {
         rethrow;
@@ -165,19 +195,6 @@ class ScoreSession extends IDSSession {
 
       return [ComposeDetail(content: "", ratio: "获取详情失败", score: "")];
     }
-  }
-
-  String _cacheHintFromError(Object error) {
-    if (error is PasswordWrongException) {
-      return "score.cache_hint_password_wrong";
-    }
-    if (error is LoginFailedException) {
-      return "score.cache_hint_login_failed";
-    }
-    if (error is DioException) {
-      return "score.cache_hint_network_failed";
-    }
-    return "score.cache_hint_unknown_error";
   }
 
   Future<List<Score>> _getScoreFromYjspt() async {

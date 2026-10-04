@@ -2,8 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -121,10 +121,7 @@ class ClassCard extends StatelessWidget {
                           /// The way to show the class info of the period.
                           /// The last one indicate whether to delete this stuff.
                           final action = await BothSideSheet.show(
-                            title: FlutterI18n.translate(
-                              context,
-                              "classtable.class_card.title",
-                            ),
+                            title: context.t.classtable.classCard.title,
                             child: ArrangementDetail(
                               information: List.generate(data.length, (index) {
                                 if (data.elementAt(index) is Subject ||
@@ -223,7 +220,7 @@ class ClassCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "@${place ?? FlutterI18n.translate(context, "classtable.class_card.unknown_classroom")}",
+                            "@${place ?? context.t.classtable.classCard.unknownClassroom}",
                             style: TextStyle(
                               color: textStyle.textColor,
                               fontSize: detailFontSize,
@@ -231,12 +228,8 @@ class ClassCard extends StatelessWidget {
                           ),
                           if (data.length > 1)
                             Text(
-                              FlutterI18n.translate(
-                                context,
-                                "classtable.class_card.remains_hint",
-                                translationParams: {
-                                  "remain_count": (data.length - 1).toString(),
-                                },
+                              context.t.classtable.classCard.remainsHint(
+                                remain_count: (data.length - 1).toString(),
                               ),
                               style: TextStyle(
                                 color: textStyle.textColor,

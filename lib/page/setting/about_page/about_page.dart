@@ -4,9 +4,10 @@
 
 import 'dart:io';
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
@@ -49,18 +50,13 @@ class _AboutPageState extends State<AboutPage> {
             ),
             const SizedBox(height: 8),
             SectionSettingScaffold(
-              title: FlutterI18n.translate(context, 'setting.about_info'),
+              title: context.t.setting.aboutInfo,
               icon: Icons.info_outline_rounded,
               items: SettingSegmentedList(
                 items: [
                   ListTile(
                     leading: const Icon(Icons.balance_rounded),
-                    title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.about_page.licenses',
-                      ),
-                    ),
+                    title: Text(context.t.setting.aboutPage.licenses),
                     trailing: const Icon(Icons.navigate_next_rounded),
                     onTap: () => showLicensePage(
                       context: context,
@@ -70,41 +66,26 @@ class _AboutPageState extends State<AboutPage> {
                         padding: EdgeInsets.symmetric(vertical: 16),
                         child: AppIconWidget(),
                       ),
-                      applicationLegalese: FlutterI18n.translate(
-                        context,
-                        'setting.about_page.copyright_notice',
-                      ),
+                      applicationLegalese:
+                          context.t.setting.aboutPage.copyrightNotice,
                     ),
                   ),
                   ListTile(
                     leading: const Icon(Icons.copyright_rounded),
                     title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.about_page.copyright_register_code',
-                      ),
+                      context.t.setting.aboutPage.copyrightRegisterCode,
                     ),
                     subtitle: const SelectableText('2026SR0738647'),
                   ),
                   ListTile(
                     leading: const Icon(Icons.verified_user_outlined),
-                    title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        'setting.about_page.beian',
-                      ),
-                    ),
+                    title: Text(context.t.setting.aboutPage.beian),
                     subtitle: const SelectableText('陕ICP备2024026116号-1A'),
                   ),
                   if (Platform.isAndroid)
                     ListTile(
                       leading: const Icon(Icons.fingerprint_rounded),
-                      title: Text(
-                        FlutterI18n.translate(
-                          context,
-                          'setting.about_page.sign_android',
-                        ),
-                      ),
+                      title: Text(context.t.setting.aboutPage.signAndroid),
                       subtitle: SelectableText(
                         preference.packageInfo.buildSignature,
                       ),
@@ -116,10 +97,7 @@ class _AboutPageState extends State<AboutPage> {
             const AboutContributorsSection(),
             const SizedBox(height: 8),
             SectionSettingScaffold(
-              title: FlutterI18n.translate(
-                context,
-                'setting.about_page.extras',
-              ),
+              title: context.t.setting.aboutPage.extras,
               icon: Icons.auto_awesome_outlined,
               items: M3EExpandableSegmentedItem(
                 index: 0,

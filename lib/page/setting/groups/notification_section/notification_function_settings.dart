@@ -1,8 +1,9 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 
@@ -29,46 +30,25 @@ class NotificationFunctionSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(
-        context,
-        'setting.notification_page.function_section',
-      ),
+      title: context.t.setting.notificationPage.functionSection,
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.enable_notification',
-              ),
-            ),
+            title: Text(context.t.setting.notificationPage.enableNotification),
             subtitle: Text(
               isEnabled
-                  ? FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.notification_scheduled',
-                      translationParams: {'count': pendingCount.toString()},
+                  ? context.t.setting.notificationPage.notificationScheduled(
+                      count: pendingCount.toString(),
                     )
-                  : FlutterI18n.translate(
-                      context,
-                      'setting.notification_page.notification_disabled_hint',
-                    ),
+                  : context.t.setting.notificationPage.notificationDisabledHint,
             ),
             value: isEnabled,
             onChanged: isLoading ? null : onEnabledChanged,
           ),
           ListTile(
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.view_the_instructions',
-              ),
-            ),
+            title: Text(context.t.setting.notificationPage.viewTheInstructions),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
-                'setting.notification_page.view_the_instructions_hint',
-              ),
+              context.t.setting.notificationPage.viewTheInstructionsHint,
             ),
             trailing: const Icon(Icons.navigate_next),
             // The guide is the only action intentionally left available while
@@ -78,17 +58,9 @@ class NotificationFunctionSettings extends StatelessWidget {
           if (isEnabled)
             ListTile(
               enabled: !isLoading,
-              title: Text(
-                FlutterI18n.translate(
-                  context,
-                  'setting.notification_page.update_schedule',
-                ),
-              ),
+              title: Text(context.t.setting.notificationPage.updateSchedule),
               subtitle: Text(
-                FlutterI18n.translate(
-                  context,
-                  'setting.notification_page.update_schedule_hint',
-                ),
+                context.t.setting.notificationPage.updateScheduleHint,
               ),
               trailing: const Icon(Icons.refresh),
               onTap: isLoading ? null : onUpdateSchedule,
@@ -96,17 +68,9 @@ class NotificationFunctionSettings extends StatelessWidget {
           if (isEnabled && pendingCount > 0)
             ListTile(
               enabled: !isLoading,
-              title: Text(
-                FlutterI18n.translate(
-                  context,
-                  'setting.notification_page.delete_all_schedule',
-                ),
-              ),
+              title: Text(context.t.setting.notificationPage.deleteAllSchedule),
               subtitle: Text(
-                FlutterI18n.translate(
-                  context,
-                  'setting.notification_page.delete_all_schedule_hint',
-                ),
+                context.t.setting.notificationPage.deleteAllScheduleHint,
               ),
               trailing: Icon(
                 Icons.delete,

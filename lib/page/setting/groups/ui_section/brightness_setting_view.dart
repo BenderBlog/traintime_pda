@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/theme_controller.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/setting/setting_choice_control.dart';
 import 'package:watermeter/page/public_widget/setting/setting_control_tile.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 class BrightnessSettingView extends StatelessWidget {
@@ -33,7 +35,7 @@ class BrightnessSettingView extends StatelessWidget {
 
         return SettingControlTile(
           leading: leadingIcon,
-          title: FlutterI18n.translate(context, 'setting.brightness_setting'),
+          title: context.t.setting.brightnessSetting,
           child: SettingChoiceControl<int>(
             value: preference.getInt(preference.Preference.brightness),
             options: List.generate(BrightnessSeed.values.length, (index) {
@@ -41,8 +43,7 @@ class BrightnessSettingView extends StatelessWidget {
               return SettingChoiceOption<int>(
                 value: index,
                 icon: icons[index],
-                label: FlutterI18n.translate(
-                  context,
+                label: context.t.resolveKey(
                   'setting.change_brightness_dialog.${brightnessSeed.label}',
                 ),
               );

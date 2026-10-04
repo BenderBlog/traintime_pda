@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -19,6 +20,34 @@ import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as prefs;
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/repository/single_flight.dart';
+
+enum OtherExperimentCacheHint implements CacheHint {
+  loginFailed,
+  notSchoolNetwork,
+  networkFailed,
+  unknownError;
+
+  @override
+  String resolve(Translations tr) => switch (this) {
+    loginFailed      => tr.experiment.otherCacheHintLoginFailed,
+    notSchoolNetwork => tr.experiment.otherCacheHintNotSchoolNetwork,
+    networkFailed    => tr.experiment.otherCacheHintNetworkFailed,
+    unknownError     => tr.experiment.otherCacheHintUnknownError,
+  };
+}
+
+OtherExperimentCacheHint _cacheHintFromError(Object error) {
+  if (error is LoginFailedException) {
+    return OtherExperimentCacheHint.loginFailed;
+  }
+  if (error is NotSchoolNetworkException) {
+    return OtherExperimentCacheHint.notSchoolNetwork;
+  }
+  if (error is DioException) {
+    return OtherExperimentCacheHint.networkFailed;
+  }
+  return OtherExperimentCacheHint.unknownError;
+}
 
 class SysjSession extends IDSSession {
   static const otherExperimentCacheName = "OtherExperiment.json";
@@ -126,24 +155,11 @@ class SysjSession extends IDSSession {
         return FetchResult.cache(
           fetchTime: cache.$1,
           data: cache.$2,
-          hintKey: _cacheHintFromError(e),
+          cacheHint: _cacheHintFromError(e),
         );
       }
       rethrow;
     }
-  }
-
-  String _cacheHintFromError(Object error) {
-    if (error is LoginFailedException) {
-      return "experiment.other_cache_hint_login_failed";
-    }
-    if (error is NotSchoolNetworkException) {
-      return "experiment.other_cache_hint_not_school_network";
-    }
-    if (error is DioException) {
-      return "experiment.other_cache_hint_network_failed";
-    }
-    return "experiment.other_cache_hint_unknown_error";
   }
 
   /// These are from sysj.xidian.edu.cn's js file

@@ -606,14 +606,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  flutter_i18n:
-    dependency: "direct main"
-    description:
-      name: flutter_i18n
-      sha256: af7d625e4bfd04764d1554a6411d349dd62d4dc204105cc819a81a35a77bd9b6
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.37.1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -1381,6 +1373,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.30.1"
+<<<<<<< HEAD
+  serial_csv:
+    dependency: transitive
+    description:
+      name: serial_csv
+      sha256: "2d62bb70cb3ce7251383fc86ea9aae1298ab1e57af6ef4e93b6a9751c5c268dd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.2"
+=======
+>>>>>>> main
   share_plus:
     dependency: "direct main"
     description:
@@ -1430,7 +1433,7 @@ packages:
     source: hosted
     version: "2.4.1"
   shared_preferences_platform_interface:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: shared_preferences_platform_interface
       sha256: "649dc798a33931919ea356c4305c2d1f81619ea6e92244070b520187b5140ef9"
@@ -1506,6 +1509,30 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  slang:
+    dependency: "direct main"
+    description:
+      name: slang
+      sha256: "6091c2b4cd9f663080ede24fde6bcb9ee43f9fad1f9eaa66e2801eee47684e24"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.19.2"
+  slang_build_runner:
+    dependency: "direct dev"
+    description:
+      name: slang_build_runner
+      sha256: f2b6c5fc1f5bc41de80b05e95e7d5d03b5c3041082877ce931fc7ba61cd08afe
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.19.0"
+  slang_flutter:
+    dependency: "direct main"
+    description:
+      name: slang_flutter
+      sha256: "2348a39432c48d7c890a2a1e3409b9faae3e49f117fe56d390d4236de8d064f4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.19.0"
   sliver_tools:
     dependency: transitive
     description:
@@ -1698,6 +1725,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
+<<<<<<< HEAD
+=======
   toml:
     dependency: transitive
     description:
@@ -1706,6 +1735,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.17.0"
+>>>>>>> main
   typed_data:
     dependency: transitive
     description:
@@ -1890,6 +1920,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.1.0"
+<<<<<<< HEAD
+=======
   xml2json:
     dependency: transitive
     description:
@@ -1898,6 +1930,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.2.9"
+>>>>>>> main
   yaml:
     dependency: "direct dev"
     description:
