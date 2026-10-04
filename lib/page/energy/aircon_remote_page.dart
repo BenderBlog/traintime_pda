@@ -1,13 +1,7 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-// 空调遥控页。
-//
-// 界面照米家（Mi Home）的空调遥控页复刻：顶上一个大温度加一行运行模式，
-// 下面依次是用电信息、电源、温度调节（滑条）、风速、扫风/强力/电辅热、
-// 运行模式，都是一张张白卡片，蓝色做强调色、橙色点电源。
-//
-// 下发的指令载荷和"乐观更新 + 轮询确认"那套逻辑沿用原来的实现，只换了外观。
+// 米家风格的空调遥控页，沿用原有指令和状态确认逻辑。
 
 import 'package:flutter/services.dart';
 import 'package:watermeter/repository/translation_key.dart';
@@ -20,10 +14,6 @@ import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/setting/aircon_imei_page.dart';
 import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
-
-/// 米家那套蓝色与橙色。
-const _miBlue = Color(0xFF2F73EA);
-const _miOrange = Color(0xFFFF6B3D);
 
 /// 温度的可调范围，和设备本身一致。
 const _minTemperature = 18;
@@ -123,8 +113,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           _error = const AirconResponseException("设备状态仍未确认");
           _isFetching = false;
 
-          /// 这一趟没对上，得把待确认的条件放掉，不然页面会一直卡在
-          /// "正在执行"，所有控件都点不动。
+          // 确认失败后解除待确认状态，让控件恢复可用。
           _pendingMatches = null;
         });
         return;
@@ -252,9 +241,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         _error = error;
         _isFetching = false;
 
-        /// 指令已经发出去的话，设备那边可能真的动了，所以乐观状态留着，
-        /// 但"待确认"的条件必须放掉 —— 否则页面会一直卡在"正在执行"，
-        /// 所有控件都点不动。
+        // 失败后解除待确认状态，仅在指令未发送时恢复旧状态。
         _pendingMatches = null;
         if (!commandSent) {
           _state = previous;
@@ -303,8 +290,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   void _setMode(AirconState state, AirconMode mode) {
     if (mode == state.mode) return;
 
-    /// 换模式时设备会顺手改温度和风速，这里跟着一起报上去，
-    /// 免得轮询确认时对不上。
+    // 切换模式时同步设备默认温度和风速，供轮询确认。
     final temperature = switch (mode) {
       AirconMode.heat => 23,
       AirconMode.cool => 26,
@@ -377,18 +363,21 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
 
   // --- 外观 ---
 
-  /// 顶上那层渐变跟着运行模式走，开关机时也会淡下去，和米家一样。
-  List<Color> _gradientColors(AirconState? state) {
+  /// 顶部渐变用主题色区分运行模式，关机时改用表面色。
+  List<Color> _gradientColors(BuildContext context, AirconState? state) {
+    final scheme = Theme.of(context).colorScheme;
+    final base = scheme.surfaceContainerLow;
     if (state == null || !state.isOn) {
-      return const [Color(0xFFF0F3F8), Color(0xFFF9FAFC)];
+      return [scheme.surfaceContainerHighest, base];
     }
-    return switch (state.mode) {
-      AirconMode.cool => const [Color(0xFFC4D9F4), Color(0xFFF6F9FD)],
-      AirconMode.heat => const [Color(0xFFF9DACA), Color(0xFFFDF6F0)],
-      AirconMode.dry => const [Color(0xFFCDE6E6), Color(0xFFF4FAFA)],
-      AirconMode.fan => const [Color(0xFFDEE5ED), Color(0xFFF6F8FB)],
-      AirconMode.auto => const [Color(0xFFD5EDE2), Color(0xFFF5FBF8)],
+    final accent = switch (state.mode) {
+      AirconMode.heat => scheme.tertiary,
+      AirconMode.cool => scheme.primary,
+      AirconMode.dry => scheme.secondary,
+      AirconMode.fan => scheme.onSurfaceVariant,
+      AirconMode.auto => scheme.primaryContainer,
     };
+    return [Color.lerp(base, accent, 0.24)!, base];
   }
 
   IconData _modeIcon(AirconMode mode) => switch (mode) {
@@ -402,10 +391,8 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: scheme.surfaceContainerLow,
       body: SignalBuilder(
         builder: (context) {
           if (_controller.imeiSignal.value.isEmpty) {
@@ -432,103 +419,119 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           }
 
           final busy = _isFetching || _pendingMatches != null;
-          final gradient = _gradientColors(state);
+          final gradient = _gradientColors(context, state);
 
           return Stack(
             children: [
-              /// 背景渐变随模式变化，AnimatedContainer 会把颜色揉过去。
-              Positioned.fill(
-                child: AnimatedContainer(
-                  duration: _stateMotionDuration,
-                  curve: Curves.easeOutCubic,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: isDark
-                          ? [
-                              Color.lerp(gradient.first, Colors.black, 0.72)!,
-                              scheme.surface,
-                            ]
-                          : gradient,
-                      stops: const [0, 0.55],
+              CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    toolbarHeight: 80,
+                    expandedHeight: 240,
+                    backgroundColor: scheme.surfaceContainerLow,
+                    surfaceTintColor: scheme.surfaceContainerLow,
+                    elevation: 0,
+                    scrolledUnderElevation: 0,
+                    leading: Center(
+                      child: _PressScaleFeedback(
+                        child: IconButton(
+                          onPressed: _isFetching ? null : _refreshDeviceState,
+                          tooltip: FlutterI18n.translate(
+                            context,
+                            "electricity.update",
+                          ),
+                          color: scheme.onSurfaceVariant,
+                          icon: const Icon(Icons.refresh),
+                        ),
+                      ),
+                    ),
+                    actions: [
+                      _PressScaleFeedback(
+                        child: IconButton(
+                          onPressed: busy ? null : _configure,
+                          tooltip: FlutterI18n.translate(
+                            context,
+                            "setting.aircon_imei_title",
+                          ),
+                          color: scheme.onSurfaceVariant,
+                          icon: const Icon(Icons.settings_outlined),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    flexibleSpace: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final top = MediaQuery.paddingOf(context).top;
+                        final expansion =
+                            ((constraints.maxHeight - top - 80) / 160).clamp(
+                              0.0,
+                              1.0,
+                            );
+                        // 温度和模式随顶部可用高度一起缩小。
+                        return AnimatedContainer(
+                          duration: _stateMotionDuration,
+                          curve: Curves.easeOutCubic,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: gradient,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(56, top, 56, 0),
+                            child: Center(
+                              child: _hero(context, state, expansion),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                ),
-              ),
-              ListView(
-                padding: EdgeInsets.fromLTRB(
-                  16,
-                  MediaQuery.paddingOf(context).top + 12,
-                  16,
-                  32,
-                ),
-                children: [
-                  _hero(context, state),
-                  if (_error != null)
-                    _CardEntrance(
-                      index: 1,
-                      child: _errorCard(context, _error!),
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      4,
+                      16,
+                      32 + MediaQuery.paddingOf(context).bottom,
                     ),
-                  const SizedBox(height: 4),
-                  _CardEntrance(index: 2, child: _energyCard(context)),
-                  _CardEntrance(
-                    index: 3,
-                    child: _powerCard(context, state, busy),
-                  ),
-                  _CardEntrance(
-                    index: 4,
-                    child: _temperatureCard(context, state, busy),
-                  ),
-                  _CardEntrance(
-                    index: 5,
-                    child: _windCard(context, state, busy),
-                  ),
-                  _CardEntrance(
-                    index: 6,
-                    child: _swingCard(context, state, busy),
-                  ),
-                  _CardEntrance(
-                    index: 7,
-                    child: _otherCard(context, state, busy),
-                  ),
-                  _CardEntrance(
-                    index: 8,
-                    child: _modeCard(context, state, busy),
+                    sliver: SliverList.list(
+                      children: [
+                        if (_error != null)
+                          _CardEntrance(
+                            index: 1,
+                            child: _errorCard(context, _error!),
+                          ),
+                        _CardEntrance(index: 2, child: _energyCard(context)),
+                        _CardEntrance(
+                          index: 3,
+                          child: _powerCard(context, state, busy),
+                        ),
+                        _CardEntrance(
+                          index: 4,
+                          child: _temperatureCard(context, state, busy),
+                        ),
+                        _CardEntrance(
+                          index: 5,
+                          child: _windCard(context, state, busy),
+                        ),
+                        _CardEntrance(
+                          index: 6,
+                          child: _swingCard(context, state, busy),
+                        ),
+                        _CardEntrance(
+                          index: 7,
+                          child: _otherCard(context, state, busy),
+                        ),
+                        _CardEntrance(
+                          index: 8,
+                          child: _modeCard(context, state, busy),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
-              ),
-              Positioned(
-                top: MediaQuery.paddingOf(context).top + 2,
-                left: 4,
-                child: _PressScaleFeedback(
-                  child: IconButton(
-                    onPressed: _isFetching ? null : _refreshDeviceState,
-                    tooltip: FlutterI18n.translate(
-                      context,
-                      "electricity.update",
-                    ),
-                    color: scheme.onSurfaceVariant,
-                    icon: const Icon(Icons.refresh),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: MediaQuery.paddingOf(context).top + 2,
-                right: 4,
-                child: _PressScaleFeedback(
-                  child: IconButton(
-                    onPressed: _isFetching || _pendingMatches != null
-                        ? null
-                        : _configure,
-                    tooltip: FlutterI18n.translate(
-                      context,
-                      "setting.aircon_imei_title",
-                    ),
-                    color: scheme.onSurfaceVariant,
-                    icon: const Icon(Icons.settings_outlined),
-                  ),
-                ),
               ),
               if (busy)
                 const Positioned(
@@ -544,58 +547,70 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
     );
   }
 
-  Widget _hero(BuildContext context, AirconState state) {
-    final textTheme = Theme.of(context).textTheme;
-    final color = Theme.of(context).colorScheme.onSurfaceVariant;
-    return Material(
-      color: Colors.transparent,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 28),
-        child: Column(
-          children: [
-            if (!state.isOn)
-              Text(
-                FlutterI18n.translate(context, "electricity.aircon_power"),
-                style: textTheme.titleMedium?.copyWith(color: color),
-              )
-            else
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    state.targetTemperature.toString(),
-                    style: textTheme.displayLarge?.copyWith(
-                      fontSize: 92,
-                      height: 1,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 2),
-                    child: Text(
-                      "℃",
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
+  Widget _hero(BuildContext context, AirconState state, double expansion) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final scheme = theme.colorScheme;
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!state.isOn)
+            Text(
+              FlutterI18n.translate(context, "electricity.aircon_power"),
+              style: textTheme.titleMedium?.copyWith(
+                color: scheme.onSurfaceVariant,
               ),
-            const SizedBox(height: 6),
+            )
+          else
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(_modeIcon(state.mode), size: 20, color: color),
-                const SizedBox(width: 6),
                 Text(
-                  FlutterI18n.translate(context, state.mode.labelKey),
-                  style: textTheme.titleMedium?.copyWith(color: color),
+                  state.targetTemperature.toString(),
+                  style: textTheme.displayLarge?.copyWith(
+                    color: scheme.onSurface,
+                    fontSize: 28 + 64 * expansion,
+                    height: 1,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 3 + 7 * expansion, left: 2),
+                  child: Text(
+                    "℃",
+                    style: textTheme.titleLarge?.copyWith(
+                      color: scheme.onSurface,
+                      fontSize: 14 + 8 * expansion,
+                      height: 1,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _modeIcon(state.mode),
+                size: 16 + 4 * expansion,
+                color: scheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                FlutterI18n.translate(context, state.mode.labelKey),
+                style: textTheme.titleMedium?.copyWith(
+                  fontSize: 12 + 4 * expansion,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -733,7 +748,12 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             icon: Icons.power_settings_new,
             size: 64,
             selected: state.isOn,
-            accent: state.isOn ? _miOrange : _miBlue,
+            accent: state.isOn
+                ? Theme.of(context).colorScheme.tertiary
+                : Theme.of(context).colorScheme.primary,
+            onAccent: state.isOn
+                ? Theme.of(context).colorScheme.onTertiary
+                : Theme.of(context).colorScheme.onPrimary,
             enabled: !busy,
             onTap: () => _setPower(state, !state.isOn),
           ),
@@ -789,14 +809,14 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
               _RoundButton(
                 icon: Icons.remove,
                 selected: false,
-                accent: _miBlue,
+                accent: Theme.of(context).colorScheme.primary,
                 enabled: !busy && state.targetTemperature > _minTemperature,
                 onTap: () =>
                     _setTemperature(state, state.targetTemperature - 1),
               ),
               const SizedBox(width: 12),
 
-              /// 滑条：底槽是灰的，填充是蓝的，中间写着当前温度。
+              // 温度条显示当前设定值，填充比例随温度变化。
               Expanded(
                 child: TweenAnimationBuilder<double>(
                   tween: Tween<double>(end: fraction.clamp(0.0, 1.0)),
@@ -817,20 +837,32 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                             curve: Curves.easeOutCubic,
                             decoration: BoxDecoration(
                               color: state.isOn
-                                  ? _miBlue
-                                  : scheme.outlineVariant,
+                                  ? Theme.of(context).colorScheme.primary
+                                  : scheme.surfaceContainerHigh,
                               borderRadius: BorderRadius.circular(27),
                             ),
                           ),
                         ),
                         Center(
-                          child: _DirectionalTemperature(
-                            value: state.targetTemperature,
-                            suffix: "℃",
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: scheme.surfaceContainerLowest,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              child: _DirectionalTemperature(
+                                value: state.targetTemperature,
+                                suffix: "℃",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: scheme.onSurface,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -843,7 +875,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
               _RoundButton(
                 icon: Icons.add,
                 selected: false,
-                accent: _miBlue,
+                accent: Theme.of(context).colorScheme.primary,
                 enabled: !busy && state.targetTemperature < _maxTemperature,
                 onTap: () =>
                     _setTemperature(state, state.targetTemperature + 1),
@@ -855,7 +887,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
     );
   }
 
-  /// 风速：一排圆钮，选中的是蓝底白字。
+  /// 风速使用一排圆钮选择。
   Widget _windCard(BuildContext context, AirconState state, bool busy) {
     final scheme = Theme.of(context).colorScheme;
     return _MiCard(
@@ -913,10 +945,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
     AirconWindSpeed.high => "H",
   };
 
-  /// 扫风：照米家做成一张单独的卡片，左边一个大圆钮、右边开关。
-  ///
-  /// 米家那张卡下面还有一个「风向」按钮，我们这台设备只提供上下扫风，
-  /// 没有左右风向的指令，就不摆一个按不动的按钮了。
+  /// 设备仅支持上下扫风，使用圆钮和开关控制。
   Widget _swingCard(BuildContext context, AirconState state, bool busy) {
     return _MiCard(
       padding: const EdgeInsets.fromLTRB(18, 14, 12, 14),
@@ -925,7 +954,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           _RoundButton(
             icon: Icons.swap_vert,
             selected: state.verticalSwing,
-            accent: _miBlue,
+            accent: Theme.of(context).colorScheme.primary,
             enabled: !busy,
             size: 52,
             onTap: () => _setVerticalSwing(state, !state.verticalSwing),
@@ -949,7 +978,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
     );
   }
 
-  /// 强力模式和辅助电热：米家页面上没有，单独放一张卡，功能不丢。
+  /// 强力模式和辅助电热共用一张卡片。
   Widget _otherCard(BuildContext context, AirconState state, bool busy) {
     Widget row({
       required IconData icon,
@@ -1224,9 +1253,9 @@ class _SlidingOptionRow extends StatelessWidget {
                   top: 0,
                   width: 54,
                   height: 54,
-                  child: const DecoratedBox(
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: _miBlue,
+                      color: Theme.of(context).colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -1269,7 +1298,7 @@ class _SlidingOptionCellState extends State<_SlidingOptionCell> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final color = widget.selected
-        ? Colors.white
+        ? scheme.onPrimary
         : (widget.enabled ? scheme.onSurfaceVariant : scheme.outline);
     return GestureDetector(
       onTap: widget.enabled ? widget.item.onTap : null,
@@ -1312,7 +1341,9 @@ class _SlidingOptionCellState extends State<_SlidingOptionCell> {
               duration: _stateMotionDuration,
               style: TextStyle(
                 fontSize: 12,
-                color: widget.selected ? _miBlue : scheme.onSurfaceVariant,
+                color: widget.selected
+                    ? Theme.of(context).colorScheme.primary
+                    : scheme.onSurfaceVariant,
                 fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w400,
               ),
               child: Text(
@@ -1328,7 +1359,7 @@ class _SlidingOptionCellState extends State<_SlidingOptionCell> {
   }
 }
 
-/// 米家那种白卡片：大圆角、很淡的阴影。
+/// 米家风格的圆角卡片，带轻微阴影。
 class _MiCard extends StatelessWidget {
   const _MiCard({required this.child, this.padding, this.onTap});
 
@@ -1348,13 +1379,11 @@ class _MiCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? scheme.surface
-              : Colors.white,
+          color: scheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: scheme.shadow.withValues(alpha: 0.05),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -1375,12 +1404,13 @@ class _MiCard extends StatelessWidget {
   }
 }
 
-/// 圆形按钮：选中是实心蓝，未选中是浅灰底。
+/// 圆形按钮用主题强调色表示选中状态。
 class _RoundButton extends StatefulWidget {
   const _RoundButton({
     this.icon,
     required this.selected,
     required this.accent,
+    this.onAccent,
     required this.onTap,
     this.enabled = true,
     this.size = 56,
@@ -1390,6 +1420,7 @@ class _RoundButton extends StatefulWidget {
 
   final bool selected;
   final Color accent;
+  final Color? onAccent;
   final VoidCallback onTap;
   final bool enabled;
   final double size;
@@ -1412,7 +1443,7 @@ class _RoundButtonState extends State<_RoundButton> {
     final foreground = !widget.enabled
         ? scheme.outline
         : widget.selected
-        ? Colors.white
+        ? (widget.onAccent ?? scheme.onPrimary)
         : scheme.onSurfaceVariant;
 
     return GestureDetector(
@@ -1470,13 +1501,15 @@ class _SwitchRow extends StatelessWidget {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: value ? _miBlue : scheme.surfaceContainerHighest,
+              color: value
+                  ? Theme.of(context).colorScheme.primary
+                  : scheme.surfaceContainerHighest,
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
               size: 18,
-              color: value ? Colors.white : scheme.onSurfaceVariant,
+              color: value ? scheme.onPrimary : scheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(width: 14),
