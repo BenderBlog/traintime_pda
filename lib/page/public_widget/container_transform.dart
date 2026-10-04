@@ -21,16 +21,46 @@ const containerTransformSplitBreakpoint = 364.0 + 1.0 + 364.0;
 /// One-shot handoff from a home card to Routes.resolveRoute.
 /// Clear after the navigation callback too, in case navigation was skipped.
 class ContainerTransformSource {
-  ContainerTransformSource({required this.fromRect, required this.fromRadius});
+  ContainerTransformSource({
+    required this.fromRect,
+    required this.fromRadius,
+    ui.Image? snapshot,
+  }) : _snapshot = snapshot;
 
   final Rect fromRect;
   final BorderRadius fromRadius;
+  ui.Image? _snapshot;
   static ContainerTransformSource? pending;
+  static ContainerTransformSource? _consumed;
 
   static ContainerTransformSource? consume() {
     final source = pending;
     pending = null;
+    _consumed?.dispose();
+    _consumed = source;
     return source;
+  }
+
+  // Routes forwards only the rect and radius. Transfer image ownership here
+  // while that synchronous route resolution is still in progress.
+  static ui.Image? _takeSnapshot(Rect? fromRect) {
+    final source = _consumed;
+    _consumed = null;
+    if (source == null) return null;
+    if (!identical(source.fromRect, fromRect)) {
+      source.dispose();
+      return null;
+    }
+    final snapshot = source._snapshot;
+    source._snapshot = null;
+    return snapshot;
+  }
+
+  /// Release an image if navigation did not hand it to a transform route.
+  void dispose() {
+    if (identical(_consumed, this)) _consumed = null;
+    _snapshot?.dispose();
+    _snapshot = null;
   }
 }
 
@@ -139,7 +169,8 @@ class _ContainerTransformSurface extends StatefulWidget {
       _ContainerTransformSurfaceState();
 }
 
-class _ContainerTransformSurfaceState extends State<_ContainerTransformSurface> {
+class _ContainerTransformSurfaceState
+    extends State<_ContainerTransformSurface> {
   final GlobalKey _boundaryKey = GlobalKey();
   ui.Image? _snapshot;
 
@@ -152,8 +183,7 @@ class _ContainerTransformSurfaceState extends State<_ContainerTransformSurface> 
 
   Future<void> _capture() async {
     if (!mounted) return;
-    final boundary =
-        _boundaryKey.currentContext?.findRenderObject();
+    final boundary = _boundaryKey.currentContext?.findRenderObject();
     if (boundary is! RenderRepaintBoundary) return;
     try {
       final ratio = MediaQuery.devicePixelRatioOf(context).clamp(1.0, 2.0);
@@ -222,6 +252,26 @@ class _TransformWindowClipper extends CustomClipper<Path> {
       oldClipper.rect != rect || oldClipper.radius != radius;
 }
 
+/// The route owns the card image after the synchronous source handoff.
+class _ContainerTransformRoute<T> extends PageRouteBuilder<T> {
+  _ContainerTransformRoute({
+    required this.cardSnapshot,
+    required super.pageBuilder,
+    required super.transitionsBuilder,
+    required super.transitionDuration,
+    required super.reverseTransitionDuration,
+    super.settings,
+  }) : super(opaque: false, barrierColor: null);
+
+  final ui.Image? cardSnapshot;
+
+  @override
+  void dispose() {
+    super.dispose();
+    cardSnapshot?.dispose();
+  }
+}
+
 PageRouteBuilder<T> containerTransformRoute<T>({
   required WidgetBuilder builder,
   Rect? fromRect,
@@ -229,12 +279,12 @@ PageRouteBuilder<T> containerTransformRoute<T>({
   RouteSettings? settings,
 }) {
   final hasSource = fromRect != null && !fromRect.isEmpty;
-  return PageRouteBuilder<T>(
+  final cardSnapshot = ContainerTransformSource._takeSnapshot(fromRect);
+  return _ContainerTransformRoute<T>(
+    cardSnapshot: cardSnapshot,
     settings: settings,
     // Keeping the source route visible also prevents its Cupertino transition
     // from reacting to this route's secondary animation. No barrier dims it.
-    opaque: false,
-    barrierColor: null,
     // 有来源卡片：从卡片位置长到整屏。
     // 没有来源（比如从设置页打开「关于软件」）：不套这个动效，但也要有过渡。
     transitionDuration: hasSource
@@ -296,6 +346,19 @@ PageRouteBuilder<T> containerTransformRoute<T>({
                 window.width / size.width,
                 window.height / size.height,
               );
+              final pageOffset = Offset(
+                window.center.dx - size.width * coverScale / 2,
+                window.center.dy - size.height * coverScale / 2,
+              );
+              // Position the image in page coordinates so the shared transform
+              // maps it exactly onto the growing window, without cover cropping.
+              final cardRect = Rect.fromLTWH(
+                (window.left - pageOffset.dx) / coverScale,
+                (window.top - pageOffset.dy) / coverScale,
+                window.width / coverScale,
+                window.height / coverScale,
+              );
+              final cardAlpha = (1 - t / 0.4).clamp(0.0, 1.0);
               return Stack(
                 children: [
                   // 驱动首页那层的"下沉"（首页在另一个 Navigator，只能靠全局值联动）。
@@ -336,28 +399,45 @@ PageRouteBuilder<T> containerTransformRoute<T>({
                     child: ClipPath(
                       clipper: _TransformWindowClipper(
                         rect: window,
-                        radius: BorderRadius.lerp(
-                          startRadius,
-                          endRadius,
-                          t,
-                        )!,
+                        radius: BorderRadius.lerp(startRadius, endRadius, t)!,
                       ),
                       child: Transform(
                         alignment: Alignment.topLeft,
                         transform: Matrix4.identity()
                           ..translateByDouble(
-                            window.center.dx - size.width * coverScale / 2,
-                            window.center.dy - size.height * coverScale / 2,
+                            pageOffset.dx,
+                            pageOffset.dy,
                             0,
                             1,
                           )
                           ..scaleByDouble(coverScale, coverScale, 1, 1),
-                        child: _ContainerTransformSurface(
-                          showSnapshot: raw < 0.999,
-                          child: ColoredBox(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            child: page,
-                          ),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            _ContainerTransformSurface(
+                              showSnapshot: raw < 0.999,
+                              child: ColoredBox(
+                                color: Theme.of(
+                                  context,
+                                ).scaffoldBackgroundColor,
+                                child: page,
+                              ),
+                            ),
+                            if (cardSnapshot != null && cardAlpha > 0)
+                              Positioned.fromRect(
+                                rect: cardRect,
+                                child: IgnorePointer(
+                                  child: RawImage(
+                                    image: cardSnapshot,
+                                    fit: BoxFit.fill,
+                                    color: Colors.white.withValues(
+                                      alpha: cardAlpha,
+                                    ),
+                                    colorBlendMode: BlendMode.modulate,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ),
