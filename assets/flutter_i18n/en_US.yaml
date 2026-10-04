@@ -948,6 +948,8 @@ setting:
     title: Set low electricity threshold
     input_hint: Input remaining electricity
   account_setting: Account Settings
+  general_account_settings: General accounts
+  undergraduate_system_accounts: Undergraduate system accounts
   sport_password_setting: PE system password
   experiment_password_setting: Physics experiment password
   electricity_password_setting: Electricity account password

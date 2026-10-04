@@ -870,6 +870,8 @@ setting:
     title: 設置低電量閾值
     input_hint: 請輸入電量度數
   account_setting: 賬號設置
+  general_account_settings: 通用賬號
+  undergraduate_system_accounts: 本科生系統帳號
   sport_password_setting: 體育系統密碼設置
   experiment_password_setting: 物理實驗系統密碼設置
   electricity_password_setting: 電費帳號密碼設置

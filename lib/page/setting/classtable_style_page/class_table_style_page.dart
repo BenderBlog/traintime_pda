@@ -59,11 +59,11 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
             enableVerticalScrolling: true,
             backgroundBlur: _backgroundBlur,
           );
-          Widget settingColumn = SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              physics: const ClampingScrollPhysics(),
+          Widget settingColumn = SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            physics: const ClampingScrollPhysics(),
+            child: SafeArea(
+              top: false,
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: sheetMaxWidth),

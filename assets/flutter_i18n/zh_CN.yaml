@@ -872,6 +872,8 @@ setting:
     title: 设置低电量阈值
     input_hint: 请输入电量度数
   account_setting: 账号设置
+  general_account_settings: 通用账号
+  undergraduate_system_accounts: 本科生系统账号
   sport_password_setting: 体育系统密码设置
   experiment_password_setting: 物理实验系统密码设置
   electricity_password_setting: 电费帐号密码设置
