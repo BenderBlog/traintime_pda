@@ -51,7 +51,7 @@ class NetworkClients {
   static const _ehallHost = 'ehall.xidian.edu.cn';
 
   static const Map<String, String> _ehallHeaders = {
-    HttpHeaders.refererHeader: 'http://ehall.xidian.edu.cn/new/index_xd.html',
+    HttpHeaders.refererHeader: 'https://ehall.xidian.edu.cn/new/index_xd.html',
     HttpHeaders.acceptHeader:
         'text/html,application/xhtml+xml,application/xml;q=0.9,'
         'image/webp,image/apng,*/*;q=0.8,'
@@ -91,7 +91,7 @@ class NetworkClients {
 
   static Dio get sportDio => _sportDio ??= _createDio(
     cookieJar: sportCookieJar,
-    baseUrl: 'http://tybjxgl.xidian.edu.cn/app/',
+    baseUrl: 'https://tybjxgl.xidian.edu.cn/app/',
     followRedirects: true,
   );
 

@@ -4,8 +4,8 @@
 
 // These are some constant used in the class table.
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 
 /// The width of the button.
 const weekButtonWidth = 74.0;
@@ -85,17 +85,17 @@ const double classTableSheetShadowSigma = 8.0;
 const double classTableSheetEndGap = 6.0;
 
 /// The largest blur which can be applied to a user defined background image.
-const double maxClassTableBackgroundBlur = 30.0;
+const double maxClassTableBackgroundBlur = 20.0;
 
 String getWeekString(BuildContext context, int index) {
-  List<String> weekList = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
+  List weekList = [
+    context.t.weekday.monday,
+    context.t.weekday.tuesday,
+    context.t.weekday.wednesday,
+    context.t.weekday.thursday,
+    context.t.weekday.friday,
+    context.t.weekday.saturday,
+    context.t.weekday.sunday,
   ];
-  return FlutterI18n.translate(context, "weekday.${weekList[index]}");
+  return weekList[index];
 }

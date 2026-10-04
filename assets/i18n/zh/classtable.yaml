@@ -1,0 +1,172 @@
+partner_classtable:
+  override_dialog: 目前有搭子课表数据，是否要覆盖？
+  no_file: 未发现导入文件
+  no_permission: 未获取存储权限，无法读取文件
+  problem: 好像导入文件有点问题:P
+  success: 导入成功
+  share_dialog:
+    title: 请不要随意分享
+    content: 导出文件包括你的个人信息，请不要随意跟别人分享，或者发在大群里。
+  save_dialog:
+    title: 保存日历文件到...
+    success_message: 应该保存成功
+    failure_message: 文件创建失败，保存取消
+  delete_dialog:
+    title: 确认对话框
+    message: 确定要清除搭子课表吗？
+    success_message: 删除搭子课表成功
+  name_dialog:
+    title: 输入对方显示该课表的名称
+    hint: 在此输入，否则为 Sweetie
+    cancel: 我就这一个甜心
+    accept: 提交
+    blank_input: 输入空白!
+page_title: 我的日程表
+partner_page_title: '{partner_name}的日程表'
+popup_menu:
+  not_arranged: 查看未安排课程信息
+  class_changed: 查看课程安排调整信息
+  add_class: 添加课程信息
+  generate_ical: 生成日历文件
+  generate_partner_file: 生成共享课表文件
+  import_partner_file: 导入共享课表文件
+  delete_partner_file: 删除共享课表文件
+  output_to_system: 导出到系统日历
+  refresh_classtable: 刷新日程表
+  switch_semester: 切换课程表学期
+  current_time_settings: 时间指示设置
+  class_color_settings: 课表样式设置
+visual_settings:
+  current_time_settings_title: 时间指示设置
+  class_color_settings_title: 课表样式设置
+  completed_style_enabled: 已结束课程样式区分
+  current_time_section: 时间指示
+  show_current_time_indicator: 显示当前时间指示线
+  show_current_time_label: 显示迷你数字时钟
+  show_today_column_highlight: 强调显示今天的纵列
+  unfinished_section: 课程样式
+  active_brightness_factor: '亮度: {value}'
+  active_border_alpha: '边框透明度: {value}'
+  active_inner_alpha: '底色透明度: {value}'
+  completed_section: 已结束课程样式
+  completed_saturation_factor: '底色饱和度: {value}'
+  completed_brightness_factor: '亮度: {value}'
+  completed_text_saturation_factor: '文字饱和度: {value}'
+  completed_border_alpha: '边框透明度: {value}'
+  completed_inner_alpha: '底色透明度: {value}'
+status_source:
+  class_table: 课表
+  exam: 考试
+  physics_experiment: 物理实验
+  other_experiment: 其他实验
+error_dialog_title: 错误信息概览
+status_banner:
+  loading: 正在更新：{sources}
+  cache: 当前使用缓存：{sources}
+  error_summary: 以下信息加载失败：{sources}
+empty_state:
+  no_course: '{semester_code} 学期没有课程安排。'
+  with_exam: '{semester_code} 学期没有课程安排，但有考试安排。'
+  with_experiment: '{semester_code} 学期没有课程安排，但有实验安排。'
+  with_exam_and_experiment: '{semester_code} 学期没有课程安排，但有考试和实验安排。'
+empty_action:
+  view_exam: 查看考试安排
+  view_experiment: 查看实验安排
+class_change_page:
+  title: 课程调整
+  empty_message: 目前没有调课信息
+  teacher_change: 教师变更：从{previous_teacher}变为{new_teacher}
+  no_teacher_change: 教师信息没有改变
+  '1': 一
+  '2': 二
+  '3': 三
+  '4': 四
+  '5': 五
+  '6': 六
+  '7': 日
+  change_class_message: 调课信息，从第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节
+    调整为第{newAffectedWeeksListStr}周星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}节，{newClassroom}教室上课
+  patch_class_message: 补课信息，第{newAffectedWeeksListStr}周 星期{weekChar_newWeek}的{newClassRangeStart}-{newClassRangeStop}节，
+    {newClassroom}补课
+  stop_class_message: 停课信息，第{originalAffectedWeeks}周 星期{weekChar_originalWeek}的{originalClassRangeStart}-{originalClassRangeEnd}节停课
+  class_info: '编号: {classCode} | {classNumber} 班
+
+    安排变更：{classChange}{teacherChange}'
+not_arranged_page:
+  title: 没有时间安排的科目
+  empty_message: 目前全部课程均有时间安排
+  content: '编号: {classCode} | {classNumber} 班
+
+    老师: {teacher}'
+empty_class_message: '{semester_code} 学期没有课程'
+empty_class_with_exam: '{semester_code} 学期没有课程但是有考试安排！
+
+  请回到主页后下滑点击”考试安排“按钮进入考试安排页面'
+week_title: 第{week}周
+noon_break: 午休
+supper_break: 晚休
+month: '{month}
+
+  月'
+no_class: 本周暂无安排，请不要在床上过于慵懒
+class_card:
+  title: 日程信息
+  unknown_classroom: 未知教室
+  remains_hint: 还有{remain_count}个日程
+class_add:
+  add_class_title: 添加课程
+  change_class_title: 修改课程
+  class_name_empty_message: 必须输入课程名
+  wrong_time_message: 输入的时间不对
+  save_button: 保存
+  input_classname_hint: 课程名字(必填)
+  input_teacher_hint: 老师姓名(选填)
+  input_classroom_hint: 教室位置(选填)
+  input_week_hint: 选择上课周次
+  input_time_hint: 选择上课时间
+  input_time_weekday_hint: 上课周次
+  input_start_time_hint: 上课时间
+  input_end_time_hint: 下课时间
+  wheel_choose_hint: 第 {index} 节
+  choose_at_least_one: 请至少选择一个上课日期和时间
+  repeat_weekly: 按周重复
+  free_time: 自定义日期
+  date_selector_free:
+    rule: 时间必须在 08:30-21:25 之间
+    rule_2: 下课时间必须晚于上课时间
+    class_start_time: 上课时间
+    class_end_time: 下课时间
+    edit_class_time: 编辑课程时间
+    choose_class_time: 选择课程时间
+course_detail_card:
+  class_number_string: '{number} 班'
+  unknown_teacher: 老师未定
+  unknown_place: 地点未定
+  class_period: '{start}-{stop}节'
+  edit: 编辑
+  delete: 删除
+  delete_single: 删除本次
+  delete_all: 删除全部
+  delete_content: 所有关于这个课的信息都会被删除，课表上关于这门课的信息将不复存在！
+  delete_content_single: 关于这个课的信息只有这个时间段都会被删除，其他的时间段会被保留。
+  delete_title: 是否删除课程信息？
+output_to_system:
+  success: 成功导出到系统日历
+  failure: 导出到系统日历过程中发生了问题:P
+  request_all_title: 权限需求说明
+  request_all: 因导出插件限制，用户必须同时授予本软件读取日历和写入日历权限，才能正常导出日程。不过，本软件不会读取日历。
+refresh_classtable:
+  ready: 准备刷新日程信息
+  success: 成功刷新日程信息
+cache_hint_password_wrong: 统一认证密码错误或已失效。
+cache_hint_login_failed: 登录课表服务失败。
+cache_hint_network_failed: 课表网络请求失败。
+cache_hint_unknown_error: 在线获取课表失败。详细错误请查看日志。
+semester_switcher:
+  choose_semester: 选择学期
+  first_academic_year: 第一学年
+  second_academic_year: 第二学年
+  fetch_remote_semester: 获取当前学期
+  fetching_remote_semester: 正在获取...
+  year: '{year}年'
+  only_future_hint: 本程序仅允许查看未来学期的课程安排。

@@ -1,7 +1,9 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:watermeter/repository/logger.dart';
 
 class FilmComponent extends StatelessWidget {
   static const sideWidthRatio = 0.06;
@@ -12,14 +14,9 @@ class FilmComponent extends StatelessWidget {
   static const imageVerticalPadding = 4.0;
 
   static List<String> description = [
-    "先到咸阳为王上，后到咸阳……你马上问问你弟弟，一辆新的斯蒂庞克牌轿车值多少钱？你连这个都不懂，就是陈纳德坐的那种啊～",
-    "峨眉峰，还TM独照。颇具浪漫主义气质啊。",
-    "我就是看不惯李涯那种……（咬牙切齿）我要是不扳倒他，我在这里算是白混了！",
-    "你看看现在，不管保密局还是党通局当官的，嘴上都是主义，那心里都是生意。",
-    "余则成赶地主的事情，就这样吧。农民和地主的事情，委员长都管不了，你管得了啊？",
-    "现在两根金条放在这里，你能告诉我哪根是高尚的，哪根是龌龊的？别来这套。",
-    "把你的脑袋从脚后跟拿出来再用一下吧，想清楚了再告诉我，为啥从箱里面爬出来的是一个叫刘闪的，比你还愚蠢的家伙！",
-    "你就是不懂得录音的基本原理，睁开眼睛看看世界吧，就这书《远东情报站》，俩16岁白俄孩子就能搞出来，不是啥复杂的戏法。",
+    "呜哇～",
+    "哇，好可爱啊",
+    "诺艾尔不是在等待奇迹——她本身就是七年前那个愿望留下的奇迹",
   ];
 
   const FilmComponent({super.key});
@@ -46,22 +43,33 @@ class FilmComponent extends StatelessWidget {
               child: SizedBox(
                 width: middleWidth,
                 child: Column(
-                  children: List.generate(
-                    8,
-                    (i) => Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: imageVerticalPadding,
-                      ),
-                      child: FilmFrame(
-                        image: Image.asset(
-                          "assets/art/qianfu_$i.jpg",
-                          fit: BoxFit.fill,
+                  children: [
+                    ...List.generate(
+                      3,
+                      (i) => Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: imageVerticalPadding,
                         ),
-                        text: description[i],
-                        sideWidth: sideWidth,
+                        child: FilmFrame(
+                          image: Image.asset(
+                            "assets/art/noel_$i.jpg",
+                            fit: BoxFit.fill,
+                          ),
+                          text: description[i],
+                          sideWidth: sideWidth,
+                        ),
                       ),
                     ),
-                  ),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: double.infinity),
+                      child: M3ETextButton(
+                        child: Text("按下本按钮以进行迫害操作"),
+                        onPressed: () {
+                          log.info("Kevin 迫害 Lolicon 一次");
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

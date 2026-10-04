@@ -1,8 +1,9 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/page/energy/aircon_remote_page.dart';
@@ -19,68 +20,38 @@ class AirconCard extends StatelessWidget {
       builder: (context) {
         final imei = controller.imeiSignal.value;
         final state = controller.deviceStateSignal.value;
-        final openRemote = FlutterI18n.translate(
-          context,
-          "homepage.aircon_card.open_remote",
-        );
+        final openRemote = context.t.homepage.airconCard.openRemote;
         final waiting = (
-          status: FlutterI18n.translate(
-            context,
-            "homepage.aircon_card.fetching",
-          ),
+          status: context.t.homepage.airconCard.fetching,
           detail: openRemote,
         );
         final display = imei.isEmpty
             ? (
-                status: FlutterI18n.translate(
-                  context,
-                  "homepage.aircon_card.not_configured",
-                ),
-                detail: FlutterI18n.translate(
-                  context,
-                  "homepage.aircon_card.configure_hint",
-                ),
+                status: context.t.homepage.airconCard.notConfigured,
+                detail: context.t.homepage.airconCard.configureHint,
               )
             : state.map(
                 data: (aircon) => (
                   status: aircon.isOn
-                      ? FlutterI18n.translate(
-                          context,
-                          "homepage.aircon_card.running",
-                          translationParams: {
-                            "mode": FlutterI18n.translate(
-                              context,
-                              aircon.mode.labelKey,
-                            ),
-                            "temperature": aircon.targetTemperature.toString(),
-                          },
+                      ? context.t.homepage.airconCard.running(
+                          mode: context.t.resolveKey(aircon.mode.labelKey),
+                          temperature: aircon.targetTemperature.toString(),
                         )
-                      : FlutterI18n.translate(
-                          context,
-                          "homepage.aircon_card.power_off",
+                      : context.t.homepage.airconCard.powerOff,
+                  detail: aircon.indoorTemperature == null
+                      ? context.t.homepage.airconCard.wind(
+                          wind: context.t.resolveKey(aircon.windSpeed.labelKey),
+                        )
+                      : context.t.homepage.airconCard.indoorAndWind(
+                          temperature: aircon.indoorTemperature.toString(),
+                          wind: context.t.resolveKey(aircon.windSpeed.labelKey),
                         ),
-                  detail: FlutterI18n.translate(
-                    context,
-                    aircon.indoorTemperature == null
-                        ? "homepage.aircon_card.wind"
-                        : "homepage.aircon_card.indoor_and_wind",
-                    translationParams: {
-                      "temperature": aircon.indoorTemperature.toString(),
-                      "wind": FlutterI18n.translate(
-                        context,
-                        aircon.windSpeed.labelKey,
-                      ),
-                    },
-                  ),
                 ),
                 loading: () => waiting,
                 refreshing: () => waiting,
                 reloading: () => waiting,
                 error: (_, _) => (
-                  status: FlutterI18n.translate(
-                    context,
-                    "homepage.aircon_card.error",
-                  ),
+                  status: context.t.homepage.airconCard.error,
                   detail: openRemote,
                 ),
               );
@@ -89,7 +60,7 @@ class AirconCard extends StatelessWidget {
           onPressed: () => context.push(const AirconRemotePage()),
           isLoad: imei.isNotEmpty && state.isLoading,
           icon: Icons.ac_unit,
-          text: FlutterI18n.translate(context, "homepage.aircon_card.title"),
+          text: context.t.homepage.airconCard.title,
           infoText: Text(display.status, style: const TextStyle(fontSize: 20)),
           bottomText: Text(display.detail, overflow: TextOverflow.ellipsis),
         );

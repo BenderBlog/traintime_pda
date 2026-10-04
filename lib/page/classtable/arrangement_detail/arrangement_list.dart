@@ -59,7 +59,7 @@ class ArrangementList extends StatelessWidget {
           );
         } else if (classDetailState.information[i]
             is (CustomClass, CustomClassTimeRange)) {
-              // 颜色降级
+          // 颜色降级
           return CustomClassDetailCard(
             customClass: classDetailState.information[i].$1,
             timeRange: classDetailState.information[i].$2,

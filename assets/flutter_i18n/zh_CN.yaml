@@ -630,7 +630,7 @@ library:
 
     不借书就要变成上面的小呆瓜咯"
   borrow_list_info: 在借 {borrow} 本，其中已过期 {dued} 本
-  search_book_window: null
+  search_book_window: ""
   search_here: 在此搜索
   normal_search: 普通搜索
   advanced_search: 高级搜索
@@ -731,7 +731,7 @@ school_net:
   cache_hint_captcha_failed: 验证码识别失败，请重试。
   cache_hint_request_failed: 校园网请求失败，请稍后重试。
   wrong_password: 密码错误
-  error_fetch: 获取失败
+  error_fetch: 获取失败：{msg}
   error_other: 其他错误：{msg}
   refresh: 刷新
 school_card_window:
@@ -802,6 +802,38 @@ score:
     CET-4: 国家英语四级
     CET-6: 国家英语六级
 setting:
+  editor:
+    save: 保存
+    apply: 应用
+    password_set: 已设置
+    password_not_set: 未设置
+    password_visibility: 显示或隐藏密码
+    toggle_sign: 切换正负号
+    positive_number: 请输入大于 0 的整数
+    electricity_unit: 度
+    text_preview: 课程安排 · TrainTime PDA · 0123456789
+    brightness: 亮度
+    border_opacity: 边框透明度
+    fill_opacity: 底色透明度
+    fill_saturation: 底色饱和度
+    text_saturation: 文字饱和度
+    background_blur: 背景模糊程度
+    year: 年份
+    semester: 学期
+  sections:
+    display: 显示
+    language_and_text: 语言和文字
+    home: 首页
+    electricity: 电量提醒
+    timetable_appearance: 课表外观
+    semester: 学期与周次
+    course_data: 课程数据
+  navigation:
+    ui_description: 主题、字体、语言与首页显示
+    classtable_description: 课表外观、学期与课程数据
+    account_description: 校园服务的账号与密码
+    notifications_description: 课前提醒与通知管理
+    core_description: 日志、缓存清理与退出登录
   about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 关于
@@ -817,7 +849,7 @@ setting:
   current_testing: 目前您正在运行测试版
   fetch_failed: 获取更新信息失败
   ui_setting: 界面设置
-  brightness_setting: 设置深浅色
+  brightness_setting: 深浅色模式
   color_setting: 颜色设置
   font_size_setting: 字体大小与粗细
   font_size_page:
@@ -840,6 +872,8 @@ setting:
     title: 设置低电量阈值
     input_hint: 请输入电量度数
   account_setting: 账号设置
+  general_account_settings: 通用账号
+  undergraduate_system_accounts: 本科生系统账号
   sport_password_setting: 体育系统密码设置
   experiment_password_setting: 物理实验系统密码设置
   electricity_password_setting: 电费帐号密码设置
@@ -925,9 +959,10 @@ setting:
     cancel_all_success: 已取消所有课前提醒
     reschedule_success: 已重新安排 {count} 个课前提醒
     reschedule_failed: "重新安排通知失败: {error}"
-  notification_debug_page: 通知服务调试页面
+  notification_debug_page: 通知状态与测试
   classtable_setting: 课表相关设置
   background: 开启课表背景图
+  class_table_background_section: 课表背景
   no_background: 你先选个图片罢，就在下面
   background_blur: "背景模糊: {value}"
   background_blur_off: 关闭
@@ -993,9 +1028,10 @@ setting:
   change_brightness_dialog:
     title: 亮度设置
     follow_setting: 跟随系统
-    day_mode: 白天模式
-    night_mode: 黑夜模式
+    day_mode: 浅色
+    night_mode: 深色
   change_swift_dialog:
+    invalid_number: 请输入有效的整数
     title: 课程偏移设置
     input_hint: 请在此输入数字
   change_electricity_title: 修改电费帐号
@@ -1077,15 +1113,19 @@ setting:
   semester_update_data: 应用新学期设置中
   easter_egg_page: 你找到了彩蛋
   about_page:
+    contributors: 贡献者与致谢
+    licenses: 开源许可
+    extras: 更多
     benderblog: 主要开发者，iOS 小部件编写和拼接
-    alnair: 开发：图书馆搜索和封面
-    aqqkad: 开发：考勤历史记录
+    alnair: 开发：图书馆搜索和封面、图书馆布局修复、饮水机接水功能及接口适配
+    aqqkad: 开发：考勤历史记录、空调遥控、空调电费数据接入、图书馆新接口适配
     bellssgit: 支持：最佳&最久故障反馈者
     brackrat: 设计：主页，登录页，配色，iOS 小部件等
     breezeline: 支持：无价值无意义的产品经理(他自己的描述)
     cafebabe: 支持：提供彩蛋代码 / 开发：2026版本滑块验证码适配
     chitao1234: 开发：修复滑块不对齐问题
     copperkoi: 开发：系统日历最新课表同步
+    dami: 开发：修复 iOS 课程偏移负数输入及输入校验
     dimole: 开发支持：辅助修复滑块问题
     elitewars: 设计：体育成绩页面
     elliot: 国际化：软件英语翻译 / 开发指导：情侣课表功能开发指导（该功能已经被移除）
@@ -1096,11 +1136,13 @@ setting:
     hawa130: 设计：课程详情卡片
     hhzm: 开发：电费查询账号计算
     imaginary_17: "开发：睿思论坛路由修复"
-    imoscarz: 开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI
+    imoscarz: 开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI / 开发：设置页面分类重构及主从布局适配
     ka-mate-ka-ora: 国际化：软件英语翻译优化
+    l1angyun: 开发：空闲教室实时显示、课表背景模糊、课表布局与屏幕圆角适配；修复校园网数据展示
     lagrange-x: 开发：课程表时间进度展示（终版方案） / 开发：课程表上过课程灰度化和其他课程界面特性
     lhx-666-cool: 支持：Windows 和 Linux 构建脚本 / 开发：2026版本滑块验证码适配
     lichtyy: 设计：配色，空白页面贴图 / 开发：实验系统页面读取代码
+    littlestejan: 开发：校园网验证码刷新及验证码输入对话框优化
     lqsy-h: 支持：推文宣传图片制作
     lsy223622: 设计：iOS 和 Android 图标 / 支持：冠名 XDYou
     mrbrilliant2046: 支持：提供网络服务使用说明文档 / 国际化：优化英语翻译
@@ -1111,6 +1153,7 @@ setting:
     rrrilac: 开发支持：电费查询
     ray: 设计：开屏画面 / 支持：iOS 发行商 & 搭子课表 / 开发指导：情侣课表功能开发指导（该功能已经被移除） / 国际化：优化英语翻译
     shadowyingyi: 支持：两次鸽子公众号宣传
+    sixteenforever: 开发：HarmonyOS 移植
     stalomeow: 设计：首页时间轴 / 开发：异步登录 & 验证码预测
     xeonds: 设计：设置页面 / 开发：XDU Planet / 开发：校园卡付款码
     xingshuyu: 开发：修复物理实验获取问题和电费窗口问题
@@ -1386,6 +1429,7 @@ ruisi:
     daily_checkin: 每日签到
     settings: 设置
     about: 关于
+    search: 搜索
   login:
     title: 登录睿思
     username: 用户名
@@ -1440,6 +1484,7 @@ ruisi:
     sticky: 置顶
   forum_list:
     title: 论坛板块
+    empty: 睿思论坛版块分组为空
   favorites:
     title: 我的收藏
     empty: 暂无收藏
@@ -1469,3 +1514,9 @@ ruisi:
     title: 我的
     tab_profile: 资料
     unknown: 未知用户
+loadError: 加载错误
+course_reminder:
+  title: "课前提醒：{name}"
+  body: "{time} 分钟后开始上课"
+  location: "地点：{location}"
+  teacher: "教师：{teacher}"

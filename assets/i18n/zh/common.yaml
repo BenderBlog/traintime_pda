@@ -1,0 +1,117 @@
+drag_text: 上拉获取更多数据
+ready_text: 正在加载......
+processing_text: 正在处理......
+processed_text: 请求成功
+no_more_text: 没有更多数据
+failed_text: 数据获取失败
+choose_semester: 选择学期
+error_detected: Ouch! 发生错误啦
+click_to_refresh: 点我刷新
+confirm_title: 确认？
+cancel: 取消
+confirm: 确定
+network_error: 网络错误，可能是没联网，可能是学校服务器出现了故障:-P
+error_detect: 遇到错误，请查看日志
+query_failed: 查询失败
+not_school_network: 没有在校园网环境
+cancel_exam: 取消考试资格:P
+no_info: 没有信息
+catcher_detected: 发生错误
+catcher_description: 详情如下
+new_homepage_hint: 本程序将开发一个新主页，目前先用猪图秀占位，玩得愉快
+local_cache_hint: 本地缓存获取于 {datetime}
+inapp_cache_hint: '程序内缓存获取于 {datetime}
+
+  缓存退出程序后失效！'
+cache_reason_default: 当前显示缓存数据。
+easter_egg_apple: '=== 带我飞向月亮吧 ===
+
+  歌声演绎：Frank Sintara, 1964
+
+
+  带我飞向月亮吧
+
+  让我和星星共舞嬉戏
+
+
+  我好想知道
+
+  木星和火星上的春天
+
+  是什么颜色的
+
+
+  让你的歌声温暖我的心
+
+  我会一直歌唱下去
+
+
+  我日夜都在想你和牵挂你
+
+  请你真心接受我 我爱你
+
+
+  === 沉浸在你的爱意中 ===
+
+  吉他演奏：Earl Klugh, 1976
+
+
+  无法忘怀这种感觉，被你的爱包裹的温暖
+
+  不想失去这种感觉，被你的爱抚摸的舒适
+
+  你让我感到好自在，被你的爱托举的坚强
+
+  想一直在你怀中，沉浸在你的爱意中
+
+  我不敢向你说出，我对你的心意和爱
+
+  '
+easter_egg_others: '=== 百变小樱魔术卡之小樱卡篇主题曲 ===
+
+  歌声演绎：Maaya Sakamoto, 2000
+
+  （原歌词为日文，按照英语翻译二翻）
+
+
+  I am a dreamer, 有无限的力量
+
+
+  我的世界有梦想、热爱与踌躇
+
+  但有些东西，我依旧无法想象
+
+  我想向着广阔的天空，寻求自己的方向
+
+
+  我要追求自己的梦想
+
+  努力让自己的心愿成真
+
+  虽困难重重也要继续前行
+
+
+  等待奇迹 等待美好
+
+  用心感受这个世界
+
+  最终 一定会出乎意料
+
+
+  === 沉浸在你的爱意中 ===
+
+  吉他演奏：Earl Klugh, 1976
+
+
+  无法忘怀这种感觉，被你的爱包裹的温暖
+
+  不想失去这种感觉，被你的爱抚摸的舒适
+
+  你让我感到好自在，被你的爱托举的坚强
+
+  想躺在你的怀中，沉浸在你的爱意
+
+  而且，我不敢想你说出，我现在的心意
+
+  '
+loadError: 加载错误

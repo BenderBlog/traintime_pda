@@ -2,6 +2,9 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
@@ -10,7 +13,7 @@ import 'dart:ui' show BlurStyle, ImageFilter, MaskFilter;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:intl/intl.dart';
 
 import 'package:styled_widget/styled_widget.dart';
@@ -167,6 +170,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       return const SizedBox.shrink();
     }
 
+    final viewport = MediaQuery.sizeOf(context);
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final cacheWidth = (math.max(viewport.width, viewport.height) * pixelRatio)
+        .round()
+        .clamp(1, 2560)
+        .toInt();
+    final imageRevision =
+        "${image.lengthSync()}:${image.lastModifiedSync().microsecondsSinceEpoch}";
+
     final blur = preference
         .getDouble(preference.Preference.classTableBackgroundBlur)
         .clamp(0.0, maxClassTableBackgroundBlur)
@@ -174,7 +186,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     Widget layer = Image.file(
       image,
+      key: ValueKey("${image.path}:$imageRevision"),
       fit: BoxFit.cover,
+      cacheWidth: cacheWidth,
       gaplessPlayback: true,
       opacity: AlwaysStoppedAnimation<double>(
         Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
@@ -266,7 +280,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     final errorWithCacheSources = state.errorWithCacheSources;
 
     String sourceLabel(ClassTableStatusSource source) =>
-        FlutterI18n.translate(context, switch (source) {
+        context.t.resolveKey(switch (source) {
           ClassTableStatusSource.classTable =>
             "classtable.status_source.class_table",
           ClassTableStatusSource.exam => "classtable.status_source.exam",
@@ -276,7 +290,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             "classtable.status_source.other_experiment",
         });
 
-    String? sourceHintKey(ClassTableStatusSource source) => switch (source) {
+    CacheHint? sourceHintKey(ClassTableStatusSource source) => switch (source) {
       ClassTableStatusSource.classTable => state.classTableCacheHintKey,
       ClassTableStatusSource.exam => state.examCacheHintKey,
       ClassTableStatusSource.physicsExperiment =>
@@ -287,36 +301,28 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     final content = <String>[
       if (errorWithoutCacheSources.isNotEmpty)
-        FlutterI18n.translate(
-          context,
-          "classtable.status_banner.error_summary",
-          translationParams: {
-            "sources": errorWithoutCacheSources.map(sourceLabel).join("、"),
-          },
+        context.t.classtable.statusBanner.errorSummary(
+          sources: errorWithoutCacheSources.map(sourceLabel).join("、"),
         ),
       ...errorWithoutCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
-            ? FlutterI18n.translate(context, hintKey)
-            : FlutterI18n.translate(context, "network_error");
+            ? hintKey.resolve(context.t)
+            : context.t.common.networkError;
         return "${sourceLabel(source)}: $detail";
       }),
       if (errorWithoutCacheSources.isNotEmpty &&
           errorWithCacheSources.isNotEmpty)
         "",
       if (errorWithCacheSources.isNotEmpty)
-        FlutterI18n.translate(
-          context,
-          "classtable.status_banner.cache",
-          translationParams: {
-            "sources": errorWithCacheSources.map(sourceLabel).join("、"),
-          },
+        context.t.classtable.statusBanner.cache(
+          sources: errorWithCacheSources.map(sourceLabel).join("、"),
         ),
       ...errorWithCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
-            ? FlutterI18n.translate(context, hintKey)
-            : FlutterI18n.translate(context, "network_error");
+            ? hintKey.resolve(context.t)
+            : context.t.common.networkError;
         return "${sourceLabel(source)}: $detail";
       }),
     ].join("\n");
@@ -324,14 +330,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
-          FlutterI18n.translate(context, "classtable.error_dialog_title"),
-        ),
+        title: Text(context.t.classtable.errorDialogTitle),
         content: Text(content),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(FlutterI18n.translate(context, "confirm")),
+            child: Text(context.t.common.confirm),
           ),
         ],
       ),
@@ -353,10 +357,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           builder: (context) => StatefulBuilder(
             builder: (context, setDialogState) => AlertDialog(
               title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.class_table_style_page.current_time_settings_title",
-                ),
+                context.t.setting.classTableStylePage.currentTimeSettingsTitle,
               ),
               content: SizedBox(
                 width: 420,
@@ -368,10 +369,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.show_current_time_indicator",
-                          ),
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .showCurrentTimeIndicator,
                         ),
                         value: enabled,
                         onChanged: (value) =>
@@ -380,10 +382,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.show_current_time_label",
-                          ),
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .showCurrentTimeLabel,
                         ),
                         value: showTimeLabel,
                         onChanged: enabled
@@ -394,10 +397,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.show_today_column_highlight",
-                          ),
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .showTodayColumnHighlight,
                         ),
                         value: showTodayColumnHighlight,
                         onChanged: (value) => setDialogState(
@@ -411,11 +415,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(FlutterI18n.translate(context, "cancel")),
+                  child: Text(context.t.common.cancel),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(FlutterI18n.translate(context, "confirm")),
+                  child: Text(context.t.common.confirm),
                 ),
               ],
             ),
@@ -461,10 +465,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           builder: (context) => StatefulBuilder(
             builder: (context, setDialogState) => AlertDialog(
               title: Text(
-                FlutterI18n.translate(
-                  context,
-                  "setting.class_table_style_page.class_color_settings_title",
-                ),
+                context.t.setting.classTableStylePage.classColorSettingsTitle,
               ),
               content: SizedBox(
                 width: 420,
@@ -476,10 +477,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.completed_style_enabled",
-                          ),
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .completedStyleEnabled,
                         ),
                         value: completedEnabled,
                         onChanged: (value) =>
@@ -487,20 +489,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       ),
                       const Divider(height: 24),
                       Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.class_table_style_page.unfinished_section",
-                        ),
+                        context.t.setting.classTableStylePage.unfinishedSection,
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.class_table_style_page.active_brightness_factor",
-                          translationParams: {
-                            "value": _formatPercent(activeBrightnessFactor),
-                          },
-                        ),
+                        context.t.setting.classTableStylePage
+                            .activeBrightnessFactor(
+                              value: _formatPercent(activeBrightnessFactor),
+                            ),
                       ),
                       Slider(
                         value: activeBrightnessFactor,
@@ -512,12 +508,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         ),
                       ),
                       Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.class_table_style_page.active_border_alpha",
-                          translationParams: {
-                            "value": _formatPercent(activeBorderAlpha),
-                          },
+                        context.t.setting.classTableStylePage.activeBorderAlpha(
+                          value: _formatPercent(activeBorderAlpha),
                         ),
                       ),
                       Slider(
@@ -529,12 +521,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                             setDialogState(() => activeBorderAlpha = value),
                       ),
                       Text(
-                        FlutterI18n.translate(
-                          context,
-                          "setting.class_table_style_page.active_inner_alpha",
-                          translationParams: {
-                            "value": _formatPercent(activeInnerAlpha),
-                          },
+                        context.t.setting.classTableStylePage.activeInnerAlpha(
+                          value: _formatPercent(activeInnerAlpha),
                         ),
                       ),
                       Slider(
@@ -548,22 +536,20 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       if (completedEnabled) ...[
                         const Divider(height: 24),
                         Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.completed_section",
-                          ),
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .completedSection,
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.completed_saturation_factor",
-                            translationParams: {
-                              "value": _formatPercent(
-                                completedSaturationFactor,
+                          context.t.setting.classTableStylePage
+                              .completedSaturationFactor(
+                                value: _formatPercent(
+                                  completedSaturationFactor,
+                                ),
                               ),
-                            },
-                          ),
                         ),
                         Slider(
                           value: completedSaturationFactor,
@@ -575,15 +561,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           ),
                         ),
                         Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.completed_brightness_factor",
-                            translationParams: {
-                              "value": _formatPercent(
-                                completedBrightnessFactor,
+                          context.t.setting.classTableStylePage
+                              .completedBrightnessFactor(
+                                value: _formatPercent(
+                                  completedBrightnessFactor,
+                                ),
                               ),
-                            },
-                          ),
                         ),
                         Slider(
                           value: completedBrightnessFactor,
@@ -595,15 +578,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           ),
                         ),
                         Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.completed_text_saturation_factor",
-                            translationParams: {
-                              "value": _formatPercent(
-                                completedTextSaturationFactor,
+                          context.t.setting.classTableStylePage
+                              .completedTextSaturationFactor(
+                                value: _formatPercent(
+                                  completedTextSaturationFactor,
+                                ),
                               ),
-                            },
-                          ),
                         ),
                         Slider(
                           value: completedTextSaturationFactor,
@@ -615,13 +595,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           ),
                         ),
                         Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.completed_border_alpha",
-                            translationParams: {
-                              "value": _formatPercent(completedBorderAlpha),
-                            },
-                          ),
+                          context.t.setting.classTableStylePage
+                              .completedBorderAlpha(
+                                value: _formatPercent(completedBorderAlpha),
+                              ),
                         ),
                         Slider(
                           value: completedBorderAlpha,
@@ -633,13 +610,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           ),
                         ),
                         Text(
-                          FlutterI18n.translate(
-                            context,
-                            "setting.class_table_style_page.completed_inner_alpha",
-                            translationParams: {
-                              "value": _formatPercent(completedInnerAlpha),
-                            },
-                          ),
+                          context.t.setting.classTableStylePage
+                              .completedInnerAlpha(
+                                value: _formatPercent(completedInnerAlpha),
+                              ),
                         ),
                         Slider(
                           value: completedInnerAlpha,
@@ -657,11 +631,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(FlutterI18n.translate(context, "cancel")),
+                  child: Text(context.t.common.cancel),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(FlutterI18n.translate(context, "confirm")),
+                  child: Text(context.t.common.confirm),
                 ),
               ],
             ),
@@ -700,71 +674,41 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "classtable.page_title")),
+        title: Text(context.t.classtable.pageTitle),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
           if (hasError)
             IconButton(
               onPressed: _showLoadErrorDialog,
               icon: const Icon(Icons.error_outline),
-              tooltip: FlutterI18n.translate(context, "load_error"),
+              tooltip: context.t.classtable.errorDialogTitle,
             ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
               PopupMenuItem<String>(
                 value: 'A',
-                child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.popup_menu.not_arranged",
-                  ),
-                ),
+                child: Text(context.t.classtable.popupMenu.notArranged),
               ),
               PopupMenuItem<String>(
                 value: 'B',
-                child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.popup_menu.class_changed",
-                  ),
-                ),
+                child: Text(context.t.classtable.popupMenu.classChanged),
               ),
               PopupMenuItem<String>(
                 value: 'C',
-                child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.popup_menu.add_class",
-                  ),
-                ),
+                child: Text(context.t.classtable.popupMenu.addClass),
               ),
               PopupMenuItem<String>(
                 value: 'D',
-                child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.popup_menu.generate_ical",
-                  ),
-                ),
+                child: Text(context.t.classtable.popupMenu.generateIcal),
               ),
               PopupMenuItem<String>(
                 value: 'H',
-                child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.popup_menu.output_to_system",
-                  ),
-                ),
+                child: Text(context.t.classtable.popupMenu.outputToSystem),
               ),
               PopupMenuItem<String>(
                 value: 'I',
-                child: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "classtable.popup_menu.refresh_classtable",
-                  ),
-                ),
+                child: Text(context.t.classtable.popupMenu.refreshClasstable),
               ),
             ],
             onSelected: (String action) async {
@@ -818,23 +762,25 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "classtable.partner_classtable.share_dialog.title",
-                          ),
+                          context
+                              .t
+                              .classtable
+                              .partnerClasstable
+                              .shareDialog
+                              .title,
                         ),
                         content: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "classtable.partner_classtable.share_dialog.content",
-                          ),
+                          context
+                              .t
+                              .classtable
+                              .partnerClasstable
+                              .shareDialog
+                              .content,
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: Text(
-                              FlutterI18n.translate(context, "confirm"),
-                            ),
+                            child: Text(context.t.common.confirm),
                           ),
                         ],
                       ),
@@ -849,10 +795,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       //      Platform.isMacOS ||
                       //      Platform.isWindows) {
                       await FilePicker.saveFile(
-                        dialogTitle: FlutterI18n.translate(
-                          context,
-                          "classtable.partner_classtable.save_dialog.title",
-                        ),
+                        dialogTitle: context
+                            .t
+                            .classtable
+                            .partnerClasstable
+                            .saveDialog
+                            .title,
                         fileName: fileName,
                         allowedExtensions: ["ics"],
                         bytes: Uint8List.fromList(
@@ -884,20 +832,24 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     if (context.mounted) {
                       showToast(
                         context: context,
-                        msg: FlutterI18n.translate(
-                          context,
-                          "classtable.partner_classtable.save_dialog.success_message",
-                        ),
+                        msg: context
+                            .t
+                            .classtable
+                            .partnerClasstable
+                            .saveDialog
+                            .successMessage,
                       );
                     }
                   } on FileSystemException {
                     if (context.mounted) {
                       showToast(
                         context: context,
-                        msg: FlutterI18n.translate(
-                          context,
-                          "classtable.partner_classtable.save_dialog.failure_message",
-                        ),
+                        msg: context
+                            .t
+                            .classtable
+                            .partnerClasstable
+                            .saveDialog
+                            .failureMessage,
                       );
                     }
                   }
@@ -909,24 +861,20 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: Text(
-                              FlutterI18n.translate(
-                                context,
-                                "classtable.output_to_system.request_all_title",
-                              ),
+                              context
+                                  .t
+                                  .classtable
+                                  .outputToSystem
+                                  .requestAllTitle,
                             ),
                             content: Text(
-                              FlutterI18n.translate(
-                                context,
-                                "classtable.output_to_system.request_all",
-                              ),
+                              context.t.classtable.outputToSystem.requestAll,
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(true),
-                                child: Text(
-                                  FlutterI18n.translate(context, "confirm"),
-                                ),
+                                child: Text(context.t.common.confirm),
                               ),
                             ],
                           ),
@@ -936,8 +884,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         if (context.mounted) {
                           showToast(
                             context: context,
-                            msg: FlutterI18n.translate(
-                              context,
+                            msg: context.t.resolveKey(
                               data
                                   ? "classtable.output_to_system.success"
                                   : "classtable.output_to_system.failure",
@@ -950,18 +897,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       await showDialog<bool>(
                         context: context,
                         builder: (BuildContext context) => AlertDialog(
-                          title: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "setting.class_refresh_title",
-                            ),
-                          ),
-                          content: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "setting.class_refresh_content",
-                            ),
-                          ),
+                          title: Text(context.t.setting.classRefreshTitle),
+                          content: Text(context.t.setting.classRefreshContent),
                           actions: [
                             TextButton(
                               style: TextButton.styleFrom(
@@ -973,15 +910,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                                 ).colorScheme.onPrimary,
                               ),
                               onPressed: () => Navigator.pop(context, false),
-                              child: Text(
-                                FlutterI18n.translate(context, "cancel"),
-                              ),
+                              child: Text(context.t.common.cancel),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: Text(
-                                FlutterI18n.translate(context, "confirm"),
-                              ),
+                              child: Text(context.t.common.confirm),
                             ),
                           ],
                         ),
@@ -994,10 +927,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       if (context.mounted) {
                         showToast(
                           context: context,
-                          msg: FlutterI18n.translate(
-                            context,
-                            "classtable.refresh_classtable.success",
-                          ),
+                          msg: context.t.classtable.refreshClasstable.success,
                         );
                       }
                     });

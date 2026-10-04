@@ -3,15 +3,22 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 /// The index row of the class table, shows the index of the day and the week.
 class ClassTableDateRow extends StatelessWidget {
   final List<DateTime> dateList = [];
-  ClassTableDateRow({super.key, required DateTime firstDay}) {
+  final double timeColumnWidth;
+  final double dayColumnWidth;
+
+  ClassTableDateRow({
+    super.key,
+    required DateTime firstDay,
+    required this.timeColumnWidth,
+    required this.dayColumnWidth,
+  }) {
     /// Here, we get the first day of the week, and generate the date row.
     dateList.addAll(List.generate(7, (i) => firstDay.add(Duration(days: i))));
   }
@@ -26,18 +33,18 @@ class ClassTableDateRow extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            FlutterI18n.translate(
-              context,
-              "classtable.month",
-              translationParams: {"month": dateList.first.month.toString()},
-            ),
+            context.t.classtable.month(month: dateList.first.month.toString()),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
               color: Theme.of(context).colorScheme.onSurface,
             ),
-          ).center().constrained(width: leftRow),
-          ...List.generate(7, (index) => WeekInfomation(time: dateList[index])),
+          ).center().constrained(width: timeColumnWidth),
+          ...List.generate(
+            7,
+            (index) =>
+                WeekInfomation(time: dateList[index], width: dayColumnWidth),
+          ),
         ],
       ),
     );
@@ -47,15 +54,15 @@ class ClassTableDateRow extends StatelessWidget {
 /// The week index info, shows the day and the week.
 class WeekInfomation extends StatelessWidget {
   final DateTime time;
-  const WeekInfomation({super.key, required this.time});
+  final double width;
+  const WeekInfomation({super.key, required this.time, required this.width});
 
   @override
   Widget build(BuildContext context) {
     bool isToday =
         (time.month == DateTime.now().month && time.day == DateTime.now().day);
-    BoxConstraints size = ClassTableState.of(context)!.constraints;
     return SizedBox(
-      width: (size.maxWidth - leftRow) / 7,
+      width: width,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

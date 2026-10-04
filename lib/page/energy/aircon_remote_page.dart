@@ -1,16 +1,19 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/page/public_widget/setting/setting_header.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
+import 'package:watermeter/page/setting/aircon_imei_page.dart';
 import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
 
 class AirconRemotePage extends StatefulWidget {
@@ -45,10 +48,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   }
 
   Future<void> _configure() async {
-    await showDialog<void>(
-      context: context,
-      builder: (context) => const AirconImeiDialog(),
-    );
+    await context.push<void>(const AirconImeiPage());
     if (!mounted) return;
     setState(() {
       _state = null;
@@ -150,10 +150,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         _pendingMatches = null;
       });
       _controller.setDeviceState(confirmedState);
-      showToast(
-        context: context,
-        msg: FlutterI18n.translate(context, "electricity.aircon_command_ok"),
-      );
+      showToast(context: context, msg: context.t.electricity.airconCommandOk);
     } catch (error) {
       if (!mounted || imei != _controller.imeiSignal.value) return;
       setState(() {
@@ -172,23 +169,18 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          FlutterI18n.translate(context, "electricity.aircon_remote"),
-        ),
+        title: Text(context.t.electricity.airconRemote),
         actions: [
           IconButton(
             onPressed: _isFetching ? null : _refreshDeviceState,
-            tooltip: FlutterI18n.translate(context, "electricity.update"),
+            tooltip: context.t.electricity.update,
             icon: const Icon(Icons.refresh),
           ),
           IconButton(
             onPressed: _isFetching || _pendingMatches != null
                 ? null
                 : _configure,
-            tooltip: FlutterI18n.translate(
-              context,
-              "setting.aircon_imei_title",
-            ),
+            tooltip: context.t.setting.airconImeiTitle,
             icon: const Icon(Icons.settings),
           ),
         ],
@@ -258,17 +250,14 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             ),
           ),
         SettingHeader(
-          title: FlutterI18n.translate(
-            context,
-            "electricity.aircon_control_section",
-          ),
+          title: context.t.electricity.airconControlSection,
           icon: Icons.power_settings_new,
         ),
         _AirconSegmentedSwitchGroup(
           items: [
             _AirconSwitchItem(
               icon: Icons.power_settings_new,
-              title: FlutterI18n.translate(context, "electricity.aircon_power"),
+              title: context.t.electricity.airconPower,
               value: state.isOn,
               onChanged: (value) => _sendCommand(
                 command: value
@@ -299,20 +288,11 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           onTap: (index) => _temperatureFocusNode.requestFocus(),
           itemBuilder: (context, index) => ListTile(
             leading: const Icon(Icons.device_thermostat),
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "electricity.aircon_target_temperature",
-              ),
-            ),
+            title: Text(context.t.electricity.airconTargetTemperature),
             subtitle: state.indoorTemperature != null
                 ? Text(
-                    FlutterI18n.translate(
-                      context,
-                      "electricity.aircon_indoor_temperature",
-                      translationParams: {
-                        "temperature": state.indoorTemperature.toString(),
-                      },
+                    context.t.electricity.airconIndoorTemperature(
+                      temperature: state.indoorTemperature.toString(),
                     ),
                   )
                 : null,
@@ -350,10 +330,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                           temperature > 32) {
                         showToast(
                           context: context,
-                          msg: FlutterI18n.translate(
-                            context,
-                            "electricity.aircon_temperature_range",
-                          ),
+                          msg: context.t.electricity.airconTemperatureRange,
                         );
                         return;
                       }
@@ -374,10 +351,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           ),
         ),
         SettingHeader(
-          title: FlutterI18n.translate(
-            context,
-            "electricity.aircon_operation_section",
-          ),
+          title: context.t.electricity.airconOperationSection,
           icon: Icons.settings_remote,
         ),
         M3ESegmentedList(
@@ -396,9 +370,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.ac_unit),
-                    title: Text(
-                      FlutterI18n.translate(context, "electricity.aircon_mode"),
-                    ),
+                    title: Text(context.t.electricity.airconMode),
                   ),
                   LayoutBuilder(
                     builder: (context, constraints) {
@@ -412,7 +384,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                             .map(
                               (mode) => M3EToggleButtonGroupAction(
                                 label: Text(
-                                  FlutterI18n.translate(context, mode.labelKey),
+                                  context.t.resolveKey(mode.labelKey),
                                 ),
                                 enabled: !busy,
                                 width: buttonWidth,
@@ -470,12 +442,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.air),
-                    title: Text(
-                      FlutterI18n.translate(
-                        context,
-                        "electricity.aircon_wind_speed",
-                      ),
-                    ),
+                    title: Text(context.t.electricity.airconWindSpeed),
                   ),
                   LayoutBuilder(
                     builder: (context, constraints) {
@@ -489,10 +456,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
                             .map(
                               (speed) => M3EToggleButtonGroupAction(
                                 label: Text(
-                                  FlutterI18n.translate(
-                                    context,
-                                    speed.labelKey,
-                                  ),
+                                  context.t.resolveKey(speed.labelKey),
                                 ),
                                 enabled: !busy,
                                 width: buttonWidth,
@@ -529,10 +493,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           ),
         ),
         SettingHeader(
-          title: FlutterI18n.translate(
-            context,
-            "electricity.aircon_other_settings_section",
-          ),
+          title: context.t.electricity.airconOtherSettingsSection,
           icon: Icons.tune,
         ),
         _AirconSegmentedSwitchGroup(
@@ -540,10 +501,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           items: [
             _AirconSwitchItem(
               icon: Icons.swap_vert,
-              title: FlutterI18n.translate(
-                context,
-                "electricity.aircon_vertical_swing",
-              ),
+              title: context.t.electricity.airconVerticalSwing,
               value: state.verticalSwing,
               onChanged: (value) => _sendCommand(
                 command: {"verticalSwing": value ? 1 : 0},
@@ -553,10 +511,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             ),
             _AirconSwitchItem(
               icon: Icons.air,
-              title: FlutterI18n.translate(
-                context,
-                "electricity.aircon_strong_mode",
-              ),
+              title: context.t.electricity.airconStrongMode,
               value: state.strongMode,
               onChanged: (value) => _sendCommand(
                 command: {
@@ -574,10 +529,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             ),
             _AirconSwitchItem(
               icon: Icons.local_fire_department,
-              title: FlutterI18n.translate(
-                context,
-                "electricity.aircon_electric_heating",
-              ),
+              title: context.t.electricity.airconElectricHeating,
               value: state.electricHeating,
               onChanged: (value) => _sendCommand(
                 command: {"electricHeating": value ? 1 : 0},
@@ -591,7 +543,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         //   ListTile(
         //     leading: const Icon(Icons.electric_bolt),
         //     title: Text(
-        //       FlutterI18n.translate(context, "electricity.aircon_amount"),
+        //       context.t.electricity.airconAmount,
         //     ),
         //     trailing: Text(state.electricAmount.toString()),
         //   ),
@@ -615,10 +567,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           children: [
             const Icon(Icons.ac_unit, size: 56),
             const SizedBox(height: 16),
-            Text(
-              FlutterI18n.translate(context, key),
-              textAlign: TextAlign.center,
-            ),
+            Text(context.t.resolveKey(key), textAlign: TextAlign.center),
             if (details != null) ...[
               const SizedBox(height: 8),
               Text(
@@ -631,7 +580,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
             FilledButton.icon(
               onPressed: onPressed,
               icon: Icon(actionIcon),
-              label: Text(FlutterI18n.translate(context, actionKey)),
+              label: Text(context.t.resolveKey(actionKey)),
             ),
           ],
         ),
@@ -668,6 +617,21 @@ class _AirconSegmentedSwitchGroup extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return M3ESegmentedColumn(
+      outerRadius: 28,
+      innerRadius: 6,
+      gap: 3,
+      color: colorScheme.surfaceContainerLow,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      selectionMode: M3ESelectionMode.multiple,
+      selectionTrigger: M3ESelectionTrigger.none,
+      isSelected: (index) => items[index].value,
+      selectedColor: colorScheme.primaryContainer.withValues(alpha: 0.4),
+      selectedRadius: 20,
+      pressedRadius: 4,
+      pressedScale: 0.98,
+      splashFactory: InkSparkle.splashFactory,
+      isEnabled: (index) => enabled,
+      onTap: (index) => items[index].onChanged(!items[index].value),
       children: [
         for (final item in items)
           Row(
@@ -690,21 +654,6 @@ class _AirconSegmentedSwitchGroup extends StatelessWidget {
             ],
           ),
       ],
-      outerRadius: 28,
-      innerRadius: 6,
-      gap: 3,
-      color: colorScheme.surfaceContainerLow,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      selectionMode: M3ESelectionMode.multiple,
-      selectionTrigger: M3ESelectionTrigger.none,
-      isSelected: (index) => items[index].value,
-      selectedColor: colorScheme.primaryContainer.withValues(alpha: 0.4),
-      selectedRadius: 20,
-      pressedRadius: 4,
-      pressedScale: 0.98,
-      splashFactory: InkSparkle.splashFactory,
-      isEnabled: (index) => enabled,
-      onTap: (index) => items[index].onChanged(!items[index].value),
     );
   }
 }

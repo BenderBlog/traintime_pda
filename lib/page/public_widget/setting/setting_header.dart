@@ -41,13 +41,12 @@ class SettingHeader extends StatelessWidget {
                 Icon(icon, size: 18, color: cs.primary),
                 const SizedBox(width: 6),
               ],
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: cs.primary,
-                  letterSpacing: 0.2,
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(color: cs.primary),
                 ),
               ),
             ],
@@ -56,40 +55,12 @@ class SettingHeader extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               subtitle!,
-              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
             ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-/// Reusable card container for playground control knobs.
-class ControlCard extends StatelessWidget {
-  const ControlCard({
-    super.key,
-    required this.children,
-    this.padding = const EdgeInsets.all(16.0),
-  });
-
-  final List<Widget> children;
-  final EdgeInsetsGeometry padding;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Card(
-      elevation: 0,
-      color: cs.surfaceContainerLow,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: padding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: children,
-        ),
       ),
     );
   }

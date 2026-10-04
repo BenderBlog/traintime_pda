@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class TimeSelector extends StatefulWidget {
   final int initialWeek;
@@ -49,121 +50,106 @@ class _TimeSelectorState extends State<TimeSelector> {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.schedule, color: widget.color, size: 16),
-                  Text(
-                    FlutterI18n.translate(
-                      context,
-                      "classtable.class_add.input_time_hint",
-                    ),
-                  ).textStyle(TextStyle(color: widget.color)).padding(left: 4),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Column(
+      child:
+          Column(
                 children: [
                   Row(
                     children: [
-                      Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.input_time_weekday_hint",
-                            ),
-                          )
+                      Icon(Icons.schedule, color: widget.color, size: 16),
+                      Text(context.t.classtable.classAdd.inputTimeHint)
                           .textStyle(TextStyle(color: widget.color))
-                          .center()
-                          .flexible(),
-                      Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.input_start_time_hint",
-                            ),
-                          )
-                          .textStyle(TextStyle(color: widget.color))
-                          .center()
-                          .flexible(),
-                      Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.input_end_time_hint",
-                            ),
-                          )
-                          .textStyle(TextStyle(color: widget.color))
-                          .center()
-                          .flexible(),
+                          .padding(left: 4),
                     ],
                   ),
-                  Row(
+                  const SizedBox(height: 8),
+                  Column(
                     children: [
-                      WheelChoose(
-                        changeBookIdCallBack: (choiceWeek) {
-                          setState(() => week = choiceWeek + 1);
-                          _notifyChange();
-                        },
-                        defaultPage: week - 1,
-                        options: List.generate(
-                          7,
-                          (index) => WheelChooseOptions(
-                            data: index,
-                            hint: getWeekString(context, index),
-                          ),
-                        ),
-                      ).flexible(),
-                      WheelChoose(
-                        changeBookIdCallBack: (choiceStart) {
-                          setState(() => start = choiceStart);
-                          _notifyChange();
-                        },
-                        defaultPage: start - 1,
-                        options: List.generate(
-                          11,
-                          (index) => WheelChooseOptions(
-                            data: index + 1,
-                            hint: FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.wheel_choose_hint",
-                              translationParams: {
-                                "index": (index + 1).toString(),
-                              },
+                      Row(
+                        children: [
+                          Text(
+                                context
+                                    .t
+                                    .classtable
+                                    .classAdd
+                                    .inputTimeWeekdayHint,
+                              )
+                              .textStyle(TextStyle(color: widget.color))
+                              .center()
+                              .flexible(),
+                          Text(context.t.classtable.classAdd.inputStartTimeHint)
+                              .textStyle(TextStyle(color: widget.color))
+                              .center()
+                              .flexible(),
+                          Text(context.t.classtable.classAdd.inputEndTimeHint)
+                              .textStyle(TextStyle(color: widget.color))
+                              .center()
+                              .flexible(),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          WheelChoose(
+                            changeBookIdCallBack: (choiceWeek) {
+                              setState(() => week = choiceWeek + 1);
+                              _notifyChange();
+                            },
+                            defaultPage: week - 1,
+                            options: List.generate(
+                              7,
+                              (index) => WheelChooseOptions(
+                                data: index,
+                                hint: getWeekString(context, index),
+                              ),
                             ),
-                          ),
-                        ),
-                      ).flexible(),
-                      WheelChoose(
-                        changeBookIdCallBack: (choiceStop) {
-                          setState(() => stop = choiceStop);
-                          _notifyChange();
-                        },
-                        defaultPage: stop - 1,
-                        options: List.generate(
-                          11,
-                          (index) => WheelChooseOptions(
-                            data: index + 1,
-                            hint: FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.wheel_choose_hint",
-                              translationParams: {
-                                "index": (index + 1).toString(),
-                              },
+                          ).flexible(),
+                          WheelChoose(
+                            changeBookIdCallBack: (choiceStart) {
+                              setState(() => start = choiceStart);
+                              _notifyChange();
+                            },
+                            defaultPage: start - 1,
+                            options: List.generate(
+                              11,
+                              (index) => WheelChooseOptions(
+                                data: index + 1,
+                                hint: context.t.classtable.classAdd
+                                    .wheelChooseHint(
+                                      index: (index + 1).toString(),
+                                    ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ).flexible(),
+                          ).flexible(),
+                          WheelChoose(
+                            changeBookIdCallBack: (choiceStop) {
+                              setState(() => stop = choiceStop);
+                              _notifyChange();
+                            },
+                            defaultPage: stop - 1,
+                            options: List.generate(
+                              11,
+                              (index) => WheelChooseOptions(
+                                data: index + 1,
+                                hint: context.t.classtable.classAdd
+                                    .wheelChooseHint(
+                                      index: (index + 1).toString(),
+                                    ),
+                              ),
+                            ),
+                          ).flexible(),
+                        ],
+                      ),
                     ],
                   ),
                 ],
+              )
+              .padding(all: 12)
+              .decorated(
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: widget.color.withValues(alpha: 0.25)),
               ),
-            ],
-          )
-          .padding(all: 12)
-          .decorated(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: widget.color.withValues(alpha: 0.25)),
-          ),
     );
   }
 }

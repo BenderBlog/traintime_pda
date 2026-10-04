@@ -1,0 +1,69 @@
+---
+title: 水電信息
+power_title: 電量信息
+cache_hint_account_missing: 未獲取到電費賬號，正在顯示緩存數據。
+cache_hint_account_parse_failed: 電費賬號解析失敗，正在顯示緩存數據。
+cache_hint_captcha_failed: 驗證碼校驗失敗，請重試。正在顯示緩存數據。
+cache_hint_password_wrong: 統一認證密碼錯誤或已失效，請更新密碼後重試。正在顯示緩存數據。
+cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
+cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
+cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
+cache_notice: 獲取時間
+account: 電費賬號
+remain_power: 電量額度
+owe_info: 欠費信息
+history: 歷史記錄
+daily_usage: 平均每日用量
+not_enough_data: 數據量不足以用於渲染
+info: 歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。
+fetching_hint: 正在獲取最新電費信息
+fetch_error: 電費信息獲取失敗，請重試
+date: 日期
+power: 該日0點電量
+update: 刷新信息
+water_usage_fetch_date: 獲取時間
+water_usage_read_before: 上次讀數
+water_usage_read_now: 本次讀數
+water_usage: 熱水用量
+water_title: 水費信息
+water_loading: 正在加載水費信息
+water_unavailable: 水費信息暫不可用，請點擊右上角刷新重試。
+water_empty: 暫無水費信息
+not_school_network: 非校園網訪問
+aircon_title: 空調用電
+aircon_imei: 空調 IMEI
+aircon_amount: 平臺用電量
+aircon_update_time: 更新時間
+aircon_waiting: 等待獲取空調用電信息
+aircon_error: 空調用電獲取失敗
+aircon_retry: 重試
+aircon_imei_missing: 掃描空調二維碼即可添加，也可以從相冊選擇二維碼圖片
+aircon_add_imei: 添加空調信息
+aircon_cache_notice: 當前顯示空調緩存數據，緩存時間：{time}
+power_metid_title: 電錶 {code}
+weter_metid_title: 水錶 {code}
+aircon_remote: 空調遙控
+aircon_control_error: 無法獲取空調狀態
+aircon_command_ok: 空調指令已執行
+aircon_control_section: 基本控制
+aircon_operation_section: 運行設定
+aircon_other_settings_section: 其他設定
+aircon_power: 電源
+aircon_target_temperature: 設定溫度
+aircon_temperature_range: 溫度必須在 18–32 ℃ 之間
+aircon_indoor_temperature: 室內溫度：{temperature} ℃
+aircon_mode: 運行模式
+aircon_mode_fan: 送風
+aircon_mode_heat: 制熱
+aircon_mode_cool: 製冷
+aircon_mode_dry: 除溼
+aircon_mode_auto: 自動
+aircon_wind_speed: 風速
+aircon_wind_auto: 自動
+aircon_wind_silent: 靜音
+aircon_wind_low: 低
+aircon_wind_medium: 中
+aircon_wind_high: 高
+aircon_vertical_swing: 上下掃風
+aircon_strong_mode: 強力模式
+aircon_electric_heating: 輔助電熱

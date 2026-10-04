@@ -606,14 +606,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  flutter_i18n:
-    dependency: "direct main"
-    description:
-      name: flutter_i18n
-      sha256: af7d625e4bfd04764d1554a6411d349dd62d4dc204105cc819a81a35a77bd9b6
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.37.1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -833,10 +825,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_android
-      sha256: "0a55d645a670d6ae11efa948f955ae904afa472f1344fc15a7ddacc20c1e7219"
+      sha256: "8a7823d5d3e884f7780829d85d92110d072bdcd9ed48e2be158d2abe91a912d4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.13+23"
+    version: "0.8.13+25"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -1381,6 +1373,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.30.1"
+  serial_csv:
+    dependency: transitive
+    description:
+      name: serial_csv
+      sha256: "2d62bb70cb3ce7251383fc86ea9aae1298ab1e57af6ef4e93b6a9751c5c268dd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.2"
   share_plus:
     dependency: "direct main"
     description:
@@ -1430,7 +1430,7 @@ packages:
     source: hosted
     version: "2.4.1"
   shared_preferences_platform_interface:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: shared_preferences_platform_interface
       sha256: "649dc798a33931919ea356c4305c2d1f81619ea6e92244070b520187b5140ef9"
@@ -1506,6 +1506,30 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  slang:
+    dependency: "direct main"
+    description:
+      name: slang
+      sha256: "6091c2b4cd9f663080ede24fde6bcb9ee43f9fad1f9eaa66e2801eee47684e24"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.19.2"
+  slang_build_runner:
+    dependency: "direct dev"
+    description:
+      name: slang_build_runner
+      sha256: f2b6c5fc1f5bc41de80b05e95e7d5d03b5c3041082877ce931fc7ba61cd08afe
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.19.0"
+  slang_flutter:
+    dependency: "direct main"
+    description:
+      name: slang_flutter
+      sha256: "2348a39432c48d7c890a2a1e3409b9faae3e49f117fe56d390d4236de8d064f4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.19.0"
   sliver_tools:
     dependency: transitive
     description:
@@ -1698,14 +1722,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
-  toml:
-    dependency: transitive
-    description:
-      name: toml
-      sha256: "35cd2a1351c14bd213f130f8efcbd3e0c18181bff0c8ca7a08f6822a2bede786"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.17.0"
   typed_data:
     dependency: transitive
     description:
@@ -1734,10 +1750,10 @@ packages:
     dependency: "direct main"
     description:
       name: url_launcher
-      sha256: f6a7e5c4835bb4e3026a04793a4199ca2d14c739ec378fdfe23fc8075d0439f8
+      sha256: e8cc955c97e06df9879140a1fe301f3d493f01b7c62dec7f46834be31d7e9fda
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.2"
+    version: "6.3.3"
   url_launcher_android:
     dependency: transitive
     description:
@@ -1890,14 +1906,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.1.0"
-  xml2json:
-    dependency: transitive
-    description:
-      name: xml2json
-      sha256: "0c1cb4e84105bdc3a8c67efc4673d317932f6fd7cc9a46cb4438bea375b7bb9b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.2.9"
   yaml:
     dependency: "direct dev"
     description:

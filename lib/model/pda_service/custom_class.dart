@@ -66,7 +66,7 @@ class CustomClass {
     this.classroom,
     required List<CustomClassTimeRange> timeRanges,
   }) : timeRanges = List<CustomClassTimeRange>.from(timeRanges)
-          ..sort((a, b) => a.startTime.compareTo(b.startTime)) {
+         ..sort((a, b) => a.startTime.compareTo(b.startTime)) {
     if (name.trim().isEmpty) {
       throw ArgumentError('Class name is required.');
     }

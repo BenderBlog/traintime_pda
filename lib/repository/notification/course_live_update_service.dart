@@ -10,10 +10,10 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
-import 'package:watermeter/generated/non_ui_i18n.g.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
 /// A single class which is shown while it is going on.
@@ -330,10 +330,10 @@ class CourseLiveUpdateService {
         periodText: periodText,
         timeText: "${_formatTime(previewStart)} - ${_formatTime(previewEnd)}",
         nextText: nextText,
-        upcomingText: NonUII18n.translate(
-          CourseReminderService().getCurrentLocale(),
-          "course_live_update.upcoming_start",
-        ),
+        upcomingText: Localization.fromPreference().resolved.appLocale
+            .buildSync()
+            .courseLiveUpdate
+            .upcomingStart,
         periods: periods,
       );
 
@@ -414,7 +414,7 @@ class CourseLiveUpdateService {
   List<CourseLiveUpdateEvent> collectEvents({required int daysToSchedule}) {
     final now = DateTime.now();
     final until = now.add(Duration(days: daysToSchedule));
-    final locale = CourseReminderService().getCurrentLocale();
+    final locale = Localization.fromPreference().resolved.appLocale.languageTag;
     final events = <CourseLiveUpdateEvent>[];
 
     final controller = ClassTableController.i;
@@ -523,16 +523,17 @@ class CourseLiveUpdateService {
     }
 
     return event.copyWith(
-      nextText: NonUII18n.translate(
-        locale,
-        "course_live_update.next_class",
-        translateParams: {
-          "time": _formatTime(next.start),
-          "location": next.location.isEmpty
-              ? NonUII18n.translate(locale, "course_live_update.no_location")
-              : next.location,
-        },
-      ),
+      nextText: AppLocaleUtils.parse(locale)
+          .buildSync()
+          .courseLiveUpdate
+          .nextClass(
+            time: _formatTime(next.start),
+            location: next.location.isEmpty
+                ? AppLocaleUtils.parse(
+                    locale,
+                  ).buildSync().courseLiveUpdate.noLocation
+                : next.location,
+          ),
     );
   }
 
@@ -549,6 +550,7 @@ class CourseLiveUpdateService {
   }) {
     final location = classroom?.trim() ?? "";
     final teacherName = teacher?.trim() ?? "";
+    final tr = AppLocaleUtils.parse(locale).buildSync();
 
     return CourseLiveUpdateEvent(
       id: _eventId(name, start),
@@ -562,22 +564,14 @@ class CourseLiveUpdateService {
       start: start,
       end: end,
       periodText: startPeriod == stopPeriod
-          ? NonUII18n.translate(
-              locale,
-              "course_live_update.period_single",
-              translateParams: {"start": "$startPeriod"},
-            )
-          : NonUII18n.translate(
-              locale,
-              "course_live_update.period",
-              translateParams: {"start": "$startPeriod", "stop": "$stopPeriod"},
+          ? tr.courseLiveUpdate.periodSingle(start: "$startPeriod")
+          : tr.courseLiveUpdate.period(
+              start: "$startPeriod",
+              stop: "$stopPeriod",
             ),
       timeText: "${_formatTime(start)} - ${_formatTime(end)}",
       location: location,
-      upcomingText: NonUII18n.translate(
-        locale,
-        "course_live_update.upcoming_start",
-      ),
+      upcomingText: tr.courseLiveUpdate.upcomingStart,
       periods: (stopPeriod - startPeriod + 1).clamp(1, 20),
     );
   }

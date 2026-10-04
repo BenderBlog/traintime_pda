@@ -40,10 +40,7 @@ extension BuildContextExt on BuildContext {
   }
 
   /// Push a named route. Skips if the top route already has the same name.
-  Future<T?> pushNamed<T extends Object?>(
-    String name, {
-    Object? arguments,
-  }) {
+  Future<T?> pushNamed<T extends Object?>(String name, {Object? arguments}) {
     final navigator = splitViewKey.currentState ?? Navigator.of(this);
     if (_isAlreadyOnRoute(navigator, name)) return Future.value(null);
     _currentDetailRoute = name;
@@ -87,12 +84,11 @@ extension BuildContextExt on BuildContext {
     RouteSettings? routeSettings,
     Offset? anchorPoint,
     TraversalEdgeBehavior? traversalEdgeBehavior,
-  }) =>
-      (splitViewKey.currentState ?? Navigator.of(this)).push(
-        DialogRoute(
-          context: splitViewKey.currentState?.context ?? this,
-          builder: (context) =>
-              Material(type: MaterialType.transparency, child: dialog),
-        ),
-      );
+  }) => (splitViewKey.currentState ?? Navigator.of(this)).push(
+    DialogRoute(
+      context: splitViewKey.currentState?.context ?? this,
+      builder: (context) =>
+          Material(type: MaterialType.transparency, child: dialog),
+    ),
+  );
 }

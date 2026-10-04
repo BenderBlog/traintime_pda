@@ -5,10 +5,10 @@
 // Library info card.
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/page/library/book_cover.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class BookInfoCard extends StatelessWidget {
   final BookInfo toUse;
@@ -43,7 +43,7 @@ class BookInfoCard extends StatelessWidget {
           TextSpan(
             children: [
               TextSpan(
-                text: FlutterI18n.translate(context, "library.author"),
+                text: context.t.library.author,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -51,9 +51,7 @@ class BookInfoCard extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text:
-                    toUse.author ??
-                    FlutterI18n.translate(context, "library.not_provided"),
+                text: toUse.author ?? context.t.library.notProvided,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -68,7 +66,7 @@ class BookInfoCard extends StatelessWidget {
           TextSpan(
             children: [
               TextSpan(
-                text: FlutterI18n.translate(context, "library.publish_house"),
+                text: context.t.library.publishHouse,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -76,9 +74,7 @@ class BookInfoCard extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text:
-                    toUse.publisherHouse ??
-                    FlutterI18n.translate(context, "library.not_provided"),
+                text: toUse.publisherHouse ?? context.t.library.notProvided,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -91,7 +87,7 @@ class BookInfoCard extends StatelessWidget {
           TextSpan(
             children: [
               TextSpan(
-                text: FlutterI18n.translate(context, "library.call_number"),
+                text: context.t.library.callNumber,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -124,10 +120,7 @@ class BookInfoCard extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: FlutterI18n.translate(
-                      context,
-                      "library.avaliable_borrow",
-                    ),
+                    text: context.t.library.avaliableBorrow,
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -155,7 +148,7 @@ class BookInfoCard extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: FlutterI18n.translate(context, "library.storage"),
+                    text: context.t.library.storage,
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

@@ -1,0 +1,33 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+title: 體育查詢
+class_info: 課程信息
+empty_class_info: 未查詢到課程信息
+test_score: 體測成績
+total_score: 四年總分
+total_score_label: 總分
+rank_label: 等級
+semester: '{year} 第{gradeType}'
+subject: 項目
+data: 數據
+score: 分數
+passed: 及格
+from_to: 第{start}節到第{stop}節
+score_string: '{score}分'
+situation_nopassword: 沒密碼
+situation_maintain: 系統維護
+situation_failed_login: 登錄失敗
+situation_query: 查詢失敗
+situation_network: 網絡故障
+situation_unknown: 未知故障{situation}
+situation_fetching: 正在獲取
+situation_error: '壞事: {situation}'
+cache_hint_missing_password: 請先填寫體育密碼後重試。
+cache_hint_credential_invalid: 體育登錄已失效，請更新體育密碼後重試。
+cache_hint_maintain: 體育服務正在維護中，請稍後重試。
+cache_hint_login_failed: 體育服務登錄失敗。
+cache_hint_query_failed: 體育信息查詢失敗。
+cache_hint_network: 體育服務網絡請求失敗。
+cache_hint_unknown: 在線獲取體育信息失敗。詳細錯誤請查看日誌。
+error_auth_expired: 體育登錄已失效，請重試。
+error_missing_password: 未填寫體育密碼
+error_credential_invalid: 體育登錄已失效，請更新體育密碼後重試。

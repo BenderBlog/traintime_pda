@@ -31,10 +31,7 @@ class ReXCard extends StatelessWidget {
     );
 
     if (item.onTap != null) {
-      return InkWell(
-        onTap: item.onTap,
-        child: text,
-      );
+      return InkWell(onTap: item.onTap, child: text);
     }
 
     return text;
@@ -83,7 +80,7 @@ class ReXCard extends StatelessWidget {
           child: bottomRow,
         ).padding(horizontal: _rem, top: 0.75 * _rem, bottom: _rem),
       ],
-    ).card(elevation: 0);
+    ).card(elevation: 0, clipBehavior: Clip.antiAlias);
   }
 }
 
@@ -92,11 +89,6 @@ class ReXCardRemaining {
   final Color? color;
   final bool isBold;
   final VoidCallback? onTap;
-  
-  ReXCardRemaining(
-    this.text, {
-    this.color,
-    this.isBold = false,
-    this.onTap,
-  });
+
+  ReXCardRemaining(this.text, {this.color, this.isBold = false, this.onTap});
 }

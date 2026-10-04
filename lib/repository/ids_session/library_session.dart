@@ -686,4 +686,7 @@ class LibrarySession extends IDSSession {
 class NotFetchLibraryException implements Exception {
   final String message;
   NotFetchLibraryException({this.message = "Error detected."});
+
+  @override
+  String toString() => message;
 }

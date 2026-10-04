@@ -1,0 +1,12 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+title: 校園卡流水信息
+income: 收入 {income}
+expense: 支出 {expense}
+select_range: 選擇日期：從 {startDay} 到 {endDay}
+store_name: 商戶名稱
+balance: 金額
+time_with_sum: 時間(共{sum}元)
+no_record: 未查詢到記錄，請修改日期後重試
+qr_code: 支付碼
+qr_code_error: 二維碼獲取失敗：{info}
+reload: 重新加載

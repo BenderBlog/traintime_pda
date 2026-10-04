@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 /*
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -13,84 +12,10 @@ import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/page/energy/electricity_average_usage_graph.dart';
 import 'package:watermeter/page/energy/aircon_remote_page.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/page/setting/aircon_imei_page.dart';
 import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
-
-class AirconEnergyCard extends StatelessWidget {
-  const AirconEnergyCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SignalBuilder(
-      builder: (context) {
-        final controller = AirconController.i;
-        final imei = controller.imeiSignal.value;
-        if (imei.isEmpty) {
-          return _buildMissingImeiCard(context);
-        }
-
-        return _buildEnergyCard(
-          context,
-          imei: imei,
-          state: controller.energyInfoStateSignal.value,
-          historyElectricityInfoList: controller.energyHistoryInfoList,
-          onRefresh: controller.refreshEnergyInfo,
-        );
-      },
-    );
-  }
-
-  Widget _buildMissingImeiCard(BuildContext context) {
-    return InfoCard(
-      iconData: Icons.ac_unit,
-      title: FlutterI18n.translate(context, "electricity.aircon_title"),
-      children: [
-        Text(
-          FlutterI18n.translate(context, "electricity.aircon_imei_missing"),
-          style: TextStyle(color: Theme.of(context).colorScheme.outline),
-        ).padding(vertical: 8, horizontal: 12),
-        FilledButton.icon(
-          onPressed: () => showDialog<void>(
-            context: context,
-            builder: (context) => const AirconImeiDialog(),
-          ),
-          icon: const Icon(Icons.add),
-          label: Text(
-            FlutterI18n.translate(context, "electricity.aircon_add_imei"),
-          ),
-        ).padding(horizontal: 12).width(double.infinity),
-      ],
-    );
-  }
-
-  Widget _buildEnergyCard(
-    BuildContext context, {
-    required String imei,
-    required AsyncState<FetchResult<AirconEnergyInfo>> state,
-    required List<ElectricityHistoryInfo> historyElectricityInfoList,
-    required VoidCallback onRefresh,
-  }) {
-    return InfoCard(
-      iconData: Icons.ac_unit,
-      title: FlutterI18n.translate(context, "electricity.aircon_title"),
-      icon: state is AsyncData<FetchResult<AirconEnergyInfo>>
-          ? Icons.refresh
-          : null,
-      buttonText: state is AsyncData<FetchResult<AirconEnergyInfo>>
-          ? FlutterI18n.translate(context, "electricity.update")
-          : null,
-      onTap: state is AsyncData<FetchResult<AirconEnergyInfo>>
-          ? onRefresh
-          : null,
-      children: [
-        FilledButton.icon(
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => const AirconRemotePage(),
-            ),
-          ),
-          icon: const Icon(Icons.settings_remote),
-          label: Text(
-            FlutterI18n.translate(context, "electricity.aircon_remote"),
+import 'package:watermeter/generated/translations.g.dart';
           ),
         ).padding(top: 12, horizontal: 12).width(double.infinity),
         state.map(
@@ -103,15 +28,9 @@ class AirconEnergyCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "electricity.aircon_cache_notice",
-                              translationParams: {
-                                "time": DateFormat(
-                                  "yyyy-MM-dd HH:mm",
-                                ).format(result.fetchTime),
-                              },
-                            ),
+                            context.t.electricity.airconCacheNotice(time: DateFormat(
+                                "yyyy-MM-dd HH:mm",
+                              ).format(result.fetchTime)),
                             style: TextStyle(
                               color: Colors.orange[800],
                               fontSize: 13,
@@ -130,26 +49,17 @@ class AirconEnergyCard extends StatelessWidget {
               SizedBox(height: 8),
               InfoItem(
                 icon: Icons.qr_code_2,
-                label: FlutterI18n.translate(
-                  context,
-                  "electricity.aircon_imei",
-                ),
+                label: context.t.electricity.airconImei,
                 value: imei,
               ),
               InfoItem(
                 icon: Icons.electric_bolt,
-                label: FlutterI18n.translate(
-                  context,
-                  "electricity.aircon_amount",
-                ),
+                label: context.t.electricity.airconAmount,
                 value: result.data.electricAmount.toString(),
               ),
               InfoItem(
                 icon: Icons.update,
-                label: FlutterI18n.translate(
-                  context,
-                  "electricity.aircon_update_time",
-                ),
+                label: context.t.electricity.airconUpdateTime,
                 value: DateFormat(
                   "yyyy-MM-dd HH:mm",
                 ).format(result.data.stateTime),
@@ -186,15 +96,13 @@ class AirconEnergyCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  FlutterI18n.translate(context, "electricity.aircon_error"),
+                  context.t.electricity.airconError,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
               TextButton(
                 onPressed: onRefresh,
-                child: Text(
-                  FlutterI18n.translate(context, "electricity.aircon_retry"),
-                ),
+                child: Text(context.t.electricity.airconRetry),
               ),
             ],
           ).padding(horizontal: 12),
