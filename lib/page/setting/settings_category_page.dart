@@ -1,7 +1,7 @@
 // Copyright 2026 Traintime PDA Authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
@@ -20,18 +20,17 @@ class SettingsCategoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(FlutterI18n.translate(context, titleKey))),
-      body: ListView(
-        shrinkWrap: true,
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        physics: ClampingScrollPhysics(),
-        children: [
-          Center(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          physics: const ClampingScrollPhysics(),
+          child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
               child: child,
             ),
           ),
-        ],
+        ),
       ),
     );
   }

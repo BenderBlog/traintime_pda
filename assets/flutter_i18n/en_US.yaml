@@ -876,6 +876,24 @@ score:
     CET-4: College English Test Band 4
     CET-6: College English Test Band 6
 setting:
+  editor:
+    save: Save
+    apply: Apply
+    password_set: Set
+    password_not_set: Not set
+    password_visibility: Show or hide password
+    toggle_sign: Toggle positive or negative
+    positive_number: Enter an integer greater than 0
+    electricity_unit: kWh
+    text_preview: Course schedule · TrainTime PDA · 0123456789
+    brightness: Brightness
+    border_opacity: Border opacity
+    fill_opacity: Fill opacity
+    fill_saturation: Fill saturation
+    text_saturation: Text saturation
+    background_blur: Background blur
+    year: Year
+    semester: Semester
   sections:
     display: Display
     language_and_text: Language and text

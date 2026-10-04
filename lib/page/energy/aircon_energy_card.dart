@@ -13,7 +13,8 @@ import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/page/energy/electricity_average_usage_graph.dart';
 import 'package:watermeter/page/energy/aircon_remote_page.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
-import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/page/setting/aircon_imei_page.dart';
 
 class AirconEnergyCard extends StatelessWidget {
   const AirconEnergyCard({super.key});
@@ -49,10 +50,7 @@ class AirconEnergyCard extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.outline),
         ).padding(vertical: 8, horizontal: 12),
         FilledButton.icon(
-          onPressed: () => showDialog<void>(
-            context: context,
-            builder: (context) => const AirconImeiDialog(),
-          ),
+          onPressed: () => context.push<void>(const AirconImeiPage()),
           icon: const Icon(Icons.add),
           label: Text(
             FlutterI18n.translate(context, "electricity.aircon_add_imei"),

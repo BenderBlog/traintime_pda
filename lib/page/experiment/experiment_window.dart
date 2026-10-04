@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/setting/password_setting_sheet.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
@@ -14,7 +16,7 @@ import 'package:watermeter/page/experiment/experiment_info_card.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
+
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
@@ -97,9 +99,10 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
               const SizedBox(height: 10),
               FilledButton(
                 onPressed: () async {
-                  final updated = await showDialog<bool>(
+                  final updated = await showPasswordSettingSheet(
                     context: context,
-                    builder: (context) => const ExperimentPasswordDialog(),
+                    preferenceKey: preference.Preference.experimentPassword,
+                    titleKey: 'setting.change_experiment_title',
                   );
                   if (updated != true || !context.mounted) return;
                   await PhysicsExperimentController.i.reloadPhysicsExperiment();

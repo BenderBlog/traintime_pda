@@ -1,6 +1,7 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +11,7 @@ import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/page/public_widget/setting/setting_header.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
+import 'package:watermeter/page/setting/aircon_imei_page.dart';
 import 'package:watermeter/repository/miscellaneous_session/aircon_session.dart';
 
 class AirconRemotePage extends StatefulWidget {
@@ -45,10 +46,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
   }
 
   Future<void> _configure() async {
-    await showDialog<void>(
-      context: context,
-      builder: (context) => const AirconImeiDialog(),
-    );
+    await context.push<void>(const AirconImeiPage());
     if (!mounted) return;
     setState(() {
       _state = null;

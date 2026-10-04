@@ -33,6 +33,7 @@ class CurrentTimeIndicatorSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
+      icon: Icons.schedule,
       title: FlutterI18n.translate(
         context,
         "setting.class_table_style_page.current_time_section",
@@ -40,6 +41,7 @@ class CurrentTimeIndicatorSettings extends StatelessWidget {
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
+            secondary: const Icon(Icons.schedule),
             title: Text(
               FlutterI18n.translate(
                 context,
@@ -50,6 +52,7 @@ class CurrentTimeIndicatorSettings extends StatelessWidget {
             onChanged: _onIndicatorChanged,
           ),
           SwitchListTile(
+            secondary: const Icon(Icons.label_outline),
             title: Text(
               FlutterI18n.translate(
                 context,
@@ -62,6 +65,7 @@ class CurrentTimeIndicatorSettings extends StatelessWidget {
                 : null,
           ),
           SwitchListTile(
+            secondary: const Icon(Icons.today),
             title: Text(
               FlutterI18n.translate(
                 context,

@@ -800,6 +800,24 @@ score:
     CET-4: 國家英語四級
     CET-6: 國家英語六級
 setting:
+  editor:
+    save: 儲存
+    apply: 套用
+    password_set: 已設定
+    password_not_set: 未設定
+    password_visibility: 顯示或隱藏密碼
+    toggle_sign: 切換正負號
+    positive_number: 請輸入大於 0 的整數
+    electricity_unit: 度
+    text_preview: 課程安排 · TrainTime PDA · 0123456789
+    brightness: 亮度
+    border_opacity: 邊框透明度
+    fill_opacity: 底色透明度
+    fill_saturation: 底色飽和度
+    text_saturation: 文字飽和度
+    background_blur: 背景模糊程度
+    year: 年份
+    semester: 學期
   sections:
     display: 顯示
     language_and_text: 語言與文字

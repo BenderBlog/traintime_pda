@@ -302,7 +302,7 @@ class _ClassTableViewState extends State<ClassTableView> {
       // Settings previews expand fully and use the page's outer scroll view.
       // The main timetable keeps its own viewport and vertical scrolling.
       if (widget.enableVerticalScrolling)
-        sheet.scrollable().expanded()
+        sheet.scrollable(physics: ClampingScrollPhysics()).expanded()
       else
         sheet,
     ].toColumn();

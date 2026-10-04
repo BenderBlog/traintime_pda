@@ -5,10 +5,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/setting/classtable_style_page/class_table_background_settings.dart';
 import 'package:watermeter/page/setting/classtable_style_page/class_card_style_settings.dart';
+import 'package:watermeter/page/setting/classtable_style_page/completed_class_style_settings.dart';
 import 'package:watermeter/page/setting/classtable_style_page/current_time_indicator_settings.dart';
-import 'package:watermeter/page/setting/class_table_preview.dart';
+import 'package:watermeter/page/classtable/class_table_preview.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ClassTableStylePage extends StatefulWidget {
@@ -49,50 +51,59 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
           FlutterI18n.translate(context, "setting.class_table_style_setting"),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.font_size_page.preview_title",
-                    ),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                Expanded(
-                  child: ClassTablePreview(
-                    loadStylePreferences: false,
-                    enableVerticalScrolling: true,
-                    backgroundBlur: _backgroundBlur,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            flex: 4,
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+      body: LayoutBuilder(
+        builder: ((context, constraints) {
+          bool isVertical = constraints.maxWidth < sheetMaxWidth * 2;
+          Widget classPreview = ClassTablePreview(
+            loadStylePreferences: false,
+            enableVerticalScrolling: true,
+            backgroundBlur: _backgroundBlur,
+          );
+          Widget settingColumn = SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               physics: const ClampingScrollPhysics(),
-              children: [
-                ClassTableBackgroundSettings(
-                  onChanged: _refreshPreview,
-                  onBlurChanged: _updatePreviewBlur,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
+                  child: Column(
+                    children: [
+                      ClassTableBackgroundSettings(
+                        onChanged: _refreshPreview,
+                        onBlurChanged: _updatePreviewBlur,
+                      ),
+                      CurrentTimeIndicatorSettings(onChanged: _refreshPreview),
+                      ClassCardStyleSettings(onChanged: _refreshPreview),
+                      CompletedClassStyleSettings(onChanged: _refreshPreview),
+                    ],
+                  ),
                 ),
-                CurrentTimeIndicatorSettings(onChanged: _refreshPreview),
-                ClassCardStyleSettings(onChanged: _refreshPreview),
-              ],
+              ),
             ),
-          ),
-        ],
+          );
+
+          if (isVertical) {
+            return Column(
+              children: [
+                Expanded(flex: isVertical ? 6 : 5, child: classPreview),
+                const Divider(height: 1),
+                Expanded(flex: isVertical ? 4 : 5, child: settingColumn),
+              ],
+            );
+          }
+
+          return Row(
+            children: [
+              Expanded(child: classPreview),
+              const VerticalDivider(width: 1),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: sheetMaxWidth * 0.8),
+                child: settingColumn,
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

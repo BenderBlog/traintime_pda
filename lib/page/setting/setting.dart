@@ -10,7 +10,8 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:m3e_core/m3e_core.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/setting/groups/about_section.dart';
 import 'package:watermeter/page/setting/groups/account_section.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/classtable_section.dart';
@@ -74,38 +75,44 @@ class _SettingWindowState extends State<SettingWindow>
         automaticallyImplyLeading: false,
         title: Text(FlutterI18n.translate(context, 'homepage.setting')),
       ),
-      body: ListView(
-        padding: EdgeInsets.all(16),
-        physics: ClampingScrollPhysics(),
-        children: [
-          const AboutSection(),
-          const SizedBox(height: 16),
-          M3ESegmentedList(
-            itemCount: categories.length,
-            padding: EdgeInsets.zero,
-            gap: 4,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              return ListTile(
-                key: ValueKey('settings-category-${category.id}'),
-                leading: Icon(category.icon),
-                title: Text(FlutterI18n.translate(context, category.titleKey)),
-                subtitle: Text(
-                  FlutterI18n.translate(
-                    context,
-                    'setting.navigation.${category.id}_description',
-                  ),
-                ),
-                onTap: () => context.pushReplacement(
-                  SettingsCategoryPage(
-                    titleKey: category.titleKey,
-                    child: category.child,
-                  ),
-                ),
-              );
-            },
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: sheetMaxWidth),
+          child: ListView(
+            padding: EdgeInsets.all(16),
+            physics: ClampingScrollPhysics(),
+            children: [
+              const AboutSection(),
+              const SizedBox(height: 16),
+              SettingSegmentedList(
+                items: categories
+                    .map(
+                      (category) => ListTile(
+                        key: ValueKey('settings-category-${category.id}'),
+                        leading: Icon(category.icon),
+                        title: Text(
+                          FlutterI18n.translate(context, category.titleKey),
+                        ),
+                        subtitle: Text(
+                          FlutterI18n.translate(
+                            context,
+                            'setting.navigation.${category.id}_description',
+                          ),
+                        ),
+                        trailing: const Icon(Icons.navigate_next),
+                        onTap: () => context.pushReplacement(
+                          SettingsCategoryPage(
+                            titleKey: category.titleKey,
+                            child: category.child,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

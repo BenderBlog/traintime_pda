@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -143,10 +144,33 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
                 _previewState.decorationName,
                 widget.backgroundBlur,
               ),
-              ClassTableView(
-                index: _previewState.currentWeek,
-                constraint: tableConstraint,
-                enableVerticalScrolling: widget.enableVerticalScrolling,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surface.withValues(alpha: 0.75),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                    constraints: BoxConstraints(minWidth: double.infinity),
+                    child: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "setting.font_size_page.preview_title",
+                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  Expanded(
+                    child: ClassTableView(
+                      index: _previewState.currentWeek,
+                      constraint: tableConstraint,
+                      enableVerticalScrolling: widget.enableVerticalScrolling,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -228,11 +252,11 @@ class _PreviewClassTableState extends ClassTableWidgetState {
       interactive: true,
     ),
     _PreviewCourse(
-      name: "Sketches Of Spain",
-      code: "Miles Davis",
-      number: "CS 1480",
-      teacher: "Teo Macero / Gil Evans",
-      classroom: "Columbia CBS",
+      name: "Give Me the Night",
+      code: "George Benson",
+      number: "HS 3453",
+      teacher: "Quincy Jones",
+      classroom: "Music Appreciation",
       placement: _PreviewPlacement(day: 3, start: 6, stop: 9),
       interactive: true,
     ),

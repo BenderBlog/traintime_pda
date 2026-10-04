@@ -3,7 +3,7 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:m3e_core/m3e_core.dart';
+import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
@@ -63,6 +63,7 @@ class CompletedClassStyleSettings extends StatelessWidget {
     final completedInner = CompletedClassStyleConfig.completedInnerAlpha;
 
     return SectionSettingScaffold(
+      icon: Icons.check_circle_outline,
       title: FlutterI18n.translate(
         context,
         "setting.class_table_style_page.completed_section",
@@ -70,6 +71,7 @@ class CompletedClassStyleSettings extends StatelessWidget {
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
+            secondary: const Icon(Icons.check_circle_outline),
             title: Text(
               FlutterI18n.translate(
                 context,
@@ -79,144 +81,74 @@ class CompletedClassStyleSettings extends StatelessWidget {
             value: completedEnabled,
             onChanged: _onCompletedStyleEnabledChanged,
           ),
-          ListTile(
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.completed_saturation_factor",
-                translationParams: {
-                  "value": _formatPercent(completedSaturation),
-                },
-              ),
+          SettingSliderTile(
+            leading: Icons.palette_outlined,
+            title: FlutterI18n.translate(
+              context,
+              'setting.editor.fill_saturation',
             ),
-            subtitle: SizedBox(
-              height: 48,
-              child: Transform.translate(
-                offset: const Offset(-10, 0),
-                child: M3ESlider(
-                  value: completedSaturation,
-                  min: 0.1,
-                  max: 1,
-                  divisions: 18,
-                  onChanged: completedEnabled
-                      ? _onCompletedSaturationChanged
-                      : null,
-                  onChangeEnd: completedEnabled
-                      ? _saveClassStyleSettings
-                      : null,
-                ),
-              ),
-            ),
+            formatValue: _formatPercent,
+            value: completedSaturation,
+            min: 0.1,
+            max: 1,
+            divisions: 18,
+            onChanged: completedEnabled ? _onCompletedSaturationChanged : null,
+            onChangeEnd: completedEnabled ? _saveClassStyleSettings : null,
           ),
-          ListTile(
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.completed_brightness_factor",
-                translationParams: {
-                  "value": _formatPercent(completedBrightness),
-                },
-              ),
-            ),
-            subtitle: SizedBox(
-              height: 48,
-              child: Transform.translate(
-                offset: const Offset(-10, 0),
-                child: M3ESlider(
-                  value: completedBrightness,
-                  min: 0.5,
-                  max: 1,
-                  divisions: 10,
-                  onChanged: completedEnabled
-                      ? _onCompletedBrightnessChanged
-                      : null,
-                  onChangeEnd: completedEnabled
-                      ? _saveClassStyleSettings
-                      : null,
-                ),
-              ),
-            ),
+          SettingSliderTile(
+            leading: Icons.brightness_6_outlined,
+            title: FlutterI18n.translate(context, 'setting.editor.brightness'),
+            formatValue: _formatPercent,
+            value: completedBrightness,
+            min: 0.5,
+            max: 1,
+            divisions: 10,
+            onChanged: completedEnabled ? _onCompletedBrightnessChanged : null,
+            onChangeEnd: completedEnabled ? _saveClassStyleSettings : null,
           ),
-          ListTile(
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.completed_text_saturation_factor",
-                translationParams: {
-                  "value": _formatPercent(completedTextSaturation),
-                },
-              ),
+          SettingSliderTile(
+            leading: Icons.format_color_text,
+            title: FlutterI18n.translate(
+              context,
+              'setting.editor.text_saturation',
             ),
-            subtitle: SizedBox(
-              height: 48,
-              child: Transform.translate(
-                offset: const Offset(-10, 0),
-                child: M3ESlider(
-                  value: completedTextSaturation,
-                  min: 0.1,
-                  max: 1,
-                  divisions: 18,
-                  onChanged: completedEnabled
-                      ? _onCompletedTextSaturationChanged
-                      : null,
-                  onChangeEnd: completedEnabled
-                      ? _saveClassStyleSettings
-                      : null,
-                ),
-              ),
-            ),
+            formatValue: _formatPercent,
+            value: completedTextSaturation,
+            min: 0.1,
+            max: 1,
+            divisions: 18,
+            onChanged: completedEnabled
+                ? _onCompletedTextSaturationChanged
+                : null,
+            onChangeEnd: completedEnabled ? _saveClassStyleSettings : null,
           ),
-          ListTile(
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.completed_border_alpha",
-                translationParams: {"value": _formatPercent(completedBorder)},
-              ),
+          SettingSliderTile(
+            leading: Icons.border_outer,
+            title: FlutterI18n.translate(
+              context,
+              'setting.editor.border_opacity',
             ),
-            subtitle: SizedBox(
-              height: 48,
-              child: Transform.translate(
-                offset: const Offset(-10, 0),
-                child: M3ESlider(
-                  value: completedBorder,
-                  min: 0.1,
-                  max: 1,
-                  divisions: 18,
-                  onChanged: completedEnabled
-                      ? _onCompletedBorderChanged
-                      : null,
-                  onChangeEnd: completedEnabled
-                      ? _saveClassStyleSettings
-                      : null,
-                ),
-              ),
-            ),
+            formatValue: _formatPercent,
+            value: completedBorder,
+            min: 0.1,
+            max: 1,
+            divisions: 18,
+            onChanged: completedEnabled ? _onCompletedBorderChanged : null,
+            onChangeEnd: completedEnabled ? _saveClassStyleSettings : null,
           ),
-          ListTile(
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.completed_inner_alpha",
-                translationParams: {"value": _formatPercent(completedInner)},
-              ),
+          SettingSliderTile(
+            leading: Icons.opacity,
+            title: FlutterI18n.translate(
+              context,
+              'setting.editor.fill_opacity',
             ),
-            subtitle: SizedBox(
-              height: 48,
-              child: Transform.translate(
-                offset: const Offset(-10, 0),
-                child: M3ESlider(
-                  value: completedInner,
-                  min: 0.1,
-                  max: 1,
-                  divisions: 18,
-                  onChanged: completedEnabled ? _onCompletedInnerChanged : null,
-                  onChangeEnd: completedEnabled
-                      ? _saveClassStyleSettings
-                      : null,
-                ),
-              ),
-            ),
+            formatValue: _formatPercent,
+            value: completedInner,
+            min: 0.1,
+            max: 1,
+            divisions: 18,
+            onChanged: completedEnabled ? _onCompletedInnerChanged : null,
+            onChangeEnd: completedEnabled ? _saveClassStyleSettings : null,
           ),
         ],
       ),

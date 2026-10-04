@@ -6,7 +6,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:m3e_core/m3e_core.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
@@ -132,90 +133,65 @@ class _ClassTableBackgroundSettingsState
 
   @override
   Widget build(BuildContext context) {
+    bool isBackgroundOn =
+        _hasBackground && preference.getBool(preference.Preference.decorated);
     return SectionSettingScaffold(
+      icon: Icons.wallpaper,
       title: FlutterI18n.translate(
         context,
         "setting.class_table_background_section",
       ),
       items: SettingSegmentedList(
         items: [
-          ListTile(
-            //leading: const Icon(MingCuteIcons.mgc_pic_line),
+          SwitchListTile(
+            secondary: const Icon(MingCuteIcons.mgc_pic_line),
             title: Text(FlutterI18n.translate(context, "setting.background")),
-            trailing: Switch(
-              value:
-                  _hasBackground &&
-                  preference.getBool(preference.Preference.decorated),
-              onChanged: (value) async {
-                if (value && !_hasBackground) {
-                  showToast(
-                    context: context,
-                    msg: FlutterI18n.translate(
-                      context,
-                      "setting.no_background",
-                    ),
-                  );
-                  return;
-                }
-                await preference.setBool(
-                  preference.Preference.decorated,
-                  value,
+            value: isBackgroundOn,
+            onChanged: (value) async {
+              if (value && !_hasBackground) {
+                showToast(
+                  context: context,
+                  msg: FlutterI18n.translate(context, "setting.no_background"),
                 );
-                if (mounted) widget.onChanged();
-              },
+                return;
+              }
+              await preference.setBool(preference.Preference.decorated, value);
+              if (mounted) widget.onChanged();
+            },
+          ),
+          SettingSliderTile(
+            leading: Icons.blur_on_sharp,
+            title: FlutterI18n.translate(
+              context,
+              'setting.editor.background_blur',
             ),
+            formatValue: (value) => value <= 0
+                ? FlutterI18n.translate(context, 'setting.background_blur_off')
+                : value.round().toString(),
+            value: _backgroundBlur,
+            min: 0,
+            max: maxClassTableBackgroundBlur,
+            divisions: maxClassTableBackgroundBlur.round(),
+            onChanged: isBackgroundOn
+                ? (value) {
+                    _backgroundBlur = value;
+                    widget.onBlurChanged(value);
+                  }
+                : null,
+            onChangeEnd: isBackgroundOn
+                ? (value) async {
+                    await preference.setDouble(
+                      preference.Preference.classTableBackgroundBlur,
+                      value,
+                    );
+                    if (!mounted) return;
+                    _backgroundBlur = value;
+                    widget.onChanged();
+                  }
+                : null,
           ),
           ListTile(
-            //leading: const Icon(Icons.blur_on_rounded),
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.background_blur",
-                translationParams: {
-                  "value": _backgroundBlur <= 0
-                      ? FlutterI18n.translate(
-                          context,
-                          "setting.background_blur_off",
-                        )
-                      : _backgroundBlur.round().toString(),
-                },
-              ),
-            ),
-            subtitle: SizedBox(
-              height: 48,
-              child: Transform.translate(
-                offset: const Offset(-10, 0),
-                child: M3ESlider(
-                  value: _backgroundBlur.clamp(
-                    0.0,
-                    maxClassTableBackgroundBlur,
-                  ),
-                  min: 0,
-                  max: maxClassTableBackgroundBlur,
-                  divisions: maxClassTableBackgroundBlur.round(),
-                  onChanged: _hasBackground
-                      ? (value) {
-                          _backgroundBlur = value;
-                          widget.onBlurChanged(value);
-                        }
-                      : null,
-                  onChangeEnd: _hasBackground
-                      ? (value) async {
-                          await preference.setDouble(
-                            preference.Preference.classTableBackgroundBlur,
-                            value,
-                          );
-                          if (!mounted) return;
-                          _backgroundBlur = value;
-                          widget.onChanged();
-                        }
-                      : null,
-                ),
-              ),
-            ),
-          ),
-          ListTile(
-            //leading: const Icon(MingCuteIcons.mgc_pic_2_line),
+            leading: const Icon(Icons.photo_album_outlined),
             title: Text(
               FlutterI18n.translate(context, "setting.choose_background"),
             ),

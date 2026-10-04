@@ -6,7 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/energy_controller.dart';
-import 'package:watermeter/page/setting/dialogs/low_electricity_threshold_dialog.dart';
+import 'package:watermeter/page/setting/numeric_setting_sheet.dart';
 
 class LowElectricityThresholdSettingView extends StatelessWidget {
   const LowElectricityThresholdSettingView({super.key});
@@ -35,10 +35,7 @@ class LowElectricityThresholdSettingView extends StatelessWidget {
           trailing: const Icon(Icons.navigate_next),
           onTap: enabled
               ? () async {
-                  await showDialog<int>(
-                    context: context,
-                    builder: (context) => LowElectricityThresholdDialog(),
-                  );
+                  await showElectricityThresholdSheet(context);
                 }
               : null,
         );
