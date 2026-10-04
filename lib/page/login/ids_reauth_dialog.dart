@@ -196,9 +196,8 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
                 onPressed: busy || _secondsRemaining > 0 ? null : _sendCode,
                 child: Text(
                   _secondsRemaining > 0
-                      ? _t('login.second_factor.resend_countdown').replaceFirst(
-                          '{seconds}',
-                          _secondsRemaining.toString(),
+                      ? context.t.login.secondFactor.resendCountdown(
+                          seconds: _secondsRemaining,
                         )
                       : _t('login.second_factor.send_code'),
                 ),
