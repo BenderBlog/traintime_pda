@@ -246,12 +246,14 @@ bool contains(Preference key) {
   return prefs.containsKey(key.key);
 }
 
+// These wrappers rely on SharedPreferencesWithCache's write-through cache.
+// Reloading after an individual write clears the entire cache during the
+// asynchronous platform read, so synchronous readers can briefly see defaults.
 Future<void> setString(Preference key, String value) async {
   if (key.type != 'String') {
     throw WrongTypeException;
   }
   await prefs.setString(key.key, value);
-  await prefs.reloadCache();
 }
 
 Future<void> setBool(Preference key, bool value) async {
@@ -259,7 +261,6 @@ Future<void> setBool(Preference key, bool value) async {
     throw WrongTypeException;
   }
   await prefs.setBool(key.key, value);
-  await prefs.reloadCache();
 }
 
 Future<void> setInt(Preference key, int value) async {
@@ -267,7 +268,6 @@ Future<void> setInt(Preference key, int value) async {
     throw WrongTypeException;
   }
   await prefs.setInt(key.key, value);
-  await prefs.reloadCache();
 }
 
 Future<void> setDouble(Preference key, double value) async {
@@ -275,17 +275,14 @@ Future<void> setDouble(Preference key, double value) async {
     throw WrongTypeException;
   }
   await prefs.setDouble(key.key, value);
-  await prefs.reloadCache();
 }
 
 Future<void> remove(Preference key) async {
   await prefs.remove(key.key);
-  await prefs.reloadCache();
 }
 
 Future<void> prefrenceClear() async {
   await prefs.clear();
-  await prefs.reloadCache();
 }
 
 int parseSemesterCodeToInt(String input) {

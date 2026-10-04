@@ -12,8 +12,10 @@ class PighubSession {
   Future<List<PigHubImage>> getPigImages() => NetworkClients.otherDio
       .get("$_urlBase/api/images?sort=0")
       .then(
-        (response) => (response.data["data"] as List<dynamic>)
-            .map((item) => PigHubImage.fromJson(item))
-            .toList(),
+        (response) =>
+            (response.data["data"] as List<dynamic>)
+                .map((item) => PigHubImage.fromJson(item))
+                .toList()
+              ..shuffle(),
       );
 }

@@ -77,7 +77,13 @@ class ChangeSwiftDialog extends StatelessWidget {
           onPressed: () async {
             final value = int.tryParse(_getNumberController.text);
             if (value == null) {
-              showToast(context: context, msg: "无法处理成数字！请检查输入");
+              showToast(
+                context: context,
+                msg: FlutterI18n.translate(
+                  context,
+                  "setting.change_swift_dialog.invalid_number",
+                ),
+              );
               return;
             }
             await WeekSwiftController.i.setWeekSwift(value);
