@@ -1107,15 +1107,19 @@ setting:
   semester_update_data: 应用新学期设置中
   easter_egg_page: 你找到了彩蛋
   about_page:
+    contributors: 贡献者与致谢
+    licenses: 开源许可
+    extras: 更多
     benderblog: 主要开发者，iOS 小部件编写和拼接
-    alnair: 开发：图书馆搜索和封面
-    aqqkad: 开发：考勤历史记录
+    alnair: 开发：图书馆搜索和封面、图书馆布局修复、饮水机接水功能及接口适配
+    aqqkad: 开发：考勤历史记录、空调遥控、空调电费数据接入、图书馆新接口适配
     bellssgit: 支持：最佳&最久故障反馈者
     brackrat: 设计：主页，登录页，配色，iOS 小部件等
     breezeline: 支持：无价值无意义的产品经理(他自己的描述)
     cafebabe: 支持：提供彩蛋代码 / 开发：2026版本滑块验证码适配
     chitao1234: 开发：修复滑块不对齐问题
     copperkoi: 开发：系统日历最新课表同步
+    dami: 开发：修复 iOS 课程偏移负数输入及输入校验
     dimole: 开发支持：辅助修复滑块问题
     elitewars: 设计：体育成绩页面
     elliot: 国际化：软件英语翻译 / 开发指导：情侣课表功能开发指导（该功能已经被移除）
@@ -1126,11 +1130,13 @@ setting:
     hawa130: 设计：课程详情卡片
     hhzm: 开发：电费查询账号计算
     imaginary_17: "开发：睿思论坛路由修复"
-    imoscarz: 开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI
+    imoscarz: 开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI / 开发：设置页面分类重构及主从布局适配
     ka-mate-ka-ora: 国际化：软件英语翻译优化
+    l1angyun: 开发：空闲教室实时显示、课表背景模糊、课表布局与屏幕圆角适配；修复校园网数据展示
     lagrange-x: 开发：课程表时间进度展示（终版方案） / 开发：课程表上过课程灰度化和其他课程界面特性
     lhx-666-cool: 支持：Windows 和 Linux 构建脚本 / 开发：2026版本滑块验证码适配
     lichtyy: 设计：配色，空白页面贴图 / 开发：实验系统页面读取代码
+    littlestejan: 开发：校园网验证码刷新及验证码输入对话框优化
     lqsy-h: 支持：推文宣传图片制作
     lsy223622: 设计：iOS 和 Android 图标 / 支持：冠名 XDYou
     mrbrilliant2046: 支持：提供网络服务使用说明文档 / 国际化：优化英语翻译
@@ -1141,6 +1147,7 @@ setting:
     rrrilac: 开发支持：电费查询
     ray: 设计：开屏画面 / 支持：iOS 发行商 & 搭子课表 / 开发指导：情侣课表功能开发指导（该功能已经被移除） / 国际化：优化英语翻译
     shadowyingyi: 支持：两次鸽子公众号宣传
+    sixteenforever: 开发：HarmonyOS 移植
     stalomeow: 设计：首页时间轴 / 开发：异步登录 & 验证码预测
     xeonds: 设计：设置页面 / 开发：XDU Planet / 开发：校园卡付款码
     xingshuyu: 开发：修复物理实验获取问题和电费窗口问题

@@ -95,6 +95,12 @@ const List<Developer> getDevelopers = [
     "https://copperkoi.cn/about",
   ),
   Developer(
+    "DaMi (Kangwenqiao)",
+    "https://avatars.githubusercontent.com/u/118408678",
+    "setting.about_page.dami",
+    "https://github.com/Kangwenqiao",
+  ),
+  Developer(
     "Dimole",
     "https://avatars.githubusercontent.com/u/24828354",
     "setting.about_page.dimole",
@@ -168,6 +174,12 @@ const List<Developer> getDevelopers = [
     "https://github.com/Ka-mate-ka-ora/",
   ),
   Developer(
+    "L1angYun",
+    "https://avatars.githubusercontent.com/u/76769653",
+    "setting.about_page.l1angyun",
+    "https://github.com/L1angYun",
+  ),
+  Developer(
     "Lagrange-X",
     "https://avatars.githubusercontent.com/u/110022915",
     "setting.about_page.lagrange-x",
@@ -184,6 +196,12 @@ const List<Developer> getDevelopers = [
     "https://avatars.githubusercontent.com/u/105974550",
     "setting.about_page.lichtyy",
     "https://github.com/lichtYy",
+  ),
+  Developer(
+    "littlestejan",
+    "https://avatars.githubusercontent.com/u/40530340",
+    "setting.about_page.littlestejan",
+    "https://github.com/littlestejan",
   ),
   Developer(
     "LQSY-H",
@@ -244,6 +262,12 @@ const List<Developer> getDevelopers = [
     "https://avatars.githubusercontent.com/u/42831635",
     "setting.about_page.shadowyingyi",
     "https://github.com/shadowyingyi",
+  ),
+  Developer(
+    "SixTeenForever",
+    "https://avatars.githubusercontent.com/u/184718848",
+    "setting.about_page.sixteenforever",
+    "https://github.com/16forever233",
   ),
   Developer(
     "stalomeow",

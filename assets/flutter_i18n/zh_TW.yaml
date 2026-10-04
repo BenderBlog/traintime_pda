@@ -1105,15 +1105,19 @@ setting:
   semester_update_data: 應用新學期設置中
   easter_egg_page: 你找到了彩蛋
   about_page:
+    contributors: 貢獻者與致謝
+    licenses: 開源授權
+    extras: 更多
     benderblog: 主要開發者，iOS 小部件編寫和拼接
-    alnair: 開發：圖書館搜索和封面
-    aqqkad: 開發：考勤歷史記錄
+    alnair: 開發：圖書館搜索和封面、圖書館佈局修復、飲水機接水功能及介面適配
+    aqqkad: 開發：考勤歷史記錄、空調遙控、空調電費資料接入、圖書館新介面適配
     bellssgit: 支持：最佳&最久故障反饋者
     brackrat: 設計：主頁，登錄頁，配色，iOS 小部件等
     breezeline: 支持：無價值無意義的產品經理(他自己的描述)
     cafebabe: 支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配
     chitao1234: 開發：修復滑塊不對齊問題
     copperkoi: 開發：系統日曆最新課表同步
+    dami: 開發：修復 iOS 課程偏移負數輸入及輸入校驗
     dimole: 開發支持：輔助修復滑塊問題
     elitewars: 設計：體育成績頁面
     elliot: 國際化：軟件英語翻譯 / 開發指導：情侶課表功能開發指導（該功能已經被移除）
@@ -1124,11 +1128,13 @@ setting:
     hawa130: 設計：課程詳情卡片
     hhzm: 開發：電費查詢賬號計算
     imaginary_17: 開發：睿思論壇路由修復
-    imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI
+    imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI / 開發：設定頁面分類重構及主從佈局適配
     ka-mate-ka-ora: 國際化：軟件英語翻譯優化
+    l1angyun: 開發：空閒教室即時顯示、課表背景模糊、課表佈局與螢幕圓角適配；修復校園網資料顯示
     lagrange-x: 開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性
     lhx-666-cool: 支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配
     lichtyy: 設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼
+    littlestejan: 開發：校園網驗證碼重新整理及驗證碼輸入對話框優化
     lqsy-h: 支持：推文宣傳圖片製作
     lsy223622: 設計：iOS 和 Android 圖標 / 支持：冠名 XDYou
     mrbrilliant2046: 支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯
@@ -1139,6 +1145,7 @@ setting:
     rrrilac: 開發支持：電費查詢
     ray: 設計：開屏畫面 / 支持：iOS 發行商 & 搭子課表 / 開發指導：情侶課表功能開發指導（該功能已經被移除） / 國際化：優化英語翻譯
     shadowyingyi: 支持：兩次鴿子公眾號宣傳
+    sixteenforever: 開發：HarmonyOS 移植
     stalomeow: 設計：首頁時間軸 / 開發：異步登錄 & 驗證碼預測
     xeonds: 設計：設置頁面 / 開發：XDU Planet / 開發：校園卡付款碼
     xingshuyu: 開發：修復物理實驗獲取問題和電費窗口問題
