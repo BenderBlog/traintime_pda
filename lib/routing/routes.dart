@@ -59,6 +59,20 @@ class Routes {
   }
 
   /// Build a [MaterialPageRoute] from a registered route name.
+  /// 给 context.push 这类直接推页面的地方用：
+  /// 有来源卡片（从首页卡片点进来）就套容器变形，否则保持原来那条 [MaterialPageRoute]。
+  static Route<T> routeFor<T extends Object?>(Widget page) {
+    final source = ContainerTransformSource.consume();
+    if (source == null) {
+      return MaterialPageRoute<T>(builder: (_) => page);
+    }
+    return containerTransformRoute<T>(
+      builder: (_) => page,
+      fromRect: source.fromRect,
+      fromRadius: source.fromRadius,
+    );
+  }
+
   /// 有来源卡片（从首页卡片点进来）才套容器变形，
   /// 其余一律用原来那条 [MaterialPageRoute] —— 不改变其它页面的老动效。
   static Route<T> resolveRoute<T extends Object?>(
