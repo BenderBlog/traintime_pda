@@ -587,6 +587,9 @@ class Translations$electricity$zh {
 	/// zh: '平台用电量'
 	String get airconAmount => '平台用电量';
 
+	/// zh: '室内温度'
+	String get airconIndoor => '室内温度';
+
 	/// zh: '更新时间'
 	String get airconUpdateTime => '更新时间';
 
@@ -5428,6 +5431,7 @@ extension on Translations {
 			'electricity.airconTitle' => '空调用电',
 			'electricity.airconImei' => '空调 IMEI',
 			'electricity.airconAmount' => '平台用电量',
+			'electricity.airconIndoor' => '室内温度',
 			'electricity.airconUpdateTime' => '更新时间',
 			'electricity.airconWaiting' => '等待获取空调用电信息',
 			'electricity.airconError' => '空调用电获取失败',
@@ -5623,9 +5627,9 @@ extension on Translations {
 			'homepage.classTableCard.scheduleFetchingInfoText' => '正在加载日程',
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加载失败',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暂无日程',
-			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			'homepage.classTableCard.allLoadingInfoText' => '全部加载中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加载中',
 			'homepage.classTableCard.partialErrorInfoText' => '部分数据加载失败',
@@ -6137,9 +6141,9 @@ extension on Translations {
 			'setting.changeSwiftDialog.inputHint' => '请在此输入数字',
 			'setting.changeSwiftDialog.invalidNumber' => '请输入有效的整数',
 			'setting.changeElectricityTitle' => '修改电费帐号',
-			'setting.changeElectricityAccount.title' => '修改电费帐号',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.title' => '修改电费帐号',
 			'setting.changeElectricityAccount.campus' => '校区',
 			'setting.changeElectricityAccount.northCampus' => '北校区',
 			'setting.changeElectricityAccount.southCampus' => '南校区',
