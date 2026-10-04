@@ -23,7 +23,9 @@ class SectionSettingScaffold extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title != null)
-          SettingHeader(title: title!, subtitle: subtitle, icon: icon),
+          SettingHeader(title: title!, subtitle: subtitle, icon: icon)
+        else
+          const SizedBox(height: 16),
         items,
       ],
     );

@@ -5,7 +5,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/setting/classtable_style_page/class_table_style_page.dart';
+import 'package:watermeter/page/setting/groups/classtable_section/classtable_style_page/class_table_style_page.dart';
 
 class ClassTableStyleTile extends StatelessWidget {
   const ClassTableStyleTile({super.key});

@@ -58,6 +58,7 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
   }
 
   Future<void> _loadNotifications() async {
+    if (_isLoading || !mounted) return;
     setState(() {
       _isLoading = true;
     });
@@ -79,34 +80,44 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
   }
 
   Future<void> _cancelNotification(int id) async {
+    if (_isLoading || !mounted) return;
+    setState(() => _isLoading = true);
     try {
       await _courseReminder.cancelNotification(id);
       if (mounted) {
         showToast(context: context, msg: '已取消通知 ID: $id');
       }
-      await _loadNotifications();
+      _allNotifications = await _courseReminder.getPendingNotifications();
     } catch (e) {
       if (mounted) {
         showToast(context: context, msg: '取消失败: $e');
       }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _cancelAll() async {
+    if (_isLoading || !mounted) return;
+    setState(() => _isLoading = true);
     try {
       await _courseReminder.cancelAllNotifications();
       if (mounted) {
         showToast(context: context, msg: '已清除所有通知');
       }
-      await _loadNotifications();
+      _allNotifications = await _courseReminder.getPendingNotifications();
     } catch (e) {
       if (mounted) {
         showToast(context: context, msg: '取消失败: $e');
       }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _sendTest() async {
+    if (_isLoading || !mounted) return;
+    setState(() => _isLoading = true);
     try {
       final now = DateTime.now();
       final testId = 99990;
@@ -128,15 +139,19 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
       if (mounted) {
         showToast(context: context, msg: '已安排测试通知(2秒后)');
       }
-      await _loadNotifications();
+      _allNotifications = await _courseReminder.getPendingNotifications();
     } catch (e) {
       if (mounted) {
         showToast(context: context, msg: '发送失败: $e');
       }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _createCustom() async {
+    if (_isLoading || !mounted) return;
+    var startedLoading = false;
     try {
       final idText = _idController.text.trim();
       if (idText.isEmpty) {
@@ -179,6 +194,8 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
         }
       }
 
+      setState(() => _isLoading = true);
+      startedLoading = true;
       await _courseReminder.scheduleNotification(
         id: id,
         title: title,
@@ -192,17 +209,23 @@ class _NotificationTestWidgetState extends State<NotificationTestWidget> {
       }
 
       // 清空表单
-      _idController.text = '99990';
-      _titleController.text = '测试通知标题';
-      _bodyController.text = '这是一条测试通知内容';
-      _delayController.text = '5';
-      _payloadController.text =
-          '{"type": "course_reminder","className": "test","weekIndex": 9}';
+      if (mounted) {
+        _idController.text = '99990';
+        _titleController.text = '测试通知标题';
+        _bodyController.text = '这是一条测试通知内容';
+        _delayController.text = '5';
+        _payloadController.text =
+            '{"type": "course_reminder","className": "test","weekIndex": 9}';
+      }
 
-      await _loadNotifications();
+      _allNotifications = await _courseReminder.getPendingNotifications();
     } catch (e) {
       if (mounted) {
         showToast(context: context, msg: '创建失败: $e');
+      }
+    } finally {
+      if (startedLoading && mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
