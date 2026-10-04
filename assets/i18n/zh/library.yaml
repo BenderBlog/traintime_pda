@@ -1,3 +1,4 @@
+---
 title: 图书馆信息
 borrow_state_title: 借书状态
 search_book_title: 查询藏书
@@ -19,16 +20,16 @@ avaliable_borrow: 可借
 storage: 馆藏
 on_shelve: 在架
 book_code: 书籍编号：{barCode}
-due_date: ' 到期'
-borrow_str: ' 借阅'
-after_due_date: ' 天前到期'
-before_due_date: ' 天后'
+due_date: " 到期"
+borrow_str: " 借阅"
+after_due_date: " 天前到期"
+before_due_date: " 天后"
 can_be_renewable: 续借
 cannot_be_renewable: 不可续借
 renewing: 正在续借
-empty_borrow_list: '目前没有查询到在借图书
-
-  不借书就要变成上面的小呆瓜咯'
+empty_borrow_list: |-
+  目前没有查询到在借图书
+  不借书就要变成上面的小呆瓜咯
 borrow_list_info: 在借 {borrow} 本，其中已过期 {dued} 本
 search_book_window: ''
 search_here: 在此搜索
@@ -47,3 +48,4 @@ publish_year_begin: 出版年起
 publish_year_end: 出版年止
 book_detail: 书籍详细信息
 no_result: 没有结果，请修改搜索参数或者开始你的搜索
+no_more_data: 没有更多结果了

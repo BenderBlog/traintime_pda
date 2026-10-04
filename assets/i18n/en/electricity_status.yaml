@@ -1,3 +1,4 @@
+---
 pending: Pending
 remain_fetching: Fetching...
 remain_network_issue: Network malfunction
@@ -13,3 +14,4 @@ need_more_info: Need to improve information on the payment platform
 need_account: Need to input electricity account
 captcha_failed: Failed to check captcha
 other_issue: Program malfunction
+no_electricity_info: No electricity meter info

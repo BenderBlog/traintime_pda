@@ -4,7 +4,7 @@
 
 // Score Window
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/score/score_page.dart';
@@ -23,9 +23,7 @@ class ScoreWindow extends StatelessWidget {
         builder: (context, state, _) {
           return Scaffold(
             appBar: AppBar(
-              title: Text(
-                context.t.score.scorePage.title,
-              ),
+              title: Text(context.t.score.scorePage.title),
               actions: [
                 if (state.state == ScoreFetchState.readyCache ||
                     state.state == ScoreFetchState.readyFresh)

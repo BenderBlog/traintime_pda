@@ -24,7 +24,7 @@ login_process:
   get_encrypt: 獲取密碼加密密鑰
   ready_login: 準備登錄
   slider: 登錄中
-  second_factor: 等待短信二次認證
+  second_factor: 等待二次認證
   after_process: 登錄後處理
   failed: 登錄失敗，響應狀態碼：{statusCode}
 no_info: 沒有信息
@@ -149,24 +149,6 @@ classtable:
     switch_semester: 切換課程表學期
     current_time_settings: 時間指示設置
     class_color_settings: 課表樣式設置
-  visual_settings:
-    current_time_settings_title: 時間指示設置
-    class_color_settings_title: 課表樣式設置
-    completed_style_enabled: 已結束課程樣式區分
-    current_time_section: 時間指示
-    show_current_time_indicator: 顯示當前時間指示線
-    show_current_time_label: 顯示迷你數字時鐘
-    show_today_column_highlight: 強調顯示今天的縱列
-    unfinished_section: 課程樣式
-    active_brightness_factor: '亮度: {value}'
-    active_border_alpha: '邊框透明度: {value}'
-    active_inner_alpha: '底色透明度: {value}'
-    completed_section: 已結束課程樣式
-    completed_saturation_factor: '底色飽和度: {value}'
-    completed_brightness_factor: '亮度: {value}'
-    completed_text_saturation_factor: '文字飽和度: {value}'
-    completed_border_alpha: '邊框透明度: {value}'
-    completed_inner_alpha: '底色透明度: {value}'
   status_source:
     class_table: 課表
     exam: 考試
@@ -306,6 +288,7 @@ club_promotion:
 electricity:
   title: 水電信息
   power_title: 電量信息
+  power_metid_title: 電錶 {code}
   cache_hint_login_failed: 登錄電費服務失敗，正在顯示緩存數據。
   cache_hint_network_failed: 電費服務網絡請求失敗，正在顯示緩存數據。
   cache_hint_unknown_error: 在線獲取電費失敗，正在顯示緩存數據。詳細錯誤請查看日誌。
@@ -316,21 +299,20 @@ electricity:
   history: 歷史記錄
   daily_usage: 平均每日用量
   not_enough_data: 數據量不足以用於渲染
-  info: '新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。
-
-    歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。'
+  info: 歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。
   fetching_hint: 正在獲取最新電費信息
-  fetch_error: 電費信息獲取失敗，請重試。
+  fetch_error: 電費信息獲取失敗，請重試
   date: 日期
   power: 該日0點電量
   update: 刷新信息
   water_usage_fetch_date: 獲取時間
   water_usage_read_before: 上次讀數
   water_usage_read_now: 本次讀數
-  water_usage: 洗澡水用量
+  water_usage: 熱水用量
   water_title: 水費信息
+  weter_metid_title: 水錶 {code}
   water_loading: 正在加載水費信息
-  water_unavailable: 水費信息暫不可用，請在電費卡片重試。
+  water_unavailable: 水費信息暫不可用，請點擊右上角刷新重試。
   water_empty: 暫無水費信息
   not_school_network: 非校園網訪問
   aircon_title: 空調用電
@@ -340,9 +322,34 @@ electricity:
   aircon_waiting: 等待獲取空調用電信息
   aircon_error: 空調用電獲取失敗
   aircon_retry: 重試
-  aircon_imei_missing: 尚未添加空調 IMEI，添加後即可查看空調用電信息。
-  aircon_add_imei: 添加空調 IMEI
+  aircon_imei_missing: 掃描空調二維碼即可添加，也可以從相冊選擇二維碼圖片
+  aircon_add_imei: 添加空調信息
   aircon_cache_notice: 當前顯示空調緩存數據，緩存時間：{time}
+  aircon_remote: 空調遙控
+  aircon_control_error: 無法獲取空調狀態
+  aircon_command_ok: 空調指令已執行
+  aircon_control_section: 基本控制
+  aircon_operation_section: 運行設定
+  aircon_other_settings_section: 其他設定
+  aircon_power: 電源
+  aircon_target_temperature: 設定溫度
+  aircon_temperature_range: 溫度必須在 18–32 ℃ 之間
+  aircon_indoor_temperature: 室內溫度：{temperature} ℃
+  aircon_mode: 運行模式
+  aircon_mode_fan: 送風
+  aircon_mode_heat: 制熱
+  aircon_mode_cool: 製冷
+  aircon_mode_dry: 除溼
+  aircon_mode_auto: 自動
+  aircon_wind_speed: 風速
+  aircon_wind_auto: 自動
+  aircon_wind_silent: 靜音
+  aircon_wind_low: 低
+  aircon_wind_medium: 中
+  aircon_wind_high: 高
+  aircon_vertical_swing: 上下掃風
+  aircon_strong_mode: 強力模式
+  aircon_electric_heating: 輔助電熱
 empty_classroom:
   title: 空閒教室
   date: 日期 {date}
@@ -351,6 +358,12 @@ empty_classroom:
   classroom: 教室
   empty: 空閒
   occupied: 佔用
+  now_ongoing: 現在 · 第 {period} 節 {start}-{end}
+  now_upcoming: 即將 · 第 {period} 節 {start}-{end}
+  now_free: 空閒 {free}/{total} 間
+  only_free_now: 只看現在空閒
+  no_free_now: 現在沒有空閒教室
+  classes_over: 今天的課已經結束了
 exam:
   title: 考試安排
   cache_hint: 已顯示緩存考試安排信息
@@ -489,6 +502,17 @@ homepage:
     title: 水電信息
     current_electricity: 餘額 {amount} 度
     cache_notice: 最後一次讀表：{date}
+  aircon_card:
+    title: 空調遙控
+    not_configured: 尚未配置空調
+    configure_hint: 點擊添加空調 IMEI
+    running: '{mode} · {temperature} ℃'
+    power_off: 空調已關閉
+    indoor_and_wind: 室內 {temperature} ℃ · 風速 {wind}
+    wind: 風速 {wind}
+    fetching: 正在獲取空調狀態
+    error: 空調狀態獲取失敗
+    open_remote: 點擊進入空調遙控
   library_card:
     title: 圖書借閱
     current_borrow: 借書 {count} 本
@@ -621,6 +645,7 @@ library:
   publish_year_end: 出版年止
   book_detail: 書籍詳細信息
   no_result: 沒有結果，請修改搜索參數或者開始你的搜索
+  no_more_data: 沒有更多結果了
 library_card:
   title: 圖書館當前狀況
   fetching: 正在獲取圖書館信息
@@ -649,16 +674,18 @@ login:
     refresh_failed: '刷新驗證碼失敗: {error}'
   slider_title: 服務器認證服務
   second_factor:
-    title: 短信二次認證
-    description: 學校要求完成二次認證。請先獲取短信驗證碼，再輸入驗證碼繼續登錄。
-    code: 短信驗證碼
-    empty_code: 請輸入短信驗證碼
+    title: 二次認證
+    description: 學校要求完成二次認證。請選擇驗證碼接收方式，獲取並輸入驗證碼後繼續登錄。
+    method: 驗證碼接收方式
+    sms: 短信驗證碼
+    enterprise_wechat: 企業微信驗證碼
+    empty_code: 請輸入驗證碼
     send_code: 獲取驗證碼
     resend_countdown: '{seconds} 秒後可重新獲取'
     trust_device: 信任此設備
     trust_device_hint: 開啟後學校可能在一段時間內不再要求本設備二次認證
     network_error: 二次認證請求失敗，請檢查網絡後重試
-    cancelled: 已取消短信二次認證
+    cancelled: 已取消二次認證
     expired: 二次認證已失效，請重新登錄
 school_net:
   title: 校園網使用詳情
@@ -773,6 +800,38 @@ score:
     CET-4: 國家英語四級
     CET-6: 國家英語六級
 setting:
+  editor:
+    save: 儲存
+    apply: 套用
+    password_set: 已設定
+    password_not_set: 未設定
+    password_visibility: 顯示或隱藏密碼
+    toggle_sign: 切換正負號
+    positive_number: 請輸入大於 0 的整數
+    electricity_unit: 度
+    text_preview: 課程安排 · TrainTime PDA · 0123456789
+    brightness: 亮度
+    border_opacity: 邊框透明度
+    fill_opacity: 底色透明度
+    fill_saturation: 底色飽和度
+    text_saturation: 文字飽和度
+    background_blur: 背景模糊程度
+    year: 年份
+    semester: 學期
+  sections:
+    display: 顯示
+    language_and_text: 語言與文字
+    home: 首頁
+    electricity: 電量提醒
+    timetable_appearance: 課表外觀
+    semester: 學期與週次
+    course_data: 課程資料
+  navigation:
+    ui_description: 主題、字體、語言與首頁顯示
+    classtable_description: 課表外觀、學期與課程資料
+    account_description: 校園服務的帳號與密碼
+    notifications_description: 課前提醒與通知管理
+    core_description: 日誌、快取清理與登出
   about_info: 程序信息
   acknowledgement: Made With Love From {developers} People
   about: 關於
@@ -783,13 +842,24 @@ setting:
   latest_version: '最新版本: {latest}'
   waiting: 等待獲取
   fetching_update: 正在獲取更新信息
-  new_version: 有新版本發佈！
+  new_version: 有新版本發佈，請立刻更新！
   current_stable: 目前您正在運行最新版
   current_testing: 目前您正在運行測試版
   fetch_failed: 獲取更新信息失敗
   ui_setting: 界面設置
-  brightness_setting: 設置深淺色
+  brightness_setting: 深淺色模式
   color_setting: 顏色設置
+  font_size_setting: 字體大小與粗細
+  font_size_page:
+    size_title: 字體大小
+    weight_title: 字體粗細
+    preview_title: 預覽
+    weight_thin: 細
+    weight_regular: 常規
+    weight_medium: 中等
+    weight_semibold: 半粗
+    weight_bold: 加粗
+    summary: '{scale}% · {weight}'
   simplify_timeline: 簡化日程時間軸
   simplify_timeline_description: 沒有日程時 減少空間佔用
   low_electricity_warning: 低電量卡片變色提醒
@@ -800,6 +870,8 @@ setting:
     title: 設置低電量閾值
     input_hint: 請輸入電量度數
   account_setting: 賬號設置
+  general_account_settings: 通用賬號
+  undergraduate_system_accounts: 本科生系統帳號
   sport_password_setting: 體育系統密碼設置
   experiment_password_setting: 物理實驗系統密碼設置
   electricity_password_setting: 電費帳號密碼設置
@@ -807,9 +879,9 @@ setting:
   electricity_account_setting: 電費賬號設置
   schoolnet_password_setting: 校園網帳號密碼設置
   schoolnet_password_description: 不設置查看不了網費
-  aircon_imei_title: 空調用電數據源
+  aircon_imei_title: 空調設備
   aircon_imei: 空調 IMEI
-  aircon_imei_not_set: 未設置，電費頁不顯示空調用電
+  aircon_imei_not_set: 未設置，無法查詢或遙控空調
   aircon_imei_current: 當前 IMEI：{imei}
   aircon_imei_saved: 空調 IMEI 已保存
   aircon_imei_cleared: 空調 IMEI 已清除
@@ -879,11 +951,35 @@ setting:
     cancel_all_success: 已取消所有課前提醒
     reschedule_success: 已重新安排 {count} 個課前提醒
     reschedule_failed: '重新安排通知失敗: {error}'
-  notification_debug_page: 通知服務調試頁面
+  notification_debug_page: 通知狀態與測試
   classtable_setting: 課表相關設置
   background: 開啟課表背景圖
+  class_table_background_section: 課表背景
   no_background: 你先選個圖片罷，就在下面
+  background_blur: "背景模糊: {value}"
+  background_blur_off: 關閉
   choose_background: 課表背景圖選擇
+  class_table_style_setting: 課表顯示與樣式
+  class_table_style_description: 時間指示和課程卡片樣式
+  class_table_style_page:
+    current_time_settings_title: 時間指示設置
+    class_color_settings_title: 課表樣式設置
+    current_time_section: 時間指示設置
+    show_current_time_indicator: 顯示當前時間指示線
+    show_current_time_label: 顯示迷你數字時鐘
+    show_today_column_highlight: 強調顯示今天的縱列
+    active_section: 課程卡片樣式
+    unfinished_section: 課程卡片樣式
+    active_brightness_factor: '亮度: {value}'
+    active_border_alpha: '邊框透明度: {value}'
+    active_inner_alpha: '底色透明度: {value}'
+    completed_section: 已結束課程樣式
+    completed_style_enabled: 已結束課程樣式區分
+    completed_saturation_factor: '底色飽和度: {value}'
+    completed_brightness_factor: '亮度: {value}'
+    completed_text_saturation_factor: '文字飽和度: {value}'
+    completed_border_alpha: '邊框透明度: {value}'
+    completed_inner_alpha: '底色透明度: {value}'
   no_permission: 未獲取存儲權限，無法讀取文件
   successful_setting: 設定成功
   failure_setting: 你沒有選圖片捏
@@ -895,9 +991,8 @@ setting:
   class_refresh_title: 確認對話框
   class_refresh_content: 是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。
   class_swift: 課程偏移設置
-  class_swift_description: '正數錯後開學日期 負數提前開學日期
-
-    目前為 {swift}'
+  class_swift_explain: 正數錯後開學日期 負數提前開學日期
+  class_swift_description: 目前為 {swift}
   core_setting: 緩存登錄設置
   check_logger: 查看網絡攔截器和日誌
   clear_and_restart: 清除緩存後重啟
@@ -925,9 +1020,10 @@ setting:
   change_brightness_dialog:
     title: 亮度設置
     follow_setting: 跟隨系統
-    day_mode: 白天模式
-    night_mode: 黑夜模式
+    day_mode: 淺色
+    night_mode: 深色
   change_swift_dialog:
+    invalid_number: 請輸入有效的整數
     title: 課程偏移設置
     input_hint: 請在此輸入數字
   change_electricity_title: 修改電費帳號
@@ -1009,15 +1105,19 @@ setting:
   semester_update_data: 應用新學期設置中
   easter_egg_page: 你找到了彩蛋
   about_page:
+    contributors: 貢獻者與致謝
+    licenses: 開源授權
+    extras: 更多
     benderblog: 主要開發者，iOS 小部件編寫和拼接
-    alnair: 開發：圖書館搜索和封面
-    aqqkad: 開發：考勤歷史記錄
+    alnair: 開發：圖書館搜索和封面、圖書館佈局修復、飲水機接水功能及介面適配
+    aqqkad: 開發：考勤歷史記錄、空調遙控、空調電費資料接入、圖書館新介面適配
     bellssgit: 支持：最佳&最久故障反饋者
     brackrat: 設計：主頁，登錄頁，配色，iOS 小部件等
     breezeline: 支持：無價值無意義的產品經理(他自己的描述)
     cafebabe: 支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配
     chitao1234: 開發：修復滑塊不對齊問題
     copperkoi: 開發：系統日曆最新課表同步
+    dami: 開發：修復 iOS 課程偏移負數輸入及輸入校驗
     dimole: 開發支持：輔助修復滑塊問題
     elitewars: 設計：體育成績頁面
     elliot: 國際化：軟件英語翻譯 / 開發指導：情侶課表功能開發指導（該功能已經被移除）
@@ -1028,11 +1128,13 @@ setting:
     hawa130: 設計：課程詳情卡片
     hhzm: 開發：電費查詢賬號計算
     imaginary_17: 開發：睿思論壇路由修復
-    imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI
+    imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI / 開發：設定頁面分類重構及主從佈局適配
     ka-mate-ka-ora: 國際化：軟件英語翻譯優化
+    l1angyun: 開發：空閒教室即時顯示、課表背景模糊、課表佈局與螢幕圓角適配；修復校園網資料顯示
     lagrange-x: 開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性
     lhx-666-cool: 支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配
     lichtyy: 設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼
+    littlestejan: 開發：校園網驗證碼重新整理及驗證碼輸入對話框優化
     lqsy-h: 支持：推文宣傳圖片製作
     lsy223622: 設計：iOS 和 Android 圖標 / 支持：冠名 XDYou
     mrbrilliant2046: 支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯
@@ -1043,6 +1145,7 @@ setting:
     rrrilac: 開發支持：電費查詢
     ray: 設計：開屏畫面 / 支持：iOS 發行商 & 搭子課表 / 開發指導：情侶課表功能開發指導（該功能已經被移除） / 國際化：優化英語翻譯
     shadowyingyi: 支持：兩次鴿子公眾號宣傳
+    sixteenforever: 開發：HarmonyOS 移植
     stalomeow: 設計：首頁時間軸 / 開發：異步登錄 & 驗證碼預測
     xeonds: 設計：設置頁面 / 開發：XDU Planet / 開發：校園卡付款碼
     xingshuyu: 開發：修復物理實驗獲取問題和電費窗口問題
@@ -1073,6 +1176,20 @@ setting:
     copyright_register_code: 著作權登記號
     sign_android: 安卓簽名
     title: 關於本軟件
+sponsorship:
+  title: 本版本由極創工作室和網管會贊助發佈
+  dialog_title: 贊助信息
+  dialog_content: '極創工作室介紹辭：極創工作室是一個由西電創新創業學院支持建設的科技創新俱樂部，旨在與校內最優秀的創新創業人才同行，專注於人工智能等領域的技術創新與產品研發。目前工作室和華為等廠家合作，深耕大語言模型相關前沿方向，已孵化超過數十個人工智能領域科創產品，其中8項產品成功落地商用。工作室最知名的產品包括SwanLab、LLMOne、NexusGate。
+
+
+    網管會介紹辭：學生網管會隸屬於西電信息網絡技術中心，主要協助處理師生校園網絡使用問題，參與校園網絡維護、線上諮詢、線下處理和技術支持等工作。我們歡迎認真負責、願意學習、對網絡與技術實踐感興趣的同學加入，一起服務同學、提升能力、積累經驗。
+
+
+    XDYou軟件開發者辭：極創在XDYou早期開發期間給了相當大的幫助，網管會我在20年入學期間加入過，可惜他們沒要我。應我最近找工作，找了他們的人瞭解了一些信息，按照約定製作本頁面作為諮詢費。
+
+    Bender Rodriguez 6/9/2026'
+  button_jichuang: 瞭解極創
+  button_xduna: 瞭解網管會
 sport:
   title: 體育查詢
   class_info: 課程信息
@@ -1171,6 +1288,7 @@ electricity_status:
   need_account: 需要填寫電費賬號
   captcha_failed: 驗證碼識別失敗
   other_issue: 程序故障
+  no_electricity_info: 沒有電錶信息
 school_card_status:
   failed_to_fetch: 獲取失敗
   failed_to_query: 查詢失敗

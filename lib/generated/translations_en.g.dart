@@ -16,22 +16,22 @@ class TranslationsEn extends Translations with BaseTranslations<AppLocale, Trans
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsEn({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.en,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ),
 		  super(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
-		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <en>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
+	@override dynamic operator[](String key) => _meta.getTranslation(key) ?? super[key];
 
 	late final TranslationsEn _root = this; // ignore: unused_field
 
@@ -65,6 +65,7 @@ class TranslationsEn extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$schoolNet$en schoolNet = _Translations$schoolNet$en._(_root);
 	@override late final _Translations$score$en score = _Translations$score$en._(_root);
 	@override late final _Translations$setting$en setting = _Translations$setting$en._(_root);
+	@override late final _Translations$sponsorship$en sponsorship = _Translations$sponsorship$en._(_root);
 	@override late final _Translations$sport$en sport = _Translations$sport$en._(_root);
 	@override late final _Translations$toolbox$en toolbox = _Translations$toolbox$en._(_root);
 	@override late final _Translations$weekday$en weekday = _Translations$weekday$en._(_root);
@@ -279,7 +280,7 @@ class _Translations$electricity$en extends Translations$electricity$zh {
 	@override String get history => 'Billing History';
 	@override String get dailyUsage => 'Average usage per day';
 	@override String get notEnoughData => 'Not enough data for rendering graph';
-	@override String get info => 'Energy system can be only be accessed at schoolnet, do contact developers if have issue.\nHistory will be recorded locally while average usage is based on the electric meter\'s record.';
+	@override String get info => 'History will be recorded locally while average usage is based on the electric meter\'s record.';
 	@override String get fetchingHint => 'Fetching the latest electricity info.';
 	@override String get fetchError => 'Failed to fetch electricity information. Please retry.';
 	@override String get date => 'Date';
@@ -291,7 +292,7 @@ class _Translations$electricity$en extends Translations$electricity$zh {
 	@override String get waterUsage => 'Bath water usage';
 	@override String get waterTitle => 'Water usage';
 	@override String get waterLoading => 'Loading water usage information';
-	@override String get waterUnavailable => 'Water usage is unavailable. Retry from the electricity card.';
+	@override String get waterUnavailable => 'Water usage is unavailable. Retry using the refresh button in the top right.';
 	@override String get waterEmpty => 'No water usage information';
 	@override String get notSchoolNetwork => 'Not school network';
 	@override String get airconTitle => 'Aircon Electricity';
@@ -301,9 +302,36 @@ class _Translations$electricity$en extends Translations$electricity$zh {
 	@override String get airconWaiting => 'Waiting to fetch aircon electricity data';
 	@override String get airconError => 'Failed to fetch aircon electricity data';
 	@override String get airconRetry => 'Retry';
-	@override String get airconImeiMissing => 'Add the aircon IMEI to view its electricity usage.';
-	@override String get airconAddImei => 'Add aircon IMEI';
+	@override String get airconImeiMissing => 'Scan the air conditioner\'s QR code to add it, or select a QR code image.';
+	@override String get airconAddImei => 'Add aircon information';
 	@override String airconCacheNotice({required Object time}) => 'Showing cached aircon data from ${time}';
+	@override String powerMetidTitle({required Object code}) => 'Electricity meter ${code}';
+	@override String weterMetidTitle({required Object code}) => 'Watermeter ${code}';
+	@override String get airconRemote => 'Aircon Remote';
+	@override String get airconControlError => 'Unable to fetch the aircon state';
+	@override String get airconCommandOk => 'Aircon command completed';
+	@override String get airconControlSection => 'Basic controls';
+	@override String get airconOperationSection => 'Operation';
+	@override String get airconOtherSettingsSection => 'Other settings';
+	@override String get airconPower => 'Power';
+	@override String get airconTargetTemperature => 'Target temperature';
+	@override String get airconTemperatureRange => 'Temperature must be between 18 and 32 ℃';
+	@override String airconIndoorTemperature({required Object temperature}) => 'Indoor temperature: ${temperature} ℃';
+	@override String get airconMode => 'Mode';
+	@override String get airconModeFan => 'Fan';
+	@override String get airconModeHeat => 'Heat';
+	@override String get airconModeCool => 'Cool';
+	@override String get airconModeDry => 'Dry';
+	@override String get airconModeAuto => 'Auto';
+	@override String get airconWindSpeed => 'Fan speed';
+	@override String get airconWindAuto => 'Auto';
+	@override String get airconWindSilent => 'Silent';
+	@override String get airconWindLow => 'Low';
+	@override String get airconWindMedium => 'Medium';
+	@override String get airconWindHigh => 'High';
+	@override String get airconVerticalSwing => 'Vertical swing';
+	@override String get airconStrongMode => 'Turbo mode';
+	@override String get airconElectricHeating => 'Auxiliary heating';
 }
 
 // Path: electricityStatus
@@ -328,6 +356,7 @@ class _Translations$electricityStatus$en extends Translations$electricityStatus$
 	@override String get needAccount => 'Need to input electricity account';
 	@override String get captchaFailed => 'Failed to check captcha';
 	@override String get otherIssue => 'Program malfunction';
+	@override String get noElectricityInfo => 'No electricity meter info';
 }
 
 // Path: emptyClassroom
@@ -344,6 +373,12 @@ class _Translations$emptyClassroom$en extends Translations$emptyClassroom$zh {
 	@override String get classroom => 'Classroom';
 	@override String get empty => 'Available';
 	@override String get occupied => 'Occupied';
+	@override String nowOngoing({required Object period, required Object start, required Object end}) => 'Now · Period ${period} ${start}-${end}';
+	@override String nowUpcoming({required Object period, required Object start, required Object end}) => 'Next · Period ${period} ${start}-${end}';
+	@override String nowFree({required Object free, required Object total}) => '${free} of ${total} free';
+	@override String get onlyFreeNow => 'Only free ones now';
+	@override String get noFreeNow => 'No classroom is free right now';
+	@override String get classesOver => 'The classes of today are over';
 }
 
 // Path: exam
@@ -473,6 +508,7 @@ class _Translations$homepage$en extends Translations$homepage$zh {
 	@override late final _Translations$homepage$toolbox$en toolbox = _Translations$homepage$toolbox$en._(_root);
 	@override late final _Translations$homepage$schoolNet$en schoolNet = _Translations$homepage$schoolNet$en._(_root);
 	@override late final _Translations$homepage$clubPromotion$en clubPromotion = _Translations$homepage$clubPromotion$en._(_root);
+	@override late final _Translations$homepage$airconCard$en airconCard = _Translations$homepage$airconCard$en._(_root);
 }
 
 // Path: library
@@ -529,6 +565,7 @@ class _Translations$library$en extends Translations$library$zh {
 	@override String get publishYearEnd => 'Publish year to';
 	@override String get bookDetail => 'Book details';
 	@override String get noResult => 'No result, change parameter or start your search';
+	@override String get noMoreData => 'No more data';
 }
 
 // Path: libraryCard
@@ -582,7 +619,7 @@ class _Translations$loginProcess$en extends Translations$loginProcess$zh {
 	@override String get getEncrypt => 'Obtain password encryption key';
 	@override String get readyLogin => 'Prepare to login';
 	@override String get slider => 'Logging in';
-	@override String get secondFactor => 'Waiting for SMS verification';
+	@override String get secondFactor => 'Waiting for verification';
 	@override String get afterProcess => 'Post-login processing';
 	@override String failed({required Object status_code}) => 'Login failed, response status code: ${status_code}';
 }
@@ -741,7 +778,7 @@ class _Translations$setting$en extends Translations$setting$zh {
 	@override String latestVersion({required Object latest}) => 'Latest version: ${latest}';
 	@override String get waiting => 'Waiting for obtain';
 	@override String get fetchingUpdate => 'Fetching update information';
-	@override String get newVersion => 'New version released!';
+	@override String get newVersion => 'New version released，PLEASE UPDATE AT ONCE!';
 	@override String get currentStable => 'You are running the latest version';
 	@override String get currentTesting => 'You are running the testing version';
 	@override String get fetchFailed => 'Failed to fetch update information';
@@ -763,9 +800,9 @@ class _Translations$setting$en extends Translations$setting$zh {
 	@override String get electricityAccountSetting => 'Electricity account setting';
 	@override String get schoolnetPasswordSetting => 'Campus net password';
 	@override String get schoolnetPasswordDescription => 'If you have not setted it, you cannot query it.';
-	@override String get airconImeiTitle => 'Aircon electricity data source';
+	@override String get airconImeiTitle => 'Aircon device';
 	@override String get airconImei => 'Aircon IMEI';
-	@override String get airconImeiNotSet => 'Not set. Aircon electricity will be hidden on the power page.';
+	@override String get airconImeiNotSet => 'Not set. Aircon data and remote control are unavailable.';
 	@override String airconImeiCurrent({required Object imei}) => 'Current IMEI: ${imei}';
 	@override String get airconImeiSaved => 'Aircon IMEI saved';
 	@override String get airconImeiCleared => 'Aircon IMEI cleared';
@@ -778,7 +815,7 @@ class _Translations$setting$en extends Translations$setting$zh {
 	@override String get courseReminderSetting => 'Pre-class Reminder Settings';
 	@override String get courseReminderDescription => 'Configure pre-class reminder notifications';
 	@override late final _Translations$setting$notificationPage$en notificationPage = _Translations$setting$notificationPage$en._(_root);
-	@override String get notificationDebugPage => 'Notification Services Debug Page';
+	@override String get notificationDebugPage => 'Notification status and test';
 	@override String get classtableSetting => 'Class Schedule Related';
 	@override String get background => 'Background image';
 	@override String get noBackground => 'You need to select an image first, it\'s at below';
@@ -794,7 +831,7 @@ class _Translations$setting$en extends Translations$setting$zh {
 	@override String get classRefreshTitle => 'Refresh Confirmation';
 	@override String get classRefreshContent => 'Do you want to force refreshing the class schedule? If you agree, we will fetch the schedule from the school, which may takes a long time.';
 	@override String get classSwift => 'Class schedule offset setting';
-	@override String classSwiftDescription({required Object swift}) => 'Positive number delays the start date, negative number advances the start date\nCurrently ${swift}\n';
+	@override String classSwiftDescription({required Object swift}) => 'Currently ${swift}';
 	@override String get coreSetting => 'Cached login settings';
 	@override String get checkLogger => 'View network interceptor and logs';
 	@override String get clearAndRestart => 'Clear cache and restart';
@@ -818,6 +855,34 @@ class _Translations$setting$en extends Translations$setting$zh {
 	@override String get semesterUpdateData => 'Applying new semester setting';
 	@override String get easterEggPage => 'You found an Easter egg';
 	@override late final _Translations$setting$aboutPage$en aboutPage = _Translations$setting$aboutPage$en._(_root);
+	@override late final _Translations$setting$editor$en editor = _Translations$setting$editor$en._(_root);
+	@override late final _Translations$setting$sections$en sections = _Translations$setting$sections$en._(_root);
+	@override late final _Translations$setting$navigation$en navigation = _Translations$setting$navigation$en._(_root);
+	@override String get fontSizeSetting => 'Font size & weight';
+	@override late final _Translations$setting$fontSizePage$en fontSizePage = _Translations$setting$fontSizePage$en._(_root);
+	@override String get generalAccountSettings => 'General accounts';
+	@override String get undergraduateSystemAccounts => 'Undergraduate system accounts';
+	@override String get classTableBackgroundSection => 'Class schedule background';
+	@override String backgroundBlur({required Object value}) => 'Background blur: ${value}';
+	@override String get backgroundBlurOff => 'Off';
+	@override String get classTableStyleSetting => 'Class schedule display & style';
+	@override String get classTableStyleDescription => 'Time indicator and course card style';
+	@override late final _Translations$setting$classTableStylePage$en classTableStylePage = _Translations$setting$classTableStylePage$en._(_root);
+	@override String get classSwiftExplain => 'Positive number delays the start date, negative number advances the start date';
+}
+
+// Path: sponsorship
+class _Translations$sponsorship$en extends Translations$sponsorship$zh {
+	_Translations$sponsorship$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'This version is sponsored and released by Jichuang Studio and the Network Management Committee.';
+	@override String get dialogTitle => 'Sponsorship Information';
+	@override String get dialogContent => 'Introduction to Jichuang Studio: Jichuang Studio is a tech innovation club supported and established by the Xidian University Innovation and Entrepreneurship College. It aims to walk alongside the campus\'s most outstanding innovation and entrepreneurship talent, focusing on technological innovation and product research and development in fields such as artificial intelligence. Currently, the studio collaborates with manufacturers like Huawei, deeply cultivating cutting-edge directions related to large language models, and has incubated over dozens of AI-related sci-tech innovation products, 8 of which have successfully achieved commercial deployment. The studio\'s best-known products include SwanLab, LLMOne, and NexusGate.\n\nIntroduction to the XDUNA: The XDUNA operates under the Xidian University Information Network Technology Center. It primarily assists in handling campus network usage issues for faculty and students, and participates in campus network maintenance, online consultation, offline processing, and technical support. We welcome responsible students who are eager to learn and interested in network and technical practices to join us in serving fellow students, improving abilities, and gaining experience.\n\nNote from the XDYou Software Developer: Jichuang provided significant help during the early development of XDYou. I joined the Network Management Committee back in my admission year in 2020, though unfortunately they didn\'t accept me. As I\'ve recently been looking for a job and consulted some of their members for information, this page has been created as a consultation fee in accordance with our agreement.\nBender Rodriguez 6/9/2026';
+	@override String get buttonJichuang => 'About Jichuang';
+	@override String get buttonXduna => 'About XDUNA';
 }
 
 // Path: sport
@@ -1470,6 +1535,25 @@ class _Translations$homepage$clubPromotion$en extends Translations$homepage$club
 	@override String get fetching => 'Fetching club info';
 }
 
+// Path: homepage.airconCard
+class _Translations$homepage$airconCard$en extends Translations$homepage$airconCard$zh {
+	_Translations$homepage$airconCard$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Aircon Remote';
+	@override String get notConfigured => 'Aircon not configured';
+	@override String get configureHint => 'Tap to add an aircon IMEI';
+	@override String running({required Object mode, required Object temperature}) => '${mode} · ${temperature} ℃';
+	@override String get powerOff => 'Aircon is off';
+	@override String indoorAndWind({required Object temperature, required Object wind}) => 'Indoor ${temperature} ℃ · Fan ${wind}';
+	@override String wind({required Object wind}) => 'Fan ${wind}';
+	@override String get fetching => 'Fetching aircon status';
+	@override String get error => 'Unable to fetch aircon status';
+	@override String get openRemote => 'Tap to open the aircon remote';
+}
+
 // Path: login.captchaWindow
 class _Translations$login$captchaWindow$en extends Translations$login$captchaWindow$zh {
 	_Translations$login$captchaWindow$en._(TranslationsEn root) : this._root = root, super.internal(root);
@@ -1490,17 +1574,20 @@ class _Translations$login$secondFactor$en extends Translations$login$secondFacto
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'SMS verification';
-	@override String get description => 'The school requires an additional verification step. Request and enter the SMS code to continue.';
+	@override String get title => 'Additional verification';
+	@override String get description => 'Choose where to receive the code, then request and enter it to continue.';
 	@override String get code => 'SMS code';
-	@override String get emptyCode => 'Enter the SMS code';
+	@override String get emptyCode => 'Enter the verification code';
 	@override String get sendCode => 'Send code';
 	@override String resendCountdown({required Object seconds}) => 'Resend in ${seconds}s';
 	@override String get trustDevice => 'Trust this device';
 	@override String get trustDeviceHint => 'The school may skip verification on this device for a limited time';
 	@override String get networkError => 'Verification request failed. Check your connection and retry.';
-	@override String get cancelled => 'SMS verification cancelled';
+	@override String get cancelled => 'Verification cancelled';
 	@override String get expired => 'Verification expired. Please log in again.';
+	@override String get method => 'Code delivery';
+	@override String get sms => 'SMS code';
+	@override String get enterpriseWechat => 'WeCom code';
 }
 
 // Path: ruisi.common
@@ -1960,8 +2047,8 @@ class _Translations$setting$changeBrightnessDialog$en extends Translations$setti
 	// Translations
 	@override String get title => 'Brightness settings';
 	@override String get followSetting => 'Follow system';
-	@override String get dayMode => 'Day mode';
-	@override String get nightMode => 'Night mode';
+	@override String get dayMode => 'Light';
+	@override String get nightMode => 'Dark';
 }
 
 // Path: setting.changeSwiftDialog
@@ -1973,6 +2060,7 @@ class _Translations$setting$changeSwiftDialog$en extends Translations$setting$ch
 	// Translations
 	@override String get title => 'Class schedule offset setting';
 	@override String get inputHint => 'Please input number here';
+	@override String get invalidNumber => 'Please enter a valid whole number';
 }
 
 // Path: setting.changeElectricityAccount
@@ -2083,8 +2171,8 @@ class _Translations$setting$aboutPage$en extends Translations$setting$aboutPage$
 
 	// Translations
 	@override String get benderblog => 'Main developer, iOS widget';
-	@override String get alnair => 'Development: Library search and cover';
-	@override String get aqqkad => 'Development: Class attandance history';
+	@override String get alnair => 'Development: Library search and covers, library layout fixes, water dispenser functionality and API updates';
+	@override String get aqqkad => 'Development: Class attendance history, air conditioner remote control and electricity data integration, library API updates';
 	@override String get bellssgit => 'Support: best and longest feedback source';
 	@override String get brackrat => 'Design: homepage, login page, color scheme, iOS widgets, etc.';
 	@override String get breezeline => 'Support: valueless and meaningless product manager (from his own description)';
@@ -2101,7 +2189,7 @@ class _Translations$setting$aboutPage$en extends Translations$setting$aboutPage$
 	@override String get hawa130 => 'Design: Class info card';
 	@override String get hhzm => 'Development: electricity fee inquiry account calculation';
 	@override String get imaginary17 => 'Developement: Ruisi navigator stack fix';
-	@override String get imoscarz => 'Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change';
+	@override String get imoscarz => 'Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change / Development: Settings category refactoring and master-detail layout adaptation';
 	@override String get kaMateKaOra => 'Internationalization: English correction';
 	@override String get lagrangeX => 'Development: Class progress indicator (adopted) / Development: Gray cover on attended class and other classtable design';
 	@override String get lhx666Cool => 'Support: Windows and Linux build scripts / Development: New Slider \'26';
@@ -2132,6 +2220,114 @@ class _Translations$setting$aboutPage$en extends Translations$setting$aboutPage$
 	@override String get copyrightRegisterCode => 'Copyright register code';
 	@override String get signAndroid => 'Android signature';
 	@override String get title => 'About this APP';
+	@override String get contributors => 'Contributors & acknowledgements';
+	@override String get licenses => 'Open source licenses';
+	@override String get extras => 'More';
+	@override String get dami => 'Development: Fix negative course offset input and input validation on iOS';
+	@override String get l1angyun => 'Development: Live availability of classrooms, timetable background blur, timetable layout and screen corner adaptation; fix campus network data display';
+	@override String get littlestejan => 'Development: Campus network captcha refresh and captcha input dialog improvements';
+	@override String get sixteenforever => 'Development: HarmonyOS port';
+}
+
+// Path: setting.editor
+class _Translations$setting$editor$en extends Translations$setting$editor$zh {
+	_Translations$setting$editor$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get save => 'Save';
+	@override String get apply => 'Apply';
+	@override String get passwordSet => 'Set';
+	@override String get passwordNotSet => 'Not set';
+	@override String get passwordVisibility => 'Show or hide password';
+	@override String get toggleSign => 'Toggle positive or negative';
+	@override String get positiveNumber => 'Enter an integer greater than 0';
+	@override String get electricityUnit => 'kWh';
+	@override String get textPreview => 'Course schedule · TrainTime PDA · 0123456789';
+	@override String get brightness => 'Brightness';
+	@override String get borderOpacity => 'Border opacity';
+	@override String get fillOpacity => 'Fill opacity';
+	@override String get fillSaturation => 'Fill saturation';
+	@override String get textSaturation => 'Text saturation';
+	@override String get backgroundBlur => 'Background blur';
+	@override String get year => 'Year';
+	@override String get semester => 'Semester';
+}
+
+// Path: setting.sections
+class _Translations$setting$sections$en extends Translations$setting$sections$zh {
+	_Translations$setting$sections$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get display => 'Display';
+	@override String get languageAndText => 'Language and text';
+	@override String get home => 'Home screen';
+	@override String get electricity => 'Electricity alerts';
+	@override String get timetableAppearance => 'Timetable appearance';
+	@override String get semester => 'Semester and weeks';
+	@override String get courseData => 'Course data';
+}
+
+// Path: setting.navigation
+class _Translations$setting$navigation$en extends Translations$setting$navigation$zh {
+	_Translations$setting$navigation$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get uiDescription => 'Theme, text, language and home display';
+	@override String get classtableDescription => 'Timetable style, semester and course data';
+	@override String get accountDescription => 'Accounts and passwords for campus services';
+	@override String get notificationsDescription => 'Course reminders and notifications';
+	@override String get coreDescription => 'Logs, cached data and sign out';
+}
+
+// Path: setting.fontSizePage
+class _Translations$setting$fontSizePage$en extends Translations$setting$fontSizePage$zh {
+	_Translations$setting$fontSizePage$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get sizeTitle => 'Font size';
+	@override String get weightTitle => 'Font weight';
+	@override String get previewTitle => 'Preview';
+	@override String get weightThin => 'Thin';
+	@override String get weightRegular => 'Regular';
+	@override String get weightMedium => 'Medium';
+	@override String get weightSemibold => 'Semi bold';
+	@override String get weightBold => 'Bold';
+	@override String summary({required Object scale, required Object weight}) => '${scale}% · ${weight}';
+}
+
+// Path: setting.classTableStylePage
+class _Translations$setting$classTableStylePage$en extends Translations$setting$classTableStylePage$zh {
+	_Translations$setting$classTableStylePage$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get currentTimeSettingsTitle => 'Time indicator settings';
+	@override String get classColorSettingsTitle => 'Class schedule style settings';
+	@override String get currentTimeSection => 'Time indicator settings';
+	@override String get showCurrentTimeIndicator => 'Show current time indicator';
+	@override String get showCurrentTimeLabel => 'Show mini time label';
+	@override String get showTodayColumnHighlight => 'Highlight today\'s column';
+	@override String get activeSection => 'Course card style';
+	@override String get unfinishedSection => 'Course card style';
+	@override String activeBrightnessFactor({required Object value}) => 'Brightness: ${value}';
+	@override String activeBorderAlpha({required Object value}) => 'Border opacity: ${value}';
+	@override String activeInnerAlpha({required Object value}) => 'Fill opacity: ${value}';
+	@override String get completedSection => 'Completed class style';
+	@override String get completedStyleEnabled => 'Completed class styling distinction';
+	@override String completedSaturationFactor({required Object value}) => 'Fill saturation: ${value}';
+	@override String completedBrightnessFactor({required Object value}) => 'Brightness: ${value}';
+	@override String completedTextSaturationFactor({required Object value}) => 'Text saturation: ${value}';
+	@override String completedBorderAlpha({required Object value}) => 'Border opacity: ${value}';
+	@override String completedInnerAlpha({required Object value}) => 'Fill opacity: ${value}';
 }
 
 // Path: xduPlanet.confirmAuditDialog
@@ -2538,7 +2734,7 @@ extension on TranslationsEn {
 			'electricity.history' => 'Billing History',
 			'electricity.dailyUsage' => 'Average usage per day',
 			'electricity.notEnoughData' => 'Not enough data for rendering graph',
-			'electricity.info' => 'Energy system can be only be accessed at schoolnet, do contact developers if have issue.\nHistory will be recorded locally while average usage is based on the electric meter\'s record.',
+			'electricity.info' => 'History will be recorded locally while average usage is based on the electric meter\'s record.',
 			'electricity.fetchingHint' => 'Fetching the latest electricity info.',
 			'electricity.fetchError' => 'Failed to fetch electricity information. Please retry.',
 			'electricity.date' => 'Date',
@@ -2550,7 +2746,7 @@ extension on TranslationsEn {
 			'electricity.waterUsage' => 'Bath water usage',
 			'electricity.waterTitle' => 'Water usage',
 			'electricity.waterLoading' => 'Loading water usage information',
-			'electricity.waterUnavailable' => 'Water usage is unavailable. Retry from the electricity card.',
+			'electricity.waterUnavailable' => 'Water usage is unavailable. Retry using the refresh button in the top right.',
 			'electricity.waterEmpty' => 'No water usage information',
 			'electricity.notSchoolNetwork' => 'Not school network',
 			'electricity.airconTitle' => 'Aircon Electricity',
@@ -2560,9 +2756,36 @@ extension on TranslationsEn {
 			'electricity.airconWaiting' => 'Waiting to fetch aircon electricity data',
 			'electricity.airconError' => 'Failed to fetch aircon electricity data',
 			'electricity.airconRetry' => 'Retry',
-			'electricity.airconImeiMissing' => 'Add the aircon IMEI to view its electricity usage.',
-			'electricity.airconAddImei' => 'Add aircon IMEI',
+			'electricity.airconImeiMissing' => 'Scan the air conditioner\'s QR code to add it, or select a QR code image.',
+			'electricity.airconAddImei' => 'Add aircon information',
 			'electricity.airconCacheNotice' => ({required Object time}) => 'Showing cached aircon data from ${time}',
+			'electricity.powerMetidTitle' => ({required Object code}) => 'Electricity meter ${code}',
+			'electricity.weterMetidTitle' => ({required Object code}) => 'Watermeter ${code}',
+			'electricity.airconRemote' => 'Aircon Remote',
+			'electricity.airconControlError' => 'Unable to fetch the aircon state',
+			'electricity.airconCommandOk' => 'Aircon command completed',
+			'electricity.airconControlSection' => 'Basic controls',
+			'electricity.airconOperationSection' => 'Operation',
+			'electricity.airconOtherSettingsSection' => 'Other settings',
+			'electricity.airconPower' => 'Power',
+			'electricity.airconTargetTemperature' => 'Target temperature',
+			'electricity.airconTemperatureRange' => 'Temperature must be between 18 and 32 ℃',
+			'electricity.airconIndoorTemperature' => ({required Object temperature}) => 'Indoor temperature: ${temperature} ℃',
+			'electricity.airconMode' => 'Mode',
+			'electricity.airconModeFan' => 'Fan',
+			'electricity.airconModeHeat' => 'Heat',
+			'electricity.airconModeCool' => 'Cool',
+			'electricity.airconModeDry' => 'Dry',
+			'electricity.airconModeAuto' => 'Auto',
+			'electricity.airconWindSpeed' => 'Fan speed',
+			'electricity.airconWindAuto' => 'Auto',
+			'electricity.airconWindSilent' => 'Silent',
+			'electricity.airconWindLow' => 'Low',
+			'electricity.airconWindMedium' => 'Medium',
+			'electricity.airconWindHigh' => 'High',
+			'electricity.airconVerticalSwing' => 'Vertical swing',
+			'electricity.airconStrongMode' => 'Turbo mode',
+			'electricity.airconElectricHeating' => 'Auxiliary heating',
 			'electricityStatus.pending' => 'Pending',
 			'electricityStatus.remainFetching' => 'Fetching...',
 			'electricityStatus.remainNetworkIssue' => 'Network malfunction',
@@ -2578,6 +2801,7 @@ extension on TranslationsEn {
 			'electricityStatus.needAccount' => 'Need to input electricity account',
 			'electricityStatus.captchaFailed' => 'Failed to check captcha',
 			'electricityStatus.otherIssue' => 'Program malfunction',
+			'electricityStatus.noElectricityInfo' => 'No electricity meter info',
 			'emptyClassroom.title' => 'Empty Classrooms',
 			'emptyClassroom.date' => ({required Object date}) => 'Date ${date}',
 			'emptyClassroom.building' => ({required Object building}) => 'Building ${building}',
@@ -2585,6 +2809,12 @@ extension on TranslationsEn {
 			'emptyClassroom.classroom' => 'Classroom',
 			'emptyClassroom.empty' => 'Available',
 			'emptyClassroom.occupied' => 'Occupied',
+			'emptyClassroom.nowOngoing' => ({required Object period, required Object start, required Object end}) => 'Now · Period ${period} ${start}-${end}',
+			'emptyClassroom.nowUpcoming' => ({required Object period, required Object start, required Object end}) => 'Next · Period ${period} ${start}-${end}',
+			'emptyClassroom.nowFree' => ({required Object free, required Object total}) => '${free} of ${total} free',
+			'emptyClassroom.onlyFreeNow' => 'Only free ones now',
+			'emptyClassroom.noFreeNow' => 'No classroom is free right now',
+			'emptyClassroom.classesOver' => 'The classes of today are over',
 			'exam.title' => 'Exam Schedule',
 			'exam.cacheHint' => 'Displaying cached exam schedule info',
 			'exam.cacheHintPasswordWrong' => 'IDS password is incorrect or expired.',
@@ -2722,6 +2952,8 @@ extension on TranslationsEn {
 			'homepage.libraryCard.noInfo' => 'Cannot retrieve information at the moment',
 			'homepage.libraryCard.fetchingInfo' => 'Fetching information...',
 			'homepage.schoolCardInfoCard.errorToast' => 'An error occurred, please contact the developer',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.schoolCardInfoCard.fetchingToast' => 'Fetching information, please check later',
 			'homepage.schoolCardInfoCard.bill' => 'Bill',
 			'homepage.schoolCardInfoCard.balance' => ({required Object amount}) => 'Remain ${amount} RMB',
@@ -2750,14 +2982,22 @@ extension on TranslationsEn {
 			'homepage.schoolNet.remaining' => ({required Object remaining}) => 'Clearing at ${remaining}',
 			'homepage.clubPromotion.failed' => 'Failed to fetch club info',
 			'homepage.clubPromotion.fetching' => 'Fetching club info',
+			'homepage.airconCard.title' => 'Aircon Remote',
+			'homepage.airconCard.notConfigured' => 'Aircon not configured',
+			'homepage.airconCard.configureHint' => 'Tap to add an aircon IMEI',
+			'homepage.airconCard.running' => ({required Object mode, required Object temperature}) => '${mode} · ${temperature} ℃',
+			'homepage.airconCard.powerOff' => 'Aircon is off',
+			'homepage.airconCard.indoorAndWind' => ({required Object temperature, required Object wind}) => 'Indoor ${temperature} ℃ · Fan ${wind}',
+			'homepage.airconCard.wind' => ({required Object wind}) => 'Fan ${wind}',
+			'homepage.airconCard.fetching' => 'Fetching aircon status',
+			'homepage.airconCard.error' => 'Unable to fetch aircon status',
+			'homepage.airconCard.openRemote' => 'Tap to open the aircon remote',
 			'library.title' => 'Library Information',
 			'library.borrowStateTitle' => 'Borrowing Status',
 			'library.searchBookTitle' => 'Search Books',
 			'library.searchFieldTitle' => 'Search Field',
 			'library.searchFieldKeywordOption' => 'Any',
 			'library.searchFieldTitleOption' => 'Title',
-			_ => null,
-		} ?? switch (path) {
 			'library.searchFieldAuthorOption' => 'Author',
 			'library.searchFieldIsbnOption' => 'ISBN',
 			'library.searchFieldBarcodeOption' => 'Bar Code',
@@ -2799,6 +3039,7 @@ extension on TranslationsEn {
 			'library.publishYearEnd' => 'Publish year to',
 			'library.bookDetail' => 'Book details',
 			'library.noResult' => 'No result, change parameter or start your search',
+			'library.noMoreData' => 'No more data',
 			'libraryCard.title' => 'Library status',
 			'libraryCard.fetching' => 'Fetching',
 			'libraryCard.northernLibrary' => 'Northern Library',
@@ -2823,22 +3064,25 @@ extension on TranslationsEn {
 			'login.captchaWindow.messageOnEmpty' => 'Please enter captcha',
 			'login.captchaWindow.refreshFailed' => ({required Object error}) => 'Failed to refresh captcha: ${error}',
 			'login.sliderTitle' => 'Server authentication service',
-			'login.secondFactor.title' => 'SMS verification',
-			'login.secondFactor.description' => 'The school requires an additional verification step. Request and enter the SMS code to continue.',
+			'login.secondFactor.title' => 'Additional verification',
+			'login.secondFactor.description' => 'Choose where to receive the code, then request and enter it to continue.',
 			'login.secondFactor.code' => 'SMS code',
-			'login.secondFactor.emptyCode' => 'Enter the SMS code',
+			'login.secondFactor.emptyCode' => 'Enter the verification code',
 			'login.secondFactor.sendCode' => 'Send code',
 			'login.secondFactor.resendCountdown' => ({required Object seconds}) => 'Resend in ${seconds}s',
 			'login.secondFactor.trustDevice' => 'Trust this device',
 			'login.secondFactor.trustDeviceHint' => 'The school may skip verification on this device for a limited time',
 			'login.secondFactor.networkError' => 'Verification request failed. Check your connection and retry.',
-			'login.secondFactor.cancelled' => 'SMS verification cancelled',
+			'login.secondFactor.cancelled' => 'Verification cancelled',
 			'login.secondFactor.expired' => 'Verification expired. Please log in again.',
+			'login.secondFactor.method' => 'Code delivery',
+			'login.secondFactor.sms' => 'SMS code',
+			'login.secondFactor.enterpriseWechat' => 'WeCom code',
 			'loginProcess.readyPage' => 'Prepare to obtain login environment',
 			'loginProcess.getEncrypt' => 'Obtain password encryption key',
 			'loginProcess.readyLogin' => 'Prepare to login',
 			'loginProcess.slider' => 'Logging in',
-			'loginProcess.secondFactor' => 'Waiting for SMS verification',
+			'loginProcess.secondFactor' => 'Waiting for verification',
 			'loginProcess.afterProcess' => 'Post-login processing',
 			'loginProcess.failed' => ({required Object status_code}) => 'Login failed, response status code: ${status_code}',
 			'month.january' => 'Jan.',
@@ -3071,7 +3315,7 @@ extension on TranslationsEn {
 			'setting.latestVersion' => ({required Object latest}) => 'Latest version: ${latest}',
 			'setting.waiting' => 'Waiting for obtain',
 			'setting.fetchingUpdate' => 'Fetching update information',
-			'setting.newVersion' => 'New version released!',
+			'setting.newVersion' => 'New version released，PLEASE UPDATE AT ONCE!',
 			'setting.currentStable' => 'You are running the latest version',
 			'setting.currentTesting' => 'You are running the testing version',
 			'setting.fetchFailed' => 'Failed to fetch update information',
@@ -3094,9 +3338,9 @@ extension on TranslationsEn {
 			'setting.electricityAccountSetting' => 'Electricity account setting',
 			'setting.schoolnetPasswordSetting' => 'Campus net password',
 			'setting.schoolnetPasswordDescription' => 'If you have not setted it, you cannot query it.',
-			'setting.airconImeiTitle' => 'Aircon electricity data source',
+			'setting.airconImeiTitle' => 'Aircon device',
 			'setting.airconImei' => 'Aircon IMEI',
-			'setting.airconImeiNotSet' => 'Not set. Aircon electricity will be hidden on the power page.',
+			'setting.airconImeiNotSet' => 'Not set. Aircon data and remote control are unavailable.',
 			'setting.airconImeiCurrent' => ({required Object imei}) => 'Current IMEI: ${imei}',
 			'setting.airconImeiSaved' => 'Aircon IMEI saved',
 			'setting.airconImeiCleared' => 'Aircon IMEI cleared',
@@ -3151,7 +3395,7 @@ extension on TranslationsEn {
 			'setting.notificationPage.cancelAllSuccess' => 'All pre-class reminders cancelled',
 			'setting.notificationPage.rescheduleSuccess' => ({required Object count}) => 'Rescheduled ${count} pre-class reminders',
 			'setting.notificationPage.rescheduleFailed' => ({required Object error}) => 'Failed to reschedule notifications: ${error}',
-			'setting.notificationDebugPage' => 'Notification Services Debug Page',
+			'setting.notificationDebugPage' => 'Notification status and test',
 			'setting.classtableSetting' => 'Class Schedule Related',
 			'setting.background' => 'Background image',
 			'setting.noBackground' => 'You need to select an image first, it\'s at below',
@@ -3167,7 +3411,7 @@ extension on TranslationsEn {
 			'setting.classRefreshTitle' => 'Refresh Confirmation',
 			'setting.classRefreshContent' => 'Do you want to force refreshing the class schedule? If you agree, we will fetch the schedule from the school, which may takes a long time.',
 			'setting.classSwift' => 'Class schedule offset setting',
-			'setting.classSwiftDescription' => ({required Object swift}) => 'Positive number delays the start date, negative number advances the start date\nCurrently ${swift}\n',
+			'setting.classSwiftDescription' => ({required Object swift}) => 'Currently ${swift}',
 			'setting.coreSetting' => 'Cached login settings',
 			'setting.checkLogger' => 'View network interceptor and logs',
 			'setting.clearAndRestart' => 'Clear cache and restart',
@@ -3190,10 +3434,11 @@ extension on TranslationsEn {
 			'setting.changeColorDialog.pink' => 'Sakura Pink',
 			'setting.changeBrightnessDialog.title' => 'Brightness settings',
 			'setting.changeBrightnessDialog.followSetting' => 'Follow system',
-			'setting.changeBrightnessDialog.dayMode' => 'Day mode',
-			'setting.changeBrightnessDialog.nightMode' => 'Night mode',
+			'setting.changeBrightnessDialog.dayMode' => 'Light',
+			'setting.changeBrightnessDialog.nightMode' => 'Dark',
 			'setting.changeSwiftDialog.title' => 'Class schedule offset setting',
 			'setting.changeSwiftDialog.inputHint' => 'Please input number here',
+			'setting.changeSwiftDialog.invalidNumber' => 'Please enter a valid whole number',
 			'setting.changeElectricityTitle' => 'Modify electricity account',
 			'setting.changeElectricityAccount.title' => 'Modify electricity account',
 			'setting.changeElectricityAccount.campus' => 'Campus',
@@ -3221,6 +3466,8 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.southYard' => 'South Yard',
 			'setting.changeElectricityAccount.yardQuery' => 'Please select yard',
 			'setting.changeElectricityAccount.apartment' => 'Apartment',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.apartmentHint' => 'Select Apartment',
 			'setting.changeElectricityAccount.northApartment' => 'North Apartment',
 			'setting.changeElectricityAccount.southApartment' => 'South Apartment',
@@ -3267,11 +3514,9 @@ extension on TranslationsEn {
 			'setting.semesterUpdateData' => 'Applying new semester setting',
 			'setting.easterEggPage' => 'You found an Easter egg',
 			'setting.aboutPage.benderblog' => 'Main developer, iOS widget',
-			'setting.aboutPage.alnair' => 'Development: Library search and cover',
-			'setting.aboutPage.aqqkad' => 'Development: Class attandance history',
+			'setting.aboutPage.alnair' => 'Development: Library search and covers, library layout fixes, water dispenser functionality and API updates',
+			'setting.aboutPage.aqqkad' => 'Development: Class attendance history, air conditioner remote control and electricity data integration, library API updates',
 			'setting.aboutPage.bellssgit' => 'Support: best and longest feedback source',
-			_ => null,
-		} ?? switch (path) {
 			'setting.aboutPage.brackrat' => 'Design: homepage, login page, color scheme, iOS widgets, etc.',
 			'setting.aboutPage.breezeline' => 'Support: valueless and meaningless product manager (from his own description)',
 			'setting.aboutPage.cafebabe' => 'Support: provide Easter egg code / Development: Development: New Slider \'26',
@@ -3287,7 +3532,7 @@ extension on TranslationsEn {
 			'setting.aboutPage.hawa130' => 'Design: Class info card',
 			'setting.aboutPage.hhzm' => 'Development: electricity fee inquiry account calculation',
 			'setting.aboutPage.imaginary17' => 'Developement: Ruisi navigator stack fix',
-			'setting.aboutPage.imoscarz' => 'Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change',
+			'setting.aboutPage.imoscarz' => 'Development: Homepage for software / Development: Checkin check for pad / Development: Sport UI Change / Development: Settings category refactoring and master-detail layout adaptation',
 			'setting.aboutPage.kaMateKaOra' => 'Internationalization: English correction',
 			'setting.aboutPage.lagrangeX' => 'Development: Class progress indicator (adopted) / Development: Gray cover on attended class and other classtable design',
 			'setting.aboutPage.lhx666Cool' => 'Support: Windows and Linux build scripts / Development: New Slider \'26',
@@ -3318,6 +3563,83 @@ extension on TranslationsEn {
 			'setting.aboutPage.copyrightRegisterCode' => 'Copyright register code',
 			'setting.aboutPage.signAndroid' => 'Android signature',
 			'setting.aboutPage.title' => 'About this APP',
+			'setting.aboutPage.contributors' => 'Contributors & acknowledgements',
+			'setting.aboutPage.licenses' => 'Open source licenses',
+			'setting.aboutPage.extras' => 'More',
+			'setting.aboutPage.dami' => 'Development: Fix negative course offset input and input validation on iOS',
+			'setting.aboutPage.l1angyun' => 'Development: Live availability of classrooms, timetable background blur, timetable layout and screen corner adaptation; fix campus network data display',
+			'setting.aboutPage.littlestejan' => 'Development: Campus network captcha refresh and captcha input dialog improvements',
+			'setting.aboutPage.sixteenforever' => 'Development: HarmonyOS port',
+			'setting.editor.save' => 'Save',
+			'setting.editor.apply' => 'Apply',
+			'setting.editor.passwordSet' => 'Set',
+			'setting.editor.passwordNotSet' => 'Not set',
+			'setting.editor.passwordVisibility' => 'Show or hide password',
+			'setting.editor.toggleSign' => 'Toggle positive or negative',
+			'setting.editor.positiveNumber' => 'Enter an integer greater than 0',
+			'setting.editor.electricityUnit' => 'kWh',
+			'setting.editor.textPreview' => 'Course schedule · TrainTime PDA · 0123456789',
+			'setting.editor.brightness' => 'Brightness',
+			'setting.editor.borderOpacity' => 'Border opacity',
+			'setting.editor.fillOpacity' => 'Fill opacity',
+			'setting.editor.fillSaturation' => 'Fill saturation',
+			'setting.editor.textSaturation' => 'Text saturation',
+			'setting.editor.backgroundBlur' => 'Background blur',
+			'setting.editor.year' => 'Year',
+			'setting.editor.semester' => 'Semester',
+			'setting.sections.display' => 'Display',
+			'setting.sections.languageAndText' => 'Language and text',
+			'setting.sections.home' => 'Home screen',
+			'setting.sections.electricity' => 'Electricity alerts',
+			'setting.sections.timetableAppearance' => 'Timetable appearance',
+			'setting.sections.semester' => 'Semester and weeks',
+			'setting.sections.courseData' => 'Course data',
+			'setting.navigation.uiDescription' => 'Theme, text, language and home display',
+			'setting.navigation.classtableDescription' => 'Timetable style, semester and course data',
+			'setting.navigation.accountDescription' => 'Accounts and passwords for campus services',
+			'setting.navigation.notificationsDescription' => 'Course reminders and notifications',
+			'setting.navigation.coreDescription' => 'Logs, cached data and sign out',
+			'setting.fontSizeSetting' => 'Font size & weight',
+			'setting.fontSizePage.sizeTitle' => 'Font size',
+			'setting.fontSizePage.weightTitle' => 'Font weight',
+			'setting.fontSizePage.previewTitle' => 'Preview',
+			'setting.fontSizePage.weightThin' => 'Thin',
+			'setting.fontSizePage.weightRegular' => 'Regular',
+			'setting.fontSizePage.weightMedium' => 'Medium',
+			'setting.fontSizePage.weightSemibold' => 'Semi bold',
+			'setting.fontSizePage.weightBold' => 'Bold',
+			'setting.fontSizePage.summary' => ({required Object scale, required Object weight}) => '${scale}% · ${weight}',
+			'setting.generalAccountSettings' => 'General accounts',
+			'setting.undergraduateSystemAccounts' => 'Undergraduate system accounts',
+			'setting.classTableBackgroundSection' => 'Class schedule background',
+			'setting.backgroundBlur' => ({required Object value}) => 'Background blur: ${value}',
+			'setting.backgroundBlurOff' => 'Off',
+			'setting.classTableStyleSetting' => 'Class schedule display & style',
+			'setting.classTableStyleDescription' => 'Time indicator and course card style',
+			'setting.classTableStylePage.currentTimeSettingsTitle' => 'Time indicator settings',
+			'setting.classTableStylePage.classColorSettingsTitle' => 'Class schedule style settings',
+			'setting.classTableStylePage.currentTimeSection' => 'Time indicator settings',
+			'setting.classTableStylePage.showCurrentTimeIndicator' => 'Show current time indicator',
+			'setting.classTableStylePage.showCurrentTimeLabel' => 'Show mini time label',
+			'setting.classTableStylePage.showTodayColumnHighlight' => 'Highlight today\'s column',
+			'setting.classTableStylePage.activeSection' => 'Course card style',
+			'setting.classTableStylePage.unfinishedSection' => 'Course card style',
+			'setting.classTableStylePage.activeBrightnessFactor' => ({required Object value}) => 'Brightness: ${value}',
+			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => 'Border opacity: ${value}',
+			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => 'Fill opacity: ${value}',
+			'setting.classTableStylePage.completedSection' => 'Completed class style',
+			'setting.classTableStylePage.completedStyleEnabled' => 'Completed class styling distinction',
+			'setting.classTableStylePage.completedSaturationFactor' => ({required Object value}) => 'Fill saturation: ${value}',
+			'setting.classTableStylePage.completedBrightnessFactor' => ({required Object value}) => 'Brightness: ${value}',
+			'setting.classTableStylePage.completedTextSaturationFactor' => ({required Object value}) => 'Text saturation: ${value}',
+			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => 'Border opacity: ${value}',
+			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => 'Fill opacity: ${value}',
+			'setting.classSwiftExplain' => 'Positive number delays the start date, negative number advances the start date',
+			'sponsorship.title' => 'This version is sponsored and released by Jichuang Studio and the Network Management Committee.',
+			'sponsorship.dialogTitle' => 'Sponsorship Information',
+			'sponsorship.dialogContent' => 'Introduction to Jichuang Studio: Jichuang Studio is a tech innovation club supported and established by the Xidian University Innovation and Entrepreneurship College. It aims to walk alongside the campus\'s most outstanding innovation and entrepreneurship talent, focusing on technological innovation and product research and development in fields such as artificial intelligence. Currently, the studio collaborates with manufacturers like Huawei, deeply cultivating cutting-edge directions related to large language models, and has incubated over dozens of AI-related sci-tech innovation products, 8 of which have successfully achieved commercial deployment. The studio\'s best-known products include SwanLab, LLMOne, and NexusGate.\n\nIntroduction to the XDUNA: The XDUNA operates under the Xidian University Information Network Technology Center. It primarily assists in handling campus network usage issues for faculty and students, and participates in campus network maintenance, online consultation, offline processing, and technical support. We welcome responsible students who are eager to learn and interested in network and technical practices to join us in serving fellow students, improving abilities, and gaining experience.\n\nNote from the XDYou Software Developer: Jichuang provided significant help during the early development of XDYou. I joined the Network Management Committee back in my admission year in 2020, though unfortunately they didn\'t accept me. As I\'ve recently been looking for a job and consulted some of their members for information, this page has been created as a consultation fee in accordance with our agreement.\nBender Rodriguez 6/9/2026',
+			'sponsorship.buttonJichuang' => 'About Jichuang',
+			'sponsorship.buttonXduna' => 'About XDUNA',
 			'sport.title' => 'Sport Query',
 			'sport.classInfo' => 'Class information',
 			'sport.emptyClassInfo' => 'No class information found',

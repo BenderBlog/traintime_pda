@@ -7,7 +7,7 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:based_split_view/based_split_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/external/ruisi_flutter/ruisi_flutter.dart';
 import 'package:watermeter/page/pig/pig_page.dart';
@@ -71,7 +71,6 @@ class _HomePageMasterState extends State<HomePageMaster>
   int _selectedIndex = 0;
   static bool refreshAtStart = false;
 
-  late StreamSubscription _intentSub;
   late PageController _controller;
   late final IDSReAuthHandler _idsReAuthHandler;
 
@@ -87,10 +86,7 @@ class _HomePageMasterState extends State<HomePageMaster>
   }
 
   void _loginAsync() async {
-    showToast(
-      context: context,
-      msg: context.t.homepage.loginMessage,
-    );
+    showToast(context: context, msg: context.t.homepage.loginMessage);
 
     try {
       await HomepageController.i.refresh(
@@ -118,12 +114,8 @@ class _HomePageMasterState extends State<HomePageMaster>
             context: context,
             barrierDismissible: false,
             builder: (context) => AlertDialog(
-              title: Text(
-                context.t.homepage.passwordWrongTitle,
-              ),
-              content: Text(
-                context.t.homepage.passwordWrongContent,
-              ),
+              title: Text(context.t.homepage.passwordWrongTitle),
+              content: Text(context.t.homepage.passwordWrongContent),
               actions: [
                 TextButton(
                   onPressed: () async {
@@ -149,9 +141,7 @@ class _HomePageMasterState extends State<HomePageMaster>
                     Navigator.of(context).pop();
                     _showOfflineModeNotice();
                   },
-                  child: Text(
-                    context.t.homepage.passwordWrongDenial,
-                  ),
+                  child: Text(context.t.homepage.passwordWrongDenial),
                 ),
               ],
             ),
@@ -168,12 +158,8 @@ class _HomePageMasterState extends State<HomePageMaster>
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(
-            context.t.homepage.offlineModeTitle,
-          ),
-          content: Text(
-            context.t.homepage.offlineModeContent,
-          ),
+          title: Text(context.t.homepage.offlineModeTitle),
+          content: Text(context.t.homepage.offlineModeContent),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -216,7 +202,6 @@ class _HomePageMasterState extends State<HomePageMaster>
     if (identical(activeIDSReAuthHandler, _idsReAuthHandler)) {
       activeIDSReAuthHandler = null;
     }
-    if (Platform.isAndroid || Platform.isIOS) _intentSub.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

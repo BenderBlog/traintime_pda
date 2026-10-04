@@ -10,7 +10,10 @@ import 'package:watermeter/model/aircon_energy.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/page/energy/electricity_average_usage_graph.dart';
+import 'package:watermeter/page/energy/aircon_remote_page.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/page/setting/aircon_imei_page.dart';
 import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -48,10 +51,7 @@ class AirconEnergyCard extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.outline),
         ).padding(vertical: 8, horizontal: 12),
         FilledButton.icon(
-          onPressed: () => showDialog<void>(
-            context: context,
-            builder: (context) => const AirconImeiDialog(),
-          ),
+          onPressed: () => context.push<void>(const AirconImeiPage()),
           icon: const Icon(Icons.add),
           label: Text(context.t.electricity.airconAddImei),
         ).padding(horizontal: 12).width(double.infinity),
@@ -79,6 +79,17 @@ class AirconEnergyCard extends StatelessWidget {
           ? onRefresh
           : null,
       children: [
+        FilledButton.icon(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => const AirconRemotePage(),
+            ),
+          ),
+          icon: const Icon(Icons.settings_remote),
+          label: Text(
+            context.t.electricity.airconRemote,
+          ),
+        ).padding(top: 12, horizontal: 12).width(double.infinity),
         state.map(
           data: (result) => Column(
             children: [

@@ -10,7 +10,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'package:time/time.dart';
 import 'package:watermeter/bridge/save_to_groupid.g.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
@@ -29,12 +28,17 @@ enum ClasstableCacheHint implements CacheHint {
   networkFailed,
   unknownError;
 
+  @override
   String resolve(Translations t) {
     switch (this) {
-      case passwordWrong: return t.classtable.cacheHintPasswordWrong;
-      case loginFailed: return t.classtable.cacheHintLoginFailed;
-      case networkFailed: return t.classtable.cacheHintNetworkFailed;
-      case unknownError: return t.classtable.cacheHintUnknownError;
+      case passwordWrong:
+        return t.classtable.cacheHintPasswordWrong;
+      case loginFailed:
+        return t.classtable.cacheHintLoginFailed;
+      case networkFailed:
+        return t.classtable.cacheHintNetworkFailed;
+      case unknownError:
+        return t.classtable.cacheHintUnknownError;
     }
   }
 }
@@ -73,7 +77,6 @@ class ClassTableSession extends IDSSession {
   Future<void> updateCacheAndGroup(ClassTableData data) async {
     await _schoolClassDataCache.writeAsString(jsonEncode(data.toJson()));
 
-    /// TODO: Change ios widgitkit code to parse user defined classtable.
     if (Platform.isIOS) {
       final api = SaveToGroupIdSwiftApi();
       try {
@@ -177,26 +180,19 @@ class ClassTableSession extends IDSSession {
 
     await followIDSRedirects(initialLocation: location, client: dio);
 
-    DateTime now = DateTime.now();
-    var currentWeek = await dio
-        .post(
-          'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/portal/queryRcap.do',
-          data: {'day': DateFormat("yyyyMMdd").format(now)},
-        )
-        .then((value) => value.data);
-    if (!currentWeek.toString().contains("xnxq")) {
-      return ClassTableData(semesterCode: semesterCode);
-    }
-    currentWeek =
-        RegExp(r'[0-9]+').firstMatch(currentWeek["xnxq"])?[0] ?? "null";
+    final calendarResponse = await dio.post(
+      'https://yjspt.xidian.edu.cn/gsapp/sys/yjsemaphome/homeAppend/getSchoolCalendar.do',
+      data: {'xnxqdm': semesterCode},
+    );
 
-    log.info(
-      "[getClasstable][getYjspt] Current week is $currentWeek, fetching...",
-    );
-    int weekDay = now.weekday - 1;
-    String termStartDay = DateFormat("yyyy-MM-dd HH:mm:ss").format(
-      now.add(Duration(days: (1 - int.parse(currentWeek)) * 7 - weekDay)).date,
-    );
+    final rawCalendar = calendarResponse.data['msg'];
+    final calendar = rawCalendar is String
+        ? jsonDecode(rawCalendar)
+        : rawCalendar;
+
+    final termStartDay = DateFormat(
+      "yyyy-MM-dd hh:mm:ss",
+    ).format(DateTime.parse(calendar['QSRQ'] as String));
 
     Map<String, dynamic> data = await dio
         .post(classInfoURL, data: {"XNXQDM": semesterCode})

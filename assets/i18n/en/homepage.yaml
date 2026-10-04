@@ -1,3 +1,4 @@
+---
 title: School Info Center
 loading: Loading
 loaded: Message updated
@@ -36,16 +37,10 @@ password_wrong_title: Wrong username or password
 password_wrong_content: Restart the app and log in manually?
 password_wrong_denial: No, enter offline mode
 offline_mode_title: Uniform Authentication Service offline mode activated
-offline_mode_content: '"Unable to connect to the Unified Authentication Service server,
-  all related services are temporarily unavailable.
-
-  Score inquiry, exam information inquiry, overdue fee inquiry, campus card inquiry
-  are closed. The schedule displays cached data. Other functions are temporarily not
-  affected.
-
+offline_mode_content: |
+  "Unable to connect to the Unified Authentication Service server, all related services are temporarily unavailable.
+  Score inquiry, exam information inquiry, overdue fee inquiry, campus card inquiry are closed. The schedule displays cached data. Other functions are temporarily not affected.
   We apologize for any inconvenience caused."
-
-  '
 offline_mode: In offline mode, all one-stop related functions are disabled
 notice_card:
   empty_notice: No application announcements retrieved, please refresh
@@ -55,9 +50,9 @@ notice_card:
   notice_page_title: Notification List
 class_table_card:
   title: Timetable
-  today: '{remain} arrangment(s) today'
+  today: "{remain} arrangment(s) today"
   today_finished: Arrangements all done today
-  tomorrow: '{remain} arrangment(s) tomorrow'
+  tomorrow: "{remain} arrangment(s) tomorrow"
   tomorrow_none: No arrangement tomorrow
   week_info: Week {weekinfo}
   on_holiday: On vacation
@@ -75,7 +70,7 @@ class_table_card:
   all_loading_infoText: All sources loading
   partial_loading_infoText: Partially loading
   partial_error_infoText: Some data failed to load
-  failed_chip: '{source} failed'
+  failed_chip: "{source} failed"
   failed_source_class_info: Class info
   failed_source_exam_info: Exam info
   failed_source_physics_experiment: Physics experiment
@@ -84,7 +79,7 @@ class_table_card:
   seat: Seat {seatnum}
 electricity_card:
   title: Electricity and Hydroenergy Information
-  current_electricity: '{amount} kWh remains'
+  current_electricity: "{amount} kWh remains"
   cache_notice: 'Last fetch date: {date}'
 library_card:
   title: Library Info
@@ -128,3 +123,14 @@ school_net:
 club_promotion:
   failed: Failed to fetch club info
   fetching: Fetching club info
+aircon_card:
+  title: Aircon Remote
+  not_configured: Aircon not configured
+  configure_hint: Tap to add an aircon IMEI
+  running: "{mode} · {temperature} ℃"
+  power_off: Aircon is off
+  indoor_and_wind: Indoor {temperature} ℃ · Fan {wind}
+  wind: Fan {wind}
+  fetching: Fetching aircon status
+  error: Unable to fetch aircon status
+  open_remote: Tap to open the aircon remote

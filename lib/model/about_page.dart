@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 const String urlOthers = "https://www.bilibili.com/video/BV1tW411n7eW";
@@ -22,8 +22,10 @@ class Link {
 
   String resolve(Translations t) {
     switch (name) {
-      case LinkName.homepage: return t.setting.aboutPage.homepage;
-      case LinkName.code: return t.setting.aboutPage.code;
+      case LinkName.homepage:
+        return t.setting.aboutPage.homepage;
+      case LinkName.code:
+        return t.setting.aboutPage.code;
     }
   }
 }
@@ -105,6 +107,12 @@ final List<Developer> getDevelopers = [
     "https://copperkoi.cn/about",
   ),
   Developer(
+    "DaMi (Kangwenqiao)",
+    "https://avatars.githubusercontent.com/u/118408678",
+    (t) => t.setting.aboutPage.dami,
+    "https://github.com/Kangwenqiao",
+  ),
+  Developer(
     "Dimole",
     "https://avatars.githubusercontent.com/u/24828354",
     (t) => t.setting.aboutPage.dimole,
@@ -178,6 +186,12 @@ final List<Developer> getDevelopers = [
     "https://github.com/Ka-mate-ka-ora/",
   ),
   Developer(
+    "L1angYun",
+    "https://avatars.githubusercontent.com/u/76769653",
+    (t) => t.setting.aboutPage.l1angyun,
+    "https://github.com/L1angYun",
+  ),
+  Developer(
     "Lagrange-X",
     "https://avatars.githubusercontent.com/u/110022915",
     (t) => t.setting.aboutPage.lagrangeX,
@@ -194,6 +208,12 @@ final List<Developer> getDevelopers = [
     "https://avatars.githubusercontent.com/u/105974550",
     (t) => t.setting.aboutPage.lichtyy,
     "https://github.com/lichtYy",
+  ),
+  Developer(
+    "littlestejan",
+    "https://avatars.githubusercontent.com/u/40530340",
+    (t) => t.setting.aboutPage.littlestejan,
+    "https://github.com/littlestejan",
   ),
   Developer(
     "LQSY-H",
@@ -254,6 +274,12 @@ final List<Developer> getDevelopers = [
     "https://avatars.githubusercontent.com/u/42831635",
     (t) => t.setting.aboutPage.shadowyingyi,
     "https://github.com/shadowyingyi",
+  ),
+  Developer(
+    "SixTeenForever",
+    "https://avatars.githubusercontent.com/u/184718848",
+    (t) => t.setting.aboutPage.sixteenforever,
+    "https://github.com/16forever233",
   ),
   Developer(
     "stalomeow",

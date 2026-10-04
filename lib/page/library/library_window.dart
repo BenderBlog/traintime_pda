@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 // Library Window.
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/library/borrow_list_window.dart';
 import 'package:watermeter/page/library/search_book_window.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -20,12 +20,8 @@ class LibraryWindow extends StatelessWidget {
           title: Text(context.t.library.title),
           bottom: TabBar(
             tabs: [
-              Tab(
-                text: context.t.library.borrowStateTitle,
-              ),
-              Tab(
-                text: context.t.library.searchBookTitle,
-              ),
+              Tab(text: context.t.library.borrowStateTitle),
+              Tab(text: context.t.library.searchBookTitle),
             ],
           ),
         ),

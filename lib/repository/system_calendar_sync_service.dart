@@ -201,8 +201,7 @@ List<CalendarEventDraft> buildCalendarEvents({
       events.add(
         CalendarEventDraft(
           title: '${cc.name}@${cc.classroom ?? "待定"}',
-          description:
-              '自定义课程：${cc.name} - 老师：${cc.teacher ?? "未知"}',
+          description: '自定义课程：${cc.name} - 老师：${cc.teacher ?? "未知"}',
           startDate: tr.startTime,
           endDate: tr.endTime,
           location: cc.classroom,
@@ -215,7 +214,8 @@ List<CalendarEventDraft> buildCalendarEvents({
 }
 
 String buildICalendarString(List<CalendarEventDraft> events) {
-  String toReturn = 'BEGIN:VCALENDAR\n'
+  String toReturn =
+      'BEGIN:VCALENDAR\n'
       'CALSCALE:GREGORIAN\n'
       'BEGIN:VTIMEZONE\n'
       'TZID:Asia/Shanghai\n'
@@ -286,10 +286,15 @@ class SystemCalendarSyncService {
   String get calendarName =>
       buildExportedClassTableCalendarName(currentSemesterCode);
 
-  List<ExperimentData> get experiments => [
-    ...physicsExperimentController.physicsExperiments.value,
-    ...otherExperimentController.otherExperiments.value,
-  ];
+  List<ExperimentData> get experiments {
+    if (preference.getBool(preference.Preference.role)) {
+      return const <ExperimentData>[];
+    }
+    return [
+      ...physicsExperimentController.physicsExperiments.value,
+      ...otherExperimentController.otherExperiments.value,
+    ];
+  }
 
   List<CustomClass> get customClasses =>
       CustomClassController.i.customClassesSignal.value;

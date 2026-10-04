@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/schoolnet/current_net_info_page.dart';
 import 'package:watermeter/page/schoolnet/general_network_usage_page.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -25,12 +25,8 @@ class _NetworkCardWindowState extends State<NetworkCardWindow> {
           title: Text(context.t.schoolNet.title),
           bottom: TabBar(
             tabs: <Widget>[
-              Tab(
-                text: context.t.schoolNet.idsAccountNet.title,
-              ),
-              Tab(
-                text: context.t.schoolNet.currentLoginNet.title,
-              ),
+              Tab(text: context.t.schoolNet.idsAccountNet.title),
+              Tab(text: context.t.schoolNet.currentLoginNet.title),
             ],
           ),
         ),

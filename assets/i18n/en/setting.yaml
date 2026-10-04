@@ -1,3 +1,4 @@
+---
 about_info: APP info
 acknowledgement: Made With Love From {developers} People
 about: About
@@ -8,7 +9,7 @@ check_update: Check for updates
 latest_version: 'Latest version: {latest}'
 waiting: Waiting for obtain
 fetching_update: Fetching update information
-new_version: New version released!
+new_version: New version released，PLEASE UPDATE AT ONCE!
 current_stable: You are running the latest version
 current_testing: You are running the testing version
 fetch_failed: Failed to fetch update information
@@ -33,9 +34,9 @@ electricity_password_description: Please set if not default
 electricity_account_setting: Electricity account setting
 schoolnet_password_setting: Campus net password
 schoolnet_password_description: If you have not setted it, you cannot query it.
-aircon_imei_title: Aircon electricity data source
+aircon_imei_title: Aircon device
 aircon_imei: Aircon IMEI
-aircon_imei_not_set: Not set. Aircon electricity will be hidden on the power page.
+aircon_imei_not_set: Not set. Aircon data and remote control are unavailable.
 aircon_imei_current: 'Current IMEI: {imei}'
 aircon_imei_saved: Aircon IMEI saved
 aircon_imei_cleared: Aircon IMEI cleared
@@ -53,7 +54,7 @@ notification_page:
   load_failed: 'Failed to load settings: {error}'
   function_section: Notification Function
   enable_notification: Enable Pre-class Reminders
-  notification_scheduled: '{count} notifications scheduled'
+  notification_scheduled: "{count} notifications scheduled"
   notification_disabled_hint: All scheduled notifications will be cancelled when disabled
   update_schedule: Update Notification Schedule
   update_schedule_hint: Reschedule notifications based on the latest course data
@@ -87,25 +88,17 @@ notification_page:
     schedule
   days_unit: days
   settings_guide_title: Notification Settings Guide
-  settings_guide_content_1: 'To ensure you receive pre-class reminders in time, please
-    make sure:
-
+  settings_guide_content_1: |-
+    To ensure you receive pre-class reminders in time, please make sure:
     1. App notification permission is enabled
-
     2. Notification sound is enabled
-
     3. Banner notifications are enabled
-
-    4. Non-native Android users, enable auto-start and disable power optimization'
-  settings_guide_content_2: 'Pre-class Reminder Module Operating Mechanism:
-
-    1. When first activated, it will automatically schedule pre-class reminders for
-    the upcoming days
-
-    2. Each time the app is opened, it will automatically check and update the notification
-    schedule
-
-    3. After modifying settings, it will automatically reschedule all notifications'
+    4. Non-native Android users, enable auto-start and disable power optimization
+  settings_guide_content_2: |-
+    Pre-class Reminder Module Operating Mechanism:
+    1. When first activated, it will automatically schedule pre-class reminders for the upcoming days
+    2. Each time the app is opened, it will automatically check and update the notification schedule
+    3. After modifying settings, it will automatically reschedule all notifications
   got_it: Got it
   open_settings: Open System Settings
   no_classtable_data: Please fetch course schedule, exam, or experiment data first
@@ -114,7 +107,7 @@ notification_page:
   cancel_all_success: All pre-class reminders cancelled
   reschedule_success: Rescheduled {count} pre-class reminders
   reschedule_failed: 'Failed to reschedule notifications: {error}'
-notification_debug_page: Notification Services Debug Page
+notification_debug_page: Notification status and test
 classtable_setting: Class Schedule Related
 background: Background image
 no_background: You need to select an image first, it's at below
@@ -132,12 +125,7 @@ class_refresh_title: Refresh Confirmation
 class_refresh_content: Do you want to force refreshing the class schedule? If you
   agree, we will fetch the schedule from the school, which may takes a long time.
 class_swift: Class schedule offset setting
-class_swift_description: 'Positive number delays the start date, negative number advances
-  the start date
-
-  Currently {swift}
-
-  '
+class_swift_description: Currently {swift}
 core_setting: Cached login settings
 check_logger: View network interceptor and logs
 clear_and_restart: Clear cache and restart
@@ -166,11 +154,12 @@ change_color_dialog:
 change_brightness_dialog:
   title: Brightness settings
   follow_setting: Follow system
-  day_mode: Day mode
-  night_mode: Night mode
+  day_mode: Light
+  night_mode: Dark
 change_swift_dialog:
   title: Class schedule offset setting
   input_hint: Please input number here
+  invalid_number: Please enter a valid whole number
 change_electricity_title: Modify electricity account
 change_electricity_account:
   title: Modify electricity account
@@ -251,8 +240,10 @@ semester_update_data: Applying new semester setting
 easter_egg_page: You found an Easter egg
 about_page:
   benderblog: Main developer, iOS widget
-  alnair: 'Development: Library search and cover'
-  aqqkad: 'Development: Class attandance history'
+  alnair: 'Development: Library search and covers, library layout fixes, water dispenser
+    functionality and API updates'
+  aqqkad: 'Development: Class attendance history, air conditioner remote control and
+    electricity data integration, library API updates'
   bellssgit: 'Support: best and longest feedback source'
   brackrat: 'Design: homepage, login page, color scheme, iOS widgets, etc.'
   breezeline: 'Support: valueless and meaningless product manager (from his own description)'
@@ -273,7 +264,8 @@ about_page:
   hhzm: 'Development: electricity fee inquiry account calculation'
   imaginary_17: 'Developement: Ruisi navigator stack fix'
   imoscarz: 'Development: Homepage for software / Development: Checkin check for pad
-    / Development: Sport UI Change'
+    / Development: Sport UI Change / Development: Settings category refactoring and
+    master-detail layout adaptation'
   ka-mate-ka-ora: 'Internationalization: English correction'
   lagrange-x: 'Development: Class progress indicator (adopted) / Development: Gray
     cover on attended class and other classtable design'
@@ -312,21 +304,93 @@ about_page:
   homepage: Homepage
   code: Source code
   know_more: Learn more
-  copyright_notice: 'This software is compiled, or derived from the traintime_pda
-    (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.
-
-    This APP has no relation to Xidian University, Tishineng Service, Shuwow and other
-    services.
-
-    Copyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present
-    Traintime PDA authors.
-
+  copyright_notice: |-
+    This software is compiled, or derived from the traintime_pda (a.k.a watermeter) codebase, which is licensed under Mozilla Public License v2.0.
+    This APP has no relation to Xidian University, Tishineng Service, Shuwow and other services.
+    Copyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present Traintime PDA authors.
     The Copyright of the Software is protected by NCAC, register code is 2026SR0738647
-
-    The Source Code Form is subject to the terms of the Mozilla Public License, v.
-    2.0. If a copy of the MPL was not distributed with this file, you can obtain one
-    at https://mozilla.org/MPL/2.0/.'
+    The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.
   beian: ICP record code
   copyright_register_code: Copyright register code
   sign_android: Android signature
   title: About this APP
+  contributors: Contributors & acknowledgements
+  licenses: Open source licenses
+  extras: More
+  dami: 'Development: Fix negative course offset input and input validation on iOS'
+  l1angyun: 'Development: Live availability of classrooms, timetable background blur,
+    timetable layout and screen corner adaptation; fix campus network data display'
+  littlestejan: 'Development: Campus network captcha refresh and captcha input dialog
+    improvements'
+  sixteenforever: 'Development: HarmonyOS port'
+editor:
+  save: Save
+  apply: Apply
+  password_set: Set
+  password_not_set: Not set
+  password_visibility: Show or hide password
+  toggle_sign: Toggle positive or negative
+  positive_number: Enter an integer greater than 0
+  electricity_unit: kWh
+  text_preview: Course schedule · TrainTime PDA · 0123456789
+  brightness: Brightness
+  border_opacity: Border opacity
+  fill_opacity: Fill opacity
+  fill_saturation: Fill saturation
+  text_saturation: Text saturation
+  background_blur: Background blur
+  year: Year
+  semester: Semester
+sections:
+  display: Display
+  language_and_text: Language and text
+  home: Home screen
+  electricity: Electricity alerts
+  timetable_appearance: Timetable appearance
+  semester: Semester and weeks
+  course_data: Course data
+navigation:
+  ui_description: Theme, text, language and home display
+  classtable_description: Timetable style, semester and course data
+  account_description: Accounts and passwords for campus services
+  notifications_description: Course reminders and notifications
+  core_description: Logs, cached data and sign out
+font_size_setting: Font size & weight
+font_size_page:
+  size_title: Font size
+  weight_title: Font weight
+  preview_title: Preview
+  weight_thin: Thin
+  weight_regular: Regular
+  weight_medium: Medium
+  weight_semibold: Semi bold
+  weight_bold: Bold
+  summary: "{scale}% · {weight}"
+general_account_settings: General accounts
+undergraduate_system_accounts: Undergraduate system accounts
+class_table_background_section: Class schedule background
+background_blur: 'Background blur: {value}'
+background_blur_off: 'Off'
+class_table_style_setting: Class schedule display & style
+class_table_style_description: Time indicator and course card style
+class_table_style_page:
+  current_time_settings_title: Time indicator settings
+  class_color_settings_title: Class schedule style settings
+  current_time_section: Time indicator settings
+  show_current_time_indicator: Show current time indicator
+  show_current_time_label: Show mini time label
+  show_today_column_highlight: Highlight today's column
+  active_section: Course card style
+  unfinished_section: Course card style
+  active_brightness_factor: 'Brightness: {value}'
+  active_border_alpha: 'Border opacity: {value}'
+  active_inner_alpha: 'Fill opacity: {value}'
+  completed_section: Completed class style
+  completed_style_enabled: Completed class styling distinction
+  completed_saturation_factor: 'Fill saturation: {value}'
+  completed_brightness_factor: 'Brightness: {value}'
+  completed_text_saturation_factor: 'Text saturation: {value}'
+  completed_border_alpha: 'Border opacity: {value}'
+  completed_inner_alpha: 'Fill opacity: {value}'
+class_swift_explain: Positive number delays the start date, negative number advances
+  the start date

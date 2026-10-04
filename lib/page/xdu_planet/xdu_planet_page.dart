@@ -1,3 +1,4 @@
+
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
@@ -81,16 +82,13 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
               },
               child: Text(
                 e == "xdu_planet.all"
-                    ? FlutterI18n.translate(
-                        context,
-                        e.replaceAll(
+                    ? context.t.resolveKey(e.replaceAll(
                           RegExp(
                             r'(lolicon)|(로리콘)|(Лоликон)|(ロリコン)',
                             caseSensitive: false,
                           ),
                           "Illegal Word Detected",
-                        ),
-                      )
+                        ))
                     : e,
                 style: TextStyle(
                   color: selected == e

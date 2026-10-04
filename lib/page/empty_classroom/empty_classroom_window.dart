@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/empty_classroom.dart';
 import 'package:watermeter/page/empty_classroom/empty_classroom_search_window.dart';
@@ -29,9 +29,7 @@ class _EmptyClassroomWindowState extends State<EmptyClassroomWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.emptyClassroom.title),
-      ),
+      appBar: AppBar(title: Text(context.t.emptyClassroom.title)),
       body: FutureBuilder(
         future: places,
         builder: (context, snapshot) {

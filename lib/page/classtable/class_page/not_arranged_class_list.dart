@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
@@ -17,9 +17,7 @@ class NotArrangedClassList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.classtable.notArrangedPage.title),
-      ),
+      appBar: AppBar(title: Text(context.t.classtable.notArrangedPage.title)),
       body: Builder(
         builder: (context) {
           if (notArranged.isEmpty) {
@@ -33,7 +31,12 @@ class NotArrangedClassList extends StatelessWidget {
             itemBuilder: (context, index) => ListTile(
               title: Text(notArranged[index].name),
               subtitle: Text(
-                context.t.classtable.notArrangedPage.content(class_code: notArranged[index].code ?? "", class_number: notArranged[index].number ?? "", teacher: notArranged[index].teacher ?? context.t.common.noInfo),
+                context.t.classtable.notArrangedPage.content(
+                  class_code: notArranged[index].code ?? "",
+                  class_number: notArranged[index].number ?? "",
+                  teacher:
+                      notArranged[index].teacher ?? context.t.common.noInfo,
+                ),
               ),
             ),
           ).constrained(maxWidth: 600);

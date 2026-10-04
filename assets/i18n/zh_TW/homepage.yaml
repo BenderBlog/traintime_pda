@@ -1,4 +1,4 @@
-# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+---
 title: 校園信息查詢
 loading: 正在加載
 loaded: 加載成功
@@ -35,11 +35,10 @@ password_wrong_title: 用戶名或密碼有誤
 password_wrong_content: 是否重啟應用後手動登錄？
 password_wrong_denial: 否，進入離線模式
 offline_mode_title: 統一認證服務離線模式開啟
-offline_mode_content: '無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。
-
+offline_mode_content: |-
+  無法連接到統一認證服務服務器，所有和其相關的服務暫時不可用。
   成績查詢，考試信息查詢，欠費查詢，校園卡查詢關閉。課表顯示緩存數據。其他功能暫不受影響。
-
-  如有不便，敬請諒解。'
+  如有不便，敬請諒解。
 offline_mode: 脫機模式下，一站式相關功能全部禁止使用
 notice_card:
   empty_notice: 目前沒有獲取應用公告，請刷新
@@ -69,7 +68,7 @@ class_table_card:
   all_loading_infoText: 全部加載中
   partial_loading_infoText: 部分加載中
   partial_error_infoText: 部分數據加載失敗
-  failed_chip: '{source}加載失敗'
+  failed_chip: "{source}加載失敗"
   failed_source_class_info: 課程信息
   failed_source_exam_info: 考試信息
   failed_source_physics_experiment: 物理實驗
@@ -122,3 +121,14 @@ school_net:
 club_promotion:
   failed: 社團信息獲取失敗
   fetching: 社團信息清單正在加載
+aircon_card:
+  title: 空調遙控
+  not_configured: 尚未配置空調
+  configure_hint: 點擊添加空調 IMEI
+  running: "{mode} · {temperature} ℃"
+  power_off: 空調已關閉
+  indoor_and_wind: 室內 {temperature} ℃ · 風速 {wind}
+  wind: 風速 {wind}
+  fetching: 正在獲取空調狀態
+  error: 空調狀態獲取失敗
+  open_remote: 點擊進入空調遙控

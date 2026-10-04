@@ -5,7 +5,7 @@
 // Course reminder notification service implementation
 
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
@@ -311,8 +311,9 @@ class CourseReminderService extends NotificationService
         CustomClassController.i.customClassesSignal.value.isNotEmpty;
 
     final hasExperimentData =
-        PhysicsExperimentController.i.physicsExperiments.value.isNotEmpty ||
-        OtherExperimentController.i.otherExperiments.value.isNotEmpty;
+        !preference.getBool(preference.Preference.role) &&
+        (PhysicsExperimentController.i.physicsExperiments.value.isNotEmpty ||
+            OtherExperimentController.i.otherExperiments.value.isNotEmpty);
 
     final hasExamData = ExamController.i.subjects.value.any(
       (subject) => subject.startTime != null,
@@ -543,6 +544,10 @@ class CourseReminderService extends NotificationService
     int daysToSchedule = 7,
     int minutesBefore = 5,
   }) async {
+    if (preference.getBool(preference.Preference.role)) {
+      return;
+    }
+
     log.info(
       '[CourseReminderService] [scheduleNotificationsFromExperimentData] Starting to schedule notifications (daysToSchedule: $daysToSchedule, minutesBefore: $minutesBefore)...',
     );

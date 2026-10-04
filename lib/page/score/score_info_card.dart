@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/page/score/score_compose_card.dart';
@@ -90,9 +90,7 @@ class _ScoreInfoCardState extends State<ScoreInfoCard> {
                 if (c.scoreData[widget.mark].scoreStatus != "初修")
                   TextSpan(text: "${c.scoreData[widget.mark].scoreStatus} "),
                 if (c.scoreData[widget.mark].isPassed == false)
-                  TextSpan(
-                    text: context.t.score.scoreInfoCard.failed,
-                  ),
+                  TextSpan(text: context.t.score.scoreInfoCard.failed),
                 TextSpan(text: c.scoreData[widget.mark].name),
               ],
             ),

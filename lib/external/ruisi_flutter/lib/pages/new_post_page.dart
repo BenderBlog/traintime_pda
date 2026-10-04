@@ -1,8 +1,8 @@
-import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 
 import '../controller/ruisi_controller.dart';
@@ -92,9 +92,9 @@ class _NewPostPageState extends State<NewPostPage> {
     if (file == null) return;
     if (!mounted) return;
 
-    final ext = file.extension?.toLowerCase();
+    final ext = file.name.toLowerCase();
     const allowed = {'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'};
-    if (ext == null || !allowed.contains(ext)) {
+    if (!allowed.contains(ext)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('仅支持 jpg/jpeg/png/gif/bmp/webp 图片')),
       );
@@ -187,7 +187,7 @@ class _NewPostPageState extends State<NewPostPage> {
                 final forums = state.groups.expand((g) => g.forums).toList();
 
                 return DropdownButtonFormField<int>(
-                  value:
+                  initialValue:
                       _selectedFid, // 注意：Flutter 新版本推荐使用 value 代替 initialValue
                   decoration: InputDecoration(
                     labelText: context.t.ruisi.post.selectForum,
@@ -214,9 +214,8 @@ class _NewPostPageState extends State<NewPostPage> {
                     setState(() => _selectedFid = v);
                     if (v != null) _loadMeta(v);
                   },
-                  validator: (v) => v == null
-                      ? context.t.ruisi.post.selectForumHint
-                      : null,
+                  validator: (v) =>
+                      v == null ? context.t.ruisi.post.selectForumHint : null,
                 );
               },
             ),
@@ -387,19 +386,13 @@ class _NewPostPageState extends State<NewPostPage> {
     if (!mounted) return;
 
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.t.ruisi.post.success),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.t.ruisi.post.success)));
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error ?? context.t.ruisi.post.failure,
-          ),
-        ),
+        SnackBar(content: Text(error ?? context.t.ruisi.post.failure)),
       );
     }
   }

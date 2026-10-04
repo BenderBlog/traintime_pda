@@ -2,7 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
@@ -12,10 +13,10 @@ import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
+import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/generated/translations.g.dart';
 
 /// The card in [classSubRow], mentioned in [ClassTableView].
 class ClassCard extends StatelessWidget {
@@ -43,6 +44,7 @@ class ClassCard extends StatelessWidget {
       palette: color,
       isCompleted: true,
     );
+    final isInteractive = classTableState.isClassCardInteractive(detail);
 
     const borderRadius = BorderRadius.all(Radius.circular(8));
     return Padding(
@@ -58,6 +60,25 @@ class ClassCard extends StatelessWidget {
             final isCompleted = splitHeight >= constraints.maxHeight - 0.5;
             final textStyle = isCompleted ? completedStyle : activeStyle;
             final borderStyle = isCompleted ? completedStyle : activeStyle;
+
+            /// Seven days have to fit next to the index row, and in a floating
+            /// window or in a split screen much less room is left for each of
+            /// them. The regular sizes would then break the name of a class
+            /// into one or two characters per line, and the lines which do not
+            /// fit in the card are cut off, so the text shrinks with the card.
+            final cardWidth = constraints.maxWidth;
+            final isNarrowCard = cardWidth < narrowClassCardWidth;
+            final isTinyCard = cardWidth < tinyClassCardWidth;
+            final nameFontSize = isTinyCard
+                ? 9.0
+                : isNarrowCard
+                ? 10.0
+                : (isPhone(context) ? 12.0 : 14.0);
+            final detailFontSize = isTinyCard
+                ? 7.0
+                : isNarrowCard
+                ? 9.0
+                : (isPhone(context) ? 10.0 : 12.0);
 
             return Stack(
               fit: StackFit.expand,
@@ -91,90 +112,96 @@ class ClassCard extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     overlayColor: Colors.transparent,
                   ),
-                  onPressed: () async {
-                    final controller = ClassTableState.of(context)!.controllers;
+                  onPressed: isInteractive
+                      ? () async {
+                          final controller = ClassTableState.of(
+                            context,
+                          )!.controllers;
 
-                    /// The way to show the class info of the period.
-                    /// The last one indicate whether to delete this stuff.
-                    final action = await BothSideSheet.show(
-                      title: context.t.classtable.classCard.title,
-                      child: ArrangementDetail(
-                        information: List.generate(data.length, (index) {
-                          if (data.elementAt(index) is Subject ||
-                              data.elementAt(index) is ExperimentData) {
-                            return data.elementAt(index);
-                          } else if (data.elementAt(index)
-                              is (
-                                CustomClass,
-                                CustomClassTimeRange,
-                                MaterialColor,
-                              )) {
-                            return data.elementAt(index);
-                          } else if (data.elementAt(index)
-                              is (CustomClass, CustomClassTimeRange)) {
-                            return data.elementAt(index);
-                          } else if (data.elementAt(index) is TimeArrangement) {
-                            final TimeArrangement arrangement =
-                                data.elementAt(index);
-                            return (
-                              classTableState.getClassDetail(
-                                classTableState.timeArrangement.indexOf(
-                                  arrangement,
-                                ),
-                              ),
-                              arrangement,
-                            );
-                          } else {
-                            return data.elementAt(index);
+                          /// The way to show the class info of the period.
+                          /// The last one indicate whether to delete this stuff.
+                          final action = await BothSideSheet.show(
+                            title: context.t.classtable.classCard.title,
+                            child: ArrangementDetail(
+                              information: List.generate(data.length, (index) {
+                                if (data.elementAt(index) is Subject ||
+                                    data.elementAt(index) is ExperimentData) {
+                                  return data.elementAt(index);
+                                } else if (data.elementAt(index)
+                                    is (
+                                      CustomClass,
+                                      CustomClassTimeRange,
+                                      MaterialColor,
+                                    )) {
+                                  return data.elementAt(index);
+                                } else if (data.elementAt(index)
+                                    is (CustomClass, CustomClassTimeRange)) {
+                                  return data.elementAt(index);
+                                } else if (data.elementAt(index)
+                                    is TimeArrangement) {
+                                  final TimeArrangement arrangement = data
+                                      .elementAt(index);
+                                  return (
+                                    classTableState.getClassDetail(
+                                      classTableState.timeArrangement.indexOf(
+                                        arrangement,
+                                      ),
+                                    ),
+                                    arrangement,
+                                  );
+                                } else {
+                                  return data.elementAt(index);
+                                }
+                              }),
+                              currentWeek: classTableState.currentWeek,
+                            ),
+                            context: context,
+                          );
+                          if (!context.mounted || action == null) return;
+
+                          if (action is (String, String?, String)) {
+                            final int customIndex = controller.customClasses
+                                .indexWhere((custom) => custom.id == action.$1);
+                            if (customIndex < 0) return;
+
+                            if (action.$3 == 'delete_all') {
+                              await controller.deleteCustomClassById(action.$1);
+                            } else if (action.$3 == 'delete_one') {
+                              final String? timeRangeId = action.$2;
+                              if (timeRangeId == null) return;
+                              await controller.deleteCustomClassTimeRange(
+                                customClassId: action.$1,
+                                timeRangeId: timeRangeId,
+                              );
+                            } else if (action.$3 == 'edit') {
+                              final CustomClass customClass =
+                                  controller.customClasses[customIndex];
+                              await Navigator.of(context)
+                                  .push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ClassAddWindow(
+                                        customToChange: customClass,
+                                        semesterLength:
+                                            controller.semesterLength,
+                                      ),
+                                    ),
+                                  )
+                                  .then((value) async {
+                                    if (value is CustomClass) {
+                                      await controller.editCustomClassById(
+                                        action.$1,
+                                        value,
+                                      );
+                                    }
+                                  });
+                            }
                           }
-                        }),
-                        currentWeek: classTableState.currentWeek,
-                      ),
-                      context: context,
-                    );
-                    if (!context.mounted || action == null) return;
-
-                    if (action is (String, String?, String)) {
-                      final int customIndex = controller.customClasses
-                          .indexWhere((custom) => custom.id == action.$1);
-                      if (customIndex < 0) return;
-
-                      if (action.$3 == 'delete_all') {
-                        await controller.deleteCustomClassById(action.$1);
-                      } else if (action.$3 == 'delete_one') {
-                        final String? timeRangeId = action.$2;
-                        if (timeRangeId == null) return;
-                        await controller.deleteCustomClassTimeRange(
-                          customClassId: action.$1,
-                          timeRangeId: timeRangeId,
-                        );
-                      } else if (action.$3 == 'edit') {
-                        final CustomClass customClass =
-                            controller.customClasses[customIndex];
-                        await Navigator.of(context)
-                            .push(
-                              MaterialPageRoute(
-                                builder: (context) => ClassAddWindow(
-                                  customToChange: customClass,
-                                  semesterLength: controller.semesterLength,
-                                ),
-                              ),
-                            )
-                            .then((value) async {
-                              if (value is CustomClass) {
-                                await controller.editCustomClassById(
-                                  action.$1,
-                                  value,
-                                );
-                              }
-                            });
-                      }
-                    }
-                  },
+                        }
+                      : null,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: isPhone(context) ? 2 : 4,
-                      vertical: 4,
+                      vertical: isNarrowCard ? 2 : 4,
                     ),
                     child: Align(
                       alignment: Alignment.topLeft,
@@ -186,7 +213,7 @@ class ClassCard extends StatelessWidget {
                               name,
                               style: TextStyle(
                                 color: textStyle.textColor,
-                                fontSize: isPhone(context) ? 12 : 14,
+                                fontSize: nameFontSize,
                               ),
                               maxLines: 3,
                               overflow: TextOverflow.clip,
@@ -196,15 +223,17 @@ class ClassCard extends StatelessWidget {
                             "@${place ?? context.t.classtable.classCard.unknownClassroom}",
                             style: TextStyle(
                               color: textStyle.textColor,
-                              fontSize: isPhone(context) ? 10 : 12,
+                              fontSize: detailFontSize,
                             ),
                           ),
                           if (data.length > 1)
                             Text(
-                              context.t.classtable.classCard.remainsHint(remain_count: (data.length - 1).toString()),
+                              context.t.classtable.classCard.remainsHint(
+                                remain_count: (data.length - 1).toString(),
+                              ),
                               style: TextStyle(
                                 color: textStyle.textColor,
-                                fontSize: isPhone(context) ? 10 : 12,
+                                fontSize: detailFontSize,
                               ),
                             ),
                         ],

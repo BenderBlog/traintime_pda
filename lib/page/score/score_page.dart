@@ -6,7 +6,7 @@
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -80,7 +80,9 @@ class _ScorePageState extends State<ScorePage> {
             builder: (context, state, _) {
               if (state.state == ScoreFetchState.readyCache) {
                 return CacheAlerter(
-                  hint: state.cacheHint?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
+                  hint:
+                      state.cacheHint?.resolve(context.t) ??
+                      context.t.common.cacheReasonDefault,
                   placeOfCache: PlaceOfCache.device,
                   fetchTime: state.fetchDate,
                 );
@@ -125,9 +127,11 @@ class _ScorePageState extends State<ScorePage> {
                         });
                       },
                       child: Text(
-                        context.t.score.chosenSemester(chosen: state.chosenSemester == ""
+                        context.t.score.chosenSemester(
+                          chosen: state.chosenSemester == ""
                               ? context.t.score.allSemester
-                              : state.chosenSemester),
+                              : state.chosenSemester,
+                        ),
                       ),
                     ),
                   ).padding(right: 8),
@@ -152,9 +156,11 @@ class _ScorePageState extends State<ScorePage> {
                         });
                       },
                       child: Text(
-                        context.t.score.chosenType(type: state.chosenStatus == ""
+                        context.t.score.chosenType(
+                          type: state.chosenStatus == ""
                               ? context.t.score.allType
-                              : state.chosenStatus),
+                              : state.chosenStatus,
+                        ),
                       ),
                     ),
                   ),
@@ -207,25 +213,19 @@ class _ScorePageState extends State<ScorePage> {
                         FilledButton(
                           onPressed: () =>
                               state.setScoreChoiceState(ChoiceState.all),
-                          child: Text(
-                            context.t.score.scorePage.selectAll,
-                          ),
+                          child: Text(context.t.score.scorePage.selectAll),
                         ),
                         const SizedBox(width: 12),
                         FilledButton(
                           onPressed: () =>
                               state.setScoreChoiceState(ChoiceState.none),
-                          child: Text(
-                            context.t.score.scorePage.selectNothing,
-                          ),
+                          child: Text(context.t.score.scorePage.selectNothing),
                         ),
                         const SizedBox(width: 12),
                         FilledButton(
                           onPressed: () =>
                               state.setScoreChoiceState(ChoiceState.original),
-                          child: Text(
-                            context.t.score.scorePage.resetSelect,
-                          ),
+                          child: Text(context.t.score.scorePage.resetSelect),
                         ),
                       ],
                     ),
@@ -242,9 +242,7 @@ class _ScorePageState extends State<ScorePage> {
                               gpa_all: state
                                   .evalAvg(true, isGPA: true)
                                   .toStringAsFixed(3),
-                              avg_all: state
-                                  .evalAvg(true)
-                                  .toStringAsFixed(2),
+                              avg_all: state.evalAvg(true).toStringAsFixed(2),
                               credit_all: state
                                   .evalCredit(true)
                                   .toStringAsFixed(2),
@@ -268,4 +266,3 @@ class _ScorePageState extends State<ScorePage> {
     );
   }
 }
-

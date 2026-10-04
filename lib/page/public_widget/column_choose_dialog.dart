@@ -1,9 +1,9 @@
-import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// ColumnChooseDialog is a dialog with a [chooseList] to select, return the index in the [chooseList].
 class ColumnChooseDialog extends StatelessWidget {
@@ -19,9 +19,7 @@ class ColumnChooseDialog extends StatelessWidget {
         chooseList.length,
         (index) => SimpleDialogOption(
           onPressed: () => Navigator.of(context).pop<int>(index),
-          child: ListTile(
-            title: Text(chooseList[index]),
-          ),
+          child: ListTile(title: Text(chooseList[index])),
         ),
       ),
     );

@@ -2,7 +2,7 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/course_detail_card.dart';
@@ -78,8 +78,9 @@ class CustomClassDetailCard extends StatelessWidget {
                         children: customClass.timeRanges
                             .map(
                               (range) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 1),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 1,
+                                ),
                                 child: _TimeRangeRow(
                                   dateText: _dateText(range),
                                   timeText: _timeText(range),
@@ -117,7 +118,11 @@ class CustomClassDetailCard extends StatelessWidget {
                             context.t.classtable.courseDetailCard.deleteTitle,
                           ),
                           content: Text(
-                            context.t.classtable.courseDetailCard.deleteContentSingle,
+                            context
+                                .t
+                                .classtable
+                                .courseDetailCard
+                                .deleteContentSingle,
                           ),
                           actions: [
                             TextButton(
@@ -130,15 +135,11 @@ class CustomClassDetailCard extends StatelessWidget {
                                 ).colorScheme.onPrimary,
                               ),
                               onPressed: () => Navigator.pop(context, false),
-                              child: Text(
-                                context.t.common.cancel,
-                              ),
+                              child: Text(context.t.common.cancel),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: Text(
-                                context.t.common.confirm,
-                              ),
+                              child: Text(context.t.common.confirm),
                             ),
                           ],
                         ),
@@ -176,15 +177,11 @@ class CustomClassDetailCard extends StatelessWidget {
                                 ).colorScheme.onPrimary,
                               ),
                               onPressed: () => Navigator.pop(context, false),
-                              child: Text(
-                                context.t.common.cancel,
-                              ),
+                              child: Text(context.t.common.cancel),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: Text(
-                                context.t.common.confirm,
-                              ),
+                              child: Text(context.t.common.confirm),
                             ),
                           ],
                         ),

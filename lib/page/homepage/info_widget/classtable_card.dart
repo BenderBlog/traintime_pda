@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -145,21 +145,21 @@ class _ClassArrangementListView extends StatelessWidget {
               builder: (context) {
                 if (isTomorrow) {
                   if (arrangements.isEmpty) {
-                    return Text(
-                      context.t.homepage.classTableCard.tomorrowNone,
-                    );
+                    return Text(context.t.homepage.classTableCard.tomorrowNone);
                   }
                   return Text(
-                    context.t.homepage.classTableCard.tomorrow(remain: arrangements.length.toString()),
+                    context.t.homepage.classTableCard.tomorrow(
+                      remain: arrangements.length.toString(),
+                    ),
                   );
                 }
                 if (arrangements.isEmpty) {
-                  return Text(
-                    context.t.homepage.classTableCard.todayFinished,
-                  );
+                  return Text(context.t.homepage.classTableCard.todayFinished);
                 }
                 return Text(
-                  context.t.homepage.classTableCard.today(remain: arrangements.length.toString()),
+                  context.t.homepage.classTableCard.today(
+                    remain: arrangements.length.toString(),
+                  ),
                 );
               },
             ),
@@ -183,7 +183,9 @@ class _ClassArrangementListView extends StatelessWidget {
 
                 String weekInfo =
                     currentWeek >= 0 && currentWeek < semesterLength
-                    ? context.t.homepage.classTableCard.weekInfo(weekinfo: "${currentWeek + 1}")
+                    ? context.t.homepage.classTableCard.weekInfo(
+                        weekinfo: "${currentWeek + 1}",
+                      )
                     : context.t.homepage.classTableCard.onHoliday;
 
                 String toShow = switch (arrangementState) {
@@ -265,7 +267,9 @@ class _ClassArrangementListTile extends StatelessWidget {
                         context.t.homepage.classTableCard.unknownPlace;
                     if (arrangement.seat != null) {
                       place += " ";
-                      place += context.t.homepage.classTableCard.seat(seatnum: arrangement.seat!);
+                      place += context.t.homepage.classTableCard.seat(
+                        seatnum: arrangement.seat!,
+                      );
                     }
                     return Text(
                       place,
@@ -404,7 +408,9 @@ class _StateList extends StatelessWidget {
       hints.add(
         _buildStateHintChip(
           context,
-          text: context.t.homepage.classTableCard.failedChip(source: _getFailedSourceLabel(context, source)),
+          text: context.t.homepage.classTableCard.failedChip(
+            source: _getFailedSourceLabel(context, source),
+          ),
           backgroundColor: theme.error,
           foregroundColor: theme.errorContainer,
         ),

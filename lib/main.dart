@@ -4,19 +4,18 @@
 
 // Intro of the watermeter program.
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:io';
 import 'dart:ui';
 
 import 'package:catcher_2/catcher_2.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:shared_preferences/util/legacy_to_async_migration_util.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,6 +27,7 @@ import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/themes/font_setting.dart';
 import 'package:home_widget/home_widget.dart';
 
 void main() async {
@@ -111,11 +111,6 @@ class _MyAppState extends State<MyApp> {
 
     if (widget.isFirst) {
       loginState = IDSLoginState.manual;
-      try {
-        IDSSession().dio.get("https://www.xidian.edu.cn");
-        // Should the permission request be sent on iOS
-        // ignore: empty_catches
-      } catch (e) {}
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -140,13 +135,15 @@ class _MyAppState extends State<MyApp> {
       builder: (context) {
         final color = appTheme.colorSignal.value;
         final themeMode = appTheme.colorStateSignal.value;
+        final fontScale = appTheme.fontScaleSignal.value;
+        final fontWeight = appTheme.fontWeightSignal.value;
         final locale = appTheme.localeSignal.value;
         appTheme.savedLocale.value;
 
         return TranslationProvider(
           child: MaterialApp(
             locale: locale,
-            localizationsDelegates: GlobalMaterialLocalizations.delegates,
+            localizationsDelegates: [...GlobalMaterialLocalizations.delegates],
             supportedLocales: AppLocaleUtils.supportedLocales,
             debugShowCheckedModeBanner: false,
             scrollBehavior: MyCustomScrollBehavior(),
@@ -231,7 +228,7 @@ class _MyAppState extends State<MyApp> {
               cupertinoOverrideTheme: const CupertinoThemeData(
                 applyThemeToAll: true,
               ),
-            ).useSystemChineseFont(Brightness.light),
+            ).applyFontWeight(fontWeightFromSlider(fontWeight)),
             darkTheme: FlexThemeData.dark(
               colors: color.last,
               usedColors: 1,
@@ -308,7 +305,7 @@ class _MyAppState extends State<MyApp> {
               cupertinoOverrideTheme: const CupertinoThemeData(
                 applyThemeToAll: true,
               ),
-            ).useSystemChineseFont(Brightness.dark),
+            ).applyFontWeight(fontWeightFromSlider(fontWeight)),
             themeMode: themeMode,
             home: DefaultTextStyle.merge(
               style: const TextStyle(textBaseline: TextBaseline.ideographic),
@@ -321,7 +318,19 @@ class _MyAppState extends State<MyApp> {
                 description: "An unexpected behaviour occured!",
                 maxWidthForSmallMode: 150,
               );
-              if (widget != null) return widget;
+              if (widget != null) {
+                return MaterialUiCompatibilityBridge(
+                  child: DefaultTextStyle.merge(
+                    style: const TextStyle().useSystemChineseFont(),
+                    child: MediaQuery(
+                      data: MediaQuery.of(
+                        context,
+                      ).copyWith(textScaler: TextScaler.linear(fontScale)),
+                      child: widget,
+                    ),
+                  ),
+                );
+              }
               throw StateError('widget is null');
             },
           ),

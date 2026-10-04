@@ -1,4 +1,4 @@
-# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+---
 about_info: 程序信息
 acknowledgement: Made With Love From {developers} People
 about: 關於
@@ -9,12 +9,12 @@ check_update: 檢查軟件更新
 latest_version: '最新版本: {latest}'
 waiting: 等待獲取
 fetching_update: 正在獲取更新信息
-new_version: 有新版本發佈！
+new_version: 有新版本發佈，請立刻更新！
 current_stable: 目前您正在運行最新版
 current_testing: 目前您正在運行測試版
 fetch_failed: 獲取更新信息失敗
 ui_setting: 界面設置
-brightness_setting: 設置深淺色
+brightness_setting: 深淺色模式
 color_setting: 顏色設置
 simplify_timeline: 簡化日程時間軸
 simplify_timeline_description: 沒有日程時 減少空間佔用
@@ -33,9 +33,9 @@ electricity_password_description: 非 123456 請設置
 electricity_account_setting: 電費賬號設置
 schoolnet_password_setting: 校園網帳號密碼設置
 schoolnet_password_description: 不設置查看不了網費
-aircon_imei_title: 空調用電數據源
+aircon_imei_title: 空調設備
 aircon_imei: 空調 IMEI
-aircon_imei_not_set: 未設置，電費頁不顯示空調用電
+aircon_imei_not_set: 未設置，無法查詢或遙控空調
 aircon_imei_current: 當前 IMEI：{imei}
 aircon_imei_saved: 空調 IMEI 已保存
 aircon_imei_cleared: 空調 IMEI 已清除
@@ -81,22 +81,17 @@ notification_page:
   days_to_schedule_hint: 本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數
   days_unit: 天
   settings_guide_title: 通知設置提示
-  settings_guide_content_1: '為了確保您能及時收到課前提醒，請確保：
-
+  settings_guide_content_1: |-
+    為了確保您能及時收到課前提醒，請確保：
     1. 開啟了應用的通知權限
-
     2. 開啟了通知的聲音提示
-
     3. 開啟了懸浮通知（橫幅通知）
-
-    4. 非原生安卓用戶，開啟自啟動和關閉電源優化'
-  settings_guide_content_2: '課前提醒模塊運行機制：
-
+    4. 非原生安卓用戶，開啟自啟動和關閉電源優化
+  settings_guide_content_2: |-
+    課前提醒模塊運行機制：
     1. 首次開啟時自動安排未來幾天的課前提醒
-
     2. 每次打開應用時自動檢查並更新通知日程
-
-    3. 修改設置後自動重新安排所有通知'
+    3. 修改設置後自動重新安排所有通知
   got_it: 知道了
   open_settings: 打開系統設置
   no_classtable_data: 請先獲取課程表、考試或實驗數據
@@ -105,7 +100,7 @@ notification_page:
   cancel_all_success: 已取消所有課前提醒
   reschedule_success: 已重新安排 {count} 個課前提醒
   reschedule_failed: '重新安排通知失敗: {error}'
-notification_debug_page: 通知服務調試頁面
+notification_debug_page: 通知狀態與測試
 classtable_setting: 課表相關設置
 background: 開啟課表背景圖
 no_background: 你先選個圖片罷，就在下面
@@ -121,9 +116,7 @@ class_refresh: 強制刷新課表
 class_refresh_title: 確認對話框
 class_refresh_content: 是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。
 class_swift: 課程偏移設置
-class_swift_description: '正數錯後開學日期 負數提前開學日期
-
-  目前為 {swift}'
+class_swift_description: 目前為 {swift}
 core_setting: 緩存登錄設置
 check_logger: 查看網絡攔截器和日誌
 clear_and_restart: 清除緩存後重啟
@@ -151,11 +144,12 @@ change_color_dialog:
 change_brightness_dialog:
   title: 亮度設置
   follow_setting: 跟隨系統
-  day_mode: 白天模式
-  night_mode: 黑夜模式
+  day_mode: 淺色
+  night_mode: 深色
 change_swift_dialog:
   title: 課程偏移設置
   input_hint: 請在此輸入數字
+  invalid_number: 請輸入有效的整數
 change_electricity_title: 修改電費帳號
 change_electricity_account:
   title: 修改電費帳號
@@ -236,8 +230,8 @@ semester_update_data: 應用新學期設置中
 easter_egg_page: 你找到了彩蛋
 about_page:
   benderblog: 主要開發者，iOS 小部件編寫和拼接
-  alnair: 開發：圖書館搜索和封面
-  aqqkad: 開發：考勤歷史記錄
+  alnair: 開發：圖書館搜索和封面、圖書館佈局修復、飲水機接水功能及介面適配
+  aqqkad: 開發：考勤歷史記錄、空調遙控、空調電費資料接入、圖書館新介面適配
   bellssgit: 支持：最佳&最久故障反饋者
   brackrat: 設計：主頁，登錄頁，配色，iOS 小部件等
   breezeline: 支持：無價值無意義的產品經理(他自己的描述)
@@ -254,7 +248,7 @@ about_page:
   hawa130: 設計：課程詳情卡片
   hhzm: 開發：電費查詢賬號計算
   imaginary_17: 開發：睿思論壇路由修復
-  imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI
+  imoscarz: 開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI / 開發：設定頁面分類重構及主從佈局適配
   ka-mate-ka-ora: 國際化：軟件英語翻譯優化
   lagrange-x: 開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性
   lhx-666-cool: 支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配
@@ -280,22 +274,91 @@ about_page:
   homepage: 主頁
   code: 開源代碼
   know_more: 知道更多
-  copyright_notice: '本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla
-    Public License, v. 2.0 授權。
-
+  copyright_notice: |-
+    本軟件拷貝基於 traintime_pda 代碼（或稱 watermeter 代碼）編譯或修改，代碼按照 Mozilla Public License, v. 2.0 授權。
     本程序和西安電子科技大學，體適能服務，書蝸，電錶等服務無關。
-
     本程序代碼版權受中國國家版權局保護，登記號2026SR0738647。
-
-    Copyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present
-    Traintime PDA authors.
-
+    Copyright 2023-2025 BenderBlog Rodriguez and contributors. Copyright 2025-present Traintime PDA authors.
     The Copyright of the Software is protected by NCAC, register code is 2026SR0738647
-
-    The Source Code Form is subject to the terms of the Mozilla Public License, v.
-    2.0. If a copy of the MPL was not distributed with this file, you can obtain one
-    at https://mozilla.org/MPL/2.0/.'
+    The Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.
   beian: 備案號
   copyright_register_code: 著作權登記號
   sign_android: 安卓簽名
   title: 關於本軟件
+  contributors: 貢獻者與致謝
+  licenses: 開源授權
+  extras: 更多
+  dami: 開發：修復 iOS 課程偏移負數輸入及輸入校驗
+  l1angyun: 開發：空閒教室即時顯示、課表背景模糊、課表佈局與螢幕圓角適配；修復校園網資料顯示
+  littlestejan: 開發：校園網驗證碼重新整理及驗證碼輸入對話框優化
+  sixteenforever: 開發：HarmonyOS 移植
+editor:
+  save: 儲存
+  apply: 套用
+  password_set: 已設定
+  password_not_set: 未設定
+  password_visibility: 顯示或隱藏密碼
+  toggle_sign: 切換正負號
+  positive_number: 請輸入大於 0 的整數
+  electricity_unit: 度
+  text_preview: 課程安排 · TrainTime PDA · 0123456789
+  brightness: 亮度
+  border_opacity: 邊框透明度
+  fill_opacity: 底色透明度
+  fill_saturation: 底色飽和度
+  text_saturation: 文字飽和度
+  background_blur: 背景模糊程度
+  year: 年份
+  semester: 學期
+sections:
+  display: 顯示
+  language_and_text: 語言與文字
+  home: 首頁
+  electricity: 電量提醒
+  timetable_appearance: 課表外觀
+  semester: 學期與週次
+  course_data: 課程資料
+navigation:
+  ui_description: 主題、字體、語言與首頁顯示
+  classtable_description: 課表外觀、學期與課程資料
+  account_description: 校園服務的帳號與密碼
+  notifications_description: 課前提醒與通知管理
+  core_description: 日誌、快取清理與登出
+font_size_setting: 字體大小與粗細
+font_size_page:
+  size_title: 字體大小
+  weight_title: 字體粗細
+  preview_title: 預覽
+  weight_thin: 細
+  weight_regular: 常規
+  weight_medium: 中等
+  weight_semibold: 半粗
+  weight_bold: 加粗
+  summary: "{scale}% · {weight}"
+general_account_settings: 通用賬號
+undergraduate_system_accounts: 本科生系統帳號
+class_table_background_section: 課表背景
+background_blur: '背景模糊: {value}'
+background_blur_off: 關閉
+class_table_style_setting: 課表顯示與樣式
+class_table_style_description: 時間指示和課程卡片樣式
+class_table_style_page:
+  current_time_settings_title: 時間指示設置
+  class_color_settings_title: 課表樣式設置
+  current_time_section: 時間指示設置
+  show_current_time_indicator: 顯示當前時間指示線
+  show_current_time_label: 顯示迷你數字時鐘
+  show_today_column_highlight: 強調顯示今天的縱列
+  active_section: 課程卡片樣式
+  unfinished_section: 課程卡片樣式
+  active_brightness_factor: '亮度: {value}'
+  active_border_alpha: '邊框透明度: {value}'
+  active_inner_alpha: '底色透明度: {value}'
+  completed_section: 已結束課程樣式
+  completed_style_enabled: 已結束課程樣式區分
+  completed_saturation_factor: '底色飽和度: {value}'
+  completed_brightness_factor: '亮度: {value}'
+  completed_text_saturation_factor: '文字飽和度: {value}'
+  completed_border_alpha: '邊框透明度: {value}'
+  completed_inner_alpha: '底色透明度: {value}'
+class_swift_explain: 正數錯後開學日期 負數提前開學日期

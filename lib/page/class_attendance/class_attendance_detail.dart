@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
@@ -28,7 +28,11 @@ class ClassAttendanceDetailView extends StatefulWidget {
       _ClassAttendanceDetailViewState();
 }
 
-String attendanceSignName(BuildContext context, SignInType type, {String? customName}) {
+String attendanceSignName(
+  BuildContext context,
+  SignInType type, {
+  String? customName,
+}) {
   if (customName != null) return customName;
   return switch (type) {
     SignInType.qrCode => context.t.classAttendance.signType.qrCode,
@@ -49,17 +53,14 @@ String attendanceSignStatus(BuildContext context, SignStatus type) {
     SignStatus.personalLeave2 =>
       context.t.classAttendance.signStatus.personalLeave2,
     SignStatus.absence => context.t.classAttendance.signStatus.absence,
-    SignStatus.sickLeave => 
-    context.t.classAttendance.signStatus.sickLeave  ,
+    SignStatus.sickLeave => context.t.classAttendance.signStatus.sickLeave,
     SignStatus.personalLeave =>
-    context.t.classAttendance.signStatus.personalLeave,
+      context.t.classAttendance.signStatus.personalLeave,
     SignStatus.later => context.t.classAttendance.signStatus.late,
-    SignStatus.leaveEarly => 
-    context.t.classAttendance.signStatus.leaveEarly,
+    SignStatus.leaveEarly => context.t.classAttendance.signStatus.leaveEarly,
     SignStatus.signExpiredy =>
       context.t.classAttendance.signStatus.signExpiredy,
-    SignStatus.publicLeave =>
-      context.t.classAttendance.signStatus.publicLeave,
+    SignStatus.publicLeave => context.t.classAttendance.signStatus.publicLeave,
   };
 }
 
@@ -216,7 +217,9 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          context.t.classAttendance.detailTitle(course_name: widget.classAttendance.courseName),
+          context.t.classAttendance.detailTitle(
+            course_name: widget.classAttendance.courseName,
+          ),
         ),
       ),
       body: body,

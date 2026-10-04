@@ -2,17 +2,19 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:styled_widget/styled_widget.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:m3e_core/m3e_core.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
+import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
+import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
+import 'package:watermeter/page/setting/about_page/about_app_header.dart';
+import 'package:watermeter/page/setting/about_page/about_contributors_section.dart';
 import 'package:watermeter/page/setting/about_page/film_component.dart';
-import 'package:watermeter/model/about_page.dart';
+import 'package:watermeter/page/setting/settings_category_page.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/generated/translations.g.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -22,133 +24,102 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  bool devVisible = false;
-  bool eggVisible = false;
+  bool _eggVisible = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(context.t.setting.aboutPage.title)),
-      body: ListView(
-        children: [
-          [
-                const AppIconWidget(size: 64),
-                const VerticalDivider(color: Colors.transparent),
-                DefaultTextStyle.merge(
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(fontSize: 22),
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text:
-                              Platform.isIOS ||
-                                  Platform.isMacOS ||
-                                  Platform.isAndroid
-                              ? "XDYou"
-                              : "Traintime PDA",
-                        ),
-                        TextSpan(text: " v${preference.packageInfo.version}\n"),
-                        TextSpan(
-                          text: "Lucky Star Edition",
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
+    final applicationName =
+        Platform.isIOS || Platform.isMacOS || Platform.isAndroid
+        ? 'XDYou'
+        : 'Traintime PDA';
+    final applicationVersion =
+        'v${preference.packageInfo.version}+'
+        '${preference.packageInfo.buildNumber}';
+
+    return SettingsCategoryPage(
+      titleKey: 'setting.about_page.title',
+      child: Padding(
+        padding: const EdgeInsets.only(top: 12, bottom: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AboutAppHeader(
+              applicationName: applicationName,
+              applicationVersion: applicationVersion,
+            ),
+            const SizedBox(height: 8),
+            SectionSettingScaffold(
+              title: context.t.setting.aboutInfo,
+              icon: Icons.info_outline_rounded,
+              items: SettingSegmentedList(
+                items: [
+                  ListTile(
+                    leading: const Icon(Icons.balance_rounded),
+                    title: Text(context.t.setting.aboutPage.licenses),
+                    trailing: const Icon(Icons.navigate_next_rounded),
+                    onTap: () => showLicensePage(
+                      context: context,
+                      applicationName: applicationName,
+                      applicationVersion: applicationVersion,
+                      applicationIcon: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: AppIconWidget(),
+                      ),
+                      applicationLegalese:
+                          context.t.setting.aboutPage.copyrightNotice,
                     ),
                   ),
-                ),
-              ]
-              .toRow(crossAxisAlignment: CrossAxisAlignment.center)
-              .padding(all: 16),
-          ...linkData.map(
-            (e) => ListTile(
-              leading: Icon(e.icon),
-              title: Text(e.resolve(context.t)),
-              onTap: () => launchUrl(
-                Uri.parse(e.url),
-                mode: LaunchMode.externalApplication,
+                  ListTile(
+                    leading: const Icon(Icons.copyright_rounded),
+                    title: Text(
+                      context.t.setting.aboutPage.copyrightRegisterCode,
+                    ),
+                    subtitle: const SelectableText('2026SR0738647'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.verified_user_outlined),
+                    title: Text(context.t.setting.aboutPage.beian),
+                    subtitle: const SelectableText('陕ICP备2024026116号-1A'),
+                  ),
+                  if (Platform.isAndroid)
+                    ListTile(
+                      leading: const Icon(Icons.fingerprint_rounded),
+                      title: Text(context.t.setting.aboutPage.signAndroid),
+                      subtitle: SelectableText(
+                        preference.packageInfo.buildSignature,
+                      ),
+                    ),
+                ],
               ),
             ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.balance),
-            title: Text(context.t.setting.aboutPage.knowMore),
-            onTap: () => showLicensePage(
-              context: context,
-              applicationName:
-                  Platform.isIOS || Platform.isMacOS || Platform.isAndroid
-                  ? "XDYou"
-                  : "Traintime PDA",
-              applicationVersion:
-                  "v${preference.packageInfo.version}+"
-                  "${preference.packageInfo.buildNumber}",
-              applicationIcon: const AppIconWidget().padding(vertical: 16),
-              applicationLegalese: context.t.setting.aboutPage.copyrightNotice,
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.copyright),
-            title: Text(context.t.setting.aboutPage.copyrightRegisterCode),
-            subtitle: const Text("2026SR0738647"),
-          ),
-          ListTile(
-            leading: const Icon(Icons.code),
-            title: Text(context.t.setting.aboutPage.beian),
-            subtitle: const Text("陕ICP备2024026116号-1A"),
-          ),
-          if (Platform.isAndroid)
-            ListTile(
-              leading: const Icon(Icons.code),
-              title: Text(context.t.setting.aboutPage.signAndroid),
-              subtitle: Text(preference.packageInfo.buildSignature),
-            ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: Text(
-              context.t.setting.acknowledgement(
-                developers: getDevelopers.length.toString(),
+            const SizedBox(height: 8),
+            const AboutContributorsSection(),
+            const SizedBox(height: 8),
+            SectionSettingScaffold(
+              title: context.t.setting.aboutPage.extras,
+              icon: Icons.auto_awesome_outlined,
+              items: M3EExpandableSegmentedItem(
+                index: 0,
+                totalCount: 1,
+                isExpanded: _eggVisible,
+                onToggle: () => setState(() => _eggVisible = !_eggVisible),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                childPadding: const EdgeInsets.all(8),
+                color: Theme.of(context).colorScheme.surfaceContainer,
+                childColor: Theme.of(context).colorScheme.surfaceContainer,
+                header: const ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.movie_outlined),
+                  title: Text('Noel herself is miracle'),
+                ),
+                children: const [FilmComponent()],
               ),
             ),
-            onTap: () => setState(() {
-              devVisible = !devVisible;
-            }),
-            trailing: Icon(
-              devVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-            ),
-          ),
-          if (devVisible)
-            ...getDevelopers.map(
-              (developer) => ListTile(
-                leading: CachedNetworkImage(
-                  fit: BoxFit.fitHeight,
-                  imageUrl: developer.imageUrl,
-                  errorWidget: (context, _, _) => Icon(Icons.person),
-                ).clipOval().constrained(width: 24, height: 24),
-                title: Text(developer.name),
-                subtitle: Text(
-                  developer.description(context.t),
-                ),
-                trailing: Icon(Icons.open_in_new),
-                onTap: () => launchUrl(
-                  Uri.parse(developer.url),
-                  mode: LaunchMode.externalApplication,
-                ),
-              ),
-            ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.star),
-            title: Text("Okaerinasaimase, goshujinsama"),
-            onTap: () => setState(() {
-              eggVisible = !eggVisible;
-            }),
-            trailing: Icon(
-              eggVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-            ),
-          ),
-          if (eggVisible) const FilmComponent(),
-        ].map((e) => e.constrained(maxWidth: 800).center()).toList(),
+          ],
+        ),
       ),
     );
   }

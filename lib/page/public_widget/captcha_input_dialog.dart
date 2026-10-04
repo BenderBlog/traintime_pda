@@ -6,7 +6,7 @@
 
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -81,8 +81,7 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
                   color: Colors.white,
                   child: Image.memory(_currentImageBytes),
                 ),
-                if (_isLoading)
-                  const CircularProgressIndicator(),
+                if (_isLoading) const CircularProgressIndicator(),
               ],
             ),
           ),

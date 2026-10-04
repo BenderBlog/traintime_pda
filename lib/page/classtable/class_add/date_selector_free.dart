@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -148,14 +148,24 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                           if (!_isInRange(start) || !_isInRange(end)) {
                             showToast(
                               context: context,
-                              msg: context.t.classtable.classAdd.dateSelectorFree.rule,
+                              msg: context
+                                  .t
+                                  .classtable
+                                  .classAdd
+                                  .dateSelectorFree
+                                  .rule,
                             );
                             return;
                           }
                           if (_minutesOf(end) <= _minutesOf(start)) {
                             showToast(
                               context: context,
-                              msg: context.t.classtable.classAdd.dateSelectorFree.rule2,
+                              msg: context
+                                  .t
+                                  .classtable
+                                  .classAdd
+                                  .dateSelectorFree
+                                  .rule2,
                             );
                             return;
                           }
@@ -180,7 +190,12 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                       _buildTimeEditor(
                         keyPrefix: 'start',
                         isStart: true,
-                        title: context.t.classtable.classAdd.dateSelectorFree.classStartTime,
+                        title: context
+                            .t
+                            .classtable
+                            .classAdd
+                            .dateSelectorFree
+                            .classStartTime,
                         color: widget.color,
                         current: start,
                         onHourChanged: (hour) {
@@ -203,7 +218,12 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                       _buildTimeEditor(
                         keyPrefix: 'end',
                         isStart: false,
-                        title: context.t.classtable.classAdd.dateSelectorFree.classEndTime,
+                        title: context
+                            .t
+                            .classtable
+                            .classAdd
+                            .dateSelectorFree
+                            .classEndTime,
                         color: widget.color,
                         current: end,
                         onHourChanged: (hour) {
@@ -348,9 +368,9 @@ class _DateSelectorFree extends State<DateSelectorFree> {
           children: [
             Row(
               children: [
-                SizedBox(width: 2,),
+                SizedBox(width: 2),
                 Icon(Icons.calendar_month, color: widget.color),
-                SizedBox(width: 16,),
+                SizedBox(width: 16),
                 Text(
                   context.t.classtable.classAdd.inputWeekHint,
                 ).textStyle(TextStyle(color: widget.color)),
@@ -395,10 +415,11 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                         tr.month.september,
                         tr.month.october,
                         tr.month.november,
-                        tr.month.december
+                        tr.month.december,
                       ];
                       final year = monthDate.year;
-                      final yearName = context.t.classtable.semesterSwitcher.year(year: '$year');
+                      final yearName = context.t.classtable.semesterSwitcher
+                          .year(year: '$year');
                       return "$yearName ${monthNameList[monthIndex]}";
                     },
               ),
@@ -422,7 +443,12 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                     context,
                     initialStart: const TimeOfDay(hour: 8, minute: 30),
                     initialEnd: const TimeOfDay(hour: 9, minute: 15),
-                    helpText: context.t.classtable.classAdd.dateSelectorFree.chooseClassTime,
+                    helpText: context
+                        .t
+                        .classtable
+                        .classAdd
+                        .dateSelectorFree
+                        .chooseClassTime,
                   );
 
                   if (pickedRange != null) {

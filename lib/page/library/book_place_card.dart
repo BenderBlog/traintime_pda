@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
@@ -41,7 +41,9 @@ class BookPlaceCard extends StatelessWidget {
           ].toRow(),
           const SizedBox(height: 8),
           Text(
-            context.t.library.bookCode(bar_code: toUse.barCode ?? context.t.library.notProvided),
+            context.t.library.bookCode(
+              bar_code: toUse.barCode ?? context.t.library.notProvided,
+            ),
             style: TextStyle(
               fontWeight: FontWeight.w400,
               color: toUse.processType == "在架"

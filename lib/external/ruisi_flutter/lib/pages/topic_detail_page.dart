@@ -1,7 +1,7 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get_it/get_it.dart';
 import 'package:share_plus/share_plus.dart';
@@ -84,11 +84,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
     if (content.length < 13) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            context.t.ruisi.topicDetail.replyTooShort,
-          ),
-        ),
+        SnackBar(content: Text(context.t.ruisi.topicDetail.replyTooShort)),
       );
       return;
     }
@@ -113,20 +109,12 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         _replyAttachments.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            context.t.ruisi.topicDetail.replySuccess,
-          ),
-        ),
+        SnackBar(content: Text(context.t.ruisi.topicDetail.replySuccess)),
       );
       _load(page: _currentPage);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            context.t.ruisi.topicDetail.replyFailure,
-          ),
-        ),
+        SnackBar(content: Text(context.t.ruisi.topicDetail.replyFailure)),
       );
     }
   }
@@ -149,9 +137,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     if (file == null) return;
     if (!mounted) return;
 
-    final ext = file.extension?.toLowerCase();
+    final ext = file.name.toLowerCase();
     const allowed = {'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'};
-    if (ext == null || !allowed.contains(ext)) {
+    if (!allowed.contains(ext)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('仅支持 jpg/jpeg/png/gif/bmp/webp 图片')),
       );
@@ -221,10 +209,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       canPop: !blockPop,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            _detail?.title ??
-                context.t.ruisi.topicDetail.title,
-          ),
+          title: Text(_detail?.title ?? context.t.ruisi.topicDetail.title),
           actions: [
             IconButton(
               icon: const Icon(Icons.bookmark_border),
@@ -269,19 +254,13 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                     const SizedBox(height: 8),
                     FilledButton.tonal(
                       onPressed: () => _load(),
-                      child: Text(
-                        context.t.ruisi.common.retry,
-                      ),
+                      child: Text(context.t.ruisi.common.retry),
                     ),
                   ],
                 ),
               )
             : _detail == null
-            ? Center(
-                child: Text(
-                  context.t.ruisi.topicDetail.noData,
-                ),
-              )
+            ? Center(child: Text(context.t.ruisi.topicDetail.noData))
             : Column(
                 children: [
                   Expanded(
@@ -360,7 +339,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                 maxLines: 3,
                                 minLines: 1,
                                 decoration: InputDecoration(
-                                  hintText: context.t.ruisi.topicDetail.replyHint,
+                                  hintText:
+                                      context.t.ruisi.topicDetail.replyHint,
                                   border: OutlineInputBorder(),
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 12,
@@ -565,9 +545,7 @@ class _PostTile extends StatelessWidget {
             children: [
               TextButton.icon(
                 icon: const Icon(Icons.reply, size: 16),
-                label: Text(
-                  context.t.ruisi.common.reply,
-                ),
+                label: Text(context.t.ruisi.common.reply),
                 onPressed: onReply,
               ),
             ],
@@ -873,7 +851,9 @@ class _VoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final typeText = vote.maxSelection > 1
-        ? context.t.ruisi.topicDetail.vote.multiSelect(count: '${vote.maxSelection}')
+        ? context.t.ruisi.topicDetail.vote.multiSelect(
+            count: '${vote.maxSelection}',
+          )
         : context.t.ruisi.topicDetail.vote.singleSelect;
 
     return Padding(
@@ -948,9 +928,7 @@ class _VoteCard extends StatelessWidget {
             const SizedBox(height: 8),
             FilledButton.tonal(
               onPressed: onVote,
-              child: Text(
-                context.t.ruisi.topicDetail.vote.open,
-              ),
+              child: Text(context.t.ruisi.topicDetail.vote.open),
             ),
           ] else ...[
             // 可投票：选项列表
@@ -962,9 +940,7 @@ class _VoteCard extends StatelessWidget {
             const SizedBox(height: 8),
             FilledButton.tonal(
               onPressed: onVote,
-              child: Text(
-                context.t.ruisi.topicDetail.vote.open,
-              ),
+              child: Text(context.t.ruisi.topicDetail.vote.open),
             ),
           ],
         ],
@@ -1042,7 +1018,9 @@ class _VoteSheetState extends State<_VoteSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                context.t.ruisi.topicDetail.vote.maxSelection(count: '${widget.vote.maxSelection}'),
+                context.t.ruisi.topicDetail.vote.maxSelection(
+                  count: '${widget.vote.maxSelection}',
+                ),
               ),
             ),
           );
@@ -1058,11 +1036,7 @@ class _VoteSheetState extends State<_VoteSheet> {
   Future<void> _submit() async {
     if (_selected.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            context.t.ruisi.topicDetail.vote.notSelected,
-          ),
-        ),
+        SnackBar(content: Text(context.t.ruisi.topicDetail.vote.notSelected)),
       );
       return;
     }
@@ -1077,20 +1051,13 @@ class _VoteSheetState extends State<_VoteSheet> {
 
       if (ok) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.t.ruisi.topicDetail.vote.success,
-            ),
-          ),
+          SnackBar(content: Text(context.t.ruisi.topicDetail.vote.success)),
         );
         Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              err ??
-                  context.t.ruisi.topicDetail.vote.failure,
-            ),
+            content: Text(err ?? context.t.ruisi.topicDetail.vote.failure),
           ),
         );
       }
@@ -1103,7 +1070,9 @@ class _VoteSheetState extends State<_VoteSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final typeText = _isMulti
-        ? context.t.ruisi.topicDetail.vote.multiSelect(count: '${widget.vote.maxSelection}')
+        ? context.t.ruisi.topicDetail.vote.multiSelect(
+            count: '${widget.vote.maxSelection}',
+          )
         : context.t.ruisi.topicDetail.vote.singleSelect;
 
     return DraggableScrollableSheet(
@@ -1171,9 +1140,7 @@ class _VoteSheetState extends State<_VoteSheet> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(
-                            context.t.ruisi.common.submit,
-                          ),
+                        : Text(context.t.ruisi.common.submit),
                   ),
                 ),
               ),

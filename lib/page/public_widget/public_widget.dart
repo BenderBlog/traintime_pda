@@ -1,11 +1,11 @@
-import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR MIT
 
 // Useful weights to simplify watermeter programming.
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 /// Check the width

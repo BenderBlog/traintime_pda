@@ -2,11 +2,11 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
-import 'package:watermeter/page/library/book_info_card.dart';
+import 'package:watermeter/page/library/book_cover.dart';
 import 'package:watermeter/page/library/book_place_card.dart';
 import 'package:watermeter/page/library/ebook_place_card.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -32,7 +32,12 @@ class _BookDetailCardState extends State<BookDetailCard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            BookCover(toUse: widget.toUse)
+            BookCover(
+                  key: ValueKey(widget.toUse.docNumber),
+                  bookName: widget.toUse.bookName,
+                  docNumber: widget.toUse.docNumber,
+                  isbn: widget.toUse.isbn,
+                )
                 .clipRRect(all: 14)
                 .padding(all: 2)
                 .decorated(

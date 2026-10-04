@@ -2,14 +2,17 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+// TODO: Add logic related to writing to preference.
+
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
-import 'package:signals/signals.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/localization.dart';
+import 'package:signals/signals.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/themes/font_setting.dart';
 
 class ThemeController {
   static final ThemeController i = ThemeController._();
@@ -21,8 +24,9 @@ class ThemeController {
   final colorStateSignal = signal(ThemeMode.system);
   final localeSignal = signal(const Locale("zh", "CN"));
   final colorSignal = signal<List<FlexSchemeColor>>([pdaColorScheme.first]);
+  final fontScaleSignal = signal<double>(defaultFontScale);
+  final fontWeightSignal = signal<double>(defaultFontWeight);
 
-  /// The locale the user picked, or [Localization.undefined] for follow-system.
   final savedLocale = signal<Localization>(Localization.undefined);
 
   void updateTheme() {
@@ -32,8 +36,24 @@ class ThemeController {
 
     log.info("[ThemeController] Changing brightness...");
     colorStateSignal.value =
-        demoBlueModeMap[preference.getInt(preference.Preference.brightness)]!;
-
+        brightnessModeList[preference.getInt(
+          preference.Preference.brightness,
+        )]!;
+    log.info("[ThemeController] Changing font scale...");
+    fontScaleSignal.value = preference.contains(preference.Preference.fontScale)
+        ? preference
+              .getDouble(preference.Preference.fontScale)
+              .clamp(minFontScale, maxFontScale)
+              .toDouble()
+        : defaultFontScale;
+    log.info("[ThemeController] Changing font weight...");
+    fontWeightSignal.value =
+        preference.contains(preference.Preference.fontWeight)
+        ? preference
+              .getDouble(preference.Preference.fontWeight)
+              .clamp(minFontWeight, maxFontWeight)
+              .toDouble()
+        : defaultFontWeight;
     log.info("[ThemeController] Changing locale...");
     savedLocale.value = Localization.fromPreference();
     _applyLocale();

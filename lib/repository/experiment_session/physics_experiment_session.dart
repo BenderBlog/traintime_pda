@@ -29,13 +29,19 @@ enum PhysicsCacheHint implements CacheHint {
   networkFailed,
   unknownError;
 
+  @override
   String resolve(Translations t) {
     switch (this) {
-      case missingPassword: return t.experiment.physicsCacheHintMissingPassword;
-      case loginFailed: return t.experiment.physicsCacheHintLoginFailed;
-      case notSchoolNetwork: return t.experiment.physicsCacheHintNotSchoolNetwork;
-      case networkFailed: return t.experiment.physicsCacheHintNetworkFailed;
-      case unknownError: return t.experiment.physicsCacheHintUnknownError;
+      case missingPassword:
+        return t.experiment.physicsCacheHintMissingPassword;
+      case loginFailed:
+        return t.experiment.physicsCacheHintLoginFailed;
+      case notSchoolNetwork:
+        return t.experiment.physicsCacheHintNotSchoolNetwork;
+      case networkFailed:
+        return t.experiment.physicsCacheHintNetworkFailed;
+      case unknownError:
+        return t.experiment.physicsCacheHintUnknownError;
     }
   }
 }

@@ -1,7 +1,7 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/pages/my_posts_page.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
@@ -23,9 +23,7 @@ class UserPage extends StatelessWidget {
     RuisiService c = GetIt.instance<RuisiService>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.ruisi.user.title),
-      ),
+      appBar: AppBar(title: Text(context.t.ruisi.user.title)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -48,8 +46,7 @@ class UserPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    c.username ??
-                        context.t.ruisi.user.unknown,
+                    c.username ?? context.t.ruisi.user.unknown,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 4),
@@ -70,9 +67,7 @@ class UserPage extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.bookmark),
-            title: Text(
-              context.t.ruisi.home.myFavorites,
-            ),
+            title: Text(context.t.ruisi.home.myFavorites),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(const FavoritesPage()),
           ),
@@ -104,11 +99,7 @@ class UserPage extends StatelessWidget {
               if (!context.mounted) return;
               context.pop();
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    context.t.ruisi.common.loggedOut,
-                  ),
-                ),
+                SnackBar(content: Text(context.t.ruisi.common.loggedOut)),
               );
             },
           ),

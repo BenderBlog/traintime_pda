@@ -9,7 +9,7 @@ import 'package:watermeter/page/library/search_book_constant.dart';
 import 'package:watermeter/page/library/search_fields.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
@@ -143,17 +143,13 @@ class _SearchBookWindowState extends State<SearchBookWindow>
                 ),
               ),
 
-              // TODO: 致 Codex
-              // 1. 文字需要国际化
-              // 2. 文字大小和图标大小需要修改
-              // 3. 图标是不是可以换一个
               noMoreItemsIndicatorBuilder: (context) =>
                   [
                         Icon(Icons.sentiment_very_satisfied, size: 24),
                         SizedBox(width: 8),
                         Text(
-                          "没有更多数据了",
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          context.t.library.noMoreData,
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ]
                       .toRow(mainAxisAlignment: MainAxisAlignment.center)

@@ -1,10 +1,10 @@
-import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -100,9 +100,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.ruisi.login.title),
-      ),
+      appBar: AppBar(title: Text(context.t.ruisi.login.title)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -253,9 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(
-                            context.t.ruisi.common.login,
-                          ),
+                        : Text(context.t.ruisi.common.login),
                   );
                 },
               ),
@@ -265,9 +261,7 @@ class _LoginPageState extends State<LoginPage> {
               OutlinedButton.icon(
                 onPressed: () => _handleResetLoginState(context),
                 icon: const Icon(Icons.refresh),
-                label: Text(
-                  context.t.ruisi.login.resetLoginState,
-                ),
+                label: Text(context.t.ruisi.login.resetLoginState),
               ),
               const SizedBox(height: 8),
 
@@ -275,9 +269,7 @@ class _LoginPageState extends State<LoginPage> {
               OutlinedButton.icon(
                 onPressed: () => _handleViewLogs(context),
                 icon: const Icon(Icons.bug_report),
-                label: Text(
-                  context.t.ruisi.login.viewLogs,
-                ),
+                label: Text(context.t.ruisi.login.viewLogs),
               ),
             ],
           ),
@@ -317,11 +309,7 @@ class _LoginPageState extends State<LoginPage> {
     if (context.mounted) {
       _checkLoginCaptcha();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            context.t.ruisi.login.resetSuccess,
-          ),
-        ),
+        SnackBar(content: Text(context.t.ruisi.login.resetSuccess)),
       );
     }
   }

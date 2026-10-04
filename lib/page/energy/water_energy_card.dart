@@ -1,72 +1,34 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
-import 'package:watermeter/generated/translations.g.dart';
 
 class WaterEnergyCard extends StatelessWidget {
-  const WaterEnergyCard({super.key});
+  final String metID;
+  final List<MeterInfo> usages;
+
+  const WaterEnergyCard({super.key, required this.metID, required this.usages});
 
   @override
   Widget build(BuildContext context) {
-    return SignalBuilder(
-      builder: (context) {
-        final controller = EnergyController.i;
-        final state = controller.energyInfoStateSignal.value;
-        final displayInfo = controller.displayEnergyInfo.value;
-        final usages = displayInfo?.waterMeterList;
-
-        return InfoCard(
-          iconData: Icons.water_drop,
-          title: context.t.electricity.waterTitle,
-          children: [
-            if (displayInfo == null)
-              _buildUnavailableState(context, hasError: state is AsyncError)
-            else if (usages == null || usages.isEmpty)
-              Text(
-                context.t.electricity.waterEmpty,
-                style: TextStyle(color: Theme.of(context).colorScheme.outline),
-              ).padding(vertical: 8, horizontal: 12)
-            else
-              _buildUsageTable(context, usages),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildUnavailableState(
-    BuildContext context, {
-    required bool hasError,
-  }) {
-    if (hasError) {
-      return Text(
-        context.t.electricity.waterUnavailable,
-        style: TextStyle(color: Theme.of(context).colorScheme.error),
-      ).padding(vertical: 8, horizontal: 12);
-    }
-
-    return Row(
+    return InfoCard(
+      iconData: Icons.water_drop,
+      title: context.t.electricity.weterMetidTitle(code: metID),
       children: [
-        const SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            context.t.electricity.waterLoading,
-          ),
-        ),
+        if (usages.isEmpty)
+          Text(
+            context.t.electricity.waterEmpty,
+            style: TextStyle(color: Theme.of(context).colorScheme.outline),
+          ).padding(vertical: 8, horizontal: 12)
+        else
+          _buildUsageTable(context, usages),
       ],
-    ).padding(vertical: 8, horizontal: 12);
+    );
   }
 
   Widget _buildUsageTable(BuildContext context, List<MeterInfo> usages) {

@@ -4,7 +4,7 @@
 
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/library_controller.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
@@ -25,25 +25,23 @@ class LibraryCard extends StatelessWidget {
           },
           isLoad: state.isLoading,
           icon: MingCuteIcons.mgc_book_2_line,
-          text:
-              context.t.homepage.libraryCard.title,
+          text: context.t.homepage.libraryCard.title,
           infoText: Text.rich(
             TextSpan(
               style: const TextStyle(fontSize: 20),
               children: [
                 state.map(
                   data: (list) => TextSpan(
-                    text: context.t.homepage.libraryCard.currentBorrow(count: list.length.toString()),
+                    text: context.t.homepage.libraryCard.currentBorrow(
+                      count: list.length.toString(),
+                    ),
                   ),
-                  loading: () => TextSpan(
-                    text: context.t.homepage.libraryCard.fetching,
-                  ),
-                  refreshing: () => TextSpan(
-                    text: context.t.homepage.libraryCard.fetching,
-                  ),
-                  reloading: () => TextSpan(
-                    text: context.t.homepage.libraryCard.fetching,
-                  ),
+                  loading: () =>
+                      TextSpan(text: context.t.homepage.libraryCard.fetching),
+                  refreshing: () =>
+                      TextSpan(text: context.t.homepage.libraryCard.fetching),
+                  reloading: () =>
+                      TextSpan(text: context.t.homepage.libraryCard.fetching),
                   error: (_, _) => TextSpan(
                     text: context.t.homepage.libraryCard.errorOccured,
                   ),
@@ -55,29 +53,24 @@ class LibraryCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             child: state.map(
               data: (data) {
-                int duedNum =
-                    data.where((element) => element.lendDay < 0).length;
+                int duedNum = data
+                    .where((element) => element.lendDay < 0)
+                    .length;
                 if (duedNum == 0) {
-                  return Text(
-                    context.t.homepage.libraryCard.noReturn,
-                  );
+                  return Text(context.t.homepage.libraryCard.noReturn);
                 }
                 return Text(
-                  context.t.homepage.libraryCard.needReturn(dued: duedNum.toString()),
+                  context.t.homepage.libraryCard.needReturn(
+                    dued: duedNum.toString(),
+                  ),
                 );
               },
-              loading: () => Text(
-                context.t.homepage.libraryCard.fetchingInfo,
-              ),
-              refreshing: () => Text(
-                context.t.homepage.libraryCard.fetchingInfo,
-              ),
-              reloading: () => Text(
-                context.t.homepage.libraryCard.fetchingInfo,
-              ),
-              error: (_, _) => Text(
-                context.t.homepage.libraryCard.noInfo,
-              ),
+              loading: () => Text(context.t.homepage.libraryCard.fetchingInfo),
+              refreshing: () =>
+                  Text(context.t.homepage.libraryCard.fetchingInfo),
+              reloading: () =>
+                  Text(context.t.homepage.libraryCard.fetchingInfo),
+              error: (_, _) => Text(context.t.homepage.libraryCard.noInfo),
             ),
           ),
         );

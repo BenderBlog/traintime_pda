@@ -1,4 +1,4 @@
-# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+---
 title: 圖書館信息
 borrow_state_title: 借書狀態
 search_book_title: 查詢藏書
@@ -20,16 +20,16 @@ avaliable_borrow: 可借
 storage: 館藏
 on_shelve: 在架
 book_code: 書籍編號：{barCode}
-due_date: ' 到期'
-borrow_str: ' 借閱'
-after_due_date: ' 天前到期'
-before_due_date: ' 天后'
+due_date: " 到期"
+borrow_str: " 借閱"
+after_due_date: " 天前到期"
+before_due_date: " 天后"
 can_be_renewable: 續借
 cannot_be_renewable: 不可續借
 renewing: 正在續借
-empty_borrow_list: '目前沒有查詢到在借圖書
-
-  不借書就要變成上面的小呆瓜咯'
+empty_borrow_list: |-
+  目前沒有查詢到在借圖書
+  不借書就要變成上面的小呆瓜咯
 borrow_list_info: 在借 {borrow} 本，其中已過期 {dued} 本
 search_book_window: ''
 search_here: 在此搜索
@@ -48,3 +48,4 @@ publish_year_begin: 出版年起
 publish_year_end: 出版年止
 book_detail: 書籍詳細信息
 no_result: 沒有結果，請修改搜索參數或者開始你的搜索
+no_more_data: 沒有更多結果了

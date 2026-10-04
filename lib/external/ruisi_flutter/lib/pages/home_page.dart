@@ -1,7 +1,7 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/constants/forum_id.dart';
 import 'package:watermeter/external/ruisi_flutter/lib/pages/search_page.dart';
@@ -79,23 +79,13 @@ class _HomePageState extends State<HomePage>
           isScrollable: true,
           controller: _tabCtrl,
           tabs: [
-            Tab(
-              text: context.t.ruisi.home.tabNewPost,
-            ),
-            Tab(
-              text: context.t.ruisi.home.tabNewReply,
-            ),
+            Tab(text: context.t.ruisi.home.tabNewPost),
+            Tab(text: context.t.ruisi.home.tabNewReply),
             Tab(text: context.t.ruisi.home.tabWater),
-            Tab(
-              text: context.t.ruisi.home.tabPhotography,
-            ),
+            Tab(text: context.t.ruisi.home.tabPhotography),
             Tab(text: context.t.ruisi.home.tabTrade),
-            Tab(
-              text: context.t.ruisi.home.tabEmployment,
-            ),
-            Tab(
-              text: context.t.ruisi.home.tabLostFound,
-            ),
+            Tab(text: context.t.ruisi.home.tabEmployment),
+            Tab(text: context.t.ruisi.home.tabLostFound),
           ],
         ),
       ),

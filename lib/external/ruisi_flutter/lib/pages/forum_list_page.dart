@@ -1,7 +1,7 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -74,11 +74,7 @@ class _ForumListPageState extends State<ForumListPage> {
 
           // 3. 空数据状态处理
           if (state.groups.isEmpty) {
-            return Center(
-              child: Text(
-                context.t.ruisi.forumList.empty,
-              ),
-            );
+            return Center(child: Text(context.t.ruisi.forumList.empty));
           }
 
           // 4. 正常数据展示 (支持下拉刷新)

@@ -1,10 +1,10 @@
-import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 
 import '../controller/ruisi_controller.dart';

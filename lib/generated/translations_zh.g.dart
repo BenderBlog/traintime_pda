@@ -20,20 +20,21 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	Translations({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.zh,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <zh>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	dynamic operator[](String key) => $meta.getTranslation(key);
+	dynamic operator[](String key) => _meta.getTranslation(key);
 
 	late final Translations _root = this; // ignore: unused_field
 
@@ -66,6 +67,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$schoolNet$zh schoolNet = Translations$schoolNet$zh.internal(_root);
 	late final Translations$score$zh score = Translations$score$zh.internal(_root);
 	late final Translations$setting$zh setting = Translations$setting$zh.internal(_root);
+	late final Translations$sponsorship$zh sponsorship = Translations$sponsorship$zh.internal(_root);
 	late final Translations$sport$zh sport = Translations$sport$zh.internal(_root);
 	late final Translations$toolbox$zh toolbox = Translations$toolbox$zh.internal(_root);
 	late final Translations$weekday$zh weekday = Translations$weekday$zh.internal(_root);
@@ -518,14 +520,14 @@ class Translations$electricity$zh {
 	/// zh: '数据量不足以用于渲染'
 	String get notEnoughData => '数据量不足以用于渲染';
 
-	/// zh: '新能源系统获取仅校园网内访问，获取过程中有问题请向开发者报告。 历史记录依旧为本地记录，平均日用量基于抄表记录计算。'
-	String get info => '新能源系统获取仅校园网内访问，获取过程中有问题请向开发者报告。\n历史记录依旧为本地记录，平均日用量基于抄表记录计算。';
+	/// zh: '历史记录依旧为本地记录，平均日用量基于抄表记录计算。'
+	String get info => '历史记录依旧为本地记录，平均日用量基于抄表记录计算。';
 
 	/// zh: '正在获取最新电费信息'
 	String get fetchingHint => '正在获取最新电费信息';
 
-	/// zh: '电费信息获取失败，请重试。'
-	String get fetchError => '电费信息获取失败，请重试。';
+	/// zh: '电费信息获取失败，请重试'
+	String get fetchError => '电费信息获取失败，请重试';
 
 	/// zh: '日期'
 	String get date => '日期';
@@ -545,8 +547,8 @@ class Translations$electricity$zh {
 	/// zh: '本次读数'
 	String get waterUsageReadNow => '本次读数';
 
-	/// zh: '洗澡水用量'
-	String get waterUsage => '洗澡水用量';
+	/// zh: '热水用量'
+	String get waterUsage => '热水用量';
 
 	/// zh: '水费信息'
 	String get waterTitle => '水费信息';
@@ -554,8 +556,8 @@ class Translations$electricity$zh {
 	/// zh: '正在加载水费信息'
 	String get waterLoading => '正在加载水费信息';
 
-	/// zh: '水费信息暂不可用，请在电费卡片重试。'
-	String get waterUnavailable => '水费信息暂不可用，请在电费卡片重试。';
+	/// zh: '水费信息暂不可用，请点击右上角刷新重试。'
+	String get waterUnavailable => '水费信息暂不可用，请点击右上角刷新重试。';
 
 	/// zh: '暂无水费信息'
 	String get waterEmpty => '暂无水费信息';
@@ -584,14 +586,95 @@ class Translations$electricity$zh {
 	/// zh: '重试'
 	String get airconRetry => '重试';
 
-	/// zh: '尚未添加空调 IMEI，添加后即可查看空调用电信息。'
-	String get airconImeiMissing => '尚未添加空调 IMEI，添加后即可查看空调用电信息。';
+	/// zh: '扫描空调二维码即可添加，也可以从相册选择二维码图片'
+	String get airconImeiMissing => '扫描空调二维码即可添加，也可以从相册选择二维码图片';
 
-	/// zh: '添加空调 IMEI'
-	String get airconAddImei => '添加空调 IMEI';
+	/// zh: '添加空调信息'
+	String get airconAddImei => '添加空调信息';
 
 	/// zh: '当前显示空调缓存数据，缓存时间：{time}'
 	String airconCacheNotice({required Object time}) => '当前显示空调缓存数据，缓存时间：${time}';
+
+	/// zh: '电表 {code}'
+	String powerMetidTitle({required Object code}) => '电表 ${code}';
+
+	/// zh: '水表 {code}'
+	String weterMetidTitle({required Object code}) => '水表 ${code}';
+
+	/// zh: '空调遥控'
+	String get airconRemote => '空调遥控';
+
+	/// zh: '无法获取空调状态'
+	String get airconControlError => '无法获取空调状态';
+
+	/// zh: '空调指令已执行'
+	String get airconCommandOk => '空调指令已执行';
+
+	/// zh: '基本控制'
+	String get airconControlSection => '基本控制';
+
+	/// zh: '运行设置'
+	String get airconOperationSection => '运行设置';
+
+	/// zh: '其他设置'
+	String get airconOtherSettingsSection => '其他设置';
+
+	/// zh: '电源'
+	String get airconPower => '电源';
+
+	/// zh: '设定温度'
+	String get airconTargetTemperature => '设定温度';
+
+	/// zh: '温度必须在 18–32 ℃ 之间'
+	String get airconTemperatureRange => '温度必须在 18–32 ℃ 之间';
+
+	/// zh: '室内温度：{temperature} ℃'
+	String airconIndoorTemperature({required Object temperature}) => '室内温度：${temperature} ℃';
+
+	/// zh: '运行模式'
+	String get airconMode => '运行模式';
+
+	/// zh: '送风'
+	String get airconModeFan => '送风';
+
+	/// zh: '制热'
+	String get airconModeHeat => '制热';
+
+	/// zh: '制冷'
+	String get airconModeCool => '制冷';
+
+	/// zh: '除湿'
+	String get airconModeDry => '除湿';
+
+	/// zh: '自动'
+	String get airconModeAuto => '自动';
+
+	/// zh: '风速'
+	String get airconWindSpeed => '风速';
+
+	/// zh: '自动'
+	String get airconWindAuto => '自动';
+
+	/// zh: '静音'
+	String get airconWindSilent => '静音';
+
+	/// zh: '低'
+	String get airconWindLow => '低';
+
+	/// zh: '中'
+	String get airconWindMedium => '中';
+
+	/// zh: '高'
+	String get airconWindHigh => '高';
+
+	/// zh: '上下扫风'
+	String get airconVerticalSwing => '上下扫风';
+
+	/// zh: '强力模式'
+	String get airconStrongMode => '强力模式';
+
+	/// zh: '辅助电热'
+	String get airconElectricHeating => '辅助电热';
 }
 
 // Path: electricityStatus
@@ -646,6 +729,9 @@ class Translations$electricityStatus$zh {
 
 	/// zh: '程序故障'
 	String get otherIssue => '程序故障';
+
+	/// zh: '没有电表信息'
+	String get noElectricityInfo => '没有电表信息';
 }
 
 // Path: emptyClassroom
@@ -676,6 +762,24 @@ class Translations$emptyClassroom$zh {
 
 	/// zh: '占用'
 	String get occupied => '占用';
+
+	/// zh: '现在 · 第 {period} 节 {start}-{end}'
+	String nowOngoing({required Object period, required Object start, required Object end}) => '现在 · 第 ${period} 节 ${start}-${end}';
+
+	/// zh: '即将 · 第 {period} 节 {start}-{end}'
+	String nowUpcoming({required Object period, required Object start, required Object end}) => '即将 · 第 ${period} 节 ${start}-${end}';
+
+	/// zh: '空闲 {free}/{total} 间'
+	String nowFree({required Object free, required Object total}) => '空闲 ${free}/${total} 间';
+
+	/// zh: '只看现在空闲'
+	String get onlyFreeNow => '只看现在空闲';
+
+	/// zh: '现在没有空闲教室'
+	String get noFreeNow => '现在没有空闲教室';
+
+	/// zh: '今天的课已经结束了'
+	String get classesOver => '今天的课已经结束了';
 }
 
 // Path: exam
@@ -974,6 +1078,7 @@ class Translations$homepage$zh {
 	late final Translations$homepage$toolbox$zh toolbox = Translations$homepage$toolbox$zh.internal(_root);
 	late final Translations$homepage$schoolNet$zh schoolNet = Translations$homepage$schoolNet$zh.internal(_root);
 	late final Translations$homepage$clubPromotion$zh clubPromotion = Translations$homepage$clubPromotion$zh.internal(_root);
+	late final Translations$homepage$airconCard$zh airconCard = Translations$homepage$airconCard$zh.internal(_root);
 }
 
 // Path: library
@@ -1124,6 +1229,9 @@ class Translations$library$zh {
 
 	/// zh: '没有结果，请修改搜索参数或者开始你的搜索'
 	String get noResult => '没有结果，请修改搜索参数或者开始你的搜索';
+
+	/// zh: '没有更多结果了'
+	String get noMoreData => '没有更多结果了';
 }
 
 // Path: libraryCard
@@ -1228,8 +1336,8 @@ class Translations$loginProcess$zh {
 	/// zh: '登录中'
 	String get slider => '登录中';
 
-	/// zh: '等待短信二次认证'
-	String get secondFactor => '等待短信二次认证';
+	/// zh: '等待二次认证'
+	String get secondFactor => '等待二次认证';
 
 	/// zh: '登录后处理'
 	String get afterProcess => '登录后处理';
@@ -1523,8 +1631,8 @@ class Translations$setting$zh {
 	/// zh: '正在获取更新信息'
 	String get fetchingUpdate => '正在获取更新信息';
 
-	/// zh: '有新版本发布！'
-	String get newVersion => '有新版本发布！';
+	/// zh: '有新版本发布，请立刻更新！'
+	String get newVersion => '有新版本发布，请立刻更新！';
 
 	/// zh: '目前您正在运行最新版'
 	String get currentStable => '目前您正在运行最新版';
@@ -1538,8 +1646,8 @@ class Translations$setting$zh {
 	/// zh: '界面设置'
 	String get uiSetting => '界面设置';
 
-	/// zh: '设置深浅色'
-	String get brightnessSetting => '设置深浅色';
+	/// zh: '深浅色模式'
+	String get brightnessSetting => '深浅色模式';
 
 	/// zh: '颜色设置'
 	String get colorSetting => '颜色设置';
@@ -1588,14 +1696,14 @@ class Translations$setting$zh {
 	/// zh: '不设置查看不了网费'
 	String get schoolnetPasswordDescription => '不设置查看不了网费';
 
-	/// zh: '空调用电数据源'
-	String get airconImeiTitle => '空调用电数据源';
+	/// zh: '空调设备'
+	String get airconImeiTitle => '空调设备';
 
 	/// zh: '空调 IMEI'
 	String get airconImei => '空调 IMEI';
 
-	/// zh: '未设置，电费页不显示空调用电'
-	String get airconImeiNotSet => '未设置，电费页不显示空调用电';
+	/// zh: '未设置，无法查询或遥控空调'
+	String get airconImeiNotSet => '未设置，无法查询或遥控空调';
 
 	/// zh: '当前 IMEI：{imei}'
 	String airconImeiCurrent({required Object imei}) => '当前 IMEI：${imei}';
@@ -1632,8 +1740,8 @@ class Translations$setting$zh {
 
 	late final Translations$setting$notificationPage$zh notificationPage = Translations$setting$notificationPage$zh.internal(_root);
 
-	/// zh: '通知服务调试页面'
-	String get notificationDebugPage => '通知服务调试页面';
+	/// zh: '通知状态与测试'
+	String get notificationDebugPage => '通知状态与测试';
 
 	/// zh: '课表相关设置'
 	String get classtableSetting => '课表相关设置';
@@ -1680,8 +1788,8 @@ class Translations$setting$zh {
 	/// zh: '课程偏移设置'
 	String get classSwift => '课程偏移设置';
 
-	/// zh: '正数错后开学日期 负数提前开学日期 目前为 {swift}'
-	String classSwiftDescription({required Object swift}) => '正数错后开学日期 负数提前开学日期\n目前为 ${swift}';
+	/// zh: '目前为 {swift}'
+	String classSwiftDescription({required Object swift}) => '目前为 ${swift}';
 
 	/// zh: '缓存登录设置'
 	String get coreSetting => '缓存登录设置';
@@ -1735,6 +1843,64 @@ class Translations$setting$zh {
 	String get easterEggPage => '你找到了彩蛋';
 
 	late final Translations$setting$aboutPage$zh aboutPage = Translations$setting$aboutPage$zh.internal(_root);
+	late final Translations$setting$editor$zh editor = Translations$setting$editor$zh.internal(_root);
+	late final Translations$setting$sections$zh sections = Translations$setting$sections$zh.internal(_root);
+	late final Translations$setting$navigation$zh navigation = Translations$setting$navigation$zh.internal(_root);
+
+	/// zh: '字体大小与粗细'
+	String get fontSizeSetting => '字体大小与粗细';
+
+	late final Translations$setting$fontSizePage$zh fontSizePage = Translations$setting$fontSizePage$zh.internal(_root);
+
+	/// zh: '通用账号'
+	String get generalAccountSettings => '通用账号';
+
+	/// zh: '本科生系统账号'
+	String get undergraduateSystemAccounts => '本科生系统账号';
+
+	/// zh: '课表背景'
+	String get classTableBackgroundSection => '课表背景';
+
+	/// zh: '背景模糊: {value}'
+	String backgroundBlur({required Object value}) => '背景模糊: ${value}';
+
+	/// zh: '关闭'
+	String get backgroundBlurOff => '关闭';
+
+	/// zh: '课表显示与样式'
+	String get classTableStyleSetting => '课表显示与样式';
+
+	/// zh: '时间指示和课程卡片样式'
+	String get classTableStyleDescription => '时间指示和课程卡片样式';
+
+	late final Translations$setting$classTableStylePage$zh classTableStylePage = Translations$setting$classTableStylePage$zh.internal(_root);
+
+	/// zh: '正数错后开学日期 负数提前开学日期'
+	String get classSwiftExplain => '正数错后开学日期 负数提前开学日期';
+}
+
+// Path: sponsorship
+class Translations$sponsorship$zh {
+	Translations$sponsorship$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '本版本由极创工作室和网管会赞助发布'
+	String get title => '本版本由极创工作室和网管会赞助发布';
+
+	/// zh: '赞助信息'
+	String get dialogTitle => '赞助信息';
+
+	/// zh: '极创工作室介绍辞：极创工作室是一个由西电创新创业学院支持建设的科技创新俱乐部，旨在与校内最优秀的创新创业人才同行，专注于人工智能等领域的技术创新与产品研发。目前工作室和华为等厂家合作，深耕大语言模型相关前沿方向，已孵化超过数十个人工智能领域科创产品，其中8项产品成功落地商用。工作室最知名的产品包括SwanLab、LLMOne、NexusGate。 网管会介绍辞：学生网管会隶属于西电信息网络技术中心，主要协助处理师生校园网络使用问题，参与校园网络维护、线上咨询、线下处理和技术支持等工作。我们欢迎认真负责、愿意学习、对网络与技术实践感兴趣的同学加入，一起服务同学、提升能力、积累经验。 XDYou软件开发者辞：极创在XDYou早期开发期间给了相当大的帮助，网管会我在20年入学期间加入过，可惜他们没要我。应我最近找工作，找了他们的人了解了一些信息，按照约定制作本页面作为咨询费。 Bender Rodriguez 6/9/2026'
+	String get dialogContent => '极创工作室介绍辞：极创工作室是一个由西电创新创业学院支持建设的科技创新俱乐部，旨在与校内最优秀的创新创业人才同行，专注于人工智能等领域的技术创新与产品研发。目前工作室和华为等厂家合作，深耕大语言模型相关前沿方向，已孵化超过数十个人工智能领域科创产品，其中8项产品成功落地商用。工作室最知名的产品包括SwanLab、LLMOne、NexusGate。\n\n网管会介绍辞：学生网管会隶属于西电信息网络技术中心，主要协助处理师生校园网络使用问题，参与校园网络维护、线上咨询、线下处理和技术支持等工作。我们欢迎认真负责、愿意学习、对网络与技术实践感兴趣的同学加入，一起服务同学、提升能力、积累经验。\n\nXDYou软件开发者辞：极创在XDYou早期开发期间给了相当大的帮助，网管会我在20年入学期间加入过，可惜他们没要我。应我最近找工作，找了他们的人了解了一些信息，按照约定制作本页面作为咨询费。\nBender Rodriguez 6/9/2026';
+
+	/// zh: '了解极创'
+	String get buttonJichuang => '了解极创';
+
+	/// zh: '了解网管会'
+	String get buttonXduna => '了解网管会';
 }
 
 // Path: sport
@@ -3030,6 +3196,45 @@ class Translations$homepage$clubPromotion$zh {
 	String get fetching => '社团信息清单正在加载';
 }
 
+// Path: homepage.airconCard
+class Translations$homepage$airconCard$zh {
+	Translations$homepage$airconCard$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '空调遥控'
+	String get title => '空调遥控';
+
+	/// zh: '尚未配置空调'
+	String get notConfigured => '尚未配置空调';
+
+	/// zh: '点击添加空调 IMEI'
+	String get configureHint => '点击添加空调 IMEI';
+
+	/// zh: '{mode} · {temperature} ℃'
+	String running({required Object mode, required Object temperature}) => '${mode} · ${temperature} ℃';
+
+	/// zh: '空调已关闭'
+	String get powerOff => '空调已关闭';
+
+	/// zh: '室内 {temperature} ℃ · 风速 {wind}'
+	String indoorAndWind({required Object temperature, required Object wind}) => '室内 ${temperature} ℃ · 风速 ${wind}';
+
+	/// zh: '风速 {wind}'
+	String wind({required Object wind}) => '风速 ${wind}';
+
+	/// zh: '正在获取空调状态'
+	String get fetching => '正在获取空调状态';
+
+	/// zh: '空调状态获取失败'
+	String get error => '空调状态获取失败';
+
+	/// zh: '点击进入空调遥控'
+	String get openRemote => '点击进入空调遥控';
+}
+
 // Path: login.captchaWindow
 class Translations$login$captchaWindow$zh {
 	Translations$login$captchaWindow$zh.internal(this._root);
@@ -3059,17 +3264,17 @@ class Translations$login$secondFactor$zh {
 
 	// Translations
 
-	/// zh: '短信二次认证'
-	String get title => '短信二次认证';
+	/// zh: '二次认证'
+	String get title => '二次认证';
 
-	/// zh: '学校要求完成二次认证。请先获取短信验证码，再输入验证码继续登录。'
-	String get description => '学校要求完成二次认证。请先获取短信验证码，再输入验证码继续登录。';
+	/// zh: '学校要求完成二次认证。请选择验证码接收方式，获取并输入验证码后继续登录。'
+	String get description => '学校要求完成二次认证。请选择验证码接收方式，获取并输入验证码后继续登录。';
 
 	/// zh: '短信验证码'
 	String get code => '短信验证码';
 
-	/// zh: '请输入短信验证码'
-	String get emptyCode => '请输入短信验证码';
+	/// zh: '请输入验证码'
+	String get emptyCode => '请输入验证码';
 
 	/// zh: '获取验证码'
 	String get sendCode => '获取验证码';
@@ -3086,11 +3291,20 @@ class Translations$login$secondFactor$zh {
 	/// zh: '二次认证请求失败，请检查网络后重试'
 	String get networkError => '二次认证请求失败，请检查网络后重试';
 
-	/// zh: '已取消短信二次认证'
-	String get cancelled => '已取消短信二次认证';
+	/// zh: '已取消二次认证'
+	String get cancelled => '已取消二次认证';
 
 	/// zh: '二次认证已失效，请重新登录'
 	String get expired => '二次认证已失效，请重新登录';
+
+	/// zh: '验证码接收方式'
+	String get method => '验证码接收方式';
+
+	/// zh: '短信验证码'
+	String get sms => '短信验证码';
+
+	/// zh: '企业微信验证码'
+	String get enterpriseWechat => '企业微信验证码';
 }
 
 // Path: ruisi.common
@@ -3982,11 +4196,11 @@ class Translations$setting$changeBrightnessDialog$zh {
 	/// zh: '跟随系统'
 	String get followSetting => '跟随系统';
 
-	/// zh: '白天模式'
-	String get dayMode => '白天模式';
+	/// zh: '浅色'
+	String get dayMode => '浅色';
 
-	/// zh: '黑夜模式'
-	String get nightMode => '黑夜模式';
+	/// zh: '深色'
+	String get nightMode => '深色';
 }
 
 // Path: setting.changeSwiftDialog
@@ -4002,6 +4216,9 @@ class Translations$setting$changeSwiftDialog$zh {
 
 	/// zh: '请在此输入数字'
 	String get inputHint => '请在此输入数字';
+
+	/// zh: '请输入有效的整数'
+	String get invalidNumber => '请输入有效的整数';
 }
 
 // Path: setting.changeElectricityAccount
@@ -4243,11 +4460,11 @@ class Translations$setting$aboutPage$zh {
 	/// zh: '主要开发者，iOS 小部件编写和拼接'
 	String get benderblog => '主要开发者，iOS 小部件编写和拼接';
 
-	/// zh: '开发：图书馆搜索和封面'
-	String get alnair => '开发：图书馆搜索和封面';
+	/// zh: '开发：图书馆搜索和封面、图书馆布局修复、饮水机接水功能及接口适配'
+	String get alnair => '开发：图书馆搜索和封面、图书馆布局修复、饮水机接水功能及接口适配';
 
-	/// zh: '开发：考勤历史记录'
-	String get aqqkad => '开发：考勤历史记录';
+	/// zh: '开发：考勤历史记录、空调遥控、空调电费数据接入、图书馆新接口适配'
+	String get aqqkad => '开发：考勤历史记录、空调遥控、空调电费数据接入、图书馆新接口适配';
 
 	/// zh: '支持：最佳&最久故障反馈者'
 	String get bellssgit => '支持：最佳&最久故障反馈者';
@@ -4297,8 +4514,8 @@ class Translations$setting$aboutPage$zh {
 	/// zh: '开发：睿思论坛路由修复'
 	String get imaginary17 => '开发：睿思论坛路由修复';
 
-	/// zh: '开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI'
-	String get imoscarz => '开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI';
+	/// zh: '开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI / 开发：设置页面分类重构及主从布局适配'
+	String get imoscarz => '开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI / 开发：设置页面分类重构及主从布局适配';
 
 	/// zh: '国际化：软件英语翻译优化'
 	String get kaMateKaOra => '国际化：软件英语翻译优化';
@@ -4389,6 +4606,240 @@ class Translations$setting$aboutPage$zh {
 
 	/// zh: '关于本软件'
 	String get title => '关于本软件';
+
+	/// zh: '贡献者与致谢'
+	String get contributors => '贡献者与致谢';
+
+	/// zh: '开源许可'
+	String get licenses => '开源许可';
+
+	/// zh: '更多'
+	String get extras => '更多';
+
+	/// zh: '开发：修复 iOS 课程偏移负数输入及输入校验'
+	String get dami => '开发：修复 iOS 课程偏移负数输入及输入校验';
+
+	/// zh: '开发：空闲教室实时显示、课表背景模糊、课表布局与屏幕圆角适配；修复校园网数据展示'
+	String get l1angyun => '开发：空闲教室实时显示、课表背景模糊、课表布局与屏幕圆角适配；修复校园网数据展示';
+
+	/// zh: '开发：校园网验证码刷新及验证码输入对话框优化'
+	String get littlestejan => '开发：校园网验证码刷新及验证码输入对话框优化';
+
+	/// zh: '开发：HarmonyOS 移植'
+	String get sixteenforever => '开发：HarmonyOS 移植';
+}
+
+// Path: setting.editor
+class Translations$setting$editor$zh {
+	Translations$setting$editor$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '保存'
+	String get save => '保存';
+
+	/// zh: '应用'
+	String get apply => '应用';
+
+	/// zh: '已设置'
+	String get passwordSet => '已设置';
+
+	/// zh: '未设置'
+	String get passwordNotSet => '未设置';
+
+	/// zh: '显示或隐藏密码'
+	String get passwordVisibility => '显示或隐藏密码';
+
+	/// zh: '切换正负号'
+	String get toggleSign => '切换正负号';
+
+	/// zh: '请输入大于 0 的整数'
+	String get positiveNumber => '请输入大于 0 的整数';
+
+	/// zh: '度'
+	String get electricityUnit => '度';
+
+	/// zh: '课程安排 · TrainTime PDA · 0123456789'
+	String get textPreview => '课程安排 · TrainTime PDA · 0123456789';
+
+	/// zh: '亮度'
+	String get brightness => '亮度';
+
+	/// zh: '边框透明度'
+	String get borderOpacity => '边框透明度';
+
+	/// zh: '底色透明度'
+	String get fillOpacity => '底色透明度';
+
+	/// zh: '底色饱和度'
+	String get fillSaturation => '底色饱和度';
+
+	/// zh: '文字饱和度'
+	String get textSaturation => '文字饱和度';
+
+	/// zh: '背景模糊程度'
+	String get backgroundBlur => '背景模糊程度';
+
+	/// zh: '年份'
+	String get year => '年份';
+
+	/// zh: '学期'
+	String get semester => '学期';
+}
+
+// Path: setting.sections
+class Translations$setting$sections$zh {
+	Translations$setting$sections$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '显示'
+	String get display => '显示';
+
+	/// zh: '语言和文字'
+	String get languageAndText => '语言和文字';
+
+	/// zh: '首页'
+	String get home => '首页';
+
+	/// zh: '电量提醒'
+	String get electricity => '电量提醒';
+
+	/// zh: '课表外观'
+	String get timetableAppearance => '课表外观';
+
+	/// zh: '学期与周次'
+	String get semester => '学期与周次';
+
+	/// zh: '课程数据'
+	String get courseData => '课程数据';
+}
+
+// Path: setting.navigation
+class Translations$setting$navigation$zh {
+	Translations$setting$navigation$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '主题、字体、语言与首页显示'
+	String get uiDescription => '主题、字体、语言与首页显示';
+
+	/// zh: '课表外观、学期与课程数据'
+	String get classtableDescription => '课表外观、学期与课程数据';
+
+	/// zh: '校园服务的账号与密码'
+	String get accountDescription => '校园服务的账号与密码';
+
+	/// zh: '课前提醒与通知管理'
+	String get notificationsDescription => '课前提醒与通知管理';
+
+	/// zh: '日志、缓存清理与退出登录'
+	String get coreDescription => '日志、缓存清理与退出登录';
+}
+
+// Path: setting.fontSizePage
+class Translations$setting$fontSizePage$zh {
+	Translations$setting$fontSizePage$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '字体大小'
+	String get sizeTitle => '字体大小';
+
+	/// zh: '字体粗细'
+	String get weightTitle => '字体粗细';
+
+	/// zh: '预览'
+	String get previewTitle => '预览';
+
+	/// zh: '细'
+	String get weightThin => '细';
+
+	/// zh: '常规'
+	String get weightRegular => '常规';
+
+	/// zh: '中等'
+	String get weightMedium => '中等';
+
+	/// zh: '半粗'
+	String get weightSemibold => '半粗';
+
+	/// zh: '加粗'
+	String get weightBold => '加粗';
+
+	/// zh: '{scale}% · {weight}'
+	String summary({required Object scale, required Object weight}) => '${scale}% · ${weight}';
+}
+
+// Path: setting.classTableStylePage
+class Translations$setting$classTableStylePage$zh {
+	Translations$setting$classTableStylePage$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '时间指示设置'
+	String get currentTimeSettingsTitle => '时间指示设置';
+
+	/// zh: '课表样式设置'
+	String get classColorSettingsTitle => '课表样式设置';
+
+	/// zh: '时间指示设置'
+	String get currentTimeSection => '时间指示设置';
+
+	/// zh: '显示当前时间指示线'
+	String get showCurrentTimeIndicator => '显示当前时间指示线';
+
+	/// zh: '显示迷你数字时钟'
+	String get showCurrentTimeLabel => '显示迷你数字时钟';
+
+	/// zh: '强调显示今天的纵列'
+	String get showTodayColumnHighlight => '强调显示今天的纵列';
+
+	/// zh: '课程卡片样式'
+	String get activeSection => '课程卡片样式';
+
+	/// zh: '课程卡片样式'
+	String get unfinishedSection => '课程卡片样式';
+
+	/// zh: '亮度: {value}'
+	String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
+
+	/// zh: '边框透明度: {value}'
+	String activeBorderAlpha({required Object value}) => '边框透明度: ${value}';
+
+	/// zh: '底色透明度: {value}'
+	String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+
+	/// zh: '已结束课程样式'
+	String get completedSection => '已结束课程样式';
+
+	/// zh: '已结束课程样式区分'
+	String get completedStyleEnabled => '已结束课程样式区分';
+
+	/// zh: '底色饱和度: {value}'
+	String completedSaturationFactor({required Object value}) => '底色饱和度: ${value}';
+
+	/// zh: '亮度: {value}'
+	String completedBrightnessFactor({required Object value}) => '亮度: ${value}';
+
+	/// zh: '文字饱和度: {value}'
+	String completedTextSaturationFactor({required Object value}) => '文字饱和度: ${value}';
+
+	/// zh: '边框透明度: {value}'
+	String completedBorderAlpha({required Object value}) => '边框透明度: ${value}';
+
+	/// zh: '底色透明度: {value}'
+	String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
 }
 
 // Path: xduPlanet.confirmAuditDialog
@@ -4873,19 +5324,19 @@ extension on Translations {
 			'electricity.history' => '历史记录',
 			'electricity.dailyUsage' => '平均每日用量',
 			'electricity.notEnoughData' => '数据量不足以用于渲染',
-			'electricity.info' => '新能源系统获取仅校园网内访问，获取过程中有问题请向开发者报告。\n历史记录依旧为本地记录，平均日用量基于抄表记录计算。',
+			'electricity.info' => '历史记录依旧为本地记录，平均日用量基于抄表记录计算。',
 			'electricity.fetchingHint' => '正在获取最新电费信息',
-			'electricity.fetchError' => '电费信息获取失败，请重试。',
+			'electricity.fetchError' => '电费信息获取失败，请重试',
 			'electricity.date' => '日期',
 			'electricity.power' => '该日0点电量',
 			'electricity.update' => '刷新信息',
 			'electricity.waterUsageFetchDate' => '获取时间',
 			'electricity.waterUsageReadBefore' => '上次读数',
 			'electricity.waterUsageReadNow' => '本次读数',
-			'electricity.waterUsage' => '洗澡水用量',
+			'electricity.waterUsage' => '热水用量',
 			'electricity.waterTitle' => '水费信息',
 			'electricity.waterLoading' => '正在加载水费信息',
-			'electricity.waterUnavailable' => '水费信息暂不可用，请在电费卡片重试。',
+			'electricity.waterUnavailable' => '水费信息暂不可用，请点击右上角刷新重试。',
 			'electricity.waterEmpty' => '暂无水费信息',
 			'electricity.notSchoolNetwork' => '非校园网访问',
 			'electricity.airconTitle' => '空调用电',
@@ -4895,9 +5346,36 @@ extension on Translations {
 			'electricity.airconWaiting' => '等待获取空调用电信息',
 			'electricity.airconError' => '空调用电获取失败',
 			'electricity.airconRetry' => '重试',
-			'electricity.airconImeiMissing' => '尚未添加空调 IMEI，添加后即可查看空调用电信息。',
-			'electricity.airconAddImei' => '添加空调 IMEI',
+			'electricity.airconImeiMissing' => '扫描空调二维码即可添加，也可以从相册选择二维码图片',
+			'electricity.airconAddImei' => '添加空调信息',
 			'electricity.airconCacheNotice' => ({required Object time}) => '当前显示空调缓存数据，缓存时间：${time}',
+			'electricity.powerMetidTitle' => ({required Object code}) => '电表 ${code}',
+			'electricity.weterMetidTitle' => ({required Object code}) => '水表 ${code}',
+			'electricity.airconRemote' => '空调遥控',
+			'electricity.airconControlError' => '无法获取空调状态',
+			'electricity.airconCommandOk' => '空调指令已执行',
+			'electricity.airconControlSection' => '基本控制',
+			'electricity.airconOperationSection' => '运行设置',
+			'electricity.airconOtherSettingsSection' => '其他设置',
+			'electricity.airconPower' => '电源',
+			'electricity.airconTargetTemperature' => '设定温度',
+			'electricity.airconTemperatureRange' => '温度必须在 18–32 ℃ 之间',
+			'electricity.airconIndoorTemperature' => ({required Object temperature}) => '室内温度：${temperature} ℃',
+			'electricity.airconMode' => '运行模式',
+			'electricity.airconModeFan' => '送风',
+			'electricity.airconModeHeat' => '制热',
+			'electricity.airconModeCool' => '制冷',
+			'electricity.airconModeDry' => '除湿',
+			'electricity.airconModeAuto' => '自动',
+			'electricity.airconWindSpeed' => '风速',
+			'electricity.airconWindAuto' => '自动',
+			'electricity.airconWindSilent' => '静音',
+			'electricity.airconWindLow' => '低',
+			'electricity.airconWindMedium' => '中',
+			'electricity.airconWindHigh' => '高',
+			'electricity.airconVerticalSwing' => '上下扫风',
+			'electricity.airconStrongMode' => '强力模式',
+			'electricity.airconElectricHeating' => '辅助电热',
 			'electricityStatus.pending' => '等待获取',
 			'electricityStatus.remainFetching' => '正在获取电量',
 			'electricityStatus.remainNetworkIssue' => '电量查询网络故障',
@@ -4913,6 +5391,7 @@ extension on Translations {
 			'electricityStatus.needAccount' => '需要填写电费账号',
 			'electricityStatus.captchaFailed' => '验证码识别失败',
 			'electricityStatus.otherIssue' => '程序故障',
+			'electricityStatus.noElectricityInfo' => '没有电表信息',
 			'emptyClassroom.title' => '空闲教室',
 			'emptyClassroom.date' => ({required Object date}) => '日期 ${date}',
 			'emptyClassroom.building' => ({required Object building}) => '教学楼 ${building}',
@@ -4920,6 +5399,12 @@ extension on Translations {
 			'emptyClassroom.classroom' => '教室',
 			'emptyClassroom.empty' => '空闲',
 			'emptyClassroom.occupied' => '占用',
+			'emptyClassroom.nowOngoing' => ({required Object period, required Object start, required Object end}) => '现在 · 第 ${period} 节 ${start}-${end}',
+			'emptyClassroom.nowUpcoming' => ({required Object period, required Object start, required Object end}) => '即将 · 第 ${period} 节 ${start}-${end}',
+			'emptyClassroom.nowFree' => ({required Object free, required Object total}) => '空闲 ${free}/${total} 间',
+			'emptyClassroom.onlyFreeNow' => '只看现在空闲',
+			'emptyClassroom.noFreeNow' => '现在没有空闲教室',
+			'emptyClassroom.classesOver' => '今天的课已经结束了',
 			'exam.title' => '考试安排',
 			'exam.cacheHint' => '已显示缓存考试安排信息',
 			'exam.cacheHintPasswordWrong' => '统一认证密码错误或已失效',
@@ -5057,6 +5542,8 @@ extension on Translations {
 			'homepage.libraryCard.noInfo' => '目前无法获取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查询信息中',
 			'homepage.schoolCardInfoCard.errorToast' => '遇到错误，请联系开发者',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.schoolCardInfoCard.fetchingToast' => '正在获取信息，请稍后再来看',
 			'homepage.schoolCardInfoCard.bill' => '流水',
 			'homepage.schoolCardInfoCard.balance' => ({required Object amount}) => '卡里 ${amount} 元',
@@ -5085,14 +5572,22 @@ extension on Translations {
 			'homepage.schoolNet.remaining' => ({required Object remaining}) => '下次结算 ${remaining}',
 			'homepage.clubPromotion.failed' => '社团信息获取失败',
 			'homepage.clubPromotion.fetching' => '社团信息清单正在加载',
+			'homepage.airconCard.title' => '空调遥控',
+			'homepage.airconCard.notConfigured' => '尚未配置空调',
+			'homepage.airconCard.configureHint' => '点击添加空调 IMEI',
+			'homepage.airconCard.running' => ({required Object mode, required Object temperature}) => '${mode} · ${temperature} ℃',
+			'homepage.airconCard.powerOff' => '空调已关闭',
+			'homepage.airconCard.indoorAndWind' => ({required Object temperature, required Object wind}) => '室内 ${temperature} ℃ · 风速 ${wind}',
+			'homepage.airconCard.wind' => ({required Object wind}) => '风速 ${wind}',
+			'homepage.airconCard.fetching' => '正在获取空调状态',
+			'homepage.airconCard.error' => '空调状态获取失败',
+			'homepage.airconCard.openRemote' => '点击进入空调遥控',
 			'library.title' => '图书馆信息',
 			'library.borrowStateTitle' => '借书状态',
 			'library.searchBookTitle' => '查询藏书',
 			'library.searchFieldTitle' => '搜索字段',
 			'library.searchFieldKeywordOption' => '任意词',
 			'library.searchFieldTitleOption' => '标题',
-			_ => null,
-		} ?? switch (path) {
 			'library.searchFieldAuthorOption' => '责任者',
 			'library.searchFieldIsbnOption' => 'ISBN',
 			'library.searchFieldBarcodeOption' => '条码号',
@@ -5134,6 +5629,7 @@ extension on Translations {
 			'library.publishYearEnd' => '出版年止',
 			'library.bookDetail' => '书籍详细信息',
 			'library.noResult' => '没有结果，请修改搜索参数或者开始你的搜索',
+			'library.noMoreData' => '没有更多结果了',
 			'libraryCard.title' => '图书馆当前状况',
 			'libraryCard.fetching' => '正在获取图书馆信息',
 			'libraryCard.northernLibrary' => '北校区状况',
@@ -5158,22 +5654,25 @@ extension on Translations {
 			'login.captchaWindow.messageOnEmpty' => '请输入验证码',
 			'login.captchaWindow.refreshFailed' => ({required Object error}) => '刷新验证码失败: ${error}',
 			'login.sliderTitle' => '服务器认证服务',
-			'login.secondFactor.title' => '短信二次认证',
-			'login.secondFactor.description' => '学校要求完成二次认证。请先获取短信验证码，再输入验证码继续登录。',
+			'login.secondFactor.title' => '二次认证',
+			'login.secondFactor.description' => '学校要求完成二次认证。请选择验证码接收方式，获取并输入验证码后继续登录。',
 			'login.secondFactor.code' => '短信验证码',
-			'login.secondFactor.emptyCode' => '请输入短信验证码',
+			'login.secondFactor.emptyCode' => '请输入验证码',
 			'login.secondFactor.sendCode' => '获取验证码',
 			'login.secondFactor.resendCountdown' => ({required Object seconds}) => '${seconds} 秒后可重新获取',
 			'login.secondFactor.trustDevice' => '信任此设备',
 			'login.secondFactor.trustDeviceHint' => '开启后学校可能在一段时间内不再要求本设备二次认证',
 			'login.secondFactor.networkError' => '二次认证请求失败，请检查网络后重试',
-			'login.secondFactor.cancelled' => '已取消短信二次认证',
+			'login.secondFactor.cancelled' => '已取消二次认证',
 			'login.secondFactor.expired' => '二次认证已失效，请重新登录',
+			'login.secondFactor.method' => '验证码接收方式',
+			'login.secondFactor.sms' => '短信验证码',
+			'login.secondFactor.enterpriseWechat' => '企业微信验证码',
 			'loginProcess.readyPage' => '准备获取登录网页',
 			'loginProcess.getEncrypt' => '获取密码加密密钥',
 			'loginProcess.readyLogin' => '准备登录',
 			'loginProcess.slider' => '登录中',
-			'loginProcess.secondFactor' => '等待短信二次认证',
+			'loginProcess.secondFactor' => '等待二次认证',
 			'loginProcess.afterProcess' => '登录后处理',
 			'loginProcess.failed' => ({required Object status_code}) => '登录失败，响应状态码：${status_code}',
 			'month.january' => '一月',
@@ -5406,12 +5905,12 @@ extension on Translations {
 			'setting.latestVersion' => ({required Object latest}) => '最新版本: ${latest}',
 			'setting.waiting' => '等待获取',
 			'setting.fetchingUpdate' => '正在获取更新信息',
-			'setting.newVersion' => '有新版本发布！',
+			'setting.newVersion' => '有新版本发布，请立刻更新！',
 			'setting.currentStable' => '目前您正在运行最新版',
 			'setting.currentTesting' => '目前您正在运行测试版',
 			'setting.fetchFailed' => '获取更新信息失败',
 			'setting.uiSetting' => '界面设置',
-			'setting.brightnessSetting' => '设置深浅色',
+			'setting.brightnessSetting' => '深浅色模式',
 			'setting.colorSetting' => '颜色设置',
 			'setting.simplifyTimeline' => '简化日程时间轴',
 			'setting.simplifyTimelineDescription' => '没有日程时 减少空间占用',
@@ -5429,9 +5928,9 @@ extension on Translations {
 			'setting.electricityAccountSetting' => '电费账号设置',
 			'setting.schoolnetPasswordSetting' => '校园网帐号密码设置',
 			'setting.schoolnetPasswordDescription' => '不设置查看不了网费',
-			'setting.airconImeiTitle' => '空调用电数据源',
+			'setting.airconImeiTitle' => '空调设备',
 			'setting.airconImei' => '空调 IMEI',
-			'setting.airconImeiNotSet' => '未设置，电费页不显示空调用电',
+			'setting.airconImeiNotSet' => '未设置，无法查询或遥控空调',
 			'setting.airconImeiCurrent' => ({required Object imei}) => '当前 IMEI：${imei}',
 			'setting.airconImeiSaved' => '空调 IMEI 已保存',
 			'setting.airconImeiCleared' => '空调 IMEI 已清除',
@@ -5486,7 +5985,7 @@ extension on Translations {
 			'setting.notificationPage.cancelAllSuccess' => '已取消所有课前提醒',
 			'setting.notificationPage.rescheduleSuccess' => ({required Object count}) => '已重新安排 ${count} 个课前提醒',
 			'setting.notificationPage.rescheduleFailed' => ({required Object error}) => '重新安排通知失败: ${error}',
-			'setting.notificationDebugPage' => '通知服务调试页面',
+			'setting.notificationDebugPage' => '通知状态与测试',
 			'setting.classtableSetting' => '课表相关设置',
 			'setting.background' => '开启课表背景图',
 			'setting.noBackground' => '你先选个图片罢，就在下面',
@@ -5502,7 +6001,7 @@ extension on Translations {
 			'setting.classRefreshTitle' => '确认对话框',
 			'setting.classRefreshContent' => '是否要强制刷新课表？同意后，将会从学校一站式后端重新获取课表，耗时会比较久。',
 			'setting.classSwift' => '课程偏移设置',
-			'setting.classSwiftDescription' => ({required Object swift}) => '正数错后开学日期 负数提前开学日期\n目前为 ${swift}',
+			'setting.classSwiftDescription' => ({required Object swift}) => '目前为 ${swift}',
 			'setting.coreSetting' => '缓存登录设置',
 			'setting.checkLogger' => '查看网络拦截器和日志',
 			'setting.clearAndRestart' => '清除缓存后重启',
@@ -5525,10 +6024,11 @@ extension on Translations {
 			'setting.changeColorDialog.pink' => '樱花粉',
 			'setting.changeBrightnessDialog.title' => '亮度设置',
 			'setting.changeBrightnessDialog.followSetting' => '跟随系统',
-			'setting.changeBrightnessDialog.dayMode' => '白天模式',
-			'setting.changeBrightnessDialog.nightMode' => '黑夜模式',
+			'setting.changeBrightnessDialog.dayMode' => '浅色',
+			'setting.changeBrightnessDialog.nightMode' => '深色',
 			'setting.changeSwiftDialog.title' => '课程偏移设置',
 			'setting.changeSwiftDialog.inputHint' => '请在此输入数字',
+			'setting.changeSwiftDialog.invalidNumber' => '请输入有效的整数',
 			'setting.changeElectricityTitle' => '修改电费帐号',
 			'setting.changeElectricityAccount.title' => '修改电费帐号',
 			'setting.changeElectricityAccount.campus' => '校区',
@@ -5556,6 +6056,8 @@ extension on Translations {
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '请选择院区',
 			'setting.changeElectricityAccount.apartment' => '楼栋',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.apartmentHint' => '选择楼栋',
 			'setting.changeElectricityAccount.northApartment' => '北楼',
 			'setting.changeElectricityAccount.southApartment' => '南楼',
@@ -5602,11 +6104,9 @@ extension on Translations {
 			'setting.semesterUpdateData' => '应用新学期设置中',
 			'setting.easterEggPage' => '你找到了彩蛋',
 			'setting.aboutPage.benderblog' => '主要开发者，iOS 小部件编写和拼接',
-			'setting.aboutPage.alnair' => '开发：图书馆搜索和封面',
-			'setting.aboutPage.aqqkad' => '开发：考勤历史记录',
+			'setting.aboutPage.alnair' => '开发：图书馆搜索和封面、图书馆布局修复、饮水机接水功能及接口适配',
+			'setting.aboutPage.aqqkad' => '开发：考勤历史记录、空调遥控、空调电费数据接入、图书馆新接口适配',
 			'setting.aboutPage.bellssgit' => '支持：最佳&最久故障反馈者',
-			_ => null,
-		} ?? switch (path) {
 			'setting.aboutPage.brackrat' => '设计：主页，登录页，配色，iOS 小部件等',
 			'setting.aboutPage.breezeline' => '支持：无价值无意义的产品经理(他自己的描述)',
 			'setting.aboutPage.cafebabe' => '支持：提供彩蛋代码 / 开发：2026版本滑块验证码适配',
@@ -5622,7 +6122,7 @@ extension on Translations {
 			'setting.aboutPage.hawa130' => '设计：课程详情卡片',
 			'setting.aboutPage.hhzm' => '开发：电费查询账号计算',
 			'setting.aboutPage.imaginary17' => '开发：睿思论坛路由修复',
-			'setting.aboutPage.imoscarz' => '开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI',
+			'setting.aboutPage.imoscarz' => '开发：设计软件主页 / 开发：平板考勤查询页面 / 开发：优化了体育查询界面的UI / 开发：设置页面分类重构及主从布局适配',
 			'setting.aboutPage.kaMateKaOra' => '国际化：软件英语翻译优化',
 			'setting.aboutPage.lagrangeX' => '开发：课程表时间进度展示（终版方案） / 开发：课程表上过课程灰度化和其他课程界面特性',
 			'setting.aboutPage.lhx666Cool' => '支持：Windows 和 Linux 构建脚本 / 开发：2026版本滑块验证码适配',
@@ -5653,6 +6153,83 @@ extension on Translations {
 			'setting.aboutPage.copyrightRegisterCode' => '著作权登记号',
 			'setting.aboutPage.signAndroid' => '安卓签名',
 			'setting.aboutPage.title' => '关于本软件',
+			'setting.aboutPage.contributors' => '贡献者与致谢',
+			'setting.aboutPage.licenses' => '开源许可',
+			'setting.aboutPage.extras' => '更多',
+			'setting.aboutPage.dami' => '开发：修复 iOS 课程偏移负数输入及输入校验',
+			'setting.aboutPage.l1angyun' => '开发：空闲教室实时显示、课表背景模糊、课表布局与屏幕圆角适配；修复校园网数据展示',
+			'setting.aboutPage.littlestejan' => '开发：校园网验证码刷新及验证码输入对话框优化',
+			'setting.aboutPage.sixteenforever' => '开发：HarmonyOS 移植',
+			'setting.editor.save' => '保存',
+			'setting.editor.apply' => '应用',
+			'setting.editor.passwordSet' => '已设置',
+			'setting.editor.passwordNotSet' => '未设置',
+			'setting.editor.passwordVisibility' => '显示或隐藏密码',
+			'setting.editor.toggleSign' => '切换正负号',
+			'setting.editor.positiveNumber' => '请输入大于 0 的整数',
+			'setting.editor.electricityUnit' => '度',
+			'setting.editor.textPreview' => '课程安排 · TrainTime PDA · 0123456789',
+			'setting.editor.brightness' => '亮度',
+			'setting.editor.borderOpacity' => '边框透明度',
+			'setting.editor.fillOpacity' => '底色透明度',
+			'setting.editor.fillSaturation' => '底色饱和度',
+			'setting.editor.textSaturation' => '文字饱和度',
+			'setting.editor.backgroundBlur' => '背景模糊程度',
+			'setting.editor.year' => '年份',
+			'setting.editor.semester' => '学期',
+			'setting.sections.display' => '显示',
+			'setting.sections.languageAndText' => '语言和文字',
+			'setting.sections.home' => '首页',
+			'setting.sections.electricity' => '电量提醒',
+			'setting.sections.timetableAppearance' => '课表外观',
+			'setting.sections.semester' => '学期与周次',
+			'setting.sections.courseData' => '课程数据',
+			'setting.navigation.uiDescription' => '主题、字体、语言与首页显示',
+			'setting.navigation.classtableDescription' => '课表外观、学期与课程数据',
+			'setting.navigation.accountDescription' => '校园服务的账号与密码',
+			'setting.navigation.notificationsDescription' => '课前提醒与通知管理',
+			'setting.navigation.coreDescription' => '日志、缓存清理与退出登录',
+			'setting.fontSizeSetting' => '字体大小与粗细',
+			'setting.fontSizePage.sizeTitle' => '字体大小',
+			'setting.fontSizePage.weightTitle' => '字体粗细',
+			'setting.fontSizePage.previewTitle' => '预览',
+			'setting.fontSizePage.weightThin' => '细',
+			'setting.fontSizePage.weightRegular' => '常规',
+			'setting.fontSizePage.weightMedium' => '中等',
+			'setting.fontSizePage.weightSemibold' => '半粗',
+			'setting.fontSizePage.weightBold' => '加粗',
+			'setting.fontSizePage.summary' => ({required Object scale, required Object weight}) => '${scale}% · ${weight}',
+			'setting.generalAccountSettings' => '通用账号',
+			'setting.undergraduateSystemAccounts' => '本科生系统账号',
+			'setting.classTableBackgroundSection' => '课表背景',
+			'setting.backgroundBlur' => ({required Object value}) => '背景模糊: ${value}',
+			'setting.backgroundBlurOff' => '关闭',
+			'setting.classTableStyleSetting' => '课表显示与样式',
+			'setting.classTableStyleDescription' => '时间指示和课程卡片样式',
+			'setting.classTableStylePage.currentTimeSettingsTitle' => '时间指示设置',
+			'setting.classTableStylePage.classColorSettingsTitle' => '课表样式设置',
+			'setting.classTableStylePage.currentTimeSection' => '时间指示设置',
+			'setting.classTableStylePage.showCurrentTimeIndicator' => '显示当前时间指示线',
+			'setting.classTableStylePage.showCurrentTimeLabel' => '显示迷你数字时钟',
+			'setting.classTableStylePage.showTodayColumnHighlight' => '强调显示今天的纵列',
+			'setting.classTableStylePage.activeSection' => '课程卡片样式',
+			'setting.classTableStylePage.unfinishedSection' => '课程卡片样式',
+			'setting.classTableStylePage.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
+			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
+			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.completedSection' => '已结束课程样式',
+			'setting.classTableStylePage.completedStyleEnabled' => '已结束课程样式区分',
+			'setting.classTableStylePage.completedSaturationFactor' => ({required Object value}) => '底色饱和度: ${value}',
+			'setting.classTableStylePage.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
+			'setting.classTableStylePage.completedTextSaturationFactor' => ({required Object value}) => '文字饱和度: ${value}',
+			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
+			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classSwiftExplain' => '正数错后开学日期 负数提前开学日期',
+			'sponsorship.title' => '本版本由极创工作室和网管会赞助发布',
+			'sponsorship.dialogTitle' => '赞助信息',
+			'sponsorship.dialogContent' => '极创工作室介绍辞：极创工作室是一个由西电创新创业学院支持建设的科技创新俱乐部，旨在与校内最优秀的创新创业人才同行，专注于人工智能等领域的技术创新与产品研发。目前工作室和华为等厂家合作，深耕大语言模型相关前沿方向，已孵化超过数十个人工智能领域科创产品，其中8项产品成功落地商用。工作室最知名的产品包括SwanLab、LLMOne、NexusGate。\n\n网管会介绍辞：学生网管会隶属于西电信息网络技术中心，主要协助处理师生校园网络使用问题，参与校园网络维护、线上咨询、线下处理和技术支持等工作。我们欢迎认真负责、愿意学习、对网络与技术实践感兴趣的同学加入，一起服务同学、提升能力、积累经验。\n\nXDYou软件开发者辞：极创在XDYou早期开发期间给了相当大的帮助，网管会我在20年入学期间加入过，可惜他们没要我。应我最近找工作，找了他们的人了解了一些信息，按照约定制作本页面作为咨询费。\nBender Rodriguez 6/9/2026',
+			'sponsorship.buttonJichuang' => '了解极创',
+			'sponsorship.buttonXduna' => '了解网管会',
 			'sport.title' => '体育查询',
 			'sport.classInfo' => '课程信息',
 			'sport.emptyClassInfo' => '未查询到课程信息',

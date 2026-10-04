@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
@@ -21,6 +21,7 @@ import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -42,8 +43,15 @@ class ClassTableState extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant ClassTableState oldWidget) {
-    controllers.chosenWeek = oldWidget.controllers.chosenWeek;
-    return true;
+    /// This widget is provided again with every rebuild (the classtable sheet
+    /// is given the room which is really left for it), so it must not touch
+    /// the controllers unless they actually changed: the setter notifies, and
+    /// that notification would rebuild this very widget again.
+    if (!identical(controllers, oldWidget.controllers)) {
+      controllers.chosenWeek = oldWidget.controllers.chosenWeek;
+      return true;
+    }
+    return constraints != oldWidget.constraints;
   }
 }
 
@@ -223,9 +231,10 @@ class ClassTableWidgetState with ChangeNotifier {
 
   /// Change chosen week.
   set chosenWeek(int chosenWeek) {
-    if (chosenWeek != _chosenWeek) {
-      _chosenWeek = chosenWeek;
+    if (chosenWeek == _chosenWeek) {
+      return;
     }
+    _chosenWeek = chosenWeek;
     notifyListeners();
   }
 
@@ -269,6 +278,8 @@ class ClassTableWidgetState with ChangeNotifier {
       .classTableComputedSignal
       .value
       .getClassDetail(timeArrangement[index]);
+
+  bool isClassCardInteractive(ClassOrgainzedData detail) => true;
 
   Future<void> addCustomClass(CustomClass customClass) =>
       customClassController.addCustomClass(customClass).then((_) {
@@ -326,8 +337,10 @@ class ClassTableWidgetState with ChangeNotifier {
     await Future.wait([
       classTableController.reloadClassTable(),
       examController.reloadExamInfo(),
-      physicsExperimentController.reloadPhysicsExperiment(),
-      otherExperimentController.reloadOtherExperiment(),
+      if (!preference.getBool(preference.Preference.role)) ...[
+        physicsExperimentController.reloadPhysicsExperiment(),
+        otherExperimentController.reloadOtherExperiment(),
+      ],
     ]);
     await maybeAutoSyncSystemCalendar();
     notifyListeners();

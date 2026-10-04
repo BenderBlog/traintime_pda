@@ -2,10 +2,11 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/page/setting/password_setting_sheet.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
+
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/routing/routes.dart';
@@ -21,9 +22,10 @@ class SportCard extends StatelessWidget {
         bool isGood = true;
         if (preference.getString(preference.Preference.sportPassword).isEmpty) {
           isGood =
-              await showDialog<bool>(
+              await showPasswordSettingSheet(
                 context: context,
-                builder: (context) => const SportPasswordDialog(),
+                preferenceKey: preference.Preference.sportPassword,
+                titleKey: 'setting.change_sport_title',
               ) ??
               false;
         }

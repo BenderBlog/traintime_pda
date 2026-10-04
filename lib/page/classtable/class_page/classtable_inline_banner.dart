@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -18,10 +18,13 @@ class ClassTableInlineBanner extends StatelessWidget {
 
   String _sourceLabel(BuildContext context, ClassTableStatusSource source) =>
       switch (source) {
-        ClassTableStatusSource.classTable => context.t.classtable.statusSource.classTable,
+        ClassTableStatusSource.classTable =>
+          context.t.classtable.statusSource.classTable,
         ClassTableStatusSource.exam => context.t.classtable.statusSource.exam,
-        ClassTableStatusSource.physicsExperiment => context.t.classtable.statusSource.physicsExperiment,
-        ClassTableStatusSource.otherExperiment => context.t.classtable.statusSource.otherExperiment,
+        ClassTableStatusSource.physicsExperiment =>
+          context.t.classtable.statusSource.physicsExperiment,
+        ClassTableStatusSource.otherExperiment =>
+          context.t.classtable.statusSource.otherExperiment,
       };
 
   @override
@@ -29,14 +32,18 @@ class ClassTableInlineBanner extends StatelessWidget {
     final isVisible = loadingSources.isNotEmpty || cacheSources.isNotEmpty;
     final loadingText = loadingSources.isEmpty
         ? null
-        : context.t.classtable.statusBanner.loading(sources: loadingSources
+        : context.t.classtable.statusBanner.loading(
+            sources: loadingSources
                 .map((source) => _sourceLabel(context, source))
-                .join("; "));
+                .join("; "),
+          );
     final cacheText = cacheSources.isEmpty
         ? null
-        : context.t.classtable.statusBanner.cache(sources: cacheSources
+        : context.t.classtable.statusBanner.cache(
+            sources: cacheSources
                 .map((source) => _sourceLabel(context, source))
-                .join("; "));
+                .join("; "),
+          );
 
     return !isVisible
         ? const SizedBox.shrink()

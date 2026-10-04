@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -28,7 +28,9 @@ class ExperimentInfoCard extends StatelessWidget {
               if (data!.score != null)
                 ReXCardRemaining(
                   data!.score!.found
-                      ? context.t.experiment.scoreInfo(score: data!.score!.label)
+                      ? context.t.experiment.scoreInfo(
+                          score: data!.score!.label,
+                        )
                       : context.t.experiment.tapForScore,
                   isBold: true,
                   onTap: () {
@@ -174,7 +176,9 @@ class ExperimentInfoCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 if (recognition?.found ?? false)
                   Text(
-                    context.t.experiment.predictScore(score: recognition!.label),
+                    context.t.experiment.predictScore(
+                      score: recognition!.label,
+                    ),
                   ),
                 Divider(),
                 Text(context.t.experiment.scoreHint2),

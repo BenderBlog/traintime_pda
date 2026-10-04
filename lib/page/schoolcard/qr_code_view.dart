@@ -4,7 +4,7 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 
@@ -41,9 +41,7 @@ class _QRCodeViewState extends State<QRCodeView> {
                     : snapshot.hasError
                     ? SizedBox(
                         width: 200,
-                        child: Text(
-                          context.t.schoolCardWindow.qrCode,
-                        ),
+                        child: Text(context.t.schoolCardWindow.qrCode),
                       )
                     : Image.memory(snapshot.data!, width: 200, height: 200),
               ),
@@ -58,9 +56,7 @@ class _QRCodeViewState extends State<QRCodeView> {
               qrCode = SchoolCardController.i.session.getQRCode();
             });
           },
-          child: Text(
-            context.t.schoolCardWindow.reload,
-          ),
+          child: Text(context.t.schoolCardWindow.reload),
         ),
       ],
     );

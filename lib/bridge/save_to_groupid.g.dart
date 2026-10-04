@@ -13,9 +13,9 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart' show immutable, protected, visibleForTesting;
 
 Object? _extractReplyValueOrThrow(
-    List<Object?>? replyList,
-    String channelName, {
-    required bool isNullValid,
+  List<Object?>? replyList,
+  String channelName, {
+  required bool isNullValid,
 }) {
   if (replyList == null) {
     throw PlatformException(
@@ -49,8 +49,9 @@ bool _deepEquals(Object? a, Object? b) {
   }
   if (a is List && b is List) {
     return a.length == b.length &&
-        a.indexed
-            .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
+        a.indexed.every(
+          ((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]),
+        );
   }
   if (a is Map && b is Map) {
     if (a.length != b.length) {
@@ -99,7 +100,6 @@ int _deepHash(Object? value) {
   return value.hashCode;
 }
 
-
 class FileToGroupID {
   FileToGroupID({
     required this.appid,
@@ -114,15 +114,12 @@ class FileToGroupID {
   String data;
 
   List<Object?> _toList() {
-    return <Object?>[
-      appid,
-      fileName,
-      data,
-    ];
+    return <Object?>[appid, fileName, data];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static FileToGroupID decode(Object result) {
     result as List<Object?>;
@@ -142,14 +139,15 @@ class FileToGroupID {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(appid, other.appid) && _deepEquals(fileName, other.fileName) && _deepEquals(data, other.data);
+    return _deepEquals(appid, other.appid) &&
+        _deepEquals(fileName, other.fileName) &&
+        _deepEquals(data, other.data);
   }
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
 }
-
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -158,7 +156,7 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is FileToGroupID) {
+    } else if (value is FileToGroupID) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
     } else {
@@ -181,9 +179,13 @@ class SaveToGroupIdSwiftApi {
   /// Constructor for [SaveToGroupIdSwiftApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  SaveToGroupIdSwiftApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  SaveToGroupIdSwiftApi({
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
+           ? '.$messageChannelSuffix'
+           : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -191,7 +193,8 @@ class SaveToGroupIdSwiftApi {
   final String pigeonVar_messageChannelSuffix;
 
   Future<String> getHostLanguage() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.getHostLanguage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.getHostLanguage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -201,49 +204,52 @@ class SaveToGroupIdSwiftApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as String;
   }
 
   Future<bool> saveToGroupId(FileToGroupID data) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.saveToGroupId$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.saveToGroupId$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[data]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[data],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   Future<bool> deleteFromGroupId(FileToGroupID data) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.deleteFromGroupId$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.watermeter.SaveToGroupIdSwiftApi.deleteFromGroupId$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[data]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[data],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 }

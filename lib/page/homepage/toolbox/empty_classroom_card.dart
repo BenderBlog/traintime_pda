@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
@@ -19,10 +19,7 @@ class EmptyClassroomCard extends StatelessWidget {
     return SmallFunctionCard(
       onPressed: () async {
         if (offline) {
-          showToast(
-            context: context,
-            msg: context.t.homepage.offlineMode,
-          );
+          showToast(context: context, msg: context.t.homepage.offlineMode);
         } else {
           context.pushReplacementNamed(Routes.emptyClassroom);
         }

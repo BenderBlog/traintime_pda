@@ -1,10 +1,9 @@
-import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-
 
 /// 设置页面
 class SettingsPage extends StatelessWidget {
@@ -14,19 +13,13 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.ruisi.settings.title),
-      ),
+      appBar: AppBar(title: Text(context.t.ruisi.settings.title)),
       body: ListView(
         children: [
-          _SectionHeader(
-            title: context.t.ruisi.settings.sectionDebug,
-          ),
+          _SectionHeader(title: context.t.ruisi.settings.sectionDebug),
           ListTile(
             leading: const Icon(Icons.bug_report),
-            title: Text(
-              context.t.ruisi.settings.viewLogs,
-            ),
+            title: Text(context.t.ruisi.settings.viewLogs),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => TalkerScreen(talker: talker)),

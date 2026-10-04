@@ -10,10 +10,15 @@ part 'energy.g.dart';
 
 @JsonSerializable()
 class ElectricityHistoryInfo {
-  DateTime fetchDay;
-  String remain;
+  final DateTime fetchDay;
+  final num remain;
+  final List<MeterInfo> historyInfo;
 
-  ElectricityHistoryInfo({required this.fetchDay, required this.remain});
+  ElectricityHistoryInfo({
+    required this.fetchDay,
+    required this.historyInfo,
+    required this.remain,
+  });
 
   factory ElectricityHistoryInfo.fromJson(Map<String, dynamic> json) =>
       _$ElectricityHistoryInfoFromJson(json);
@@ -48,14 +53,10 @@ class MeterInfo {
 
 @JsonSerializable()
 class EnergyInfo {
-  final DateTime lastReadDate;
-  final num electricityRemain;
-  final List<MeterInfo> electricityMeterList;
-  final List<MeterInfo>? waterMeterList;
+  final Map<String, ElectricityHistoryInfo> electricityMeterList;
+  final Map<String, List<MeterInfo>> waterMeterList;
 
   EnergyInfo({
-    required this.lastReadDate,
-    required this.electricityRemain,
     required this.electricityMeterList,
     required this.waterMeterList,
   });

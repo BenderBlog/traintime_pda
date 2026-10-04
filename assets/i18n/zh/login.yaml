@@ -1,3 +1,4 @@
+---
 identity_number: 学号
 password: 一站式登录密码
 login: 登录
@@ -18,14 +19,17 @@ captcha_window:
   refresh_failed: '刷新验证码失败: {error}'
 slider_title: 服务器认证服务
 second_factor:
-  title: 短信二次认证
-  description: 学校要求完成二次认证。请先获取短信验证码，再输入验证码继续登录。
+  title: 二次认证
+  description: 学校要求完成二次认证。请选择验证码接收方式，获取并输入验证码后继续登录。
   code: 短信验证码
-  empty_code: 请输入短信验证码
+  empty_code: 请输入验证码
   send_code: 获取验证码
-  resend_countdown: '{seconds} 秒后可重新获取'
+  resend_countdown: "{seconds} 秒后可重新获取"
   trust_device: 信任此设备
   trust_device_hint: 开启后学校可能在一段时间内不再要求本设备二次认证
   network_error: 二次认证请求失败，请检查网络后重试
-  cancelled: 已取消短信二次认证
+  cancelled: 已取消二次认证
   expired: 二次认证已失效，请重新登录
+  method: 验证码接收方式
+  sms: 短信验证码
+  enterprise_wechat: 企业微信验证码

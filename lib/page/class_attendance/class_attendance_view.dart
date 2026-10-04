@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA Authors
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
@@ -28,9 +28,7 @@ class ClassAttendanceView extends StatelessWidget {
 
           return Scaffold(
             appBar: AppBar(
-              title: Text(
-                context.t.classAttendance.title,
-              ),
+              title: Text(context.t.classAttendance.title),
               actions: [
                 if (state.state == ClassAttendanceFetchState.ok ||
                     state.state == ClassAttendanceFetchState.empty)
@@ -50,9 +48,7 @@ class ClassAttendanceView extends StatelessWidget {
                         children: [
                           const CircularProgressIndicator(),
                           const SizedBox(height: 16),
-                          Text(
-                            context.t.classAttendance.longLoad,
-                          ),
+                          Text(context.t.classAttendance.longLoad),
                         ],
                       ),
                     );
@@ -136,9 +132,7 @@ class ClassAttendanceView extends StatelessWidget {
             ineligibleCourses.toColumn(),
           ],
           if (warningCourses.isNotEmpty) ...[
-            TimelineTitle(
-              title: context.t.classAttendance.courseState.warning,
-            ),
+            TimelineTitle(title: context.t.classAttendance.courseState.warning),
             warningCourses.toColumn(),
           ],
           if (eligibleCourses.isNotEmpty) ...[
@@ -148,9 +142,7 @@ class ClassAttendanceView extends StatelessWidget {
             eligibleCourses.toColumn(),
           ],
           if (unknownCourses.isNotEmpty) ...[
-            TimelineTitle(
-              title: context.t.classAttendance.courseState.unknown,
-            ),
+            TimelineTitle(title: context.t.classAttendance.courseState.unknown),
             unknownCourses.toColumn(),
           ],
         ],

@@ -4,11 +4,12 @@
 
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/page/homepage/homepage_edit_mode.dart';
 import 'package:watermeter/page/homepage/homepage_widget_registry.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
+import 'package:watermeter/page/homepage/notice_card/sponsorship_card.dart';
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/staggered_grid.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -178,7 +179,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             padding: EdgeInsetsGeometry.only(right: 8),
             child: IconButton(
               icon: Icon(_editMode ? Icons.check : Icons.edit),
-              tooltip: _editMode ? context.t.homepage.editDone : context.t.homepage.editMode,
+              tooltip: _editMode
+                  ? context.t.homepage.editDone
+                  : context.t.homepage.editMode,
               onPressed: () {
                 if (_editMode) {
                   _exitEditMode();
@@ -201,10 +204,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          showToast(
-            context: context,
-            msg: context.t.homepage.loadingMessage,
-          );
+          showToast(context: context, msg: context.t.homepage.loadingMessage);
           await HomepageController.i.refresh(
             sliderCaptcha: (String cookieStr) {
               return SliderCaptchaClientProvider(cookie: cookieStr).solve(
@@ -214,16 +214,14 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             },
           );
           if (context.mounted) {
-            showToast(
-              context: context,
-              msg: context.t.homepage.loaded,
-            );
+            showToast(context: context, msg: context.t.homepage.loaded);
           }
         },
         child: ListView(
           padding: const EdgeInsets.all(8),
           children: [
             const UpdateCard(),
+            const SponsorshipCard(),
             const ClassTableCard(),
             if (_editMode)
               Padding(
@@ -318,5 +316,3 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     );
   }
 }
-
-

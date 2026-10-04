@@ -2,13 +2,14 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum EmptyListViewType { reading, singing, rolling, defaultimg }
 
 class EmptyListView extends StatelessWidget {
   final String text;
   final String assets;
+  final List<Widget> buttons;
 
   static String _getAssets(EmptyListViewType type) {
     switch (type) {
@@ -25,17 +26,38 @@ class EmptyListView extends StatelessWidget {
     super.key,
     required this.text,
     required EmptyListViewType type,
+    this.buttons = const [],
   }) : assets = _getAssets(type);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset(assets, scale: 1.5),
-        const Divider(color: Colors.transparent),
-        Text(text),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.hasBoundedHeight &&
+                    constraints.maxHeight < 240) {
+                  return const Center(
+                    child: Icon(Icons.inbox_outlined, size: 64),
+                  );
+                }
+
+                return Image.asset(assets, scale: 1.5, fit: BoxFit.contain);
+              },
+            ),
+          ),
+          const Divider(color: Colors.transparent),
+          Text(text, textAlign: TextAlign.center),
+          if (buttons.isNotEmpty) ...[
+            const Divider(color: Colors.transparent),
+            ...buttons,
+          ],
+        ],
+      ),
     );
   }
 }

@@ -4,7 +4,7 @@
 
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/network_usage.dart';
 import 'package:watermeter/model/not_school_network_exception.dart';
@@ -95,12 +95,14 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                           children: [
                             InfoItem(
                               icon: Icons.person,
-                              label: context.t.schoolNet.currentLoginNet.account,
+                              label:
+                                  context.t.schoolNet.currentLoginNet.account,
                               value: currentUserNetInfo.userName,
                             ),
                             InfoItem(
                               icon: Icons.assignment,
-                              label: context.t.schoolNet.currentLoginNet.planType,
+                              label:
+                                  context.t.schoolNet.currentLoginNet.planType,
                               value: currentUserNetInfo.productsName,
                               valueColor: Colors.green,
                             ),
@@ -120,8 +122,11 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
 
                     // 流量使用卡片
                     InfoCard(
-                          title:
-                              context.t.schoolNet.currentLoginNet.usageSituation,
+                          title: context
+                              .t
+                              .schoolNet
+                              .currentLoginNet
+                              .usageSituation,
                           children: [
                             const SizedBox(height: 8),
                             LinearProgressIndicator(
@@ -130,8 +135,9 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                             const SizedBox(height: 4),
                             Text(
                               context.t.schoolNet.currentLoginNet.usedPercent(
-                                percent: (usedPercentage * 100)
-                                    .toStringAsFixed(1),
+                                percent: (usedPercentage * 100).toStringAsFixed(
+                                  1,
+                                ),
                               ),
                               textAlign: TextAlign.right,
                             ).padding(horizontal: 12),
@@ -142,8 +148,11 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
                               color: Colors.redAccent,
                             ).padding(horizontal: 12),
                             NetDataRow(
-                              label:
-                                  context.t.schoolNet.currentLoginNet.remainCount,
+                              label: context
+                                  .t
+                                  .schoolNet
+                                  .currentLoginNet
+                                  .remainCount,
                               value: _formatBytes(
                                 currentUserNetInfo.remainBytes,
                               ),
@@ -162,9 +171,7 @@ class _CurrentNetInfoState extends State<CurrentNetInfoPage>
 
                     FilledButton(
                           onPressed: _reload,
-                          child: Text(
-                            context.t.schoolNet.refresh,
-                          ),
+                          child: Text(context.t.schoolNet.refresh),
                         )
                         .padding(horizontal: 4, vertical: 8)
                         .width(double.infinity)

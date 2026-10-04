@@ -233,7 +233,7 @@ class RuisiApi {
             ? location
             : '$_baseUrl/$location';
         talker.info('POST 302 → GET $redirectUrl');
-        return get(redirectUrl);
+        return await get(redirectUrl);
       }
 
       return (true, response.data ?? '服务端无返回');

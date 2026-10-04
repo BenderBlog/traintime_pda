@@ -1,3 +1,4 @@
+
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
@@ -129,7 +130,7 @@ class _ContentPageState extends State<ContentPage> {
                         title: Text(
                           "#${snapshot.data![index].ID} "
                           "${snapshot.data![index].user_id} "
-                          "${FlutterI18n.translate(context, snapshot.data![index].statusStr)}",
+                          "${context.t.resolveKey(snapshot.data![index].statusStr)}",
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

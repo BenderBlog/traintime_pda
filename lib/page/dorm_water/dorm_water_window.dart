@@ -1,7 +1,7 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:watermeter/model/dorm_water.dart';
 import 'dart:convert' show base64Decode;
@@ -112,39 +112,27 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
 
     if (phone.isEmpty) {
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: context.t.dormWater.phoneRequired,
-      );
+      showToast(context: context, msg: context.t.dormWater.phoneRequired);
       return;
     }
 
     if (imageCode.isEmpty) {
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: context.t.dormWater.imageCodeRequired,
-      );
+      showToast(context: context, msg: context.t.dormWater.imageCodeRequired);
       return;
     }
 
     try {
       await _session.sendSmsCode(phoneNumber: phone, imageCode: imageCode);
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: context.t.dormWater.smsSent,
-      );
+      showToast(context: context, msg: context.t.dormWater.smsSent);
     } on Exception catch (e) {
       if (!mounted) return;
       showToast(context: context, msg: e.toString());
       _loadCaptcha();
     } catch (e) {
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: "${context.t.dormWater.smsFailed}: $e",
-      );
+      showToast(context: context, msg: "${context.t.dormWater.smsFailed}: $e");
       _loadCaptcha();
     }
   }
@@ -156,19 +144,13 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
 
     if (phone.isEmpty) {
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: context.t.dormWater.phoneRequired,
-      );
+      showToast(context: context, msg: context.t.dormWater.phoneRequired);
       return;
     }
 
     if (smsCode.isEmpty) {
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: context.t.dormWater.smsCodeRequired,
-      );
+      showToast(context: context, msg: context.t.dormWater.smsCodeRequired);
       return;
     }
 
@@ -179,10 +161,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     try {
       await _session.login(phoneNumber: phone, smsCode: smsCode);
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: context.t.dormWater.loginSuccess,
-      );
+      showToast(context: context, msg: context.t.dormWater.loginSuccess);
       setState(() {
         _isLoggedIn = true;
       });
@@ -219,10 +198,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     _loadCaptcha();
 
     if (!mounted) return;
-    showToast(
-      context: context,
-      msg: context.t.dormWater.logoutSuccess,
-    );
+    showToast(context: context, msg: context.t.dormWater.logoutSuccess);
   }
 
   /// Load device list
@@ -247,8 +223,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       });
       showToast(
         context: context,
-        msg:
-            "${context.t.dormWater.fetchDevicesFailed}: $e",
+        msg: "${context.t.dormWater.fetchDevicesFailed}: $e",
       );
     }
   }
@@ -264,10 +239,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     try {
       await _session.startWater(deviceId: device.id);
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: context.t.dormWater.startWaterSuccess,
-      );
+      showToast(context: context, msg: context.t.dormWater.startWaterSuccess);
       // Start polling device status
       _pollDeviceStatus(device.id);
     } catch (e) {
@@ -278,8 +250,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       });
       showToast(
         context: context,
-        msg:
-            "${context.t.dormWater.startWaterFailed}: $e",
+        msg: "${context.t.dormWater.startWaterFailed}: $e",
       );
     }
   }
@@ -289,10 +260,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
     try {
       await _session.endWater(deviceId: deviceId);
       if (!mounted) return;
-      showToast(
-        context: context,
-        msg: context.t.dormWater.endWaterSuccess,
-      );
+      showToast(context: context, msg: context.t.dormWater.endWaterSuccess);
       setState(() {
         _isWaterRunning = false;
         _currentDevice = null;
@@ -302,8 +270,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg:
-            "${context.t.dormWater.endWaterFailed}: $e",
+        msg: "${context.t.dormWater.endWaterFailed}: $e",
       );
     }
   }
@@ -382,9 +349,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
   /// Build login page
   Widget _buildLoginPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.dormWater.title),
-      ),
+      appBar: AppBar(title: Text(context.t.dormWater.title)),
       body: _buildLoginTab(context),
     );
   }
@@ -416,8 +381,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
       if (!mounted) return;
       showToast(
         context: context,
-        msg:
-            "${context.t.dormWater.addDeviceFailed}: $e",
+        msg: "${context.t.dormWater.addDeviceFailed}: $e",
       );
     }
   }
@@ -453,9 +417,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
         TextField(
           controller: _phoneController,
           keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-            labelText: context.t.dormWater.phone,
-          ),
+          decoration: InputDecoration(labelText: context.t.dormWater.phone),
         ),
         const SizedBox(height: 12),
         // Image code input with captcha image on the right
@@ -478,9 +440,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
         // SMS code input
         TextField(
           controller: _smsCodeController,
-          decoration: InputDecoration(
-            labelText: context.t.dormWater.smsCode,
-          ),
+          decoration: InputDecoration(labelText: context.t.dormWater.smsCode),
         ),
         const SizedBox(height: 16),
         Row(
@@ -488,9 +448,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
             Expanded(
               child: FilledButton.tonal(
                 onPressed: _sendSmsCode,
-                child: Text(
-                  context.t.dormWater.sendSms,
-                ),
+                child: Text(context.t.dormWater.sendSms),
               ),
             ),
             const SizedBox(width: 8),
@@ -533,9 +491,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _loadDevices,
-              child: Text(
-                context.t.dormWater.retryLoadDevices,
-              ),
+              child: Text(context.t.dormWater.retryLoadDevices),
             ),
           ],
         ),
@@ -551,9 +507,7 @@ class _DormWaterWindowState extends State<DormWaterWindow> {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _loadDevices,
-              child: Text(
-                context.t.dormWater.selectDevice,
-              ),
+              child: Text(context.t.dormWater.selectDevice),
             ),
           ],
         ),

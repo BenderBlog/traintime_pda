@@ -2,7 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -12,7 +13,6 @@ import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/routing/routes.dart';
-import 'package:watermeter/generated/translations.g.dart';
 
 class EnergyCard extends StatelessWidget {
   const EnergyCard({super.key});
@@ -25,10 +25,13 @@ class EnergyCard extends StatelessWidget {
         final state = controller.energyInfoStateSignal.value;
         final displayInfo = controller.displayEnergyInfo.value;
         final electricityWarning = controller.electricityWarning.value;
+        final firstElectricityMeter =
+            displayInfo?.electricityMeterList.values.first;
         final lowElectricityWarning =
-            displayInfo != null &&
+            firstElectricityMeter != null &&
             electricityWarning >= 0 &&
-            displayInfo.electricityRemain < electricityWarning;
+            /// TODO: Currently we just assume that there's only one electric meter in a dorm.
+            firstElectricityMeter.remain < electricityWarning;
 
         return MainPageCard(
           onPressed: () async {
@@ -44,32 +47,36 @@ class EnergyCard extends StatelessWidget {
             style: const TextStyle(fontSize: 20),
             child: displayInfo != null
                 ? Text(
-                    context.t.homepage.electricityCard.currentElectricity(amount: displayInfo.electricityRemain.toString()),
+                    firstElectricityMeter != null
+                        ? context.t.homepage.electricityCard.currentElectricity(
+                            amount: firstElectricityMeter.remain.toString(),
+                          )
+                        : context.t.electricityStatus.noElectricityInfo,
                   )
                 : state.map(
                     data: (_) => const Text(""),
-                    error: () => Text(
-                      context.t.electricityStatus.remainNotFound,
-                    ),
-                    loading: () => Text(
-                      context.t.electricityStatus.remainFetching,
-                    ),
+                    error: () =>
+                        Text(context.t.electricityStatus.remainNotFound),
+                    loading: () =>
+                        Text(context.t.electricityStatus.remainFetching),
                   ),
           ),
           bottomText: displayInfo != null
               ? Text(
-                  context.t.homepage.electricityCard.cacheNotice(date: DateFormat(
-                        "yyyy-MM-dd",
-                      ).format(displayInfo.electricityMeterList.first.ReadTime)),
+                  firstElectricityMeter != null
+                      ? context.t.homepage.electricityCard
+                            .cacheNotice(
+                              date: DateFormat(
+                                "yyyy-MM-dd",
+                              ).format(firstElectricityMeter.fetchDay),
+                            )
+                            .replaceAll("\n", "")
+                      : context.t.electricityStatus.noElectricityInfo,
                 )
               : state.map(
                   data: (_) => const Text(""),
-                  error: () => Text(
-                    context.t.electricityStatus.oweIssue,
-                  ),
-                  loading: () => Text(
-                    context.t.electricityStatus.oweFetching,
-                  ),
+                  error: () => Text(context.t.electricityStatus.oweIssue),
+                  loading: () => Text(context.t.electricityStatus.oweFetching),
                 ),
         );
       },

@@ -4,7 +4,7 @@
 
 // Exam Infomation Interface.
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/exam_controller.dart';
@@ -78,35 +78,25 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     ],
                     children: [
                       if (isDisQualified.isNotEmpty) ...[
-                        TimelineTitle(
-                          title: context.t.exam.unableToExam,
-                        ),
+                        TimelineTitle(title: context.t.exam.unableToExam),
                         isDisQualified
                             .map((e) => ExamInfoCard(toUse: e))
                             .toList()
                             .toColumn(),
                       ],
-                      TimelineTitle(
-                        title: context.t.exam.notFinished,
-                      ),
+                      TimelineTitle(title: context.t.exam.notFinished),
                       [
                         if (isNotFinished.isNotEmpty)
                           ...isNotFinished.map((e) => ExamInfoCard(toUse: e))
                         else
-                          ExamInfoCard(
-                            title: context.t.exam.allFinished,
-                          ),
+                          ExamInfoCard(title: context.t.exam.allFinished),
                       ].toColumn(),
-                      TimelineTitle(
-                        title: context.t.exam.finished,
-                      ),
+                      TimelineTitle(title: context.t.exam.finished),
                       [
                         if (isFinished.isNotEmpty)
                           ...isFinished.map((e) => ExamInfoCard(toUse: e))
                         else
-                          ExamInfoCard(
-                            title: context.t.exam.noneFinished,
-                          ),
+                          ExamInfoCard(title: context.t.exam.noneFinished),
                       ].toColumn(),
                     ],
                   );
@@ -122,7 +112,9 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
                     if (isFromCache && fetchTime != null)
                       CacheAlerter(
                         dataType: context.t.exam.title,
-                        hint: cacheHintKey?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
+                        hint:
+                            cacheHintKey?.resolve(context.t) ??
+                            context.t.common.cacheReasonDefault,
                         placeOfCache: PlaceOfCache.device,
                         fetchTime: fetchTime,
                       ),
@@ -168,4 +160,3 @@ class _ExamInfoWindowState extends State<ExamInfoWindow> {
     );
   }
 }
-

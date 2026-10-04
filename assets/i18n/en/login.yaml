@@ -1,3 +1,4 @@
+---
 identity_number: Student ID
 password: IDS Login password
 login: Login
@@ -19,16 +20,18 @@ captcha_window:
   refresh_failed: 'Failed to refresh captcha: {error}'
 slider_title: Server authentication service
 second_factor:
-  title: SMS verification
-  description: The school requires an additional verification step. Request and enter
-    the SMS code to continue.
+  title: Additional verification
+  description: Choose where to receive the code, then request and enter it to continue.
   code: SMS code
-  empty_code: Enter the SMS code
+  empty_code: Enter the verification code
   send_code: Send code
   resend_countdown: Resend in {seconds}s
   trust_device: Trust this device
   trust_device_hint: The school may skip verification on this device for a limited
     time
   network_error: Verification request failed. Check your connection and retry.
-  cancelled: SMS verification cancelled
+  cancelled: Verification cancelled
   expired: Verification expired. Please log in again.
+  method: Code delivery
+  sms: SMS code
+  enterprise_wechat: WeCom code

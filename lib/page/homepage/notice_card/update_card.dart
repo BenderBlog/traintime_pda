@@ -1,13 +1,13 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/page/setting/dialogs/update_dialog.dart';
-import 'package:watermeter/generated/translations.g.dart';
 
 class UpdateCard extends StatelessWidget {
   const UpdateCard({super.key});
@@ -33,11 +33,15 @@ class UpdateCard extends StatelessWidget {
             case null:
               return Text(
                     context.t.setting.currentTesting,
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   )
                   .paddingDirectional(horizontal: 16, vertical: 14)
-                  .withHomeCardStyle(context);
+                  .withHomeCardStyle(context, type: HomeCardType.warning);
             case true:
-              return Text(context.t.setting.newVersion)
+              return Text(
+                    context.t.setting.newVersion,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
                   .paddingDirectional(horizontal: 16, vertical: 14)
                   .withHomeCardStyle(
                     context,
@@ -48,6 +52,7 @@ class UpdateCard extends StatelessWidget {
                             UpdateDialog(updateMessage: state.value!),
                       );
                     },
+                    type: HomeCardType.warning,
                   );
             case false:
               return SizedBox(height: 0);

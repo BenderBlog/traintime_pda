@@ -1,7 +1,7 @@
 name: watermeter
 description: Another personal data assistant for XDU.
 publish_to: "none"
-version: 1.6.4+48
+version: 1.6.7+51
 
 environment:
   sdk: ^3.8.0
@@ -31,34 +31,39 @@ dependencies:
   charset_converter: ^2.2.1
   # Homepage
   infinite_scroll_pagination: ^5.1.1
-  sn_progress_dialog: ^1.1.3
-  fluttertoast: ^9.0.0
-  flex_color_scheme: ^8.3.0
+  sn_progress_dialog: ^2.0.0
+  fluttertoast: ^10.0.0
+  # Theme
+  material_ui: ^1.3.0
+  m3e_core: ^1.1.4
+  cupertino_ui: ^1.1.0
+  flex_color_scheme: ^9.0.0
   # Others
   url_launcher: ^6.1.6
   time: ^2.1.5
   auto_size_text: ^3.0.0
   restart_app: ^1.7.3
   calendar_date_picker2: ^3.0.0
-  cached_network_image: ^3.2.3
+  cached_network_image: ^4.0.0
   flutter_native_splash: ^2.3.1
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^2.0.0
   package_info_plus: ^10.1.0
   flutter_staggered_grid_view: ^0.7.0
   styled_widget: ^0.4.1
-  file_picker: ^12.0.0-beta.1
+  file_picker: ^13.1.0
   chinese_font_library: ^1.1.0
   ming_cute_icons: ^0.0.7
   remixicon: ^4.9.1
   based_split_view: ^1.2.0
-  permission_handler: ^12.0.1
+  permission_handler: ^13.0.1
   # QR code scanner
+  flutter_zxing: ^3.0.1
   # Output to system calendar
-  device_calendar_plus: ^0.7.1
+  device_calendar_plus: ^0.10.1
   # Homepage Widget
-  home_widget: ^0.9.3
+  home_widget: ^0.10.0
   image: ^4.2.0
   catcher_2: ^2.0.0
   share_plus: ^13.1.0
@@ -69,7 +74,6 @@ dependencies:
   intl:
   timezone: ^0.11.0
   flutter_local_notifications: ^22.0.1
-  flutter_zxing: ^2.3.0
   flutter_html: ^3.0.0
   slang: ^4.18.0
   slang_flutter: ^4.18.0
@@ -80,10 +84,21 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.3
   build_runner: ^2.6.0
   flutter_lints: ^6.0.0
-  pigeon: ^27.1.0
+  pigeon: ^29.0.6
   yaml: ^3.1.3
   json_serializable: ^6.10.0
   slang_build_runner: ^4.18.0
+  shared_preferences_platform_interface: ^2.4.2
+
+  # Fix for flutter_html 3.0.0 compatibility issue with html package.
+  # flutter_html 3.0.0 calls qs.matches() which was removed in html 0.15.7+.
+  # This override pins html to 0.15.6 until flutter_html releases a fix.
+  # See: https://github.com/Sub6Resources/flutter_html/issues/1522
+  path: ^1.9.1
+  build: ^4.0.11
+  glob: ^2.2.0
+dependency_overrides:
+  html: 0.15.6
 
 flutter_launcher_icons:
   android: true
@@ -107,12 +122,9 @@ flutter:
     - assets/art/pda_girl_default.webp
     # - assets/art/pda_girl_singing.png
     - assets/art/pda_girl_reading.webp
-    - assets/art/lucky_star_1.jpg
-    - assets/art/lucky_star_2.jpg
-    - assets/art/lucky_star_3.jpg
-    - assets/art/lucky_star_4.jpg
-    - assets/art/lucky_star_5.jpg
-    - assets/art/lucky_star_6.jpg
+    - assets/art/noel_0.jpg
+    - assets/art/noel_1.jpg
+    - assets/art/noel_2.jpg
     # - assets/art/Fxemoji_u1F4BE_Kazami_Yuka.png
     # - assets/art/anan_christmas.png
     # - assets/art/Sakura_and_Tomoyo_Kimono.jpg

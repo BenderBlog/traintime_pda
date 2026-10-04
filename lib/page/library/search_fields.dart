@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/controller/library_controller.dart';
@@ -287,21 +287,9 @@ class _SearchFieldsState extends State<SearchFields> {
   int? _intFilter(String value) => value.isEmpty ? null : int.tryParse(value);
 
   List<_SearchOption> _matchModeOptions(BuildContext context) => [
-    LibrarySearchOption(
-      "1",
-      context.t.library.matchExact,
-      "精确",
-    ),
-    LibrarySearchOption(
-      "2",
-      context.t.library.matchFuzzy,
-      "模糊",
-    ),
-    LibrarySearchOption(
-      "3",
-      context.t.library.matchPrefix,
-      "前方",
-    ),
+    LibrarySearchOption("1", context.t.library.matchExact, "精确"),
+    LibrarySearchOption("2", context.t.library.matchFuzzy, "模糊"),
+    LibrarySearchOption("3", context.t.library.matchPrefix, "前方"),
   ];
 
   Widget _buildBaseSearchFields(
@@ -459,7 +447,7 @@ class _SearchFieldsState extends State<SearchFields> {
         FilledButton.icon(
           onPressed: _submitSearch,
           icon: const Icon(Icons.manage_search),
-          label: Text(context.t.library.search,),
+          label: Text(context.t.library.search),
         ),
       ],
     );

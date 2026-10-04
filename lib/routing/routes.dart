@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/class_attendance/class_attendance_view.dart';
 import 'package:watermeter/page/classtable/classtable.dart';
 import 'package:watermeter/page/dorm_water/dorm_water_window.dart';

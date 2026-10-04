@@ -1,3 +1,4 @@
+
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
@@ -27,10 +28,7 @@ class ClubPromotionCard extends StatelessWidget {
                 itemBuilder: (context, index) => Row(
                   children: [
                     TagsBoxes(
-                      text: FlutterI18n.translate(
-                        context,
-                        clubList[index].type.first.getTypeName(),
-                      ),
+                      text: context.t.resolveKey(clubList[index].type.first.getTypeName()),
                     ),
                     const SizedBox(width: 8),
                     Text(

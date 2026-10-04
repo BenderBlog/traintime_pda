@@ -4,12 +4,12 @@
 
 // Pig page — random pig image from pighub.top.
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/pighub_image.dart';
 import 'package:watermeter/repository/miscellaneous_session/pighub_session.dart';
 
@@ -87,8 +87,15 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
 
           final data = snapshot.data!;
           return [
+                // Text(
+                //   context.t.common.newHomepageHint,
+                //   textAlign: TextAlign.center,
+                // ),
+                // const SizedBox(height: 12),
                 Text(
-                  context.t.common.newHomepageHint,
+                  "There are ${snapshot.data!.length} pigs in the Animal Farm. \n"
+                  "Better stay at home and do as you're told. \n"
+                  "Get out of the road if you want to grow old!",
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
@@ -122,6 +129,7 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
                   icon: const Icon(Icons.shuffle),
                   label: const Text("Change A Pig"),
                 ),
+                SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: () => launchUrlString(
                     data[index].url,

@@ -2,7 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/page/setting/password_setting_sheet.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/password_exceptions.dart';
@@ -12,7 +13,7 @@ import 'package:watermeter/page/public_widget/captcha_input_dialog.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
-import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
+
 import 'package:watermeter/repository/preference.dart' as pref;
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/miscellaneous_session/schoolnet_session.dart';
@@ -183,9 +184,10 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
               errorStatus: context.t.schoolNet.emptyPassword,
               buttonName: context.t.setting.changeSchoolnetPasswordTitle,
               function: () async {
-                await showDialog(
+                await showPasswordSettingSheet(
                   context: context,
-                  builder: (context) => const SchoolNetPasswordDialog(),
+                  preferenceKey: pref.Preference.schoolNetQueryPassword,
+                  titleKey: 'setting.change_schoolnet_password_title',
                 );
                 if (!context.mounted) return;
                 if (pref
@@ -206,9 +208,10 @@ class _GeneralNetworkUsagePageState extends State<GeneralNetworkUsagePage>
               errorStatus: context.t.schoolNet.wrongPassword,
               buttonName: context.t.setting.changeSchoolnetPasswordTitle,
               function: () async {
-                await showDialog(
+                await showPasswordSettingSheet(
                   context: context,
-                  builder: (context) => const SchoolNetPasswordDialog(),
+                  preferenceKey: pref.Preference.schoolNetQueryPassword,
+                  titleKey: 'setting.change_schoolnet_password_title',
                 );
                 if (!context.mounted) return;
                 if (pref

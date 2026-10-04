@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
@@ -28,9 +28,7 @@ class ScoreComposeCard extends Dialog {
           if (snapshot.data == null || snapshot.data!.isEmpty) {
             info = InfoDetailBox(
               child: Center(
-                child: Text(
-                  context.t.score.scoreComposeCard.noDetail,
-                ),
+                child: Text(context.t.score.scoreComposeCard.noDetail),
               ),
             );
           } else {
@@ -66,17 +64,13 @@ class ScoreComposeCard extends Dialog {
         } else if (snapshot.hasError) {
           info = InfoDetailBox(
             child: Center(
-              child: Text(
-                context.t.score.scoreComposeCard.noDetail,
-              ),
+              child: Text(context.t.score.scoreComposeCard.noDetail),
             ),
           );
         } else {
           info = InfoDetailBox(
             child: Center(
-              child: Text(
-                context.t.score.scoreComposeCard.fetching,
-              ),
+              child: Text(context.t.score.scoreComposeCard.fetching),
             ),
           );
         }

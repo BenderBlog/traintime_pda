@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
@@ -147,9 +147,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         actions: [
           TextButton(
             onPressed: _save,
-            child: Text(
-              context.t.classtable.classAdd.saveButton,
-            ),
+            child: Text(context.t.classtable.classAdd.saveButton),
           ),
         ],
       ),
@@ -173,7 +171,8 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                       ),
-                      hintText: context.t.classtable.classAdd.inputClassnameHint,
+                      hintText:
+                          context.t.classtable.classAdd.inputClassnameHint,
                     ),
                   ).padding(vertical: inputFieldVerticalPadding),
                   TextField(
@@ -197,7 +196,8 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                       ),
-                      hintText: context.t.classtable.classAdd.inputClassroomHint,
+                      hintText:
+                          context.t.classtable.classAdd.inputClassroomHint,
                     ),
                   ).padding(vertical: inputFieldVerticalPadding),
                 ],

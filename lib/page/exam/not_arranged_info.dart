@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
@@ -15,11 +15,7 @@ class NoArrangedInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          context.t.exam.noArrangement.title,
-        ),
-      ),
+      appBar: AppBar(title: Text(context.t.exam.noArrangement.title)),
       body: Builder(
         builder: (context) {
           if (list.isEmpty) {

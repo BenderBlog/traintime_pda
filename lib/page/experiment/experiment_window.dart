@@ -2,7 +2,9 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/setting/password_setting_sheet.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
@@ -13,7 +15,7 @@ import 'package:watermeter/page/experiment/experiment_info_card.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
-import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
+
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_title.dart';
 import 'package:watermeter/page/public_widget/timeline_widget/timeline_widget.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -87,16 +89,15 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
               const SizedBox(height: 10),
               FilledButton(
                 onPressed: () async {
-                  final updated = await showDialog<bool>(
+                  final updated = await showPasswordSettingSheet(
                     context: context,
-                    builder: (context) => const ExperimentPasswordDialog(),
+                    preferenceKey: preference.Preference.experimentPassword,
+                    titleKey: 'setting.change_experiment_title',
                   );
                   if (updated != true || !context.mounted) return;
                   await PhysicsExperimentController.i.reloadPhysicsExperiment();
                 },
-                child: Text(
-                  context.t.setting.changeExperimentTitle,
-                ),
+                child: Text(context.t.setting.changeExperimentTitle),
               ),
             ],
           ),
@@ -126,14 +127,23 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
         if (isPhysicsFromCache && physicsFetchTime != null)
           CacheAlerter(
             dataType: context.t.experiment.physicsExperiment,
-            hint: PhysicsExperimentController.i.physicsExperimentCacheHintKey.value?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
+            hint:
+                PhysicsExperimentController
+                    .i
+                    .physicsExperimentCacheHintKey
+                    .value
+                    ?.resolve(context.t) ??
+                context.t.common.cacheReasonDefault,
             placeOfCache: PlaceOfCache.device,
             fetchTime: physicsFetchTime,
           ),
         if (isOtherFromCache && otherFetchTime != null)
           CacheAlerter(
             dataType: context.t.experiment.otherExperiment,
-            hint: OtherExperimentController.i.otherExperimentCacheHintKey.value?.resolve(context.t) ?? context.t.common.cacheReasonDefault,
+            hint:
+                OtherExperimentController.i.otherExperimentCacheHintKey.value
+                    ?.resolve(context.t) ??
+                context.t.common.cacheReasonDefault,
             placeOfCache: PlaceOfCache.device,
             fetchTime: otherFetchTime,
           ),
@@ -154,24 +164,20 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                 _buildPhysicsErrorCard(context, physicsError),
               if (otherError != null)
                 ExperimentInfoCard(
-                  title: context.t.experiment.errorOther(info: otherError.toString()),
+                  title: context.t.experiment.errorOther(
+                    info: otherError.toString(),
+                  ),
                 ),
-              ExperimentInfoCard(
-                title: context.t.experiment.scoreHint0,
-              ),
+              ExperimentInfoCard(title: context.t.experiment.scoreHint0),
               if (doing.isNotEmpty) ...[
-                TimelineTitle(
-                  title: context.t.experiment.ongoing,
-                ),
+                TimelineTitle(title: context.t.experiment.ongoing),
                 Column(
                   children: doing
                       .map((experiment) => ExperimentInfoCard(data: experiment))
                       .toList(),
                 ),
               ],
-              TimelineTitle(
-                title: context.t.experiment.notFinished,
-              ),
+              TimelineTitle(title: context.t.experiment.notFinished),
               unDone.isNotEmpty
                   ? Column(
                       children: unDone
@@ -181,12 +187,8 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                           )
                           .toList(),
                     )
-                  : TimelineTitle(
-                      title: context.t.experiment.allFinished,
-                    ),
-              TimelineTitle(
-                title: context.t.experiment.finished,
-              ),
+                  : TimelineTitle(title: context.t.experiment.allFinished),
+              TimelineTitle(title: context.t.experiment.finished),
               done.isNotEmpty
                   ? Column(
                       children: done
@@ -196,9 +198,7 @@ class _ExperimentWindowState extends State<ExperimentWindow> {
                           )
                           .toList(),
                     )
-                  : TimelineTitle(
-                      title: context.t.experiment.noneFinished,
-                    ),
+                  : TimelineTitle(title: context.t.experiment.noneFinished),
             ],
           ),
         ),

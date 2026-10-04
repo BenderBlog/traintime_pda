@@ -1,3 +1,4 @@
+---
 title: Library Information
 borrow_state_title: Borrowing Status
 search_book_title: Search Books
@@ -19,10 +20,10 @@ avaliable_borrow: Available to borrow
 storage: Storage
 on_shelve: On shelf
 book_code: 'Book code: {barCode}'
-due_date: ' Due date'
-borrow_str: ' Borrow'
-after_due_date: ' day(s) overdue'
-before_due_date: ' day(s) left'
+due_date: " Due date"
+borrow_str: " Borrow"
+after_due_date: " day(s) overdue"
+before_due_date: " day(s) left"
 can_be_renewable: Renewable
 cannot_be_renewable: Not renewable
 renewing: Renewing
@@ -45,3 +46,4 @@ publish_year_begin: Publish year from
 publish_year_end: Publish year to
 book_detail: Book details
 no_result: No result, change parameter or start your search
+no_more_data: No more data

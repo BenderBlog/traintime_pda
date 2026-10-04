@@ -4,9 +4,12 @@
 
 // Login window of the program.
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:math';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:watermeter/controller/update_notice_controller.dart';
+import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -25,7 +28,6 @@ import 'package:watermeter/page/login/ids_reauth_dialog.dart';
 import 'package:watermeter/repository/ids_session/semester_session.dart';
 import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
 import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
-import 'package:watermeter/generated/translations.g.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({super.key});
@@ -52,6 +54,7 @@ class _LoginWindowState extends State<LoginWindow> {
     prefixIcon: Icon(iconData),
     hintText: hintText,
     suffixIcon: suffixIcon,
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
   );
 
   /// Can I see the password?
@@ -60,10 +63,16 @@ class _LoginWindowState extends State<LoginWindow> {
   Widget contentColumn() => Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
+      MediaQuery.removePadding(
+        context: context,
+        child: UpdateCard(),
+      ).constrained(width: double.infinity),
+      const SizedBox(height: 16.0),
       TextField(
         controller: _idsAccountController,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_user_3_fill,
+
           hintText: context.t.login.identityNumber,
         ),
       ).center(),
@@ -118,9 +127,7 @@ class _LoginWindowState extends State<LoginWindow> {
       msg: context.t.login.onLoginProgress,
       max: 100,
       hideValue: true,
-      completed: Completed(
-        completedMsg: context.t.login.completeLogin,
-      ),
+      completed: Completed(completedMsg: context.t.login.completeLogin),
     );
     IDSSession ses = IDSSession();
 
@@ -159,14 +166,12 @@ class _LoginWindowState extends State<LoginWindow> {
           if (pd.isOpen()) {
             pd.update(
               msg: switch (status) {
-                LoginProcessStep.readyPage =>
-                  context.t.loginProcess.readyPage,
+                LoginProcessStep.readyPage => context.t.loginProcess.readyPage,
                 LoginProcessStep.getEncrypt =>
                   context.t.loginProcess.getEncrypt,
                 LoginProcessStep.readyLogin =>
                   context.t.loginProcess.readyLogin,
-                LoginProcessStep.slider =>
-                  context.t.loginProcess.slider,
+                LoginProcessStep.slider => context.t.loginProcess.slider,
                 LoginProcessStep.secondFactor =>
                   context.t.loginProcess.secondFactor,
                 LoginProcessStep.afterProcess =>
@@ -263,13 +268,17 @@ class _LoginWindowState extends State<LoginWindow> {
             } else {
               showToast(
                 context: context,
-                msg: context.t.login.failedLoginWithCode(code: e.response!.statusCode.toString()),
+                msg: context.t.login.failedLoginWithCode(
+                  code: e.response!.statusCode.toString(),
+                ),
               );
             }
           } else {
             showToast(
               context: context,
-              msg: context.t.login.failedLoginWithMessage(message: e.message.toString()),
+              msg: context.t.login.failedLoginWithMessage(
+                message: e.message.toString(),
+              ),
             );
           }
         } else {
@@ -285,10 +294,7 @@ class _LoginWindowState extends State<LoginWindow> {
               ),
             ),
           );
-          showToast(
-            context: context,
-            msg: context.t.login.failedLoginOther,
-          );
+          showToast(context: context, msg: context.t.login.failedLoginOther);
         }
       }
     }
@@ -301,6 +307,7 @@ class _LoginWindowState extends State<LoginWindow> {
   void initState() {
     super.initState();
 
+    UpdateNoticeController.i.reloadUpdateNoticeInfo();
     var cachedAccount = preference.getString(preference.Preference.idsAccount);
     if (cachedAccount.isNotEmpty) {
       _idsAccountController.text = cachedAccount;

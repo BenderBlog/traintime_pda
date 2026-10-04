@@ -2,7 +2,7 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -23,10 +23,7 @@ class ButtomButtons extends StatelessWidget {
       alignment: WrapAlignment.center,
       children: [
         TextButton(
-          child: Text(
-            context.t.login.clearCache,
-            style: _bottomTextStyle,
-          ),
+          child: Text(context.t.login.clearCache, style: _bottomTextStyle),
           onPressed: () {
             NetworkCookieJars.ids.deleteAll().then((value) {
               if (context.mounted) {
@@ -39,10 +36,7 @@ class ButtomButtons extends StatelessWidget {
           },
         ),
         TextButton(
-          child: Text(
-            context.t.login.seeInspector,
-            style: _bottomTextStyle,
-          ),
+          child: Text(context.t.login.seeInspector, style: _bottomTextStyle),
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(

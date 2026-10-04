@@ -146,10 +146,7 @@ class ScoreState extends ChangeNotifier {
       log.info("[ScorePageState] Finish fetching. state: $state");
       if (context.mounted) {
         if (isCache) {
-          showToast(
-            context: context,
-            msg: context.t.score.cacheMessage,
-          );
+          showToast(context: context, msg: context.t.score.cacheMessage);
         }
       }
       notifyListeners();
@@ -225,7 +222,12 @@ class ScoreState extends ChangeNotifier {
 
   String get unPassed => unPassedSet.isEmpty ? "" : unPassedSet.join(",");
 
-  String bottomInfo(BuildContext context) => context.t.score.summary(chosen: getSelectedScoreList.length.toString(), credit: evalCredit(false).toStringAsFixed(2), avg: evalAvg(false).toStringAsFixed(2), gpa: evalAvg(false, isGPA: true).toStringAsFixed(2));
+  String bottomInfo(BuildContext context) => context.t.score.summary(
+    chosen: getSelectedScoreList.length.toString(),
+    credit: evalCredit(false).toStringAsFixed(2),
+    avg: evalAvg(false).toStringAsFixed(2),
+    gpa: evalAvg(false, isGPA: true).toStringAsFixed(2),
+  );
 
   double get notCoreClass {
     double toReturn = 0.0;

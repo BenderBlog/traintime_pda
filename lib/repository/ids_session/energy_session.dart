@@ -120,31 +120,37 @@ class EnergySession extends IDSSession {
     }
   }
 
-  List<ElectricityHistoryInfo> getElectricityHistory() {
-    var list = <ElectricityHistoryInfo>[];
+  Map<String, List<ElectricityHistoryInfo>> getElectricityHistory() {
+    var history = <String, List<ElectricityHistoryInfo>>{};
 
     if (!_fileHistory.existsSync()) {
       _fileHistory.createSync(recursive: true);
-      return list;
+      return history;
     }
 
     try {
       String rawHistory = _fileHistory.readAsStringSync();
-      List<ElectricityHistoryInfo> toAdd = jsonDecode(rawHistory)
-          .map<ElectricityHistoryInfo>(
-            (data) => ElectricityHistoryInfo.fromJson(data),
-          )
-          .toList();
-      list.addAll(toAdd);
-      list.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
+      final rawMeters = jsonDecode(rawHistory) as Map<String, dynamic>;
+      for (final meter in rawMeters.entries) {
+        final readings = (meter.value as List<dynamic>)
+            .map(
+              (data) =>
+                  ElectricityHistoryInfo.fromJson(data as Map<String, dynamic>),
+            )
+            .toList();
+        readings.sort((a, b) => a.fetchDay.compareTo(b.fetchDay));
+        history[meter.key] = readings;
+      }
     } catch (e, s) {
       log.handle(e, s);
     }
 
-    return list;
+    return history;
   }
 
-  void saveElectricityHistory(List<ElectricityHistoryInfo> history) {
+  void saveElectricityHistory(
+    Map<String, List<ElectricityHistoryInfo>> history,
+  ) {
     if (!_fileHistory.existsSync()) {
       _fileHistory.createSync(recursive: true);
     }
@@ -157,7 +163,7 @@ class EnergySession extends IDSSession {
     }
 
     _fileHistory.deleteSync();
-    _fileHistory.writeAsStringSync("[]");
+    _fileHistory.writeAsStringSync("{}");
   }
 
   Future<FetchResult<EnergyInfo>> getElectricityInfo({
@@ -306,86 +312,86 @@ class EnergySession extends IDSSession {
       isGetMethod: true,
     );
 
-    int electricityIndex =
-        response.data["ResData"]["rows"][0]["MediumCode"] == "2" ? 0 : 1;
+    Map<String, ElectricityHistoryInfo> electricityList = {};
+    Map<String, List<MeterInfo>> waterList = {};
 
-    num electricityRemainNum = num.parse(
-      response.data["ResData"]["rows"][electricityIndex]["LastNum"].toString(),
-    );
-    String electricityMetID =
-        response.data["ResData"]["rows"][electricityIndex]["MetID"];
-
-    List<int> fetchDate = response
-        .data["ResData"]["rows"][electricityIndex]["LastReadDate"]
-        .toString()
-        .split("-")
-        .map((e) => int.parse(e))
-        .toList();
-
-    DateTime rangeEndForElectricity = DateTime(
-      fetchDate[0],
-      fetchDate[1],
-      fetchDate[2],
-    );
-    DateTime rangeBeginForElectricity = rangeEndForElectricity.shift(
-      months: -1,
-    );
     DateTime rangeEndForWater = DateTime.now();
-    DateTime rangeBeginForWater = rangeEndForWater.shift(years: -1);
 
-    List<MeterInfo> electricityList =
-        await _request(
-          "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/GetMetRead",
-          isGetMethod: true,
-          data: {
-            "MetID": electricityMetID,
-            "ReadTimeS": DateFormat(
-              "yyyy-MM-dd",
-            ).format(rangeBeginForElectricity),
-            "ReadTimeE": DateFormat(
-              "yyyy-MM-dd",
-            ).format(rangeEndForElectricity),
-            "ReadNum": "",
-          },
-        ).then(
-          (value) => (value.data["ResData"]["rows"] as List<dynamic>)
-              .map((e) => MeterInfo.fromJson(e))
-              .toList(),
+    for (var i in response.data["ResData"]["rows"]) {
+      if (i["MediumCode"] == "2") {
+        String electricityMetID = i["MetID"];
+
+        num electricityRemainNum = num.parse(i["LastNum"].toString());
+
+        List<int> fetchDate = i["LastReadDate"]
+            .toString()
+            .split("-")
+            .map((e) => int.parse(e))
+            .toList();
+        DateTime rangeEndForElectricity = DateTime(
+          fetchDate[0],
+          fetchDate[1],
+          fetchDate[2],
+        );
+        DateTime rangeBeginForElectricity = rangeEndForElectricity.shift(
+          months: -1,
         );
 
-    List<MeterInfo>? waterList;
-
-    try {
-      int waterIndex = electricityIndex == 0 ? 1 : 0;
-      String waterMetID = response.data["ResData"]["rows"][waterIndex]["MetID"];
-      waterList =
-          await _request(
-            "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/GetMetRead",
-            isGetMethod: true,
-            data: {
-              "MetID": waterMetID,
-              "ReadTimeS": DateFormat("yyyy-MM-dd").format(rangeBeginForWater),
-              "ReadTimeE": DateFormat("yyyy-MM-dd").format(rangeEndForWater),
-              "ReadNum": "",
-            },
-          ).then(
-            (value) => (value.data["ResData"]["rows"] as List<dynamic>)
-                .map((e) => MeterInfo.fromJson(e))
-                .toList(),
-          );
-    } catch (e, s) {
-      log.error(
-        "[EnergySession] failed to fetch water list, it will leave a blank",
-        e,
-        s,
-      );
+        List<MeterInfo> electricityReadInfoList =
+            await _request(
+              "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/GetMetRead",
+              isGetMethod: true,
+              data: {
+                "MetID": electricityMetID,
+                "ReadTimeS": DateFormat(
+                  "yyyy-MM-dd",
+                ).format(rangeBeginForElectricity),
+                "ReadTimeE": DateFormat(
+                  "yyyy-MM-dd",
+                ).format(rangeEndForElectricity),
+                "ReadNum": "",
+              },
+            ).then(
+              (value) => (value.data["ResData"]["rows"] as List<dynamic>)
+                  .map((e) => MeterInfo.fromJson(e))
+                  .toList(),
+            );
+        electricityList[electricityMetID] = ElectricityHistoryInfo(
+          fetchDay: rangeEndForElectricity,
+          remain: electricityRemainNum,
+          historyInfo: electricityReadInfoList,
+        );
+      } else if (i["MediumCode"] == "1") {
+        String waterMetID = i["MetID"];
+        DateTime rangeBeginForWater = rangeEndForWater.shift(years: -1);
+        List<MeterInfo> waterReadInfoList =
+            await _request(
+              "https://ignypt.xidian.edu.cn/estManage/api/WeChat/V2/GetMetRead",
+              isGetMethod: true,
+              data: {
+                "MetID": waterMetID,
+                "ReadTimeS": DateFormat(
+                  "yyyy-MM-dd",
+                ).format(rangeBeginForWater),
+                "ReadTimeE": DateFormat("yyyy-MM-dd").format(rangeEndForWater),
+                "ReadNum": "",
+              },
+            ).then(
+              (value) => (value.data["ResData"]["rows"] as List<dynamic>)
+                  .map((e) => MeterInfo.fromJson(e))
+                  .toList(),
+            );
+        waterList[waterMetID] = waterReadInfoList;
+      } else {
+        log.info(
+          '[ElectricitySession][_requestNewEnergyInfo] Unable to parse this meter info: ${i.toString()}',
+        );
+      }
     }
 
     return EnergyInfo(
       electricityMeterList: electricityList,
       waterMeterList: waterList,
-      electricityRemain: electricityRemainNum,
-      lastReadDate: rangeEndForElectricity,
     );
   }
 }

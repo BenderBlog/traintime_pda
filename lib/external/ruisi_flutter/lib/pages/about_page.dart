@@ -1,8 +1,8 @@
-import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/urls.dart';
@@ -20,9 +20,7 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.ruisi.about.title),
-      ),
+      appBar: AppBar(title: Text(context.t.ruisi.about.title)),
       body: ListView(
         children: [
           const SizedBox(height: 40),
@@ -60,17 +58,13 @@ class AboutPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(context.t.ruisi.about.version),
-            subtitle: Text(
-              context.t.ruisi.about.versionNumber,
-            ),
+            subtitle: Text(context.t.ruisi.about.versionNumber),
           ),
 
           // 源代码
           ListTile(
             leading: const Icon(Icons.code),
-            title: Text(
-              context.t.ruisi.about.sourceCode,
-            ),
+            title: Text(context.t.ruisi.about.sourceCode),
             subtitle: Text(Urls.homePage),
             onTap: () => _openUrl(Urls.homePage),
           ),
@@ -78,12 +72,8 @@ class AboutPage extends StatelessWidget {
           // 反馈
           ListTile(
             leading: const Icon(Icons.bug_report),
-            title: Text(
-              context.t.ruisi.about.bugReport,
-            ),
-            subtitle: Text(
-              context.t.ruisi.about.bugReportSubtitle,
-            ),
+            title: Text(context.t.ruisi.about.bugReport),
+            subtitle: Text(context.t.ruisi.about.bugReportSubtitle),
             onTap: () => _openUrl('${Urls.homePage}/issues'),
           ),
 
@@ -92,9 +82,7 @@ class AboutPage extends StatelessWidget {
           // 隐私政策
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
-            title: Text(
-              context.t.ruisi.about.privacyPolicy,
-            ),
+            title: Text(context.t.ruisi.about.privacyPolicy),
             onTap: () => _showPrivacyPolicy(context),
           ),
 
@@ -118,13 +106,9 @@ class AboutPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(
-          context.t.ruisi.about.privacyPolicy,
-        ),
+        title: Text(context.t.ruisi.about.privacyPolicy),
         content: SingleChildScrollView(
-          child: Text(
-            context.t.ruisi.about.privacyPolicyContent,
-          ),
+          child: Text(context.t.ruisi.about.privacyPolicyContent),
         ),
         actions: [
           TextButton(

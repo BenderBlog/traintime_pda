@@ -16,22 +16,22 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsZhTw({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.zhTw,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ),
 		  super(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
-		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <zh-TW>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
+	@override dynamic operator[](String key) => _meta.getTranslation(key) ?? super[key];
 
 	late final TranslationsZhTw _root = this; // ignore: unused_field
 
@@ -65,6 +65,7 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final _Translations$schoolNet$zh_TW schoolNet = _Translations$schoolNet$zh_TW._(_root);
 	@override late final _Translations$score$zh_TW score = _Translations$score$zh_TW._(_root);
 	@override late final _Translations$setting$zh_TW setting = _Translations$setting$zh_TW._(_root);
+	@override late final _Translations$sponsorship$zh_TW sponsorship = _Translations$sponsorship$zh_TW._(_root);
 	@override late final _Translations$sport$zh_TW sport = _Translations$sport$zh_TW._(_root);
 	@override late final _Translations$toolbox$zh_TW toolbox = _Translations$toolbox$zh_TW._(_root);
 	@override late final _Translations$weekday$zh_TW weekday = _Translations$weekday$zh_TW._(_root);
@@ -279,19 +280,19 @@ class _Translations$electricity$zh_TW extends Translations$electricity$zh {
 	@override String get history => '歷史記錄';
 	@override String get dailyUsage => '平均每日用量';
 	@override String get notEnoughData => '數據量不足以用於渲染';
-	@override String get info => '新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。\n歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。';
+	@override String get info => '歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。';
 	@override String get fetchingHint => '正在獲取最新電費信息';
-	@override String get fetchError => '電費信息獲取失敗，請重試。';
+	@override String get fetchError => '電費信息獲取失敗，請重試';
 	@override String get date => '日期';
 	@override String get power => '該日0點電量';
 	@override String get update => '刷新信息';
 	@override String get waterUsageFetchDate => '獲取時間';
 	@override String get waterUsageReadBefore => '上次讀數';
 	@override String get waterUsageReadNow => '本次讀數';
-	@override String get waterUsage => '洗澡水用量';
+	@override String get waterUsage => '熱水用量';
 	@override String get waterTitle => '水費信息';
 	@override String get waterLoading => '正在加載水費信息';
-	@override String get waterUnavailable => '水費信息暫不可用，請在電費卡片重試。';
+	@override String get waterUnavailable => '水費信息暫不可用，請點擊右上角刷新重試。';
 	@override String get waterEmpty => '暫無水費信息';
 	@override String get notSchoolNetwork => '非校園網訪問';
 	@override String get airconTitle => '空調用電';
@@ -301,9 +302,36 @@ class _Translations$electricity$zh_TW extends Translations$electricity$zh {
 	@override String get airconWaiting => '等待獲取空調用電信息';
 	@override String get airconError => '空調用電獲取失敗';
 	@override String get airconRetry => '重試';
-	@override String get airconImeiMissing => '尚未添加空調 IMEI，添加後即可查看空調用電信息。';
-	@override String get airconAddImei => '添加空調 IMEI';
+	@override String get airconImeiMissing => '掃描空調二維碼即可添加，也可以從相冊選擇二維碼圖片';
+	@override String get airconAddImei => '添加空調信息';
 	@override String airconCacheNotice({required Object time}) => '當前顯示空調緩存數據，緩存時間：${time}';
+	@override String powerMetidTitle({required Object code}) => '電錶 ${code}';
+	@override String weterMetidTitle({required Object code}) => '水錶 ${code}';
+	@override String get airconRemote => '空調遙控';
+	@override String get airconControlError => '無法獲取空調狀態';
+	@override String get airconCommandOk => '空調指令已執行';
+	@override String get airconControlSection => '基本控制';
+	@override String get airconOperationSection => '運行設定';
+	@override String get airconOtherSettingsSection => '其他設定';
+	@override String get airconPower => '電源';
+	@override String get airconTargetTemperature => '設定溫度';
+	@override String get airconTemperatureRange => '溫度必須在 18–32 ℃ 之間';
+	@override String airconIndoorTemperature({required Object temperature}) => '室內溫度：${temperature} ℃';
+	@override String get airconMode => '運行模式';
+	@override String get airconModeFan => '送風';
+	@override String get airconModeHeat => '制熱';
+	@override String get airconModeCool => '製冷';
+	@override String get airconModeDry => '除溼';
+	@override String get airconModeAuto => '自動';
+	@override String get airconWindSpeed => '風速';
+	@override String get airconWindAuto => '自動';
+	@override String get airconWindSilent => '靜音';
+	@override String get airconWindLow => '低';
+	@override String get airconWindMedium => '中';
+	@override String get airconWindHigh => '高';
+	@override String get airconVerticalSwing => '上下掃風';
+	@override String get airconStrongMode => '強力模式';
+	@override String get airconElectricHeating => '輔助電熱';
 }
 
 // Path: electricityStatus
@@ -328,6 +356,7 @@ class _Translations$electricityStatus$zh_TW extends Translations$electricityStat
 	@override String get needAccount => '需要填寫電費賬號';
 	@override String get captchaFailed => '驗證碼識別失敗';
 	@override String get otherIssue => '程序故障';
+	@override String get noElectricityInfo => '沒有電錶信息';
 }
 
 // Path: emptyClassroom
@@ -344,6 +373,12 @@ class _Translations$emptyClassroom$zh_TW extends Translations$emptyClassroom$zh 
 	@override String get classroom => '教室';
 	@override String get empty => '空閒';
 	@override String get occupied => '佔用';
+	@override String nowOngoing({required Object period, required Object start, required Object end}) => '現在 · 第 ${period} 節 ${start}-${end}';
+	@override String nowUpcoming({required Object period, required Object start, required Object end}) => '即將 · 第 ${period} 節 ${start}-${end}';
+	@override String nowFree({required Object free, required Object total}) => '空閒 ${free}/${total} 間';
+	@override String get onlyFreeNow => '只看現在空閒';
+	@override String get noFreeNow => '現在沒有空閒教室';
+	@override String get classesOver => '今天的課已經結束了';
 }
 
 // Path: exam
@@ -473,6 +508,7 @@ class _Translations$homepage$zh_TW extends Translations$homepage$zh {
 	@override late final _Translations$homepage$toolbox$zh_TW toolbox = _Translations$homepage$toolbox$zh_TW._(_root);
 	@override late final _Translations$homepage$schoolNet$zh_TW schoolNet = _Translations$homepage$schoolNet$zh_TW._(_root);
 	@override late final _Translations$homepage$clubPromotion$zh_TW clubPromotion = _Translations$homepage$clubPromotion$zh_TW._(_root);
+	@override late final _Translations$homepage$airconCard$zh_TW airconCard = _Translations$homepage$airconCard$zh_TW._(_root);
 }
 
 // Path: library
@@ -529,6 +565,7 @@ class _Translations$library$zh_TW extends Translations$library$zh {
 	@override String get publishYearEnd => '出版年止';
 	@override String get bookDetail => '書籍詳細信息';
 	@override String get noResult => '沒有結果，請修改搜索參數或者開始你的搜索';
+	@override String get noMoreData => '沒有更多結果了';
 }
 
 // Path: libraryCard
@@ -582,7 +619,7 @@ class _Translations$loginProcess$zh_TW extends Translations$loginProcess$zh {
 	@override String get getEncrypt => '獲取密碼加密密鑰';
 	@override String get readyLogin => '準備登錄';
 	@override String get slider => '登錄中';
-	@override String get secondFactor => '等待短信二次認證';
+	@override String get secondFactor => '等待二次認證';
 	@override String get afterProcess => '登錄後處理';
 	@override String failed({required Object status_code}) => '登錄失敗，響應狀態碼：${status_code}';
 }
@@ -741,12 +778,12 @@ class _Translations$setting$zh_TW extends Translations$setting$zh {
 	@override String latestVersion({required Object latest}) => '最新版本: ${latest}';
 	@override String get waiting => '等待獲取';
 	@override String get fetchingUpdate => '正在獲取更新信息';
-	@override String get newVersion => '有新版本發佈！';
+	@override String get newVersion => '有新版本發佈，請立刻更新！';
 	@override String get currentStable => '目前您正在運行最新版';
 	@override String get currentTesting => '目前您正在運行測試版';
 	@override String get fetchFailed => '獲取更新信息失敗';
 	@override String get uiSetting => '界面設置';
-	@override String get brightnessSetting => '設置深淺色';
+	@override String get brightnessSetting => '深淺色模式';
 	@override String get colorSetting => '顏色設置';
 	@override String get simplifyTimeline => '簡化日程時間軸';
 	@override String get simplifyTimelineDescription => '沒有日程時 減少空間佔用';
@@ -763,9 +800,9 @@ class _Translations$setting$zh_TW extends Translations$setting$zh {
 	@override String get electricityAccountSetting => '電費賬號設置';
 	@override String get schoolnetPasswordSetting => '校園網帳號密碼設置';
 	@override String get schoolnetPasswordDescription => '不設置查看不了網費';
-	@override String get airconImeiTitle => '空調用電數據源';
+	@override String get airconImeiTitle => '空調設備';
 	@override String get airconImei => '空調 IMEI';
-	@override String get airconImeiNotSet => '未設置，電費頁不顯示空調用電';
+	@override String get airconImeiNotSet => '未設置，無法查詢或遙控空調';
 	@override String airconImeiCurrent({required Object imei}) => '當前 IMEI：${imei}';
 	@override String get airconImeiSaved => '空調 IMEI 已保存';
 	@override String get airconImeiCleared => '空調 IMEI 已清除';
@@ -778,7 +815,7 @@ class _Translations$setting$zh_TW extends Translations$setting$zh {
 	@override String get courseReminderSetting => '課前通知設置';
 	@override String get courseReminderDescription => '設置課前提醒通知';
 	@override late final _Translations$setting$notificationPage$zh_TW notificationPage = _Translations$setting$notificationPage$zh_TW._(_root);
-	@override String get notificationDebugPage => '通知服務調試頁面';
+	@override String get notificationDebugPage => '通知狀態與測試';
 	@override String get classtableSetting => '課表相關設置';
 	@override String get background => '開啟課表背景圖';
 	@override String get noBackground => '你先選個圖片罷，就在下面';
@@ -794,7 +831,7 @@ class _Translations$setting$zh_TW extends Translations$setting$zh {
 	@override String get classRefreshTitle => '確認對話框';
 	@override String get classRefreshContent => '是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。';
 	@override String get classSwift => '課程偏移設置';
-	@override String classSwiftDescription({required Object swift}) => '正數錯後開學日期 負數提前開學日期\n目前為 ${swift}';
+	@override String classSwiftDescription({required Object swift}) => '目前為 ${swift}';
 	@override String get coreSetting => '緩存登錄設置';
 	@override String get checkLogger => '查看網絡攔截器和日誌';
 	@override String get clearAndRestart => '清除緩存後重啟';
@@ -818,6 +855,34 @@ class _Translations$setting$zh_TW extends Translations$setting$zh {
 	@override String get semesterUpdateData => '應用新學期設置中';
 	@override String get easterEggPage => '你找到了彩蛋';
 	@override late final _Translations$setting$aboutPage$zh_TW aboutPage = _Translations$setting$aboutPage$zh_TW._(_root);
+	@override late final _Translations$setting$editor$zh_TW editor = _Translations$setting$editor$zh_TW._(_root);
+	@override late final _Translations$setting$sections$zh_TW sections = _Translations$setting$sections$zh_TW._(_root);
+	@override late final _Translations$setting$navigation$zh_TW navigation = _Translations$setting$navigation$zh_TW._(_root);
+	@override String get fontSizeSetting => '字體大小與粗細';
+	@override late final _Translations$setting$fontSizePage$zh_TW fontSizePage = _Translations$setting$fontSizePage$zh_TW._(_root);
+	@override String get generalAccountSettings => '通用賬號';
+	@override String get undergraduateSystemAccounts => '本科生系統帳號';
+	@override String get classTableBackgroundSection => '課表背景';
+	@override String backgroundBlur({required Object value}) => '背景模糊: ${value}';
+	@override String get backgroundBlurOff => '關閉';
+	@override String get classTableStyleSetting => '課表顯示與樣式';
+	@override String get classTableStyleDescription => '時間指示和課程卡片樣式';
+	@override late final _Translations$setting$classTableStylePage$zh_TW classTableStylePage = _Translations$setting$classTableStylePage$zh_TW._(_root);
+	@override String get classSwiftExplain => '正數錯後開學日期 負數提前開學日期';
+}
+
+// Path: sponsorship
+class _Translations$sponsorship$zh_TW extends Translations$sponsorship$zh {
+	_Translations$sponsorship$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '本版本由極創工作室和網管會贊助發佈';
+	@override String get dialogTitle => '贊助信息';
+	@override String get dialogContent => '極創工作室介紹辭：極創工作室是一個由西電創新創業學院支持建設的科技創新俱樂部，旨在與校內最優秀的創新創業人才同行，專注於人工智能等領域的技術創新與產品研發。目前工作室和華為等廠家合作，深耕大語言模型相關前沿方向，已孵化超過數十個人工智能領域科創產品，其中8項產品成功落地商用。工作室最知名的產品包括SwanLab、LLMOne、NexusGate。\n\n網管會介紹辭：學生網管會隸屬於西電信息網絡技術中心，主要協助處理師生校園網絡使用問題，參與校園網絡維護、線上諮詢、線下處理和技術支持等工作。我們歡迎認真負責、願意學習、對網絡與技術實踐感興趣的同學加入，一起服務同學、提升能力、積累經驗。\n\nXDYou軟件開發者辭：極創在XDYou早期開發期間給了相當大的幫助，網管會我在20年入學期間加入過，可惜他們沒要我。應我最近找工作，找了他們的人瞭解了一些信息，按照約定製作本頁面作為諮詢費。\nBender Rodriguez 6/9/2026';
+	@override String get buttonJichuang => '瞭解極創';
+	@override String get buttonXduna => '瞭解網管會';
 }
 
 // Path: sport
@@ -1470,6 +1535,25 @@ class _Translations$homepage$clubPromotion$zh_TW extends Translations$homepage$c
 	@override String get fetching => '社團信息清單正在加載';
 }
 
+// Path: homepage.airconCard
+class _Translations$homepage$airconCard$zh_TW extends Translations$homepage$airconCard$zh {
+	_Translations$homepage$airconCard$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '空調遙控';
+	@override String get notConfigured => '尚未配置空調';
+	@override String get configureHint => '點擊添加空調 IMEI';
+	@override String running({required Object mode, required Object temperature}) => '${mode} · ${temperature} ℃';
+	@override String get powerOff => '空調已關閉';
+	@override String indoorAndWind({required Object temperature, required Object wind}) => '室內 ${temperature} ℃ · 風速 ${wind}';
+	@override String wind({required Object wind}) => '風速 ${wind}';
+	@override String get fetching => '正在獲取空調狀態';
+	@override String get error => '空調狀態獲取失敗';
+	@override String get openRemote => '點擊進入空調遙控';
+}
+
 // Path: login.captchaWindow
 class _Translations$login$captchaWindow$zh_TW extends Translations$login$captchaWindow$zh {
 	_Translations$login$captchaWindow$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -1490,17 +1574,20 @@ class _Translations$login$secondFactor$zh_TW extends Translations$login$secondFa
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '短信二次認證';
-	@override String get description => '學校要求完成二次認證。請先獲取短信驗證碼，再輸入驗證碼繼續登錄。';
+	@override String get title => '二次認證';
+	@override String get description => '學校要求完成二次認證。請選擇驗證碼接收方式，獲取並輸入驗證碼後繼續登錄。';
 	@override String get code => '短信驗證碼';
-	@override String get emptyCode => '請輸入短信驗證碼';
+	@override String get emptyCode => '請輸入驗證碼';
 	@override String get sendCode => '獲取驗證碼';
 	@override String resendCountdown({required Object seconds}) => '${seconds} 秒後可重新獲取';
 	@override String get trustDevice => '信任此設備';
 	@override String get trustDeviceHint => '開啟後學校可能在一段時間內不再要求本設備二次認證';
 	@override String get networkError => '二次認證請求失敗，請檢查網絡後重試';
-	@override String get cancelled => '已取消短信二次認證';
+	@override String get cancelled => '已取消二次認證';
 	@override String get expired => '二次認證已失效，請重新登錄';
+	@override String get method => '驗證碼接收方式';
+	@override String get sms => '短信驗證碼';
+	@override String get enterpriseWechat => '企業微信驗證碼';
 }
 
 // Path: ruisi.common
@@ -1960,8 +2047,8 @@ class _Translations$setting$changeBrightnessDialog$zh_TW extends Translations$se
 	// Translations
 	@override String get title => '亮度設置';
 	@override String get followSetting => '跟隨系統';
-	@override String get dayMode => '白天模式';
-	@override String get nightMode => '黑夜模式';
+	@override String get dayMode => '淺色';
+	@override String get nightMode => '深色';
 }
 
 // Path: setting.changeSwiftDialog
@@ -1973,6 +2060,7 @@ class _Translations$setting$changeSwiftDialog$zh_TW extends Translations$setting
 	// Translations
 	@override String get title => '課程偏移設置';
 	@override String get inputHint => '請在此輸入數字';
+	@override String get invalidNumber => '請輸入有效的整數';
 }
 
 // Path: setting.changeElectricityAccount
@@ -2083,8 +2171,8 @@ class _Translations$setting$aboutPage$zh_TW extends Translations$setting$aboutPa
 
 	// Translations
 	@override String get benderblog => '主要開發者，iOS 小部件編寫和拼接';
-	@override String get alnair => '開發：圖書館搜索和封面';
-	@override String get aqqkad => '開發：考勤歷史記錄';
+	@override String get alnair => '開發：圖書館搜索和封面、圖書館佈局修復、飲水機接水功能及介面適配';
+	@override String get aqqkad => '開發：考勤歷史記錄、空調遙控、空調電費資料接入、圖書館新介面適配';
 	@override String get bellssgit => '支持：最佳&最久故障反饋者';
 	@override String get brackrat => '設計：主頁，登錄頁，配色，iOS 小部件等';
 	@override String get breezeline => '支持：無價值無意義的產品經理(他自己的描述)';
@@ -2101,7 +2189,7 @@ class _Translations$setting$aboutPage$zh_TW extends Translations$setting$aboutPa
 	@override String get hawa130 => '設計：課程詳情卡片';
 	@override String get hhzm => '開發：電費查詢賬號計算';
 	@override String get imaginary17 => '開發：睿思論壇路由修復';
-	@override String get imoscarz => '開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI';
+	@override String get imoscarz => '開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI / 開發：設定頁面分類重構及主從佈局適配';
 	@override String get kaMateKaOra => '國際化：軟件英語翻譯優化';
 	@override String get lagrangeX => '開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性';
 	@override String get lhx666Cool => '支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配';
@@ -2132,6 +2220,114 @@ class _Translations$setting$aboutPage$zh_TW extends Translations$setting$aboutPa
 	@override String get copyrightRegisterCode => '著作權登記號';
 	@override String get signAndroid => '安卓簽名';
 	@override String get title => '關於本軟件';
+	@override String get contributors => '貢獻者與致謝';
+	@override String get licenses => '開源授權';
+	@override String get extras => '更多';
+	@override String get dami => '開發：修復 iOS 課程偏移負數輸入及輸入校驗';
+	@override String get l1angyun => '開發：空閒教室即時顯示、課表背景模糊、課表佈局與螢幕圓角適配；修復校園網資料顯示';
+	@override String get littlestejan => '開發：校園網驗證碼重新整理及驗證碼輸入對話框優化';
+	@override String get sixteenforever => '開發：HarmonyOS 移植';
+}
+
+// Path: setting.editor
+class _Translations$setting$editor$zh_TW extends Translations$setting$editor$zh {
+	_Translations$setting$editor$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get save => '儲存';
+	@override String get apply => '套用';
+	@override String get passwordSet => '已設定';
+	@override String get passwordNotSet => '未設定';
+	@override String get passwordVisibility => '顯示或隱藏密碼';
+	@override String get toggleSign => '切換正負號';
+	@override String get positiveNumber => '請輸入大於 0 的整數';
+	@override String get electricityUnit => '度';
+	@override String get textPreview => '課程安排 · TrainTime PDA · 0123456789';
+	@override String get brightness => '亮度';
+	@override String get borderOpacity => '邊框透明度';
+	@override String get fillOpacity => '底色透明度';
+	@override String get fillSaturation => '底色飽和度';
+	@override String get textSaturation => '文字飽和度';
+	@override String get backgroundBlur => '背景模糊程度';
+	@override String get year => '年份';
+	@override String get semester => '學期';
+}
+
+// Path: setting.sections
+class _Translations$setting$sections$zh_TW extends Translations$setting$sections$zh {
+	_Translations$setting$sections$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get display => '顯示';
+	@override String get languageAndText => '語言與文字';
+	@override String get home => '首頁';
+	@override String get electricity => '電量提醒';
+	@override String get timetableAppearance => '課表外觀';
+	@override String get semester => '學期與週次';
+	@override String get courseData => '課程資料';
+}
+
+// Path: setting.navigation
+class _Translations$setting$navigation$zh_TW extends Translations$setting$navigation$zh {
+	_Translations$setting$navigation$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get uiDescription => '主題、字體、語言與首頁顯示';
+	@override String get classtableDescription => '課表外觀、學期與課程資料';
+	@override String get accountDescription => '校園服務的帳號與密碼';
+	@override String get notificationsDescription => '課前提醒與通知管理';
+	@override String get coreDescription => '日誌、快取清理與登出';
+}
+
+// Path: setting.fontSizePage
+class _Translations$setting$fontSizePage$zh_TW extends Translations$setting$fontSizePage$zh {
+	_Translations$setting$fontSizePage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get sizeTitle => '字體大小';
+	@override String get weightTitle => '字體粗細';
+	@override String get previewTitle => '預覽';
+	@override String get weightThin => '細';
+	@override String get weightRegular => '常規';
+	@override String get weightMedium => '中等';
+	@override String get weightSemibold => '半粗';
+	@override String get weightBold => '加粗';
+	@override String summary({required Object scale, required Object weight}) => '${scale}% · ${weight}';
+}
+
+// Path: setting.classTableStylePage
+class _Translations$setting$classTableStylePage$zh_TW extends Translations$setting$classTableStylePage$zh {
+	_Translations$setting$classTableStylePage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get currentTimeSettingsTitle => '時間指示設置';
+	@override String get classColorSettingsTitle => '課表樣式設置';
+	@override String get currentTimeSection => '時間指示設置';
+	@override String get showCurrentTimeIndicator => '顯示當前時間指示線';
+	@override String get showCurrentTimeLabel => '顯示迷你數字時鐘';
+	@override String get showTodayColumnHighlight => '強調顯示今天的縱列';
+	@override String get activeSection => '課程卡片樣式';
+	@override String get unfinishedSection => '課程卡片樣式';
+	@override String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
+	@override String activeBorderAlpha({required Object value}) => '邊框透明度: ${value}';
+	@override String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String get completedSection => '已結束課程樣式';
+	@override String get completedStyleEnabled => '已結束課程樣式區分';
+	@override String completedSaturationFactor({required Object value}) => '底色飽和度: ${value}';
+	@override String completedBrightnessFactor({required Object value}) => '亮度: ${value}';
+	@override String completedTextSaturationFactor({required Object value}) => '文字飽和度: ${value}';
+	@override String completedBorderAlpha({required Object value}) => '邊框透明度: ${value}';
+	@override String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
 }
 
 // Path: xduPlanet.confirmAuditDialog
@@ -2538,19 +2734,19 @@ extension on TranslationsZhTw {
 			'electricity.history' => '歷史記錄',
 			'electricity.dailyUsage' => '平均每日用量',
 			'electricity.notEnoughData' => '數據量不足以用於渲染',
-			'electricity.info' => '新能源系統獲取僅校園網內訪問，獲取過程中有問題請向開發者報告。\n歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。',
+			'electricity.info' => '歷史記錄依舊為本地記錄，平均日用量基於抄表記錄計算。',
 			'electricity.fetchingHint' => '正在獲取最新電費信息',
-			'electricity.fetchError' => '電費信息獲取失敗，請重試。',
+			'electricity.fetchError' => '電費信息獲取失敗，請重試',
 			'electricity.date' => '日期',
 			'electricity.power' => '該日0點電量',
 			'electricity.update' => '刷新信息',
 			'electricity.waterUsageFetchDate' => '獲取時間',
 			'electricity.waterUsageReadBefore' => '上次讀數',
 			'electricity.waterUsageReadNow' => '本次讀數',
-			'electricity.waterUsage' => '洗澡水用量',
+			'electricity.waterUsage' => '熱水用量',
 			'electricity.waterTitle' => '水費信息',
 			'electricity.waterLoading' => '正在加載水費信息',
-			'electricity.waterUnavailable' => '水費信息暫不可用，請在電費卡片重試。',
+			'electricity.waterUnavailable' => '水費信息暫不可用，請點擊右上角刷新重試。',
 			'electricity.waterEmpty' => '暫無水費信息',
 			'electricity.notSchoolNetwork' => '非校園網訪問',
 			'electricity.airconTitle' => '空調用電',
@@ -2560,9 +2756,36 @@ extension on TranslationsZhTw {
 			'electricity.airconWaiting' => '等待獲取空調用電信息',
 			'electricity.airconError' => '空調用電獲取失敗',
 			'electricity.airconRetry' => '重試',
-			'electricity.airconImeiMissing' => '尚未添加空調 IMEI，添加後即可查看空調用電信息。',
-			'electricity.airconAddImei' => '添加空調 IMEI',
+			'electricity.airconImeiMissing' => '掃描空調二維碼即可添加，也可以從相冊選擇二維碼圖片',
+			'electricity.airconAddImei' => '添加空調信息',
 			'electricity.airconCacheNotice' => ({required Object time}) => '當前顯示空調緩存數據，緩存時間：${time}',
+			'electricity.powerMetidTitle' => ({required Object code}) => '電錶 ${code}',
+			'electricity.weterMetidTitle' => ({required Object code}) => '水錶 ${code}',
+			'electricity.airconRemote' => '空調遙控',
+			'electricity.airconControlError' => '無法獲取空調狀態',
+			'electricity.airconCommandOk' => '空調指令已執行',
+			'electricity.airconControlSection' => '基本控制',
+			'electricity.airconOperationSection' => '運行設定',
+			'electricity.airconOtherSettingsSection' => '其他設定',
+			'electricity.airconPower' => '電源',
+			'electricity.airconTargetTemperature' => '設定溫度',
+			'electricity.airconTemperatureRange' => '溫度必須在 18–32 ℃ 之間',
+			'electricity.airconIndoorTemperature' => ({required Object temperature}) => '室內溫度：${temperature} ℃',
+			'electricity.airconMode' => '運行模式',
+			'electricity.airconModeFan' => '送風',
+			'electricity.airconModeHeat' => '制熱',
+			'electricity.airconModeCool' => '製冷',
+			'electricity.airconModeDry' => '除溼',
+			'electricity.airconModeAuto' => '自動',
+			'electricity.airconWindSpeed' => '風速',
+			'electricity.airconWindAuto' => '自動',
+			'electricity.airconWindSilent' => '靜音',
+			'electricity.airconWindLow' => '低',
+			'electricity.airconWindMedium' => '中',
+			'electricity.airconWindHigh' => '高',
+			'electricity.airconVerticalSwing' => '上下掃風',
+			'electricity.airconStrongMode' => '強力模式',
+			'electricity.airconElectricHeating' => '輔助電熱',
 			'electricityStatus.pending' => '等待獲取',
 			'electricityStatus.remainFetching' => '正在獲取電量',
 			'electricityStatus.remainNetworkIssue' => '電量查詢網絡故障',
@@ -2578,6 +2801,7 @@ extension on TranslationsZhTw {
 			'electricityStatus.needAccount' => '需要填寫電費賬號',
 			'electricityStatus.captchaFailed' => '驗證碼識別失敗',
 			'electricityStatus.otherIssue' => '程序故障',
+			'electricityStatus.noElectricityInfo' => '沒有電錶信息',
 			'emptyClassroom.title' => '空閒教室',
 			'emptyClassroom.date' => ({required Object date}) => '日期 ${date}',
 			'emptyClassroom.building' => ({required Object building}) => '教學樓 ${building}',
@@ -2585,6 +2809,12 @@ extension on TranslationsZhTw {
 			'emptyClassroom.classroom' => '教室',
 			'emptyClassroom.empty' => '空閒',
 			'emptyClassroom.occupied' => '佔用',
+			'emptyClassroom.nowOngoing' => ({required Object period, required Object start, required Object end}) => '現在 · 第 ${period} 節 ${start}-${end}',
+			'emptyClassroom.nowUpcoming' => ({required Object period, required Object start, required Object end}) => '即將 · 第 ${period} 節 ${start}-${end}',
+			'emptyClassroom.nowFree' => ({required Object free, required Object total}) => '空閒 ${free}/${total} 間',
+			'emptyClassroom.onlyFreeNow' => '只看現在空閒',
+			'emptyClassroom.noFreeNow' => '現在沒有空閒教室',
+			'emptyClassroom.classesOver' => '今天的課已經結束了',
 			'exam.title' => '考試安排',
 			'exam.cacheHint' => '已顯示緩存考試安排信息',
 			'exam.cacheHintPasswordWrong' => '統一認證密碼錯誤或已失效',
@@ -2722,6 +2952,8 @@ extension on TranslationsZhTw {
 			'homepage.libraryCard.noInfo' => '目前無法獲取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查詢信息中',
 			'homepage.schoolCardInfoCard.errorToast' => '遇到錯誤，請聯繫開發者',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.schoolCardInfoCard.fetchingToast' => '正在獲取信息，請稍後再來看',
 			'homepage.schoolCardInfoCard.bill' => '流水',
 			'homepage.schoolCardInfoCard.balance' => ({required Object amount}) => '卡里 ${amount} 元',
@@ -2750,14 +2982,22 @@ extension on TranslationsZhTw {
 			'homepage.schoolNet.remaining' => ({required Object remaining}) => '下次結算 ${remaining}',
 			'homepage.clubPromotion.failed' => '社團信息獲取失敗',
 			'homepage.clubPromotion.fetching' => '社團信息清單正在加載',
+			'homepage.airconCard.title' => '空調遙控',
+			'homepage.airconCard.notConfigured' => '尚未配置空調',
+			'homepage.airconCard.configureHint' => '點擊添加空調 IMEI',
+			'homepage.airconCard.running' => ({required Object mode, required Object temperature}) => '${mode} · ${temperature} ℃',
+			'homepage.airconCard.powerOff' => '空調已關閉',
+			'homepage.airconCard.indoorAndWind' => ({required Object temperature, required Object wind}) => '室內 ${temperature} ℃ · 風速 ${wind}',
+			'homepage.airconCard.wind' => ({required Object wind}) => '風速 ${wind}',
+			'homepage.airconCard.fetching' => '正在獲取空調狀態',
+			'homepage.airconCard.error' => '空調狀態獲取失敗',
+			'homepage.airconCard.openRemote' => '點擊進入空調遙控',
 			'library.title' => '圖書館信息',
 			'library.borrowStateTitle' => '借書狀態',
 			'library.searchBookTitle' => '查詢藏書',
 			'library.searchFieldTitle' => '搜索字段',
 			'library.searchFieldKeywordOption' => '任意詞',
 			'library.searchFieldTitleOption' => '標題',
-			_ => null,
-		} ?? switch (path) {
 			'library.searchFieldAuthorOption' => '責任者',
 			'library.searchFieldIsbnOption' => 'ISBN',
 			'library.searchFieldBarcodeOption' => '條碼號',
@@ -2799,6 +3039,7 @@ extension on TranslationsZhTw {
 			'library.publishYearEnd' => '出版年止',
 			'library.bookDetail' => '書籍詳細信息',
 			'library.noResult' => '沒有結果，請修改搜索參數或者開始你的搜索',
+			'library.noMoreData' => '沒有更多結果了',
 			'libraryCard.title' => '圖書館當前狀況',
 			'libraryCard.fetching' => '正在獲取圖書館信息',
 			'libraryCard.northernLibrary' => '北校區狀況',
@@ -2823,22 +3064,25 @@ extension on TranslationsZhTw {
 			'login.captchaWindow.messageOnEmpty' => '請輸入驗證碼',
 			'login.captchaWindow.refreshFailed' => ({required Object error}) => '刷新驗證碼失敗: ${error}',
 			'login.sliderTitle' => '服務器認證服務',
-			'login.secondFactor.title' => '短信二次認證',
-			'login.secondFactor.description' => '學校要求完成二次認證。請先獲取短信驗證碼，再輸入驗證碼繼續登錄。',
+			'login.secondFactor.title' => '二次認證',
+			'login.secondFactor.description' => '學校要求完成二次認證。請選擇驗證碼接收方式，獲取並輸入驗證碼後繼續登錄。',
 			'login.secondFactor.code' => '短信驗證碼',
-			'login.secondFactor.emptyCode' => '請輸入短信驗證碼',
+			'login.secondFactor.emptyCode' => '請輸入驗證碼',
 			'login.secondFactor.sendCode' => '獲取驗證碼',
 			'login.secondFactor.resendCountdown' => ({required Object seconds}) => '${seconds} 秒後可重新獲取',
 			'login.secondFactor.trustDevice' => '信任此設備',
 			'login.secondFactor.trustDeviceHint' => '開啟後學校可能在一段時間內不再要求本設備二次認證',
 			'login.secondFactor.networkError' => '二次認證請求失敗，請檢查網絡後重試',
-			'login.secondFactor.cancelled' => '已取消短信二次認證',
+			'login.secondFactor.cancelled' => '已取消二次認證',
 			'login.secondFactor.expired' => '二次認證已失效，請重新登錄',
+			'login.secondFactor.method' => '驗證碼接收方式',
+			'login.secondFactor.sms' => '短信驗證碼',
+			'login.secondFactor.enterpriseWechat' => '企業微信驗證碼',
 			'loginProcess.readyPage' => '準備獲取登錄網頁',
 			'loginProcess.getEncrypt' => '獲取密碼加密密鑰',
 			'loginProcess.readyLogin' => '準備登錄',
 			'loginProcess.slider' => '登錄中',
-			'loginProcess.secondFactor' => '等待短信二次認證',
+			'loginProcess.secondFactor' => '等待二次認證',
 			'loginProcess.afterProcess' => '登錄後處理',
 			'loginProcess.failed' => ({required Object status_code}) => '登錄失敗，響應狀態碼：${status_code}',
 			'month.january' => '一月',
@@ -3071,12 +3315,12 @@ extension on TranslationsZhTw {
 			'setting.latestVersion' => ({required Object latest}) => '最新版本: ${latest}',
 			'setting.waiting' => '等待獲取',
 			'setting.fetchingUpdate' => '正在獲取更新信息',
-			'setting.newVersion' => '有新版本發佈！',
+			'setting.newVersion' => '有新版本發佈，請立刻更新！',
 			'setting.currentStable' => '目前您正在運行最新版',
 			'setting.currentTesting' => '目前您正在運行測試版',
 			'setting.fetchFailed' => '獲取更新信息失敗',
 			'setting.uiSetting' => '界面設置',
-			'setting.brightnessSetting' => '設置深淺色',
+			'setting.brightnessSetting' => '深淺色模式',
 			'setting.colorSetting' => '顏色設置',
 			'setting.simplifyTimeline' => '簡化日程時間軸',
 			'setting.simplifyTimelineDescription' => '沒有日程時 減少空間佔用',
@@ -3094,9 +3338,9 @@ extension on TranslationsZhTw {
 			'setting.electricityAccountSetting' => '電費賬號設置',
 			'setting.schoolnetPasswordSetting' => '校園網帳號密碼設置',
 			'setting.schoolnetPasswordDescription' => '不設置查看不了網費',
-			'setting.airconImeiTitle' => '空調用電數據源',
+			'setting.airconImeiTitle' => '空調設備',
 			'setting.airconImei' => '空調 IMEI',
-			'setting.airconImeiNotSet' => '未設置，電費頁不顯示空調用電',
+			'setting.airconImeiNotSet' => '未設置，無法查詢或遙控空調',
 			'setting.airconImeiCurrent' => ({required Object imei}) => '當前 IMEI：${imei}',
 			'setting.airconImeiSaved' => '空調 IMEI 已保存',
 			'setting.airconImeiCleared' => '空調 IMEI 已清除',
@@ -3151,7 +3395,7 @@ extension on TranslationsZhTw {
 			'setting.notificationPage.cancelAllSuccess' => '已取消所有課前提醒',
 			'setting.notificationPage.rescheduleSuccess' => ({required Object count}) => '已重新安排 ${count} 個課前提醒',
 			'setting.notificationPage.rescheduleFailed' => ({required Object error}) => '重新安排通知失敗: ${error}',
-			'setting.notificationDebugPage' => '通知服務調試頁面',
+			'setting.notificationDebugPage' => '通知狀態與測試',
 			'setting.classtableSetting' => '課表相關設置',
 			'setting.background' => '開啟課表背景圖',
 			'setting.noBackground' => '你先選個圖片罷，就在下面',
@@ -3167,7 +3411,7 @@ extension on TranslationsZhTw {
 			'setting.classRefreshTitle' => '確認對話框',
 			'setting.classRefreshContent' => '是否要強制刷新課表？同意後，將會從學校一站式後端重新獲取課表，耗時會比較久。',
 			'setting.classSwift' => '課程偏移設置',
-			'setting.classSwiftDescription' => ({required Object swift}) => '正數錯後開學日期 負數提前開學日期\n目前為 ${swift}',
+			'setting.classSwiftDescription' => ({required Object swift}) => '目前為 ${swift}',
 			'setting.coreSetting' => '緩存登錄設置',
 			'setting.checkLogger' => '查看網絡攔截器和日誌',
 			'setting.clearAndRestart' => '清除緩存後重啟',
@@ -3190,10 +3434,11 @@ extension on TranslationsZhTw {
 			'setting.changeColorDialog.pink' => '櫻花粉',
 			'setting.changeBrightnessDialog.title' => '亮度設置',
 			'setting.changeBrightnessDialog.followSetting' => '跟隨系統',
-			'setting.changeBrightnessDialog.dayMode' => '白天模式',
-			'setting.changeBrightnessDialog.nightMode' => '黑夜模式',
+			'setting.changeBrightnessDialog.dayMode' => '淺色',
+			'setting.changeBrightnessDialog.nightMode' => '深色',
 			'setting.changeSwiftDialog.title' => '課程偏移設置',
 			'setting.changeSwiftDialog.inputHint' => '請在此輸入數字',
+			'setting.changeSwiftDialog.invalidNumber' => '請輸入有效的整數',
 			'setting.changeElectricityTitle' => '修改電費帳號',
 			'setting.changeElectricityAccount.title' => '修改電費帳號',
 			'setting.changeElectricityAccount.campus' => '校區',
@@ -3221,6 +3466,8 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '請選擇院區',
 			'setting.changeElectricityAccount.apartment' => '樓棟',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.apartmentHint' => '選擇樓棟',
 			'setting.changeElectricityAccount.northApartment' => '北樓',
 			'setting.changeElectricityAccount.southApartment' => '南樓',
@@ -3267,11 +3514,9 @@ extension on TranslationsZhTw {
 			'setting.semesterUpdateData' => '應用新學期設置中',
 			'setting.easterEggPage' => '你找到了彩蛋',
 			'setting.aboutPage.benderblog' => '主要開發者，iOS 小部件編寫和拼接',
-			'setting.aboutPage.alnair' => '開發：圖書館搜索和封面',
-			'setting.aboutPage.aqqkad' => '開發：考勤歷史記錄',
+			'setting.aboutPage.alnair' => '開發：圖書館搜索和封面、圖書館佈局修復、飲水機接水功能及介面適配',
+			'setting.aboutPage.aqqkad' => '開發：考勤歷史記錄、空調遙控、空調電費資料接入、圖書館新介面適配',
 			'setting.aboutPage.bellssgit' => '支持：最佳&最久故障反饋者',
-			_ => null,
-		} ?? switch (path) {
 			'setting.aboutPage.brackrat' => '設計：主頁，登錄頁，配色，iOS 小部件等',
 			'setting.aboutPage.breezeline' => '支持：無價值無意義的產品經理(他自己的描述)',
 			'setting.aboutPage.cafebabe' => '支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配',
@@ -3287,7 +3532,7 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.hawa130' => '設計：課程詳情卡片',
 			'setting.aboutPage.hhzm' => '開發：電費查詢賬號計算',
 			'setting.aboutPage.imaginary17' => '開發：睿思論壇路由修復',
-			'setting.aboutPage.imoscarz' => '開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI',
+			'setting.aboutPage.imoscarz' => '開發：設計軟件主頁 / 開發：平板考勤查詢頁面 / 開發：優化了體育查詢界面的UI / 開發：設定頁面分類重構及主從佈局適配',
 			'setting.aboutPage.kaMateKaOra' => '國際化：軟件英語翻譯優化',
 			'setting.aboutPage.lagrangeX' => '開發：課程表時間進度展示（終版方案） / 開發：課程表上過課程灰度化和其他課程界面特性',
 			'setting.aboutPage.lhx666Cool' => '支持：Windows 和 Linux 構建腳本 / 開發：2026版本滑塊驗證碼適配',
@@ -3318,6 +3563,83 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.copyrightRegisterCode' => '著作權登記號',
 			'setting.aboutPage.signAndroid' => '安卓簽名',
 			'setting.aboutPage.title' => '關於本軟件',
+			'setting.aboutPage.contributors' => '貢獻者與致謝',
+			'setting.aboutPage.licenses' => '開源授權',
+			'setting.aboutPage.extras' => '更多',
+			'setting.aboutPage.dami' => '開發：修復 iOS 課程偏移負數輸入及輸入校驗',
+			'setting.aboutPage.l1angyun' => '開發：空閒教室即時顯示、課表背景模糊、課表佈局與螢幕圓角適配；修復校園網資料顯示',
+			'setting.aboutPage.littlestejan' => '開發：校園網驗證碼重新整理及驗證碼輸入對話框優化',
+			'setting.aboutPage.sixteenforever' => '開發：HarmonyOS 移植',
+			'setting.editor.save' => '儲存',
+			'setting.editor.apply' => '套用',
+			'setting.editor.passwordSet' => '已設定',
+			'setting.editor.passwordNotSet' => '未設定',
+			'setting.editor.passwordVisibility' => '顯示或隱藏密碼',
+			'setting.editor.toggleSign' => '切換正負號',
+			'setting.editor.positiveNumber' => '請輸入大於 0 的整數',
+			'setting.editor.electricityUnit' => '度',
+			'setting.editor.textPreview' => '課程安排 · TrainTime PDA · 0123456789',
+			'setting.editor.brightness' => '亮度',
+			'setting.editor.borderOpacity' => '邊框透明度',
+			'setting.editor.fillOpacity' => '底色透明度',
+			'setting.editor.fillSaturation' => '底色飽和度',
+			'setting.editor.textSaturation' => '文字飽和度',
+			'setting.editor.backgroundBlur' => '背景模糊程度',
+			'setting.editor.year' => '年份',
+			'setting.editor.semester' => '學期',
+			'setting.sections.display' => '顯示',
+			'setting.sections.languageAndText' => '語言與文字',
+			'setting.sections.home' => '首頁',
+			'setting.sections.electricity' => '電量提醒',
+			'setting.sections.timetableAppearance' => '課表外觀',
+			'setting.sections.semester' => '學期與週次',
+			'setting.sections.courseData' => '課程資料',
+			'setting.navigation.uiDescription' => '主題、字體、語言與首頁顯示',
+			'setting.navigation.classtableDescription' => '課表外觀、學期與課程資料',
+			'setting.navigation.accountDescription' => '校園服務的帳號與密碼',
+			'setting.navigation.notificationsDescription' => '課前提醒與通知管理',
+			'setting.navigation.coreDescription' => '日誌、快取清理與登出',
+			'setting.fontSizeSetting' => '字體大小與粗細',
+			'setting.fontSizePage.sizeTitle' => '字體大小',
+			'setting.fontSizePage.weightTitle' => '字體粗細',
+			'setting.fontSizePage.previewTitle' => '預覽',
+			'setting.fontSizePage.weightThin' => '細',
+			'setting.fontSizePage.weightRegular' => '常規',
+			'setting.fontSizePage.weightMedium' => '中等',
+			'setting.fontSizePage.weightSemibold' => '半粗',
+			'setting.fontSizePage.weightBold' => '加粗',
+			'setting.fontSizePage.summary' => ({required Object scale, required Object weight}) => '${scale}% · ${weight}',
+			'setting.generalAccountSettings' => '通用賬號',
+			'setting.undergraduateSystemAccounts' => '本科生系統帳號',
+			'setting.classTableBackgroundSection' => '課表背景',
+			'setting.backgroundBlur' => ({required Object value}) => '背景模糊: ${value}',
+			'setting.backgroundBlurOff' => '關閉',
+			'setting.classTableStyleSetting' => '課表顯示與樣式',
+			'setting.classTableStyleDescription' => '時間指示和課程卡片樣式',
+			'setting.classTableStylePage.currentTimeSettingsTitle' => '時間指示設置',
+			'setting.classTableStylePage.classColorSettingsTitle' => '課表樣式設置',
+			'setting.classTableStylePage.currentTimeSection' => '時間指示設置',
+			'setting.classTableStylePage.showCurrentTimeIndicator' => '顯示當前時間指示線',
+			'setting.classTableStylePage.showCurrentTimeLabel' => '顯示迷你數字時鐘',
+			'setting.classTableStylePage.showTodayColumnHighlight' => '強調顯示今天的縱列',
+			'setting.classTableStylePage.activeSection' => '課程卡片樣式',
+			'setting.classTableStylePage.unfinishedSection' => '課程卡片樣式',
+			'setting.classTableStylePage.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
+			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
+			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.completedSection' => '已結束課程樣式',
+			'setting.classTableStylePage.completedStyleEnabled' => '已結束課程樣式區分',
+			'setting.classTableStylePage.completedSaturationFactor' => ({required Object value}) => '底色飽和度: ${value}',
+			'setting.classTableStylePage.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
+			'setting.classTableStylePage.completedTextSaturationFactor' => ({required Object value}) => '文字飽和度: ${value}',
+			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
+			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classSwiftExplain' => '正數錯後開學日期 負數提前開學日期',
+			'sponsorship.title' => '本版本由極創工作室和網管會贊助發佈',
+			'sponsorship.dialogTitle' => '贊助信息',
+			'sponsorship.dialogContent' => '極創工作室介紹辭：極創工作室是一個由西電創新創業學院支持建設的科技創新俱樂部，旨在與校內最優秀的創新創業人才同行，專注於人工智能等領域的技術創新與產品研發。目前工作室和華為等廠家合作，深耕大語言模型相關前沿方向，已孵化超過數十個人工智能領域科創產品，其中8項產品成功落地商用。工作室最知名的產品包括SwanLab、LLMOne、NexusGate。\n\n網管會介紹辭：學生網管會隸屬於西電信息網絡技術中心，主要協助處理師生校園網絡使用問題，參與校園網絡維護、線上諮詢、線下處理和技術支持等工作。我們歡迎認真負責、願意學習、對網絡與技術實踐感興趣的同學加入，一起服務同學、提升能力、積累經驗。\n\nXDYou軟件開發者辭：極創在XDYou早期開發期間給了相當大的幫助，網管會我在20年入學期間加入過，可惜他們沒要我。應我最近找工作，找了他們的人瞭解了一些信息，按照約定製作本頁面作為諮詢費。\nBender Rodriguez 6/9/2026',
+			'sponsorship.buttonJichuang' => '瞭解極創',
+			'sponsorship.buttonXduna' => '瞭解網管會',
 			'sport.title' => '體育查詢',
 			'sport.classInfo' => '課程信息',
 			'sport.emptyClassInfo' => '未查詢到課程信息',

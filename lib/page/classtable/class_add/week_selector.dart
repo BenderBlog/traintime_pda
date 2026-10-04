@@ -1,9 +1,9 @@
-import 'package:watermeter/generated/translations.g.dart';
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 class WeekSelector extends StatefulWidget {
@@ -58,9 +58,7 @@ class _WeekSelectorState extends State<WeekSelector> {
                   Row(
                     children: [
                       Icon(Icons.calendar_month, color: widget.color, size: 16),
-                      Text(
-                            context.t.classtable.classAdd.inputWeekHint,
-                          )
+                      Text(context.t.classtable.classAdd.inputWeekHint)
                           .textStyle(TextStyle(color: widget.color))
                           .padding(left: 4),
                     ],

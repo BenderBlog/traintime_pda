@@ -6,7 +6,7 @@
 
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -312,9 +312,7 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.login.sliderTitle),
-      ),
+      appBar: AppBar(title: Text(context.t.login.sliderTitle)),
       body: FutureBuilder<SliderCaptchaClientProvider>(
         future: _providerFuture,
         builder: (context, snapshot) {

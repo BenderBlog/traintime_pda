@@ -2,16 +2,20 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/model/fetch_result.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui' show BlurStyle, ImageFilter, MaskFilter;
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
@@ -26,7 +30,6 @@ import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/generated/translations.g.dart';
 
 class ContentClassTablePage extends StatefulWidget {
   const ContentClassTablePage({super.key});
@@ -49,7 +52,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// Week choice row controller.
   late PageController rowControl;
 
-  late BoxDecoration decoration;
   late ClassTableWidgetState classTableState;
   bool _isListening = false;
   bool _didLoadVisualSettings = false;
@@ -112,23 +114,106 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       keepPage: true,
     );
 
-    /// Let controllers listen to the currentWeek's change.
-    /// Init the background.
-    File image = File("${supportPath.path}/${classTableState.decorationName}");
-    decoration = BoxDecoration(
-      image:
-          (preference.getBool(preference.Preference.decorated) &&
-              image.existsSync())
-          ? DecorationImage(
-              image: FileImage(image),
-              fit: BoxFit.cover,
-              opacity: Theme.of(context).brightness == Brightness.dark
-                  ? 0.4
-                  : 1.0,
-            )
-          : null,
-    );
     super.didChangeDependencies();
+  }
+
+  /// Padding which keeps the classtable sheet away from the edges of the
+  /// display.
+  ///
+  /// The sheet is scrollable down to its very last row, and the bottom of the
+  /// screen is where the system navigation bar and the rounded corners of the
+  /// display are. Both are honoured here, so the last block of the day (the
+  /// time of the 11th class) stays readable.
+  EdgeInsets _sheetSafeInsets(BuildContext context) {
+    /// `padding` already has the top inset of the app bar taken out, while
+    /// `viewPadding` keeps the real size of the system bars. The bottom one
+    /// has to come from `viewPadding`, otherwise the sheet would crawl under
+    /// the navigation bar whenever the keyboard is around.
+    final padding = MediaQuery.paddingOf(context);
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+
+    /// The sheet does not reach the edges of the display, so the corner of the
+    /// screen only reaches in about half of its radius where the sheet starts.
+    /// Keeping the whole radius free left a lot of empty room on devices with
+    /// round corners, so only half of it is kept, within sane limits.
+    ///
+    /// The radii come from [MediaQuery.displayCornerRadiiOf], which the platform
+    /// fills in on Android 12 and later and leaves null everywhere else. Reading
+    /// them there also means this page is rebuilt whenever they change, so the
+    /// window does not have to be watched by hand.
+    final corners = MediaQuery.displayCornerRadiiOf(context);
+    final cornerRadius = math.max(
+      corners?.bottomLeft.y ?? 0,
+      corners?.bottomRight.y ?? 0,
+    );
+    final cornerInset = math.min(
+      math.max(cornerRadius / 2, classTableMinimumBottomInset),
+      classTableMaximumBottomInset,
+    );
+    return EdgeInsets.fromLTRB(
+      padding.left + classTableSheetMargin,
+      padding.top + classTableSheetMargin,
+      padding.right + classTableSheetMargin,
+      math.max(viewPadding.bottom, cornerInset) + classTableSheetMargin,
+    );
+  }
+
+  /// The user defined background image, blurred as configured.
+  Widget _backgroundLayer(BuildContext context) {
+    if (!preference.getBool(preference.Preference.decorated)) {
+      return const SizedBox.shrink();
+    }
+
+    final image = File("${supportPath.path}/${classTableState.decorationName}");
+    if (!image.existsSync()) {
+      return const SizedBox.shrink();
+    }
+
+    final viewport = MediaQuery.sizeOf(context);
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final cacheWidth = (math.max(viewport.width, viewport.height) * pixelRatio)
+        .round()
+        .clamp(1, 2560)
+        .toInt();
+    final imageRevision =
+        "${image.lengthSync()}:${image.lastModifiedSync().microsecondsSinceEpoch}";
+
+    final blur = preference
+        .getDouble(preference.Preference.classTableBackgroundBlur)
+        .clamp(0.0, maxClassTableBackgroundBlur)
+        .toDouble();
+
+    Widget layer = Image.file(
+      image,
+      key: ValueKey("${image.path}:$imageRevision"),
+      fit: BoxFit.cover,
+      cacheWidth: cacheWidth,
+      gaplessPlayback: true,
+      opacity: AlwaysStoppedAnimation<double>(
+        Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
+      ),
+    );
+
+    if (blur > 0) {
+      /// Blurring pulls in the pixels outside of the image, which would leave
+      /// the edges translucent. The image is scaled up a little to make sure
+      /// the whole background stays covered.
+      layer = ClipRect(
+        child: Transform.scale(
+          scale: 1 + blur / 50,
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: blur,
+              sigmaY: blur,
+              tileMode: TileMode.clamp,
+            ),
+            child: layer,
+          ),
+        ),
+      );
+    }
+
+    return Positioned.fill(child: layer);
   }
 
   /// A row shows a series of buttons about the classtable's index.
@@ -194,12 +279,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     final errorWithCacheSources = state.errorWithCacheSources;
 
     String sourceLabel(ClassTableStatusSource source) =>
-      switch (source) {
-        ClassTableStatusSource.classTable => context.t.classtable.statusSource.classTable,
-        ClassTableStatusSource.exam => context.t.classtable.statusSource.exam,
-        ClassTableStatusSource.physicsExperiment => context.t.classtable.statusSource.physicsExperiment,
-        ClassTableStatusSource.otherExperiment => context.t.classtable.statusSource.otherExperiment,
-      };
+        context.t.resolveKey(switch (source) {
+          ClassTableStatusSource.classTable =>
+            "classtable.status_source.class_table",
+          ClassTableStatusSource.exam => "classtable.status_source.exam",
+          ClassTableStatusSource.physicsExperiment =>
+            "classtable.status_source.physics_experiment",
+          ClassTableStatusSource.otherExperiment =>
+            "classtable.status_source.other_experiment",
+        });
 
     CacheHint? sourceHintKey(ClassTableStatusSource source) => switch (source) {
       ClassTableStatusSource.classTable => state.classTableCacheHintKey,
@@ -212,7 +300,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     final content = <String>[
       if (errorWithoutCacheSources.isNotEmpty)
-        context.t.classtable.statusBanner.errorSummary(sources: errorWithoutCacheSources.map(sourceLabel).join("、")),
+        context.t.classtable.statusBanner.errorSummary(
+          sources: errorWithoutCacheSources.map(sourceLabel).join("、"),
+        ),
       ...errorWithoutCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
@@ -224,7 +314,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           errorWithCacheSources.isNotEmpty)
         "",
       if (errorWithCacheSources.isNotEmpty)
-        context.t.classtable.statusBanner.cache(sources: errorWithCacheSources.map(sourceLabel).join("、")),
+        context.t.classtable.statusBanner.cache(
+          sources: errorWithCacheSources.map(sourceLabel).join("、"),
+        ),
       ...errorWithCacheSources.map((source) {
         final hintKey = sourceHintKey(source);
         final detail = hintKey != null
@@ -237,9 +329,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
-          context.t.classtable.errorDialogTitle,
-        ),
+        title: Text(context.t.classtable.errorDialogTitle),
         content: Text(content),
         actions: [
           TextButton(
@@ -253,6 +343,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   String _formatPercent(double value) => "${(value * 100).round()}%";
 
+  // ignore: unused_element
   Future<void> _showCurrentTimeSettingsDialog() async {
     var enabled = CurrentTimeIndicatorConfig.enabled;
     var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
@@ -265,7 +356,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           builder: (context) => StatefulBuilder(
             builder: (context, setDialogState) => AlertDialog(
               title: Text(
-                context.t.classtable.visualSettings.currentTimeSettingsTitle,
+                context.t.setting.classTableStylePage.currentTimeSettingsTitle,
               ),
               content: SizedBox(
                 width: 420,
@@ -277,7 +368,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          context.t.classtable.visualSettings.showCurrentTimeIndicator,
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .showCurrentTimeIndicator,
                         ),
                         value: enabled,
                         onChanged: (value) =>
@@ -286,7 +381,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          context.t.classtable.visualSettings.showCurrentTimeLabel,
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .showCurrentTimeLabel,
                         ),
                         value: showTimeLabel,
                         onChanged: enabled
@@ -297,7 +396,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          context.t.classtable.visualSettings.showTodayColumnHighlight,
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .showTodayColumnHighlight,
                         ),
                         value: showTodayColumnHighlight,
                         onChanged: (value) => setDialogState(
@@ -335,6 +438,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     setState(() {});
   }
 
+  // ignore: unused_element
   Future<void> _showClassColorSettingsDialog() async {
     var completedEnabled = CompletedClassStyleConfig.completedEnabled;
     var activeBrightnessFactor = CompletedClassStyleConfig
@@ -360,7 +464,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           builder: (context) => StatefulBuilder(
             builder: (context, setDialogState) => AlertDialog(
               title: Text(
-                context.t.classtable.visualSettings.classColorSettingsTitle,
+                context.t.setting.classTableStylePage.classColorSettingsTitle,
               ),
               content: SizedBox(
                 width: 420,
@@ -372,7 +476,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          context.t.classtable.visualSettings.completedStyleEnabled,
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .completedStyleEnabled,
                         ),
                         value: completedEnabled,
                         onChanged: (value) =>
@@ -380,11 +488,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       ),
                       const Divider(height: 24),
                       Text(
-                        context.t.classtable.visualSettings.unfinishedSection,
+                        context.t.setting.classTableStylePage.unfinishedSection,
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        context.t.classtable.visualSettings.activeBrightnessFactor(value: _formatPercent(activeBrightnessFactor)),
+                        context.t.setting.classTableStylePage
+                            .activeBrightnessFactor(
+                              value: _formatPercent(activeBrightnessFactor),
+                            ),
                       ),
                       Slider(
                         value: activeBrightnessFactor,
@@ -396,7 +507,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         ),
                       ),
                       Text(
-                        context.t.classtable.visualSettings.activeBorderAlpha(value: _formatPercent(activeBorderAlpha)),
+                        context.t.setting.classTableStylePage.activeBorderAlpha(
+                          value: _formatPercent(activeBorderAlpha),
+                        ),
                       ),
                       Slider(
                         value: activeBorderAlpha,
@@ -407,7 +520,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                             setDialogState(() => activeBorderAlpha = value),
                       ),
                       Text(
-                        context.t.classtable.visualSettings.activeInnerAlpha(value: _formatPercent(activeInnerAlpha)),
+                        context.t.setting.classTableStylePage.activeInnerAlpha(
+                          value: _formatPercent(activeInnerAlpha),
+                        ),
                       ),
                       Slider(
                         value: activeInnerAlpha,
@@ -420,11 +535,20 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       if (completedEnabled) ...[
                         const Divider(height: 24),
                         Text(
-                          context.t.classtable.visualSettings.completedSection,
+                          context
+                              .t
+                              .setting
+                              .classTableStylePage
+                              .completedSection,
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          context.t.classtable.visualSettings.completedSaturationFactor(value: _formatPercent(completedSaturationFactor).toString()),
+                          context.t.setting.classTableStylePage
+                              .completedSaturationFactor(
+                                value: _formatPercent(
+                                  completedSaturationFactor,
+                                ),
+                              ),
                         ),
                         Slider(
                           value: completedSaturationFactor,
@@ -436,7 +560,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           ),
                         ),
                         Text(
-                          context.t.classtable.visualSettings.completedBrightnessFactor(value: _formatPercent(completedBrightnessFactor).toString()),
+                          context.t.setting.classTableStylePage
+                              .completedBrightnessFactor(
+                                value: _formatPercent(
+                                  completedBrightnessFactor,
+                                ),
+                              ),
                         ),
                         Slider(
                           value: completedBrightnessFactor,
@@ -448,7 +577,12 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           ),
                         ),
                         Text(
-                          context.t.classtable.visualSettings.completedTextSaturationFactor(value: _formatPercent(completedTextSaturationFactor).toString()),
+                          context.t.setting.classTableStylePage
+                              .completedTextSaturationFactor(
+                                value: _formatPercent(
+                                  completedTextSaturationFactor,
+                                ),
+                              ),
                         ),
                         Slider(
                           value: completedTextSaturationFactor,
@@ -460,7 +594,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           ),
                         ),
                         Text(
-                          context.t.classtable.visualSettings.completedBorderAlpha(value: _formatPercent(completedBorderAlpha)),
+                          context.t.setting.classTableStylePage
+                              .completedBorderAlpha(
+                                value: _formatPercent(completedBorderAlpha),
+                              ),
                         ),
                         Slider(
                           value: completedBorderAlpha,
@@ -472,7 +609,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           ),
                         ),
                         Text(
-                          context.t.classtable.visualSettings.completedInnerAlpha(value: _formatPercent(completedInnerAlpha)),
+                          context.t.setting.classTableStylePage
+                              .completedInnerAlpha(
+                                value: _formatPercent(completedInnerAlpha),
+                              ),
                         ),
                         Slider(
                           value: completedInnerAlpha,
@@ -540,58 +680,34 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             IconButton(
               onPressed: _showLoadErrorDialog,
               icon: const Icon(Icons.error_outline),
-              tooltip: context.t.common.loadError,
+              tooltip: context.t.classtable.errorDialogTitle,
             ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
               PopupMenuItem<String>(
                 value: 'A',
-                child: Text(
-                  context.t.classtable.popupMenu.notArranged,
-                ),
+                child: Text(context.t.classtable.popupMenu.notArranged),
               ),
               PopupMenuItem<String>(
                 value: 'B',
-                child: Text(
-                  context.t.classtable.popupMenu.classChanged,
-                ),
+                child: Text(context.t.classtable.popupMenu.classChanged),
               ),
               PopupMenuItem<String>(
                 value: 'C',
-                child: Text(
-                  context.t.classtable.popupMenu.addClass,
-                ),
+                child: Text(context.t.classtable.popupMenu.addClass),
               ),
               PopupMenuItem<String>(
                 value: 'D',
-                child: Text(
-                  context.t.classtable.popupMenu.generateIcal,
-                ),
+                child: Text(context.t.classtable.popupMenu.generateIcal),
               ),
               PopupMenuItem<String>(
                 value: 'H',
-                child: Text(
-                  context.t.classtable.popupMenu.outputToSystem,
-                ),
+                child: Text(context.t.classtable.popupMenu.outputToSystem),
               ),
               PopupMenuItem<String>(
                 value: 'I',
-                child: Text(
-                  context.t.classtable.popupMenu.refreshClasstable,
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'J',
-                child: Text(
-                  context.t.classtable.popupMenu.currentTimeSettings,
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'K',
-                child: Text(
-                  context.t.classtable.popupMenu.classColorSettings,
-                ),
+                child: Text(context.t.classtable.popupMenu.refreshClasstable),
               ),
             ],
             onSelected: (String action) async {
@@ -645,17 +761,25 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: Text(
-                          context.t.classtable.partnerClasstable.shareDialog.title,
+                          context
+                              .t
+                              .classtable
+                              .partnerClasstable
+                              .shareDialog
+                              .title,
                         ),
                         content: Text(
-                          context.t.classtable.partnerClasstable.shareDialog.content,
+                          context
+                              .t
+                              .classtable
+                              .partnerClasstable
+                              .shareDialog
+                              .content,
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: Text(
-                              context.t.common.confirm,
-                            ),
+                            child: Text(context.t.common.confirm),
                           ),
                         ],
                       ),
@@ -670,13 +794,19 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       //      Platform.isMacOS ||
                       //      Platform.isWindows) {
                       await FilePicker.saveFile(
-                        dialogTitle: context.t.classtable.partnerClasstable.saveDialog.title,
+                        dialogTitle: context
+                            .t
+                            .classtable
+                            .partnerClasstable
+                            .saveDialog
+                            .title,
                         fileName: fileName,
                         allowedExtensions: ["ics"],
                         bytes: Uint8List.fromList(
                           utf8.encode(classTableState.iCalenderStr),
                         ),
-                        lockParentWindow: true,
+                        windowsOptions: WindowsOptions(lockParentWindow: true),
+                        linuxOptions: LinuxOptions(lockParentWindow: true),
                       );
                       //  } else {
                       //    String tempPath = await getTemporaryDirectory().then(
@@ -701,14 +831,24 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     if (context.mounted) {
                       showToast(
                         context: context,
-                        msg: context.t.classtable.partnerClasstable.saveDialog.successMessage,
+                        msg: context
+                            .t
+                            .classtable
+                            .partnerClasstable
+                            .saveDialog
+                            .successMessage,
                       );
                     }
                   } on FileSystemException {
                     if (context.mounted) {
                       showToast(
                         context: context,
-                        msg: context.t.classtable.partnerClasstable.saveDialog.failureMessage,
+                        msg: context
+                            .t
+                            .classtable
+                            .partnerClasstable
+                            .saveDialog
+                            .failureMessage,
                       );
                     }
                   }
@@ -720,7 +860,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: Text(
-                              context.t.classtable.outputToSystem.requestAllTitle,
+                              context
+                                  .t
+                                  .classtable
+                                  .outputToSystem
+                                  .requestAllTitle,
                             ),
                             content: Text(
                               context.t.classtable.outputToSystem.requestAll,
@@ -729,9 +873,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                               TextButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(true),
-                                child: Text(
-                                  context.t.common.confirm,
-                                ),
+                                child: Text(context.t.common.confirm),
                               ),
                             ],
                           ),
@@ -741,9 +883,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         if (context.mounted) {
                           showToast(
                             context: context,
-                            msg: data
-                                ? context.t.classtable.outputToSystem.success
-                                : context.t.classtable.outputToSystem.failure,
+                            msg: context.t.resolveKey(
+                              data
+                                  ? "classtable.output_to_system.success"
+                                  : "classtable.output_to_system.failure",
+                            ),
                           );
                         }
                       });
@@ -752,12 +896,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       await showDialog<bool>(
                         context: context,
                         builder: (BuildContext context) => AlertDialog(
-                          title: Text(
-                            context.t.setting.classRefreshTitle,
-                          ),
-                          content: Text(
-                            context.t.setting.classRefreshContent,
-                          ),
+                          title: Text(context.t.setting.classRefreshTitle),
+                          content: Text(context.t.setting.classRefreshContent),
                           actions: [
                             TextButton(
                               style: TextButton.styleFrom(
@@ -769,15 +909,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                                 ).colorScheme.onPrimary,
                               ),
                               onPressed: () => Navigator.pop(context, false),
-                              child: Text(
-                                context.t.common.cancel,
-                              ),
+                              child: Text(context.t.common.cancel),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: Text(
-                                context.t.common.confirm,
-                              ),
+                              child: Text(context.t.common.confirm),
                             ),
                           ],
                         ),
@@ -796,36 +932,102 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     });
                   }
                   break;
-                case 'J':
-                  await _showCurrentTimeSettingsDialog();
-                  break;
-                case 'K':
-                  await _showClassColorSettingsDialog();
-                  break;
               }
             },
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          PreferredSize(
-            preferredSize: Size.fromHeight(
-              MediaQuery.sizeOf(context).height >= 500
-                  ? topRowHeightBig
-                  : topRowHeightSmall,
+      body: Builder(
+        /// The safe area has to be measured below the app bar: the insets of
+        /// the context above the scaffold still contain the status bar the app
+        /// bar has already taken care of.
+        builder: (context) => Stack(
+          fit: StackFit.expand,
+          children: [
+            /// The background image is drawn behind everything, so the
+            /// decorated area still reaches the edges of the screen while the
+            /// sheet below respects the safe area.
+            _backgroundLayer(context),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                PreferredSize(
+                  preferredSize: Size.fromHeight(
+                    MediaQuery.sizeOf(context).height >= 500
+                        ? topRowHeightBig
+                        : topRowHeightSmall,
+                  ),
+                  child: _topView(),
+                ),
+                ClassTableInlineBanner(
+                  loadingSources: state.loadingSources,
+                  cacheSources: state.cacheSources,
+                ),
+                _sheet(context).expanded(),
+              ],
             ),
-            child: _topView(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The sheet of the classtable: it is kept inside the safe area of the
+  /// display and gets rounded corners of its own, since it does not reach the
+  /// edges of the screen any more.
+  ///
+  /// A shadow drawn only outside of it, plus a hairline around it, lift it off
+  /// the screen, so the table reads as one card floating over the picture and
+  /// the room kept below it reads as the margin of that card instead of a gap.
+  ///
+  /// The picture itself is left alone: a colour laid over it would hide the
+  /// background image, and blurring it here would only repeat what the
+  /// background blur already does.
+  Widget _sheet(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final borderRadius = BorderRadius.circular(classTableSheetRadius);
+    return Padding(
+      padding: _sheetSafeInsets(context),
+      child: Stack(
+        /// 阴影要画到面板外面去，所以这一层不能裁。
+        clipBehavior: Clip.none,
+        children: [
+          /// 阴影单独一层，而且**只画面板外侧**：面板本身是透明的，
+          /// 用普通的 BoxShadow 会在面板内部透出来一圈黑。
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _SheetShadowPainter(
+                radius: classTableSheetRadius,
+                sigma: classTableSheetShadowSigma,
+                color: scheme.shadow.withValues(alpha: 0.5),
+              ),
+            ),
           ),
-          ClassTableInlineBanner(
-            loadingSources: state.loadingSources,
-            cacheSources: state.cacheSources,
+          Positioned.fill(
+            child: DecoratedBox(
+              /// 紧贴着边缘描一圈极细的线：花壁纸上只靠阴影，边角是"站不住"的。
+              position: DecorationPosition.foreground,
+              decoration: BoxDecoration(
+                borderRadius: borderRadius,
+                border: Border.all(
+                  color: scheme.outlineVariant.withValues(alpha: 0.6),
+                  width: 0.8,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: borderRadius,
+                child: LayoutBuilder(
+                  /// The table measures itself against the room which is really
+                  /// left for it, instead of the whole window.
+                  builder: (context, constraints) => ClassTableState(
+                    constraints: constraints,
+                    controllers: classTableState,
+                    child: _classTablePage(),
+                  ),
+                ),
+              ),
+            ),
           ),
-          DecoratedBox(
-            decoration: decoration,
-            child: _classTablePage(),
-          ).expanded(),
         ],
       ),
     );
@@ -856,3 +1058,46 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   );
 }
 
+/// 画课表面板外侧的一圈阴影。
+///
+/// 面板里面是透的（能看见壁纸），所以不能直接用 `BoxShadow` —— 它的模糊会从
+/// 面板内部透出来，看着就是"里面一圈黑"。这里先把面板那块从画布上挖掉，
+/// 再画模糊的圆角矩形，于是只有外侧那一圈留下来。
+class _SheetShadowPainter extends CustomPainter {
+  const _SheetShadowPainter({
+    required this.radius,
+    required this.sigma,
+    required this.color,
+  });
+
+  final double radius;
+  final double sigma;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final box = Offset.zero & size;
+    final rrect = RRect.fromRectAndRadius(box, Radius.circular(radius));
+
+    canvas.clipPath(
+      Path.combine(
+        PathOperation.difference,
+        Path()..addRect(box.inflate(sigma * 4)),
+        Path()..addRRect(rrect),
+      ),
+      doAntiAlias: true,
+    );
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = color
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, sigma),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _SheetShadowPainter oldDelegate) =>
+      oldDelegate.radius != radius ||
+      oldDelegate.sigma != sigma ||
+      oldDelegate.color != color;
+}

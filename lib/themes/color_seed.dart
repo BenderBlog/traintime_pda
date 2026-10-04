@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/themes/default.dart';
 import 'package:watermeter/themes/green.dart';
 import 'package:watermeter/themes/orange.dart';
@@ -27,13 +27,6 @@ const colorList = [
   Colors.deepOrange,
   Colors.brown,
 ];
-
-/// Bright mode select
-const demoBlueModeMap = {
-  0: ThemeMode.system,
-  1: ThemeMode.light,
-  2: ThemeMode.dark,
-};
 
 List<FlexSchemeColor> pdaColorScheme = [
   DefaultColor.light,
@@ -65,3 +58,20 @@ enum ColorSeed {
 
 /// Colors for class information card which not in this week.
 const uselessColor = Colors.grey;
+
+/// Bright mode select
+const brightnessModeList = {
+  0: ThemeMode.system,
+  1: ThemeMode.light,
+  2: ThemeMode.dark,
+};
+
+enum BrightnessSeed {
+  followSetting('follow_setting', 0),
+  day('day_mode', 1),
+  night('night_mode', 2);
+
+  const BrightnessSeed(this.label, this.brightnessOffset);
+  final String label;
+  final int brightnessOffset;
+}
