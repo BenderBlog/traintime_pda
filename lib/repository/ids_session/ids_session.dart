@@ -500,7 +500,10 @@ class IDSSession {
       if (redirectCount > maxAuthRedirects) {
         throw const LoginFailedException(msg: '统一认证跳转次数超过 30 次');
       }
-      currentUri = nextUri;
+      currentUri = nextUri.replace(
+        scheme: 'https',
+        // port: uri.port == 80 ? null : uri.port,
+      );
     }
   }
 
