@@ -129,8 +129,15 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
         /// very end of the scroll. [ClassTableSheet.bottomClearance] adds the room the bottom of the
         /// display itself needs, which is what keeps the last time and the current time indicator
         /// clear of the navigation bar and of the screen's own rounded corners.
+        ///
+        /// [classTableTimeLineTopGap] leads instead: the grid starts one strip lower than the sheet,
+        /// so that before the first class the current time indicator has somewhere to be other than
+        /// on top of the 8:30 label.
         final double gridHeight =
-            61 * blockUnit + classTableSheetEndGap + widget.bottomClearance;
+            classTableTimeLineTopGap +
+            61 * blockUnit +
+            classTableSheetEndGap +
+            widget.bottomClearance;
 
         final Widget content = Stack(
           fit: StackFit.expand,
@@ -488,7 +495,12 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
       weekStart: weekStart,
       leftRow: timeColumnWidth,
       blockWidth: (maxWidth - timeColumnWidth) / 7,
-      blockHeight: (double count) => count * blockUnit,
+
+      /// Block 0 sits [classTableTimeLineTopGap] below the top of the grid, exactly like the class
+      /// cards do. Before the first class the indicator still uses its own minimum instead, so it
+      /// waits in that strip rather than on the 8:30 label.
+      blockHeight: (double count) =>
+          classTableTimeLineTopGap + count * blockUnit,
       opacity: opacity,
     );
   }

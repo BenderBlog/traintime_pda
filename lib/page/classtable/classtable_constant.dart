@@ -112,6 +112,19 @@ const double classTableHeightReference = 560.0;
 /// 躲开；末尾的时间滑块也会停在该避让区域上方以避免遮挡文字。
 const double classTableSheetEndGap = 20.0;
 
+/// The blank strip the time line keeps above its first period.
+///
+/// Before the first class there is no block for the current time indicator to sit in: the top of
+/// the grid *is* the 8:30 line, so the buoy lands on that label and reads as though the first
+/// period had already started. This much room above period 1 gives it a place of its own at the
+/// very top, level with the top edge of the table.
+///
+/// The floor is where the buoy's own bottom would meet the "8:30" label: the indicator hangs from
+/// the top edge at `labelHeight / 2 + 1` and is `labelHeight` tall, while the first period already
+/// pads its label 4.5 below the strip. With the default 13pt label that leaves about 9.5, so this
+/// is deliberately close to the tightest it can be.
+const double classTableTimeLineTopGap = 10.0;
+
 /// The largest blur which can be applied to a user defined background image.
 const double maxClassTableBackgroundBlur = 20.0;
 

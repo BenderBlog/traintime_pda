@@ -94,10 +94,13 @@ class ClassTableTimeLine extends StatelessWidget {
           ),
         ),
 
-        /// The labels keep the grid's full height, so each row stays aligned with its blocks.
+        /// The labels keep the grid's full height, so each row stays aligned with its blocks. They
+        /// start below [classTableTimeLineTopGap] while the panel above them does not, which is how
+        /// the time line reads as extended upwards: the strip is part of the panel and carries the
+        /// current time indicator before the first class, but no period label.
         Positioned(
           left: 0,
-          top: 0,
+          top: classTableTimeLineTopGap,
           width: timeColumnWidth,
           child: Column(children: _labels(context)),
         ),

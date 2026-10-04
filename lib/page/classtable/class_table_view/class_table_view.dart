@@ -9,6 +9,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -116,7 +117,10 @@ class _ClassTableViewState extends State<ClassTableView>
       for (var i in arrangedEvents) {
         /// Generate the row.
         final double cardHeight = blockheight(i.stop - i.start);
-        final double cardTop = blockheight(i.start);
+
+        /// Block 0 is a strip below the top of the grid, shared with the time line's labels, so the
+        /// cards, the labels and the indicator all agree on where a period starts.
+        final double cardTop = classTableTimeLineTopGap + blockheight(i.start);
         final double cardLeft =
             widget.timeColumnWidth + blockwidth * (index - 1);
         final completedHeight = _completedHeight(i, index);
