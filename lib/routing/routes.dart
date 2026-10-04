@@ -13,6 +13,7 @@ import 'package:watermeter/page/experiment/experiment_window.dart';
 import 'package:watermeter/page/library/library_window.dart';
 import 'package:watermeter/page/schoolcard/school_card_window.dart';
 import 'package:watermeter/page/schoolnet/network_card_window.dart';
+import 'package:watermeter/page/public_widget/container_transform.dart';
 import 'package:watermeter/page/score/score_window.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/page/sport/sport_window.dart';
@@ -58,13 +59,39 @@ class Routes {
   }
 
   /// Build a [MaterialPageRoute] from a registered route name.
+  /// 给 context.push 这类直接推页面的地方用：
+  /// 有来源卡片（从首页卡片点进来）就套容器变形，否则保持原来那条 [MaterialPageRoute]。
+  static Route<T> routeFor<T extends Object?>(Widget page) {
+    final source = ContainerTransformSource.consume();
+    if (source == null) {
+      return MaterialPageRoute<T>(builder: (_) => page);
+    }
+    return containerTransformRoute<T>(
+      builder: (_) => page,
+      fromRect: source.fromRect,
+      fromRadius: source.fromRadius,
+    );
+  }
+
+  /// 有来源卡片（从首页卡片点进来）才套容器变形，
+  /// 其余一律用原来那条 [MaterialPageRoute] —— 不改变其它页面的老动效。
   static Route<T> resolveRoute<T extends Object?>(
     String name, {
     Object? arguments,
   }) {
-    return MaterialPageRoute<T>(
-      settings: RouteSettings(name: name, arguments: arguments),
+    final source = ContainerTransformSource.consume();
+    final settings = RouteSettings(name: name, arguments: arguments);
+    if (source == null) {
+      return MaterialPageRoute<T>(
+        settings: settings,
+        builder: (_) => _resolve(name, arguments),
+      );
+    }
+    return containerTransformRoute<T>(
+      settings: settings,
       builder: (_) => _resolve(name, arguments),
+      fromRect: source.fromRect,
+      fromRadius: source.fromRadius,
     );
   }
 }
