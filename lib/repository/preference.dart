@@ -59,6 +59,10 @@ enum Preference {
     key: "classTableBackgroundBlur",
     type: "double",
   ), // 课表背景图的模糊程度
+  classTableWeekBarCollapsed(
+    key: "classTableWeekBarCollapsed",
+    type: "bool",
+  ), // 周次栏是否收进标题栏；默认 false 即固定显示
   swift(key: "swift", type: "int"), // 周次偏移
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式
@@ -156,6 +160,34 @@ enum Preference {
     key: "classStyleCompletedInnerAlpha",
     type: "double",
   ), // 已完成课程底色透明度
+  classStyleGlassEnabled(
+    key: "classStyleGlassEnabled",
+    type: "bool",
+  ), // 毛玻璃背景总开关
+  classStyleGlassCardSigma(
+    key: "classStyleGlassCardSigma",
+    type: "double",
+  ), // 课程卡片背景模糊
+  classStyleGlassTimeLineSigma(
+    key: "classStyleGlassTimeLineSigma",
+    type: "double",
+  ), // 时间轴面板背景模糊
+  classStyleGlassDateRowSigma(
+    key: "classStyleGlassDateRowSigma",
+    type: "double",
+  ), // 日期栏面板背景模糊
+  classStyleGlassWeekBarSigma(
+    key: "classStyleGlassWeekBarSigma",
+    type: "double",
+  ), // 周次栏背景模糊
+  classStyleGlassBannerSigma(
+    key: "classStyleGlassBannerSigma",
+    type: "double",
+  ), // 状态横幅背景模糊
+  classStyleGlassAppBarSigma(
+    key: "classStyleGlassAppBarSigma",
+    type: "double",
+  ), // 导航栏背景模糊
   lowElectricityWarningEnabled(
     key: "lowElectricityWarningEnabled",
     type: "bool",

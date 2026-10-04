@@ -86,8 +86,14 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
     if (isOccupied) {
       opacity = isCompleted ? _completedOpacity : _occupiedOpacity;
     }
-    return ClipOval(
-      child: ColoredBox(color: dotColor.withValues(alpha: opacity)),
+    return SizedBox.square(
+      dimension: 7.0,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: dotColor.withValues(alpha: opacity),
+        ),
+      ),
     );
   }
 
@@ -99,95 +105,122 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
     required int index,
     required bool showOverview,
     required Color primaryColor,
-  }) => Column(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    children: [
-      AutoSizeText(
-        FlutterI18n.translate(
-          context,
-          "classtable.week_title",
-          translationParams: {"week": (index + 1).toString()},
+  }) {
+    List<Widget>? overviewChildren;
+    if (showOverview) {
+      final now = controller.currentTime;
+      final today = DateTime(now.year, now.month, now.day);
+      final weekStart = controller.startDay
+          .add(Duration(days: 7 * controller.offset))
+          .add(Duration(days: 7 * widget.index));
+      final currentBlockIndex = CurrentTimeIndicator.transferTimeToBlockIndex(
+        now,
+      );
+      final dayArrangements = List.generate(
+        5,
+        (d) =>
+            controller.getArrangement(weekIndex: widget.index, dayIndex: d + 1),
+      );
+
+      overviewChildren = List.generate(25, (i) {
+        int day = i % 5 + 1;
+        int time = i ~/ 5;
+        final blockDate = weekStart.add(Duration(days: day - 1));
+        final arrangedEvents = dayArrangements[day - 1];
+
+        final slot = _slotRange(time);
+
+        var hasOccupiedEvent = false;
+        var allOccupiedEventsCompleted = true;
+
+        for (var event in arrangedEvents) {
+          final eventOccupiesCell = _eventOccupiesSlot(
+            event: event,
+            slotStart: slot.start,
+            slotStop: slot.stop,
+          );
+          if (!eventOccupiesCell) {
+            continue;
+          }
+
+          hasOccupiedEvent = true;
+
+          final eventCompleted = _slotCompleted(
+            slotDate: blockDate,
+            today: today,
+            slotStop: slot.stop,
+            currentBlockIndex: currentBlockIndex,
+          );
+
+          allOccupiedEventsCompleted =
+              allOccupiedEventsCompleted && eventCompleted;
+
+          // Any ongoing/upcoming arrangement in the same cell should keep
+          // the preview block highlighted as active.
+          if (!eventCompleted) {
+            break;
+          }
+        }
+
+        return dot(
+          isOccupied: hasOccupiedEvent,
+          isCompleted: hasOccupiedEvent && allOccupiedEventsCompleted,
+          primaryColor: primaryColor,
+        );
+      });
+    }
+
+    final children = overviewChildren;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        AutoSizeText(
+          FlutterI18n.translate(
+            context,
+            "classtable.week_title",
+            translationParams: {"week": (index + 1).toString()},
+          ),
+          style: TextStyle(
+            fontWeight: index == controller.currentWeek
+                ? FontWeight.bold
+                : FontWeight.normal,
+          ),
+          maxLines: 1,
+          group: _autoSizeGroup,
         ),
-        style: TextStyle(
-          fontWeight: index == controller.currentWeek
-              ? FontWeight.bold
-              : FontWeight.normal,
-        ),
-        maxLines: 1,
-        group: _autoSizeGroup,
-      ),
 
-      /// These code are used to render the overview of the week,
-      /// as long as the height of the page is over 500.
-      if (showOverview)
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(6, 4, 6, 2),
-            child: GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 5,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 2,
-              physics: const NeverScrollableScrollPhysics(),
-              children: List.generate(25, (i) {
-                int day = i % 5 + 1;
-                int time = i ~/ 5;
-                final now = controller.currentTime;
-                final today = DateTime(now.year, now.month, now.day);
-                final weekStart = controller.startDay
-                    .add(Duration(days: 7 * controller.offset))
-                    .add(Duration(days: 7 * widget.index));
-                final blockDate = weekStart.add(Duration(days: day - 1));
-                final currentBlockIndex =
-                    CurrentTimeIndicator.transferTimeToBlockIndex(now);
-                List<ClassOrgainzedData> arrangedEvents = controller
-                    .getArrangement(weekIndex: widget.index, dayIndex: day);
-
-                final slot = _slotRange(time);
-
-                var hasOccupiedEvent = false;
-                var allOccupiedEventsCompleted = true;
-
-                for (var event in arrangedEvents) {
-                  final eventOccupiesCell = _eventOccupiesSlot(
-                    event: event,
-                    slotStart: slot.start,
-                    slotStop: slot.stop,
-                  );
-                  if (!eventOccupiesCell) {
-                    continue;
-                  }
-
-                  hasOccupiedEvent = true;
-
-                  final eventCompleted = _slotCompleted(
-                    slotDate: blockDate,
-                    today: today,
-                    slotStop: slot.stop,
-                    currentBlockIndex: currentBlockIndex,
-                  );
-
-                  allOccupiedEventsCompleted =
-                      allOccupiedEventsCompleted && eventCompleted;
-
-                  // Any ongoing/upcoming arrangement in the same cell should keep
-                  // the preview block highlighted as active.
-                  if (!eventCompleted) {
-                    break;
-                  }
-                }
-
-                return dot(
-                  isOccupied: hasOccupiedEvent,
-                  isCompleted: hasOccupiedEvent && allOccupiedEventsCompleted,
-                  primaryColor: primaryColor,
-                );
-              }),
+        /// These code are used to render the overview of the week,
+        /// as long as the height of the page is over 500.
+        if (showOverview && children != null)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(6, 4, 6, 2),
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(5, (time) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(5, (dayIndex) {
+                            final i = time * 5 + dayIndex;
+                            return children[i];
+                          }),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
-    ],
-  );
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

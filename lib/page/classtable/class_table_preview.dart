@@ -10,10 +10,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/repository/network_client.dart';
@@ -164,10 +165,25 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
                     ),
                   ),
                   Expanded(
-                    child: ClassTableView(
-                      index: _previewState.currentWeek,
-                      constraint: tableConstraint,
-                      enableVerticalScrolling: widget.enableVerticalScrolling,
+                    /// No blur on the sheet itself on purpose: this is a small static sample where
+                    /// the frosted look is barely legible, and a tableful of backdrop filters
+                    /// re-reading their backdrop on every frame is what made the settings page
+                    /// stutter while it scrolled. The wallpaper behind it is still blurred by
+                    /// [_backgroundLayer].
+                    ///
+                    /// Clamping rather than bouncing, as upstream had it: the sample is a pane
+                    /// inside a page that already scrolls, so a pull here would fight the page.
+                    child: GlassBlurScope(
+                      enabled: false,
+                      child: ClassTableSheet(
+                        singleIndex: _previewState.currentWeek,
+
+                        /// When the sample is not given a viewport of its own it expands to the
+                        /// table's full height and the settings page around it scrolls, so the
+                        /// last periods of the day are reachable in the sample too.
+                        enableVerticalScrolling: widget.enableVerticalScrolling,
+                        verticalPhysics: const ClampingScrollPhysics(),
+                      ),
                     ),
                   ),
                 ],

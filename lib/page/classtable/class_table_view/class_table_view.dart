@@ -2,40 +2,16 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
-import 'dart:math' as math;
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/time_list.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
-import 'package:watermeter/page/classtable/class_table_view/class_table_time_column_layout.dart';
-import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
-import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-
-/// THe classtable view, the way the the classtable sheet rendered.
-class ClassTableView extends StatefulWidget {
-  final int index;
-  final BoxConstraints constraint;
-
-  /// When disabled, the table expands to its full height for an outer scroll view.
-  final bool enableVerticalScrolling;
-
-  const ClassTableView({
-    super.key,
-    required this.constraint,
-    required this.index,
-    this.enableVerticalScrolling = true,
-  });
-
-  @override
-  State<ClassTableView> createState() => _ClassTableViewState();
-}
 
 ///
 /// Classtable blanks below per blocks.
@@ -46,13 +22,42 @@ class ClassTableView extends StatefulWidget {
 ///  * Evening time 9-11 each 5 blocks.
 /// Total 61 parts, 49 as phone divider.
 ///
-class _ClassTableViewState extends State<ClassTableView> {
+
+/// One week of the class table: the class cards, the day-column highlight and the current-time
+/// indicator.
+///
+/// The date row and the time line are deliberately not here. They belong to `ClassTableSheet`, which
+/// lays them out once for the whole table so that they stay still while the weeks page horizontally.
+class ClassTableView extends StatefulWidget {
+  /// The week this page shows.
+  final int index;
+
+  /// The width of the time column, which the seven day columns share what is left of.
+  final double timeColumnWidth;
+
+  /// The height of one of the 61 blocks of a day, measured by the sheet so that the grid, the time
+  /// line and the settings preview all size a block the same way.
+  final double blockUnit;
+
+  const ClassTableView({
+    super.key,
+    required this.index,
+    required this.timeColumnWidth,
+    required this.blockUnit,
+  });
+
+  @override
+  State<ClassTableView> createState() => _ClassTableViewState();
+}
+
+class _ClassTableViewState extends State<ClassTableView>
+    with AutomaticKeepAliveClientMixin {
   late ClassTableWidgetState classTableState;
   late BoxConstraints size;
-  late ClassTableTimeColumnLayout _timeColumnLayout;
   bool _isListening = false;
 
-  double get _timeColumnWidth => _timeColumnLayout.width;
+  @override
+  bool get wantKeepAlive => true;
 
   DateTime get _visibleWeekStart => classTableState.startDay
       .add(Duration(days: 7 * classTableState.offset))
@@ -82,166 +87,109 @@ class _ClassTableViewState extends State<ClassTableView> {
     return blockheight(completedBlocks);
   }
 
-  Positioned? _currentTimeIndicator() => CurrentTimeIndicator.build(
-    context: context,
-    now: classTableState.currentTime,
-    weekStart: _visibleWeekStart,
-    leftRow: _timeColumnWidth,
-    blockWidth: blockwidth,
-    blockHeight: blockheight,
-  );
-
   Positioned? _currentDayColumnBox() => CurrentTimeIndicator.buildDayColumnBox(
     context: context,
     now: classTableState.currentTime,
     weekStart: _visibleWeekStart,
-    leftRow: _timeColumnWidth,
+    leftRow: widget.timeColumnWidth,
     blockWidth: blockwidth,
-    blockHeight: blockheight,
-  );
-
-  /// The height of one of the 61 blocks of a day.
-  ///
-  /// Its minimum also accounts for the time labels at the current font scale.
-  double get _blockUnit => math.max(
-    (widget.constraint.minHeight - midRowHeight) / (isPhone(context) ? 48 : 61),
-    _timeColumnLayout.minimumBlockHeight,
   );
 
   /// The height of the class card.
-  double blockheight(double count) => count * _blockUnit;
+  double blockheight(double count) => count * widget.blockUnit;
 
-  double get blockwidth => (size.maxWidth - _timeColumnWidth) / 7;
+  double get blockwidth => (size.maxWidth - widget.timeColumnWidth) / 7;
 
-  /// The class table are divided into 8 rows, the leftest row is the index row.
-  List<Widget> classSubRow(bool isRest) {
-    if (isRest) {
-      List<Widget> thisRow = [];
-      final currentDayColumnBox = _currentDayColumnBox();
-      if (currentDayColumnBox != null) {
-        thisRow.add(currentDayColumnBox);
-      }
+  /// The class cards of this week, plus the highlight and the current-time indicator over them.
+  List<Widget> _classLayer() {
+    final List<Widget> thisRow = [];
 
-      for (var index = 1; index <= 7; ++index) {
-        List<ClassOrgainzedData> arrangedEvents = classTableState
-            .getArrangement(weekIndex: widget.index, dayIndex: index);
+    final currentDayColumnBox = _currentDayColumnBox();
+    if (currentDayColumnBox != null) {
+      thisRow.add(currentDayColumnBox);
+    }
 
-        /// Choice the day and render it!
-        for (var i in arrangedEvents) {
-          /// Generate the row.
-          final completedHeight = _completedHeight(i, index);
-          thisRow.add(
-            Positioned(
-              top: blockheight(i.start),
-              height: blockheight(i.stop - i.start),
-              left: _timeColumnWidth + blockwidth * (index - 1),
-              width: blockwidth,
-              child: ClassCard(detail: i, completedHeight: completedHeight),
-            ),
-          );
-        }
-      }
+    for (var index = 1; index <= 7; ++index) {
+      final List<ClassOrgainzedData> arrangedEvents = classTableState
+          .getArrangement(weekIndex: widget.index, dayIndex: index);
 
-      final timeIndicator = _currentTimeIndicator();
-      if (timeIndicator != null) {
-        thisRow.add(timeIndicator);
-      }
+      /// Choice the day and render it!
+      for (var i in arrangedEvents) {
+        /// Generate the row.
+        final double cardHeight = blockheight(i.stop - i.start);
 
-      if (thisRow.isEmpty &&
-          !preference.getBool(preference.Preference.decorated)) {
+        /// Block 0 is a strip below the top of the grid, shared with the time line's labels, so the
+        /// cards, the labels and the indicator all agree on where a period starts.
+        final double cardTop = classTableTimeLineTopGap + blockheight(i.start);
+        final double cardLeft =
+            widget.timeColumnWidth + blockwidth * (index - 1);
+        final completedHeight = _completedHeight(i, index);
         thisRow.add(
-          Center(
-            child: Column(
-              children: [
-                SizedBox(height: blockheight(8)),
-                Image.asset("assets/art/pda_classtable_empty.webp", scale: 2),
-                const SizedBox(height: 20),
-                ...FlutterI18n.translate(
-                  context,
-                  "classtable.no_class",
-                ).split("\n").map((e) => Text(e)),
-              ],
+          Positioned(
+            top: cardTop,
+            height: cardHeight,
+            left: cardLeft,
+            width: blockwidth,
+            child: ClassCard(
+              detail: i,
+              completedHeight: completedHeight,
+
+              /// Known here already, so the card does not have to measure itself.
+              height: cardHeight - 2,
+              width: blockwidth,
             ),
-          ).padding(left: _timeColumnWidth),
+          ),
         );
       }
-
-      return thisRow;
-    } else {
-      /// Leftest side, the index array.
-      return List.generate(13, (index) {
-        double height = blockheight(index != 4 && index != 9 ? 5 : 3);
-
-        late int indexOfChar;
-        if ([0, 1, 2, 3].contains(index)) {
-          indexOfChar = index;
-        } else if (index == 4) {
-          indexOfChar = -1; // noon break
-        } else if ([5, 6, 7, 8].contains(index)) {
-          indexOfChar = index - 1;
-        } else if (index == 9) {
-          indexOfChar = -2; // supper break
-        } else {
-          //if ([10, 11, 12].contains(index))
-          indexOfChar = index - 2;
-        }
-
-        /// 每一节的上下课时间贴着这一格的上下边，节次写在中间。
-        ///
-        /// 三行都挤在格子中间时，当前时间线落在格子的哪一段是看不出来的 ——
-        /// 它压在中间那几行字上，很容易被读成压在两个节次的分界上。贴着边写，
-        /// 线夹在哪两条时间之间，就是哪一节。
-        final Widget cell;
-        if (indexOfChar == -1 || indexOfChar == -2) {
-          cell = Text(
-            FlutterI18n.translate(
-              context,
-              indexOfChar == -1
-                  ? "classtable.noon_break"
-                  : "classtable.supper_break",
-            ),
-            style: _timeColumnLayout.breakStyle,
-            textAlign: TextAlign.center,
-          ).center();
-        } else {
-          cell = Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                timeList[indexOfChar * 2],
-                style: _timeColumnLayout.timeStyle,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                softWrap: false,
-              ),
-              Text(
-                "${indexOfChar + 1}",
-                style: _timeColumnLayout.periodStyle,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                softWrap: false,
-              ),
-              Text(
-                timeList[indexOfChar * 2 + 1],
-                style: _timeColumnLayout.timeStyle,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                softWrap: false,
-              ),
-            ],
-          );
-        }
-
-        return SizedBox(width: _timeColumnWidth, height: height, child: cell);
-      });
     }
+
+    if (thisRow.isEmpty &&
+        !preference.getBool(preference.Preference.decorated)) {
+      thisRow.add(
+        Center(
+          child: Column(
+            children: [
+              SizedBox(height: blockheight(8)),
+              Image.asset("assets/art/pda_classtable_empty.webp", scale: 2),
+              const SizedBox(height: 20),
+              ...FlutterI18n.translate(
+                context,
+                "classtable.no_class",
+              ).split("\n").map((e) => Text(e)),
+            ],
+          ),
+        ).padding(left: widget.timeColumnWidth),
+      );
+    }
+
+    return thisRow;
   }
+
+  int _lastScheduleVersion = 0;
 
   /// This function will be triggered when user changed class info.
   void _reload() {
-    if (mounted) {
+    if (!mounted) return;
+    if (_lastScheduleVersion != classTableState.scheduleVersion) {
+      _lastScheduleVersion = classTableState.scheduleVersion;
       setState(() {});
     }
+  }
+
+  /// Whether this page was the current week at the last tick.
+  bool _wasCurrentWeek = false;
+
+  /// Triggered on minute time ticks: only the current week updates its time indicator and progress.
+  ///
+  /// The page that just stopped being the current week redraws once more as well, or it would keep
+  /// last Sunday's day-column highlight after midnight.
+  void _onTimeTick() {
+    if (!mounted) return;
+    final bool isCurrentWeek = widget.index == classTableState.currentWeek;
+    if (isCurrentWeek || _wasCurrentWeek) {
+      setState(() {});
+    }
+    _wasCurrentWeek = isCurrentWeek;
   }
 
   void updateSize() => size = ClassTableState.of(context)!.constraints;
@@ -251,7 +199,10 @@ class _ClassTableViewState extends State<ClassTableView> {
     super.didChangeDependencies();
     if (!_isListening) {
       classTableState = ClassTableState.of(context)!.controllers;
+      _lastScheduleVersion = classTableState.scheduleVersion;
+      _wasCurrentWeek = widget.index == classTableState.currentWeek;
       classTableState.addListener(_reload);
+      classTableState.timeTickNotifier.addListener(_onTimeTick);
       _isListening = true;
     }
     updateSize();
@@ -260,6 +211,7 @@ class _ClassTableViewState extends State<ClassTableView> {
   @override
   void dispose() {
     classTableState.removeListener(_reload);
+    classTableState.timeTickNotifier.removeListener(_onTimeTick);
     super.dispose();
   }
 
@@ -271,40 +223,11 @@ class _ClassTableViewState extends State<ClassTableView> {
 
   @override
   Widget build(BuildContext context) {
-    _timeColumnLayout = ClassTableTimeColumnLayout.of(context);
-    final sheet =
-        [
-          classSubRow(false)
-              .toColumn()
-              .decorated(
-                color: Theme.of(
-                  context,
-                ).colorScheme.surface.withValues(alpha: 0.75),
-              )
-              .constrained(width: _timeColumnWidth)
-              // Fill the time axis background through the gap below the last class.
-              .positioned(left: 0, top: 0, bottom: 0),
-          ...classSubRow(true),
-        ].toStack().constrained(
-          height: blockheight(61) + classTableSheetEndGap,
-          width: size.maxWidth,
-        );
-    return [
-      /// The main class table.
-      ClassTableDateRow(
-        firstDay: classTableState.startDay
-            .add(Duration(days: 7 * classTableState.offset))
-            .add(Duration(days: 7 * widget.index)),
-        timeColumnWidth: _timeColumnWidth,
-        dayColumnWidth: blockwidth,
-      ),
-
-      // Settings previews expand fully and use the page's outer scroll view.
-      // The main timetable keeps its own viewport and vertical scrolling.
-      if (widget.enableVerticalScrolling)
-        sheet.scrollable(physics: ClampingScrollPhysics()).expanded()
-      else
-        sheet,
-    ].toColumn();
+    /// The whole date row, time line and viewport belong to `ClassTableSheet` in this branch's
+    /// rendering path; this page is only the seven columns of one week. Upstream still carries the
+    /// older all-in-one build here, and its one change to it (forcing [ClampingScrollPhysics] on
+    /// the settings preview's viewport) is honoured in `ClassTableSheet.verticalPhysics` instead.
+    super.build(context);
+    return Stack(children: _classLayer());
   }
 }

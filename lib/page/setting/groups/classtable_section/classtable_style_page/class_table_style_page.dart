@@ -5,12 +5,14 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/classtable/class_table_preview.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/classtable_style_page/class_card_style_settings.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/classtable_style_page/class_table_background_settings.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/classtable_style_page/completed_class_style_settings.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/classtable_style_page/current_time_indicator_settings.dart';
+import 'package:watermeter/page/setting/groups/classtable_section/classtable_style_page/glass_style_settings.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class ClassTableStylePage extends StatefulWidget {
@@ -30,6 +32,7 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
     super.initState();
     CurrentTimeIndicatorConfig.loadFromPreference();
     CompletedClassStyleConfig.loadFromPreference();
+    GlassStyleConfig.loadFromPreference();
   }
 
   void _rebuild() {}
@@ -73,6 +76,9 @@ class _ClassTableStylePageState extends State<ClassTableStylePage> {
                         onChanged: _refreshPreview,
                         onBlurChanged: _updatePreviewBlur,
                       ),
+
+                      /// Kept next to the wallpaper it blurs.
+                      GlassStyleSettings(onChanged: _refreshPreview),
                       CurrentTimeIndicatorSettings(onChanged: _refreshPreview),
                       ClassCardStyleSettings(onChanged: _refreshPreview),
                       CompletedClassStyleSettings(onChanged: _refreshPreview),
