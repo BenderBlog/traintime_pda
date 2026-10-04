@@ -57,6 +57,13 @@ const double timeLineShadowAlpha = 0.18;
 /// wallpaper's own colour through is what makes the bar read as glass instead of flat paint.
 const double weekBarSurfaceAlpha = 0.42;
 
+/// The height over which the frosted header fades out into the sharp content area.
+///
+/// In this bottom strip, the frosted glass and its tint taper down with a linear alpha gradient
+/// (100% -> 0%) so that the blur naturally dissolves into the sharp wallpaper below instead of
+/// ending on a hard line across character artwork or wallpaper content.
+const double frostedHeaderFeatherHeight = 30.0;
+
 /// Opacity of the inline status banner's tint, over its blurred backdrop.
 ///
 /// Higher than the week bar's: the banner carries two lines of small text, so it keeps more of its
