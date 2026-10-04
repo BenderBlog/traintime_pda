@@ -312,13 +312,13 @@ PageRouteBuilder<T> containerTransformRoute<T>({
                         if (t > 0.001)
                           BackdropFilter(
                             filter: ui.ImageFilter.blur(
-                              sigmaX: 14 * t,
-                              sigmaY: 14 * t,
+                              sigmaX: 10 * t,
+                              sigmaY: 10 * t,
                             ),
                             child: const ColoredBox(color: Color(0x00000000)),
                           ),
                         ColoredBox(
-                          color: Colors.black.withValues(alpha: 0.10 * t),
+                          color: Colors.black.withValues(alpha: 0.32 * t),
                         ),
                       ],
                     ),
