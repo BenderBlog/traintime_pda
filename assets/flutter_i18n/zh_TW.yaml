@@ -803,6 +803,24 @@ score:
     CET-4: 國家英語四級
     CET-6: 國家英語六級
 setting:
+  editor:
+    save: 儲存
+    apply: 套用
+    password_set: 已設定
+    password_not_set: 未設定
+    password_visibility: 顯示或隱藏密碼
+    toggle_sign: 切換正負號
+    positive_number: 請輸入大於 0 的整數
+    electricity_unit: 度
+    text_preview: 課程安排 · TrainTime PDA · 0123456789
+    brightness: 亮度
+    border_opacity: 邊框透明度
+    fill_opacity: 底色透明度
+    fill_saturation: 底色飽和度
+    text_saturation: 文字飽和度
+    background_blur: 背景模糊程度
+    year: 年份
+    semester: 學期
   sections:
     display: 顯示
     language_and_text: 語言與文字
@@ -966,12 +984,12 @@ setting:
     frosted_section: 毛玻璃背景
     frosted_enabled: 啟用毛玻璃背景
     frosted_enabled_hint: 關閉後各控件只保留半透明底色，可省電、更流暢
-    frosted_card_sigma: '課程卡片模糊: {value}'
-    frosted_time_line_sigma: '時間軸模糊: {value}'
-    frosted_date_row_sigma: '日期欄模糊: {value}'
-    frosted_week_bar_sigma: '週次欄模糊: {value}'
-    frosted_banner_sigma: '狀態橫幅模糊: {value}'
-    frosted_app_bar_sigma: '導航欄模糊: {value}'
+    frosted_card_sigma: 課程卡片模糊
+    frosted_time_line_sigma: 時間軸模糊
+    frosted_date_row_sigma: 日期欄模糊
+    frosted_week_bar_sigma: 週次欄模糊
+    frosted_banner_sigma: 狀態橫幅模糊
+    frosted_app_bar_sigma: 導航欄模糊
   no_permission: 未獲取存儲權限，無法讀取文件
   successful_setting: 設定成功
   failure_setting: 你沒有選圖片捏

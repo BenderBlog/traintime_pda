@@ -1,9 +1,9 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:m3e_core/m3e_core.dart';
+import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -17,32 +17,27 @@ class FontSizeSettingView extends StatelessWidget {
     return SignalBuilder(
       builder: (context) {
         final fontScale = ThemeController.i.fontScaleSignal.value;
-        return ListTile(
-          leading: const Icon(Icons.text_fields),
-          title: Text(
-            "${FlutterI18n.translate(context, "setting.font_size_page.size_title")} ${(fontScale * 100).round()}%",
+        return SettingSliderTile(
+          leading: Icons.text_fields,
+          title: FlutterI18n.translate(
+            context,
+            'setting.font_size_page.size_title',
           ),
-          subtitle: SizedBox(
-            height: 48,
-            child: Transform.translate(
-              offset: const Offset(-10, 0),
-              child: M3ESlider(
-                value: fontScale,
-                min: minFontScale,
-                max: maxFontScale,
-                divisions: 12,
-                onChanged: (value) {
-                  ThemeController.i.fontScaleSignal.value = value;
-                },
-                onChangeEnd: (value) async {
-                  await preference.setDouble(
-                    preference.Preference.fontScale,
-                    value,
-                  );
-                  ThemeController.i.updateTheme();
-                },
-              ),
-            ),
+          formatValue: (value) => "${(value * 100).round()}%",
+          value: fontScale,
+          min: minFontScale,
+          max: maxFontScale,
+          divisions: 12,
+          onChanged: (value) {
+            ThemeController.i.fontScaleSignal.value = value;
+          },
+          onChangeEnd: (value) async {
+            await preference.setDouble(preference.Preference.fontScale, value);
+            ThemeController.i.updateTheme();
+          },
+          preview: Text(
+            FlutterI18n.translate(context, 'setting.editor.text_preview'),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         );
       },

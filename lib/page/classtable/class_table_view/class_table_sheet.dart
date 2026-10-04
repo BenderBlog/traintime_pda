@@ -26,6 +26,7 @@ class ClassTableSheet extends StatefulWidget {
     this.semesterLength = 1,
     this.onPageChanged,
     this.enableVerticalScrolling = true,
+    this.verticalPhysics,
     this.heightReference,
     this.bottomClearance = 0,
   });
@@ -38,6 +39,14 @@ class ClassTableSheet extends StatefulWidget {
   final int semesterLength;
   final ValueChanged<int>? onPageChanged;
   final bool enableVerticalScrolling;
+
+  /// Overrides the physics of the sheet's own vertical scroll.
+  ///
+  /// The timetable pulls against [classTableBounceOverscroll] because the pull itself is its
+  /// feedback, but the settings preview is a small pane inside a page that already scrolls, so
+  /// there the same pull would fight the page and it clamps instead. Null keeps the timetable's
+  /// own behaviour.
+  final ScrollPhysics? verticalPhysics;
 
   /// The height the blocks are scaled against, [classTableHeightReference] when null.
   ///
@@ -154,9 +163,10 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                 controller: _verticalControl,
                 physics: !widget.enableVerticalScrolling
                     ? const NeverScrollableScrollPhysics()
-                    : classTableBounceOverscroll
-                    ? const BouncingScrollPhysics()
-                    : null,
+                    : widget.verticalPhysics ??
+                          (classTableBounceOverscroll
+                              ? const BouncingScrollPhysics()
+                              : null),
                 child: Column(
                   children: [
                     /// Room reserved for the floating date row.

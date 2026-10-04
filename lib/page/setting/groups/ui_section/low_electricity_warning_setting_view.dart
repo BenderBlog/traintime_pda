@@ -15,9 +15,8 @@ class LowElectricityWarningSettingView extends StatelessWidget {
     return SignalBuilder(
       builder: (context) {
         final enabled = EnergyController.i.lowElectricityWarningEnabled.value;
-
-        return ListTile(
-          leading: const Icon(MingCuteIcons.mgc_flash_line),
+        return SwitchListTile(
+          secondary: const Icon(MingCuteIcons.mgc_flash_line),
           title: Text(
             FlutterI18n.translate(context, 'setting.low_electricity_warning'),
           ),
@@ -27,10 +26,8 @@ class LowElectricityWarningSettingView extends StatelessWidget {
               'setting.low_electricity_warning_description',
             ),
           ),
-          trailing: Switch(
-            value: enabled,
-            onChanged: EnergyController.i.setLowElectricityWarningEnabled,
-          ),
+          value: enabled,
+          onChanged: EnergyController.i.setLowElectricityWarningEnabled,
         );
       },
     );

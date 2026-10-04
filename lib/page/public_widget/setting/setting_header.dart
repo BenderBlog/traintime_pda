@@ -41,13 +41,12 @@ class SettingHeader extends StatelessWidget {
                 Icon(icon, size: 18, color: cs.primary),
                 const SizedBox(width: 6),
               ],
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: cs.primary,
-                  letterSpacing: 0.2,
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(color: cs.primary),
                 ),
               ),
             ],
@@ -56,7 +55,9 @@ class SettingHeader extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               subtitle!,
-              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
             ),
           ],
         ],

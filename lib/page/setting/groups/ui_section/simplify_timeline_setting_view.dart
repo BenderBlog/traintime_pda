@@ -15,8 +15,8 @@ class SimplifyTimelineSettingView extends StatelessWidget {
     return ValueListenableBuilder<bool>(
       valueListenable: ClassTableCard.simplifiedMode,
       builder: (context, simplifiedMode, _) {
-        return ListTile(
-          leading: const Icon(MingCuteIcons.mgc_timeline_line),
+        return SwitchListTile(
+          secondary: const Icon(MingCuteIcons.mgc_timeline_line),
           title: Text(
             FlutterI18n.translate(context, 'setting.simplify_timeline'),
           ),
@@ -26,16 +26,14 @@ class SimplifyTimelineSettingView extends StatelessWidget {
               'setting.simplify_timeline_description',
             ),
           ),
-          trailing: Switch(
-            value: simplifiedMode,
-            onChanged: (value) async {
-              await preference.setBool(
-                preference.Preference.simplifiedClassTimeline,
-                value,
-              );
-              ClassTableCard.reloadSettingsFromPref();
-            },
-          ),
+          value: simplifiedMode,
+          onChanged: (value) async {
+            await preference.setBool(
+              preference.Preference.simplifiedClassTimeline,
+              value,
+            );
+            ClassTableCard.reloadSettingsFromPref();
+          },
         );
       },
     );

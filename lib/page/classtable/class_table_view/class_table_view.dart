@@ -223,6 +223,10 @@ class _ClassTableViewState extends State<ClassTableView>
 
   @override
   Widget build(BuildContext context) {
+    /// The whole date row, time line and viewport belong to `ClassTableSheet` in this branch's
+    /// rendering path; this page is only the seven columns of one week. Upstream still carries the
+    /// older all-in-one build here, and its one change to it (forcing [ClampingScrollPhysics] on
+    /// the settings preview's viewport) is honoured in `ClassTableSheet.verticalPhysics` instead.
     super.build(context);
     return Stack(children: _classLayer());
   }

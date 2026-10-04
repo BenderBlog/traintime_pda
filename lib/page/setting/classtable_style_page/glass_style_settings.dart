@@ -3,15 +3,15 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:m3e_core/m3e_core.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
+import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 
-/// One slider per blurred surface of the class table.
+/// One slider per frosted surface of the class table.
 ///
-/// The values are written to the preference store when a drag ends rather than
-/// on every frame, so holding a finger on the slider does not hammer the disk.
+/// The values are written to the preference store when a drag ends rather than on every frame, so
+/// holding a finger on a slider does not hammer the disk.
 class GlassStyleSettings extends StatelessWidget {
   const GlassStyleSettings({super.key, required this.onChanged});
 
@@ -28,41 +28,33 @@ class GlassStyleSettings extends StatelessWidget {
     await GlassStyleConfig.saveToPreference();
   }
 
-  Widget _sigmaTile(
+  SettingSliderTile _sigmaTile(
     BuildContext context, {
+    required IconData leading,
     required String titleKey,
     required double value,
     required ValueChanged<double> onSigmaChanged,
   }) {
-    return ListTile(
-      title: Text(
-        FlutterI18n.translate(
-          context,
-          titleKey,
-          translationParams: {"value": "${value.round()}"},
-        ),
-      ),
-      subtitle: SizedBox(
-        height: 48,
-        child: Transform.translate(
-          offset: const Offset(-10, 0),
-          child: M3ESlider(
-            value: value,
-            min: GlassStyleConfig.minSigma,
-            max: GlassStyleConfig.maxSigma,
-            divisions: GlassStyleConfig.maxSigma.round(),
-            // Nothing to blur while the frosted look is switched off.
-            onChanged: GlassStyleConfig.enabled ? onSigmaChanged : null,
-            onChangeEnd: _save,
-          ),
-        ),
-      ),
+    /// Nothing left to blur once the frosted look is off, so the whole row goes disabled.
+    final bool enabled = GlassStyleConfig.enabled;
+
+    return SettingSliderTile(
+      leading: leading,
+      title: FlutterI18n.translate(context, titleKey),
+      formatValue: (sigma) => sigma.round().toString(),
+      value: value,
+      min: GlassStyleConfig.minSigma,
+      max: GlassStyleConfig.maxSigma,
+      divisions: GlassStyleConfig.maxSigma.round(),
+      onChanged: enabled ? onSigmaChanged : null,
+      onChangeEnd: enabled ? _save : null,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
+      icon: Icons.blur_on,
       title: FlutterI18n.translate(
         context,
         "setting.class_table_style_page.frosted_section",
@@ -70,6 +62,7 @@ class GlassStyleSettings extends StatelessWidget {
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
+            secondary: const Icon(Icons.blur_circular),
             title: Text(
               FlutterI18n.translate(
                 context,
@@ -87,6 +80,7 @@ class GlassStyleSettings extends StatelessWidget {
           ),
           _sigmaTile(
             context,
+            leading: Icons.square_outlined,
             titleKey: "setting.class_table_style_page.frosted_card_sigma",
             value: GlassStyleConfig.cardSigma,
             onSigmaChanged: (value) {
@@ -96,6 +90,7 @@ class GlassStyleSettings extends StatelessWidget {
           ),
           _sigmaTile(
             context,
+            leading: Icons.schedule,
             titleKey: "setting.class_table_style_page.frosted_time_line_sigma",
             value: GlassStyleConfig.timeLineSigma,
             onSigmaChanged: (value) {
@@ -105,6 +100,7 @@ class GlassStyleSettings extends StatelessWidget {
           ),
           _sigmaTile(
             context,
+            leading: Icons.calendar_today_outlined,
             titleKey: "setting.class_table_style_page.frosted_date_row_sigma",
             value: GlassStyleConfig.dateRowSigma,
             onSigmaChanged: (value) {
@@ -114,6 +110,7 @@ class GlassStyleSettings extends StatelessWidget {
           ),
           _sigmaTile(
             context,
+            leading: Icons.view_week_outlined,
             titleKey: "setting.class_table_style_page.frosted_week_bar_sigma",
             value: GlassStyleConfig.weekBarSigma,
             onSigmaChanged: (value) {
@@ -123,6 +120,7 @@ class GlassStyleSettings extends StatelessWidget {
           ),
           _sigmaTile(
             context,
+            leading: Icons.campaign_outlined,
             titleKey: "setting.class_table_style_page.frosted_banner_sigma",
             value: GlassStyleConfig.bannerSigma,
             onSigmaChanged: (value) {
@@ -132,6 +130,7 @@ class GlassStyleSettings extends StatelessWidget {
           ),
           _sigmaTile(
             context,
+            leading: Icons.web_asset_outlined,
             titleKey: "setting.class_table_style_page.frosted_app_bar_sigma",
             value: GlassStyleConfig.appBarSigma,
             onSigmaChanged: (value) {

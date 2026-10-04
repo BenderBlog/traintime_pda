@@ -1,6 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/page/setting/password_setting_sheet.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -8,14 +10,33 @@ import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
-import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
-import 'package:watermeter/page/setting/dialogs/experiment_password_dialog.dart';
-import 'package:watermeter/page/setting/dialogs/schoolnet_password_dialog.dart';
-import 'package:watermeter/page/setting/dialogs/sport_password_dialog.dart';
+import 'package:watermeter/page/setting/aircon_imei_page.dart';
+
 import 'package:watermeter/repository/preference.dart' as preference;
 
-class AccountSection extends StatelessWidget {
+class AccountSection extends StatefulWidget {
   const AccountSection({super.key});
+
+  @override
+  State<AccountSection> createState() => _AccountSectionState();
+}
+
+class _AccountSectionState extends State<AccountSection> {
+  String _passwordStatus(preference.Preference key) => FlutterI18n.translate(
+    context,
+    preference.getString(key).isEmpty
+        ? 'setting.editor.password_not_set'
+        : 'setting.editor.password_set',
+  );
+
+  Future<void> _editPassword(preference.Preference key, String titleKey) async {
+    final saved = await showPasswordSettingSheet(
+      context: context,
+      preferenceKey: key,
+      titleKey: titleKey,
+    );
+    if (saved == true && mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +52,14 @@ class AccountSection extends StatelessWidget {
                   "setting.sport_password_setting",
                 ),
               ),
+              subtitle: Text(
+                _passwordStatus(preference.Preference.sportPassword),
+              ),
               trailing: const Icon(Icons.navigate_next),
               onTap: () {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) => const SportPasswordDialog(),
+                _editPassword(
+                  preference.Preference.sportPassword,
+                  'setting.change_sport_title',
                 );
               },
             ),
@@ -48,12 +71,14 @@ class AccountSection extends StatelessWidget {
                   "setting.experiment_password_setting",
                 ),
               ),
+              subtitle: Text(
+                _passwordStatus(preference.Preference.experimentPassword),
+              ),
               trailing: const Icon(Icons.navigate_next),
               onTap: () {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) => const ExperimentPasswordDialog(),
+                _editPassword(
+                  preference.Preference.experimentPassword,
+                  'setting.change_experiment_title',
                 );
               },
             ),
@@ -68,16 +93,13 @@ class AccountSection extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.schoolnet_password_description",
-              ),
+              '${_passwordStatus(preference.Preference.schoolNetQueryPassword)} · ${FlutterI18n.translate(context, "setting.schoolnet_password_description")}',
             ),
             trailing: const Icon(Icons.navigate_next),
             onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => const SchoolNetPasswordDialog(),
+              _editPassword(
+                preference.Preference.schoolNetQueryPassword,
+                'setting.change_schoolnet_password_title',
               );
             },
           ),
@@ -102,12 +124,10 @@ class AccountSection extends StatelessWidget {
                 );
               },
             ),
-            trailing: const Icon(Icons.qr_code_scanner),
+            leading: const Icon(Icons.ac_unit),
+            trailing: const Icon(Icons.navigate_next),
             onTap: () {
-              showDialog<void>(
-                context: context,
-                builder: (context) => const AirconImeiDialog(),
-              );
+              context.push<void>(const AirconImeiPage());
             },
           ),
         ],

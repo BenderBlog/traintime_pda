@@ -1,12 +1,13 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/page/public_widget/setting/setting_dropdown_button.dart';
+import 'package:watermeter/page/public_widget/setting/setting_choice_control.dart';
+import 'package:watermeter/page/public_widget/setting/setting_control_tile.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
 
@@ -30,36 +31,26 @@ class BrightnessSettingView extends StatelessWidget {
           _ => icons[0],
         };
 
-        return ListTile(
-          leading: Icon(leadingIcon),
-          title: Text(
-            FlutterI18n.translate(context, 'setting.brightness_setting'),
-          ),
-          trailing: SizedBox(
-            width: 180,
-            child: SettingDropdownButton<int>(
-              value: preference.getInt(preference.Preference.brightness),
-              items: List.generate(BrightnessSeed.values.length, (index) {
-                final brightnessSeed = BrightnessSeed.values[index];
-                return DropdownMenuItem<int>(
-                  value: index,
-                  child: Text(
-                    FlutterI18n.translate(
-                      context,
-                      'setting.change_brightness_dialog.${brightnessSeed.label}',
-                    ),
-                  ),
-                );
-              }),
-              onChanged: (value) async {
-                if (value == null) return;
-                await preference.setInt(
-                  preference.Preference.brightness,
-                  value,
-                );
-                ThemeController.i.updateTheme();
-              },
-            ),
+        return SettingControlTile(
+          leading: leadingIcon,
+          title: FlutterI18n.translate(context, 'setting.brightness_setting'),
+          child: SettingChoiceControl<int>(
+            value: preference.getInt(preference.Preference.brightness),
+            options: List.generate(BrightnessSeed.values.length, (index) {
+              final brightnessSeed = BrightnessSeed.values[index];
+              return SettingChoiceOption<int>(
+                value: index,
+                icon: icons[index],
+                label: FlutterI18n.translate(
+                  context,
+                  'setting.change_brightness_dialog.${brightnessSeed.label}',
+                ),
+              );
+            }),
+            onChanged: (value) async {
+              await preference.setInt(preference.Preference.brightness, value);
+              ThemeController.i.updateTheme();
+            },
           ),
         );
       },

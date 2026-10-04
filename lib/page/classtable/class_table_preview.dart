@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
@@ -144,21 +145,48 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
                 _previewState.decorationName,
                 widget.backgroundBlur,
               ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surface.withValues(alpha: 0.75),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                    constraints: BoxConstraints(minWidth: double.infinity),
+                    child: Text(
+                      FlutterI18n.translate(
+                        context,
+                        "setting.font_size_page.preview_title",
+                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  Expanded(
+                    /// No blur on the sheet itself on purpose: this is a small static sample where
+                    /// the frosted look is barely legible, and a tableful of backdrop filters
+                    /// re-reading their backdrop on every frame is what made the settings page
+                    /// stutter while it scrolled. The wallpaper behind it is still blurred by
+                    /// [_backgroundLayer].
+                    ///
+                    /// Clamping rather than bouncing, as upstream had it: the sample is a pane
+                    /// inside a page that already scrolls, so a pull here would fight the page.
+                    child: GlassBlurScope(
+                      enabled: false,
+                      child: ClassTableSheet(
+                        singleIndex: _previewState.currentWeek,
 
-              /// No blur on the sheet itself on purpose: this is a small static sample where the
-              /// frosted look is barely legible, and a tableful of backdrop filters re-reading
-              /// their backdrop on every frame is what made the settings page stutter while it
-              /// scrolled. The wallpaper behind it is still blurred by [_backgroundLayer].
-              GlassBlurScope(
-                enabled: false,
-                child: ClassTableSheet(
-                  singleIndex: _previewState.currentWeek,
-
-                  /// When the sample is not given a viewport of its own it expands to the table's
-                  /// full height and the settings page around it scrolls, so the last periods of
-                  /// the day are reachable in the sample too.
-                  enableVerticalScrolling: widget.enableVerticalScrolling,
-                ),
+                        /// When the sample is not given a viewport of its own it expands to the
+                        /// table's full height and the settings page around it scrolls, so the
+                        /// last periods of the day are reachable in the sample too.
+                        enableVerticalScrolling: widget.enableVerticalScrolling,
+                        verticalPhysics: const ClampingScrollPhysics(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -240,11 +268,11 @@ class _PreviewClassTableState extends ClassTableWidgetState {
       interactive: true,
     ),
     _PreviewCourse(
-      name: "Sketches Of Spain",
-      code: "Miles Davis",
-      number: "CS 1480",
-      teacher: "Teo Macero / Gil Evans",
-      classroom: "Columbia CBS",
+      name: "Give Me the Night",
+      code: "George Benson",
+      number: "HS 3453",
+      teacher: "Quincy Jones",
+      classroom: "Music Appreciation",
       placement: _PreviewPlacement(day: 3, start: 6, stop: 9),
       interactive: true,
     ),

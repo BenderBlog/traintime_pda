@@ -9,7 +9,7 @@ import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/theme_controller.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/page/setting/class_table_preview.dart';
+import 'package:watermeter/page/classtable/class_table_preview.dart';
 import 'package:watermeter/themes/font_setting.dart';
 
 class FontSizePage extends StatefulWidget {
