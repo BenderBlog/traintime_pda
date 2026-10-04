@@ -226,7 +226,7 @@ class _ContainerTransformSurfaceState
             opacity: widget.showSnapshot ? 1 : 0,
             duration: const Duration(milliseconds: 120),
             curve: Curves.easeOut,
-            child: RawImage(image: snapshot, fit: BoxFit.fill),
+            child: RawImage(image: snapshot, fit: BoxFit.cover),
           ),
       ],
     );
@@ -429,7 +429,7 @@ PageRouteBuilder<T> containerTransformRoute<T>({
                                 child: IgnorePointer(
                                   child: RawImage(
                                     image: cardSnapshot,
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.cover,
                                     color: Colors.white.withValues(
                                       alpha: cardAlpha,
                                     ),
