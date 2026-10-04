@@ -176,25 +176,32 @@ class _HomePageMasterState extends State<HomePageMaster>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!refreshAtStart) {
-      unawaited(UpdateNoticeController.i.reloadUpdateNoticeInfo());
-      log.info(
-        "[home][BackgroundFetchFromHome]"
-        "Current loginstate: $loginState, if none will _loginAsync.",
-      );
-      if (loginState == IDSLoginState.none) {
-        _loginAsync();
-      } else {
-        HomepageController.i.refresh(
-          forceRetryLogin: true,
-          sliderCaptcha: (String cookieStr) {
-            return SliderCaptchaClientProvider(cookie: cookieStr).solve(
-              manualSolver: (provider) =>
-                  solveSliderCaptchaManually(context, provider),
-            );
-          },
-        );
-      }
       refreshAtStart = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          refreshAtStart = false;
+          return;
+        }
+
+        unawaited(UpdateNoticeController.i.reloadUpdateNoticeInfo());
+        log.info(
+          "[home][BackgroundFetchFromHome]"
+          "Current loginstate: $loginState, if none will _loginAsync.",
+        );
+        if (loginState == IDSLoginState.none) {
+          _loginAsync();
+        } else {
+          HomepageController.i.refresh(
+            forceRetryLogin: true,
+            sliderCaptcha: (String cookieStr) {
+              return SliderCaptchaClientProvider(cookie: cookieStr).solve(
+                manualSolver: (provider) =>
+                    solveSliderCaptchaManually(context, provider),
+              );
+            },
+          );
+        }
+      });
     }
   }
 
