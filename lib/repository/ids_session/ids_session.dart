@@ -108,6 +108,46 @@ class IDSSession {
     "execution",
   ];
 
+  ({String salt, Map<String, String> fields}) _parsePasswordLoginForm(
+    String html,
+  ) {
+    final form = parse(html).getElementById("pwdFromId");
+    if (form == null || form.localName != "form") {
+      throw const IDSProtocolException("统一认证页面缺少密码登录表单");
+    }
+    final inputs = form.querySelectorAll('input[type="hidden"]');
+
+    String readField(String fieldName, {bool allowEmpty = false}) {
+      final matches = inputs
+          .where(
+            (input) =>
+                input.id == fieldName || input.attributes["name"] == fieldName,
+          )
+          .toList();
+      if (matches.isEmpty) {
+        throw IDSProtocolException("密码登录表单缺少字段：$fieldName");
+      }
+      if (matches.length > 1) {
+        throw IDSProtocolException("密码登录表单存在重复字段：$fieldName");
+      }
+      final value = matches.single.attributes["value"];
+      if (value == null || (!allowEmpty && value.trim().isEmpty)) {
+        throw IDSProtocolException("密码登录表单字段值无效：$fieldName");
+      }
+      return value;
+    }
+
+    final salt = readField("pwdEncryptSalt");
+    if (![16, 24, 32].contains(utf8.encode(salt).length)) {
+      throw const IDSProtocolException("密码登录表单的 pwdEncryptSalt 长度无效");
+    }
+    final fields = {
+      for (final fieldName in _header)
+        fieldName: readField(fieldName, allowEmpty: fieldName == "lt"),
+    };
+    return (salt: salt, fields: fields);
+  }
+
   String _parsePasswordWrongMsg(String html) {
     var form = parse(html).getElementById("showErrorTip");
     var msg = form?.text ?? "登录遇到问题";
@@ -228,13 +268,10 @@ class IDSSession {
       );
     }
 
+    final passwordForm = _parsePasswordLoginForm(
+      initialResponse.data?.toString() ?? '',
+    );
     await _registerBrowserFingerprint();
-    final response = initialResponse.data?.toString() ?? '';
-
-    /// Start getting data from webpage.
-    var page = parse(response);
-    var form = page.getElementsByTagName("input")
-      ..removeWhere((element) => element.attributes["type"] != "hidden");
 
     /// Check whether it need CAPTCHA or not:-P
     /// Used in two captcha.
@@ -250,9 +287,6 @@ class IDSSession {
     if (onResponse != null) {
       onResponse(30, LoginProcessStep.getEncrypt);
     }
-    String keys = form
-        .firstWhere((element) => element.id == "pwdEncryptSalt")
-        .attributes["value"]!;
 
     /// Prepare for login.
     if (onResponse != null) {
@@ -260,20 +294,13 @@ class IDSSession {
     }
     Map<String, dynamic> head = {
       'username': username,
-      'password': aesEncrypt(password, keys),
+      'password': aesEncrypt(password, passwordForm.salt),
       'rememberMe': 'true',
       'cllt': 'userNameLogin',
       'dllt': 'generalLogin',
       '_eventId': 'submit',
+      ...passwordForm.fields,
     };
-
-    for (var i in _header) {
-      head[i] = form
-          .firstWhere(
-            (element) => element.attributes["name"] == i || element.id == i,
-          )
-          .attributes["value"]!;
-    }
 
     if (onResponse != null) {
       onResponse(45, LoginProcessStep.slider);
