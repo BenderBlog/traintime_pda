@@ -25,13 +25,16 @@ class LearningSession extends IDSSession {
 
   static String userId = "";
 
+  Future<Response<dynamic>> _fetchCoursePage() => dio.get(
+    COURSE_INFO_URL,
+    queryParameters: {"v": 1},
+    options: Options(
+      headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
+    ),
+  );
+
   Future<bool> isLogin() async {
-    final response = await dio.get(
-      COURSE_INFO_URL,
-      options: Options(
-        headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
-      ),
-    );
+    final response = await _fetchCoursePage();
     final statusCode = response.statusCode ?? 0;
     return !(statusCode >= 300 && statusCode < 400) &&
         response.headers.value(HttpHeaders.locationHeader) == null &&
@@ -95,12 +98,7 @@ class LearningSession extends IDSSession {
       log.info(
         "[LearningSession][getAttandanceRecord] Fetching class list info",
       );
-      final coursePageResponse = await dio.get(
-        COURSE_INFO_URL,
-        options: Options(
-          headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
-        ),
-      );
+      final coursePageResponse = await _fetchCoursePage();
       final courseStatusCode = coursePageResponse.statusCode ?? 0;
       doc = parse(coursePageResponse.data?.toString() ?? "");
       final needsLogin =
