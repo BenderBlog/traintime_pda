@@ -33,15 +33,6 @@ class LearningSession extends IDSSession {
     ),
   );
 
-  Future<bool> isLogin() async {
-    final response = await _fetchCoursePage();
-    final statusCode = response.statusCode ?? 0;
-    return !(statusCode >= 300 && statusCode < 400) &&
-        response.headers.value(HttpHeaders.locationHeader) == null &&
-        parse(response.data?.toString() ?? "").getElementById("yearList") !=
-            null;
-  }
-
   Future<void> loginLearningSession() async {
     log.info("[LearningSession][loginLearningSession] Logging in");
     final location = await checkAndLogin(
@@ -61,11 +52,6 @@ class LearningSession extends IDSSession {
   ) async {
     if (data.courseId == null || data.clazzId == null) {
       return [];
-    }
-
-    if (await isLogin() == false) {
-      log.info("[LearningSession][getAttendanceRecordDetail] Need login");
-      await loginLearningSession();
     }
 
     Map<String, dynamic> jsonData = await dio
@@ -99,22 +85,7 @@ class LearningSession extends IDSSession {
         "[LearningSession][getAttandanceRecord] Fetching class list info",
       );
       final coursePageResponse = await _fetchCoursePage();
-      final courseStatusCode = coursePageResponse.statusCode ?? 0;
       doc = parse(coursePageResponse.data?.toString() ?? "");
-      final needsLogin =
-          (courseStatusCode >= 300 && courseStatusCode < 400) ||
-          coursePageResponse.headers.value(HttpHeaders.locationHeader) !=
-              null ||
-          doc.getElementById("yearList") == null;
-      if (needsLogin) {
-        if (attempt == 1) {
-          throw const LoginFailedException(msg: "课程系统登录失败");
-        }
-        log.info("[LearningSession][getAttandanceRecord] Need login");
-        await loginLearningSession();
-        continue;
-      }
-
       final semester = doc
           .querySelector("#yearList option[selected]")
           ?.attributes["value"]
@@ -141,13 +112,12 @@ class LearningSession extends IDSSession {
           },
         ),
       );
-      final attendanceStatusCode = attendanceResponse.statusCode ?? 0;
-      final attendanceNeedsLogin =
-          (attendanceStatusCode >= 300 && attendanceStatusCode < 400) ||
-          attendanceResponse.headers.value(HttpHeaders.locationHeader) != null;
-      if (attendanceNeedsLogin) {
+      attendanceHtml = attendanceResponse.data?.toString() ?? "";
+      final hasAttendanceData =
+          attendanceHtml.contains("课程名称") || attendanceHtml.contains("签到次数");
+      if (!hasAttendanceData) {
         if (attempt == 1) {
-          throw const LoginFailedException(msg: "课程系统登录失败");
+          throw const LoginFailedException(msg: "课程系统登录失败：考勤接口未返回课程名称或签到次数");
         }
         log.info(
           "[LearningSession][getAttandanceRecord] "
@@ -157,10 +127,7 @@ class LearningSession extends IDSSession {
         continue;
       }
 
-      attendanceHtml = attendanceResponse.data.toString().replaceAll(
-        RegExp(r'\r|\n|\t'),
-        "",
-      );
+      attendanceHtml = attendanceHtml.replaceAll(RegExp(r'\r|\n|\t'), "");
       break;
     }
 
