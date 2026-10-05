@@ -15,7 +15,7 @@ import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 import 'package:watermeter/repository/ids_session/ids_session.dart';
 
 class LearningSession extends IDSSession {
-  static const LOGIN_URL = "https://xdspoc.fanya.chaoxing.com/sso/xdspoc";
+  static const LOGIN_URL = "https://learning.xidian.edu.cn/cassso/xidian";
   static const COURSE_INFO_URL =
       "https://fycourse.fanya.chaoxing.com/courselist/study";
   static const COURSE_DATA_URL =
@@ -77,6 +77,8 @@ class LearningSession extends IDSSession {
   }
 
   Future<List<ClassAttendance>> getAttandanceRecord() async {
+    await loginLearningSession();
+
     late Document doc;
     late String attendanceHtml;
 
