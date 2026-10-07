@@ -108,46 +108,6 @@ class IDSSession {
     "execution",
   ];
 
-  ({String salt, Map<String, String> fields}) _parsePasswordLoginForm(
-    String html,
-  ) {
-    final form = parse(html).getElementById("pwdFromId");
-    if (form == null || form.localName != "form") {
-      throw const IDSProtocolException("统一认证页面缺少密码登录表单");
-    }
-    final inputs = form.querySelectorAll('input[type="hidden"]');
-
-    String readField(String fieldName, {bool allowEmpty = false}) {
-      final matches = inputs
-          .where(
-            (input) =>
-                input.id == fieldName || input.attributes["name"] == fieldName,
-          )
-          .toList();
-      if (matches.isEmpty) {
-        throw IDSProtocolException("密码登录表单缺少字段：$fieldName");
-      }
-      if (matches.length > 1) {
-        throw IDSProtocolException("密码登录表单存在重复字段：$fieldName");
-      }
-      final value = matches.single.attributes["value"];
-      if (value == null || (!allowEmpty && value.trim().isEmpty)) {
-        throw IDSProtocolException("密码登录表单字段值无效：$fieldName");
-      }
-      return value;
-    }
-
-    final salt = readField("pwdEncryptSalt");
-    if (![16, 24, 32].contains(utf8.encode(salt).length)) {
-      throw const IDSProtocolException("密码登录表单的 pwdEncryptSalt 长度无效");
-    }
-    final fields = {
-      for (final fieldName in _header)
-        fieldName: readField(fieldName, allowEmpty: fieldName == "lt"),
-    };
-    return (salt: salt, fields: fields);
-  }
-
   String _parsePasswordWrongMsg(String html) {
     var form = parse(html).getElementById("showErrorTip");
     var msg = form?.text ?? "登录遇到问题";
@@ -268,9 +228,37 @@ class IDSSession {
       );
     }
 
-    final passwordForm = _parsePasswordLoginForm(
+    final passwordForm = parse(
       initialResponse.data?.toString() ?? '',
-    );
+    ).getElementById("pwdFromId");
+    if (passwordForm == null || passwordForm.localName != "form") {
+      throw const IDSProtocolException("统一认证页面缺少密码登录表单");
+    }
+    final inputs = passwordForm.querySelectorAll('input[type="hidden"]');
+    final fields = <String, String>{};
+    for (final fieldName in ["pwdEncryptSalt", ..._header]) {
+      final matches = inputs
+          .where(
+            (input) =>
+                input.id == fieldName || input.attributes["name"] == fieldName,
+          )
+          .toList();
+      if (matches.isEmpty) {
+        throw IDSProtocolException("密码登录表单缺少字段：$fieldName");
+      }
+      if (matches.length > 1) {
+        throw IDSProtocolException("密码登录表单存在重复字段：$fieldName");
+      }
+      final value = matches.single.attributes["value"];
+      if (value == null || (fieldName != "lt" && value.trim().isEmpty)) {
+        throw IDSProtocolException("密码登录表单字段值无效：$fieldName");
+      }
+      fields[fieldName] = value;
+    }
+    final salt = fields.remove("pwdEncryptSalt")!;
+    if (![16, 24, 32].contains(utf8.encode(salt).length)) {
+      throw const IDSProtocolException("密码登录表单的 pwdEncryptSalt 长度无效");
+    }
     await _registerBrowserFingerprint();
 
     /// Check whether it need CAPTCHA or not:-P
@@ -294,12 +282,12 @@ class IDSSession {
     }
     Map<String, dynamic> head = {
       'username': username,
-      'password': aesEncrypt(password, passwordForm.salt),
+      'password': aesEncrypt(password, salt),
       'rememberMe': 'true',
       'cllt': 'userNameLogin',
       'dllt': 'generalLogin',
       '_eventId': 'submit',
-      ...passwordForm.fields,
+      ...fields,
     };
 
     if (onResponse != null) {
