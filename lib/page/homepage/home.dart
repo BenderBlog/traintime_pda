@@ -271,6 +271,9 @@ class _HomePageMasterState extends State<HomePageMaster>
           const SettingWindow(),
         ],
         onPageChanged: (int index) {
+          // 切换页面时清除焦点，避免其他页面（如睿思）的输入框保留焦点，
+          // 在从子页面返回时被恢复焦点并自动弹出输入法。
+          FocusManager.instance.primaryFocus?.unfocus();
           if (_selectedIndex != index) {
             setState(() {
               _selectedIndex = index;
@@ -292,6 +295,7 @@ class _HomePageMasterState extends State<HomePageMaster>
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
           if (_selectedIndex != index) {
+            FocusManager.instance.primaryFocus?.unfocus();
             setState(() {
               _selectedIndex = index;
             });
