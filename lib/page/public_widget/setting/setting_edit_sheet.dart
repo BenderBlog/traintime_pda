@@ -33,7 +33,12 @@ class SettingSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return M3EBottomSheet(title: Text(title), style: style, child: child);
+    // Modal sheets do not avoid the keyboard by themselves, lift the sheet
+    // above the input method so focused fields stay visible.
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: M3EBottomSheet(title: Text(title), style: style, child: child),
+    );
   }
 }
 
@@ -136,87 +141,89 @@ class _SettingTextEditSheetState extends State<SettingTextEditSheet> {
           dragHandlePadding: EdgeInsets.symmetric(vertical: 12),
           padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (widget.description != null) ...[
-              Text(
-                widget.description!,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 12),
-            ],
-            TextField(
-              autofocus: true,
-              controller: _controller,
-              enabled: !_saving,
-              obscureText: _obscured,
-              autocorrect: !widget.isPassword,
-              enableSuggestions: !widget.isPassword,
-              keyboardType: widget.keyboardType,
-              inputFormatters: widget.inputFormatters,
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _save(),
-              onChanged: (_) {
-                if (_error != null) {
-                  setState(() {
-                    _error = null;
-                  });
-                }
-              },
-              decoration: InputDecoration(
-                labelText: widget.label,
-                suffixText: widget.suffixText,
-                errorText: _error,
-                errorMaxLines: 3,
-                border: const OutlineInputBorder(),
-                suffixIcon: widget.isPassword
-                    ? IconButton(
-                        tooltip: widget.visibilityLabel,
-                        onPressed: _saving
-                            ? null
-                            : () => setState(() {
-                                _obscured = !_obscured;
-                              }),
-                        icon: Icon(
-                          _obscured ? Icons.visibility : Icons.visibility_off,
-                        ),
-                      )
-                    : widget.signToggleLabel != null
-                    ? IconButton(
-                        tooltip: widget.signToggleLabel,
-                        onPressed: _saving ? null : _toggleSign,
-                        icon: const Icon(Icons.exposure),
-                      )
-                    : null,
-              ),
-            ),
-            const SizedBox(height: 16),
-            OverflowBar(
-              alignment: MainAxisAlignment.end,
-              spacing: 8,
-              overflowSpacing: 8,
-              children: [
-                TextButton(
-                  onPressed: _saving
-                      ? null
-                      : () => Navigator.pop(context, false),
-                  child: Text(widget.cancelLabel),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (widget.description != null) ...[
+                Text(
+                  widget.description!,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                FilledButton(
-                  onPressed: _saving ? null : _save,
-                  child: _saving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(widget.saveLabel),
-                ),
+                const SizedBox(height: 12),
               ],
-            ),
-          ],
+              TextField(
+                autofocus: true,
+                controller: _controller,
+                enabled: !_saving,
+                obscureText: _obscured,
+                autocorrect: !widget.isPassword,
+                enableSuggestions: !widget.isPassword,
+                keyboardType: widget.keyboardType,
+                inputFormatters: widget.inputFormatters,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _save(),
+                onChanged: (_) {
+                  if (_error != null) {
+                    setState(() {
+                      _error = null;
+                    });
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: widget.label,
+                  suffixText: widget.suffixText,
+                  errorText: _error,
+                  errorMaxLines: 3,
+                  border: const OutlineInputBorder(),
+                  suffixIcon: widget.isPassword
+                      ? IconButton(
+                          tooltip: widget.visibilityLabel,
+                          onPressed: _saving
+                              ? null
+                              : () => setState(() {
+                                  _obscured = !_obscured;
+                                }),
+                          icon: Icon(
+                            _obscured ? Icons.visibility : Icons.visibility_off,
+                          ),
+                        )
+                      : widget.signToggleLabel != null
+                      ? IconButton(
+                          tooltip: widget.signToggleLabel,
+                          onPressed: _saving ? null : _toggleSign,
+                          icon: const Icon(Icons.exposure),
+                        )
+                      : null,
+                ),
+              ),
+              const SizedBox(height: 16),
+              OverflowBar(
+                alignment: MainAxisAlignment.end,
+                spacing: 8,
+                overflowSpacing: 8,
+                children: [
+                  TextButton(
+                    onPressed: _saving
+                        ? null
+                        : () => Navigator.pop(context, false),
+                    child: Text(widget.cancelLabel),
+                  ),
+                  FilledButton(
+                    onPressed: _saving ? null : _save,
+                    child: _saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(widget.saveLabel),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
