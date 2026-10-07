@@ -4,11 +4,11 @@
 
 import 'dart:io';
 
-import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
+import 'package:watermeter/page/public_widget/setting/setting_expandable_section.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/setting/about_page/about_app_header.dart';
@@ -17,15 +17,8 @@ import 'package:watermeter/page/setting/about_page/film_component.dart';
 import 'package:watermeter/page/setting/settings_category_page.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
-class AboutPage extends StatefulWidget {
+class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
-
-  @override
-  State<AboutPage> createState() => _AboutPageState();
-}
-
-class _AboutPageState extends State<AboutPage> {
-  bool _eggVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -99,18 +92,8 @@ class _AboutPageState extends State<AboutPage> {
             SectionSettingScaffold(
               title: context.t.setting.aboutPage.extras,
               icon: Icons.auto_awesome_outlined,
-              items: M3EExpandableSegmentedItem(
-                index: 0,
-                totalCount: 1,
-                isExpanded: _eggVisible,
-                onToggle: () => setState(() => _eggVisible = !_eggVisible),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
+              items: SettingExpandableSection(
                 childPadding: const EdgeInsets.all(8),
-                color: Theme.of(context).colorScheme.surfaceContainer,
-                childColor: Theme.of(context).colorScheme.surfaceContainer,
                 header: const ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(Icons.movie_outlined),
