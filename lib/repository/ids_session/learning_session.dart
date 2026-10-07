@@ -25,19 +25,13 @@ class LearningSession extends IDSSession {
 
   static String userId = "";
 
-  Future<bool> isLogin() async {
-    final response = await dio.get(
-      COURSE_INFO_URL,
-      options: Options(
-        headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
-      ),
-    );
-    final statusCode = response.statusCode ?? 0;
-    return !(statusCode >= 300 && statusCode < 400) &&
-        response.headers.value(HttpHeaders.locationHeader) == null &&
-        parse(response.data?.toString() ?? "").getElementById("yearList") !=
-            null;
-  }
+  Future<Response<dynamic>> _fetchCoursePage() => dio.get(
+    COURSE_INFO_URL,
+    queryParameters: {"v": 1},
+    options: Options(
+      headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
+    ),
+  );
 
   Future<void> loginLearningSession() async {
     log.info("[LearningSession][loginLearningSession] Logging in");
@@ -58,11 +52,6 @@ class LearningSession extends IDSSession {
   ) async {
     if (data.courseId == null || data.clazzId == null) {
       return [];
-    }
-
-    if (await isLogin() == false) {
-      log.info("[LearningSession][getAttendanceRecordDetail] Need login");
-      await loginLearningSession();
     }
 
     Map<String, dynamic> jsonData = await dio
@@ -88,6 +77,8 @@ class LearningSession extends IDSSession {
   }
 
   Future<List<ClassAttendance>> getAttandanceRecord() async {
+    await loginLearningSession();
+
     late Document doc;
     late String attendanceHtml;
 
@@ -95,32 +86,23 @@ class LearningSession extends IDSSession {
       log.info(
         "[LearningSession][getAttandanceRecord] Fetching class list info",
       );
-      final coursePageResponse = await dio.get(
-        COURSE_INFO_URL,
-        options: Options(
-          headers: {HttpHeaders.hostHeader: "fycourse.fanya.chaoxing.com"},
-        ),
-      );
-      final courseStatusCode = coursePageResponse.statusCode ?? 0;
+      final coursePageResponse = await _fetchCoursePage();
       doc = parse(coursePageResponse.data?.toString() ?? "");
-      final needsLogin =
-          (courseStatusCode >= 300 && courseStatusCode < 400) ||
-          coursePageResponse.headers.value(HttpHeaders.locationHeader) !=
-              null ||
-          doc.getElementById("yearList") == null;
-      if (needsLogin) {
-        if (attempt == 1) {
-          throw const LoginFailedException(msg: "课程系统登录失败");
-        }
-        log.info("[LearningSession][getAttandanceRecord] Need login");
-        await loginLearningSession();
-        continue;
-      }
-
-      final semester = doc
+      var semester = doc
           .querySelector("#yearList option[selected]")
           ?.attributes["value"]
           ?.trim();
+      if (semester == null || semester.isEmpty) {
+        final selectedText = doc.querySelector("#selectdd .zse_p")?.text.trim();
+        final selectedLink = doc
+            .querySelectorAll("#selectdd a")
+            .where((link) => link.text.trim() == selectedText)
+            .firstOrNull;
+        semester = selectedLink?.attributes["semesternum"]?.trim();
+        if (selectedLink != null && selectedText == "全部课程") {
+          semester ??= "0";
+        }
+      }
       if (semester == null || semester.isEmpty) {
         throw const FormatException("无法解析当前学期");
       }
@@ -143,13 +125,12 @@ class LearningSession extends IDSSession {
           },
         ),
       );
-      final attendanceStatusCode = attendanceResponse.statusCode ?? 0;
-      final attendanceNeedsLogin =
-          (attendanceStatusCode >= 300 && attendanceStatusCode < 400) ||
-          attendanceResponse.headers.value(HttpHeaders.locationHeader) != null;
-      if (attendanceNeedsLogin) {
+      attendanceHtml = attendanceResponse.data?.toString() ?? "";
+      final hasAttendanceData =
+          attendanceHtml.contains("课程名称") || attendanceHtml.contains("签到次数");
+      if (!hasAttendanceData) {
         if (attempt == 1) {
-          throw const LoginFailedException(msg: "课程系统登录失败");
+          throw const LoginFailedException(msg: "课程系统登录失败：考勤接口未返回课程名称或签到次数");
         }
         log.info(
           "[LearningSession][getAttandanceRecord] "
@@ -159,30 +140,34 @@ class LearningSession extends IDSSession {
         continue;
       }
 
-      attendanceHtml = attendanceResponse.data.toString().replaceAll(
-        RegExp(r'\r|\n|\t'),
-        "",
-      );
+      attendanceHtml = attendanceHtml.replaceAll(RegExp(r'\r|\n|\t'), "");
       break;
     }
 
-    final items = doc.querySelectorAll('div.myde_course_item');
+    final items = doc.querySelectorAll('div.myde_course_item, li.zmy_item');
 
     final resultsClassInfo = <Map<String, String>>[];
     final seen = <String>{}; // 用 courseId|clazzId 去重
 
     for (final item in items) {
       final cnameAttr = (item.attributes['cname'] ?? '').trim();
-      final dtText = item.querySelector('dl.myde_course_dl > dt')?.text ?? "";
+      final dtText =
+          item
+              .querySelector('dl.myde_course_dl > dt, dl.zmy_info > dt')
+              ?.text ??
+          "";
       final courseNameFromDt = dtText
           .replaceAll(RegExp(r'\s*\(.*?\)\s*$'), '')
           .trim();
       final courseName = cnameAttr.isNotEmpty ? cnameAttr : courseNameFromDt;
 
       // dd[0]=老师 dd[1]=班级 dd[2]=开课时间
-      final dds = item.querySelectorAll('dl.myde_course_dl > dd');
-      final teacher = dds.isNotEmpty ? dds[0].text : '';
-      final classNo = dds.length >= 2 ? dds[1].text : '';
+      final dds = item.querySelectorAll(
+        'dl.myde_course_dl > dd, dl.zmy_info > dd',
+      );
+      final teacher = dds.isNotEmpty ? dds[0].text.trim() : '';
+      final classNo = dds.length >= 2 ? dds[1].text.trim() : '';
+      if (courseName.isEmpty || classNo.isEmpty) continue;
       // final startDate = dds.length >= 3
       //     ? extractDate(cleanText(dds[2].text))
       //     : '';
@@ -190,7 +175,7 @@ class LearningSession extends IDSSession {
       // 从 href 解析：courseId/clazzId/cpi
       final href =
           item
-              .querySelector('div.myde_course_pic a[href]')
+              .querySelector('div.myde_course_pic a[href], a.zmy_pic[href]')
               ?.attributes['href'] ??
           '';
       String courseId = '';
@@ -246,11 +231,16 @@ class LearningSession extends IDSSession {
       }
 
       List<String> rowData = cells.map((td) => td.text.trim()).toList();
-      Map<String, String> data = resultsClassInfo.firstWhere(
-        (data) =>
-            data["courseName"] == rowData[0] && data["classNo"] == rowData[1],
-        orElse: () => {},
-      );
+      final matchingCourses = resultsClassInfo
+          .where(
+            (data) =>
+                data["courseName"] == rowData[0] &&
+                data["classNo"] == rowData[1],
+          )
+          .toList();
+      final data = matchingCourses.length == 1
+          ? matchingCourses.single
+          : <String, String>{};
       results.add(
         ClassAttendance(
           isWarning: isWarning,
