@@ -42,7 +42,12 @@ class _AirconQrScannerPageState extends State<AirconQrScannerPage>
 
   CameraController? _controller;
   Object? _error;
-  bool _initializing = false;
+
+  /// Whether the camera should be running. A camera still opening checks it
+  /// after each step, as stopping cannot reach it before it is assigned.
+  bool _wantCamera = false;
+  Future<void>? _starting;
+  Future<void>? _releasing;
 
   int _decoding = 0;
   bool _finished = false;
@@ -86,12 +91,21 @@ class _AirconQrScannerPageState extends State<AirconQrScannerPage>
     }
   }
 
-  Future<void> _startCamera() async {
-    if (_initializing || _finished) return;
-    _initializing = true;
+  Future<void> _startCamera() {
+    _wantCamera = true;
+    if (_finished) return Future.value();
+    return _starting ??= _openCamera().whenComplete(() => _starting = null);
+  }
+
+  Future<void> _openCamera() async {
     CameraController? controller;
+    bool cancelled() => !mounted || !_wantCamera;
     try {
+      // The camera may refuse to open while the last controller still holds it.
+      await _releasing;
+      if (cancelled()) return;
       final cameras = await availableCameras();
+      if (cancelled()) return;
       if (cameras.isEmpty) throw CameraException('noCamera', null);
       controller = CameraController(
         cameras.firstWhere(
@@ -109,10 +123,7 @@ class _AirconQrScannerPageState extends State<AirconQrScannerPage>
             : ImageFormatGroup.yuv420,
       );
       await controller.initialize();
-      if (!mounted) {
-        await controller.dispose();
-        return;
-      }
+      if (cancelled()) return;
 
       // Not every device supports these; scanning works without them.
       try {
@@ -126,7 +137,9 @@ class _AirconQrScannerPageState extends State<AirconQrScannerPage>
       try {
         await controller.setFocusMode(FocusMode.auto);
       } catch (_) {}
+      if (cancelled()) return;
       await controller.startImageStream(_onFrame);
+      if (cancelled()) return;
 
       // Continuous autofocus alone often settles soft when zoomed in, while
       // starting a focus run every so often reliably sharpens the code.
@@ -140,23 +153,33 @@ class _AirconQrScannerPageState extends State<AirconQrScannerPage>
         _error = null;
       });
     } catch (e) {
-      if (!identical(_controller, controller)) await controller?.dispose();
       if (mounted) setState(() => _error = e);
     } finally {
-      _initializing = false;
+      if (controller != null && !identical(_controller, controller)) {
+        await _release(controller);
+      }
     }
   }
 
-  void _stopCamera({bool rebuild = true}) {
+  /// Stops the camera, completing once it is released, including one that was
+  /// still opening.
+  Future<void> _stopCamera({bool rebuild = true}) async {
+    _wantCamera = false;
     _refocusTimer?.cancel();
     _refocusTimer = null;
     final controller = _controller;
     _controller = null;
     _torch = false;
-    if (controller == null) return;
-    if (rebuild && mounted) setState(() {});
-    controller.dispose();
+    if (controller != null) {
+      if (rebuild && mounted) setState(() {});
+      _release(controller);
+    }
+    await _starting;
+    await _releasing;
   }
+
+  Future<void> _release(CameraController controller) =>
+      _releasing = controller.dispose().catchError((Object _) {});
 
   void _onFrame(CameraImage image) {
     if (_decoding >= _maxDecoding || _finished) return;
@@ -220,9 +243,9 @@ class _AirconQrScannerPageState extends State<AirconQrScannerPage>
   }
 
   Future<void> _takePhoto() async {
-    // Let the camera app have the camera.
-    _stopCamera();
     try {
+      // Let the camera app have the camera.
+      await _stopCamera();
       final photo = await ImagePicker().pickImage(
         source: ImageSource.camera,
         requestFullMetadata: false,
