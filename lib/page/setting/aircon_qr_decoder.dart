@@ -13,6 +13,11 @@
 // (or the whole image) reads them, but which blur and window works depends on
 // how large the code is in the picture. So several are tried: all of them for
 // a photo, and a couple per frame in turn for the camera.
+//
+// Even so, the logo leaves so little error correction that a slightly blurry
+// sticker fails. Knowing what the stickers encode, the template reader (see
+// aircon_qr_template_reader.dart) reads much blurrier ones, so it is tried
+// right after the image as is.
 
 import 'dart:io';
 import 'dart:isolate';
@@ -23,6 +28,7 @@ import 'dart:ui' as ui;
 import 'package:flutter_zxing/flutter_zxing.dart';
 
 import 'package:watermeter/controller/aircon_controller.dart';
+import 'package:watermeter/page/setting/aircon_qr_template_reader.dart';
 
 /// Longest side the photo is decoded at. Large enough to keep a small sticker
 /// readable in a full phone photo, small enough to stay fast.
@@ -101,7 +107,7 @@ Future<AirconQrResult> _decodeRgbaInBackground(
     width,
     height,
   );
-  return _decode(_photoVariants(image));
+  return _decode(_photoAttempts(image));
 });
 
 /// Looks for the IMEI in one camera frame. [frameIndex] picks which of the
@@ -110,17 +116,28 @@ Future<AirconQrResult> decodeAirconImeiFromCameraFrame(
   AirconQrFrame frame,
   int frameIndex,
 ) => Isolate.run(
-  () => _decode(_frameVariants(_luminanceFromFrame(frame), frameIndex)),
+  () => _decode(_frameAttempts(_luminanceFromFrame(frame), frameIndex)),
 );
 
-AirconQrResult _decode(Iterable<_Variant> variants) {
+AirconQrResult _decode(Iterable<_Attempt> attempts) {
   var foundOtherCode = false;
-  for (final variant in variants) {
-    final results = zx.readBarcodes(variant.image.bytes, variant.params);
-    for (final code in results.codes) {
-      final imei = AirconController.tryParseImei(code.text ?? "");
-      if (imei != null) return (imei: imei, foundOtherCode: false);
-      foundOtherCode = true;
+  for (final attempt in attempts) {
+    switch (attempt) {
+      case _Variant(:final image, :final params):
+        final results = zx.readBarcodes(image.bytes, params);
+        for (final code in results.codes) {
+          final imei = AirconController.tryParseImei(code.text ?? "");
+          if (imei != null) return (imei: imei, foundOtherCode: false);
+          foundOtherCode = true;
+        }
+      case _TemplateRead(:final image, :final pass):
+        final imei = readAirconImeiByTemplate(
+          image.bytes,
+          image.width,
+          image.height,
+          pass,
+        );
+        if (imei != null) return (imei: imei, foundOtherCode: false);
     }
   }
   return (imei: null, foundOtherCode: foundOtherCode);
@@ -134,7 +151,11 @@ class _Gray {
   final int height;
 }
 
-class _Variant {
+/// One way of looking for the code in an image.
+sealed class _Attempt {}
+
+/// Decoding [image] with zxing.
+class _Variant implements _Attempt {
   _Variant(
     this.image, {
     int cropLeft = 0,
@@ -160,6 +181,18 @@ class _Variant {
   final DecodeParams params;
 }
 
+/// Reading [image] with the template reader.
+class _TemplateRead implements _Attempt {
+  const _TemplateRead(this.image, this.pass);
+
+  final _Gray image;
+  final AirconTemplatePass pass;
+}
+
+/// Shorter side a photo is reduced to for the template reader, about that of
+/// the part of a camera frame it is tuned for.
+const _templateSide = 1000;
+
 /// Each picked so that together they read the stickers across the range of
 /// sizes a code takes up in a photo or a frame.
 final List<_Gray Function(_Gray)> _binarizations = [
@@ -171,8 +204,23 @@ final List<_Gray Function(_Gray)> _binarizations = [
   (image) => _otsuThreshold(_boxBlur(image, 3)),
 ];
 
-Iterable<_Variant> _photoVariants(_Gray image) sync* {
+Iterable<_Attempt> _photoAttempts(_Gray image) sync* {
   yield _Variant(image);
+
+  // First at about the size of a frame, then at full size in case the sticker
+  // takes up only a small part of the photo.
+  final reduced = _scale(
+    image,
+    min(1.0, _templateSide / min(image.width, image.height)),
+  );
+  for (final pass in airconTemplatePasses) {
+    yield _TemplateRead(reduced, pass);
+  }
+  if (!identical(reduced, image)) {
+    for (final pass in airconTemplatePasses.where((pass) => !pass.halve)) {
+      yield _TemplateRead(image, pass);
+    }
+  }
 
   for (final scale in const [1.0, 0.75, 0.5]) {
     final scaled = _scale(image, scale);
@@ -204,12 +252,17 @@ Iterable<_Variant> _photoVariants(_Gray image) sync* {
   }
 }
 
-/// The frame as is, which reads ordinary codes, then two binarizations. Over
-/// consecutive frames these cycle through every binarization at full and at
-/// reduced size. Reducing helps once the camera is zoomed in far: the frame is
-/// then enlarged from fewer real pixels, and shrinking it sharpens the code.
-Iterable<_Variant> _frameVariants(_Gray frame, int frameIndex) sync* {
+/// The frame as is, which reads ordinary codes, then the template reader and
+/// two binarizations. Over consecutive frames these cycle through every pass
+/// of the template reader, and every binarization at full and at reduced
+/// size. Reducing helps once the camera is zoomed in far: the frame is then
+/// enlarged from fewer real pixels, and shrinking it sharpens the code.
+Iterable<_Attempt> _frameAttempts(_Gray frame, int frameIndex) sync* {
   yield _Variant(frame);
+  yield _TemplateRead(
+    frame,
+    airconTemplatePasses[frameIndex % airconTemplatePasses.length],
+  );
 
   final count = _binarizations.length;
   for (var k = 0; k < 2; k++) {
