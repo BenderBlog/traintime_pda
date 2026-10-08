@@ -44,6 +44,9 @@ aircon_imei_clear: 清除
 scan_aircon_qr: 掃描空調二維碼
 pick_aircon_qr_image: 從相冊選擇二維碼圖片
 aircon_camera_unavailable: 當前平臺不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI
+aircon_scan_hint: "輕點畫面可以對焦；空調離得遠、放大後仍然模糊時，請用系統相機拍照識別"
+aircon_take_photo: "用系統相機拍照識別"
+aircon_camera_error: "無法打開相機：{error}"
 notification_setting: 通知設置
 course_reminder_setting: 課前通知設置
 course_reminder_description: 設置課前提醒通知

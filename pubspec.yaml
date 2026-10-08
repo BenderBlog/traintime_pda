@@ -60,6 +60,8 @@ dependencies:
   permission_handler: ^13.0.1
   # QR code scanner
   flutter_zxing: ^3.0.1
+  camera: ^0.12.1
+  image_picker: ^1.2.3
   # Output to system calendar
   device_calendar_plus: ^0.10.1
   # Homepage Widget

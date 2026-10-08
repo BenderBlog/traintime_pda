@@ -1741,6 +1741,15 @@ class Translations$setting$zh {
 	/// zh: '当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI'
 	String get airconCameraUnavailable => '当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI';
 
+	/// zh: '轻点画面可以对焦；空调离得远、放大后仍然模糊时，请用系统相机拍照识别'
+	String get airconScanHint => '轻点画面可以对焦；空调离得远、放大后仍然模糊时，请用系统相机拍照识别';
+
+	/// zh: '用系统相机拍照识别'
+	String get airconTakePhoto => '用系统相机拍照识别';
+
+	/// zh: '无法打开相机：{error}'
+	String airconCameraError({required Object error}) => '无法打开相机：${error}';
+
 	/// zh: '通知设置'
 	String get notificationSetting => '通知设置';
 
@@ -1905,8 +1914,8 @@ class Translations$sponsorship$zh {
 	/// zh: '详细信息'
 	String get dialogTitle => '详细信息';
 
-	/// zh: '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。 注意：由于上架限制，部分功能被迫移除。 另外，本程序彩蛋是某个抱枕。 BenderBlog Rodriguez 4/10/2026'
-	String get dialogContent => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026';
+	/// zh: '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是使用本程序的代码，把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。 注意：由于上架限制，部分功能被迫移除。 另外，本程序彩蛋是某个抱枕。 BenderBlog Rodriguez 4/10/2026'
+	String get dialogContent => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是使用本程序的代码，把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026';
 
 	/// zh: '华为应用商店网址'
 	String get button => '华为应用商店网址';
@@ -5952,6 +5961,9 @@ extension on Translations {
 			'setting.scanAirconQr' => '扫描空调二维码',
 			'setting.pickAirconQrImage' => '从相册选择二维码图片',
 			'setting.airconCameraUnavailable' => '当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI',
+			'setting.airconScanHint' => '轻点画面可以对焦；空调离得远、放大后仍然模糊时，请用系统相机拍照识别',
+			'setting.airconTakePhoto' => '用系统相机拍照识别',
+			'setting.airconCameraError' => ({required Object error}) => '无法打开相机：${error}',
 			'setting.notificationSetting' => '通知设置',
 			'setting.courseReminderSetting' => '课前通知设置',
 			'setting.courseReminderDescription' => '设置课前提醒通知',
@@ -6062,11 +6074,11 @@ extension on Translations {
 			'setting.changeElectricityAccount.failedGenerate' => ({required Object e}) => '生成失败：${e}',
 			'setting.changeElectricityAccount.buildingNumber' => '楼号',
 			'setting.changeElectricityAccount.buildingNumberHint' => '例如: 16, 7, 55',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.buildingNumberQuery' => '请输入楼号',
 			'setting.changeElectricityAccount.yard' => '院区',
 			'setting.changeElectricityAccount.yardHint' => '选择院区',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '请选择院区',
@@ -6240,7 +6252,7 @@ extension on Translations {
 			'setting.classSwiftExplain' => '正数错后开学日期 负数提前开学日期',
 			'sponsorship.title' => '欢迎使用 XDYou 的鸿蒙版本',
 			'sponsorship.dialogTitle' => '详细信息',
-			'sponsorship.dialogContent' => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026',
+			'sponsorship.dialogContent' => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是使用本程序的代码，把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026',
 			'sponsorship.button' => '华为应用商店网址',
 			'sport.title' => '体育查询',
 			'sport.classInfo' => '课程信息',
