@@ -21,13 +21,6 @@ object WearCompanionPaths {
     const val SCHEMA_VERSION = 1
 }
 
-data class WearCredentialSyncPayload(
-    val idsAccount: String,
-    val idsPassword: String,
-    val isPostGraduate: Boolean? = null,
-    val currentSemester: String? = null,
-)
-
 data class WearScheduleSyncPayload(
     val classTable: ClassTableData,
     val otherExperiments: List<ExperimentData>? = null,
@@ -48,7 +41,7 @@ data class WearPaymentQrSyncPayload(
 
 data class WearCompanionSyncEnvelope(
     val sessionId: String,
-    val credentials: WearCredentialSyncPayload,
+    val profileId: String? = null,
     val schedule: WearScheduleSyncPayload,
     val paymentQr: WearPaymentQrSyncPayload? = null,
     val directPairing: Boolean = false,
@@ -69,7 +62,7 @@ data class WearCompanionSyncEnvelope(
             }
             return WearCompanionSyncEnvelope(
                 sessionId = sessionId,
-                credentials = parseCredentials(json.optJSONObject("credentials")),
+                profileId = json.optString("profileId", "").ifEmpty { null },
                 schedule = parseSchedule(json.optJSONObject("schedule")),
                 paymentQr = parsePaymentQr(json.optJSONObject("paymentQr")),
                 directPairing = json.optBoolean("directPairing", false),
@@ -78,29 +71,6 @@ data class WearCompanionSyncEnvelope(
                 } else {
                     null
                 },
-            )
-        }
-
-        private fun parseCredentials(json: JSONObject?): WearCredentialSyncPayload {
-            if (json == null) {
-                throw WearSyncFormatException("Wear sync credentials are required.")
-            }
-            val account = json.optString("idsAccount", "")
-            val password = json.optString("idsPassword", "")
-            if (account.isEmpty() || password.isEmpty()) {
-                throw WearSyncFormatException("Wear sync credentials are invalid.")
-            }
-            val isPostGraduate = if (json.has("isPostGraduate") && !json.isNull("isPostGraduate")) {
-                json.getBoolean("isPostGraduate")
-            } else {
-                null
-            }
-            val semester = json.optString("currentSemester", "").ifEmpty { null }
-            return WearCredentialSyncPayload(
-                idsAccount = account,
-                idsPassword = password,
-                isPostGraduate = isPostGraduate,
-                currentSemester = semester,
             )
         }
 

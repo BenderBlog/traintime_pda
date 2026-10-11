@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/classtable/class_page/content_classtable_page.dart';
 import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';

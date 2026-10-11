@@ -3,9 +3,9 @@
 
 package io.github.benderblog.traintime_pda.ui.screens
 
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,16 +29,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
-import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import io.github.benderblog.traintime_pda.domain.WearAgendaItem
 import io.github.benderblog.traintime_pda.domain.WearAgendaKind
 import io.github.benderblog.traintime_pda.domain.WearHomeData
+import io.github.benderblog.traintime_pda.ui.PullRefresh
+import io.github.benderblog.traintime_pda.ui.pressFeedback
 import java.time.format.DateTimeFormatter
 
 private val TimeFmt: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -47,95 +48,60 @@ fun HomeScreen(
     loading: Boolean,
     error: String?,
     onRefresh: () -> Unit,
-    onLogout: () -> Unit,
+    onOpenAgenda: () -> Unit,
     onOpenQr: () -> Unit,
-    onRetry: () -> Unit,
 ) {
-    if (loading && data.todayItems.isEmpty() && data.tomorrowItems.isEmpty() && error == null) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-        return
-    }
-
-    if (error != null && data.todayItems.isEmpty() && data.tomorrowItems.isEmpty()) {
+    PullRefresh(refreshing = loading, onRefresh = onRefresh) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = error.take(120),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.body2,
-                color = MaterialTheme.colors.error,
-            )
-            Spacer(Modifier.height(12.dp))
-            Button(onClick = onRetry) { Text("重试") }
-            Spacer(Modifier.height(8.dp))
-            Button(
-                onClick = onLogout,
-                colors = ButtonDefaults.secondaryButtonColors(),
-            ) { Text("重新登录") }
-        }
-        return
-    }
-
-    // Content is biased slightly upward for round screens (extra top padding is modest).
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(start = 28.dp, top = 32.dp, end = 28.dp, bottom = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Column(
-            modifier = Modifier
-                .widthIn(max = 280.dp)
-                .fillMaxWidth(),
+                .padding(start = 28.dp, top = 32.dp, end = 28.dp, bottom = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AgendaSection(title = "今天", items = data.todayItems)
-            AgendaSection(title = "明天", items = data.tomorrowItems)
-            Spacer(Modifier.height(8.dp))
-            CampusCard(onOpenQr = onOpenQr)
-            Spacer(Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                modifier = Modifier
+                    .widthIn(max = 280.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Button(
-                    onClick = onRefresh,
-                    modifier = Modifier.weight(1f, fill = false),
+                val agendaInteraction = remember { MutableInteractionSource() }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(MaterialTheme.colors.surface)
+                        .clickable(
+                            interactionSource = agendaInteraction,
+                            indication = LocalIndication.current,
+                            onClick = onOpenAgenda,
+                        )
+                        .pressFeedback(agendaInteraction)
+                        .padding(12.dp),
                 ) {
-                    Text(if (loading) "…" else "刷新")
+                    Text("日程", style = MaterialTheme.typography.title3)
+                    AgendaSection(title = "今天", items = data.todayItems)
+                    AgendaSection(title = "明天", items = data.tomorrowItems)
+                    Text("查看其他日期 ›", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.caption2)
                 }
-                Button(
-                    onClick = onLogout,
-                    colors = ButtonDefaults.secondaryButtonColors(),
-                    modifier = Modifier.weight(1f, fill = false),
-                ) {
-                    Text("退出")
+                Spacer(Modifier.height(8.dp))
+                CampusCard(onOpenQr = onOpenQr)
+                if (error != null) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = error.take(80),
+                        color = MaterialTheme.colors.error,
+                        style = MaterialTheme.typography.caption2,
+                        textAlign = TextAlign.Center,
+                    )
                 }
-            }
-            if (error != null) {
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = error.take(80),
-                    color = MaterialTheme.colors.error,
-                    style = MaterialTheme.typography.caption2,
-                    textAlign = TextAlign.Center,
-                )
             }
         }
     }
 }
 
 @Composable
-private fun AgendaSection(title: String, items: List<WearAgendaItem>) {
+internal fun AgendaSection(title: String, items: List<WearAgendaItem>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -226,6 +192,7 @@ private fun KindPill(kind: WearAgendaKind) {
 
 @Composable
 private fun CampusCard(onOpenQr: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -241,9 +208,10 @@ private fun CampusCard(onOpenQr: () -> Unit) {
         Spacer(Modifier.height(8.dp))
         Chip(
             onClick = onOpenQr,
+            interactionSource = interaction,
             label = { Text("付款码") },
             colors = ChipDefaults.primaryChipColors(),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().pressFeedback(interaction),
         )
     }
 }

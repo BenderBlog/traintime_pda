@@ -5,10 +5,10 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
-import 'package:watermeter/repository/xidian_ids/school_card_session.dart';
-import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
+import 'package:watermeter/repository/ids_session/classtable_session.dart';
+import 'package:watermeter/repository/ids_session/school_card_session.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
+import 'package:watermeter/repository/ids_session/sysj_session.dart';
 
 /// Phone-side endpoint of the XDYou Wear companion protocol.
 class WearCompanionSyncService {
@@ -18,6 +18,9 @@ class WearCompanionSyncService {
   static const _channel = MethodChannel(channelName);
 
   const WearCompanionSyncService();
+
+  String get phoneAccount =>
+      preference.getString(preference.Preference.idsAccount);
 
   Future<void> startPaymentProxy() async {
     _channel.setMethodCallHandler((call) async {
@@ -53,12 +56,9 @@ class WearCompanionSyncService {
     Uint8List? paymentQr,
     DateTime? paymentQrFetchedAt,
   }) {
-    final account = preference.getString(preference.Preference.idsAccount);
+    final account = phoneAccount;
     final password = preference.getString(preference.Preference.idsPassword);
-    final semester = preference.getString(
-      preference.Preference.currentSemester,
-    );
-    final classTable = ClassTableSession.getCache()?.$2;
+    final classTable = ClassTableSession().getCache()?.$2;
     if (account.isEmpty || password.isEmpty) {
       throw StateError('请先在手机端登录 IDS');
     }
@@ -66,18 +66,10 @@ class WearCompanionSyncService {
       throw StateError('手机端暂无课表缓存，请先刷新首页');
     }
 
-    final experiments = SysjSession.getCache()?.$2;
+    final experiments = SysjSession().getCache()?.$2;
     return {
       'schemaVersion': 1,
       'sessionId': sessionId,
-      // The watch uses these credentials only for the payment-code exception.
-      'credentials': {
-        'idsAccount': account,
-        'idsPassword': password,
-        if (preference.contains(preference.Preference.role))
-          'isPostGraduate': preference.getBool(preference.Preference.role),
-        'currentSemester': semester,
-      },
       'schedule': {
         'classTable': classTable.toJson(),
         if (experiments != null)
@@ -93,22 +85,33 @@ class WearCompanionSyncService {
     };
   }
 
-  Future<Map<String, dynamic>> _buildSnapshotWithPaymentQr({
+  Future<Map<String, dynamic>> _buildSnapshotWithCachedPaymentQr({
     required String sessionId,
   }) async {
-    Uint8List? paymentQr;
-    DateTime? fetchedAt;
+    final snapshot = buildSnapshot(sessionId: sessionId);
     try {
-      paymentQr = await SchoolCardSession().getQRCode();
-      fetchedAt = DateTime.now();
+      final cached = await _channel
+          .invokeMapMethod<String, dynamic>('getCachedPaymentQr', {
+            'idsAccount': phoneAccount,
+          })
+          .timeout(const Duration(seconds: 2));
+      if (cached?['profileId'] is String) {
+        snapshot['profileId'] = cached!['profileId'];
+      }
+      if (cached != null &&
+          cached['pngBase64'] is String &&
+          (cached['pngBase64'] as String).isNotEmpty &&
+          cached['fetchedAtEpochMs'] is num &&
+          (cached['fetchedAtEpochMs'] as num) >= 0) {
+        snapshot['paymentQr'] = {
+          'pngBase64': cached['pngBase64'],
+          'fetchedAtEpochMs': cached['fetchedAtEpochMs'],
+        };
+      }
     } catch (_) {
-      // Schedule and credential sync must remain usable if payment auth expires.
+      // An optional cached code must never block offline schedule synchronization.
     }
-    return buildSnapshot(
-      sessionId: sessionId,
-      paymentQr: paymentQr,
-      paymentQrFetchedAt: fetchedAt,
-    );
+    return snapshot;
   }
 
   Future<List<WearNode>> connectedNodes() async {
@@ -129,22 +132,27 @@ class WearCompanionSyncService {
   }
 
   Future<bool> pairAndSync(WearNode node) async {
-    final snapshot = await _buildSnapshotWithPaymentQr(
+    final snapshot = await _buildSnapshotWithCachedPaymentQr(
       sessionId: 'direct-pairing',
     );
     snapshot['directPairing'] = true;
     final payload = jsonEncode(snapshot);
-    await _channel.invokeMethod<void>('sendSyncPayload', {
-      'nodeId': node.id,
-      'messagePath': syncPath,
-      'payload': payload,
-    });
+    await _channel
+        .invokeMethod<void>('sendSyncPayload', {
+          'nodeId': node.id,
+          'messagePath': syncPath,
+          'payload': payload,
+        })
+        .timeout(
+          const Duration(seconds: 20),
+          onTimeout: () => throw StateError('同步超时，请保持手表应用在前台后重试'),
+        );
     return snapshot.containsKey('paymentQr');
   }
 
   /// Updates the native cache used to answer a bound watch in the background.
   Future<void> cacheLatestSnapshot() async {
-    final snapshot = await _buildSnapshotWithPaymentQr(
+    final snapshot = await _buildSnapshotWithCachedPaymentQr(
       sessionId: 'background-sync',
     );
     final payload = jsonEncode(snapshot);

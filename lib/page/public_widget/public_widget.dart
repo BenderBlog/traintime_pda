@@ -4,8 +4,8 @@
 
 // Useful weights to simplify watermeter programming.
 
-import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 /// Check the width
@@ -157,7 +157,7 @@ class ReloadWidget extends StatelessWidget {
     return [
           [
                 Text(
-                  FlutterI18n.translate(context, "error_detected"),
+                  context.t.common.errorDetected,
                   style: const TextStyle(fontSize: 16),
                 ).center().padding(bottom: 8),
                 if (errorStatus != null)
@@ -168,12 +168,15 @@ class ReloadWidget extends StatelessWidget {
               .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
               .scrollable()
               .expanded(),
-          FilledButton(
-            onPressed: function,
-            child: Text(
-              buttonName ?? FlutterI18n.translate(context, "click_to_refresh"),
-            ),
-          ).padding(top: 8),
+          SafeArea(
+            top: false,
+            left: false,
+            right: false,
+            child: FilledButton(
+              onPressed: function,
+              child: Text(buttonName ?? context.t.common.clickToRefresh),
+            ).padding(top: 8),
+          ),
         ]
         .toColumn(mainAxisAlignment: MainAxisAlignment.center)
         .padding(horizontal: 20, vertical: 8)

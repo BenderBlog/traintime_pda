@@ -5,7 +5,6 @@
 // No more supression for the students who want talking!
 /*
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/pda_service/club_info.dart';
 
 class ClubCard extends StatelessWidget {
@@ -64,10 +63,7 @@ class ClubCard extends StatelessWidget {
                                       ).colorScheme.primary,
                                     ),
                                     child: Text(
-                                      FlutterI18n.translate(
-                                        context,
-                                        type.getTypeName(),
-                                      ),
+                                      context.t.resolveKey(type.getTypeName()),
                                       style: TextStyle(
                                         color: Theme.of(
                                           context,

@@ -4,12 +4,12 @@
 import 'package:signals/signals.dart';
 import 'package:watermeter/model/xidian_ids/library.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart';
+import 'package:watermeter/repository/ids_session/library_session.dart';
 
 class LibraryController {
   static final LibraryController i = LibraryController._();
-  bool _isReloading = false;
   final Map<int, Future<List<BookLocation>>> _bookLocationFutures = {};
+  final LibrarySession session = LibrarySession();
 
   LibraryController._();
 
@@ -18,20 +18,16 @@ class LibraryController {
   );
 
   Future<void> reloadBorrowList() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = libraryBorrowStateSignal.peek().value;
     libraryBorrowStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await LibrarySession().getBorrowList();
-      libraryBorrowStateSignal.value = AsyncState.data(result);
+      final result = await session.getBorrowList();
+      libraryBorrowStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       libraryBorrowStateSignal.value = AsyncState.error(e, s);
       log.handle(e, s, "[LibraryController][reloadBorrowList] Have issue");
-    } finally {
-      _isReloading = false;
     }
   }
 
@@ -43,7 +39,7 @@ class LibraryController {
 
     return _bookLocationFutures.putIfAbsent(book.docNumber, () async {
       try {
-        return await LibrarySession().bookLocations(book.docNumber);
+        return await session.bookLocations(book.docNumber);
       } catch (e, s) {
         _bookLocationFutures.remove(book.docNumber);
         log.handle(e, s, "[LibraryController][loadBookLocations] Have issue");

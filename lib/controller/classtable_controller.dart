@@ -8,22 +8,25 @@ import 'package:signals/signals.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
 import 'package:watermeter/controller/semester_controller.dart';
+import 'package:watermeter/controller/sport_controller.dart';
 import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:watermeter/model/xidian_sport/sport_class.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/repository/xidian_ids/classtable_session.dart';
+import 'package:watermeter/repository/ids_session/classtable_session.dart';
 
 class ClassTableController {
   static const decorationName = "decoration.jpg";
   static final ClassTableController i = ClassTableController._();
-  bool _isReloading = false;
+
+  final ClassTableSession session = ClassTableSession();
 
   ClassTableController._() {
-    final cache = ClassTableSession.getCache();
+    final cache = session.getCache();
     if (cache != null) {
       final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
       _lastValidSchoolClassTable.value = cached;
@@ -50,7 +53,7 @@ class ClassTableController {
       _lastHandledSemesterSyncEvent = semesterChangeEvent;
       if (semesterChangeEvent.didChange) {
         _lastValidSchoolClassTable.value = null;
-        ClassTableSession.deleteCache();
+        session.deleteCache();
         unawaited(CustomClassController.i.clearAll());
       }
       unawaited(reloadClassTable());
@@ -64,18 +67,17 @@ class ClassTableController {
   }
 
   Future<void> reloadClassTable() async {
-    if (_isReloading) return;
-    _isReloading = true;
     final previous = _lastValidSchoolClassTable.value;
     schoolClassTableStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getClassTable(
+      final result = await session.getClassTable(
         SemesterController.i.semesterSignal.value,
+        preference.getUserRole(),
       );
       _lastValidSchoolClassTable.value = result;
-      schoolClassTableStateSignal.value = AsyncState.data(result);
+      schoolClassTableStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       schoolClassTableStateSignal.value = AsyncState.error(e, s);
       log.handle(
@@ -83,8 +85,6 @@ class ClassTableController {
         s,
         "[ClassTableControllerNew][reloadClassTable] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 
@@ -93,19 +93,81 @@ class ClassTableController {
   );
 
   late final classTableComputedSignal = computed<ClassTableData>(() {
+    // 第一步：获取教务课表与体育课程。computed 内同时读取两个信号，
+    // 体育课程刷新后课表教室会自动重算。
     final networkClassTable = schoolClassTableComputedSignal.value;
+    final sportClasses = preference.getBool(preference.Preference.role)
+        ? const <SportClassItem>[]
+        : SportController.i.sportClassesComputedSignal.value;
 
+    // 第二步-a：按（学期、教师、星期、起止节次）汇总体育上课地点，
+    // 同一语义键对应多个地点时保留为集合，唯一匹配才回填。
+    final sportLocations = <(String, String, int, int, int), Set<String>>{};
+    for (final sportClass in sportClasses) {
+      final place = sportClass.place.trim();
+      if (sportClass.term != networkClassTable.semesterCode ||
+          sportClass.teacher.isEmpty ||
+          place.isEmpty) {
+        continue;
+      }
+      sportLocations
+          .putIfAbsent((
+            sportClass.term,
+            sportClass.teacher,
+            sportClass.week,
+            sportClass.start,
+            sportClass.stop,
+          ), () => <String>{})
+          .add(place);
+    }
+
+    // 第二步-b：拷贝一份教务时间安排，只改 classroom，不污染缓存原对象。
+    final timeArrangement = networkClassTable.timeArrangement.map((
+      arrangement,
+    ) {
+      return TimeArrangement(
+        source: arrangement.source,
+        index: arrangement.index,
+        weekList: List<bool>.from(arrangement.weekList),
+        classroom: arrangement.classroom,
+        teacher: arrangement.teacher,
+        day: arrangement.day,
+        start: arrangement.start,
+        stop: arrangement.stop,
+      );
+    }).toList();
+
+    for (final arrangement in timeArrangement) {
+      // 仅处理教务来源、教室为空且索引合法的安排，已有教室不覆盖。
+      if (arrangement.source != Source.school ||
+          arrangement.classroom?.trim().isNotEmpty == true ||
+          arrangement.index < 0 ||
+          arrangement.index >= networkClassTable.classDetail.length) {
+        continue;
+      }
+      final matchedLocations =
+          sportLocations[(
+            networkClassTable.semesterCode,
+            arrangement.teacher ?? '',
+            arrangement.day,
+            arrangement.start,
+            arrangement.stop,
+          )];
+      if (matchedLocations?.length == 1) {
+        arrangement.classroom = matchedLocations!.single;
+      }
+    }
+
+    // 第二步-c：输出全新的 ClassTableData。
     return ClassTableData(
       semesterLength: networkClassTable.semesterLength,
       semesterCode: networkClassTable.semesterCode,
       termStartDay: networkClassTable.termStartDay,
-      classDetail: List<ClassDetail>.from(networkClassTable.classDetail),
-      notArranged: List<NotArrangementClassDetail>.from(
-        networkClassTable.notArranged,
-      ),
-      timeArrangement: List<TimeArrangement>.from(
-        networkClassTable.timeArrangement,
-      ),
+      classDetail: networkClassTable.classDetail.map(ClassDetail.from).toList(),
+      notArranged: networkClassTable.notArranged
+          .map(NotArrangementClassDetail.from)
+          .toList(),
+      timeArrangement: timeArrangement,
       classChanges: List<ClassChange>.from(networkClassTable.classChanges),
     );
   });
@@ -125,8 +187,8 @@ class ClassTableController {
         classTableComputedSignal.value.timeArrangement.isNotEmpty,
   );
 
-  late final classTableCacheHintKeyComputedSignal = computed<String?>(
-    () => _lastValidSchoolClassTable.value?.hintKey,
+  late final classTableCacheHintKeyComputedSignal = computed<CacheHint?>(
+    () => _lastValidSchoolClassTable.value?.cacheHint,
   );
 
   late final startDayComputedSignal = computed<DateTime?>(() {

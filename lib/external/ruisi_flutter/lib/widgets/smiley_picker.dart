@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 /// 表情选择器组件
@@ -92,7 +92,7 @@ class _SmileyPickerState extends State<SmileyPicker>
                       borderRadius: BorderRadius.circular(6),
                       child: s.isImage
                           ? Image.asset(
-                              'assets/ruisi_flutter/smiley/${s.path}.png',
+                              'assets/ruisi_flutter/smiley/${s.path}.webp',
                               fit: BoxFit.contain,
                             )
                           : Center(

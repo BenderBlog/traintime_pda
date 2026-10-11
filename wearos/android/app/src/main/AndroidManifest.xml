@@ -2,7 +2,6 @@
 
     <uses-feature android:name="android.hardware.type.watch" android:required="true" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
-    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="false"
@@ -16,6 +15,21 @@
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="false" />
+
+        <service
+            android:name=".tiles.AgendaTileService"
+            android:label="@string/agenda_tile_label"
+            android:description="@string/agenda_tile_description"
+            android:icon="@mipmap/ic_launcher"
+            android:exported="true"
+            android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">
+            <intent-filter>
+                <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />
+            </intent-filter>
+            <meta-data
+                android:name="androidx.wear.tiles.PREVIEW"
+                android:resource="@drawable/agenda_tile_preview" />
+        </service>
 
         <activity
             android:name=".MainActivity"

@@ -1,7 +1,7 @@
 // Copyright 2024 BenderBlog Rodriguez.
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class BothSideSheet extends StatefulWidget {
   final Widget child;

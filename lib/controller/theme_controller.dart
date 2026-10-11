@@ -2,15 +2,17 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'dart:io';
+// TODO: Add logic related to writing to preference.
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/repository/localization.dart';
 import 'package:signals/signals.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
+import 'package:watermeter/themes/font_setting.dart';
 
 class ThemeController {
   static final ThemeController i = ThemeController._();
@@ -22,23 +24,10 @@ class ThemeController {
   final colorStateSignal = signal(ThemeMode.system);
   final localeSignal = signal(const Locale("zh", "CN"));
   final colorSignal = signal<List<FlexSchemeColor>>([pdaColorScheme.first]);
+  final fontScaleSignal = signal<double>(defaultFontScale);
+  final fontWeightSignal = signal<double>(defaultFontWeight);
 
-  late final i18nDelegateSignal = computed<FlutterI18nDelegate>(() {
-    final locale = localeSignal.value;
-    return FlutterI18nDelegate(
-      translationLoader: FileTranslationLoader(
-        fallbackFile: "zh_CN",
-        useCountryCode: true,
-        forcedLocale: locale,
-      ),
-      missingTranslationHandler: (key, locale) {
-        log.info(
-          "[Locale] Missing Key: $key, "
-          "languageCode: ${locale?.languageCode ?? "unknown"}",
-        );
-      },
-    );
-  });
+  final savedLocale = signal<Localization>(Localization.undefined);
 
   void updateTheme() {
     log.info("[ThemeController] Changing color...");
@@ -47,33 +36,41 @@ class ThemeController {
 
     log.info("[ThemeController] Changing brightness...");
     colorStateSignal.value =
-        demoBlueModeMap[preference.getInt(preference.Preference.brightness)]!;
+        brightnessModeList[preference.getInt(
+          preference.Preference.brightness,
+        )]!;
+    log.info("[ThemeController] Changing font scale...");
+    fontScaleSignal.value = preference.contains(preference.Preference.fontScale)
+        ? preference
+              .getDouble(preference.Preference.fontScale)
+              .clamp(minFontScale, maxFontScale)
+              .toDouble()
+        : defaultFontScale;
+    log.info("[ThemeController] Changing font weight...");
+    fontWeightSignal.value =
+        preference.contains(preference.Preference.fontWeight)
+        ? preference
+              .getDouble(preference.Preference.fontWeight)
+              .clamp(minFontWeight, maxFontWeight)
+              .toDouble()
+        : defaultFontWeight;
     log.info("[ThemeController] Changing locale...");
-    String localization = preference.getString(
-      preference.Preference.localization,
-    );
-    if (localization.isEmpty) {
-      String systemLocale = Platform.localeName;
-      log.info("[ThemeController] System lang $systemLocale");
-      if (systemLocale.contains("zh")) {
-        if (Platform.isIOS || Platform.isMacOS) {
-          if (systemLocale.contains("Hans")) {
-            localization = "zh_CN";
-          } else {
-            localization = "zh_TW";
-          }
-        } else {
-          if (systemLocale.contains("CN") || systemLocale.contains("SG")) {
-            localization = "zh_CN";
-          } else {
-            localization = "zh_TW";
-          }
-        }
-      } else {
-        localization = "en_US";
-      }
-    }
-    log.info("[ThemeController] Locale to set $localization");
-    localeSignal.value = Locale.fromSubtags(languageCode: localization);
+    savedLocale.value = Localization.fromPreference();
+    _applyLocale();
+  }
+
+  /// Call when the user picks a language. Updates UI immediately and persists
+  /// asynchronously.
+  Future<void> setLocale(Localization value) async {
+    savedLocale.value = value;
+    _applyLocale();
+    await value.saveToPreference();
+  }
+
+  void _applyLocale() {
+    final localization = savedLocale.value.resolved;
+    log.info("[ThemeController] Locale to set ${localization.string}");
+    localeSignal.value = localization.flutterLocale!;
+    LocaleSettings.setLocaleSync(localization.appLocale);
   }
 }

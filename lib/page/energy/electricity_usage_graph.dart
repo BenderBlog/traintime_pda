@@ -5,11 +5,12 @@ import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:material_ui/material_ui.dart';
+
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class _GraphMetrics {
   static const double chartHorizontalPadding = 30;
@@ -54,8 +55,7 @@ class ElectricityUsageGraph extends StatefulWidget {
     // Parsing number, store the latest data.
     // Notice that the historyElectricityInfo have sorted.
     for (final info in historyElectricityInfo) {
-      final v = double.tryParse(info.remain);
-      if (v == null) continue;
+      final v = info.remain.toDouble();
 
       final dayTime = DateTime(
         info.fetchDay.year,
@@ -97,12 +97,22 @@ class ElectricityUsageGraph extends StatefulWidget {
     final rawBiggestValue = data.values.reduce((a, b) => a > b ? a : b);
     final rawSmallestValue = data.values.reduce((a, b) => a > b ? b : a);
     final isFlatData = rawBiggestValue == rawSmallestValue;
+    final containsNegativeValue = rawSmallestValue < 0;
     // Flat data still needs a non-zero range so the single horizontal line can
     // be placed around the visual middle instead of collapsing to the bottom.
-    double biggestValue = isFlatData
+    // Negative balances also need room above zero so that the zero reference
+    // line and every data point remain inside the plot area.
+    final double biggestValue = containsNegativeValue
+        ? max(
+            rawBiggestValue + _GraphMetrics.yAxisPaddingValue,
+            _GraphMetrics.yAxisPaddingValue,
+          )
+        : isFlatData
         ? rawBiggestValue + _GraphMetrics.flatDataExtraValue
         : rawBiggestValue + _GraphMetrics.yAxisPaddingValue;
-    double smallestValue = isFlatData
+    final double smallestValue = containsNegativeValue
+        ? rawSmallestValue - _GraphMetrics.yAxisPaddingValue
+        : isFlatData
         ? max(rawSmallestValue - _GraphMetrics.flatDataExtraValue, 0)
         : max(rawSmallestValue - _GraphMetrics.yAxisPaddingValue, 0);
     final verticalStep = plotHeight / (biggestValue - smallestValue);
@@ -140,16 +150,25 @@ class ElectricityUsageGraph extends StatefulWidget {
       "$points",
     );
 
-    if (isFlatData) {
+    if (isFlatData && !containsNegativeValue) {
       lines = {rawBiggestValue.toInt(): plotTop + plotHeight / 2};
       return;
     }
     final verticalkeyStep =
         (biggestValue - smallestValue) / _GraphMetrics.defaultYAxisSegmentCount;
-    final List<double> keys = List.generate(
+    final keys = List.generate(
       _GraphMetrics.defaultYAxisLabelCount,
       (i) => biggestValue - (i + 1) * verticalkeyStep,
     );
+    if (containsNegativeValue) {
+      var closestToZero = 0;
+      for (var i = 1; i < keys.length; i++) {
+        if (keys[i].abs() < keys[closestToZero].abs()) {
+          closestToZero = i;
+        }
+      }
+      keys[closestToZero] = 0;
+    }
     lines = {
       for (final value in keys)
         value.toInt(): plotBottom - (value - smallestValue) * verticalStep,
@@ -201,7 +220,7 @@ class _ElectricityUsageGraphState extends State<ElectricityUsageGraph> {
       );
 
       return Text(
-        FlutterI18n.translate(context, "electricity.not_enough_data"),
+        context.t.electricity.notEnoughData,
         textAlign: TextAlign.center,
 
         style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),

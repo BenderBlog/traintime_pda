@@ -2,8 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:flutter/material.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
@@ -25,10 +25,13 @@ class EnergyCard extends StatelessWidget {
         final state = controller.energyInfoStateSignal.value;
         final displayInfo = controller.displayEnergyInfo.value;
         final electricityWarning = controller.electricityWarning.value;
+        final firstElectricityMeter =
+            displayInfo?.electricityMeterList.values.first;
         final lowElectricityWarning =
-            displayInfo != null &&
+            firstElectricityMeter != null &&
             electricityWarning >= 0 &&
-            displayInfo.electricityRemain < electricityWarning;
+            /// TODO: Currently we just assume that there's only one electric meter in a dorm.
+            firstElectricityMeter.remain < electricityWarning;
 
         return MainPageCard(
           onPressed: () async {
@@ -39,64 +42,41 @@ class EnergyCard extends StatelessWidget {
           type: lowElectricityWarning
               ? HomeCardType.warning
               : HomeCardType.plain,
-          text: FlutterI18n.translate(
-            context,
-            "homepage.electricity_card.title",
-          ),
+          text: context.t.homepage.electricityCard.title,
           infoText: DefaultTextStyle.merge(
             style: const TextStyle(fontSize: 20),
             child: displayInfo != null
                 ? Text(
-                    FlutterI18n.translate(
-                      context,
-                      "homepage.electricity_card.current_electricity",
-                      translationParams: {
-                        "amount": displayInfo.electricityRemain.toString(),
-                      },
-                    ),
+                    firstElectricityMeter != null
+                        ? context.t.homepage.electricityCard.currentElectricity(
+                            amount: firstElectricityMeter.remain.toString(),
+                          )
+                        : context.t.electricityStatus.noElectricityInfo,
                   )
                 : state.map(
                     data: (_) => const Text(""),
-                    error: () => Text(
-                      FlutterI18n.translate(
-                        context,
-                        "electricity_status.remain_not_found",
-                      ),
-                    ),
-                    loading: () => Text(
-                      FlutterI18n.translate(
-                        context,
-                        "electricity_status.remain_fetching",
-                      ),
-                    ),
+                    error: () =>
+                        Text(context.t.electricityStatus.remainNotFound),
+                    loading: () =>
+                        Text(context.t.electricityStatus.remainFetching),
                   ),
           ),
           bottomText: displayInfo != null
               ? Text(
-                  FlutterI18n.translate(
-                    context,
-                    "homepage.electricity_card.cache_notice",
-                    translationParams: {
-                      "date": DateFormat(
-                        "yyyy-MM-dd",
-                      ).format(displayInfo.electricityMeterList.first.ReadTime),
-                    },
-                  ).replaceAll("\n", ""),
+                  firstElectricityMeter != null
+                      ? context.t.homepage.electricityCard
+                            .cacheNotice(
+                              date: DateFormat(
+                                "yyyy-MM-dd",
+                              ).format(firstElectricityMeter.fetchDay),
+                            )
+                            .replaceAll("\n", "")
+                      : context.t.electricityStatus.noElectricityInfo,
                 )
               : state.map(
                   data: (_) => const Text(""),
-                  error: () => Text(
-                    FlutterI18n.translate(
-                      context,
-                      "electricity_status.owe_issue",
-                    ),
-                  ),
-                  loading: () => Text(
-                    FlutterI18n.translate(
-                      context,
-                      "electricity_status.owe_fetching",
-                    ),
-                  ),
+                  error: () => Text(context.t.electricityStatus.oweIssue),
+                  loading: () => Text(context.t.electricityStatus.oweFetching),
                 ),
         );
       },

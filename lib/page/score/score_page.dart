@@ -3,19 +3,20 @@
 // SPDX-License-Identifier: MPL-2.0
 // Main window for score.
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/public_widget/cache_alerter.dart';
 import 'package:watermeter/page/public_widget/column_choose_dialog.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/loading_alerter.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:watermeter/page/score/score_info_card.dart';
 import 'package:watermeter/page/score/score_state.dart';
 import 'package:watermeter/page/score/score_statics.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({super.key});
@@ -36,9 +37,7 @@ class _ScorePageState extends State<ScorePage> {
 
   void pushSumDialog(BuildContext context, String text) => context.pushDialog(
     AlertDialog(
-      title: Text(
-        FlutterI18n.translate(context, "score.score_choice.sum_dialog_title"),
-      ),
+      title: Text(context.t.score.scoreChoice.sumDialogTitle),
       content: Text(text),
     ),
   );
@@ -57,6 +56,10 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isSelectMode = context.select<ScoreState, bool>(
+      (state) => state.isSelectMode,
+    );
+
     return Scaffold(
       body: Column(
         children: [
@@ -67,7 +70,7 @@ class _ScorePageState extends State<ScorePage> {
                   isLoading: true,
                   showOverlay: false,
                   showAnimation: false,
-                  hint: FlutterI18n.translate(context, "score.fetching_hint"),
+                  hint: context.t.score.fetchingHint,
                 );
               }
               return const SizedBox.shrink();
@@ -77,7 +80,9 @@ class _ScorePageState extends State<ScorePage> {
             builder: (context, state, _) {
               if (state.state == ScoreFetchState.readyCache) {
                 return CacheAlerter(
-                  hint: FlutterI18n.translate(context, state.hintKey ?? ""),
+                  hint:
+                      state.cacheHint?.resolve(context.t) ??
+                      context.t.common.cacheReasonDefault,
                   placeOfCache: PlaceOfCache.device,
                   fetchTime: state.fetchDate,
                 );
@@ -94,10 +99,7 @@ class _ScorePageState extends State<ScorePage> {
                     autofocus: false,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
-                      hintText: FlutterI18n.translate(
-                        context,
-                        "score.score_page.search_hint",
-                      ),
+                      hintText: context.t.score.scorePage.searchHint,
                     ),
                     onChanged: (value) =>
                         context.read<ScoreState>().search = value,
@@ -111,7 +113,7 @@ class _ScorePageState extends State<ScorePage> {
                           context: context,
                           builder: (context) => ColumnChooseDialog(
                             chooseList: [
-                              "score.all_semester",
+                              context.t.score.allSemester,
                               ...state.semester,
                             ].toList(),
                           ),
@@ -125,17 +127,10 @@ class _ScorePageState extends State<ScorePage> {
                         });
                       },
                       child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "score.chosen_semester",
-                          translationParams: {
-                            "chosen": state.chosenSemester == ""
-                                ? FlutterI18n.translate(
-                                    context,
-                                    "score.all_semester",
-                                  )
-                                : state.chosenSemester,
-                          },
+                        context.t.score.chosenSemester(
+                          chosen: state.chosenSemester == ""
+                              ? context.t.score.allSemester
+                              : state.chosenSemester,
                         ),
                       ),
                     ),
@@ -147,7 +142,7 @@ class _ScorePageState extends State<ScorePage> {
                           context: context,
                           builder: (context) => ColumnChooseDialog(
                             chooseList: [
-                              "score.all_type",
+                              context.t.score.allType,
                               ...state.statuses,
                             ].toList(),
                           ),
@@ -161,17 +156,10 @@ class _ScorePageState extends State<ScorePage> {
                         });
                       },
                       child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "score.chosen_type",
-                          translationParams: {
-                            "type": state.chosenStatus == ""
-                                ? FlutterI18n.translate(
-                                    context,
-                                    "score.all_type",
-                                  )
-                                : state.chosenStatus,
-                          },
+                        context.t.score.chosenType(
+                          type: state.chosenStatus == ""
+                              ? context.t.score.allType
+                              : state.chosenStatus,
                         ),
                       ),
                     ),
@@ -187,7 +175,9 @@ class _ScorePageState extends State<ScorePage> {
                   builder: (context, constraints) => AlignedGridView.count(
                     shrinkWrap: true,
                     itemCount: state.toShow.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                    ).withSafeBottom(context),
                     crossAxisCount: (constraints.maxWidth ~/ cardWidth).clamp(
                       1,
                       1000,
@@ -201,106 +191,78 @@ class _ScorePageState extends State<ScorePage> {
               } else {
                 return EmptyListView(
                   type: EmptyListViewType.reading,
-                  text: FlutterI18n.translate(
-                    context,
-                    "score.score_page.no_record",
-                  ),
+                  text: context.t.score.scorePage.noRecord,
                 );
               }
             },
-          ).safeArea().expanded(),
+          ).expanded(),
         ],
       ),
       floatingActionButton: scoreInfoDialog(context),
-      bottomNavigationBar: Consumer<ScoreState>(
-        builder: (context, state, _) => Visibility(
-          visible: state.isSelectMode,
-          child: BottomAppBar(
-            height: 136,
-            elevation: 5.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
+      bottomNavigationBar: isSelectMode
+          ? Consumer<ScoreState>(
+              builder: (context, state, _) => BottomAppBar(
+                height: 136,
+                elevation: 5.0,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.all),
-                      child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "score.score_page.select_all",
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.all),
+                          child: Text(context.t.score.scorePage.selectAll),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.none),
-                      child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "score.score_page.select_nothing",
+                        const SizedBox(width: 12),
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.none),
+                          child: Text(context.t.score.scorePage.selectNothing),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    FilledButton(
-                      onPressed: () =>
-                          state.setScoreChoiceState(ChoiceState.original),
-                      child: Text(
-                        FlutterI18n.translate(
-                          context,
-                          "score.score_page.reset_select",
+                        const SizedBox(width: 12),
+                        FilledButton(
+                          onPressed: () =>
+                              state.setScoreChoiceState(ChoiceState.original),
+                          child: Text(context.t.score.scorePage.resetSelect),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(state.bottomInfo(context)),
-                    IconButton(
-                      onPressed: () => pushSumDialog(
-                        context,
-                        FlutterI18n.translate(
-                          context,
-                          "score.score_choice.sum_dialog_content",
-                          translationParams: {
-                            "gpa_all": state
-                                .evalAvg(true, isGPA: true)
-                                .toStringAsFixed(3),
-                            "avg_all": state.evalAvg(true).toStringAsFixed(2),
-                            "credit_all": state
-                                .evalCredit(true)
-                                .toStringAsFixed(2),
-                            "unpassed": state.unPassed.isEmpty
-                                ? FlutterI18n.translate(
-                                    context,
-                                    "score.all_passed",
-                                  )
-                                : state.unPassed,
-                            "not_core_credit": state.notCoreClass.toString(),
-                            "not_core_type": FlutterI18n.translate(
-                              context,
-                              state.notCoreClassTypeList,
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(state.bottomInfo(context)),
+                        IconButton(
+                          onPressed: () => pushSumDialog(
+                            context,
+                            context.t.score.scoreChoice.sumDialogContent(
+                              gpa_all: state
+                                  .evalAvg(true, isGPA: true)
+                                  .toStringAsFixed(3),
+                              avg_all: state.evalAvg(true).toStringAsFixed(2),
+                              credit_all: state
+                                  .evalCredit(true)
+                                  .toStringAsFixed(2),
+                              unpassed: state.unPassed.isEmpty
+                                  ? context.t.score.allPassed
+                                  : state.unPassed,
+                              not_core_type: state.notCoreClassTypeList == null
+                                  ? context.t.score.none
+                                  : state.notCoreClassTypeList!,
                             ),
-                          },
+                          ),
+                          icon: const Icon(Icons.info),
                         ),
-                      ),
-                      icon: const Icon(Icons.info),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            )
+          : null,
     );
   }
 }

@@ -12,21 +12,37 @@ import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/sysj_session.dart';
+import 'package:watermeter/repository/ids_session/sysj_session.dart';
+import 'package:watermeter/repository/preference.dart' as pref;
 
 class OtherExperimentController {
   static final OtherExperimentController i = OtherExperimentController._();
-  bool _isReloading = false;
+  final session = SysjSession();
 
   OtherExperimentController._() {
+    if (pref.getBool(pref.Preference.role)) {
+      _setUnavailableForPostgraduate();
+      return;
+    }
+
     /// Load from cache at the beginning
-    final cache = SysjSession.getCache();
+    final cache = session.getCache();
     if (cache != null) {
       final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
       _lastValidOtherExperiment.value = cached;
       otherExperimentStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
+  }
+
+  void _setUnavailableForPostgraduate() {
+    _lastValidOtherExperiment.value = null;
+    otherExperimentStateSignal.value = AsyncState.data(
+      FetchResult.fresh(
+        fetchTime: DateTime.now(),
+        data: const <ExperimentData>[],
+      ),
+    );
   }
 
   final _lastValidOtherExperiment = signal<FetchResult<List<ExperimentData>>?>(
@@ -40,6 +56,11 @@ class OtherExperimentController {
 
   void _initEffects() {
     effect(() {
+      if (pref.getBool(pref.Preference.role)) {
+        _setUnavailableForPostgraduate();
+        return;
+      }
+
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
       if (semesterChangeEvent == null ||
@@ -50,23 +71,26 @@ class OtherExperimentController {
       _lastHandledSemesterSyncEvent = semesterChangeEvent;
       if (semesterChangeEvent.didChange) {
         _lastValidOtherExperiment.value = null;
-        SysjSession.deleteCache();
+        session.deleteCache();
       }
       unawaited(reloadOtherExperiment());
     }, options: EffectOptions(name: "OtherExperimentSemesterChangeEffect"));
   }
 
   Future<void> reloadOtherExperiment() async {
-    if (_isReloading) return;
-    _isReloading = true;
+    if (pref.getBool(pref.Preference.role)) {
+      _setUnavailableForPostgraduate();
+      return;
+    }
+
     final previous = _lastValidOtherExperiment.value;
     otherExperimentStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getOtherExperimentData();
+      final result = await session.getOtherExperimentData();
       _lastValidOtherExperiment.value = result;
-      otherExperimentStateSignal.value = AsyncState.data(result);
+      otherExperimentStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       otherExperimentStateSignal.value = AsyncState.error(e, s);
       log.handle(
@@ -74,8 +98,6 @@ class OtherExperimentController {
         s,
         "[OtherExperimentController][reloadOtherExperiment] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 
@@ -95,8 +117,8 @@ class OtherExperimentController {
     () => _lastValidOtherExperiment.value?.fetchTime,
   );
 
-  late final otherExperimentCacheHintKey = computed<String?>(
-    () => _lastValidOtherExperiment.value?.hintKey,
+  late final otherExperimentCacheHintKey = computed<CacheHint?>(
+    () => _lastValidOtherExperiment.value?.cacheHint,
   );
 
   late final hasOtherExperimentArrangement = computed(

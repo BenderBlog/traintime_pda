@@ -1,7 +1,7 @@
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 class InfoCard extends StatelessWidget {
@@ -67,7 +67,7 @@ class InfoCard extends StatelessWidget {
         ]
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
         .padding(bottom: 12)
-        .card(elevation: 0);
+        .card(elevation: 0, clipBehavior: Clip.antiAlias);
   }
 }
 
@@ -76,12 +76,14 @@ class InfoItem extends StatelessWidget {
   final String label;
   final String? value;
   final Color? valueColor;
+  final bool isWhiteBackground;
   const InfoItem({
     super.key,
     required this.icon,
     required this.label,
     this.value,
     this.valueColor,
+    this.isWhiteBackground = true,
   });
 
   @override
@@ -92,18 +94,22 @@ class InfoItem extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: Colors.grey[600]),
           const SizedBox(width: 12),
-          Text(
-            "$label${value == null ? "" : "："}",
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+          Flexible(
+            child: Text(
+              "$label${value == null ? "" : "："}",
+              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            ),
           ),
           if (value != null) ...[
             const SizedBox(width: 4),
-            Text(
-              value!,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: valueColor ?? Theme.of(context).primaryColor,
+            Flexible(
+              child: Text(
+                value!,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: valueColor ?? Theme.of(context).primaryColor,
+                ),
               ),
             ),
           ],

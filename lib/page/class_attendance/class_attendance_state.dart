@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/learning_session.dart';
+import 'package:watermeter/repository/ids_session/learning_session.dart';
 
 enum ClassAttendanceFetchState { fetching, ok, error, empty }
 

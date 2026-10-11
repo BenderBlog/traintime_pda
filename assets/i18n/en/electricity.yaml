@@ -1,0 +1,75 @@
+---
+title: Power Info
+power_title: Infomation
+cache_hint_account_missing: Electricity account information is missing, showing cached data.
+cache_hint_account_parse_failed: Failed to parse the electricity account, showing cached data.
+cache_hint_captcha_failed: Captcha verification failed. Please retry. Showing cached data.
+cache_hint_password_wrong: IDS password is incorrect or expired. Update your password and retry. Showing cached data.
+cache_hint_login_failed: Failed to log in to the electricity service, showing cached
+  data.
+cache_hint_network_failed: Electricity service network request failed, showing cached
+  data.
+cache_hint_unknown_error: Failed to fetch the latest electricity data online, showing
+  cached data. Check logs for details.
+cache_notice: Last fetched
+account: Account
+remain_power: Remain power
+owe_info: Arrears
+history: Billing History
+daily_usage: Average usage per day
+not_enough_data: Not enough data for rendering graph
+info: History will be recorded locally while average usage is based on the electric
+  meter's record.
+fetching_hint: Fetching the latest electricity info.
+fetch_error: Failed to fetch electricity information. Please retry.
+date: Date
+power: Remaining
+update: Refresh
+water_usage_fetch_date: Fetch time
+water_usage_read_before: Last time
+water_usage_read_now: This time
+water_usage: Bath water usage
+water_title: Water usage
+water_loading: Loading water usage information
+water_unavailable: Water usage is unavailable. Retry using the refresh button in the
+  top right.
+water_empty: No water usage information
+not_school_network: Not school network
+aircon_title: Aircon Electricity
+aircon_imei: Aircon IMEI
+aircon_amount: Platform usage
+aircon_update_time: Updated at
+aircon_waiting: Waiting to fetch aircon electricity data
+aircon_error: Failed to fetch aircon electricity data
+aircon_retry: Retry
+aircon_imei_missing: Scan the air conditioner's QR code to add it, or select a QR
+  code image.
+aircon_add_imei: Add aircon information
+aircon_cache_notice: Showing cached aircon data from {time}
+power_metid_title: Electricity meter {code}
+weter_metid_title: Watermeter {code}
+aircon_remote: Aircon Remote
+aircon_control_error: Unable to fetch the aircon state
+aircon_command_ok: Aircon command completed
+aircon_control_section: Basic controls
+aircon_operation_section: Operation
+aircon_other_settings_section: Other settings
+aircon_power: Power
+aircon_target_temperature: Target temperature
+aircon_temperature_range: Temperature must be between 18 and 32 ℃
+aircon_indoor_temperature: 'Indoor temperature: {temperature} ℃'
+aircon_mode: Mode
+aircon_mode_fan: Fan
+aircon_mode_heat: Heat
+aircon_mode_cool: Cool
+aircon_mode_dry: Dry
+aircon_mode_auto: Auto
+aircon_wind_speed: Fan speed
+aircon_wind_auto: Auto
+aircon_wind_silent: Silent
+aircon_wind_low: Low
+aircon_wind_medium: Medium
+aircon_wind_high: High
+aircon_vertical_swing: Vertical swing
+aircon_strong_mode: Turbo mode
+aircon_electric_heating: Auxiliary heating

@@ -4,7 +4,7 @@
 
 // Borrow list, shows the user's borrowlist.
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/library_controller.dart';
@@ -32,16 +32,16 @@ class _BorrowListWindowState extends State<BorrowListWindow>
       child: SignalBuilder(
         builder: (context) =>
             LibraryController.i.libraryBorrowStateSignal.value.map(
-          data: (list) => BorrowListView(borrowList: list),
-          loading: () => const CircularProgressIndicator().center(),
-          refreshing: () => const CircularProgressIndicator().center(),
-          reloading: () => const CircularProgressIndicator().center(),
-          error: (err, stack) => ReloadWidget(
-            errorStatus: err,
-            stackTrace: stack,
-            function: LibraryController.i.reloadBorrowList,
-          ).center(),
-        ),
+              data: (list) => BorrowListView(borrowList: list),
+              loading: () => const CircularProgressIndicator().center(),
+              refreshing: () => const CircularProgressIndicator().center(),
+              reloading: () => const CircularProgressIndicator().center(),
+              error: (err, stack) => ReloadWidget(
+                errorStatus: err,
+                stackTrace: stack,
+                function: LibraryController.i.reloadBorrowList,
+              ).center(),
+            ),
       ),
     );
   }

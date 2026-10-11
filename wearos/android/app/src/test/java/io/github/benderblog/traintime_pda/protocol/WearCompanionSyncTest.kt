@@ -10,7 +10,6 @@ import io.github.benderblog.traintime_pda.domain.ClassTableData
 import io.github.benderblog.traintime_pda.domain.Source
 import io.github.benderblog.traintime_pda.domain.TimeArrangement
 import io.github.benderblog.traintime_pda.domain.WearAgendaBuilder
-import io.github.benderblog.traintime_pda.ids.SchoolCardSession
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Rule
@@ -25,29 +24,10 @@ class WearCompanionSyncTest {
 
     @Test
     fun rejectsMalformedNativeSyncPayloads() {
-        val missingCredentials = JSONObject()
-            .put("schemaVersion", 1)
-            .put("sessionId", "session-123")
-            .put(
-                "schedule",
-                JSONObject().put("classTable", classTableJson("缺少凭据")),
-            )
-        try {
-            WearCompanionSyncEnvelope.fromJson(missingCredentials)
-            throw AssertionError("expected WearSyncFormatException")
-        } catch (_: WearSyncFormatException) {
-            // expected
-        }
-
         val missingSchedule = JSONObject()
             .put("schemaVersion", 1)
             .put("sessionId", "session-123")
-            .put(
-                "credentials",
-                JSONObject()
-                    .put("idsAccount", "2200000002")
-                    .put("idsPassword", "secret"),
-            )
+            .put("profileId", "profile-test")
         try {
             WearCompanionSyncEnvelope.fromJson(missingSchedule)
             throw AssertionError("expected WearSyncFormatException")
@@ -63,14 +43,7 @@ class WearCompanionSyncTest {
             JSONObject()
                 .put("schemaVersion", 1)
                 .put("sessionId", "session-123")
-                .put(
-                    "credentials",
-                    JSONObject()
-                        .put("idsAccount", "2200000002")
-                        .put("idsPassword", "synced-secret")
-                        .put("isPostGraduate", false)
-                        .put("currentSemester", "fallback-term"),
-                )
+                .put("profileId", "profile-test")
                 .put("schedule", JSONObject().put("classTable", table))
                 .put(
                     "paymentQr",
@@ -80,8 +53,6 @@ class WearCompanionSyncTest {
                 ),
         )
 
-        assertThat(envelope.credentials.idsAccount).isEqualTo("2200000002")
-        assertThat(envelope.credentials.idsPassword).isEqualTo("synced-secret")
         assertThat(envelope.schedule.classTable.classDetail.single().name).isEqualTo("扫码同步课程")
         assertThat(envelope.paymentQr!!.bytes.toList()).containsExactly(1.toByte(), 2.toByte(), 3.toByte())
     }
@@ -90,7 +61,6 @@ class WearCompanionSyncTest {
     fun cacheImportAndHomeLoadRoundTrip() {
         val root = tempFolder.newFolder("files")
         val cache = WearCacheStore(root)
-        SchoolCardSession.resetOpenId()
 
         val table = ClassTableData(
             semesterLength = 1,
@@ -129,28 +99,19 @@ class WearCompanionSyncTest {
 
         cache.clearCampusCaches()
         cache.clearPaymentQr()
-        SchoolCardSession.resetOpenId()
         assertThat(cache.classTableExists()).isFalse()
         assertThat(cache.readPaymentQr()).isNull()
-        assertThat(SchoolCardSession.openid).isEmpty()
     }
 
     @Test
-    fun importerWritesCredentialsScheduleAndPayment() {
+    fun decodesScheduleAndPaymentForCacheImport() {
         // Exercise protocol + cache side of import without Android SharedPreferences.
         val root = tempFolder.newFolder("import")
         val cache = WearCacheStore(root)
         val raw = JSONObject()
             .put("schemaVersion", 1)
             .put("sessionId", "session-import")
-            .put(
-                "credentials",
-                JSONObject()
-                    .put("idsAccount", "2200000001")
-                    .put("idsPassword", "new-secret")
-                    .put("isPostGraduate", true)
-                    .put("currentSemester", "2026-1"),
-            )
+            .put("profileId", "profile-test")
             .put(
                 "schedule",
                 JSONObject()
@@ -192,7 +153,6 @@ class WearCompanionSyncTest {
         )
         envelope.paymentQr?.let { cache.writePaymentQr(it.bytes, it.fetchedAtEpochMs) }
 
-        assertThat(envelope.credentials.idsAccount).isEqualTo("2200000001")
         assertThat(cache.readClassTable()!!.classDetail.single().name).isEqualTo("导入课程")
         assertThat(cache.readExperiments()!!.single().name).isEqualTo("导入实验")
         assertThat(cache.readPaymentQr()!!.first.toList())

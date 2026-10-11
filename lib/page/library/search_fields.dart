@@ -2,14 +2,15 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/page/library/search_book_constant.dart';
-import 'package:watermeter/repository/xidian_ids/library_session.dart'
-    as search_book;
+import 'package:material_ui/material_ui.dart';
 
-typedef _SearchOption = search_book.LibrarySearchOption;
+import 'package:styled_widget/styled_widget.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/controller/library_controller.dart';
+import 'package:watermeter/model/xidian_ids/library.dart';
+import 'package:watermeter/page/library/search_book_constant.dart';
+
+typedef _SearchOption = LibrarySearchOption;
 
 class BookSearchQuery {
   final bool isAdvanced;
@@ -103,8 +104,8 @@ class _SearchFieldsState extends State<SearchFields> {
   bool _onlyOnShelf = false;
   bool _showAdvancedOptions = false;
 
-  late final Future<search_book.LibrarySearchFilterOptions>
-  _filterOptionsFuture = search_book.LibrarySession().searchFilterOptions();
+  late final Future<LibrarySearchFilterOptions> _filterOptionsFuture =
+      LibraryController.i.session.searchFilterOptions();
   final TextEditingController _textController = TextEditingController();
 
   @override
@@ -115,12 +116,11 @@ class _SearchFieldsState extends State<SearchFields> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<search_book.LibrarySearchFilterOptions>(
+    return FutureBuilder<LibrarySearchFilterOptions>(
           future: _filterOptionsFuture,
           builder: (context, snapshot) {
             final options =
-                snapshot.data ??
-                search_book.LibrarySearchFilterOptions.fallback();
+                snapshot.data ?? LibrarySearchFilterOptions.fallback();
             return LayoutBuilder(
               builder: (context, constraints) => OverlayPortal(
                 controller: _overlayController,
@@ -288,27 +288,15 @@ class _SearchFieldsState extends State<SearchFields> {
   int? _intFilter(String value) => value.isEmpty ? null : int.tryParse(value);
 
   List<_SearchOption> _matchModeOptions(BuildContext context) => [
-    search_book.LibrarySearchOption(
-      "1",
-      FlutterI18n.translate(context, "library.match_exact"),
-      "精确",
-    ),
-    search_book.LibrarySearchOption(
-      "2",
-      FlutterI18n.translate(context, "library.match_fuzzy"),
-      "模糊",
-    ),
-    search_book.LibrarySearchOption(
-      "3",
-      FlutterI18n.translate(context, "library.match_prefix"),
-      "前方",
-    ),
+    LibrarySearchOption("1", context.t.library.matchExact, "精确"),
+    LibrarySearchOption("2", context.t.library.matchFuzzy, "模糊"),
+    LibrarySearchOption("3", context.t.library.matchPrefix, "前方"),
   ];
 
   Widget _buildBaseSearchFields(
     BuildContext context,
     double maxWidth,
-    search_book.LibrarySearchFilterOptions options,
+    LibrarySearchFilterOptions options,
   ) {
     return Row(
       children: [
@@ -328,7 +316,7 @@ class _SearchFieldsState extends State<SearchFields> {
             controller: _textController,
             decoration: _inputDecoration(
               context,
-              FlutterI18n.translate(context, "library.search_here"),
+              context.t.library.searchHere,
               prefixIcon: Icons.search,
             ),
             onFieldSubmitted: (_) => _submitSearch(),
@@ -341,7 +329,7 @@ class _SearchFieldsState extends State<SearchFields> {
   Widget _buildAdvancedSearchFields(
     BuildContext context,
     double maxWidth,
-    search_book.LibrarySearchFilterOptions options,
+    LibrarySearchFilterOptions options,
   ) {
     return [
       _SearchFieldGrid(
@@ -350,7 +338,7 @@ class _SearchFieldsState extends State<SearchFields> {
         children: [
           _buildOptionDropdown(
             context,
-            label: FlutterI18n.translate(context, "library.match_mode"),
+            label: context.t.library.matchMode,
             value: _advancedMatchMode,
             options: _matchModeOptions(context),
             onChanged: (value) => setState(() => _advancedMatchMode = value),
@@ -460,7 +448,7 @@ class _SearchFieldsState extends State<SearchFields> {
         FilledButton.icon(
           onPressed: _submitSearch,
           icon: const Icon(Icons.manage_search),
-          label: Text(FlutterI18n.translate(context, "library.search")),
+          label: Text(context.t.library.search),
         ),
       ],
     );
@@ -475,7 +463,7 @@ class _SearchFieldsState extends State<SearchFields> {
   }) {
     return _buildOptionDropdown(
       context,
-      label: FlutterI18n.translate(context, "library.search_field_title"),
+      label: context.t.library.searchFieldTitle,
       value: value,
       options: options,
       selectedMaxLines: selectedMaxLines,

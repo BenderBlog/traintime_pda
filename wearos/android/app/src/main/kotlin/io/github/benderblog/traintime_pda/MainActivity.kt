@@ -4,6 +4,8 @@
 package io.github.benderblog.traintime_pda
 
 import android.os.Bundle
+import android.content.Intent
+import android.os.PowerManager
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +17,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import io.github.benderblog.traintime_pda.ui.WearApp
 import io.github.benderblog.traintime_pda.ui.WearScreen
 import io.github.benderblog.traintime_pda.ui.WearViewModel
@@ -29,6 +32,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.getBooleanExtra(EXTRA_SHOW_AGENDA, false)) viewModel.showAgenda()
         setContent {
             val lifecycleOwner = LocalLifecycleOwner.current
             val state by viewModel.state.collectAsStateWithLifecycle()
@@ -48,16 +52,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            LaunchedEffect(state.screen, state.qrResult) {
+            LaunchedEffect(lifecycleOwner, state.screen, state.qrResult) {
                 // Give scanners enough time to read the code without allowing an
                 // accidentally abandoned QR screen to keep the watch awake forever.
                 val keepOn = state.screen == WearScreen.QR && state.qrResult != null
                 if (keepOn) {
-                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    try {
-                        delay(QR_SCREEN_ON_TIMEOUT_MS)
-                    } finally {
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                        val powerManager = getSystemService(PowerManager::class.java)
+                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        try {
+                            delay(
+                                if (powerManager.isPowerSaveMode) QR_POWER_SAVE_TIMEOUT_MS
+                                else QR_SCREEN_ON_TIMEOUT_MS,
+                            )
+                        } finally {
+                            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        }
                     }
                 } else {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -68,7 +78,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private companion object {
-        const val QR_SCREEN_ON_TIMEOUT_MS = 60_000L
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(EXTRA_SHOW_AGENDA, false)) viewModel.showAgenda()
+    }
+
+    companion object {
+        const val EXTRA_SHOW_AGENDA = "show_agenda"
+        private const val QR_SCREEN_ON_TIMEOUT_MS = 60_000L
+        private const val QR_POWER_SAVE_TIMEOUT_MS = 15_000L
     }
 }

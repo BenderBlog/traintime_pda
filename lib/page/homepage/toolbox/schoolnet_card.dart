@@ -2,11 +2,12 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/page/homepage/small_function_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/routing/routes.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class SchoolnetCard extends StatelessWidget {
   const SchoolnetCard({super.key});
@@ -16,7 +17,7 @@ class SchoolnetCard extends StatelessWidget {
     return SmallFunctionCard(
       onPressed: () => context.pushReplacementNamed(Routes.networkCard),
       icon: MingCuteIcons.mgc_wifi_fill,
-      nameKey: "homepage.toolbox.schoolnet",
+      name: context.t.homepage.toolbox.schoolnet,
     );
   }
 }

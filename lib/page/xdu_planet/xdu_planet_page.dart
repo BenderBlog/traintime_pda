@@ -6,7 +6,6 @@
 // Idea from xenode.
 /*
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xdu_planet/xdu_planet.dart';
@@ -14,6 +13,7 @@ import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/xdu_planet/content_page.dart';
 import 'package:watermeter/repository/xdu_planet_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class XDUPlanetPage extends StatefulWidget {
   const XDUPlanetPage({super.key});
@@ -81,16 +81,13 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
               },
               child: Text(
                 e == "xdu_planet.all"
-                    ? FlutterI18n.translate(
-                        context,
-                        e.replaceAll(
+                    ? context.t.resolveKey(e.replaceAll(
                           RegExp(
                             r'(lolicon)|(로리콘)|(Лоликон)|(ロリコン)',
                             caseSensitive: false,
                           ),
                           "Illegal Word Detected",
-                        ),
-                      )
+                        ))
                     : e,
                 style: TextStyle(
                   color: selected == e
@@ -136,7 +133,7 @@ class _XDUPlanetPageState extends State<XDUPlanetPage>
               children: [
                 const CircularProgressIndicator(),
                 const SizedBox(height: 16),
-                Text(FlutterI18n.translate(context, "xdu_planet.loading")),
+                Text(context.t.xduPlanet.loading),
               ],
             ),
           );
@@ -162,7 +159,7 @@ class ArticleCard extends StatelessWidget {
                   ),
                   "Illegal Word Detected",
                 ) ??
-                FlutterI18n.translate(context, "xdu_planet.unknown_author"),
+                context.t.xduPlanet.unknownAuthor,
           ),
           Text(article.title, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),

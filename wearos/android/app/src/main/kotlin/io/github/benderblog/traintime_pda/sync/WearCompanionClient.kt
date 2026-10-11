@@ -13,6 +13,7 @@ import io.github.benderblog.traintime_pda.protocol.WearCompanionPaths
 import io.github.benderblog.traintime_pda.protocol.WearCompanionSyncEnvelope
 import io.github.benderblog.traintime_pda.protocol.WearPaymentQrResponse
 import kotlinx.coroutines.async
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -62,8 +63,10 @@ class WearCompanionClient(
     fun isCompanionPaired(): Boolean = pairedPhoneNodeId() != null
 
     fun startListening() {
-        if (!listening.compareAndSet(false, true)) return
-        messageClient.addListener(this)
+        synchronized(listening) {
+            if (!listening.compareAndSet(false, true)) return
+            messageClient.addListener(this)
+        }
         pendingSyncPayload?.let { payload ->
             pendingSyncPayload = null
             handleSyncPayload(payload, pairedPhoneNodeId())
@@ -71,25 +74,46 @@ class WearCompanionClient(
     }
 
     fun stopListening() {
-        if (!listening.compareAndSet(true, false)) return
-        messageClient.removeListener(this)
+        synchronized(listening) {
+            if (!listening.compareAndSet(true, false)) return
+            messageClient.removeListener(this)
+        }
     }
 
+    fun isForeground(): Boolean = listening.get()
+
+    private fun requireForeground() {
+        check(isForeground()) { "Wear app is not in the foreground" }
+    }
+
+    private fun sendForegroundMessage(nodeId: String, path: String, data: ByteArray) =
+        synchronized(listening) {
+            requireForeground()
+            messageClient.sendMessage(nodeId, path, data)
+        }
+
     suspend fun requestCompanionSync() {
+        requireForeground()
         val nodeId = pairedPhoneNodeId()
             ?: throw IllegalStateException("No companion phone is paired")
-        messageClient.sendMessage(nodeId, WearCompanionPaths.REQUEST, ByteArray(0)).await()
+        sendForegroundMessage(nodeId, WearCompanionPaths.REQUEST, ByteArray(0)).await()
     }
 
     suspend fun requestPaymentQrFromPhone(timeoutMs: Long = 20_000L): WearPaymentQrResponse {
+        requireForeground()
         val nodeId = pairedPhoneNodeId()
             ?: throw IllegalStateException("No companion phone is paired")
         return withTimeout(timeoutMs) {
+            val connected = Wearable.getNodeClient(appContext).connectedNodes.await()
+            if (connected.none { it.id == nodeId }) {
+                throw IllegalStateException("Companion phone is disconnected")
+            }
             coroutineScope {
                 // Subscribe before send to avoid missing a fast response.
-                val deferred = async { paymentResponses.first() }
-                messageClient
-                    .sendMessage(nodeId, WearCompanionPaths.PAYMENT_REQUEST, ByteArray(0))
+                val deferred = async(start = CoroutineStart.UNDISPATCHED) {
+                    paymentResponses.first()
+                }
+                sendForegroundMessage(nodeId, WearCompanionPaths.PAYMENT_REQUEST, ByteArray(0))
                     .await()
                 deferred.await()
             }
@@ -97,6 +121,7 @@ class WearCompanionClient(
     }
 
     override fun onMessageReceived(event: MessageEvent) {
+        if (!isForeground()) return
         when (event.path) {
             WearCompanionPaths.PAYMENT_RESPONSE -> {
                 if (event.sourceNodeId != pairedPhoneNodeId()) return
@@ -121,9 +146,9 @@ class WearCompanionClient(
         try {
             val envelope = WearCompanionSyncEnvelope.decode(payload)
             importer.importEnvelope(envelope, payload)
-            sourceNodeId?.let { nodeId ->
+            sourceNodeId?.takeIf { isForeground() }?.let { nodeId ->
                 rememberPairedPhone(nodeId)
-                messageClient.sendMessage(
+                sendForegroundMessage(
                     nodeId,
                     WearCompanionPaths.SYNC_ACK,
                     envelope.sessionId.toByteArray(Charsets.UTF_8),

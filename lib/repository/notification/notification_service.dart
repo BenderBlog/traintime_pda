@@ -17,8 +17,8 @@ import 'package:watermeter/repository/logger.dart';
 /// This class provides a common interface and basic implementation for
 /// notification functionalities, intended to be extended by specific
 /// notification services (e.g., course reminders).
-/// 
-/// Attention: Every Subclass inherits from this should add the subclass 
+///
+/// Attention: Every Subclass inherits from this should add the subclass
 /// in the [NotificationRegistrar](./notification_registrar.dart)
 /// to make sure the initialization and event handle.
 abstract class NotificationService {
@@ -33,7 +33,7 @@ abstract class NotificationService {
     this.androidNotificationDetails,
     this.darwinNotificationDetails,
   });
-  
+
   @protected
   bool initialized = false;
 
@@ -57,17 +57,17 @@ abstract class NotificationService {
 
       const DarwinInitializationSettings initializationSettingsDarwin =
           DarwinInitializationSettings(
-        requestAlertPermission: false,
-        requestBadgePermission: false,
-        requestSoundPermission: false,
-      );
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false,
+          );
 
       const InitializationSettings initializationSettings =
           InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: initializationSettingsDarwin,
-        macOS: initializationSettingsDarwin,
-      );
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsDarwin,
+            macOS: initializationSettingsDarwin,
+          );
 
       await flutterLocalNotificationsPlugin.initialize(
         settings: initializationSettings,
@@ -75,7 +75,9 @@ abstract class NotificationService {
       );
 
       initialized = true;
-      log.info('Notification service initialized successfully for ${runtimeType.toString()}');
+      log.info(
+        'Notification service initialized successfully for ${runtimeType.toString()}',
+      );
     } catch (e, stackTrace) {
       log.error(
         'Failed to initialize notification service for ${runtimeType.toString()}',
@@ -90,13 +92,13 @@ abstract class NotificationService {
   ///
   /// Subclasses must implement this to define behavior when a user
   /// taps on a notification.
-  /// 
+  ///
   /// If you wanna use this method, please call
   /// [handleAppLaunchFromNotification] of your instance to make it work.
   void handleNotificationTap(NotificationResponse response);
 
   /// Handle app launch from notification tap.
-  /// 
+  ///
   /// This should be called during app startup to process any notification
   /// that launched the app.
   Future<void> handleAppLaunchFromNotification() async {
@@ -218,11 +220,7 @@ abstract class NotificationService {
 
       log.info('Sent immediate notification $id');
     } catch (e, stackTrace) {
-      log.error(
-        'Failed to send immediate notification',
-        e,
-        stackTrace,
-      );
+      log.error('Failed to send immediate notification', e, stackTrace);
       rethrow;
     }
   }
@@ -232,24 +230,22 @@ abstract class NotificationService {
     bool? result;
     if (Platform.isAndroid) {
       result = await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.requestNotificationsPermission();
     } else if (Platform.isIOS) {
       result = await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
     } else if (Platform.isMacOS) {
       result = await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
+          .resolvePlatformSpecificImplementation<
+            MacOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
     } else {
       return false;
     }
@@ -260,14 +256,18 @@ abstract class NotificationService {
   Future<bool> checkNotificationPermission() async {
     if (Platform.isAndroid) {
       final result = await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.areNotificationsEnabled();
       return result ?? false;
     } else if (Platform.isIOS) {
       // On iOS, we use requestPermissions to check current status
       // The plugin will return the current permission status without showing a prompt if already determined
       final iosPlugin = flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
       if (iosPlugin == null) return false;
 
       // Request permissions returns true if any permission is granted
@@ -277,7 +277,9 @@ abstract class NotificationService {
       return result.isEnabled;
     } else if (Platform.isMacOS) {
       final macosPlugin = flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>();
+          .resolvePlatformSpecificImplementation<
+            MacOSFlutterLocalNotificationsPlugin
+          >();
       if (macosPlugin == null) return false;
       final result = await macosPlugin.checkPermissions();
       if (result == null) return false;
@@ -290,11 +292,13 @@ abstract class NotificationService {
   /// Requests schedule exact alarm permission (Android only).
   Future<bool> requestExactAlarmPermission() async {
     if (!Platform.isAndroid) return true; // Not applicable on other platforms
-    
+
     final androidPlugin = flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin == null) return false;
-    
+
     // Request exact alarm permission by opening settings
     final result = await androidPlugin.requestExactAlarmsPermission();
     return result ?? false;
@@ -303,11 +307,13 @@ abstract class NotificationService {
   /// Checks if schedule exact alarm permission has been granted (Android only).
   Future<bool> checkExactAlarmPermission() async {
     if (!Platform.isAndroid) return true; // Not applicable on other platforms
-    
+
     final androidPlugin = flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin == null) return false;
-    
+
     final result = await androidPlugin.canScheduleExactNotifications();
     return result ?? false;
   }
@@ -319,14 +325,11 @@ abstract class NotificationService {
     }
 
     try {
-      final results = await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+      final results = await flutterLocalNotificationsPlugin
+          .pendingNotificationRequests();
       return results;
     } catch (e, stackTrace) {
-      log.error(
-        'Failed to get pending notifications',
-        e,
-        stackTrace,
-      );
+      log.error('Failed to get pending notifications', e, stackTrace);
       return [];
     }
   }
@@ -341,11 +344,7 @@ abstract class NotificationService {
       await flutterLocalNotificationsPlugin.cancel(id: id);
       log.info('Cancelled notification $id');
     } catch (e, stackTrace) {
-      log.error(
-        'Failed to cancel notification',
-        e,
-        stackTrace,
-      );
+      log.error('Failed to cancel notification', e, stackTrace);
       rethrow;
     }
   }
@@ -360,11 +359,7 @@ abstract class NotificationService {
       await flutterLocalNotificationsPlugin.cancelAll();
       log.info('Cancelled all notifications');
     } catch (e, stackTrace) {
-      log.error(
-        'Failed to cancel all notifications',
-        e,
-        stackTrace,
-      );
+      log.error('Failed to cancel all notifications', e, stackTrace);
       rethrow;
     }
   }

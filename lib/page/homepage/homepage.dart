@@ -4,19 +4,21 @@
 
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:material_ui/material_ui.dart';
+
+import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/page/homepage/homepage_edit_mode.dart';
 import 'package:watermeter/page/homepage/homepage_widget_registry.dart';
 import 'package:watermeter/page/homepage/info_widget/classtable_card.dart';
+import 'package:watermeter/page/homepage/notice_card/sponsorship_card.dart';
 import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/homepage/staggered_grid.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/page/homepage/refresh.dart';
 import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 
 class MainPage extends StatefulWidget {
   final Function()? changePage;
@@ -115,7 +117,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           return Padding(
             padding: const EdgeInsets.all(24),
             child: Text(
-              FlutterI18n.translate(context, "homepage.hide_empty"),
+              context.t.homepage.hideEmpty,
               textAlign: TextAlign.center,
             ),
           );
@@ -126,13 +128,13 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                FlutterI18n.translate(context, "homepage.hidden_title"),
+                context.t.homepage.hiddenTitle,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             for (final entry in hidden)
               ListTile(
-                title: Text(FlutterI18n.translate(context, entry.titleKey)),
+                title: Text(entry.titleBuilder(context)),
                 trailing: IconButton(
                   icon: const Icon(Icons.visibility),
                   onPressed: () async {
@@ -157,17 +159,17 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "homepage.title")),
+        title: Text(context.t.homepage.title),
         actions: [
           if (_editMode) ...[
             IconButton(
               icon: const Icon(Icons.visibility),
-              tooltip: FlutterI18n.translate(context, "homepage.manage_hidden"),
+              tooltip: context.t.homepage.manageHidden,
               onPressed: _showHiddenSheet,
             ),
             IconButton(
               icon: const Icon(Icons.restore),
-              tooltip: FlutterI18n.translate(context, "homepage.edit_reset"),
+              tooltip: context.t.homepage.editReset,
               onPressed: () async {
                 await resetAll();
                 setState(() => _allEntries = getOrderedEntries());
@@ -178,10 +180,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             padding: EdgeInsetsGeometry.only(right: 8),
             child: IconButton(
               icon: Icon(_editMode ? Icons.check : Icons.edit),
-              tooltip: FlutterI18n.translate(
-                context,
-                _editMode ? "homepage.edit_done" : "homepage.edit_mode",
-              ),
+              tooltip: _editMode
+                  ? context.t.homepage.editDone
+                  : context.t.homepage.editMode,
               onPressed: () {
                 if (_editMode) {
                   _exitEditMode();
@@ -189,7 +190,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   setState(() {
                     _editMode = true;
                     _shakeAmplitudes.clear();
-      _fadingEntries.clear();
+                    _fadingEntries.clear();
                     for (final entry in _allEntries) {
                       _shakeAmplitudes[entry.id] =
                           0.7 + Random().nextDouble() * 0.3;
@@ -204,12 +205,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          showToast(
-            context: context,
-            msg: FlutterI18n.translate(context, "homepage.loading_message"),
-          );
-          await update(
-            context: context,
+          showToast(context: context, msg: context.t.homepage.loadingMessage);
+          await HomepageController.i.refresh(
             sliderCaptcha: (String cookieStr) {
               return SliderCaptchaClientProvider(cookie: cookieStr).solve(
                 manualSolver: (provider) =>
@@ -218,22 +215,20 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             },
           );
           if (context.mounted) {
-            showToast(
-              context: context,
-              msg: FlutterI18n.translate(context, "homepage.loaded"),
-            );
+            showToast(context: context, msg: context.t.homepage.loaded);
           }
         },
         child: ListView(
           padding: const EdgeInsets.all(8),
           children: [
             const UpdateCard(),
+            const SponsorshipCard(),
             const ClassTableCard(),
             if (_editMode)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
-                  FlutterI18n.translate(context, "homepage.edit_hint"),
+                  context.t.homepage.editHint,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.secondary,
                     fontSize: 13,
@@ -255,59 +250,63 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                       opacity: _fadingEntries.contains(entry.id) ? 0.0 : 1.0,
                       child: _editMode
                           ? _buildShake(
-                            entry.id,
-                            Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                DraggableCard(
-                                  id: entry.id,
-                                  onSwap: _onSwap,
-                                  feedbackWidth: entry.gridSpan * colWidth,
-                                  feedbackHeight: 80,
-                                  child: entry.builder(context, _editMode),
-                                ),
-                                // 隐藏按钮：右上角（课程表不显示）
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() => _fadingEntries.add(entry.id));
-                                      Future.delayed(
-                                        const Duration(milliseconds: 300),
-                                        () async {
-                                          await hideEntry(entry.id);
-                                          _fadingEntries.remove(entry.id);
-                                          if (context.mounted) {
-                                            setState(() =>
-                                                _allEntries = getOrderedEntries());
-                                          }
-                                        },
-                                      );
-                                    },
-                                    child: ClipOval(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.surfaceContainerHighest,
-                                        ),
-                                        padding: const EdgeInsets.all(4),
-                                        child: Icon(
-                                          Icons.close,
-                                          size: 16,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
+                              entry.id,
+                              Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  DraggableCard(
+                                    id: entry.id,
+                                    onSwap: _onSwap,
+                                    feedbackWidth: entry.gridSpan * colWidth,
+                                    feedbackHeight: 80,
+                                    child: entry.builder(context, _editMode),
+                                  ),
+                                  // 隐藏按钮：右上角（课程表不显示）
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(
+                                          () => _fadingEntries.add(entry.id),
+                                        );
+                                        Future.delayed(
+                                          const Duration(milliseconds: 300),
+                                          () async {
+                                            await hideEntry(entry.id);
+                                            _fadingEntries.remove(entry.id);
+                                            if (context.mounted) {
+                                              setState(
+                                                () => _allEntries =
+                                                    getOrderedEntries(),
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
+                                      child: ClipOval(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceContainerHighest,
+                                          ),
+                                          padding: const EdgeInsets.all(4),
+                                          child: Icon(
+                                            Icons.close,
+                                            size: 16,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : entry.builder(context, _editMode),
+                                ],
+                              ),
+                            )
+                          : entry.builder(context, _editMode),
                     ),
                   ),
               ],

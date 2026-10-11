@@ -1,12 +1,11 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/repository/preference.dart';
 
 extension RuisiBranchNavigation on BuildContext {
-  static const String _homeTopicPreviewRouteName =
-      'ruisi.home.topic_preview';
+  static const String _homeTopicPreviewRouteName = 'ruisi.home.topic_preview';
 
   /// 从 Ruisi 顶层入口打开一条新的页面分支。
   ///

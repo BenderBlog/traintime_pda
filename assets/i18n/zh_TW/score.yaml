@@ -1,0 +1,55 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+cache_message: 已顯示緩存成績信息
+summary: '目前選中科目 {chosen}  總計學分 {credit}
+
+  均分 {avg} GPA {gpa}'
+all_passed: 所有科目均已通過
+cache_hint_password_wrong: 統一認證密碼錯誤或已失效
+cache_hint_login_failed: 登錄考試服務失敗
+cache_hint_network_failed: 網絡連接失敗
+cache_hint_unknown_error: 在線獲取成績安排失敗，詳細錯誤請查看日誌
+fetching_hint: 正在獲取最新成績信息，請不要退出頁面
+all_semester: 所有學期
+chosen_semester: 學期 {chosen}
+all_type: 所有類型
+chosen_type: 類型 {type}
+none: 暫無
+score_choice:
+  title: 成績單
+  search_hint: 搜索成績記錄
+  empty_list: 沒有選擇該學期的課程計入均分計算
+  sum_dialog_title: 小總結
+  sum_dialog_content: '所有科目的GPA：{gpa_all}
+
+    所有科目的均分：{avg_all}
+
+    所有科目的學分：{credit_all}
+
+    未通過科目：{unpassed}
+
+    公共選修課：{not_core_type}
+
+    本程序提供的數據僅供參考，開發者對其準確性不負責'
+score_compose_card:
+  no_detail: 未提供詳情信息
+  fetching: 正在獲取
+  credit: 學分
+  gpa: GPA
+  score: 成績
+score_info_card:
+  title: 成績詳情
+  original_course: 初修
+  failed: '[掛] '
+  credit: 學分 {credit}
+  gpa: GPA {gpa}
+  score: 成績 {score}
+score_page:
+  title: 成績查詢
+  search_hint: 搜索成績記錄
+  no_record: 未篩查到合請求的記錄
+  select_all: 全選
+  select_nothing: 全不選
+  reset_select: 重置選擇
+  summary: 總結
+  CET-4: 國家英語四級
+  CET-6: 國家英語六級

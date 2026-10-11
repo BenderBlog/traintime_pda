@@ -2,15 +2,16 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/class_attendance.dart';
 import 'package:watermeter/page/public_widget/empty_list_view.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 import 'package:watermeter/page/public_widget/re_x_card.dart';
-import 'package:watermeter/repository/xidian_ids/learning_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
+import 'package:watermeter/repository/ids_session/learning_session.dart';
 
 class ClassAttendanceDetailView extends StatefulWidget {
   final ClassAttendance classAttendance;
@@ -25,6 +26,42 @@ class ClassAttendanceDetailView extends StatefulWidget {
   @override
   State<ClassAttendanceDetailView> createState() =>
       _ClassAttendanceDetailViewState();
+}
+
+String attendanceSignName(
+  BuildContext context,
+  SignInType type, {
+  String? customName,
+}) {
+  if (customName != null) return customName;
+  return switch (type) {
+    SignInType.qrCode => context.t.classAttendance.signType.qrCode,
+    SignInType.gesture => context.t.classAttendance.signType.gesture,
+    SignInType.position => context.t.classAttendance.signType.position,
+    SignInType.unknown => context.t.classAttendance.signType.kDefault,
+    SignInType.customName => context.t.classAttendance.signType.kDefault,
+  };
+}
+
+String attendanceSignStatus(BuildContext context, SignStatus type) {
+  return switch (type) {
+    SignStatus.absenceNotParticipating =>
+      context.t.classAttendance.signStatus.absenceNotParticipating,
+    SignStatus.signed => context.t.classAttendance.signStatus.signed,
+    SignStatus.signedByTeacher =>
+      context.t.classAttendance.signStatus.signedByTeacher,
+    SignStatus.personalLeave2 =>
+      context.t.classAttendance.signStatus.personalLeave2,
+    SignStatus.absence => context.t.classAttendance.signStatus.absence,
+    SignStatus.sickLeave => context.t.classAttendance.signStatus.sickLeave,
+    SignStatus.personalLeave =>
+      context.t.classAttendance.signStatus.personalLeave,
+    SignStatus.later => context.t.classAttendance.signStatus.late,
+    SignStatus.leaveEarly => context.t.classAttendance.signStatus.leaveEarly,
+    SignStatus.signExpiredy =>
+      context.t.classAttendance.signStatus.signExpiredy,
+    SignStatus.publicLeave => context.t.classAttendance.signStatus.publicLeave,
+  };
 }
 
 class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
@@ -108,10 +145,7 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
                   );
                 },
                 noItemsFoundIndicatorBuilder: (context) => EmptyListView(
-                  text: FlutterI18n.translate(
-                    context,
-                    "class_attndance.no_attendance_record",
-                  ),
+                  text: context.t.classAttendance.noAttendanceRecord,
                   type: EmptyListViewType.rolling,
                 ),
                 noMoreItemsIndicatorBuilder: (context) =>
@@ -129,38 +163,31 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
 
                 itemBuilder: (context, item, index) => ReXCard(
                   title: Text(
-                    item.signName.contains("class_attendance.sign_type")
-                        ? FlutterI18n.translate(context, item.signName)
-                        : item.signName,
+                    attendanceSignName(
+                      context,
+                      item.signType,
+                      customName: item.name,
+                    ),
                   ),
                   remaining: [
                     ReXCardRemaining(
-                      FlutterI18n.translate(context, item.signStatus),
+                      attendanceSignStatus(context, item.signStatusType),
                     ),
                   ],
                   bottomRow: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildInfoRow(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.detail_card.creator_name",
-                        ),
+                        context.t.classAttendance.detailCard.creatorName,
                         item.creatorName,
                       ),
                       _buildInfoRow(
-                        FlutterI18n.translate(
-                          context,
-                          "class_attendance.detail_card.start_time",
-                        ),
+                        context.t.classAttendance.detailCard.startTime,
                         item.starttime,
                       ),
                       if (item.submittime != null)
                         _buildInfoRow(
-                          FlutterI18n.translate(
-                            context,
-                            "class_attendance.detail_card.summit_time",
-                          ),
+                          context.t.classAttendance.detailCard.summitTime,
                           item.submittime!,
                         ),
                     ],
@@ -170,7 +197,9 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(height: 4);
               },
-              padding: const EdgeInsets.symmetric(vertical: 9.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 9,
+              ).withSafeBottom(context, enabled: widget.showAppBar),
             ),
       ),
     );
@@ -188,12 +217,8 @@ class _ClassAttendanceDetailViewState extends State<ClassAttendanceDetailView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          FlutterI18n.translate(
-            context,
-            "class_attendance.detail_title",
-            translationParams: {
-              "courseName": widget.classAttendance.courseName,
-            },
+          context.t.classAttendance.detailTitle(
+            course_name: widget.classAttendance.courseName,
           ),
         ),
       ),

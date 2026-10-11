@@ -1,16 +1,15 @@
-// Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
-// SPDX-License-Identifier: MPL-2.0
 // Copyright 2023-2025 BenderBlog Rodriguez and contributors
-// Copyright 2025 Traintime PDA authors.
+// Copyright 2025-2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
 // A captcha input dialog.
 
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:material_ui/material_ui.dart';
+
 import 'package:watermeter/page/public_widget/toast.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class CaptchaInputDialog extends StatefulWidget {
   final List<int> image;
@@ -53,11 +52,7 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
       if (mounted) {
         showToast(
           context: context,
-          msg: FlutterI18n.translate(
-            context,
-            "login.captcha_window.refresh_failed",
-            translationParams: {"error": e.toString()},
-          ),
+          msg: context.t.login.captchaWindow.refreshFailed(error: e.toString()),
         );
       }
     } finally {
@@ -72,7 +67,7 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(context, "login.captcha_window.title")),
+      title: Text(context.t.login.captchaWindow.title),
       titleTextStyle: const TextStyle(fontSize: 20, color: Colors.black),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -83,9 +78,11 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Image.memory(_currentImageBytes),
-                if (_isLoading)
-                  const CircularProgressIndicator(),
+                Container(
+                  color: Colors.white,
+                  child: Image.memory(_currentImageBytes),
+                ),
+                if (_isLoading) const CircularProgressIndicator(),
               ],
             ),
           ),
@@ -95,31 +92,25 @@ class _CaptchaInputDialogState extends State<CaptchaInputDialog> {
             style: const TextStyle(fontSize: 20),
             controller: _captchaController,
             decoration: InputDecoration(
-              hintText: FlutterI18n.translate(
-                context,
-                "login.captcha_window.hint",
-              ),
+              hintText: context.t.login.captchaWindow.hint,
             ),
           ),
         ],
       ),
       actions: <Widget>[
         TextButton(
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(context.t.common.cancel),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(context.t.common.confirm),
           onPressed: () async {
             if (_captchaController.text.isEmpty) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "login.captcha_window.message_on_empty",
-                ),
+                msg: context.t.login.captchaWindow.messageOnEmpty,
               );
             } else {
               Navigator.of(context).pop(_captchaController.text);

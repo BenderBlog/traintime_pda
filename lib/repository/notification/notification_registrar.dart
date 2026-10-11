@@ -29,29 +29,37 @@ class NotificationServiceRegistrar {
     if (!_notificationServices.contains(notificationService)) {
       _notificationServices.add(notificationService);
     }
-    log.info("[NotificationRegistrar][register] Register a NotificationService <${notificationService.runtimeType.toString()}>");
+    log.info(
+      "[NotificationRegistrar][register] Register a NotificationService <${notificationService.runtimeType.toString()}>",
+    );
   }
 
   /// The function for unregistering NotificationServices
-  /// 
+  ///
   /// That [return] is [false] means there is no NotificationService you want to unregister.
   /// That [return] is [true] means unregister successfully.
   bool unregister(NotificationService notificationService) {
     final isSuccess = _notificationServices.remove(notificationService);
     if (isSuccess) {
-      log.info("[NotificationRegistrar][unregister] Unregister a NotificationService <${notificationService.runtimeType.toString()}> successfully");
+      log.info(
+        "[NotificationRegistrar][unregister] Unregister a NotificationService <${notificationService.runtimeType.toString()}> successfully",
+      );
     } else {
-      log.warning("[NotificationRegistrar][unregister] Fail to unregister a NotificationService <${notificationService.runtimeType.toString()}>");
+      log.warning(
+        "[NotificationRegistrar][unregister] Fail to unregister a NotificationService <${notificationService.runtimeType.toString()}>",
+      );
     }
     return isSuccess;
   }
 
   /// Default Services in XDYou.
-  /// 
+  ///
   /// If you add a new Service in XDYou, plz register it here.
   void _registerDefaultServices() {
     register(CourseReminderService());
-    log.info("[NotificationRegistrar][_registerDefaultServices] Register default NotificationServices successfully");
+    log.info(
+      "[NotificationRegistrar][_registerDefaultServices] Register default NotificationServices successfully",
+    );
   }
 
   /// Initialize all registered notification services.
@@ -68,9 +76,13 @@ class NotificationServiceRegistrar {
             .where((service) => !service.isInitialized)
             .map((service) => service.initialize()),
       );
-      log.info("[NotificationRegistrar][initializeAllServices] Initialize all the default NotificationService successfully");
+      log.info(
+        "[NotificationRegistrar][initializeAllServices] Initialize all the default NotificationService successfully",
+      );
     } catch (e) {
-      log.error("[NotificationRegistrar][initializeAllServices] Fail to initialize all the default NotificationService");
+      log.error(
+        "[NotificationRegistrar][initializeAllServices] Fail to initialize all the default NotificationService",
+      );
       throw NotificationRegistrarInitiationException(e);
     }
     return true;

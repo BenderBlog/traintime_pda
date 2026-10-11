@@ -1,0 +1,19 @@
+type:
+  tech: 技术
+  acg: 晒你系
+  union: 官方
+  profit: 商业
+  sport: 体育
+  art: 文化
+  unknown: 未知
+  game: 游戏
+  all: 所有
+wrong_param: 错误参数
+no_group_info: 未传入社团信息
+loading: 正在加载
+error_outside: 在外围遇到错误
+error: 遇到错误
+qq_copied: QQ号已经复制到剪贴板
+no_link: 未提供入群链接
+loading_problem: 加载遇到错误
+picture_preview: 图片预览

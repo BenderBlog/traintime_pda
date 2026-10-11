@@ -8,6 +8,83 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'library.g.dart';
 
+List<LibrarySearchOption> _yearOptions() {
+  final currentYear = DateTime.now().year;
+  return [
+    const LibrarySearchOption("", "全部"),
+    for (int year = currentYear; year >= 1950; year--)
+      LibrarySearchOption(year.toString(), year.toString()),
+  ];
+}
+
+class LibrarySearchOption {
+  final String value;
+  final String label;
+  final String shortLabel;
+
+  const LibrarySearchOption(this.value, this.label, [String? shortLabel])
+    : shortLabel = shortLabel ?? label;
+}
+
+class LibrarySearchFilterOptions {
+  final List<LibrarySearchOption> searchFields;
+  final List<LibrarySearchOption> documentTypes;
+  final List<LibrarySearchOption> resourceTypes;
+  final List<LibrarySearchOption> campuses;
+  final List<LibrarySearchOption> locations;
+  final List<LibrarySearchOption> countries;
+  final List<LibrarySearchOption> languages;
+  final List<LibrarySearchOption> years;
+
+  const LibrarySearchFilterOptions({
+    required this.searchFields,
+    required this.documentTypes,
+    required this.resourceTypes,
+    required this.campuses,
+    required this.locations,
+    required this.countries,
+    required this.languages,
+    required this.years,
+  });
+
+  factory LibrarySearchFilterOptions.fallback() => LibrarySearchFilterOptions(
+    searchFields: const [
+      LibrarySearchOption("keyWord", "任意词", "任意"),
+      LibrarySearchOption("title", "题名"),
+      LibrarySearchOption("author", "责任者"),
+      LibrarySearchOption("isbn", "标准号", "标准号"),
+      LibrarySearchOption("callNo", "索书号", "索书"),
+      LibrarySearchOption("barcode", "条码号", "条码"),
+    ],
+    documentTypes: const [
+      LibrarySearchOption("", "全部"),
+      LibrarySearchOption("1", "图书"),
+    ],
+    resourceTypes: const [
+      LibrarySearchOption("", "全部"),
+      LibrarySearchOption("1", "馆藏资源"),
+      LibrarySearchOption("2", "电子资源"),
+    ],
+    campuses: const [
+      LibrarySearchOption("", "全部"),
+      LibrarySearchOption("1", "雁塔校区"),
+      LibrarySearchOption("2", "长安校区"),
+    ],
+    locations: const [LibrarySearchOption("", "全部")],
+    countries: const [
+      LibrarySearchOption("", "全部"),
+      LibrarySearchOption("CN", "中国"),
+      LibrarySearchOption("US", "美国"),
+    ],
+    languages: const [
+      LibrarySearchOption("", "全部"),
+      LibrarySearchOption("chi", "汉语"),
+      LibrarySearchOption("eng", "英语"),
+    ],
+    years: _yearOptions(),
+  );
+}
+
 @JsonSerializable()
 class BorrowData {
   @JsonKey(fromJson: _intValue)

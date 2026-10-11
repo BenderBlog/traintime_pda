@@ -1,5 +1,7 @@
 package io.github.benderblog.traintime_pda
 
+import org.json.JSONObject
+import java.util.UUID
 import android.content.Context
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
@@ -18,14 +20,47 @@ internal object WearCompanionTransport {
     @Volatile
     private var paymentProxyActive = false
 
-    fun cachePayload(context: Context, payload: String) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putString(PAYLOAD, payload).apply()
+    fun profileIdForAccount(context: Context, account: String): String {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val previous = prefs.getString("profile_account", null)
+        val stored = prefs.getString("profile_id", null)
+        if (previous == account && stored != null) return stored
+        val id = UUID.randomUUID().toString()
+        prefs.edit().apply {
+            if (previous != null && previous != account) remove(PAYLOAD)
+            putString("profile_account", account)
+            putString("profile_id", id)
+        }.apply()
+        return id
     }
 
-    fun cachedPayload(context: Context): String? =
+    fun sanitizedPayload(context: Context, payload: String): String {
+        val json = JSONObject(payload)
+        val legacyAccount = json.optJSONObject("credentials")?.optString("idsAccount")
+        if (!json.has("profileId") && !legacyAccount.isNullOrEmpty()) {
+            json.put("profileId", profileIdForAccount(context, legacyAccount))
+        }
+        json.remove("credentials")
+        return json.toString()
+    }
+
+    fun cachePayload(context: Context, payload: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(PAYLOAD, null)
+            .edit().putString(PAYLOAD, sanitizedPayload(context, payload)).apply()
+    }
+
+    fun cachedPayload(context: Context): String? {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val stored = prefs.getString(PAYLOAD, null) ?: return null
+        return try {
+            sanitizedPayload(context, stored).also { safe ->
+                if (safe != stored) prefs.edit().putString(PAYLOAD, safe).apply()
+            }
+        } catch (_: Exception) {
+            prefs.edit().remove(PAYLOAD).apply()
+            null
+        }
+    }
 
     fun rememberPairedWatch(context: Context, nodeId: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

@@ -30,9 +30,22 @@ data class WearHomeData(
     val tomorrowItems: List<WearAgendaItem>,
 )
 
+data class WearAgendaDay(val date: LocalDate, val items: List<WearAgendaItem>)
+
 object WearAgendaBuilder {
     private val termStartFormatter: DateTimeFormatter =
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
+    fun loadWeekData(
+        semesterCode: String,
+        classTable: ClassTableData?,
+        experiments: List<ExperimentData>?,
+        weekStart: LocalDate,
+        zone: ZoneId = ZoneId.systemDefault(),
+    ): List<WearAgendaDay> = (0L..6L).map { offset ->
+        val date = weekStart.plusDays(offset)
+        WearAgendaDay(date, loadHomeData(semesterCode, classTable, experiments, date.atStartOfDay(), zone).todayItems)
+    }
 
     fun courseItemsForDay(table: ClassTableData, day: LocalDate): List<WearAgendaItem> {
         val weekIndex = weekIndexForDay(table, day)

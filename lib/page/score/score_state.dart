@@ -3,13 +3,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/score.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/score/score_statics.dart';
 import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/xidian_ids/score_session.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/repository/ids_session/score_session.dart';
+import 'package:watermeter/repository/preference.dart';
 
 class ScoreState extends ChangeNotifier {
   /// Hack on notifyListeners, do not fire when the widget is disposed.
@@ -44,7 +45,7 @@ class ScoreState extends ChangeNotifier {
   StackTrace? stackTrace;
 
   /// Hintkey for cache result
-  String? hintKey;
+  CacheHint? cacheHint;
 
   /// Is score is selected to count.
   List<bool> isSelected = [];
@@ -85,7 +86,9 @@ class ScoreState extends ChangeNotifier {
 
     try {
       /// Fetch the data.
-      FetchResult<List<Score>> scoreDataFetchResult = await session.getScore();
+      FetchResult<List<Score>> scoreDataFetchResult = await session.getScore(
+        getUserRole(),
+      );
 
       /// Reset data.
       isCache = false;
@@ -97,7 +100,7 @@ class ScoreState extends ChangeNotifier {
       /// Error status changed.
       error = null;
       stackTrace = null;
-      hintKey = null;
+      cacheHint = null;
 
       /// State reset in here.
       isSelected.clear();
@@ -127,7 +130,7 @@ class ScoreState extends ChangeNotifier {
       });
 
       if (scoreDataFetchResult.isCache) {
-        hintKey = scoreDataFetchResult.hintKey;
+        cacheHint = scoreDataFetchResult.cacheHint;
         isCache = true;
         state = ScoreFetchState.readyCache;
         return;
@@ -143,10 +146,7 @@ class ScoreState extends ChangeNotifier {
       log.info("[ScorePageState] Finish fetching. state: $state");
       if (context.mounted) {
         if (isCache) {
-          showToast(
-            context: context,
-            msg: FlutterI18n.translate(context, "score.cache_message"),
-          );
+          showToast(context: context, msg: context.t.score.cacheMessage);
         }
       }
       notifyListeners();
@@ -222,15 +222,11 @@ class ScoreState extends ChangeNotifier {
 
   String get unPassed => unPassedSet.isEmpty ? "" : unPassedSet.join(",");
 
-  String bottomInfo(BuildContext context) => FlutterI18n.translate(
-    context,
-    "score.summary",
-    translationParams: {
-      "chosen": getSelectedScoreList.length.toString(),
-      "credit": evalCredit(false).toStringAsFixed(2),
-      "avg": evalAvg(false).toStringAsFixed(2),
-      "gpa": evalAvg(false, isGPA: true).toStringAsFixed(2),
-    },
+  String bottomInfo(BuildContext context) => context.t.score.summary(
+    chosen: getSelectedScoreList.length.toString(),
+    credit: evalCredit(false).toStringAsFixed(2),
+    avg: evalAvg(false).toStringAsFixed(2),
+    gpa: evalAvg(false, isGPA: true).toStringAsFixed(2),
   );
 
   double get notCoreClass {
@@ -245,7 +241,7 @@ class ScoreState extends ChangeNotifier {
     return toReturn;
   }
 
-  String get notCoreClassTypeList {
+  String? get notCoreClassTypeList {
     Map<String, int> notCoreClassCount = {};
 
     for (var i in scoreData) {
@@ -266,7 +262,7 @@ class ScoreState extends ChangeNotifier {
               "${notCoreClassCount[k]}分",
         )
         .join("；");
-    return toReturn.isEmpty ? "score.none" : toReturn;
+    return toReturn.isEmpty ? null : toReturn;
   }
 
   set isSelectMode(bool value) {

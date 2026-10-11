@@ -1,0 +1,17 @@
+title: 考试安排
+cache_hint: 已显示缓存考试安排信息
+cache_hint_password_wrong: 统一认证密码错误或已失效
+cache_hint_login_failed: 登录考试服务失败
+cache_hint_network_failed: 网络连接失败
+cache_hint_unknown_error: 在线获取考试安排失败，详细错误请查看日志
+fetching_hint: 正在获取最新考试安排
+not_finished: 未完成考试
+all_finished: 所有考试全部完成
+unable_to_exam: 无法完成考试
+finished: 已完成考试
+none_finished: 一门还没考呢
+no_exam_arrangement: 目前没有考试安排
+no_arrangement:
+  title: 目前无安排考试的科目
+  all_arranged: 目前所有科目均已安排考试
+  subtitle: '编号: {id}'

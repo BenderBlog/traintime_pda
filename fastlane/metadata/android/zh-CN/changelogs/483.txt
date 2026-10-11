@@ -1,0 +1,12 @@
+注意：@aqqkad 提供的空调用量查询代码已经合并，但仍需调试，故本版本不搭载该功能。
+
+1. 验证码输入对话框刷新优化 @littlestejan
+2. 重构用户自定义课程 @hazuki-keatsu
+3. 适配二步认证（仅短信机制）@BenderBlog
+4. 网络代码优化 @BenderBlog
+5. 图书馆新接口适配 @aqqkad
+6. 图书馆搜书页面重写 @aqqkad @A1nair @BenderBlog
+7. 主页电量低提醒 @aqqkad
+8. 各类页面优化和重写 @BenderBlog
+9. Android 构建修复 @ZYar-er
+10. 每日电量使用图渲染错误修复 @BenderBlog

@@ -4,10 +4,13 @@
 
 // Login window of the program.
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'dart:math';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:material_ui/material_ui.dart';
+
+import 'package:watermeter/controller/update_notice_controller.dart';
+import 'package:watermeter/page/homepage/notice_card/update_card.dart';
 import 'package:watermeter/page/setting/about_page/about_page.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
@@ -16,16 +19,16 @@ import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/app_icon.dart';
 import 'package:watermeter/page/login/jc_captcha.dart';
-import 'package:watermeter/repository/xidian_ids/slider_captcha_client.dart';
-import 'package:watermeter/repository/xidian_ids/ehall_session.dart';
+import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
+import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
-import 'package:watermeter/repository/xidian_ids/ids_session.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
 import 'package:watermeter/page/login/bottom_buttons.dart';
 import 'package:watermeter/page/login/ids_reauth_dialog.dart';
-import 'package:watermeter/repository/xidian_ids/personal_info_session.dart';
-import 'package:watermeter/repository/xidian_ids/ids_auth_protocol.dart';
-import 'package:watermeter/repository/xidian_ids/ids_reauth_client.dart';
+import 'package:watermeter/repository/ids_session/semester_session.dart';
+import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 
 class LoginWindow extends StatefulWidget {
   const LoginWindow({super.key});
@@ -52,20 +55,25 @@ class _LoginWindowState extends State<LoginWindow> {
     prefixIcon: Icon(iconData),
     hintText: hintText,
     suffixIcon: suffixIcon,
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
   );
 
   /// Can I see the password?
   bool _couldNotView = true;
 
   Widget contentColumn() => Column(
-    mainAxisSize: MainAxisSize.min,
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
+      MediaQuery.removePadding(
+        context: context,
+        child: UpdateCard(),
+      ).constrained(width: double.infinity),
+      const SizedBox(height: 16.0),
       TextField(
         controller: _idsAccountController,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_user_3_fill,
-          hintText: FlutterI18n.translate(context, "login.identity_number"),
+          hintText: context.t.login.identityNumber,
         ),
       ).center(),
       const SizedBox(height: 16.0),
@@ -74,7 +82,7 @@ class _LoginWindowState extends State<LoginWindow> {
         obscureText: _couldNotView,
         decoration: _inputDecoration(
           iconData: MingCuteIcons.mgc_safe_lock_fill,
-          hintText: FlutterI18n.translate(context, "login.password"),
+          hintText: context.t.login.password,
           suffixIcon: IconButton(
             icon: Icon(_couldNotView ? Icons.visibility : Icons.visibility_off),
             onPressed: () {
@@ -92,7 +100,7 @@ class _LoginWindowState extends State<LoginWindow> {
           maximumSize: const Size(double.infinity, 64),
         ),
         child: Text(
-          FlutterI18n.translate(context, "login.login"),
+          context.t.login.login,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
         ),
         onPressed: () async {
@@ -101,10 +109,7 @@ class _LoginWindowState extends State<LoginWindow> {
           } else {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "login.incorrect_password_pattern",
-              ),
+              msg: context.t.login.incorrectPasswordPattern,
             );
           }
         },
@@ -119,17 +124,15 @@ class _LoginWindowState extends State<LoginWindow> {
     loginState = IDSLoginState.requesting;
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(
-      msg: FlutterI18n.translate(context, "login.on_login_progress"),
+      msg: context.t.login.onLoginProgress,
       max: 100,
       hideValue: true,
-      completed: Completed(
-        completedMsg: FlutterI18n.translate(context, "login.complete_login"),
-      ),
+      completed: Completed(completedMsg: context.t.login.completeLogin),
     );
-    EhallSession ses = EhallSession();
+    IDSSession ses = IDSSession();
 
     try {
-      await ses.clearCookieJar();
+      await NetworkCookieJars.ids.deleteAll();
       log.warning(
         "[login_window][login] "
         "Have cleared login state.",
@@ -142,27 +145,49 @@ class _LoginWindowState extends State<LoginWindow> {
     }
 
     try {
-      await ses.loginEhall(
+      Future<Uri> reAuthHandler(IDSReAuthClient client) async {
+        if (pd.isOpen()) pd.close();
+        if (!mounted) throw const IDSReAuthCancelledException();
+        final result = await showIDSReAuthDialog(context, client);
+        if (mounted && !pd.isOpen()) {
+          pd.show(
+            msg: context.t.loginProcess.afterProcess,
+            max: 100,
+            hideValue: true,
+          );
+        }
+        return result;
+      }
+
+      await ses.login(
         username: _idsAccountController.text,
         password: _idsPasswordController.text,
-        onResponse: (int number, String status) {
+        onResponse: (int number, LoginProcessStep status) {
           if (pd.isOpen()) {
             pd.update(
-              msg: FlutterI18n.translate(context, status),
+              msg: switch (status) {
+                LoginProcessStep.readyPage => context.t.loginProcess.readyPage,
+                LoginProcessStep.getEncrypt =>
+                  context.t.loginProcess.getEncrypt,
+                LoginProcessStep.readyLogin =>
+                  context.t.loginProcess.readyLogin,
+                LoginProcessStep.slider => context.t.loginProcess.slider,
+                LoginProcessStep.secondFactor =>
+                  context.t.loginProcess.secondFactor,
+                LoginProcessStep.afterProcess =>
+                  context.t.loginProcess.afterProcess,
+              },
               value: number,
             );
           }
         },
-        reAuthHandler: (client) async {
+        reAuthHandler: (IDSReAuthClient client) async {
           if (pd.isOpen()) pd.close();
           if (!mounted) throw const IDSReAuthCancelledException();
           final result = await showIDSReAuthDialog(context, client);
           if (mounted && !pd.isOpen()) {
             pd.show(
-              msg: FlutterI18n.translate(
-                context,
-                'login_process.after_process',
-              ),
+              msg: context.t.loginProcess.afterProcess,
               max: 100,
               hideValue: true,
             );
@@ -188,10 +213,12 @@ class _LoginWindowState extends State<LoginWindow> {
           _idsPasswordController.text,
         );
 
-        bool isPostGraduate = await ses.checkWhetherPostgraduate();
+        bool isPostGraduate = await ses.checkWhetherPostgraduate(
+          reAuthHandler: reAuthHandler,
+        );
         String semesterInfo = isPostGraduate
-            ? await PersonalInfoSession().getSemesterInfoYjspt()
-            : await PersonalInfoSession().getSemesterInfoEhall();
+            ? await SemesterSession().getSemesterInfoYjspt()
+            : await SemesterSession().getSemesterInfoEhall();
         preference.setString(
           preference.Preference.currentSemester,
           semesterInfo,
@@ -216,16 +243,13 @@ class _LoginWindowState extends State<LoginWindow> {
           loginState = IDSLoginState.cancelled;
           showToast(
             context: context,
-            msg: FlutterI18n.translate(
-              context,
-              'login.second_factor.cancelled',
-            ),
+            msg: context.t.login.secondFactor.cancelled,
           );
         } else if (e is IDSReAuthExpiredException) {
           loginState = IDSLoginState.fail;
           showToast(
             context: context,
-            msg: FlutterI18n.translate(context, 'login.second_factor.expired'),
+            msg: context.t.login.secondFactor.expired,
           );
         } else if (e is LoginFailedException) {
           loginState = IDSLoginState.fail;
@@ -239,30 +263,21 @@ class _LoginWindowState extends State<LoginWindow> {
             if (e.response == null) {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "login.failed_login_cannot_connect_to_server",
-                ),
+                msg: context.t.login.failedLoginCannotConnectToServer,
               );
             } else {
               showToast(
                 context: context,
-                msg: FlutterI18n.translate(
-                  context,
-                  "login.failed_login_with_code",
-                  translationParams: {
-                    "code": e.response!.statusCode.toString(),
-                  },
+                msg: context.t.login.failedLoginWithCode(
+                  code: e.response!.statusCode.toString(),
                 ),
               );
             }
           } else {
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "login.failed_login_with_message",
-                translationParams: {"message": e.message.toString()},
+              msg: context.t.login.failedLoginWithMessage(
+                message: e.message.toString(),
               ),
             );
           }
@@ -279,10 +294,7 @@ class _LoginWindowState extends State<LoginWindow> {
               ),
             ),
           );
-          showToast(
-            context: context,
-            msg: FlutterI18n.translate(context, "login.failed_login_other"),
-          );
+          showToast(context: context, msg: context.t.login.failedLoginOther);
         }
       }
     }
@@ -295,6 +307,7 @@ class _LoginWindowState extends State<LoginWindow> {
   void initState() {
     super.initState();
 
+    UpdateNoticeController.i.reloadUpdateNoticeInfo();
     var cachedAccount = preference.getString(preference.Preference.idsAccount);
     if (cachedAccount.isNotEmpty) {
       _idsAccountController.text = cachedAccount;
@@ -303,63 +316,43 @@ class _LoginWindowState extends State<LoginWindow> {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape = width / height > 1.0;
     return Scaffold(
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final horizontalPadding = isLandscape
-                ? width * 0.25
-                : widthOfSquare;
-            const verticalPadding = 16.0;
-            return SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: verticalPadding,
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: max(
-                    0,
-                    constraints.maxHeight - verticalPadding * 2,
-                  ),
-                ),
-                child: isLandscape
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const AppIconWidget().gestures(
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const AboutPage(),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 48),
-                          Expanded(child: contentColumn()),
-                        ],
-                      )
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const AppIconWidget()
-                              .padding(vertical: kToolbarHeight * 0.75)
-                              .gestures(
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => const AboutPage(),
-                                  ),
-                                ),
-                              ),
-                          contentColumn(),
-                        ],
-                      ),
-              ),
-            );
-          },
+      resizeToAvoidBottomInset: false,
+      body: Padding(
+        padding: EdgeInsets.only(
+          left: width / height > 1.0 ? width * 0.25 : widthOfSquare,
+          right: width / height > 1.0 ? width * 0.25 : widthOfSquare,
+          top: kToolbarHeight,
         ),
+        child: width / height > 1.0
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const AppIconWidget().gestures(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const AboutPage(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 48),
+                  Expanded(child: contentColumn()),
+                ],
+              )
+            : Column(
+                children: [
+                  const AppIconWidget()
+                      .padding(vertical: kToolbarHeight * 0.75)
+                      .gestures(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AboutPage(),
+                          ),
+                        ),
+                      ),
+                  contentColumn(),
+                ],
+              ).center(),
       ),
     );
   }

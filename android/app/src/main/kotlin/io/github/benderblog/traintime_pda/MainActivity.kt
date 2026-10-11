@@ -28,6 +28,7 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
         // Enable edge-to-edge display
         WindowCompat.enableEdgeToEdge(window)
         super.onCreate(savedInstanceState)
+        WearCompanionTransport.cachedPayload(this)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -38,6 +39,21 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
         ).also { channel ->
             channel.setMethodCallHandler { call, result ->
                 when (call.method) {
+                "getCachedPaymentQr" -> {
+                    val account = call.argument<String>("idsAccount")
+                    if (account.isNullOrBlank()) {
+                        result.success(null)
+                    } else {
+                        val profileId = WearCompanionTransport.profileIdForAccount(this, account)
+                        val snapshot = WearCompanionTransport.cachedPayload(this)?.let { JSONObject(it) }
+                        val qr = if (snapshot?.optString("profileId") == profileId) snapshot.optJSONObject("paymentQr") else null
+                        result.success(mapOf(
+                            "profileId" to profileId,
+                            "pngBase64" to qr?.optString("pngBase64"),
+                            "fetchedAtEpochMs" to qr?.optLong("fetchedAtEpochMs", -1L),
+                        ))
+                    }
+                }
                 "getConnectedWearNodes" -> {
                     Wearable.getNodeClient(this).connectedNodes
                         .addOnSuccessListener { nodes ->
@@ -66,7 +82,8 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                         result.error("invalid_arguments", "Invalid Wear sync request", null)
                         return@setMethodCallHandler
                     }
-                    WearCompanionTransport.cachePayload(this, payload)
+                    val safePayload = WearCompanionTransport.sanitizedPayload(this, payload)
+                    WearCompanionTransport.cachePayload(this, safePayload)
                     val sessionId = try {
                         JSONObject(payload).optString("sessionId")
                     } catch (_: Exception) {
@@ -95,7 +112,7 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                     pendingSyncResults[nodeId] = PendingSync(sessionId, result, timeout)
                     mainHandler.postDelayed(timeout, SYNC_ACK_TIMEOUT_MS)
                     Wearable.getMessageClient(this)
-                        .sendMessage(nodeId, path, payload.toByteArray(Charsets.UTF_8))
+                        .sendMessage(nodeId, path, safePayload.toByteArray(Charsets.UTF_8))
                         .addOnFailureListener { error ->
                             mainHandler.post {
                                 val pending = pendingSyncResults.remove(nodeId)

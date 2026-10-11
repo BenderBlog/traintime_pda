@@ -8,6 +8,8 @@ import io.github.benderblog.traintime_pda.data.WearCacheStore
 import io.github.benderblog.traintime_pda.data.WearPreferences
 import io.github.benderblog.traintime_pda.data.WearSyncImporter
 import io.github.benderblog.traintime_pda.sync.WearCompanionClient
+import androidx.wear.tiles.TileService
+import io.github.benderblog.traintime_pda.tiles.AgendaTileService
 
 /** Process-scoped services for the Wear app. */
 class WearAppContainer(context: Context) {
@@ -15,7 +17,14 @@ class WearAppContainer(context: Context) {
 
     val preferences = WearPreferences(appContext)
     val cache = WearCacheStore(appContext)
-    val importer = WearSyncImporter(preferences, cache)
+    val importer = WearSyncImporter(preferences, cache) {
+        TileService.getUpdater(appContext).requestUpdate(AgendaTileService::class.java)
+    }
+    init {
+        if (preferences.clearLegacyAuthentication()) cache.clearPaymentQr()
+        cache.clearIdsCookies()
+    }
+
     val companionClient = WearCompanionClient(appContext, importer)
 
     fun needsPairing(): Boolean = !companionClient.isCompanionPaired()

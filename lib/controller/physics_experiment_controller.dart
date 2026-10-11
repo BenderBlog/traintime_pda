@@ -13,21 +13,36 @@ import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:watermeter/repository/physics_experiment_session.dart';
+import 'package:watermeter/repository/experiment_session/physics_experiment_session.dart';
 
 class PhysicsExperimentController {
+  final ExperimentSession session = ExperimentSession();
   static final PhysicsExperimentController i = PhysicsExperimentController._();
-  bool _isReloading = false;
 
   PhysicsExperimentController._() {
+    if (pref.getBool(pref.Preference.role)) {
+      _setUnavailableForPostgraduate();
+      return;
+    }
+
     /// Load from cache at the beginning
-    final cache = ExperimentSession.getCache();
+    final cache = session.getCache();
     if (cache != null) {
       final cached = FetchResult.cache(fetchTime: cache.$1, data: cache.$2);
       _lastValidPhysicsExperiment.value = cached;
       physicsExperimentStateSignal.value = AsyncState.data(cached);
     }
     _initEffects();
+  }
+
+  void _setUnavailableForPostgraduate() {
+    _lastValidPhysicsExperiment.value = null;
+    physicsExperimentStateSignal.value = AsyncState.data(
+      FetchResult.fresh(
+        fetchTime: DateTime.now(),
+        data: const <ExperimentData>[],
+      ),
+    );
   }
 
   final _lastValidPhysicsExperiment =
@@ -40,6 +55,11 @@ class PhysicsExperimentController {
 
   void _initEffects() {
     effect(() {
+      if (pref.getBool(pref.Preference.role)) {
+        _setUnavailableForPostgraduate();
+        return;
+      }
+
       final semesterChangeEvent =
           SemesterController.i.semesterSyncEventSignal.value;
       if (semesterChangeEvent == null ||
@@ -52,7 +72,7 @@ class PhysicsExperimentController {
         _lastValidPhysicsExperiment.value = null;
         unawaited(
           Future(() async {
-            ExperimentSession.deleteCache();
+            session.deleteCache();
             await pref.remove(pref.Preference.experimentPassword);
           }),
         );
@@ -63,16 +83,19 @@ class PhysicsExperimentController {
   }
 
   Future<void> reloadPhysicsExperiment() async {
-    if (_isReloading) return;
-    _isReloading = true;
+    if (pref.getBool(pref.Preference.role)) {
+      _setUnavailableForPostgraduate();
+      return;
+    }
+
     final previous = _lastValidPhysicsExperiment.value;
     physicsExperimentStateSignal.value = previous != null
         ? AsyncState.dataRefreshing(previous)
         : AsyncState.loading();
     try {
-      final result = await getPhysicsExperimentData();
+      final result = await session.getData();
       _lastValidPhysicsExperiment.value = result;
-      physicsExperimentStateSignal.value = AsyncState.data(result);
+      physicsExperimentStateSignal.set(AsyncState.data(result), force: true);
     } catch (e, s) {
       physicsExperimentStateSignal.value = AsyncState.error(e, s);
       log.handle(
@@ -80,8 +103,6 @@ class PhysicsExperimentController {
         s,
         "[PhysicsExperimentController][reloadPhysicsExperiment] Have issue",
       );
-    } finally {
-      _isReloading = false;
     }
   }
 
@@ -101,8 +122,8 @@ class PhysicsExperimentController {
     () => _lastValidPhysicsExperiment.value?.fetchTime,
   );
 
-  late final physicsExperimentCacheHintKey = computed<String?>(
-    () => _lastValidPhysicsExperiment.value?.hintKey,
+  late final physicsExperimentCacheHintKey = computed<CacheHint?>(
+    () => _lastValidPhysicsExperiment.value?.cacheHint,
   );
 
   late final hasPhysicsExperimentArrangement = computed(

@@ -1,17 +1,33 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:signals/signals.dart';
+import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
+import 'package:watermeter/controller/energy_controller.dart';
 import 'package:watermeter/controller/exam_controller.dart';
 import 'package:watermeter/controller/global_timer_controller.dart';
+import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/controller/other_experiment_controller.dart';
 import 'package:watermeter/controller/physics_experiment_controller.dart';
+import 'package:watermeter/controller/school_card_controller.dart';
+import 'package:watermeter/controller/semester_controller.dart';
+import 'package:watermeter/controller/sport_controller.dart';
+import 'package:watermeter/controller/week_swift_controller.dart';
 import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/password_exceptions.dart';
+import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
+import 'package:watermeter/repository/ids_session/ids_session.dart';
+import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/repository/system_calendar_sync_service.dart';
+import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/repository/wear_companion_sync.dart';
 
 enum ArrangementState { fetching, fetched, error, none }
 
@@ -29,6 +45,115 @@ class HomepageController {
 
   HomepageController._() {
     GlobalTimerController.i;
+    SemesterController.i;
+    WeekSwiftController.i;
+    ClassTableController.i;
+    ExamController.i;
+    if (!preference.getBool(preference.Preference.role)) {
+      OtherExperimentController.i;
+      PhysicsExperimentController.i;
+    }
+  }
+
+  Future<void> _comboLogin({
+    required Future<void> Function(String) sliderCaptcha,
+  }) async {
+    if (loginState == IDSLoginState.requesting) {
+      return;
+    }
+    loginState = IDSLoginState.requesting;
+
+    try {
+      await IDSSession().checkAndLogin(
+        target:
+            "https://ehall.xidian.edu.cn/login?service="
+            "https://ehall.xidian.edu.cn/new/index.html",
+        sliderCaptcha: sliderCaptcha,
+      );
+      loginState = IDSLoginState.success;
+    } on PasswordWrongException {
+      loginState = IDSLoginState.passwordWrong;
+      log.warning(
+        "[HomepageController][_comboLogin] "
+        "Combo login failed because the password is wrong.",
+      );
+    } on IDSReAuthCancelledException {
+      loginState = IDSLoginState.cancelled;
+      log.info(
+        '[HomepageController][_comboLogin] '
+        'Additional verification was cancelled by the user.',
+      );
+    } catch (e, s) {
+      loginState = IDSLoginState.fail;
+      log.warning(
+        "[HomepageController][_comboLogin] Combo login failed.",
+        e,
+        s,
+      );
+    }
+  }
+
+  Future<void> _safeReload(
+    String name,
+    Future<void> Function() callback,
+  ) async {
+    try {
+      await callback();
+    } catch (e, s) {
+      log.handle(e, s, "[HomepageController][$name] Have issue");
+    }
+  }
+
+  Future<void> refresh({
+    bool forceRetryLogin = false,
+    required Future<void> Function(String) sliderCaptcha,
+  }) async {
+    if (forceRetryLogin || loginState == IDSLoginState.fail) {
+      await _comboLogin(sliderCaptcha: sliderCaptcha);
+    }
+
+    await _safeReload("Semester", SemesterController.i.refreshSemesterInfo);
+
+    await Future.wait([
+      _safeReload("Classtable", ClassTableController.i.reloadClassTable),
+      _safeReload("Exam", ExamController.i.reloadExamInfo),
+      if (!preference.getBool(preference.Preference.role)) ...[
+        _safeReload(
+          "PhysicsExperiment",
+          PhysicsExperimentController.i.reloadPhysicsExperiment,
+        ),
+        _safeReload(
+          "OtherExperiment",
+          OtherExperimentController.i.reloadOtherExperiment,
+        ),
+        _safeReload("Sport", () async {
+          await SportController.i.reloadClass();
+        }),
+      ],
+      _safeReload("Library", LibraryController.i.reloadBorrowList),
+      _safeReload("SchoolCard", SchoolCardController.i.reloadOverview),
+      _safeReload("Electricity", EnergyController.i.refreshElectricityInfo),
+      _safeReload("Aircon", AirconController.i.refreshDeviceState),
+    ]);
+    await maybeAutoSyncSystemCalendar();
+
+    if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+      final reminderService = CourseReminderService();
+      await reminderService.initialize();
+      reminderService.validateAndUpdateNotifications();
+    }
+
+    final hasCredential =
+        preference.getString(preference.Preference.idsAccount).isNotEmpty &&
+        preference.getString(preference.Preference.idsPassword).isNotEmpty;
+    await syncWidgetLoginState(hasCredential);
+    if (Platform.isAndroid && hasCredential) {
+      try {
+        await const WearCompanionSyncService().cacheLatestSnapshot();
+      } catch (e, s) {
+        log.handle(e, s, '[HomepageController][WearCompanion] Cache failed');
+      }
+    }
   }
 
   List<HomeArrangement> _sortArrangements(Iterable<HomeArrangement> data) {
@@ -99,6 +224,10 @@ class HomepageController {
 
   late final physicsExperimentSourceStateComputedSignal =
       computed<HomepageSourceState>(() {
+        if (preference.getBool(preference.Preference.role)) {
+          return HomepageSourceState.none;
+        }
+
         final state =
             PhysicsExperimentController.i.physicsExperimentStateSignal.value;
         if (state.isLoading) {
@@ -120,6 +249,10 @@ class HomepageController {
 
   late final otherExperimentSourceStateComputedSignal =
       computed<HomepageSourceState>(() {
+        if (preference.getBool(preference.Preference.role)) {
+          return HomepageSourceState.none;
+        }
+
         final state =
             OtherExperimentController.i.otherExperimentStateSignal.value;
         if (state.isLoading) {
@@ -153,11 +286,16 @@ class HomepageController {
       ...ClassTableController.i.arrangementOfTodayComputedSignal.value,
       ..._getCustomClassOfDay(GlobalTimerController.i.currentTimeSignal.value),
       ...ExamController.i.todayExams.value,
-      ...PhysicsExperimentController
-          .i
-          .physicsExperimentOfTodayComputedSignal
-          .value,
-      ...OtherExperimentController.i.otherExperimentOfTodayComputedSignal.value,
+      if (!preference.getBool(preference.Preference.role)) ...[
+        ...PhysicsExperimentController
+            .i
+            .physicsExperimentOfTodayComputedSignal
+            .value,
+        ...OtherExperimentController
+            .i
+            .otherExperimentOfTodayComputedSignal
+            .value,
+      ],
     ]),
   );
 
@@ -171,14 +309,16 @@ class HomepageController {
             ),
           ),
           ...ExamController.i.tomorrowExams.value,
-          ...PhysicsExperimentController
-              .i
-              .physicsExperimentOfTomorrowComputedSignal
-              .value,
-          ...OtherExperimentController
-              .i
-              .otherExperimentOfTomorrowComputedSignal
-              .value,
+          if (!preference.getBool(preference.Preference.role)) ...[
+            ...PhysicsExperimentController
+                .i
+                .physicsExperimentOfTomorrowComputedSignal
+                .value,
+            ...OtherExperimentController
+                .i
+                .otherExperimentOfTomorrowComputedSignal
+                .value,
+          ],
         ]),
       );
 

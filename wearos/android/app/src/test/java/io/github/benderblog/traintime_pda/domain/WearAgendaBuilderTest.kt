@@ -99,6 +99,51 @@ class WearAgendaBuilderTest {
         assertThat(data.todayItems.map { it.title }).containsExactly("离线课程")
     }
 
+    @Test
+    fun eveningPeriodMatchesPhoneSoTileDoesNotSwitchFiveMinutesLate() {
+        val table = singleCourseTable("晚间课程").let {
+            it.copy(timeArrangement = it.timeArrangement.map { item ->
+                item.copy(start = 10, stop = 10)
+            })
+        }
+        val item = WearAgendaBuilder.courseItemsForDay(table, LocalDate.of(2026, 5, 19)).single()
+        assertThat(item.start).isEqualTo(LocalDateTime.of(2026, 5, 19, 19, 50))
+        assertThat(item.end).isEqualTo(LocalDateTime.of(2026, 5, 19, 20, 35))
+    }
+
+    @Test
+    fun futureWeekIncludesAllSevenDaysAndKeepsSundayClassesAndExperiments() {
+        val original = singleCourseTable("周末课程")
+        val table = original.copy(
+            semesterLength = 2,
+            timeArrangement = original.timeArrangement.map {
+                it.copy(day = 7, weekList = listOf(false, true))
+            },
+        )
+        val zone = ZoneId.of("Asia/Shanghai")
+        val sunday = LocalDate.of(2026, 5, 31)
+        val experiment = ExperimentData(
+            name = "周末实验",
+            classroom = "实验室",
+            teacher = "王老师",
+            timeRanges = listOf(
+                sunday.atTime(14, 0).atZone(zone).toInstant().toEpochMilli() to
+                    sunday.atTime(16, 0).atZone(zone).toInstant().toEpochMilli(),
+            ),
+        )
+        val days = WearAgendaBuilder.loadWeekData(
+            semesterCode = "2026-1",
+            classTable = table,
+            experiments = listOf(experiment),
+            weekStart = LocalDate.of(2026, 5, 25),
+            zone = zone,
+        )
+        assertThat(days.map { it.date.dayOfWeek.value }).containsExactly(1, 2, 3, 4, 5, 6, 7).inOrder()
+        assertThat(days.last().date).isEqualTo(sunday)
+        assertThat(days.last().items.map { it.title }).containsExactly("周末课程", "周末实验").inOrder()
+        assertThat(days.dropLast(1).flatMap { it.items }).isEmpty()
+    }
+
     companion object {
         fun singleCourseTable(name: String): ClassTableData = ClassTableData(
             semesterLength = 1,

@@ -1,0 +1,54 @@
+cache_message: 已显示缓存成绩信息
+summary: '目前选中科目 {chosen}  总计学分 {credit}
+
+  均分 {avg} GPA {gpa}'
+all_passed: 所有科目均已通过
+cache_hint_password_wrong: 统一认证密码错误或已失效
+cache_hint_login_failed: 登录考试服务失败
+cache_hint_network_failed: 网络连接失败
+cache_hint_unknown_error: 在线获取成绩安排失败，详细错误请查看日志
+fetching_hint: 正在获取最新成绩信息，请不要退出页面
+all_semester: 所有学期
+chosen_semester: 学期 {chosen}
+all_type: 所有类型
+chosen_type: 类型 {type}
+none: 暂无
+score_choice:
+  title: 成绩单
+  search_hint: 搜索成绩记录
+  empty_list: 没有选择该学期的课程计入均分计算
+  sum_dialog_title: 小总结
+  sum_dialog_content: '所有科目的GPA：{gpa_all}
+
+    所有科目的均分：{avg_all}
+
+    所有科目的学分：{credit_all}
+
+    未通过科目：{unpassed}
+
+    公共选修课：{not_core_type}
+
+    本程序提供的数据仅供参考，开发者对其准确性不负责'
+score_compose_card:
+  no_detail: 未提供详情信息
+  fetching: 正在获取
+  credit: 学分
+  gpa: GPA
+  score: 成绩
+score_info_card:
+  title: 成绩详情
+  original_course: 初修
+  failed: '[挂] '
+  credit: 学分 {credit}
+  gpa: GPA {gpa}
+  score: 成绩 {score}
+score_page:
+  title: 成绩查询
+  search_hint: 搜索成绩记录
+  no_record: 未筛查到合请求的记录
+  select_all: 全选
+  select_nothing: 全不选
+  reset_select: 重置选择
+  summary: 总结
+  CET-4: 国家英语四级
+  CET-6: 国家英语六级

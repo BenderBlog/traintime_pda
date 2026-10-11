@@ -4,13 +4,15 @@
 
 import 'package:pigeon/pigeon.dart';
 
-@ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/bridge/save_to_groupid.g.dart',
-  dartOptions: DartOptions(),
-  swiftOut: 'ios/Runner/SaveToGroupID.g.swift',
-  swiftOptions: SwiftOptions(),
-  copyrightHeader: "pigeon_bridge/copyright_header.txt",
-))
+@ConfigurePigeon(
+  PigeonOptions(
+    dartOut: 'lib/bridge/save_to_groupid.g.dart',
+    dartOptions: DartOptions(),
+    swiftOut: 'ios/Runner/SaveToGroupID.g.swift',
+    swiftOptions: SwiftOptions(),
+    copyrightHeader: "pigeon_bridge/copyright_header.txt",
+  ),
+)
 class FileToGroupID {
   FileToGroupID({
     required this.appid,
