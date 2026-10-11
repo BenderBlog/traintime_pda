@@ -1,0 +1,80 @@
+// Copyright 2026 Traintime PDA authors.
+// SPDX-License-Identifier: MPL-2.0
+
+package io.github.benderblog.traintime_pda.data
+
+import io.github.benderblog.traintime_pda.protocol.WearCompanionSyncEnvelope
+import io.github.benderblog.traintime_pda.protocol.WearPaymentQrSyncPayload
+import io.github.benderblog.traintime_pda.protocol.WearScheduleSyncPayload
+import org.json.JSONObject
+
+/**
+ * Imports a phone-produced envelope into local prefs + file caches.
+ * Schedule is never fetched by the watch; only this path updates it.
+ */
+class WearSyncImporter(
+    private val preferences: WearPreferences,
+    private val cache: WearCacheStore,
+    private val onScheduleChanged: () -> Unit = {},
+) {
+    fun importEnvelope(envelope: WearCompanionSyncEnvelope, rawPayload: String? = null) {
+        envelope.profileId?.let { profileId ->
+            if (preferences.profileId != null && preferences.profileId != profileId) {
+                cache.clearCampusCaches()
+                cache.clearPaymentQr()
+            }
+            preferences.profileId = profileId
+        }
+        importSchedule(envelope.schedule, rawPayload)
+        envelope.paymentQr?.let { importPaymentQr(it) }
+        onScheduleChanged()
+    }
+
+    fun importSchedule(payload: WearScheduleSyncPayload, rawPayload: String? = null) {
+        val rawClassTable = rawPayload?.let {
+            try {
+                JSONObject(it).optJSONObject("schedule")?.optJSONObject("classTable")?.toString()
+            } catch (_: Exception) {
+                null
+            }
+        }
+        if (rawClassTable != null) {
+            cache.writeClassTableRaw(rawClassTable)
+        } else {
+            cache.writeClassTable(payload.classTable)
+        }
+        if (payload.classTable.semesterCode.isNotEmpty()) {
+            preferences.currentSemester = payload.classTable.semesterCode
+        }
+
+        val experiments = payload.otherExperiments
+        if (experiments != null) {
+            val rawExperiments = rawPayload?.let {
+                try {
+                    JSONObject(it).optJSONObject("schedule")
+                        ?.optJSONArray("otherExperiments")
+                        ?.toString()
+                } catch (_: Exception) {
+                    null
+                }
+            }
+            if (rawExperiments != null) {
+                cache.writeExperimentsRaw(rawExperiments)
+            } else {
+                cache.writeExperiments(experiments)
+            }
+        }
+    }
+
+    fun importPaymentQr(payload: WearPaymentQrSyncPayload) {
+        cache.writePaymentQr(payload.bytes, payload.fetchedAtEpochMs)
+    }
+
+    fun logout() {
+        cache.clearCampusCaches()
+        cache.clearPaymentQr()
+        preferences.currentSemester = ""
+        preferences.profileId = null
+        onScheduleChanged()
+    }
+}

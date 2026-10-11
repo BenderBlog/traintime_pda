@@ -1,0 +1,31 @@
+# Android / Gradle
+*.iml
+.idea/
+.gradle/
+local.properties
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.APK
+*.apk
+*.aab
+
+# OS / editor
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# Legacy Flutter leftovers (if any reappear)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+.fvm/

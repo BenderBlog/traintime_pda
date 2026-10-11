@@ -1,0 +1,4 @@
+<resources>
+    <string name="agenda_tile_label">XDYou 课表</string>
+    <string name="agenda_tile_description">离线查看正在进行和接下来的课程、实验安排</string>
+</resources>

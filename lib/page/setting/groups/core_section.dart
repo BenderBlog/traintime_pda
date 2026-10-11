@@ -28,6 +28,7 @@ import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/page/setting/wear_companion_sync_page.dart';
 
 class CoreSection extends StatelessWidget {
   const CoreSection({super.key});
@@ -37,6 +38,14 @@ class CoreSection extends StatelessWidget {
     return SectionSettingScaffold(
       items: SettingSegmentedList(
         items: [
+          if (Platform.isAndroid)
+            ListTile(
+              leading: const Icon(Icons.watch_outlined),
+              title: const Text('XDYou Wear'),
+              subtitle: const Text('配对 Wear OS 手表并同步数据'),
+              trailing: const Icon(Icons.navigate_next),
+              onTap: () => context.push<void>(const WearCompanionSyncPage()),
+            ),
           ListTile(
             leading: const Icon(MingCuteIcons.mgc_document_line),
             title: Text(context.t.setting.checkLogger),

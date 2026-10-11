@@ -1,0 +1,12 @@
+// Root build for the native XDYou Wear OS client.
+// Flutter is no longer used on the watch target.
+
+plugins {
+    id "com.android.application" version "8.13.2" apply false
+    id "org.jetbrains.kotlin.android" version "2.2.20" apply false
+    id "org.jetbrains.kotlin.plugin.compose" version "2.2.20" apply false
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.layout.buildDirectory
+}

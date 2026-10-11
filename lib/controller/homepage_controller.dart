@@ -27,6 +27,7 @@ import 'package:watermeter/repository/notification/course_reminder_service.dart'
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/system_calendar_sync_service.dart';
 import 'package:watermeter/repository/widget_state_sync.dart';
+import 'package:watermeter/repository/wear_companion_sync.dart';
 
 enum ArrangementState { fetching, fetched, error, none }
 
@@ -146,6 +147,13 @@ class HomepageController {
         preference.getString(preference.Preference.idsAccount).isNotEmpty &&
         preference.getString(preference.Preference.idsPassword).isNotEmpty;
     await syncWidgetLoginState(hasCredential);
+    if (Platform.isAndroid && hasCredential) {
+      try {
+        await const WearCompanionSyncService().cacheLatestSnapshot();
+      } catch (e, s) {
+        log.handle(e, s, '[HomepageController][WearCompanion] Cache failed');
+      }
+    }
   }
 
   List<HomeArrangement> _sortArrangements(Iterable<HomeArrangement> data) {
