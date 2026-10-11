@@ -154,6 +154,7 @@ class _IDSReAuthDialogState extends State<_IDSReAuthDialog> {
     return PopScope(
       canPop: false,
       child: AlertDialog(
+        scrollable: true,
         title: Text(_t('login.second_factor.title')),
         content: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
