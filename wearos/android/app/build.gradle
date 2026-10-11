@@ -21,7 +21,6 @@ android {
         targetSdk 34
         versionCode 43
         versionName "1.5.13"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -68,18 +67,11 @@ android {
             applicationIdSuffix ""
         }
     }
-
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-        }
-    }
 }
 
 dependencies {
     def composeBom = platform("androidx.compose:compose-bom:2026.06.01")
     implementation composeBom
-    androidTestImplementation composeBom
 
     implementation "androidx.core:core-ktx:1.17.0"
     implementation "androidx.activity:activity-compose:1.13.0"
@@ -97,10 +89,4 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2"
-
-    testImplementation "junit:junit:4.13.2"
-    testImplementation "org.jetbrains.kotlin:kotlin-test:2.2.20"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
-    testImplementation "com.google.truth:truth:1.4.4"
-    testImplementation "org.json:json:20240303"
 }

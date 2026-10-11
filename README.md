@@ -75,11 +75,11 @@ Tools • Dart 3.13.0 • DevTools 2.60.0
 git submodule update --init --recursive
 ```
 
-构建和测试 Wear OS 应用：
+构建 Wear OS 应用：
 
 ```bash
 cd wearos/android
-./gradlew testDebugUnitTest assembleRelease
+./gradlew assembleRelease
 ```
 
 ## 授权信息

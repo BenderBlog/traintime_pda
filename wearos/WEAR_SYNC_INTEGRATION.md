@@ -99,5 +99,5 @@ data.
 
 ```bash
 cd wearos/android
-./gradlew testDebugUnitTest assembleDebug
+./gradlew assembleDebug
 ```

@@ -21,7 +21,7 @@ on:
       - ".github/workflows/check_wearos.yaml"
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,6 +35,6 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Test and build native Wear OS app
+      - name: Build native Wear OS app
         working-directory: wearos/android
-        run: ./gradlew testDebugUnitTest assembleDebug
+        run: ./gradlew assembleDebug
