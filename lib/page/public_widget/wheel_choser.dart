@@ -32,10 +32,12 @@ class _WheelChooseState<T> extends State<WheelChoose<T>> {
   static const double _heightOfText = 30;
   static const double _widthOfLine = 1;
   late final PageController _pageController;
+  late int _selectedPage;
 
   @override
   void initState() {
     super.initState();
+    _selectedPage = widget.defaultPage;
     _pageController = PageController(
       viewportFraction: 1 / 3,
       initialPage: widget.defaultPage,
@@ -45,7 +47,10 @@ class _WheelChooseState<T> extends State<WheelChoose<T>> {
   @override
   void didUpdateWidget(covariant WheelChoose<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.defaultPage != widget.defaultPage) {
+
+    if (oldWidget.defaultPage != widget.defaultPage &&
+        widget.defaultPage != _selectedPage) {
+      _selectedPage = widget.defaultPage;
       _pageController.animateToPage(
         widget.defaultPage,
         duration: const Duration(milliseconds: 250),
@@ -83,6 +88,7 @@ class _WheelChooseState<T> extends State<WheelChoose<T>> {
             ).textColor(Theme.of(context).colorScheme.primary).center();
           },
           onPageChanged: (int index) {
+            _selectedPage = index;
             widget.changeBookIdCallBack(widget.options[index].data);
           },
         ),
