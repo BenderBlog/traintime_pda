@@ -109,6 +109,7 @@ class _DateSelectorFree extends State<DateSelectorFree> {
       end = TimeOfDay(hour: fixedEnd ~/ 60, minute: fixedEnd % 60);
     }
 
+    FocusScope.of(context).unfocus();
     return await showModalBottomSheet<(TimeOfDay, TimeOfDay)>(
       context: context,
       isScrollControlled: true,
