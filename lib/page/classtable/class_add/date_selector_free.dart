@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:flutter/material.dart' as legacy;
 import 'package:material_ui/material_ui.dart';
 
 import 'package:intl/intl.dart';
@@ -378,116 +379,129 @@ class _DateSelectorFree extends State<DateSelectorFree> {
               ],
             ),
             const SizedBox(height: 8),
-            CalendarDatePicker2(
-              config: CalendarDatePicker2Config(
-                calendarType: CalendarDatePicker2Type.multi,
-                hideMonthPickerDividers: true,
-                firstDate: _semesterFirstDate,
-                lastDate: _semesterLastDate,
-                firstDayOfWeek: MaterialLocalizations.of(
-                  context,
-                ).firstDayOfWeekIndex,
-                selectedDayHighlightColor: widget.color,
-                disableModePicker: true,
-                disableMonthPicker: true,
-                selectableYearPredicate: (_) => false,
-                weekdayLabels: [
-                  context.t.weekday.sunday,
-                  context.t.weekday.monday,
-                  context.t.weekday.tuesday,
-                  context.t.weekday.wednesday,
-                  context.t.weekday.thursday,
-                  context.t.weekday.friday,
-                  context.t.weekday.saturday,
-                ],
-                modePickerTextHandler:
-                    ({required DateTime monthDate, bool? isMonthPicker}) {
-                      final monthIndex = monthDate.month - 1;
-                      final tr = context.t;
-                      final monthNameList = [
-                        tr.month.january,
-                        tr.month.february,
-                        tr.month.march,
-                        tr.month.april,
-                        tr.month.may,
-                        tr.month.june,
-                        tr.month.july,
-                        tr.month.august,
-                        tr.month.september,
-                        tr.month.october,
-                        tr.month.november,
-                        tr.month.december,
-                      ];
-                      final year = monthDate.year;
-                      final yearName = context.t.classtable.semesterSwitcher
-                          .year(year: '$year');
-                      return "$yearName ${monthNameList[monthIndex]}";
-                    },
-              ),
-              value: chosenDatesRanges.map((e) => e.start).toList(),
-              onValueChanged: (dates) async {
-                final newBaseDates = dates.whereType<DateTime>().toList();
-                final oldBaseDates = chosenDatesRanges
-                    .map((d) => DateUtils.dateOnly(d.start))
-                    .toList();
+            // calendar_date_picker2 still uses package:flutter/material.dart,
+            // while this app uses material_ui. Its InkResponse widgets require
+            // Flutter's own Theme and Material ancestors.
+            // Required until calendar_date_picker2 migrates to material_ui.
+            // ignore: deprecated_member_use
+            MaterialUiCompatibilityBridge(
+              child: legacy.Material(
+                type: legacy.MaterialType.transparency,
+                child: CalendarDatePicker2(
+                  config: CalendarDatePicker2Config(
+                    calendarType: CalendarDatePicker2Type.multi,
+                    hideMonthPickerDividers: true,
+                    firstDate: _semesterFirstDate,
+                    lastDate: _semesterLastDate,
+                    firstDayOfWeek: MaterialLocalizations.of(
+                      context,
+                    ).firstDayOfWeekIndex,
+                    selectedDayHighlightColor: widget.color,
+                    disableModePicker: true,
+                    disableMonthPicker: true,
+                    selectableYearPredicate: (_) => false,
+                    weekdayLabels: [
+                      context.t.weekday.sunday,
+                      context.t.weekday.monday,
+                      context.t.weekday.tuesday,
+                      context.t.weekday.wednesday,
+                      context.t.weekday.thursday,
+                      context.t.weekday.friday,
+                      context.t.weekday.saturday,
+                    ],
+                    modePickerTextHandler:
+                        ({required DateTime monthDate, bool? isMonthPicker}) {
+                          final monthIndex = monthDate.month - 1;
+                          final tr = context.t;
+                          final monthNameList = [
+                            tr.month.january,
+                            tr.month.february,
+                            tr.month.march,
+                            tr.month.april,
+                            tr.month.may,
+                            tr.month.june,
+                            tr.month.july,
+                            tr.month.august,
+                            tr.month.september,
+                            tr.month.october,
+                            tr.month.november,
+                            tr.month.december,
+                          ];
+                          final year = monthDate.year;
+                          final yearName = context.t.classtable.semesterSwitcher
+                              .year(year: '$year');
+                          return "$yearName ${monthNameList[monthIndex]}";
+                        },
+                  ),
+                  value: chosenDatesRanges.map((e) => e.start).toList(),
+                  onValueChanged: (dates) async {
+                    final newBaseDates = dates.whereType<DateTime>().toList();
+                    final oldBaseDates = chosenDatesRanges
+                        .map((d) => DateUtils.dateOnly(d.start))
+                        .toList();
 
-                DateTime? addedDate;
-                for (var d in newBaseDates) {
-                  if (!oldBaseDates.contains(DateUtils.dateOnly(d))) {
-                    addedDate = d;
-                    break;
-                  }
-                }
+                    DateTime? addedDate;
+                    for (var d in newBaseDates) {
+                      if (!oldBaseDates.contains(DateUtils.dateOnly(d))) {
+                        addedDate = d;
+                        break;
+                      }
+                    }
 
-                if (addedDate != null) {
-                  final pickedRange = await _showRangeTimePicker(
-                    context,
-                    initialStart: const TimeOfDay(hour: 8, minute: 30),
-                    initialEnd: const TimeOfDay(hour: 9, minute: 15),
-                    helpText: context
-                        .t
-                        .classtable
-                        .classAdd
-                        .dateSelectorFree
-                        .chooseClassTime,
-                  );
-
-                  if (pickedRange != null) {
-                    final finalStartDate = DateTime(
-                      addedDate.year,
-                      addedDate.month,
-                      addedDate.day,
-                      pickedRange.$1.hour,
-                      pickedRange.$1.minute,
-                    );
-                    final finalEndDate = DateTime(
-                      addedDate.year,
-                      addedDate.month,
-                      addedDate.day,
-                      pickedRange.$2.hour,
-                      pickedRange.$2.minute,
-                    );
-
-                    setState(() {
-                      chosenDatesRanges.add(
-                        DateTimeRange(start: finalStartDate, end: finalEndDate),
+                    if (addedDate != null) {
+                      final pickedRange = await _showRangeTimePicker(
+                        context,
+                        initialStart: const TimeOfDay(hour: 8, minute: 30),
+                        initialEnd: const TimeOfDay(hour: 9, minute: 15),
+                        helpText: context
+                            .t
+                            .classtable
+                            .classAdd
+                            .dateSelectorFree
+                            .chooseClassTime,
                       );
-                    });
-                    widget.onChanged(chosenDatesRanges);
-                  } else {
-                    setState(() {});
-                  }
-                } else {
-                  setState(() {
-                    chosenDatesRanges.removeWhere(
-                      (d) => !newBaseDates
-                          .map((nd) => DateUtils.dateOnly(nd))
-                          .contains(DateUtils.dateOnly(d.start)),
-                    );
-                  });
-                  widget.onChanged(chosenDatesRanges);
-                }
-              },
+
+                      if (pickedRange != null) {
+                        final finalStartDate = DateTime(
+                          addedDate.year,
+                          addedDate.month,
+                          addedDate.day,
+                          pickedRange.$1.hour,
+                          pickedRange.$1.minute,
+                        );
+                        final finalEndDate = DateTime(
+                          addedDate.year,
+                          addedDate.month,
+                          addedDate.day,
+                          pickedRange.$2.hour,
+                          pickedRange.$2.minute,
+                        );
+
+                        setState(() {
+                          chosenDatesRanges.add(
+                            DateTimeRange(
+                              start: finalStartDate,
+                              end: finalEndDate,
+                            ),
+                          );
+                        });
+                        widget.onChanged(chosenDatesRanges);
+                      } else {
+                        setState(() {});
+                      }
+                    } else {
+                      setState(() {
+                        chosenDatesRanges.removeWhere(
+                          (d) => !newBaseDates
+                              .map((nd) => DateUtils.dateOnly(nd))
+                              .contains(DateUtils.dateOnly(d.start)),
+                        );
+                      });
+                      widget.onChanged(chosenDatesRanges);
+                    }
+                  },
+                ),
+              ),
             ),
             if (chosenDatesRanges.isNotEmpty)
               ...List.generate(chosenDatesRanges.length, (index) {
