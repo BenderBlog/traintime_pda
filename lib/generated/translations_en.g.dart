@@ -100,7 +100,7 @@ class _Translations$classtable$en extends Translations$classtable$zh {
 
 	// Translations
 	@override late final _Translations$classtable$partnerClasstable$en partnerClasstable = _Translations$classtable$partnerClasstable$en._(_root);
-	@override String get pageTitle => 'My Schedule';
+	@override String get pageTitle => 'Schedule';
 	@override String partnerPageTitle({required Object partner_name}) => '${partner_name}\'s Schedule';
 	@override late final _Translations$classtable$popupMenu$en popupMenu = _Translations$classtable$popupMenu$en._(_root);
 	@override late final _Translations$classtable$visualSettings$en visualSettings = _Translations$classtable$visualSettings$en._(_root);
@@ -1185,7 +1185,7 @@ class _Translations$classtable$statusBanner$en extends Translations$classtable$s
 
 	// Translations
 	@override String loading({required Object sources}) => 'Updating: ${sources}';
-	@override String cache({required Object sources}) => 'Using cached data: ${sources}';
+	@override String cache({required Object sources}) => 'Currently cached: ${sources}';
 	@override String errorSummary({required Object sources}) => 'Failed to load: ${sources}';
 }
 
@@ -2507,7 +2507,7 @@ extension on TranslationsEn {
 			'classtable.partnerClasstable.nameDialog.cancel' => 'There\'s nobody other than my sweetie',
 			'classtable.partnerClasstable.nameDialog.accept' => 'Submit',
 			'classtable.partnerClasstable.nameDialog.blankInput' => 'Input is blank!',
-			'classtable.pageTitle' => 'My Schedule',
+			'classtable.pageTitle' => 'Schedule',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}\'s Schedule',
 			'classtable.popupMenu.notArranged' => 'View unarranged classes',
 			'classtable.popupMenu.classChanged' => 'View schedule changes',
@@ -2544,7 +2544,7 @@ extension on TranslationsEn {
 			'classtable.statusSource.otherExperiment' => 'Other Experiments',
 			'classtable.errorDialogTitle' => 'Error Info',
 			'classtable.statusBanner.loading' => ({required Object sources}) => 'Updating: ${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => 'Using cached data: ${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => 'Currently cached: ${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => 'Failed to load: ${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => 'No classes are arranged for semester ${semester_code}.',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => 'No classes are arranged for semester ${semester_code}, but exam arrangements are available.',

@@ -23,7 +23,7 @@ partner_classtable:
     cancel: There's nobody other than my sweetie
     accept: Submit
     blank_input: Input is blank!
-page_title: My Schedule
+page_title: Schedule
 partner_page_title: '{partner_name}''s Schedule'
 popup_menu:
   not_arranged: View unarranged classes
@@ -64,7 +64,7 @@ status_source:
 error_dialog_title: Error Info
 status_banner:
   loading: 'Updating: {sources}'
-  cache: 'Using cached data: {sources}'
+  cache: 'Currently cached: {sources}'
   error_summary: 'Failed to load: {sources}'
 empty_state:
   no_course: No classes are arranged for semester {semester_code}.

@@ -21,7 +21,7 @@ partner_classtable:
     cancel: 我就这一个甜心
     accept: 提交
     blank_input: 输入空白!
-page_title: 我的日程表
+page_title: 日程表
 partner_page_title: '{partner_name}的日程表'
 popup_menu:
   not_arranged: 查看未安排课程信息
@@ -62,7 +62,7 @@ status_source:
 error_dialog_title: 错误信息概览
 status_banner:
   loading: 正在更新：{sources}
-  cache: 当前使用缓存：{sources}
+  cache: 当前缓存：{sources}
   error_summary: 以下信息加载失败：{sources}
 empty_state:
   no_course: '{semester_code} 学期没有课程安排。'

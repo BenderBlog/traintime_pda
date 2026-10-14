@@ -20,7 +20,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
-import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
+import 'package:watermeter/page/classtable/class_page/classtable_status_hint.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
@@ -674,7 +674,25 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t.classtable.pageTitle),
+        /// The loading and cache hints of the sources sit next to the title
+        /// instead of in a row of their own above the table.
+        titleSpacing: -6,
+        title: Row(
+          children: [
+            Text(
+              context.t.classtable.pageTitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: ClassTableStatusHint(
+                loadingSources: state.loadingSources,
+                cacheSources: state.cacheSources,
+              ),
+            ),
+          ],
+        ),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
           if (hasError)
@@ -959,10 +977,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         : topRowHeightSmall,
                   ),
                   child: _topView(),
-                ),
-                ClassTableInlineBanner(
-                  loadingSources: state.loadingSources,
-                  cacheSources: state.cacheSources,
                 ),
                 _sheet(context).expanded(),
               ],
