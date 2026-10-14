@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_zxing/flutter_zxing.dart';
 
 import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/generated/translations.g.dart';
@@ -14,29 +13,12 @@ import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/page/setting/aircon_qr_decoder.dart';
+import 'package:watermeter/page/setting/aircon_qr_scanner_page.dart';
 import 'package:watermeter/repository/pick_file.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 bool get _canUseCameraScanner => Platform.isAndroid || Platform.isIOS;
-
-DecodeParams _airconQrImageDecodeParams({bool isMultiScan = false}) =>
-    DecodeParams(
-      imageFormat: ImageFormat.rgb,
-      format: Format.matrixCodes,
-      tryHarder: true,
-      tryInverted: true,
-      tryDownscale: true,
-      maxSize: 1600,
-      isMultiScan: isMultiScan,
-    );
-
-String? _tryParseAirconImei(Codes results) {
-  for (final result in results.codes) {
-    final imei = AirconController.tryParseImei(result.text ?? "");
-    if (imei != null) return imei;
-  }
-  return null;
-}
 
 class AirconImeiPage extends StatefulWidget {
   const AirconImeiPage({super.key});
@@ -50,6 +32,7 @@ class _AirconImeiPageState extends State<AirconImeiPage> {
     text: preference.getString(preference.Preference.airconImei),
   );
   bool _saving = false;
+  bool _decodingImage = false;
   String? _error;
 
   @override
@@ -68,7 +51,7 @@ class _AirconImeiPageState extends State<AirconImeiPage> {
     }
 
     final imei = await Navigator.of(context).push<String?>(
-      MaterialPageRoute(builder: (context) => const _AirconImeiScannerPage()),
+      MaterialPageRoute(builder: (context) => const AirconQrScannerPage()),
     );
     if (!mounted || imei == null || imei.isEmpty) return;
     _controller.text = imei;
@@ -79,23 +62,11 @@ class _AirconImeiPageState extends State<AirconImeiPage> {
     try {
       final file = await pickFile(type: FileType.image);
       final path = file?.path;
-      if (path == null || path.isEmpty) return;
+      if (path == null || path.isEmpty || !mounted) return;
 
-      final result = await zx.readBarcodeImagePathString(
-        path,
-        _airconQrImageDecodeParams(),
-      );
+      setState(() => _decodingImage = true);
+      final imei = await decodeAirconImeiFromImageFile(path);
       if (!mounted) return;
-
-      var imei = AirconController.tryParseImei(result.text ?? "");
-      if (imei == null) {
-        final results = await zx.readBarcodesImagePathString(
-          path,
-          _airconQrImageDecodeParams(isMultiScan: true),
-        );
-        if (!mounted) return;
-        imei = _tryParseAirconImei(results);
-      }
 
       if (imei == null) {
         showToast(context: context, msg: context.t.setting.airconImeiInvalid);
@@ -107,6 +78,8 @@ class _AirconImeiPageState extends State<AirconImeiPage> {
     } catch (e) {
       if (!mounted) return;
       showToast(context: context, msg: context.t.setting.airconImeiInvalid);
+    } finally {
+      if (mounted) setState(() => _decodingImage = false);
     }
   }
 
@@ -192,8 +165,16 @@ class _AirconImeiPageState extends State<AirconImeiPage> {
                         label: Text(context.t.setting.scanAirconQr),
                       ),
                     OutlinedButton.icon(
-                      onPressed: _saving ? null : _pickQrCodeImage,
-                      icon: const Icon(Icons.photo_library_outlined),
+                      onPressed: _saving || _decodingImage
+                          ? null
+                          : _pickQrCodeImage,
+                      icon: _decodingImage
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.photo_library_outlined),
                       label: Text(context.t.setting.pickAirconQrImage),
                     ),
                   ],
@@ -218,47 +199,6 @@ class _AirconImeiPageState extends State<AirconImeiPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _AirconImeiScannerPage extends StatefulWidget {
-  const _AirconImeiScannerPage();
-
-  @override
-  State<_AirconImeiScannerPage> createState() => _AirconImeiScannerPageState();
-}
-
-class _AirconImeiScannerPageState extends State<_AirconImeiScannerPage> {
-  bool _finished = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(context.t.setting.scanAirconQr)),
-      body: ReaderWidget(
-        isMultiScan: true,
-        codeFormat: Format.matrixCodes,
-        tryHarder: true,
-        tryInverted: true,
-        tryDownscale: true,
-        showGallery: false,
-        showToggleCamera: false,
-        onMultiScan: (results) {
-          if (_finished) return;
-          final imei = _tryParseAirconImei(results);
-          if (imei == null) {
-            showToast(
-              context: context,
-              msg: context.t.setting.airconImeiInvalid,
-            );
-            return;
-          }
-
-          _finished = true;
-          Navigator.of(context).pop(imei);
-        },
       ),
     );
   }

@@ -815,6 +815,9 @@ class _Translations$setting$zh_TW extends Translations$setting$zh {
 	@override String get scanAirconQr => '掃描空調二維碼';
 	@override String get pickAirconQrImage => '從相冊選擇二維碼圖片';
 	@override String get airconCameraUnavailable => '當前平臺不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI';
+	@override String get airconScanHint => '輕點畫面可以對焦；空調離得遠、放大後仍然模糊時，請用系統相機拍照識別';
+	@override String get airconTakePhoto => '用系統相機拍照識別';
+	@override String airconCameraError({required Object error}) => '無法打開相機：${error}';
 	@override String get notificationSetting => '通知設置';
 	@override String get courseReminderSetting => '課前通知設置';
 	@override String get courseReminderDescription => '設置課前提醒通知';
@@ -3356,6 +3359,9 @@ extension on TranslationsZhTw {
 			'setting.scanAirconQr' => '掃描空調二維碼',
 			'setting.pickAirconQrImage' => '從相冊選擇二維碼圖片',
 			'setting.airconCameraUnavailable' => '當前平臺不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI',
+			'setting.airconScanHint' => '輕點畫面可以對焦；空調離得遠、放大後仍然模糊時，請用系統相機拍照識別',
+			'setting.airconTakePhoto' => '用系統相機拍照識別',
+			'setting.airconCameraError' => ({required Object error}) => '無法打開相機：${error}',
 			'setting.notificationSetting' => '通知設置',
 			'setting.courseReminderSetting' => '課前通知設置',
 			'setting.courseReminderDescription' => '設置課前提醒通知',
@@ -3466,11 +3472,11 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.failedGenerate' => ({required Object e}) => '生成失敗：${e}',
 			'setting.changeElectricityAccount.buildingNumber' => '樓號',
 			'setting.changeElectricityAccount.buildingNumberHint' => '例如: 16, 7, 55',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.buildingNumberQuery' => '請輸入樓號',
 			'setting.changeElectricityAccount.yard' => '院區',
 			'setting.changeElectricityAccount.yardHint' => '選擇院區',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '請選擇院區',

@@ -815,6 +815,9 @@ class _Translations$setting$en extends Translations$setting$zh {
 	@override String get scanAirconQr => 'Scan aircon QR code';
 	@override String get pickAirconQrImage => 'Choose QR image';
 	@override String get airconCameraUnavailable => 'Camera scanning is unavailable on this platform. Choose a QR image or enter the IMEI manually.';
+	@override String get airconScanHint => 'Tap to focus. If the aircon is far away and stays blurry when zoomed in, take a photo with the system camera instead.';
+	@override String get airconTakePhoto => 'Take a photo with the system camera';
+	@override String airconCameraError({required Object error}) => 'Unable to open the camera: ${error}';
 	@override String get notificationSetting => 'Notification Settings';
 	@override String get courseReminderSetting => 'Pre-class Reminder Settings';
 	@override String get courseReminderDescription => 'Configure pre-class reminder notifications';
@@ -884,7 +887,7 @@ class _Translations$sponsorship$en extends Translations$sponsorship$zh {
 	// Translations
 	@override String get title => 'Welcome to XDYou for HarmonyOS';
 	@override String get dialogTitle => 'More information';
-	@override String get dialogContent => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from the Class of 2025, with the help of AI. In essence, the app was recompiled for HarmonyOS. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026';
+	@override String get dialogContent => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from 2025 grade, with the help of AI. The app was recompiled for HarmonyOS, using the same code as mine. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is inspired by a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026';
 	@override String get button => 'Huawei AppGallery';
 }
 
@@ -3356,6 +3359,9 @@ extension on TranslationsEn {
 			'setting.scanAirconQr' => 'Scan aircon QR code',
 			'setting.pickAirconQrImage' => 'Choose QR image',
 			'setting.airconCameraUnavailable' => 'Camera scanning is unavailable on this platform. Choose a QR image or enter the IMEI manually.',
+			'setting.airconScanHint' => 'Tap to focus. If the aircon is far away and stays blurry when zoomed in, take a photo with the system camera instead.',
+			'setting.airconTakePhoto' => 'Take a photo with the system camera',
+			'setting.airconCameraError' => ({required Object error}) => 'Unable to open the camera: ${error}',
 			'setting.notificationSetting' => 'Notification Settings',
 			'setting.courseReminderSetting' => 'Pre-class Reminder Settings',
 			'setting.courseReminderDescription' => 'Configure pre-class reminder notifications',
@@ -3466,11 +3472,11 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.failedGenerate' => ({required Object e}) => 'Failed to generate: ${e}',
 			'setting.changeElectricityAccount.buildingNumber' => 'Building number',
 			'setting.changeElectricityAccount.buildingNumberHint' => 'eg: 16, 7, 55',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.buildingNumberQuery' => 'Please input building No.',
 			'setting.changeElectricityAccount.yard' => 'Yard',
 			'setting.changeElectricityAccount.yardHint' => 'Select Yard',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => 'North Yard',
 			'setting.changeElectricityAccount.southYard' => 'South Yard',
 			'setting.changeElectricityAccount.yardQuery' => 'Please select yard',
@@ -3644,7 +3650,7 @@ extension on TranslationsEn {
 			'setting.classSwiftExplain' => 'Positive number delays the start date, negative number advances the start date',
 			'sponsorship.title' => 'Welcome to XDYou for HarmonyOS',
 			'sponsorship.dialogTitle' => 'More information',
-			'sponsorship.dialogContent' => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from the Class of 2025, with the help of AI. In essence, the app was recompiled for HarmonyOS. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026',
+			'sponsorship.dialogContent' => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from 2025 grade, with the help of AI. The app was recompiled for HarmonyOS, using the same code as mine. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is inspired by a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026',
 			'sponsorship.button' => 'Huawei AppGallery',
 			'sport.title' => 'Sport Query',
 			'sport.classInfo' => 'Class information',
