@@ -674,27 +674,18 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     return Scaffold(
       appBar: AppBar(
-        /// The loading and cache hints of the sources sit next to the title
-        /// instead of in a row of their own above the table.
+        /// One character earlier than the default spacing, which reads as an
+        /// indent in front of a title this short.
         titleSpacing: -6,
-        title: Row(
-          children: [
-            Text(
-              context.t.classtable.pageTitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(width: 10),
-            Flexible(
-              child: ClassTableStatusHint(
-                loadingSources: state.loadingSources,
-                cacheSources: state.cacheSources,
-              ),
-            ),
-          ],
-        ),
+        title: Text(context.t.classtable.pageTitle),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
+          /// What the table is busy with, on the side where the error button
+          /// already opens the detail.
+          ClassTableStatusHint(
+            loadingSources: state.loadingSources,
+            cacheSources: state.cacheSources,
+          ),
           if (hasError)
             IconButton(
               onPressed: _showLoadErrorDialog,
