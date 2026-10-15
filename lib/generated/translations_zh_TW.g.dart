@@ -100,7 +100,7 @@ class _Translations$classtable$zh_TW extends Translations$classtable$zh {
 
 	// Translations
 	@override late final _Translations$classtable$partnerClasstable$zh_TW partnerClasstable = _Translations$classtable$partnerClasstable$zh_TW._(_root);
-	@override String get pageTitle => '我的日程表';
+	@override String get pageTitle => '日程表';
 	@override String partnerPageTitle({required Object partner_name}) => '${partner_name}的日程表';
 	@override late final _Translations$classtable$popupMenu$zh_TW popupMenu = _Translations$classtable$popupMenu$zh_TW._(_root);
 	@override late final _Translations$classtable$visualSettings$zh_TW visualSettings = _Translations$classtable$visualSettings$zh_TW._(_root);
@@ -1185,7 +1185,7 @@ class _Translations$classtable$statusBanner$zh_TW extends Translations$classtabl
 
 	// Translations
 	@override String loading({required Object sources}) => '正在更新：${sources}';
-	@override String cache({required Object sources}) => '當前使用緩存：${sources}';
+	@override String cache({required Object sources}) => '當前緩存：${sources}';
 	@override String errorSummary({required Object sources}) => '以下信息加載失敗：${sources}';
 }
 
@@ -2507,7 +2507,7 @@ extension on TranslationsZhTw {
 			'classtable.partnerClasstable.nameDialog.cancel' => '我就這一個甜心',
 			'classtable.partnerClasstable.nameDialog.accept' => '提交',
 			'classtable.partnerClasstable.nameDialog.blankInput' => '輸入空白!',
-			'classtable.pageTitle' => '我的日程表',
+			'classtable.pageTitle' => '日程表',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}的日程表',
 			'classtable.popupMenu.notArranged' => '查看未安排課程信息',
 			'classtable.popupMenu.classChanged' => '查看課程安排調整信息',
@@ -2544,7 +2544,7 @@ extension on TranslationsZhTw {
 			'classtable.statusSource.otherExperiment' => '其他實驗',
 			'classtable.errorDialogTitle' => '錯誤信息概覽',
 			'classtable.statusBanner.loading' => ({required Object sources}) => '正在更新：${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => '當前使用緩存：${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => '當前緩存：${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => '以下信息加載失敗：${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => '${semester_code} 學期沒有課程安排。',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => '${semester_code} 學期沒有課程安排，但有考試安排。',

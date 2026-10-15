@@ -114,8 +114,8 @@ class Translations$classtable$zh {
 	// Translations
 	late final Translations$classtable$partnerClasstable$zh partnerClasstable = Translations$classtable$partnerClasstable$zh.internal(_root);
 
-	/// zh: '我的日程表'
-	String get pageTitle => '我的日程表';
+	/// zh: '日程表'
+	String get pageTitle => '日程表';
 
 	/// zh: '{partner_name}的日程表'
 	String partnerPageTitle({required Object partner_name}) => '${partner_name}的日程表';
@@ -2530,8 +2530,8 @@ class Translations$classtable$statusBanner$zh {
 	/// zh: '正在更新：{sources}'
 	String loading({required Object sources}) => '正在更新：${sources}';
 
-	/// zh: '当前使用缓存：{sources}'
-	String cache({required Object sources}) => '当前使用缓存：${sources}';
+	/// zh: '当前缓存：{sources}'
+	String cache({required Object sources}) => '当前缓存：${sources}';
 
 	/// zh: '以下信息加载失败：{sources}'
 	String errorSummary({required Object sources}) => '以下信息加载失败：${sources}';
@@ -5103,7 +5103,7 @@ extension on Translations {
 			'classtable.partnerClasstable.nameDialog.cancel' => '我就这一个甜心',
 			'classtable.partnerClasstable.nameDialog.accept' => '提交',
 			'classtable.partnerClasstable.nameDialog.blankInput' => '输入空白!',
-			'classtable.pageTitle' => '我的日程表',
+			'classtable.pageTitle' => '日程表',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}的日程表',
 			'classtable.popupMenu.notArranged' => '查看未安排课程信息',
 			'classtable.popupMenu.classChanged' => '查看课程安排调整信息',
@@ -5140,7 +5140,7 @@ extension on Translations {
 			'classtable.statusSource.otherExperiment' => '其他实验',
 			'classtable.errorDialogTitle' => '错误信息概览',
 			'classtable.statusBanner.loading' => ({required Object sources}) => '正在更新：${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => '当前使用缓存：${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => '当前缓存：${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => '以下信息加载失败：${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => '${semester_code} 学期没有课程安排。',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => '${semester_code} 学期没有课程安排，但有考试安排。',
