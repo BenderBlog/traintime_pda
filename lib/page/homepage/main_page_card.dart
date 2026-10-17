@@ -2,6 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 
@@ -15,7 +17,8 @@ class MainPageCard extends StatelessWidget {
   final Widget? rightButton;
   final bool? isBold;
   final HomeCardType type;
-  final void Function()? onPressed;
+  final FutureOr<void> Function()? onPressed;
+  final bool enableContainerTransform;
   const MainPageCard({
     super.key,
     required this.icon,
@@ -25,6 +28,7 @@ class MainPageCard extends StatelessWidget {
     required this.isLoad,
     this.onPressed,
     this.rightButton,
+    this.enableContainerTransform = true,
     this.progress,
     this.isBold,
     this.type = HomeCardType.plain,
@@ -37,6 +41,7 @@ class MainPageCard extends StatelessWidget {
         : Theme.of(context).brightness == Brightness.dark
         ? Theme.of(context).colorScheme.onSurface
         : Theme.of(context).colorScheme.onSurfaceVariant;
+
     return ListTile(
       leading: Icon(
         icon,
@@ -64,6 +69,11 @@ class MainPageCard extends StatelessWidget {
         },
       ),
       trailing: rightButton,
-    ).withHomeCardStyle(context, onPressed: onPressed, type: type);
+    ).withHomeCardStyle(
+      context,
+      onPressed: onPressed,
+      enableContainerTransform: enableContainerTransform,
+      type: type,
+    );
   }
 }
