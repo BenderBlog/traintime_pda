@@ -302,6 +302,7 @@ class _Translations$electricity$zh_TW extends Translations$electricity$zh {
 	@override String get airconTitle => '空調用電';
 	@override String get airconImei => '空調 IMEI';
 	@override String get airconAmount => '平臺用電量';
+	@override String get airconIndoor => '室內溫度';
 	@override String get airconUpdateTime => '更新時間';
 	@override String get airconWaiting => '等待獲取空調用電信息';
 	@override String get airconError => '空調用電獲取失敗';
@@ -2759,6 +2760,7 @@ extension on TranslationsZhTw {
 			'electricity.airconTitle' => '空調用電',
 			'electricity.airconImei' => '空調 IMEI',
 			'electricity.airconAmount' => '平臺用電量',
+			'electricity.airconIndoor' => '室內溫度',
 			'electricity.airconUpdateTime' => '更新時間',
 			'electricity.airconWaiting' => '等待獲取空調用電信息',
 			'electricity.airconError' => '空調用電獲取失敗',
@@ -2954,9 +2956,9 @@ extension on TranslationsZhTw {
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => '借書 ${count} 本',
 			'homepage.libraryCard.errorOccured' => '獲取借書信息發生錯誤',
 			'homepage.libraryCard.fetching' => '正在獲取借書信息',
-			'homepage.libraryCard.noReturn' => '目前沒有待歸還書籍',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.libraryCard.noReturn' => '目前沒有待歸還書籍',
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待歸還 ${dued} 本書籍',
 			'homepage.libraryCard.noInfo' => '目前無法獲取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查詢信息中',
@@ -3468,9 +3470,9 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.buildingNumberHint' => '例如: 16, 7, 55',
 			'setting.changeElectricityAccount.buildingNumberQuery' => '請輸入樓號',
 			'setting.changeElectricityAccount.yard' => '院區',
-			'setting.changeElectricityAccount.yardHint' => '選擇院區',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.yardHint' => '選擇院區',
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '請選擇院區',
