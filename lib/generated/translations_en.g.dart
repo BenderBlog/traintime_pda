@@ -43,6 +43,7 @@ class TranslationsEn extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$classtable$en classtable = _Translations$classtable$en._(_root);
 	@override late final _Translations$clubPromotion$en clubPromotion = _Translations$clubPromotion$en._(_root);
 	@override late final _Translations$common$en common = _Translations$common$en._(_root);
+	@override late final _Translations$courseLiveUpdate$en courseLiveUpdate = _Translations$courseLiveUpdate$en._(_root);
 	@override late final _Translations$courseReminder$en courseReminder = _Translations$courseReminder$en._(_root);
 	@override late final _Translations$dormWater$en dormWater = _Translations$dormWater$en._(_root);
 	@override late final _Translations$easterEggRobot$en easterEggRobot = _Translations$easterEggRobot$en._(_root);
@@ -183,6 +184,20 @@ class _Translations$common$en extends Translations$common$zh {
 	@override String get easterEggApple => '=== Fly Me To The Moon ===\nVocal: Frank Sintara, 1964\n\nFly me to the moon\nLet me play among the stars\n\nLet me see what\'s spring is like\non a Jupiter and Mars\n\nFill my heart with song\nand let me sing forever more\n\nYou are all I long for\nall I worship and I adore\n\nIn other words\nPlease, be true\n\nIn other words\nI love you\n\n=== Living Inside Your Love ===\nGuitar: Earl Klugh, 1976\n\nCan\'t get over the feeling\nLiving inside your love\n\nI never want to lose the feeling\nLiving inside your love\n\nBaby, you made my life so free\nLiving inside your love\n\nI\'m just where I want to be\nLiving inside your love\n\nAnd I never could say\nWhat I\'m feeling today\nFor you...\n';
 	@override String get easterEggOthers => '=== Cardcaptor Sakura OP3 ===\nVocal: Maaya Sakamoto, 2000\nIn Japanese Roman Letters\n\nI\'m a dreamer\nhisomu PAWA-\n\nwatashi no sekai\nyume to koi to fuan de dekite\'ru\ndemo souzou wo shinai mono\nkakurete\'ru hazu\n\nsora ni mukau kiki no you ni anata wo\nmassugu mitsumete\'ru\nmitsuketai naa kanaetai naa\nshinjiru sore dake de\n\nkoerarenai mono wa nai\nutau you ni kiseki no you ni\n"omoi" ga subete wo kaete yuku yo\nkitto kitto\nodoroku kurai\n\n=== Living Inside Your Love ===\nGuitar: Earl Klugh, 1976\n\nCan\'t get over the feeling\nLiving inside your love\n\nI never want to lose the feeling\nLiving inside your love\n\nBaby, you made my life so free\nLiving inside your love\n\nI\'m just where I want to be\nLiving inside your love\n\nAnd I never could say\nWhat I\'m feeling today\nFor you...\n';
 	@override String get loadError => 'Load Error';
+}
+
+// Path: courseLiveUpdate
+class _Translations$courseLiveUpdate$en extends Translations$courseLiveUpdate$zh {
+	_Translations$courseLiveUpdate$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String period({required Object start, required Object stop}) => 'Period ${start}-${stop}';
+	@override String periodSingle({required Object start}) => 'Period ${start}';
+	@override String nextClass({required Object time, required Object location}) => 'Next ${time} · ${location}';
+	@override String get upcomingStart => 'Starts soon';
+	@override String get noLocation => 'No classroom';
 }
 
 // Path: courseReminder
@@ -884,7 +899,7 @@ class _Translations$sponsorship$en extends Translations$sponsorship$zh {
 	// Translations
 	@override String get title => 'Welcome to XDYou for HarmonyOS';
 	@override String get dialogTitle => 'More information';
-	@override String get dialogContent => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from the Class of 2025, with the help of AI. In essence, the app was recompiled for HarmonyOS. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026';
+	@override String get dialogContent => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from 2025 grade, with the help of AI. The app was recompiled for HarmonyOS, using the same code as mine. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is inspired by a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026';
 	@override String get button => 'Huawei AppGallery';
 }
 
@@ -1973,6 +1988,12 @@ class _Translations$setting$notificationPage$en extends Translations$setting$not
 	@override String get minutesBefore => 'Advance Reminder Time';
 	@override String get minutesBeforeHint => 'The time setting for pre-class reminders';
 	@override String get minutesUnit => 'minutes';
+	@override String get liveUpdateSection => 'Live Update (island)';
+	@override String get liveUpdateEnabled => 'Show the class on the island';
+	@override String get liveUpdateEnabledHint => 'Stays in the status bar and in the island while the class goes on, and goes away at its end - this is not the reminder above';
+	@override String get liveUpdateLead => 'How early it shows up';
+	@override String get liveUpdateLeadHint => 'Only decides when the island appears; the reminder above is the one which makes a sound';
+	@override String get liveUpdateLeadAtClass => 'At the class';
 	@override String get daysToSchedule => 'Schedule Duration';
 	@override String get daysToScheduleHint => 'This program writes course information into the planned schedule in advance. This setting can adjust the number of days for writing into the planned schedule';
 	@override String get daysUnit => 'days';
@@ -2676,6 +2697,11 @@ extension on TranslationsEn {
 			'common.easterEggApple' => '=== Fly Me To The Moon ===\nVocal: Frank Sintara, 1964\n\nFly me to the moon\nLet me play among the stars\n\nLet me see what\'s spring is like\non a Jupiter and Mars\n\nFill my heart with song\nand let me sing forever more\n\nYou are all I long for\nall I worship and I adore\n\nIn other words\nPlease, be true\n\nIn other words\nI love you\n\n=== Living Inside Your Love ===\nGuitar: Earl Klugh, 1976\n\nCan\'t get over the feeling\nLiving inside your love\n\nI never want to lose the feeling\nLiving inside your love\n\nBaby, you made my life so free\nLiving inside your love\n\nI\'m just where I want to be\nLiving inside your love\n\nAnd I never could say\nWhat I\'m feeling today\nFor you...\n',
 			'common.easterEggOthers' => '=== Cardcaptor Sakura OP3 ===\nVocal: Maaya Sakamoto, 2000\nIn Japanese Roman Letters\n\nI\'m a dreamer\nhisomu PAWA-\n\nwatashi no sekai\nyume to koi to fuan de dekite\'ru\ndemo souzou wo shinai mono\nkakurete\'ru hazu\n\nsora ni mukau kiki no you ni anata wo\nmassugu mitsumete\'ru\nmitsuketai naa kanaetai naa\nshinjiru sore dake de\n\nkoerarenai mono wa nai\nutau you ni kiseki no you ni\n"omoi" ga subete wo kaete yuku yo\nkitto kitto\nodoroku kurai\n\n=== Living Inside Your Love ===\nGuitar: Earl Klugh, 1976\n\nCan\'t get over the feeling\nLiving inside your love\n\nI never want to lose the feeling\nLiving inside your love\n\nBaby, you made my life so free\nLiving inside your love\n\nI\'m just where I want to be\nLiving inside your love\n\nAnd I never could say\nWhat I\'m feeling today\nFor you...\n',
 			'common.loadError' => 'Load Error',
+			'courseLiveUpdate.period' => ({required Object start, required Object stop}) => 'Period ${start}-${stop}',
+			'courseLiveUpdate.periodSingle' => ({required Object start}) => 'Period ${start}',
+			'courseLiveUpdate.nextClass' => ({required Object time, required Object location}) => 'Next ${time} · ${location}',
+			'courseLiveUpdate.upcomingStart' => 'Starts soon',
+			'courseLiveUpdate.noLocation' => 'No classroom',
 			'courseReminder.title' => ({required Object name}) => 'Pre-class Reminder: ${name}',
 			'courseReminder.body' => ({required Object time}) => 'Class starts in ${time} minutes',
 			'courseReminder.location' => ({required Object location}) => 'Location: ${location}',
@@ -2950,13 +2976,13 @@ extension on TranslationsEn {
 			'homepage.electricityCard.title' => 'Electricity and Hydroenergy Information',
 			'homepage.electricityCard.currentElectricity' => ({required Object amount}) => '${amount} kWh remains',
 			'homepage.electricityCard.cacheNotice' => ({required Object date}) => 'Last fetch date: ${date}',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.libraryCard.title' => 'Library Info',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => 'Borrowing ${count} book(s)',
 			'homepage.libraryCard.errorOccured' => 'Error occurred while retrieving borrowing information',
 			'homepage.libraryCard.fetching' => 'Fetching borrowing information',
 			'homepage.libraryCard.noReturn' => 'Currently there\'s no book to be returned',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => 'Need to return ${dued} books',
 			'homepage.libraryCard.noInfo' => 'Cannot retrieve information at the moment',
 			'homepage.libraryCard.fetchingInfo' => 'Fetching information...',
@@ -3388,6 +3414,12 @@ extension on TranslationsEn {
 			'setting.notificationPage.minutesBefore' => 'Advance Reminder Time',
 			'setting.notificationPage.minutesBeforeHint' => 'The time setting for pre-class reminders',
 			'setting.notificationPage.minutesUnit' => 'minutes',
+			'setting.notificationPage.liveUpdateSection' => 'Live Update (island)',
+			'setting.notificationPage.liveUpdateEnabled' => 'Show the class on the island',
+			'setting.notificationPage.liveUpdateEnabledHint' => 'Stays in the status bar and in the island while the class goes on, and goes away at its end - this is not the reminder above',
+			'setting.notificationPage.liveUpdateLead' => 'How early it shows up',
+			'setting.notificationPage.liveUpdateLeadHint' => 'Only decides when the island appears; the reminder above is the one which makes a sound',
+			'setting.notificationPage.liveUpdateLeadAtClass' => 'At the class',
 			'setting.notificationPage.daysToSchedule' => 'Schedule Duration',
 			'setting.notificationPage.daysToScheduleHint' => 'This program writes course information into the planned schedule in advance. This setting can adjust the number of days for writing into the planned schedule',
 			'setting.notificationPage.daysUnit' => 'days',
@@ -3458,6 +3490,8 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.successfulFetch' => ({required Object account_number}) => 'Successful fetching account: ${account_number}',
 			'setting.changeElectricityAccount.failedFetch' => ({required Object e}) => 'Failed to fetch: ${e}',
 			'setting.changeElectricityAccount.accountSaved' => ({required Object account_number}) => 'Account saved：${account_number}',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.unknownCodingPattern' => 'Unknown coding pattern',
 			'setting.changeElectricityAccount.selectBuilding' => 'Select Building',
 			'setting.changeElectricityAccount.building' => 'Building',
@@ -3469,8 +3503,6 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.buildingNumberQuery' => 'Please input building No.',
 			'setting.changeElectricityAccount.yard' => 'Yard',
 			'setting.changeElectricityAccount.yardHint' => 'Select Yard',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => 'North Yard',
 			'setting.changeElectricityAccount.southYard' => 'South Yard',
 			'setting.changeElectricityAccount.yardQuery' => 'Please select yard',
@@ -3644,7 +3676,7 @@ extension on TranslationsEn {
 			'setting.classSwiftExplain' => 'Positive number delays the start date, negative number advances the start date',
 			'sponsorship.title' => 'Welcome to XDYou for HarmonyOS',
 			'sponsorship.dialogTitle' => 'More information',
-			'sponsorship.dialogContent' => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from the Class of 2025, with the help of AI. In essence, the app was recompiled for HarmonyOS. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026',
+			'sponsorship.dialogContent' => 'The HarmonyOS version of this app was ported by SixTeenForever, a student from 2025 grade, with the help of AI. The app was recompiled for HarmonyOS, using the same code as mine. It seems a native widget was added, but I have not seen the source code, so I am not sure. If the source code is made public, I expect to take over maintenance for a while.\n\nNote: Some features had to be removed due to app store submission requirements.\n\nAlso, the app\'s Easter egg is inspired by a certain dakimakura.\n\nBenderBlog Rodriguez 4/10/2026',
 			'sponsorship.button' => 'Huawei AppGallery',
 			'sport.title' => 'Sport Query',
 			'sport.classInfo' => 'Class information',
