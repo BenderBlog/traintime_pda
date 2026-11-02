@@ -2530,8 +2530,8 @@ class Translations$classtable$statusBanner$zh {
 	/// zh: '正在更新：{sources}'
 	String loading({required Object sources}) => '正在更新：${sources}';
 
-	/// zh: '当前缓存：{sources}'
-	String cache({required Object sources}) => '当前缓存：${sources}';
+	/// zh: '读取缓存：{sources}'
+	String cache({required Object sources}) => '读取缓存：${sources}';
 
 	/// zh: '以下信息加载失败：{sources}'
 	String errorSummary({required Object sources}) => '以下信息加载失败：${sources}';
@@ -5140,7 +5140,7 @@ extension on Translations {
 			'classtable.statusSource.otherExperiment' => '其他实验',
 			'classtable.errorDialogTitle' => '错误信息概览',
 			'classtable.statusBanner.loading' => ({required Object sources}) => '正在更新：${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => '当前缓存：${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => '读取缓存：${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => '以下信息加载失败：${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => '${semester_code} 学期没有课程安排。',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => '${semester_code} 学期没有课程安排，但有考试安排。',

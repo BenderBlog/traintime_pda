@@ -1185,7 +1185,7 @@ class _Translations$classtable$statusBanner$zh_TW extends Translations$classtabl
 
 	// Translations
 	@override String loading({required Object sources}) => '正在更新：${sources}';
-	@override String cache({required Object sources}) => '當前緩存：${sources}';
+	@override String cache({required Object sources}) => '讀取緩存：${sources}';
 	@override String errorSummary({required Object sources}) => '以下信息加載失敗：${sources}';
 }
 
@@ -2544,7 +2544,7 @@ extension on TranslationsZhTw {
 			'classtable.statusSource.otherExperiment' => '其他實驗',
 			'classtable.errorDialogTitle' => '錯誤信息概覽',
 			'classtable.statusBanner.loading' => ({required Object sources}) => '正在更新：${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => '當前緩存：${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => '讀取緩存：${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => '以下信息加載失敗：${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => '${semester_code} 學期沒有課程安排。',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => '${semester_code} 學期沒有課程安排，但有考試安排。',

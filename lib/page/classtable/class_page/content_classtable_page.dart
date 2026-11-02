@@ -674,9 +674,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
     return Scaffold(
       appBar: AppBar(
-        /// One character earlier than the default spacing, which reads as an
-        /// indent in front of a title this short.
-        titleSpacing: -6,
         title: Text(context.t.classtable.pageTitle),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [

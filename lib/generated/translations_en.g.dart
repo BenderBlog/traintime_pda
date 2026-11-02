@@ -1185,7 +1185,7 @@ class _Translations$classtable$statusBanner$en extends Translations$classtable$s
 
 	// Translations
 	@override String loading({required Object sources}) => 'Updating: ${sources}';
-	@override String cache({required Object sources}) => 'Currently cached: ${sources}';
+	@override String cache({required Object sources}) => 'Reading from cache: ${sources}';
 	@override String errorSummary({required Object sources}) => 'Failed to load: ${sources}';
 }
 
@@ -2544,7 +2544,7 @@ extension on TranslationsEn {
 			'classtable.statusSource.otherExperiment' => 'Other Experiments',
 			'classtable.errorDialogTitle' => 'Error Info',
 			'classtable.statusBanner.loading' => ({required Object sources}) => 'Updating: ${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => 'Currently cached: ${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => 'Reading from cache: ${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => 'Failed to load: ${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => 'No classes are arranged for semester ${semester_code}.',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => 'No classes are arranged for semester ${semester_code}, but exam arrangements are available.',

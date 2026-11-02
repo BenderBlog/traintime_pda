@@ -64,7 +64,7 @@ status_source:
 error_dialog_title: Error Info
 status_banner:
   loading: 'Updating: {sources}'
-  cache: 'Currently cached: {sources}'
+  cache: 'Reading from cache: {sources}'
   error_summary: 'Failed to load: {sources}'
 empty_state:
   no_course: No classes are arranged for semester {semester_code}.

@@ -63,7 +63,7 @@ status_source:
 error_dialog_title: 錯誤信息概覽
 status_banner:
   loading: 正在更新：{sources}
-  cache: 當前緩存：{sources}
+  cache: 讀取緩存：{sources}
   error_summary: 以下信息加載失敗：{sources}
 empty_state:
   no_course: '{semester_code} 學期沒有課程安排。'
