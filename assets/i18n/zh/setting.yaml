@@ -342,6 +342,8 @@ background_blur: '背景模糊: {value}'
 background_blur_off: 关闭
 class_table_style_setting: 课表显示与样式
 class_table_style_description: 时间指示和课程卡片样式
+class_table_week_row_show: 显示周次栏
+class_table_week_row_description: 关闭后收起上方的周次选择栏，给课程卡片留出更多空间
 class_table_style_page:
   current_time_settings_title: 时间指示设置
   class_color_settings_title: 课表样式设置

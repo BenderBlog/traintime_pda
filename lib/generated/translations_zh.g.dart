@@ -1885,6 +1885,12 @@ class Translations$setting$zh {
 	/// zh: '时间指示和课程卡片样式'
 	String get classTableStyleDescription => '时间指示和课程卡片样式';
 
+	/// zh: '显示周次栏'
+	String get classTableWeekRowShow => '显示周次栏';
+
+	/// zh: '关闭后收起上方的周次选择栏，给课程卡片留出更多空间'
+	String get classTableWeekRowDescription => '关闭后收起上方的周次选择栏，给课程卡片留出更多空间';
+
 	late final Translations$setting$classTableStylePage$zh classTableStylePage = Translations$setting$classTableStylePage$zh.internal(_root);
 
 	/// zh: '正数错后开学日期 负数提前开学日期'
@@ -2427,6 +2433,12 @@ class Translations$classtable$popupMenu$zh {
 
 	/// zh: '刷新日程表'
 	String get refreshClasstable => '刷新日程表';
+
+	/// zh: '隐藏周次栏'
+	String get hideWeekRow => '隐藏周次栏';
+
+	/// zh: '显示周次栏'
+	String get showWeekRow => '显示周次栏';
 
 	/// zh: '切换课程表学期'
 	String get switchSemester => '切换课程表学期';
@@ -5114,6 +5126,8 @@ extension on Translations {
 			'classtable.popupMenu.deletePartnerFile' => '删除共享课表文件',
 			'classtable.popupMenu.outputToSystem' => '导出到系统日历',
 			'classtable.popupMenu.refreshClasstable' => '刷新日程表',
+			'classtable.popupMenu.hideWeekRow' => '隐藏周次栏',
+			'classtable.popupMenu.showWeekRow' => '显示周次栏',
 			'classtable.popupMenu.switchSemester' => '切换课程表学期',
 			'classtable.popupMenu.currentTimeSettings' => '时间指示设置',
 			'classtable.popupMenu.classColorSettings' => '课表样式设置',
@@ -5549,10 +5563,10 @@ extension on Translations {
 			'homepage.libraryCard.title' => '图书借阅',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => '借书 ${count} 本',
 			'homepage.libraryCard.errorOccured' => '获取借书信息发生错误',
-			'homepage.libraryCard.fetching' => '正在获取借书信息',
-			'homepage.libraryCard.noReturn' => '目前没有待归还书籍',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.libraryCard.fetching' => '正在获取借书信息',
+			'homepage.libraryCard.noReturn' => '目前没有待归还书籍',
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待归还 ${dued} 本书籍',
 			'homepage.libraryCard.noInfo' => '目前无法获取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查询信息中',
@@ -6063,10 +6077,10 @@ extension on Translations {
 			'setting.changeElectricityAccount.buildingNumber' => '楼号',
 			'setting.changeElectricityAccount.buildingNumberHint' => '例如: 16, 7, 55',
 			'setting.changeElectricityAccount.buildingNumberQuery' => '请输入楼号',
-			'setting.changeElectricityAccount.yard' => '院区',
-			'setting.changeElectricityAccount.yardHint' => '选择院区',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.yard' => '院区',
+			'setting.changeElectricityAccount.yardHint' => '选择院区',
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '请选择院区',
@@ -6219,6 +6233,8 @@ extension on Translations {
 			'setting.backgroundBlurOff' => '关闭',
 			'setting.classTableStyleSetting' => '课表显示与样式',
 			'setting.classTableStyleDescription' => '时间指示和课程卡片样式',
+			'setting.classTableWeekRowShow' => '显示周次栏',
+			'setting.classTableWeekRowDescription' => '关闭后收起上方的周次选择栏，给课程卡片留出更多空间',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => '时间指示设置',
 			'setting.classTableStylePage.classColorSettingsTitle' => '课表样式设置',
 			'setting.classTableStylePage.currentTimeSection' => '时间指示设置',

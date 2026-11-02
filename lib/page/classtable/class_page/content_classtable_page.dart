@@ -20,6 +20,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
+import 'package:watermeter/page/classtable/class_page/class_table_week_row_config.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
@@ -63,11 +64,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     }
     setState(() => isTopRowLocked = true);
     Future.wait([
-      rowControl.animateToPage(
-        classTableState.chosenWeek,
-        curve: Curves.easeInOut,
-        duration: const Duration(milliseconds: changePageTime),
-      ),
+      /// The row has no scroll position while it is hidden, and asking it to
+      /// scroll then would throw.
+      if (ClassTableWeekRowConfig.visible.value && rowControl.hasClients)
+        rowControl.animateToPage(
+          classTableState.chosenWeek,
+          curve: Curves.easeInOut,
+          duration: const Duration(milliseconds: changePageTime),
+        ),
       pageControl.animateToPage(
         classTableState.chosenWeek,
         curve: Curves.easeInOutCubic,
@@ -80,8 +84,26 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     });
   }
 
+  void _onWeekRowVisibilityChanged() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {});
+
+    /// The row was detached while it was hidden, so it has to catch up with the
+    /// week which may have been chosen in the meantime.
+    if (ClassTableWeekRowConfig.visible.value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && rowControl.hasClients) {
+          rowControl.jumpToPage(classTableState.chosenWeek);
+        }
+      });
+    }
+  }
+
   @override
   void dispose() {
+    ClassTableWeekRowConfig.visible.removeListener(_onWeekRowVisibilityChanged);
     classTableState.removeListener(_switchPage);
     super.dispose();
   }
@@ -97,6 +119,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     if (!_isListening) {
       classTableState = ClassTableState.of(context)!.controllers;
       classTableState.addListener(_switchPage);
+      ClassTableWeekRowConfig.visible.addListener(_onWeekRowVisibilityChanged);
       _isListening = true;
     }
 
@@ -710,6 +733,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                 value: 'I',
                 child: Text(context.t.classtable.popupMenu.refreshClasstable),
               ),
+              PopupMenuItem<String>(
+                value: 'J',
+                child: Text(
+                  ClassTableWeekRowConfig.visible.value
+                      ? context.t.classtable.popupMenu.hideWeekRow
+                      : context.t.classtable.popupMenu.showWeekRow,
+                ),
+              ),
             ],
             onSelected: (String action) async {
               switch (action) {
@@ -933,6 +964,11 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                     });
                   }
                   break;
+                case 'J':
+                  await ClassTableWeekRowConfig.setVisible(
+                    !ClassTableWeekRowConfig.visible.value,
+                  );
+                  break;
               }
             },
           ),
@@ -952,13 +988,15 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                PreferredSize(
-                  preferredSize: Size.fromHeight(
-                    MediaQuery.sizeOf(context).height >= 500
-                        ? topRowHeightBig
-                        : topRowHeightSmall,
-                  ),
-                  child: _topView(),
+                /// The row can be put away, so the sheet gets the room that it
+                /// takes and the last class of the day stays in sight.
+                AnimatedSize(
+                  duration: const Duration(milliseconds: changePageTime),
+                  curve: Curves.easeInOut,
+                  alignment: Alignment.topCenter,
+                  child: ClassTableWeekRowConfig.visible.value
+                      ? _topView()
+                      : const SizedBox.shrink(),
                 ),
                 ClassTableInlineBanner(
                   loadingSources: state.loadingSources,

@@ -33,6 +33,8 @@ popup_menu:
   delete_partner_file: 删除共享课表文件
   output_to_system: 导出到系统日历
   refresh_classtable: 刷新日程表
+  hide_week_row: 隐藏周次栏
+  show_week_row: 显示周次栏
   switch_semester: 切换课程表学期
   current_time_settings: 时间指示设置
   class_color_settings: 课表样式设置

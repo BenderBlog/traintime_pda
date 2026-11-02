@@ -871,6 +871,8 @@ class _Translations$setting$en extends Translations$setting$zh {
 	@override String get backgroundBlurOff => 'Off';
 	@override String get classTableStyleSetting => 'Class schedule display & style';
 	@override String get classTableStyleDescription => 'Time indicator and course card style';
+	@override String get classTableWeekRowShow => 'Show week bar';
+	@override String get classTableWeekRowDescription => 'Turn off to put the week selector away, leaving more room for class cards';
 	@override late final _Translations$setting$classTableStylePage$en classTableStylePage = _Translations$setting$classTableStylePage$en._(_root);
 	@override String get classSwiftExplain => 'Positive number delays the start date, negative number advances the start date';
 }
@@ -1133,6 +1135,8 @@ class _Translations$classtable$popupMenu$en extends Translations$classtable$popu
 	@override String get deletePartnerFile => 'Delete partner classtable file';
 	@override String get outputToSystem => 'Export to system calendar';
 	@override String get refreshClasstable => 'Refresh schedule';
+	@override String get hideWeekRow => 'Hide week bar';
+	@override String get showWeekRow => 'Show week bar';
 	@override String get switchSemester => 'Switch classtable semester';
 	@override String get currentTimeSettings => 'Time indicator settings';
 	@override String get classColorSettings => 'Class color settings';
@@ -2518,6 +2522,8 @@ extension on TranslationsEn {
 			'classtable.popupMenu.deletePartnerFile' => 'Delete partner classtable file',
 			'classtable.popupMenu.outputToSystem' => 'Export to system calendar',
 			'classtable.popupMenu.refreshClasstable' => 'Refresh schedule',
+			'classtable.popupMenu.hideWeekRow' => 'Hide week bar',
+			'classtable.popupMenu.showWeekRow' => 'Show week bar',
 			'classtable.popupMenu.switchSemester' => 'Switch classtable semester',
 			'classtable.popupMenu.currentTimeSettings' => 'Time indicator settings',
 			'classtable.popupMenu.classColorSettings' => 'Class color settings',
@@ -2953,10 +2959,10 @@ extension on TranslationsEn {
 			'homepage.libraryCard.title' => 'Library Info',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => 'Borrowing ${count} book(s)',
 			'homepage.libraryCard.errorOccured' => 'Error occurred while retrieving borrowing information',
-			'homepage.libraryCard.fetching' => 'Fetching borrowing information',
-			'homepage.libraryCard.noReturn' => 'Currently there\'s no book to be returned',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.libraryCard.fetching' => 'Fetching borrowing information',
+			'homepage.libraryCard.noReturn' => 'Currently there\'s no book to be returned',
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => 'Need to return ${dued} books',
 			'homepage.libraryCard.noInfo' => 'Cannot retrieve information at the moment',
 			'homepage.libraryCard.fetchingInfo' => 'Fetching information...',
@@ -3467,10 +3473,10 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.buildingNumber' => 'Building number',
 			'setting.changeElectricityAccount.buildingNumberHint' => 'eg: 16, 7, 55',
 			'setting.changeElectricityAccount.buildingNumberQuery' => 'Please input building No.',
-			'setting.changeElectricityAccount.yard' => 'Yard',
-			'setting.changeElectricityAccount.yardHint' => 'Select Yard',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.yard' => 'Yard',
+			'setting.changeElectricityAccount.yardHint' => 'Select Yard',
 			'setting.changeElectricityAccount.northYard' => 'North Yard',
 			'setting.changeElectricityAccount.southYard' => 'South Yard',
 			'setting.changeElectricityAccount.yardQuery' => 'Please select yard',
@@ -3623,6 +3629,8 @@ extension on TranslationsEn {
 			'setting.backgroundBlurOff' => 'Off',
 			'setting.classTableStyleSetting' => 'Class schedule display & style',
 			'setting.classTableStyleDescription' => 'Time indicator and course card style',
+			'setting.classTableWeekRowShow' => 'Show week bar',
+			'setting.classTableWeekRowDescription' => 'Turn off to put the week selector away, leaving more room for class cards',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => 'Time indicator settings',
 			'setting.classTableStylePage.classColorSettingsTitle' => 'Class schedule style settings',
 			'setting.classTableStylePage.currentTimeSection' => 'Time indicator settings',

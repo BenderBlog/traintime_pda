@@ -8,6 +8,7 @@ import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.d
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/class_refresh_tile.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/class_table_style_tile.dart';
+import 'package:watermeter/page/setting/groups/classtable_section/class_table_week_row_tile.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/class_week_offset_tile.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/clear_user_classes_tile.dart';
 import 'package:watermeter/page/setting/groups/classtable_section/semester_change_tile.dart';
@@ -22,7 +23,9 @@ class ClasstableSection extends StatelessWidget {
         SectionSettingScaffold(
           icon: Icons.palette_outlined,
           title: context.t.setting.classTableStyleSetting,
-          items: const SettingSegmentedList(items: [ClassTableStyleTile()]),
+          items: const SettingSegmentedList(
+            items: [ClassTableStyleTile(), ClassTableWeekRowTile()],
+          ),
         ),
         SectionSettingScaffold(
           icon: Icons.calendar_month_outlined,

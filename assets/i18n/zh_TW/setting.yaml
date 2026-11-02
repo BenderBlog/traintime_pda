@@ -342,6 +342,8 @@ background_blur: '背景模糊: {value}'
 background_blur_off: 關閉
 class_table_style_setting: 課表顯示與樣式
 class_table_style_description: 時間指示和課程卡片樣式
+class_table_week_row_show: 顯示週次欄
+class_table_week_row_description: 關閉後收起上方的週次選擇欄，給課程卡片留出更多空間
 class_table_style_page:
   current_time_settings_title: 時間指示設置
   class_color_settings_title: 課表樣式設置

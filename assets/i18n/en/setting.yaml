@@ -373,6 +373,8 @@ background_blur: 'Background blur: {value}'
 background_blur_off: 'Off'
 class_table_style_setting: Class schedule display & style
 class_table_style_description: Time indicator and course card style
+class_table_week_row_show: Show week bar
+class_table_week_row_description: Turn off to put the week selector away, leaving more room for class cards
 class_table_style_page:
   current_time_settings_title: Time indicator settings
   class_color_settings_title: Class schedule style settings

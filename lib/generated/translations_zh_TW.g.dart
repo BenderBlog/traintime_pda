@@ -871,6 +871,8 @@ class _Translations$setting$zh_TW extends Translations$setting$zh {
 	@override String get backgroundBlurOff => '關閉';
 	@override String get classTableStyleSetting => '課表顯示與樣式';
 	@override String get classTableStyleDescription => '時間指示和課程卡片樣式';
+	@override String get classTableWeekRowShow => '顯示週次欄';
+	@override String get classTableWeekRowDescription => '關閉後收起上方的週次選擇欄，給課程卡片留出更多空間';
 	@override late final _Translations$setting$classTableStylePage$zh_TW classTableStylePage = _Translations$setting$classTableStylePage$zh_TW._(_root);
 	@override String get classSwiftExplain => '正數錯後開學日期 負數提前開學日期';
 }
@@ -1133,6 +1135,8 @@ class _Translations$classtable$popupMenu$zh_TW extends Translations$classtable$p
 	@override String get deletePartnerFile => '刪除共享課表文件';
 	@override String get outputToSystem => '導出到系統日曆';
 	@override String get refreshClasstable => '刷新日程表';
+	@override String get hideWeekRow => '隱藏週次欄';
+	@override String get showWeekRow => '顯示週次欄';
 	@override String get switchSemester => '切換課程表學期';
 	@override String get currentTimeSettings => '時間指示設置';
 	@override String get classColorSettings => '課表樣式設置';
@@ -2518,6 +2522,8 @@ extension on TranslationsZhTw {
 			'classtable.popupMenu.deletePartnerFile' => '刪除共享課表文件',
 			'classtable.popupMenu.outputToSystem' => '導出到系統日曆',
 			'classtable.popupMenu.refreshClasstable' => '刷新日程表',
+			'classtable.popupMenu.hideWeekRow' => '隱藏週次欄',
+			'classtable.popupMenu.showWeekRow' => '顯示週次欄',
 			'classtable.popupMenu.switchSemester' => '切換課程表學期',
 			'classtable.popupMenu.currentTimeSettings' => '時間指示設置',
 			'classtable.popupMenu.classColorSettings' => '課表樣式設置',
@@ -2953,10 +2959,10 @@ extension on TranslationsZhTw {
 			'homepage.libraryCard.title' => '圖書借閱',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => '借書 ${count} 本',
 			'homepage.libraryCard.errorOccured' => '獲取借書信息發生錯誤',
-			'homepage.libraryCard.fetching' => '正在獲取借書信息',
-			'homepage.libraryCard.noReturn' => '目前沒有待歸還書籍',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.libraryCard.fetching' => '正在獲取借書信息',
+			'homepage.libraryCard.noReturn' => '目前沒有待歸還書籍',
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待歸還 ${dued} 本書籍',
 			'homepage.libraryCard.noInfo' => '目前無法獲取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查詢信息中',
@@ -3467,10 +3473,10 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.buildingNumber' => '樓號',
 			'setting.changeElectricityAccount.buildingNumberHint' => '例如: 16, 7, 55',
 			'setting.changeElectricityAccount.buildingNumberQuery' => '請輸入樓號',
-			'setting.changeElectricityAccount.yard' => '院區',
-			'setting.changeElectricityAccount.yardHint' => '選擇院區',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.yard' => '院區',
+			'setting.changeElectricityAccount.yardHint' => '選擇院區',
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '請選擇院區',
@@ -3623,6 +3629,8 @@ extension on TranslationsZhTw {
 			'setting.backgroundBlurOff' => '關閉',
 			'setting.classTableStyleSetting' => '課表顯示與樣式',
 			'setting.classTableStyleDescription' => '時間指示和課程卡片樣式',
+			'setting.classTableWeekRowShow' => '顯示週次欄',
+			'setting.classTableWeekRowDescription' => '關閉後收起上方的週次選擇欄，給課程卡片留出更多空間',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => '時間指示設置',
 			'setting.classTableStylePage.classColorSettingsTitle' => '課表樣式設置',
 			'setting.classTableStylePage.currentTimeSection' => '時間指示設置',

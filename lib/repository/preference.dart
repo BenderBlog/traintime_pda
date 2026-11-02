@@ -59,6 +59,10 @@ enum Preference {
     key: "classTableBackgroundBlur",
     type: "double",
   ), // 课表背景图的模糊程度
+  classTableWeekRowVisible(
+    key: "classTableWeekRowVisible",
+    type: "bool",
+  ), // 课表上方的周次栏是否显示
   swift(key: "swift", type: "int"), // 周次偏移
   color(key: "color", type: "int"), // 颜色索引
   brightness(key: "brightness", type: "int"), // 深浅色模式

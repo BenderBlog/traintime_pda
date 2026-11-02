@@ -35,6 +35,8 @@ popup_menu:
   delete_partner_file: Delete partner classtable file
   output_to_system: Export to system calendar
   refresh_classtable: Refresh schedule
+  hide_week_row: Hide week bar
+  show_week_row: Show week bar
   switch_semester: Switch classtable semester
   current_time_settings: Time indicator settings
   class_color_settings: Class color settings
