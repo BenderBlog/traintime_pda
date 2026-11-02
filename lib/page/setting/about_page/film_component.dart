@@ -1,9 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:watermeter/repository/logger.dart';
+import 'package:styled_widget/styled_widget.dart';
 
 class FilmComponent extends StatelessWidget {
   static const sideWidthRatio = 0.06;
@@ -13,13 +12,16 @@ class FilmComponent extends StatelessWidget {
   static const sideRadiusRatio = 8 / 36;
   static const imageVerticalPadding = 4.0;
 
-  static List<String> description = [
-    "呜哇～",
-    "哇，好可爱啊",
-    "诺艾尔不是在等待奇迹——她本身就是七年前那个愿望留下的奇迹",
-  ];
+  final List<String>? description;
+  final List<String> pics;
+  final List<Widget>? remainingWidget;
 
-  const FilmComponent({super.key});
+  const FilmComponent({
+    super.key,
+    this.description,
+    required this.pics,
+    this.remainingWidget,
+  }) : assert(description == null || description.length == pics.length);
 
   @override
   Widget build(BuildContext context) {
@@ -43,32 +45,25 @@ class FilmComponent extends StatelessWidget {
               child: SizedBox(
                 width: middleWidth,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     ...List.generate(
-                      3,
+                      pics.length,
                       (i) => Padding(
                         padding: const EdgeInsets.only(
                           bottom: imageVerticalPadding,
                         ),
                         child: FilmFrame(
-                          image: Image.asset(
-                            "assets/art/noel_$i.jpg",
-                            fit: BoxFit.fill,
-                          ),
-                          text: description[i],
+                          image: Image.asset(pics[i], fit: BoxFit.fill),
+                          text: description?[i],
                           sideWidth: sideWidth,
                         ),
                       ),
                     ),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: double.infinity),
-                      child: M3ETextButton(
-                        child: Text("按下本按钮以进行迫害操作"),
-                        onPressed: () {
-                          log.info("Kevin 迫害 Lolicon 一次");
-                        },
+                    if (remainingWidget != null && remainingWidget!.isNotEmpty)
+                      ...remainingWidget!.map<Widget>(
+                        (e) => e.constrained(minWidth: double.infinity),
                       ),
-                    ),
                   ],
                 ),
               ),

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:io';
+import 'dart:math';
 
 import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
@@ -15,6 +16,7 @@ import 'package:watermeter/page/setting/about_page/about_app_header.dart';
 import 'package:watermeter/page/setting/about_page/about_contributors_section.dart';
 import 'package:watermeter/page/setting/about_page/film_component.dart';
 import 'package:watermeter/page/setting/settings_category_page.dart';
+import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class AboutPage extends StatefulWidget {
@@ -26,6 +28,9 @@ class AboutPage extends StatefulWidget {
 
 class _AboutPageState extends State<AboutPage> {
   bool _eggVisible = false;
+
+  final List<String> emoji = ["😨", "😭", "😋", "😡", "🤔", "🤣", "🥹"];
+  final Random random = Random();
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +121,26 @@ class _AboutPageState extends State<AboutPage> {
                   leading: Icon(Icons.movie_outlined),
                   title: Text('Noel herself is miracle'),
                 ),
-                children: const [FilmComponent()],
+                children: [
+                  FilmComponent(
+                    description: [
+                      "呜哇～",
+                      "哇，好可爱啊",
+                      "诺艾尔不是在等待奇迹——她本身就是七年前那个愿望留下的奇迹",
+                    ],
+                    pics: List.generate(3, (i) => "assets/art/noel_$i.jpg"),
+                    remainingWidget: [
+                      M3ETextButton(
+                        child: Text("按下本按钮以进行迫害操作"),
+                        onPressed: () {
+                          log.info(
+                            "你迫害了 Lolicon 一次，${emoji[random.nextInt(emoji.length)]}",
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
