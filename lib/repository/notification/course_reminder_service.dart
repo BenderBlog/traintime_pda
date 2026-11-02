@@ -18,6 +18,7 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/repository/notification/course_live_update_service.dart';
 import 'package:watermeter/repository/notification/notification_service.dart';
 import 'package:watermeter/repository/localization.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
@@ -162,11 +163,10 @@ class CourseReminderService extends NotificationService
       '[CourseReminderService] [didChangeLocales] System locale changed, rescheduling notifications...',
     );
 
-    // Check if notifications are enabled
+    // Live updates have their own switch and still need localized text when
+    // reminders are disabled.
     if (!isEnabled) {
-      log.info(
-        '[CourseReminderService] [didChangeLocales] Notifications not enabled, skipping reschedule',
-      );
+      _scheduleLiveUpdate(daysToSchedule > 0 ? daysToSchedule : 7);
       return;
     }
 
@@ -760,6 +760,10 @@ class CourseReminderService extends NotificationService
     int minutesBefore = 5,
   }) async {
     try {
+      // Publish the live schedule before reminders so reminder failures cannot
+      // prevent the ongoing class from appearing on the island.
+      await _scheduleLiveUpdate(daysToSchedule);
+
       // Schedule course, custom course, experiment, and exam notifications in parallel.
       await Future.wait([
         _scheduleNotificationFromCourseData(
@@ -789,14 +793,31 @@ class CourseReminderService extends NotificationService
     }
   }
 
+  /// 把接下来的课放到岛上（实时更新 / 灵动岛）。
+  ///
+  /// 它有自己的开关（通知设置里的「上课时显示在岛上」），关着的时候原生那边
+  /// 什么都不会排，所以这里不用再判断一次。
+  Future<void> _scheduleLiveUpdate(int daysToSchedule) async {
+    await CourseLiveUpdateService.instance.scheduleFromCourseData(
+      daysToSchedule: daysToSchedule,
+    );
+  }
+
   /// Validate and update the scheduled notification
   Future<void> validateAndUpdateNotifications() async {
     log.info(
       '[CourseReminderService] [validateAndUpdateNotifications] Validating scheduled notifications...',
     );
     try {
-      // Check if notifications are enabled first
+      // Load configuration for the live schedule as well as reminders.
+      final config = await _loadScheduleConfig();
+      final int daysToSchedule = config?['daysToSchedule'] ?? 7;
+      final int minutesBefore = config?['minutesBefore'] ?? 5;
+
+      // Live updates follow their own switch even when reminders are disabled.
+      // The enabled path schedules them in scheduleNotificationsFromCourseData.
       if (!isEnabled) {
+        await _scheduleLiveUpdate(daysToSchedule);
         log.info(
           '[CourseReminderService] [validateAndUpdateNotifications] Notifications not enabled, skipping validation',
         );
@@ -805,16 +826,13 @@ class CourseReminderService extends NotificationService
       }
 
       if (!hasSchedulableReminderSourceData) {
+        // Let the live service clear platform events when courses disappear.
+        await _scheduleLiveUpdate(daysToSchedule);
         log.warning(
           '[CourseReminderService] [validateAndUpdateNotifications] No schedulable reminder source data available, cannot validate notifications',
         );
         return;
       }
-
-      // Load configuration
-      final config = await _loadScheduleConfig();
-      final int daysToSchedule = config?['daysToSchedule'] ?? 7;
-      final int minutesBefore = config?['minutesBefore'] ?? 5;
 
       // Check if locale has changed
       final currentLocale = _getCurrentLocale();

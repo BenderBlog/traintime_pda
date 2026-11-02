@@ -43,6 +43,7 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final _Translations$classtable$zh_TW classtable = _Translations$classtable$zh_TW._(_root);
 	@override late final _Translations$clubPromotion$zh_TW clubPromotion = _Translations$clubPromotion$zh_TW._(_root);
 	@override late final _Translations$common$zh_TW common = _Translations$common$zh_TW._(_root);
+	@override late final _Translations$courseLiveUpdate$zh_TW courseLiveUpdate = _Translations$courseLiveUpdate$zh_TW._(_root);
 	@override late final _Translations$courseReminder$zh_TW courseReminder = _Translations$courseReminder$zh_TW._(_root);
 	@override late final _Translations$dormWater$zh_TW dormWater = _Translations$dormWater$zh_TW._(_root);
 	@override late final _Translations$easterEggRobot$zh_TW easterEggRobot = _Translations$easterEggRobot$zh_TW._(_root);
@@ -183,6 +184,20 @@ class _Translations$common$zh_TW extends Translations$common$zh {
 	@override String get easterEggApple => '=== 帶我飛向月亮吧 ===\n歌聲演繹：Frank Sintara, 1964\n\n帶我飛向月亮吧\n讓我和星星共舞嬉戲\n\n我好想知道\n木星和火星上的春天\n是什麼顏色的\n\n讓你的歌聲溫暖我的心\n我會一直歌唱下去\n\n我日夜都在想你和牽掛你\n請你真心接受我 我愛你\n\n=== 沉浸在你的愛意中 ===\n吉他演奏：Earl Klugh, 1976\n\n無法忘懷這種感覺，被你的愛包裹的溫暖\n不想失去這種感覺，被你的愛撫摸的舒適\n你讓我感到好自在，被你的愛託舉的堅強\n想一直在你懷中，沉浸在你的愛意中\n我不敢向你說出，我對你的心意和愛\n';
 	@override String get easterEggOthers => '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===\n歌聲演繹：Maaya Sakamoto, 2000\n（原歌詞為日文，按照英語翻譯二翻）\n\nI am a dreamer, 有無限的力量\n\n我的世界有夢想、熱愛與躊躇\n但有些東西，我依舊無法想象\n我想向著廣闊的天空，尋求自己的方向\n\n我要追求自己的夢想\n努力讓自己的心願成真\n雖困難重重也要繼續前行\n\n等待奇蹟 等待美好\n用心感受這個世界\n最終 一定會出乎意料\n\n=== 沉浸在你的愛意中 ===\n吉他演奏：Earl Klugh, 1976\n\n無法忘懷這種感覺，被你的愛包裹的溫暖\n不想失去這種感覺，被你的愛撫摸的舒適\n你讓我感到好自在，被你的愛託舉的堅強\n想躺在你的懷中，沉浸在你的愛意\n而且，我不敢想你說出，我現在的心意\n';
 	@override String get loadError => '加載錯誤';
+}
+
+// Path: courseLiveUpdate
+class _Translations$courseLiveUpdate$zh_TW extends Translations$courseLiveUpdate$zh {
+	_Translations$courseLiveUpdate$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String period({required Object start, required Object stop}) => '第 ${start}-${stop} 節';
+	@override String periodSingle({required Object start}) => '第 ${start} 節';
+	@override String nextClass({required Object time, required Object location}) => '下一節 ${time} · ${location}';
+	@override String get upcomingStart => '即將開始';
+	@override String get noLocation => '未知教室';
 }
 
 // Path: courseReminder
@@ -1973,6 +1988,12 @@ class _Translations$setting$notificationPage$zh_TW extends Translations$setting$
 	@override String get minutesBefore => '提前提醒時間';
 	@override String get minutesBeforeHint => '課前提前提醒的時間設置';
 	@override String get minutesUnit => '分鐘';
+	@override String get liveUpdateSection => '實時更新（島）';
+	@override String get liveUpdateEnabled => '上課時顯示在島上';
+	@override String get liveUpdateEnabledHint => '上課期間一直掛在狀態欄/島上，下課自動消失；和提醒是兩回事';
+	@override String get liveUpdateLead => '提前多久上島';
+	@override String get liveUpdateLeadHint => '只影響島，不響鈴；上面的「提前提醒時間」才是會響的那條';
+	@override String get liveUpdateLeadAtClass => '上課時';
 	@override String get daysToSchedule => '計劃通知天數';
 	@override String get daysToScheduleHint => '本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數';
 	@override String get daysUnit => '天';
@@ -2676,6 +2697,11 @@ extension on TranslationsZhTw {
 			'common.easterEggApple' => '=== 帶我飛向月亮吧 ===\n歌聲演繹：Frank Sintara, 1964\n\n帶我飛向月亮吧\n讓我和星星共舞嬉戲\n\n我好想知道\n木星和火星上的春天\n是什麼顏色的\n\n讓你的歌聲溫暖我的心\n我會一直歌唱下去\n\n我日夜都在想你和牽掛你\n請你真心接受我 我愛你\n\n=== 沉浸在你的愛意中 ===\n吉他演奏：Earl Klugh, 1976\n\n無法忘懷這種感覺，被你的愛包裹的溫暖\n不想失去這種感覺，被你的愛撫摸的舒適\n你讓我感到好自在，被你的愛託舉的堅強\n想一直在你懷中，沉浸在你的愛意中\n我不敢向你說出，我對你的心意和愛\n',
 			'common.easterEggOthers' => '=== 百變小櫻魔術卡之小櫻卡篇主題曲 ===\n歌聲演繹：Maaya Sakamoto, 2000\n（原歌詞為日文，按照英語翻譯二翻）\n\nI am a dreamer, 有無限的力量\n\n我的世界有夢想、熱愛與躊躇\n但有些東西，我依舊無法想象\n我想向著廣闊的天空，尋求自己的方向\n\n我要追求自己的夢想\n努力讓自己的心願成真\n雖困難重重也要繼續前行\n\n等待奇蹟 等待美好\n用心感受這個世界\n最終 一定會出乎意料\n\n=== 沉浸在你的愛意中 ===\n吉他演奏：Earl Klugh, 1976\n\n無法忘懷這種感覺，被你的愛包裹的溫暖\n不想失去這種感覺，被你的愛撫摸的舒適\n你讓我感到好自在，被你的愛託舉的堅強\n想躺在你的懷中，沉浸在你的愛意\n而且，我不敢想你說出，我現在的心意\n',
 			'common.loadError' => '加載錯誤',
+			'courseLiveUpdate.period' => ({required Object start, required Object stop}) => '第 ${start}-${stop} 節',
+			'courseLiveUpdate.periodSingle' => ({required Object start}) => '第 ${start} 節',
+			'courseLiveUpdate.nextClass' => ({required Object time, required Object location}) => '下一節 ${time} · ${location}',
+			'courseLiveUpdate.upcomingStart' => '即將開始',
+			'courseLiveUpdate.noLocation' => '未知教室',
 			'courseReminder.title' => ({required Object name}) => '課前提醒：${name}',
 			'courseReminder.body' => ({required Object time}) => '${time} 分鐘後開始上課',
 			'courseReminder.location' => ({required Object location}) => '地點：${location}',
@@ -2950,13 +2976,13 @@ extension on TranslationsZhTw {
 			'homepage.electricityCard.title' => '水電信息',
 			'homepage.electricityCard.currentElectricity' => ({required Object amount}) => '餘額 ${amount} 度',
 			'homepage.electricityCard.cacheNotice' => ({required Object date}) => '最後一次讀表：${date}',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.libraryCard.title' => '圖書借閱',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => '借書 ${count} 本',
 			'homepage.libraryCard.errorOccured' => '獲取借書信息發生錯誤',
 			'homepage.libraryCard.fetching' => '正在獲取借書信息',
 			'homepage.libraryCard.noReturn' => '目前沒有待歸還書籍',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待歸還 ${dued} 本書籍',
 			'homepage.libraryCard.noInfo' => '目前無法獲取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查詢信息中',
@@ -3388,6 +3414,12 @@ extension on TranslationsZhTw {
 			'setting.notificationPage.minutesBefore' => '提前提醒時間',
 			'setting.notificationPage.minutesBeforeHint' => '課前提前提醒的時間設置',
 			'setting.notificationPage.minutesUnit' => '分鐘',
+			'setting.notificationPage.liveUpdateSection' => '實時更新（島）',
+			'setting.notificationPage.liveUpdateEnabled' => '上課時顯示在島上',
+			'setting.notificationPage.liveUpdateEnabledHint' => '上課期間一直掛在狀態欄/島上，下課自動消失；和提醒是兩回事',
+			'setting.notificationPage.liveUpdateLead' => '提前多久上島',
+			'setting.notificationPage.liveUpdateLeadHint' => '只影響島，不響鈴；上面的「提前提醒時間」才是會響的那條',
+			'setting.notificationPage.liveUpdateLeadAtClass' => '上課時',
 			'setting.notificationPage.daysToSchedule' => '計劃通知天數',
 			'setting.notificationPage.daysToScheduleHint' => '本程序是提前將課程信息寫入計劃日程，該設置可調整寫入計劃日程的天數',
 			'setting.notificationPage.daysUnit' => '天',
@@ -3458,6 +3490,8 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.successfulFetch' => ({required Object account_number}) => '賬號獲取成功：${account_number}',
 			'setting.changeElectricityAccount.failedFetch' => ({required Object e}) => '獲取失敗：${e}',
 			'setting.changeElectricityAccount.accountSaved' => ({required Object account_number}) => '賬號已保存：${account_number}',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.unknownCodingPattern' => '該樓號編碼規則未知',
 			'setting.changeElectricityAccount.selectBuilding' => '選擇樓棟',
 			'setting.changeElectricityAccount.building' => '樓棟',
@@ -3469,8 +3503,6 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.buildingNumberQuery' => '請輸入樓號',
 			'setting.changeElectricityAccount.yard' => '院區',
 			'setting.changeElectricityAccount.yardHint' => '選擇院區',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '請選擇院區',

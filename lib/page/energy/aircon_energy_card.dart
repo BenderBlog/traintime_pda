@@ -14,87 +14,8 @@ import 'package:watermeter/page/energy/aircon_remote_page.dart';
 import 'package:watermeter/page/public_widget/info_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/setting/aircon_imei_page.dart';
-<<<<<<< HEAD
 import 'package:watermeter/page/setting/dialogs/aircon_imei_dialog.dart';
 import 'package:watermeter/generated/translations.g.dart';
-=======
->>>>>>> main
-
-class AirconEnergyCard extends StatelessWidget {
-  const AirconEnergyCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SignalBuilder(
-      builder: (context) {
-        final controller = AirconController.i;
-        final imei = controller.imeiSignal.value;
-        if (imei.isEmpty) {
-          return _buildMissingImeiCard(context);
-        }
-
-        return _buildEnergyCard(
-          context,
-          imei: imei,
-          state: controller.energyInfoStateSignal.value,
-          historyElectricityInfoList: controller.energyHistoryInfoList,
-          onRefresh: controller.refreshEnergyInfo,
-        );
-      },
-    );
-  }
-
-  Widget _buildMissingImeiCard(BuildContext context) {
-    return InfoCard(
-      iconData: Icons.ac_unit,
-      title: context.t.electricity.airconTitle,
-      children: [
-        Text(
-          context.t.electricity.airconImeiMissing,
-          style: TextStyle(color: Theme.of(context).colorScheme.outline),
-        ).padding(vertical: 8, horizontal: 12),
-        FilledButton.icon(
-          onPressed: () => context.push<void>(const AirconImeiPage()),
-          icon: const Icon(Icons.add),
-          label: Text(context.t.electricity.airconAddImei),
-        ).padding(horizontal: 12).width(double.infinity),
-      ],
-    );
-  }
-
-  Widget _buildEnergyCard(
-    BuildContext context, {
-    required String imei,
-    required AsyncState<FetchResult<AirconEnergyInfo>> state,
-    required List<ElectricityHistoryInfo> historyElectricityInfoList,
-    required VoidCallback onRefresh,
-  }) {
-    return InfoCard(
-      iconData: Icons.ac_unit,
-      title: context.t.electricity.airconTitle,
-      icon: state is AsyncData<FetchResult<AirconEnergyInfo>>
-          ? Icons.refresh
-          : null,
-      buttonText: state is AsyncData<FetchResult<AirconEnergyInfo>>
-          ? context.t.electricity.update
-          : null,
-      onTap: state is AsyncData<FetchResult<AirconEnergyInfo>>
-          ? onRefresh
-          : null,
-      children: [
-        FilledButton.icon(
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => const AirconRemotePage(),
-            ),
-          ),
-          icon: const Icon(Icons.settings_remote),
-          label: Text(
-<<<<<<< HEAD
-            context.t.electricity.airconRemote,
-=======
-            FlutterI18n.translate(context, "electricity.aircon_remote"),
->>>>>>> main
           ),
         ).padding(top: 12, horizontal: 12).width(double.infinity),
         state.map(

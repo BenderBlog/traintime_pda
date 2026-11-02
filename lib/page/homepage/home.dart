@@ -30,6 +30,7 @@ import 'package:watermeter/page/login/jc_captcha.dart';
 import 'package:watermeter/page/login/ids_reauth_dialog.dart';
 import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
+import 'package:watermeter/repository/notification/course_reminder_service.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -183,6 +184,7 @@ class _HomePageMasterState extends State<HomePageMaster>
           return;
         }
 
+        unawaited(_ensureNotificationPermission());
         unawaited(UpdateNoticeController.i.reloadUpdateNoticeInfo());
         log.info(
           "[home][BackgroundFetchFromHome]"
@@ -212,6 +214,58 @@ class _HomePageMasterState extends State<HomePageMaster>
     }
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// Course reminders and the Live Update of the class which is going on (the
+  /// "Super Island" of Xiaomi, the Dynamic Island of iOS) are notifications.
+  /// Without the permission neither of them can show up at all, so it is asked
+  /// for once the app is up; when it is denied, the way to the system settings
+  /// is pointed out.
+  Future<void> _ensureNotificationPermission() async {
+    final service = CourseReminderService();
+    try {
+      if (await service.checkNotificationPermission()) {
+        return;
+      }
+
+      final granted = await service.requestNotificationPermission();
+      if (granted || !mounted) {
+        return;
+      }
+
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(
+            dialogContext.t.setting.notificationPage.notificationPermission,
+          ),
+          content: Text(
+            dialogContext.t.setting.notificationPage.permissionDeniedMsg,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(dialogContext.t.common.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                service.openNotificationSettings();
+              },
+              child: Text(
+                dialogContext.t.setting.notificationPage.openSettings,
+              ),
+            ),
+          ],
+        ),
+      );
+    } catch (e, stackTrace) {
+      log.error(
+        "[home] Failed to ask for the notification permission",
+        e,
+        stackTrace,
+      );
+    }
   }
 
   @override

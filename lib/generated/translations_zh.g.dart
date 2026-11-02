@@ -45,6 +45,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$classtable$zh classtable = Translations$classtable$zh.internal(_root);
 	late final Translations$clubPromotion$zh clubPromotion = Translations$clubPromotion$zh.internal(_root);
 	late final Translations$common$zh common = Translations$common$zh.internal(_root);
+	late final Translations$courseLiveUpdate$zh courseLiveUpdate = Translations$courseLiveUpdate$zh.internal(_root);
 	late final Translations$courseReminder$zh courseReminder = Translations$courseReminder$zh.internal(_root);
 	late final Translations$dormWater$zh dormWater = Translations$dormWater$zh.internal(_root);
 	late final Translations$easterEggRobot$zh easterEggRobot = Translations$easterEggRobot$zh.internal(_root);
@@ -300,6 +301,30 @@ class Translations$common$zh {
 
 	/// zh: '加载错误'
 	String get loadError => '加载错误';
+}
+
+// Path: courseLiveUpdate
+class Translations$courseLiveUpdate$zh {
+	Translations$courseLiveUpdate$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '第 {start}-{stop} 节'
+	String period({required Object start, required Object stop}) => '第 ${start}-${stop} 节';
+
+	/// zh: '第 {start} 节'
+	String periodSingle({required Object start}) => '第 ${start} 节';
+
+	/// zh: '下一节 {time} · {location}'
+	String nextClass({required Object time, required Object location}) => '下一节 ${time} · ${location}';
+
+	/// zh: '即将开始'
+	String get upcomingStart => '即将开始';
+
+	/// zh: '未知教室'
+	String get noLocation => '未知教室';
 }
 
 // Path: courseReminder
@@ -1905,8 +1930,8 @@ class Translations$sponsorship$zh {
 	/// zh: '详细信息'
 	String get dialogTitle => '详细信息';
 
-	/// zh: '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。 注意：由于上架限制，部分功能被迫移除。 另外，本程序彩蛋是某个抱枕。 BenderBlog Rodriguez 4/10/2026'
-	String get dialogContent => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026';
+	/// zh: '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是使用本程序的代码，把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。 注意：由于上架限制，部分功能被迫移除。 另外，本程序彩蛋是某个抱枕。 BenderBlog Rodriguez 4/10/2026'
+	String get dialogContent => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是使用本程序的代码，把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026';
 
 	/// zh: '华为应用商店网址'
 	String get button => '华为应用商店网址';
@@ -4064,6 +4089,24 @@ class Translations$setting$notificationPage$zh {
 	/// zh: '分钟'
 	String get minutesUnit => '分钟';
 
+	/// zh: '实时更新（岛）'
+	String get liveUpdateSection => '实时更新（岛）';
+
+	/// zh: '上课时显示在岛上'
+	String get liveUpdateEnabled => '上课时显示在岛上';
+
+	/// zh: '上课期间一直挂在状态栏/岛上，放学自动消失；和提醒是两回事'
+	String get liveUpdateEnabledHint => '上课期间一直挂在状态栏/岛上，放学自动消失；和提醒是两回事';
+
+	/// zh: '提前多久上岛'
+	String get liveUpdateLead => '提前多久上岛';
+
+	/// zh: '只影响岛，不响铃；上面的「提前提醒时间」才是会响的那条'
+	String get liveUpdateLeadHint => '只影响岛，不响铃；上面的「提前提醒时间」才是会响的那条';
+
+	/// zh: '上课时'
+	String get liveUpdateLeadAtClass => '上课时';
+
 	/// zh: '计划通知天数'
 	String get daysToSchedule => '计划通知天数';
 
@@ -5272,6 +5315,11 @@ extension on Translations {
 			'common.easterEggApple' => '=== 带我飞向月亮吧 ===\n歌声演绎：Frank Sintara, 1964\n\n带我飞向月亮吧\n让我和星星共舞嬉戏\n\n我好想知道\n木星和火星上的春天\n是什么颜色的\n\n让你的歌声温暖我的心\n我会一直歌唱下去\n\n我日夜都在想你和牵挂你\n请你真心接受我 我爱你\n\n=== 沉浸在你的爱意中 ===\n吉他演奏：Earl Klugh, 1976\n\n无法忘怀这种感觉，被你的爱包裹的温暖\n不想失去这种感觉，被你的爱抚摸的舒适\n你让我感到好自在，被你的爱托举的坚强\n想一直在你怀中，沉浸在你的爱意中\n我不敢向你说出，我对你的心意和爱\n',
 			'common.easterEggOthers' => '=== 百变小樱魔术卡之小樱卡篇主题曲 ===\n歌声演绎：Maaya Sakamoto, 2000\n（原歌词为日文，按照英语翻译二翻）\n\nI am a dreamer, 有无限的力量\n\n我的世界有梦想、热爱与踌躇\n但有些东西，我依旧无法想象\n我想向着广阔的天空，寻求自己的方向\n\n我要追求自己的梦想\n努力让自己的心愿成真\n虽困难重重也要继续前行\n\n等待奇迹 等待美好\n用心感受这个世界\n最终 一定会出乎意料\n\n=== 沉浸在你的爱意中 ===\n吉他演奏：Earl Klugh, 1976\n\n无法忘怀这种感觉，被你的爱包裹的温暖\n不想失去这种感觉，被你的爱抚摸的舒适\n你让我感到好自在，被你的爱托举的坚强\n想躺在你的怀中，沉浸在你的爱意\n而且，我不敢想你说出，我现在的心意\n',
 			'common.loadError' => '加载错误',
+			'courseLiveUpdate.period' => ({required Object start, required Object stop}) => '第 ${start}-${stop} 节',
+			'courseLiveUpdate.periodSingle' => ({required Object start}) => '第 ${start} 节',
+			'courseLiveUpdate.nextClass' => ({required Object time, required Object location}) => '下一节 ${time} · ${location}',
+			'courseLiveUpdate.upcomingStart' => '即将开始',
+			'courseLiveUpdate.noLocation' => '未知教室',
 			'courseReminder.title' => ({required Object name}) => '课前提醒：${name}',
 			'courseReminder.body' => ({required Object time}) => '${time} 分钟后开始上课',
 			'courseReminder.location' => ({required Object location}) => '地点：${location}',
@@ -5546,13 +5594,13 @@ extension on Translations {
 			'homepage.electricityCard.title' => '水电信息',
 			'homepage.electricityCard.currentElectricity' => ({required Object amount}) => '余额 ${amount} 度',
 			'homepage.electricityCard.cacheNotice' => ({required Object date}) => '最后一次读表：${date}',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.libraryCard.title' => '图书借阅',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => '借书 ${count} 本',
 			'homepage.libraryCard.errorOccured' => '获取借书信息发生错误',
 			'homepage.libraryCard.fetching' => '正在获取借书信息',
 			'homepage.libraryCard.noReturn' => '目前没有待归还书籍',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待归还 ${dued} 本书籍',
 			'homepage.libraryCard.noInfo' => '目前无法获取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查询信息中',
@@ -5984,6 +6032,12 @@ extension on Translations {
 			'setting.notificationPage.minutesBefore' => '提前提醒时间',
 			'setting.notificationPage.minutesBeforeHint' => '课前提前提醒的时间设置',
 			'setting.notificationPage.minutesUnit' => '分钟',
+			'setting.notificationPage.liveUpdateSection' => '实时更新（岛）',
+			'setting.notificationPage.liveUpdateEnabled' => '上课时显示在岛上',
+			'setting.notificationPage.liveUpdateEnabledHint' => '上课期间一直挂在状态栏/岛上，放学自动消失；和提醒是两回事',
+			'setting.notificationPage.liveUpdateLead' => '提前多久上岛',
+			'setting.notificationPage.liveUpdateLeadHint' => '只影响岛，不响铃；上面的「提前提醒时间」才是会响的那条',
+			'setting.notificationPage.liveUpdateLeadAtClass' => '上课时',
 			'setting.notificationPage.daysToSchedule' => '计划通知天数',
 			'setting.notificationPage.daysToScheduleHint' => '本程序是提前将课程信息写入计划日程，该设置可调整写入计划日程的天数',
 			'setting.notificationPage.daysUnit' => '天',
@@ -6054,6 +6108,8 @@ extension on Translations {
 			'setting.changeElectricityAccount.successfulFetch' => ({required Object account_number}) => '账号获取成功：${account_number}',
 			'setting.changeElectricityAccount.failedFetch' => ({required Object e}) => '获取失败：${e}',
 			'setting.changeElectricityAccount.accountSaved' => ({required Object account_number}) => '账号已保存：${account_number}',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.unknownCodingPattern' => '该楼号编码规则未知',
 			'setting.changeElectricityAccount.selectBuilding' => '选择楼栋',
 			'setting.changeElectricityAccount.building' => '楼栋',
@@ -6065,8 +6121,6 @@ extension on Translations {
 			'setting.changeElectricityAccount.buildingNumberQuery' => '请输入楼号',
 			'setting.changeElectricityAccount.yard' => '院区',
 			'setting.changeElectricityAccount.yardHint' => '选择院区',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.northYard' => '北院',
 			'setting.changeElectricityAccount.southYard' => '南院',
 			'setting.changeElectricityAccount.yardQuery' => '请选择院区',
@@ -6240,7 +6294,7 @@ extension on Translations {
 			'setting.classSwiftExplain' => '正数错后开学日期 负数提前开学日期',
 			'sponsorship.title' => '欢迎使用 XDYou 的鸿蒙版本',
 			'sponsorship.dialogTitle' => '详细信息',
-			'sponsorship.dialogContent' => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026',
+			'sponsorship.dialogContent' => '25级学生SixTeenForever使用AI技术将我程序移植到了鸿蒙系统，基本上就是使用本程序的代码，把我程序重新编译了一遍。好像是添加了一个原生小组件，但是我没看到源代码，所以我也不清楚。如果他公开了源代码，预计接下来的维护由我接手一段时间。\n\n注意：由于上架限制，部分功能被迫移除。\n\n另外，本程序彩蛋是某个抱枕。\n\nBenderBlog Rodriguez 4/10/2026',
 			'sponsorship.button' => '华为应用商店网址',
 			'sport.title' => '体育查询',
 			'sport.classInfo' => '课程信息',
