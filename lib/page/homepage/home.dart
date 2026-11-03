@@ -11,7 +11,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/external/ruisi_flutter/ruisi_flutter.dart';
-import 'package:watermeter/page/pig/pig_page.dart';
+import 'package:watermeter/page/pig/entertainment_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -267,7 +267,7 @@ class _HomePageMasterState extends State<HomePageMaster>
             talker: TalkerFlutter.init(),
           ),
           const ToolBoxPage(),
-          const PigPage(),
+          EntertainmentPage(parentPageController: _controller),
           const SettingWindow(),
         ],
         onPageChanged: (int index) {

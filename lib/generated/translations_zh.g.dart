@@ -54,6 +54,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$exam$zh exam = Translations$exam$zh.internal(_root);
 	late final Translations$experiment$zh experiment = Translations$experiment$zh.internal(_root);
 	late final Translations$experimentController$zh experimentController = Translations$experimentController$zh.internal(_root);
+	late final Translations$guessBook$zh guessBook = Translations$guessBook$zh.internal(_root);
 	late final Translations$homepage$zh homepage = Translations$homepage$zh.internal(_root);
 	late final Translations$library$zh library = Translations$library$zh.internal(_root);
 	late final Translations$libraryCard$zh libraryCard = Translations$libraryCard$zh.internal(_root);
@@ -979,6 +980,66 @@ class Translations$experimentController$zh {
 	String get loginFailed => '登录失败';
 }
 
+// Path: guessBook
+class Translations$guessBook$zh {
+	Translations$guessBook$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: 'Emoji 猜书名'
+	String get title => 'Emoji 猜书名';
+
+	/// zh: '看表情，猜猜是哪本书'
+	String get entryDescription => '看表情，猜猜是哪本书';
+
+	/// zh: '题库暂时为空'
+	String get empty => '题库暂时为空';
+
+	/// zh: '这些表情说的是哪本书？'
+	String get question => '这些表情说的是哪本书？';
+
+	/// zh: '从下面的选项中选出答案'
+	String get instruction => '从下面的选项中选出答案';
+
+	/// zh: '答对了！'
+	String get correct => '答对了！';
+
+	/// zh: '正确答案：{answer}'
+	String answer({required Object answer}) => '正确答案：${answer}';
+
+	/// zh: '下一题'
+	String get next => '下一题';
+
+	/// zh: '查看答案'
+	String get reveal => '查看答案';
+
+	/// zh: '选择题'
+	String get choiceMode => '选择题';
+
+	/// zh: '输入题'
+	String get inputMode => '输入题';
+
+	/// zh: '输入你猜的书名'
+	String get inputInstruction => '输入你猜的书名';
+
+	/// zh: '书名'
+	String get inputLabel => '书名';
+
+	/// zh: '提交答案'
+	String get submit => '提交答案';
+
+	/// zh: '原题'
+	String get originalClue => '原题';
+
+	/// zh: '随机表情'
+	String get randomClue => '随机表情';
+
+	/// zh: '这道题无法完整生成随机表情，已使用原题。'
+	String get randomClueFallback => '这道题无法完整生成随机表情，已使用原题。';
+}
+
 // Path: homepage
 class Translations$homepage$zh {
 	Translations$homepage$zh.internal(this._root);
@@ -1046,6 +1107,9 @@ class Translations$homepage$zh {
 
 	/// zh: '社团推荐'
 	String get club => '社团推荐';
+
+	/// zh: '放松一下'
+	String get relax => '放松一下';
 
 	/// zh: '猪图鉴赏'
 	String get dashboard => '猪图鉴赏';
@@ -5482,6 +5546,23 @@ extension on Translations {
 			'experiment.scoreHint3' => '目前识别库数据不全，请您务必核对一下。',
 			'experimentController.noPassword' => '没有物理实验密码，请到设置中进行设置',
 			'experimentController.loginFailed' => '登录失败',
+			'guessBook.title' => 'Emoji 猜书名',
+			'guessBook.entryDescription' => '看表情，猜猜是哪本书',
+			'guessBook.empty' => '题库暂时为空',
+			'guessBook.question' => '这些表情说的是哪本书？',
+			'guessBook.instruction' => '从下面的选项中选出答案',
+			'guessBook.correct' => '答对了！',
+			'guessBook.answer' => ({required Object answer}) => '正确答案：${answer}',
+			'guessBook.next' => '下一题',
+			'guessBook.reveal' => '查看答案',
+			'guessBook.choiceMode' => '选择题',
+			'guessBook.inputMode' => '输入题',
+			'guessBook.inputInstruction' => '输入你猜的书名',
+			'guessBook.inputLabel' => '书名',
+			'guessBook.submit' => '提交答案',
+			'guessBook.originalClue' => '原题',
+			'guessBook.randomClue' => '随机表情',
+			'guessBook.randomClueFallback' => '这道题无法完整生成随机表情，已使用原题。',
 			'homepage.title' => '校园信息查询',
 			'homepage.loading' => '正在加载',
 			'homepage.loaded' => '加载成功',
@@ -5502,6 +5583,7 @@ extension on Translations {
 			'homepage.homepage' => '校园信息',
 			'homepage.ruisi' => '睿思论坛',
 			'homepage.club' => '社团推荐',
+			'homepage.relax' => '放松一下',
 			'homepage.dashboard' => '猪图鉴赏',
 			'homepage.planet' => '博客星球',
 			'homepage.setting' => '设置',
@@ -5542,6 +5624,8 @@ extension on Translations {
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加载失败',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暂无日程',
 			'homepage.classTableCard.updatingInfoText' => '正在更新',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.allLoadingInfoText' => '全部加载中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加载中',
 			'homepage.classTableCard.partialErrorInfoText' => '部分数据加载失败',
@@ -5560,8 +5644,6 @@ extension on Translations {
 			'homepage.libraryCard.errorOccured' => '获取借书信息发生错误',
 			'homepage.libraryCard.fetching' => '正在获取借书信息',
 			'homepage.libraryCard.noReturn' => '目前没有待归还书籍',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待归还 ${dued} 本书籍',
 			'homepage.libraryCard.noInfo' => '目前无法获取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查询信息中',
@@ -6056,6 +6138,8 @@ extension on Translations {
 			'setting.changeSwiftDialog.invalidNumber' => '请输入有效的整数',
 			'setting.changeElectricityTitle' => '修改电费帐号',
 			'setting.changeElectricityAccount.title' => '修改电费帐号',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.campus' => '校区',
 			'setting.changeElectricityAccount.northCampus' => '北校区',
 			'setting.changeElectricityAccount.southCampus' => '南校区',
@@ -6074,8 +6158,6 @@ extension on Translations {
 			'setting.changeElectricityAccount.failedGenerate' => ({required Object e}) => '生成失败：${e}',
 			'setting.changeElectricityAccount.buildingNumber' => '楼号',
 			'setting.changeElectricityAccount.buildingNumberHint' => '例如: 16, 7, 55',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.buildingNumberQuery' => '请输入楼号',
 			'setting.changeElectricityAccount.yard' => '院区',
 			'setting.changeElectricityAccount.yardHint' => '选择院区',

@@ -52,6 +52,7 @@ class TranslationsEn extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$exam$en exam = _Translations$exam$en._(_root);
 	@override late final _Translations$experiment$en experiment = _Translations$experiment$en._(_root);
 	@override late final _Translations$experimentController$en experimentController = _Translations$experimentController$en._(_root);
+	@override late final _Translations$guessBook$en guessBook = _Translations$guessBook$en._(_root);
 	@override late final _Translations$homepage$en homepage = _Translations$homepage$en._(_root);
 	@override late final _Translations$library$en library = _Translations$library$en._(_root);
 	@override late final _Translations$libraryCard$en libraryCard = _Translations$libraryCard$en._(_root);
@@ -465,6 +466,32 @@ class _Translations$experimentController$en extends Translations$experimentContr
 	@override String get loginFailed => 'Login failed';
 }
 
+// Path: guessBook
+class _Translations$guessBook$en extends Translations$guessBook$zh {
+	_Translations$guessBook$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Emoji Book Quiz';
+	@override String get entryDescription => 'Guess the book from the emoji';
+	@override String get empty => 'There are no questions yet.';
+	@override String get question => 'Which book do these emoji represent?';
+	@override String get instruction => 'Choose an answer below.';
+	@override String get correct => 'Correct!';
+	@override String answer({required Object answer}) => 'Correct answer: ${answer}';
+	@override String get next => 'Next question';
+	@override String get reveal => 'Show answer';
+	@override String get choiceMode => 'Multiple choice';
+	@override String get inputMode => 'Type answer';
+	@override String get inputInstruction => 'Enter the book title.';
+	@override String get inputLabel => 'Book title';
+	@override String get submit => 'Submit answer';
+	@override String get originalClue => 'Original';
+	@override String get randomClue => 'Random emoji';
+	@override String get randomClueFallback => 'This clue could not be fully generated, so the original is shown.';
+}
+
 // Path: homepage
 class _Translations$homepage$en extends Translations$homepage$zh {
 	_Translations$homepage$en._(TranslationsEn root) : this._root = root, super.internal(root);
@@ -493,6 +520,7 @@ class _Translations$homepage$en extends Translations$homepage$zh {
 	@override String get ruisi => 'Forum';
 	@override String get club => 'Club';
 	@override String get planet => 'Blog';
+	@override String get relax => 'Take a break';
 	@override String get dashboard => 'Pighub';
 	@override String get setting => 'Settings';
 	@override late final _Translations$homepage$inputPartnerData$en inputPartnerData = _Translations$homepage$inputPartnerData$en._(_root);
@@ -2880,6 +2908,23 @@ extension on TranslationsEn {
 			'experiment.scoreHint3' => 'Due to the lack of data for recognization, it is necessary to check twice.',
 			'experimentController.noPassword' => 'Experiment password is not set, please set up one in the setting',
 			'experimentController.loginFailed' => 'Login failed',
+			'guessBook.title' => 'Emoji Book Quiz',
+			'guessBook.entryDescription' => 'Guess the book from the emoji',
+			'guessBook.empty' => 'There are no questions yet.',
+			'guessBook.question' => 'Which book do these emoji represent?',
+			'guessBook.instruction' => 'Choose an answer below.',
+			'guessBook.correct' => 'Correct!',
+			'guessBook.answer' => ({required Object answer}) => 'Correct answer: ${answer}',
+			'guessBook.next' => 'Next question',
+			'guessBook.reveal' => 'Show answer',
+			'guessBook.choiceMode' => 'Multiple choice',
+			'guessBook.inputMode' => 'Type answer',
+			'guessBook.inputInstruction' => 'Enter the book title.',
+			'guessBook.inputLabel' => 'Book title',
+			'guessBook.submit' => 'Submit answer',
+			'guessBook.originalClue' => 'Original',
+			'guessBook.randomClue' => 'Random emoji',
+			'guessBook.randomClueFallback' => 'This clue could not be fully generated, so the original is shown.',
 			'homepage.title' => 'School Info Center',
 			'homepage.loading' => 'Loading',
 			'homepage.loaded' => 'Message updated',
@@ -2901,6 +2946,7 @@ extension on TranslationsEn {
 			'homepage.ruisi' => 'Forum',
 			'homepage.club' => 'Club',
 			'homepage.planet' => 'Blog',
+			'homepage.relax' => 'Take a break',
 			'homepage.dashboard' => 'Pighub',
 			'homepage.setting' => 'Settings',
 			'homepage.inputPartnerData.routeNotExist' => 'Import path does not exist:P',
@@ -2940,6 +2986,8 @@ extension on TranslationsEn {
 			'homepage.classTableCard.scheduleErrorInfoText' => 'Failed to load schedule',
 			'homepage.classTableCard.scheduleNoneInfoText' => 'No schedule available',
 			'homepage.classTableCard.updatingInfoText' => 'Updating',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.allLoadingInfoText' => 'All sources loading',
 			'homepage.classTableCard.partialLoadingInfoText' => 'Partially loading',
 			'homepage.classTableCard.partialErrorInfoText' => 'Some data failed to load',
@@ -2958,8 +3006,6 @@ extension on TranslationsEn {
 			'homepage.libraryCard.errorOccured' => 'Error occurred while retrieving borrowing information',
 			'homepage.libraryCard.fetching' => 'Fetching borrowing information',
 			'homepage.libraryCard.noReturn' => 'Currently there\'s no book to be returned',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => 'Need to return ${dued} books',
 			'homepage.libraryCard.noInfo' => 'Cannot retrieve information at the moment',
 			'homepage.libraryCard.fetchingInfo' => 'Fetching information...',
@@ -3454,6 +3500,8 @@ extension on TranslationsEn {
 			'setting.changeSwiftDialog.invalidNumber' => 'Please enter a valid whole number',
 			'setting.changeElectricityTitle' => 'Modify electricity account',
 			'setting.changeElectricityAccount.title' => 'Modify electricity account',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.campus' => 'Campus',
 			'setting.changeElectricityAccount.northCampus' => 'Northern Campus',
 			'setting.changeElectricityAccount.southCampus' => 'Southern Campus',
@@ -3472,8 +3520,6 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.failedGenerate' => ({required Object e}) => 'Failed to generate: ${e}',
 			'setting.changeElectricityAccount.buildingNumber' => 'Building number',
 			'setting.changeElectricityAccount.buildingNumberHint' => 'eg: 16, 7, 55',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.buildingNumberQuery' => 'Please input building No.',
 			'setting.changeElectricityAccount.yard' => 'Yard',
 			'setting.changeElectricityAccount.yardHint' => 'Select Yard',

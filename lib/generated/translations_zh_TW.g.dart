@@ -52,6 +52,7 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final _Translations$exam$zh_TW exam = _Translations$exam$zh_TW._(_root);
 	@override late final _Translations$experiment$zh_TW experiment = _Translations$experiment$zh_TW._(_root);
 	@override late final _Translations$experimentController$zh_TW experimentController = _Translations$experimentController$zh_TW._(_root);
+	@override late final _Translations$guessBook$zh_TW guessBook = _Translations$guessBook$zh_TW._(_root);
 	@override late final _Translations$homepage$zh_TW homepage = _Translations$homepage$zh_TW._(_root);
 	@override late final _Translations$library$zh_TW library = _Translations$library$zh_TW._(_root);
 	@override late final _Translations$libraryCard$zh_TW libraryCard = _Translations$libraryCard$zh_TW._(_root);
@@ -465,6 +466,32 @@ class _Translations$experimentController$zh_TW extends Translations$experimentCo
 	@override String get loginFailed => '登錄失敗';
 }
 
+// Path: guessBook
+class _Translations$guessBook$zh_TW extends Translations$guessBook$zh {
+	_Translations$guessBook$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Emoji 猜書名';
+	@override String get entryDescription => '看表情，猜猜是哪本書';
+	@override String get empty => '題庫暫時為空';
+	@override String get question => '這些表情說的是哪本書？';
+	@override String get instruction => '從下面的選項中選出答案';
+	@override String get correct => '答對了！';
+	@override String answer({required Object answer}) => '正確答案：${answer}';
+	@override String get next => '下一題';
+	@override String get reveal => '查看答案';
+	@override String get choiceMode => '選擇題';
+	@override String get inputMode => '輸入題';
+	@override String get inputInstruction => '輸入你猜的書名';
+	@override String get inputLabel => '書名';
+	@override String get submit => '提交答案';
+	@override String get originalClue => '原題';
+	@override String get randomClue => '隨機表情';
+	@override String get randomClueFallback => '這道題無法完整生成隨機表情，已使用原題。';
+}
+
 // Path: homepage
 class _Translations$homepage$zh_TW extends Translations$homepage$zh {
 	_Translations$homepage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -492,6 +519,7 @@ class _Translations$homepage$zh_TW extends Translations$homepage$zh {
 	@override String get homepage => '校園信息';
 	@override String get ruisi => '睿思論壇';
 	@override String get club => '社團推薦';
+	@override String get relax => '放鬆一下';
 	@override String get dashboard => '豬圖鑑賞';
 	@override String get planet => '博客星球';
 	@override String get setting => '設置';
@@ -2880,6 +2908,23 @@ extension on TranslationsZhTw {
 			'experiment.scoreHint3' => '目前識別庫數據不全，請您務必核對一下。',
 			'experimentController.noPassword' => '沒有物理實驗密碼，請到設置中進行設置',
 			'experimentController.loginFailed' => '登錄失敗',
+			'guessBook.title' => 'Emoji 猜書名',
+			'guessBook.entryDescription' => '看表情，猜猜是哪本書',
+			'guessBook.empty' => '題庫暫時為空',
+			'guessBook.question' => '這些表情說的是哪本書？',
+			'guessBook.instruction' => '從下面的選項中選出答案',
+			'guessBook.correct' => '答對了！',
+			'guessBook.answer' => ({required Object answer}) => '正確答案：${answer}',
+			'guessBook.next' => '下一題',
+			'guessBook.reveal' => '查看答案',
+			'guessBook.choiceMode' => '選擇題',
+			'guessBook.inputMode' => '輸入題',
+			'guessBook.inputInstruction' => '輸入你猜的書名',
+			'guessBook.inputLabel' => '書名',
+			'guessBook.submit' => '提交答案',
+			'guessBook.originalClue' => '原題',
+			'guessBook.randomClue' => '隨機表情',
+			'guessBook.randomClueFallback' => '這道題無法完整生成隨機表情，已使用原題。',
 			'homepage.title' => '校園信息查詢',
 			'homepage.loading' => '正在加載',
 			'homepage.loaded' => '加載成功',
@@ -2900,6 +2945,7 @@ extension on TranslationsZhTw {
 			'homepage.homepage' => '校園信息',
 			'homepage.ruisi' => '睿思論壇',
 			'homepage.club' => '社團推薦',
+			'homepage.relax' => '放鬆一下',
 			'homepage.dashboard' => '豬圖鑑賞',
 			'homepage.planet' => '博客星球',
 			'homepage.setting' => '設置',
@@ -2940,6 +2986,8 @@ extension on TranslationsZhTw {
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加載失敗',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暫無日程',
 			'homepage.classTableCard.updatingInfoText' => '正在更新',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.allLoadingInfoText' => '全部加載中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加載中',
 			'homepage.classTableCard.partialErrorInfoText' => '部分數據加載失敗',
@@ -2958,8 +3006,6 @@ extension on TranslationsZhTw {
 			'homepage.libraryCard.errorOccured' => '獲取借書信息發生錯誤',
 			'homepage.libraryCard.fetching' => '正在獲取借書信息',
 			'homepage.libraryCard.noReturn' => '目前沒有待歸還書籍',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.needReturn' => ({required Object dued}) => '待歸還 ${dued} 本書籍',
 			'homepage.libraryCard.noInfo' => '目前無法獲取信息',
 			'homepage.libraryCard.fetchingInfo' => '正在查詢信息中',
@@ -3454,6 +3500,8 @@ extension on TranslationsZhTw {
 			'setting.changeSwiftDialog.invalidNumber' => '請輸入有效的整數',
 			'setting.changeElectricityTitle' => '修改電費帳號',
 			'setting.changeElectricityAccount.title' => '修改電費帳號',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeElectricityAccount.campus' => '校區',
 			'setting.changeElectricityAccount.northCampus' => '北校區',
 			'setting.changeElectricityAccount.southCampus' => '南校區',
@@ -3472,8 +3520,6 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.failedGenerate' => ({required Object e}) => '生成失敗：${e}',
 			'setting.changeElectricityAccount.buildingNumber' => '樓號',
 			'setting.changeElectricityAccount.buildingNumberHint' => '例如: 16, 7, 55',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.buildingNumberQuery' => '請輸入樓號',
 			'setting.changeElectricityAccount.yard' => '院區',
 			'setting.changeElectricityAccount.yardHint' => '選擇院區',

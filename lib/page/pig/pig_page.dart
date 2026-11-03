@@ -14,7 +14,10 @@ import 'package:watermeter/model/pighub_image.dart';
 import 'package:watermeter/repository/miscellaneous_session/pighub_session.dart';
 
 class PigPage extends StatefulWidget {
-  const PigPage({super.key});
+  const PigPage({super.key, this.appBarBottom, this.showAppBar = true});
+
+  final PreferredSizeWidget? appBarBottom;
+  final bool showAppBar;
 
   @override
   State<PigPage> createState() => _PigPageState();
@@ -29,12 +32,14 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
-    _future = session.getPigImages();
+    _future = session.getPigImages()..ignore();
   }
 
   void _fetch() {
     setState(() {
-      _future = session.getPigImages();
+      index = 0;
+      // FutureBuilder 会显示错误；提前监听避免请求在下一帧前失败时未被处理。
+      _future = session.getPigImages()..ignore();
     });
   }
 
@@ -45,14 +50,28 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.t.homepage.dashboard),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.replay_outlined),
-            onPressed: _fetch,
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: Text(context.t.homepage.dashboard),
+              bottom: widget.appBarBottom,
+            )
+          : null,
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+        child: Center(
+          heightFactor: 1,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 680),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _fetch,
+                icon: const Icon(Icons.replay_outlined),
+                label: Text(context.t.common.clickToRefresh),
+              ),
+            ),
           ),
-        ],
+        ),
       ),
       body: FutureBuilder<List<PigHubImage>>(
         future: _future,
@@ -72,12 +91,6 @@ class _PigPageState extends State<PigPage> with AutomaticKeepAliveClientMixin {
                   Text(
                     "Failed to fetch a pig :(\n${snapshot.error}",
                     textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: _fetch,
-                    icon: const Icon(Icons.replay_outlined),
-                    label: const Text("Try Again"),
                   ),
                 ]
                 .toColumn(mainAxisAlignment: MainAxisAlignment.center)

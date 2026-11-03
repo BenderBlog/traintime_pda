@@ -1253,6 +1253,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "29.1.0"
+  pinyin_pro_flutter:
+    dependency: "direct main"
+    description:
+      name: pinyin_pro_flutter
+      sha256: bec8ee7a39c058972b77dd702ee731029273d139ff1841c476ff144ac263e5ab
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   platform:
     dependency: transitive
     description:
@@ -1907,7 +1915,7 @@ packages:
     source: hosted
     version: "7.1.0"
   yaml:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: yaml
       sha256: f67cdd8e07d3c6329146aaef1ba043542b3134c12489f553ca9a7435d1068aea
