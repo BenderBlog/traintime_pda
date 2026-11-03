@@ -104,13 +104,13 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         return;
       }
       if (state.imei != imei) {
-        throw const AirconResponseException("设备状态归属不匹配");
+        throw const AirconResponseException("device owner mismatch");
       }
 
       final matches = _pendingMatches;
       if (matches != null && !matches(state)) {
         setState(() {
-          _error = const AirconResponseException("设备状态仍未确认");
+          _error = const AirconResponseException("device state still unconfirmed");
           _isFetching = false;
 
           // 确认失败后解除待确认状态，让控件恢复可用。
@@ -216,7 +216,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
         return;
       }
       if (confirmedState == null) {
-        throw pollError ?? const AirconResponseException("设备状态未确认");
+        throw pollError ?? const AirconResponseException("device state unconfirmed");
       }
 
       setState(() {
@@ -247,7 +247,7 @@ class _AirconRemotePageState extends State<AirconRemotePage> {
           _state = previous;
         }
       });
-      showToast(context: context, msg: error.toString());
+      showToast(context: context, msg: context.t.electricity.airconControlError);
     }
   }
 
