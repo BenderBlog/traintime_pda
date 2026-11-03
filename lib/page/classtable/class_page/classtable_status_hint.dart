@@ -7,22 +7,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
-/// A loop while the classtable is fetching, and [Icons.sync_problem] when what
-/// is on screen is a cached copy the error button does not already explain.
+/// A loop beside the error button while a source is being fetched, and nothing
+/// otherwise. Which sources came from the cache is the error dialog's business.
 class ClassTableStatusHint extends StatelessWidget {
   final List<ClassTableStatusSource> loadingSources;
-  final List<ClassTableStatusSource> cacheSources;
 
-  /// The error button beside the mark lists the cached sources in its dialog,
-  /// so the mark would only repeat it.
-  final bool cacheExplained;
-
-  const ClassTableStatusHint({
-    super.key,
-    required this.loadingSources,
-    required this.cacheSources,
-    this.cacheExplained = false,
-  });
+  const ClassTableStatusHint({super.key, required this.loadingSources});
 
   /// The size the app bar draws the buttons beside the mark at.
   static const double _iconSize = 24;
@@ -50,39 +40,31 @@ class ClassTableStatusHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loading = loadingSources.isNotEmpty;
-    final cached = !loading && cacheSources.isNotEmpty && !cacheExplained;
-    if (!loading && !cached) {
+    if (loadingSources.isEmpty) {
       return const SizedBox.shrink();
     }
 
     /// Quieter than the buttons beside it: this is a note, not an action.
     final color = Theme.of(context).colorScheme.onSurfaceVariant;
 
-    /// One size for both marks, so the buttons beside them never shift.
+    /// The box keeps one size, so the buttons beside it do not shift.
     return Tooltip(
-      message: loading
-          ? context.t.classtable.statusBanner.loading(
-              sources: _joinSources(context, loadingSources),
-            )
-          : context.t.classtable.statusBanner.cache(
-              sources: _joinSources(context, cacheSources),
-            ),
+      message: context.t.classtable.statusBanner.loading(
+        sources: _joinSources(context, loadingSources),
+      ),
       child: SizedBox(
         width: _iconSize,
         height: _iconSize,
-        child: loading
-            ? Center(
-                child: SizedBox(
-                  width: _spinnerSize,
-                  height: _spinnerSize,
-                  child: CircularProgressIndicator(
-                    strokeWidth: _spinnerStroke,
-                    color: color,
-                  ),
-                ),
-              )
-            : Icon(Icons.sync_problem, size: _iconSize, color: color),
+        child: Center(
+          child: SizedBox(
+            width: _spinnerSize,
+            height: _spinnerSize,
+            child: CircularProgressIndicator(
+              strokeWidth: _spinnerStroke,
+              color: color,
+            ),
+          ),
+        ),
       ),
     );
   }

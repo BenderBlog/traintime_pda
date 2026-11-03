@@ -16,9 +16,6 @@ class EmptyClassTablePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = ClassTableState.of(context)!.controllers;
-    final hasError =
-        state.errorWithoutCacheSources.isNotEmpty ||
-        state.errorWithCacheSources.isNotEmpty;
     final hasExamArrangement = state.hasExamArrangement;
     final hasExperimentArrangement = state.hasExperimentArrangement;
     final emptyMessageKey = hasExamArrangement && hasExperimentArrangement
@@ -33,11 +30,7 @@ class EmptyClassTablePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(context.t.classtable.pageTitle),
         actions: [
-          ClassTableStatusHint(
-            loadingSources: state.loadingSources,
-            cacheSources: state.cacheSources,
-            cacheExplained: hasError,
-          ),
+          ClassTableStatusHint(loadingSources: state.loadingSources),
           const ClassTableErrorButton(),
         ],
       ),

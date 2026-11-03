@@ -600,20 +600,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   @override
   Widget build(BuildContext context) {
     final state = ClassTableState.of(context)!.controllers;
-    final hasError =
-        state.errorWithoutCacheSources.isNotEmpty ||
-        state.errorWithCacheSources.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t.classtable.pageTitle),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
-          ClassTableStatusHint(
-            loadingSources: state.loadingSources,
-            cacheSources: state.cacheSources,
-            cacheExplained: hasError,
-          ),
+          ClassTableStatusHint(loadingSources: state.loadingSources),
           const ClassTableErrorButton(),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
