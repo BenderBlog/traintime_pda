@@ -303,6 +303,7 @@ class _Translations$electricity$en extends Translations$electricity$zh {
 	@override String get airconTitle => 'Aircon Electricity';
 	@override String get airconImei => 'Aircon IMEI';
 	@override String get airconAmount => 'Platform usage';
+	@override String get airconIndoor => 'Indoor temperature';
 	@override String get airconUpdateTime => 'Updated at';
 	@override String get airconWaiting => 'Waiting to fetch aircon electricity data';
 	@override String get airconError => 'Failed to fetch aircon electricity data';
@@ -2790,6 +2791,7 @@ extension on TranslationsEn {
 			'electricity.airconTitle' => 'Aircon Electricity',
 			'electricity.airconImei' => 'Aircon IMEI',
 			'electricity.airconAmount' => 'Platform usage',
+			'electricity.airconIndoor' => 'Indoor temperature',
 			'electricity.airconUpdateTime' => 'Updated at',
 			'electricity.airconWaiting' => 'Waiting to fetch aircon electricity data',
 			'electricity.airconError' => 'Failed to fetch aircon electricity data',
@@ -2985,9 +2987,9 @@ extension on TranslationsEn {
 			'homepage.classTableCard.scheduleFetchingInfoText' => 'Loading schedule',
 			'homepage.classTableCard.scheduleErrorInfoText' => 'Failed to load schedule',
 			'homepage.classTableCard.scheduleNoneInfoText' => 'No schedule available',
-			'homepage.classTableCard.updatingInfoText' => 'Updating',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.classTableCard.updatingInfoText' => 'Updating',
 			'homepage.classTableCard.allLoadingInfoText' => 'All sources loading',
 			'homepage.classTableCard.partialLoadingInfoText' => 'Partially loading',
 			'homepage.classTableCard.partialErrorInfoText' => 'Some data failed to load',
@@ -3499,9 +3501,9 @@ extension on TranslationsEn {
 			'setting.changeSwiftDialog.inputHint' => 'Please input number here',
 			'setting.changeSwiftDialog.invalidNumber' => 'Please enter a valid whole number',
 			'setting.changeElectricityTitle' => 'Modify electricity account',
-			'setting.changeElectricityAccount.title' => 'Modify electricity account',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.title' => 'Modify electricity account',
 			'setting.changeElectricityAccount.campus' => 'Campus',
 			'setting.changeElectricityAccount.northCampus' => 'Northern Campus',
 			'setting.changeElectricityAccount.southCampus' => 'Southern Campus',

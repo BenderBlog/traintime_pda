@@ -303,6 +303,7 @@ class _Translations$electricity$zh_TW extends Translations$electricity$zh {
 	@override String get airconTitle => '空調用電';
 	@override String get airconImei => '空調 IMEI';
 	@override String get airconAmount => '平臺用電量';
+	@override String get airconIndoor => '室內溫度';
 	@override String get airconUpdateTime => '更新時間';
 	@override String get airconWaiting => '等待獲取空調用電信息';
 	@override String get airconError => '空調用電獲取失敗';
@@ -2790,6 +2791,7 @@ extension on TranslationsZhTw {
 			'electricity.airconTitle' => '空調用電',
 			'electricity.airconImei' => '空調 IMEI',
 			'electricity.airconAmount' => '平臺用電量',
+			'electricity.airconIndoor' => '室內溫度',
 			'electricity.airconUpdateTime' => '更新時間',
 			'electricity.airconWaiting' => '等待獲取空調用電信息',
 			'electricity.airconError' => '空調用電獲取失敗',
@@ -2985,9 +2987,9 @@ extension on TranslationsZhTw {
 			'homepage.classTableCard.scheduleFetchingInfoText' => '正在加載日程',
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加載失敗',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暫無日程',
-			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			'homepage.classTableCard.allLoadingInfoText' => '全部加載中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加載中',
 			'homepage.classTableCard.partialErrorInfoText' => '部分數據加載失敗',
@@ -3499,9 +3501,9 @@ extension on TranslationsZhTw {
 			'setting.changeSwiftDialog.inputHint' => '請在此輸入數字',
 			'setting.changeSwiftDialog.invalidNumber' => '請輸入有效的整數',
 			'setting.changeElectricityTitle' => '修改電費帳號',
-			'setting.changeElectricityAccount.title' => '修改電費帳號',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.title' => '修改電費帳號',
 			'setting.changeElectricityAccount.campus' => '校區',
 			'setting.changeElectricityAccount.northCampus' => '北校區',
 			'setting.changeElectricityAccount.southCampus' => '南校區',

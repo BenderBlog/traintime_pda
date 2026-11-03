@@ -38,6 +38,7 @@ not_school_network: Not school network
 aircon_title: Aircon Electricity
 aircon_imei: Aircon IMEI
 aircon_amount: Platform usage
+aircon_indoor: Indoor temperature
 aircon_update_time: Updated at
 aircon_waiting: Waiting to fetch aircon electricity data
 aircon_error: Failed to fetch aircon electricity data
