@@ -44,6 +44,9 @@ aircon_imei_clear: 清除
 scan_aircon_qr: 扫描空调二维码
 pick_aircon_qr_image: 从相册选择二维码图片
 aircon_camera_unavailable: 当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI
+aircon_scan_hint: "轻点画面可以对焦；空调离得远、放大后仍然模糊时，请用系统相机拍照识别"
+aircon_take_photo: "用系统相机拍照识别"
+aircon_camera_error: "无法打开相机：{error}"
 notification_setting: 通知设置
 course_reminder_setting: 课前通知设置
 course_reminder_description: 设置课前提醒通知
