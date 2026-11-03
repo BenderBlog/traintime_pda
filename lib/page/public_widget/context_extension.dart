@@ -22,20 +22,20 @@ extension BuildContextExt on BuildContext {
 
   Future<T?> push<T extends Object?>(Widget page) =>
       (splitViewKey.currentState ?? Navigator.of(this)).push(
-        MaterialPageRoute<T>(builder: (_) => page),
+        Routes.routeFor<T>(page),
       );
 
   Future<T?> pushReplacement<T extends Object?>(Widget page) {
     _currentDetailRoute = null;
     if (splitViewKey.currentState != null) {
       return splitViewKey.currentState!.pushAndRemoveUntil(
-        MaterialPageRoute<T>(builder: (_) => page),
+        Routes.routeFor<T>(page),
         (route) => route.isFirst && route.isActive,
       );
     } else {
       return Navigator.of(
         this,
-      ).pushReplacement(MaterialPageRoute<T>(builder: (_) => page));
+      ).pushReplacement(Routes.routeFor<T>(page));
     }
   }
 
