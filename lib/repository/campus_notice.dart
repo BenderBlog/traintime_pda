@@ -166,100 +166,112 @@ class CampusNoticeSearch {
     try {
       await Future.wait(
         channels.map(
-          (channel) => pool.withResource(() async {
-            if (token.isCancelled) return;
-            final hits = <CampusNotice>[];
-            var incomplete = false;
-            final visited = <Uri>{};
-            final seen = <Uri>{};
-            final entry = Uri.parse(channel.url);
-            final elapsed = Stopwatch()..start();
-            Uri? page = entry;
-            try {
-              while (page != null && !token.isCancelled) {
-                if (elapsed.elapsed.inSeconds >= 45 ||
-                    page.origin != entry.origin ||
-                    !visited.add(page) ||
-                    visited.length > 15) {
-                  incomplete = true;
-                  break;
-                }
-                final list = parseNoticeList(
-                  await _read(page, token),
-                  page,
-                  channel,
-                );
-                var hasNewer = false;
-                var freshRows = 0;
-                for (final item in list.items) {
-                  if (token.isCancelled) return;
-                  if (elapsed.elapsed.inSeconds >= 45) {
-                    incomplete = true;
-                    break;
-                  }
-                  if (!seen.add(item.url)) continue;
-                  freshRows++;
-                  var date = item.date;
-                  var title = item.title;
-                  if (date == null ||
-                      (!date.isBefore(start) && title.endsWith('...'))) {
-                    // Some VSB lists omit the year or truncate the heading.
-                    if (item.url.host == entry.host) {
-                      try {
-                        final doc = html.parse(await _read(item.url, token));
-                        final dateText = RegExp(
-                          r'(?:发布日期|发布时间|日期|时间)\s*[:：]\s*(20\d\d[-./]\d{1,2}[-./]\d{1,2})',
-                        ).firstMatch(doc.body?.text ?? '');
-                        date ??= _date(dateText?[1] ?? '');
-                        if (title.endsWith('...')) {
-                          final full = doc.querySelector('title')?.text.trim();
-                          if (full != null &&
-                              full.startsWith(
-                                title.substring(0, title.length - 3),
-                              )) {
-                            title = full
-                                .split(RegExp(r'\s*[-_]\s*(?:西安电子科技大学|本科生院)'))
-                                .first;
-                          } else {
-                            incomplete = true;
-                          }
-                        }
-                      } on Exception {
-                        incomplete = true;
-                      }
-                    }
-                  }
-                  if (date == null) {
-                    incomplete = true;
-                    hasNewer = true;
-                    continue;
-                  }
-                  if (date.isBefore(start)) continue;
-                  hasNewer = true;
-                  if (!date.isAfter(today) &&
-                      _normalize(title).contains(query)) {
-                    hits.add((
-                      title: title,
-                      date: date,
-                      url: item.url,
-                      source: channel.source,
-                    ));
-                  }
-                }
-                if (freshRows == 0 && list.next != null) incomplete = true;
-                page = hasNewer ? list.next : null;
-              }
-            } on Exception {
-              incomplete = true;
-            }
-            if (!token.isCancelled) {
-              onChannel(hits, incomplete ? channel.source : null);
-            }
-          }),
+          (channel) => pool.withResource(
+            () => _searchChannel(
+              channel,
+              query,
+              token,
+              start: start,
+              today: today,
+              onChannel: onChannel,
+            ),
+          ),
         ),
       );
     } finally {
       await pool.close();
+    }
+  }
+
+  Future<void> _searchChannel(
+    NoticeChannel channel,
+    String query,
+    CancelToken token, {
+    required DateTime start,
+    required DateTime today,
+    required void Function(List<CampusNotice> hits, String? failedSource)
+    onChannel,
+  }) async {
+    if (token.isCancelled) return;
+    final hits = <CampusNotice>[];
+    var incomplete = false;
+    final visited = <Uri>{};
+    final seen = <Uri>{};
+    final entry = Uri.parse(channel.url);
+    final elapsed = Stopwatch()..start();
+    Uri? page = entry;
+    try {
+      while (page != null && !token.isCancelled) {
+        if (elapsed.elapsed.inSeconds >= 45 ||
+            page.origin != entry.origin ||
+            !visited.add(page) ||
+            visited.length > 15) {
+          incomplete = true;
+          break;
+        }
+        final list = parseNoticeList(await _read(page, token), page, channel);
+        var hasNewer = false;
+        var freshRows = 0;
+        for (final item in list.items) {
+          if (token.isCancelled) return;
+          if (elapsed.elapsed.inSeconds >= 45) {
+            incomplete = true;
+            break;
+          }
+          if (!seen.add(item.url)) continue;
+          freshRows++;
+          var date = item.date;
+          var title = item.title;
+          if (date == null ||
+              (!date.isBefore(start) && title.endsWith('...'))) {
+            // Some VSB lists omit the year or truncate the heading.
+            if (item.url.host == entry.host) {
+              try {
+                final doc = html.parse(await _read(item.url, token));
+                final dateText = RegExp(
+                  r'(?:发布日期|发布时间|日期|时间)\s*[:：]\s*(20\d\d[-./]\d{1,2}[-./]\d{1,2})',
+                ).firstMatch(doc.body?.text ?? '');
+                date ??= _date(dateText?[1] ?? '');
+                if (title.endsWith('...')) {
+                  final full = doc.querySelector('title')?.text.trim();
+                  if (full != null &&
+                      full.startsWith(title.substring(0, title.length - 3))) {
+                    title = full
+                        .split(RegExp(r'\s*[-_]\s*(?:西安电子科技大学|本科生院)'))
+                        .first;
+                  } else {
+                    incomplete = true;
+                  }
+                }
+              } on Exception {
+                incomplete = true;
+              }
+            }
+          }
+          if (date == null) {
+            incomplete = true;
+            hasNewer = true;
+            continue;
+          }
+          if (date.isBefore(start)) continue;
+          hasNewer = true;
+          if (!date.isAfter(today) && _normalize(title).contains(query)) {
+            hits.add((
+              title: title,
+              date: date,
+              url: item.url,
+              source: channel.source,
+            ));
+          }
+        }
+        if (freshRows == 0 && list.next != null) incomplete = true;
+        page = hasNewer ? list.next : null;
+      }
+    } on Exception {
+      incomplete = true;
+    }
+    if (!token.isCancelled) {
+      onChannel(hits, incomplete ? channel.source : null);
     }
   }
 }
