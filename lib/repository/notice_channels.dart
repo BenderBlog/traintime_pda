@@ -79,17 +79,17 @@ const noticeChannels = [
   NoticeChannel('电子工程学院', 'https://see.xidian.edu.cn/tzgg.htm', '.part2L li'),
   NoticeChannel(
     '计算机科学与技术学院',
-    'https://cs.xidian.edu.cn/tzgg.htm',
+    'https://cs.xidian.edu.cn/tzgg.htm', // 学院通知公告
     '.n_wenzhang li',
   ),
   NoticeChannel(
     '计算机科学与技术学院',
-    'https://cs.xidian.edu.cn/bkjy/jxtz.htm',
+    'https://cs.xidian.edu.cn/bkjy/jxtz.htm', // 本科教育：教学通知
     '.n_wenzhang li',
   ),
   NoticeChannel(
     '计算机科学与技术学院',
-    'https://cs.xidian.edu.cn/yjsjy/yjstz.htm',
+    'https://cs.xidian.edu.cn/yjsjy/yjstz.htm', // 研究生教育：研究生通知
     '.n_wenzhang li',
   ),
   NoticeChannel(
