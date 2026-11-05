@@ -984,6 +984,11 @@ class _Translations$toolbox$en extends Translations$toolbox$zh {
 	@override String get physicsDescription => 'Hope the operation goes smoothly';
 	@override String get discover => 'Ruisi Navigation';
 	@override String get discoverDescription => 'Lots other functions';
+	@override String get noticeSearch => 'Campus notices';
+	@override String get noticeHint => 'Keyword in notice titles from the last 30 days';
+	@override String get noticeIncomplete => 'Some sources could not be fully searched';
+	@override String get noticeEmpty => 'No matches in the lists checked';
+	@override String get noticeOpenError => 'Could not open the original notice';
 }
 
 // Path: weekday
@@ -3747,6 +3752,11 @@ extension on TranslationsEn {
 			'toolbox.physicsDescription' => 'Hope the operation goes smoothly',
 			'toolbox.discover' => 'Ruisi Navigation',
 			'toolbox.discoverDescription' => 'Lots other functions',
+			'toolbox.noticeSearch' => 'Campus notices',
+			'toolbox.noticeHint' => 'Keyword in notice titles from the last 30 days',
+			'toolbox.noticeIncomplete' => 'Some sources could not be fully searched',
+			'toolbox.noticeEmpty' => 'No matches in the lists checked',
+			'toolbox.noticeOpenError' => 'Could not open the original notice',
 			'weekday.monday' => 'Mon.',
 			'weekday.tuesday' => 'Tue.',
 			'weekday.wednesday' => 'Wed.',
