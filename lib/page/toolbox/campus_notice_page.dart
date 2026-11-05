@@ -40,9 +40,7 @@ class _CampusNoticePageState extends State<CampusNoticePage> {
       _token = token;
       _checked = 0;
       _byUrl.clear();
-      _failed
-        ..clear()
-        ..addAll(unavailableNoticeSources);
+      _failed.clear();
     });
     await _search.search(
       keyword,

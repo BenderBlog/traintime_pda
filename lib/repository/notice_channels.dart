@@ -260,6 +260,3 @@ const noticeChannels = [
     '.ny-textlist li',
   ),
 ];
-
-// No accessible notice list at the supplied institute URL.
-const unavailableNoticeSources = ['芜湖研究院'];
