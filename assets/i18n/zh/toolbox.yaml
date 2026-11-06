@@ -17,7 +17,8 @@ discover: 睿思导航
 discover_description: 补充其他功能
 notice_search: 通知查询
 notice_description: 不要错过通知
-notice_hint: 关键词（近 30 天的通知标题）
+notice_hint: 搜索关键词（近30天的通知标题）
+notice_placeholder: 如:转专业
 notice_incomplete: 部分来源未查完
 notice_empty: 已查栏目中没有匹配的通知
 notice_open_error: 无法打开原文链接

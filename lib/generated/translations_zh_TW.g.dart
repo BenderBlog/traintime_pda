@@ -986,7 +986,8 @@ class _Translations$toolbox$zh_TW extends Translations$toolbox$zh {
 	@override String get discoverDescription => '補充其他功能';
 	@override String get noticeSearch => '通知查詢';
 	@override String get noticeDescription => '不要錯過通知';
-	@override String get noticeHint => '關鍵詞（近 30 天的通知標題）';
+	@override String get noticeHint => '搜尋關鍵詞（近30天的通知標題）';
+	@override String get noticePlaceholder => '如:轉專業';
 	@override String get noticeIncomplete => '部分來源未查完';
 	@override String get noticeEmpty => '已查欄目中沒有符合的通知';
 	@override String get noticeOpenError => '無法開啟原文連結';
@@ -3755,7 +3756,8 @@ extension on TranslationsZhTw {
 			'toolbox.discoverDescription' => '補充其他功能',
 			'toolbox.noticeSearch' => '通知查詢',
 			'toolbox.noticeDescription' => '不要錯過通知',
-			'toolbox.noticeHint' => '關鍵詞（近 30 天的通知標題）',
+			'toolbox.noticeHint' => '搜尋關鍵詞（近30天的通知標題）',
+			'toolbox.noticePlaceholder' => '如:轉專業',
 			'toolbox.noticeIncomplete' => '部分來源未查完',
 			'toolbox.noticeEmpty' => '已查欄目中沒有符合的通知',
 			'toolbox.noticeOpenError' => '無法開啟原文連結',

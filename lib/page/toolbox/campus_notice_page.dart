@@ -74,18 +74,30 @@ class _CampusNoticePageState extends State<CampusNoticePage> {
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _input,
-                textInputAction: TextInputAction.search,
-                onSubmitted: (_) => _submit(),
-                decoration: InputDecoration(
-                  labelText: t.noticeHint,
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.search),
-                    tooltip: t.noticeSearch,
-                    onPressed: _submit,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    t.noticeHint,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _input,
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: (_) => _submit(),
+                    decoration: InputDecoration(
+                      hintText: t.noticePlaceholder,
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.search),
+                        tooltip: t.noticeSearch,
+                        onPressed: _submit,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             if (running)

@@ -986,7 +986,8 @@ class _Translations$toolbox$en extends Translations$toolbox$zh {
 	@override String get discoverDescription => 'Lots other functions';
 	@override String get noticeSearch => 'Notice search';
 	@override String get noticeDescription => 'Don\'t miss any notices';
-	@override String get noticeHint => 'Keyword in notice titles from the last 30 days';
+	@override String get noticeHint => 'Search keywords (notice titles from the last 30 days)';
+	@override String get noticePlaceholder => 'e.g. changing majors';
 	@override String get noticeIncomplete => 'Some sources could not be fully searched';
 	@override String get noticeEmpty => 'No matches in the lists checked';
 	@override String get noticeOpenError => 'Could not open the original notice';
@@ -3755,7 +3756,8 @@ extension on TranslationsEn {
 			'toolbox.discoverDescription' => 'Lots other functions',
 			'toolbox.noticeSearch' => 'Notice search',
 			'toolbox.noticeDescription' => 'Don\'t miss any notices',
-			'toolbox.noticeHint' => 'Keyword in notice titles from the last 30 days',
+			'toolbox.noticeHint' => 'Search keywords (notice titles from the last 30 days)',
+			'toolbox.noticePlaceholder' => 'e.g. changing majors',
 			'toolbox.noticeIncomplete' => 'Some sources could not be fully searched',
 			'toolbox.noticeEmpty' => 'No matches in the lists checked',
 			'toolbox.noticeOpenError' => 'Could not open the original notice',
