@@ -4,6 +4,7 @@
 
 import 'package:material_ui/material_ui.dart';
 
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/toolbox/campus_notice_page.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -24,9 +25,7 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
           ListTile(
             leading: const Icon(Icons.search),
             title: Text(context.t.toolbox.noticeSearch),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const CampusNoticePage()),
-            ),
+            onTap: () => context.push<void>(const CampusNoticePage()),
           ),
         ],
       ),
