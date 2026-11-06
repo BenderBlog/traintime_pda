@@ -984,7 +984,8 @@ class _Translations$toolbox$en extends Translations$toolbox$zh {
 	@override String get physicsDescription => 'Hope the operation goes smoothly';
 	@override String get discover => 'Ruisi Navigation';
 	@override String get discoverDescription => 'Lots other functions';
-	@override String get noticeSearch => 'Campus notices';
+	@override String get noticeSearch => 'Notice search';
+	@override String get noticeDescription => 'Don\'t miss any notices';
 	@override String get noticeHint => 'Keyword in notice titles from the last 30 days';
 	@override String get noticeIncomplete => 'Some sources could not be fully searched';
 	@override String get noticeEmpty => 'No matches in the lists checked';
@@ -3752,7 +3753,8 @@ extension on TranslationsEn {
 			'toolbox.physicsDescription' => 'Hope the operation goes smoothly',
 			'toolbox.discover' => 'Ruisi Navigation',
 			'toolbox.discoverDescription' => 'Lots other functions',
-			'toolbox.noticeSearch' => 'Campus notices',
+			'toolbox.noticeSearch' => 'Notice search',
+			'toolbox.noticeDescription' => 'Don\'t miss any notices',
 			'toolbox.noticeHint' => 'Keyword in notice titles from the last 30 days',
 			'toolbox.noticeIncomplete' => 'Some sources could not be fully searched',
 			'toolbox.noticeEmpty' => 'No matches in the lists checked',

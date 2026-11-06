@@ -2149,8 +2149,11 @@ class Translations$toolbox$zh {
 	/// zh: '补充其他功能'
 	String get discoverDescription => '补充其他功能';
 
-	/// zh: '官网通知查询'
-	String get noticeSearch => '官网通知查询';
+	/// zh: '通知查询'
+	String get noticeSearch => '通知查询';
+
+	/// zh: '不要错过通知'
+	String get noticeDescription => '不要错过通知';
 
 	/// zh: '关键词（近 30 天的通知标题）'
 	String get noticeHint => '关键词（近 30 天的通知标题）';
@@ -6400,7 +6403,8 @@ extension on Translations {
 			'toolbox.physicsDescription' => '希望操作顺利',
 			'toolbox.discover' => '睿思导航',
 			'toolbox.discoverDescription' => '补充其他功能',
-			'toolbox.noticeSearch' => '官网通知查询',
+			'toolbox.noticeSearch' => '通知查询',
+			'toolbox.noticeDescription' => '不要错过通知',
 			'toolbox.noticeHint' => '关键词（近 30 天的通知标题）',
 			'toolbox.noticeIncomplete' => '部分来源未查完',
 			'toolbox.noticeEmpty' => '已查栏目中没有匹配的通知',

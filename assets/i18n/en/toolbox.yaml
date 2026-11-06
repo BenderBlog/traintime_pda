@@ -15,7 +15,8 @@ physics: Physics Calculation
 physics_description: Hope the operation goes smoothly
 discover: Ruisi Navigation
 discover_description: Lots other functions
-notice_search: Campus notices
+notice_search: Notice search
+notice_description: Don't miss any notices
 notice_hint: Keyword in notice titles from the last 30 days
 notice_incomplete: Some sources could not be fully searched
 notice_empty: No matches in the lists checked
