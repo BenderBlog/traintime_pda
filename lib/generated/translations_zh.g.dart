@@ -2148,6 +2148,27 @@ class Translations$toolbox$zh {
 
 	/// zh: '补充其他功能'
 	String get discoverDescription => '补充其他功能';
+
+	/// zh: '通知查询'
+	String get noticeSearch => '通知查询';
+
+	/// zh: '不要错过通知'
+	String get noticeDescription => '不要错过通知';
+
+	/// zh: '搜索关键词（近30天的通知标题）'
+	String get noticeHint => '搜索关键词（近30天的通知标题）';
+
+	/// zh: '如:转专业'
+	String get noticePlaceholder => '如:转专业';
+
+	/// zh: '部分来源未查完'
+	String get noticeIncomplete => '部分来源未查完';
+
+	/// zh: '已查栏目中没有匹配的通知'
+	String get noticeEmpty => '已查栏目中没有匹配的通知';
+
+	/// zh: '无法打开原文链接'
+	String get noticeOpenError => '无法打开原文链接';
 }
 
 // Path: weekday
@@ -6385,6 +6406,13 @@ extension on Translations {
 			'toolbox.physicsDescription' => '希望操作顺利',
 			'toolbox.discover' => '睿思导航',
 			'toolbox.discoverDescription' => '补充其他功能',
+			'toolbox.noticeSearch' => '通知查询',
+			'toolbox.noticeDescription' => '不要错过通知',
+			'toolbox.noticeHint' => '搜索关键词（近30天的通知标题）',
+			'toolbox.noticePlaceholder' => '如:转专业',
+			'toolbox.noticeIncomplete' => '部分来源未查完',
+			'toolbox.noticeEmpty' => '已查栏目中没有匹配的通知',
+			'toolbox.noticeOpenError' => '无法打开原文链接',
 			'weekday.monday' => '周一',
 			'weekday.tuesday' => '周二',
 			'weekday.wednesday' => '周三',
