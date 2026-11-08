@@ -131,13 +131,30 @@ class_add:
   choose_at_least_one: 请至少选择一个上课日期和时间
   repeat_weekly: 按周重复
   free_time: 自定义日期
-  date_selector_free:
-    rule: 时间必须在 08:30-21:25 之间
-    rule_2: 下课时间必须晚于上课时间
-    class_start_time: 上课时间
-    class_end_time: 下课时间
-    edit_class_time: 编辑课程时间
-    choose_class_time: 选择课程时间
+  schedule_builder:
+    add_time: 添加新的时间
+    schedule_list_title: 上课安排
+    date_rules: 日期规则
+    time_rules: 时间规则
+    edit_rules: 修改
+    empty_selection: 尚未选择
+    select_dates: 选择日期
+    multi_date_tip: 可多选上课日期。
+    select_times: 选择时间段
+    presets: 预设选择
+    custom: 自定义
+    add_time_range: 添加时间段
+    time_range_title: 第 {index} 个时间段
+    start_time: 开始时间
+    end_time: 结束时间
+    time_rule: 时间必须在 08:30-21:25 之间
+    time_order_rule: 结束时间必须晚于开始时间
+    generate_and_add: 生成并添加
+    confirm_add_title: 确认添加课程时间？
+    confirm_add_message: '{date_count} 个日期 x {time_count} 个时间段，共生成 {range_count} 条课程安排。'
+    overlap_title: 时间冲突，无法添加
+    overlap_message: 有 {count} 条新增时间段与其他时间段重叠，请修改日期或时间规则后重试。
+    overlap_range: '{date}：{range}'
 course_detail_card:
   class_number_string: '{number} 班'
   unknown_teacher: 老师未定

@@ -147,18 +147,35 @@ class_add:
   choose_at_least_one: Please choose at least one time for class
   repeat_weekly: Repeat Weekly
   free_time: Free Time
-  date_selector_free:
-    rule: Time must be between 8:30 and 21:25.
-    rule_2: The end time must be later than the start time.
-    class_start_time: Start time
-    class_end_time: End time
-    edit_class_time: Edit the class time
-    choose_class_time: Choose a class time
+  schedule_builder:
+    add_time: Add dates and times
+    schedule_list_title: Class schedule
+    date_rules: Date rules
+    time_rules: Time rules
+    edit_rules: Edit
+    empty_selection: Nothing selected
+    select_dates: Select dates
+    multi_date_tip: Selecting multiple class dates is supported.
+    select_times: Select time ranges
+    presets: Presets
+    custom: Custom
+    add_time_range: Add time range
+    time_range_title: Time range {index}
+    start_time: Start time
+    end_time: End time
+    time_rule: Time must be between 8:30 and 21:25.
+    time_order_rule: The end time must be later than the start time.
+    generate_and_add: Generate and add
+    confirm_add_title: Add these class times?
+    confirm_add_message: '{date_count} dates x {time_count} time ranges will create {range_count} schedule entries.'
+    overlap_title: Schedule conflict
+    overlap_message: '{count} generated time ranges overlap other time ranges. Adjust the date or time rules and try again.'
+    overlap_range: '{date}: {range}'
 course_detail_card:
   class_number_string: Class {number}
   unknown_teacher: Unknown teacher
   unknown_place: Unknown classroom
-  class_period: period {start} to {stop}
+  class_period: Period {start} to {stop}
   edit: Edit
   delete: Delete
   delete_single: Delete this one
