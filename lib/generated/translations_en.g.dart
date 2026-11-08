@@ -1316,7 +1316,7 @@ class _Translations$classtable$classAdd$en extends Translations$classtable$class
 	@override String get chooseAtLeastOne => 'Please choose at least one time for class';
 	@override String get repeatWeekly => 'Repeat Weekly';
 	@override String get freeTime => 'Free Time';
-	@override late final _Translations$classtable$classAdd$dateSelectorFree$en dateSelectorFree = _Translations$classtable$classAdd$dateSelectorFree$en._(_root);
+	@override late final _Translations$classtable$classAdd$scheduleBuilder$en scheduleBuilder = _Translations$classtable$classAdd$scheduleBuilder$en._(_root);
 }
 
 // Path: classtable.courseDetailCard
@@ -1329,7 +1329,7 @@ class _Translations$classtable$courseDetailCard$en extends Translations$classtab
 	@override String classNumberString({required Object number}) => 'Class ${number}';
 	@override String get unknownTeacher => 'Unknown teacher';
 	@override String get unknownPlace => 'Unknown classroom';
-	@override String classPeriod({required Object start, required Object stop}) => 'period ${start} to ${stop}';
+	@override String classPeriod({required Object start, required Object stop}) => 'Period ${start} to ${stop}';
 	@override String get edit => 'Edit';
 	@override String get delete => 'Delete';
 	@override String get deleteSingle => 'Delete this one';
@@ -2428,19 +2428,36 @@ class _Translations$classtable$partnerClasstable$nameDialog$en extends Translati
 	@override String get blankInput => 'Input is blank!';
 }
 
-// Path: classtable.classAdd.dateSelectorFree
-class _Translations$classtable$classAdd$dateSelectorFree$en extends Translations$classtable$classAdd$dateSelectorFree$zh {
-	_Translations$classtable$classAdd$dateSelectorFree$en._(TranslationsEn root) : this._root = root, super.internal(root);
+// Path: classtable.classAdd.scheduleBuilder
+class _Translations$classtable$classAdd$scheduleBuilder$en extends Translations$classtable$classAdd$scheduleBuilder$zh {
+	_Translations$classtable$classAdd$scheduleBuilder$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
-	@override String get rule => 'Time must be between 8:30 and 21:25.';
-	@override String get rule2 => 'The end time must be later than the start time.';
-	@override String get classStartTime => 'Start time';
-	@override String get classEndTime => 'End time';
-	@override String get editClassTime => 'Edit the class time';
-	@override String get chooseClassTime => 'Choose a class time';
+	@override String get addTime => 'Add dates and times';
+	@override String get scheduleListTitle => 'Class schedule';
+	@override String get dateRules => 'Date rules';
+	@override String get timeRules => 'Time rules';
+	@override String get editRules => 'Edit';
+	@override String get emptySelection => 'Nothing selected';
+	@override String get selectDates => 'Select dates';
+	@override String get multiDateTip => 'Selecting multiple class dates is supported.';
+	@override String get selectTimes => 'Select time ranges';
+	@override String get presets => 'Presets';
+	@override String get custom => 'Custom';
+	@override String get addTimeRange => 'Add time range';
+	@override String timeRangeTitle({required Object index}) => 'Time range ${index}';
+	@override String get startTime => 'Start time';
+	@override String get endTime => 'End time';
+	@override String get timeRule => 'Time must be between 8:30 and 21:25.';
+	@override String get timeOrderRule => 'The end time must be later than the start time.';
+	@override String get generateAndAdd => 'Generate and add';
+	@override String get confirmAddTitle => 'Add these class times?';
+	@override String confirmAddMessage({required Object date_count, required Object time_count, required Object range_count}) => '${date_count} dates x ${time_count} time ranges will create ${range_count} schedule entries.';
+	@override String get overlapTitle => 'Schedule conflict';
+	@override String overlapMessage({required Object count}) => '${count} generated time ranges overlap other time ranges. Adjust the date or time rules and try again.';
+	@override String overlapRange({required Object date, required Object range}) => '${date}: ${range}';
 }
 
 // Path: ruisi.topicDetail.vote
@@ -2628,16 +2645,33 @@ extension on TranslationsEn {
 			'classtable.classAdd.chooseAtLeastOne' => 'Please choose at least one time for class',
 			'classtable.classAdd.repeatWeekly' => 'Repeat Weekly',
 			'classtable.classAdd.freeTime' => 'Free Time',
-			'classtable.classAdd.dateSelectorFree.rule' => 'Time must be between 8:30 and 21:25.',
-			'classtable.classAdd.dateSelectorFree.rule2' => 'The end time must be later than the start time.',
-			'classtable.classAdd.dateSelectorFree.classStartTime' => 'Start time',
-			'classtable.classAdd.dateSelectorFree.classEndTime' => 'End time',
-			'classtable.classAdd.dateSelectorFree.editClassTime' => 'Edit the class time',
-			'classtable.classAdd.dateSelectorFree.chooseClassTime' => 'Choose a class time',
+			'classtable.classAdd.scheduleBuilder.addTime' => 'Add dates and times',
+			'classtable.classAdd.scheduleBuilder.scheduleListTitle' => 'Class schedule',
+			'classtable.classAdd.scheduleBuilder.dateRules' => 'Date rules',
+			'classtable.classAdd.scheduleBuilder.timeRules' => 'Time rules',
+			'classtable.classAdd.scheduleBuilder.editRules' => 'Edit',
+			'classtable.classAdd.scheduleBuilder.emptySelection' => 'Nothing selected',
+			'classtable.classAdd.scheduleBuilder.selectDates' => 'Select dates',
+			'classtable.classAdd.scheduleBuilder.multiDateTip' => 'Selecting multiple class dates is supported.',
+			'classtable.classAdd.scheduleBuilder.selectTimes' => 'Select time ranges',
+			'classtable.classAdd.scheduleBuilder.presets' => 'Presets',
+			'classtable.classAdd.scheduleBuilder.custom' => 'Custom',
+			'classtable.classAdd.scheduleBuilder.addTimeRange' => 'Add time range',
+			'classtable.classAdd.scheduleBuilder.timeRangeTitle' => ({required Object index}) => 'Time range ${index}',
+			'classtable.classAdd.scheduleBuilder.startTime' => 'Start time',
+			'classtable.classAdd.scheduleBuilder.endTime' => 'End time',
+			'classtable.classAdd.scheduleBuilder.timeRule' => 'Time must be between 8:30 and 21:25.',
+			'classtable.classAdd.scheduleBuilder.timeOrderRule' => 'The end time must be later than the start time.',
+			'classtable.classAdd.scheduleBuilder.generateAndAdd' => 'Generate and add',
+			'classtable.classAdd.scheduleBuilder.confirmAddTitle' => 'Add these class times?',
+			'classtable.classAdd.scheduleBuilder.confirmAddMessage' => ({required Object date_count, required Object time_count, required Object range_count}) => '${date_count} dates x ${time_count} time ranges will create ${range_count} schedule entries.',
+			'classtable.classAdd.scheduleBuilder.overlapTitle' => 'Schedule conflict',
+			'classtable.classAdd.scheduleBuilder.overlapMessage' => ({required Object count}) => '${count} generated time ranges overlap other time ranges. Adjust the date or time rules and try again.',
+			'classtable.classAdd.scheduleBuilder.overlapRange' => ({required Object date, required Object range}) => '${date}: ${range}',
 			'classtable.courseDetailCard.classNumberString' => ({required Object number}) => 'Class ${number}',
 			'classtable.courseDetailCard.unknownTeacher' => 'Unknown teacher',
 			'classtable.courseDetailCard.unknownPlace' => 'Unknown classroom',
-			'classtable.courseDetailCard.classPeriod' => ({required Object start, required Object stop}) => 'period ${start} to ${stop}',
+			'classtable.courseDetailCard.classPeriod' => ({required Object start, required Object stop}) => 'Period ${start} to ${stop}',
 			'classtable.courseDetailCard.edit' => 'Edit',
 			'classtable.courseDetailCard.delete' => 'Delete',
 			'classtable.courseDetailCard.deleteSingle' => 'Delete this one',
@@ -2969,6 +3003,8 @@ extension on TranslationsEn {
 			'homepage.noticeCard.openUrl' => 'Open link',
 			'homepage.noticeCard.noticePageTitle' => 'Notification List',
 			'homepage.classTableCard.title' => 'Timetable',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.today' => ({required Object remain}) => '${remain} arrangment(s) today',
 			'homepage.classTableCard.todayFinished' => 'Arrangements all done today',
 			'homepage.classTableCard.tomorrow' => ({required Object remain}) => '${remain} arrangment(s) tomorrow',
@@ -2986,8 +3022,6 @@ extension on TranslationsEn {
 			'homepage.classTableCard.scheduleErrorInfoText' => 'Failed to load schedule',
 			'homepage.classTableCard.scheduleNoneInfoText' => 'No schedule available',
 			'homepage.classTableCard.updatingInfoText' => 'Updating',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.classTableCard.allLoadingInfoText' => 'All sources loading',
 			'homepage.classTableCard.partialLoadingInfoText' => 'Partially loading',
 			'homepage.classTableCard.partialErrorInfoText' => 'Some data failed to load',
@@ -3483,6 +3517,8 @@ extension on TranslationsEn {
 			'setting.logoutDialog.content' => 'Are you want to log out? All your data will be completely deleted!',
 			'setting.logoutDialog.loggingOut' => 'Logging out...',
 			'setting.needCloseDialog.title' => 'Crashed',
+			_ => null,
+		} ?? switch (path) {
 			'setting.needCloseDialog.content' => 'Due to technical limitations, you need to close the window manually and then reopen the app.',
 			'setting.changeColorDialog.title' => 'Color setting',
 			'setting.changeColorDialog.kDefault' => 'Default',
@@ -3500,8 +3536,6 @@ extension on TranslationsEn {
 			'setting.changeSwiftDialog.invalidNumber' => 'Please enter a valid whole number',
 			'setting.changeElectricityTitle' => 'Modify electricity account',
 			'setting.changeElectricityAccount.title' => 'Modify electricity account',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.campus' => 'Campus',
 			'setting.changeElectricityAccount.northCampus' => 'Northern Campus',
 			'setting.changeElectricityAccount.southCampus' => 'Southern Campus',

@@ -2795,7 +2795,7 @@ class Translations$classtable$classAdd$zh {
 	/// zh: '自定义日期'
 	String get freeTime => '自定义日期';
 
-	late final Translations$classtable$classAdd$dateSelectorFree$zh dateSelectorFree = Translations$classtable$classAdd$dateSelectorFree$zh.internal(_root);
+	late final Translations$classtable$classAdd$scheduleBuilder$zh scheduleBuilder = Translations$classtable$classAdd$scheduleBuilder$zh.internal(_root);
 }
 
 // Path: classtable.courseDetailCard
@@ -5026,31 +5026,82 @@ class Translations$classtable$partnerClasstable$nameDialog$zh {
 	String get blankInput => '输入空白!';
 }
 
-// Path: classtable.classAdd.dateSelectorFree
-class Translations$classtable$classAdd$dateSelectorFree$zh {
-	Translations$classtable$classAdd$dateSelectorFree$zh.internal(this._root);
+// Path: classtable.classAdd.scheduleBuilder
+class Translations$classtable$classAdd$scheduleBuilder$zh {
+	Translations$classtable$classAdd$scheduleBuilder$zh.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
 	// Translations
 
+	/// zh: '添加新的时间'
+	String get addTime => '添加新的时间';
+
+	/// zh: '上课安排'
+	String get scheduleListTitle => '上课安排';
+
+	/// zh: '日期规则'
+	String get dateRules => '日期规则';
+
+	/// zh: '时间规则'
+	String get timeRules => '时间规则';
+
+	/// zh: '修改'
+	String get editRules => '修改';
+
+	/// zh: '尚未选择'
+	String get emptySelection => '尚未选择';
+
+	/// zh: '选择日期'
+	String get selectDates => '选择日期';
+
+	/// zh: '可多选上课日期。'
+	String get multiDateTip => '可多选上课日期。';
+
+	/// zh: '选择时间段'
+	String get selectTimes => '选择时间段';
+
+	/// zh: '预设选择'
+	String get presets => '预设选择';
+
+	/// zh: '自定义'
+	String get custom => '自定义';
+
+	/// zh: '添加时间段'
+	String get addTimeRange => '添加时间段';
+
+	/// zh: '第 {index} 个时间段'
+	String timeRangeTitle({required Object index}) => '第 ${index} 个时间段';
+
+	/// zh: '开始时间'
+	String get startTime => '开始时间';
+
+	/// zh: '结束时间'
+	String get endTime => '结束时间';
+
 	/// zh: '时间必须在 08:30-21:25 之间'
-	String get rule => '时间必须在 08:30-21:25 之间';
+	String get timeRule => '时间必须在 08:30-21:25 之间';
 
-	/// zh: '下课时间必须晚于上课时间'
-	String get rule2 => '下课时间必须晚于上课时间';
+	/// zh: '结束时间必须晚于开始时间'
+	String get timeOrderRule => '结束时间必须晚于开始时间';
 
-	/// zh: '上课时间'
-	String get classStartTime => '上课时间';
+	/// zh: '生成并添加'
+	String get generateAndAdd => '生成并添加';
 
-	/// zh: '下课时间'
-	String get classEndTime => '下课时间';
+	/// zh: '确认添加课程时间？'
+	String get confirmAddTitle => '确认添加课程时间？';
 
-	/// zh: '编辑课程时间'
-	String get editClassTime => '编辑课程时间';
+	/// zh: '{date_count} 个日期 x {time_count} 个时间段，共生成 {range_count} 条课程安排。'
+	String confirmAddMessage({required Object date_count, required Object time_count, required Object range_count}) => '${date_count} 个日期 x ${time_count} 个时间段，共生成 ${range_count} 条课程安排。';
 
-	/// zh: '选择课程时间'
-	String get chooseClassTime => '选择课程时间';
+	/// zh: '时间冲突，无法添加'
+	String get overlapTitle => '时间冲突，无法添加';
+
+	/// zh: '有 {count} 条新增时间段与其他时间段重叠，请修改日期或时间规则后重试。'
+	String overlapMessage({required Object count}) => '有 ${count} 条新增时间段与其他时间段重叠，请修改日期或时间规则后重试。';
+
+	/// zh: '{date}：{range}'
+	String overlapRange({required Object date, required Object range}) => '${date}：${range}';
 }
 
 // Path: ruisi.topicDetail.vote
@@ -5266,12 +5317,29 @@ extension on Translations {
 			'classtable.classAdd.chooseAtLeastOne' => '请至少选择一个上课日期和时间',
 			'classtable.classAdd.repeatWeekly' => '按周重复',
 			'classtable.classAdd.freeTime' => '自定义日期',
-			'classtable.classAdd.dateSelectorFree.rule' => '时间必须在 08:30-21:25 之间',
-			'classtable.classAdd.dateSelectorFree.rule2' => '下课时间必须晚于上课时间',
-			'classtable.classAdd.dateSelectorFree.classStartTime' => '上课时间',
-			'classtable.classAdd.dateSelectorFree.classEndTime' => '下课时间',
-			'classtable.classAdd.dateSelectorFree.editClassTime' => '编辑课程时间',
-			'classtable.classAdd.dateSelectorFree.chooseClassTime' => '选择课程时间',
+			'classtable.classAdd.scheduleBuilder.addTime' => '添加新的时间',
+			'classtable.classAdd.scheduleBuilder.scheduleListTitle' => '上课安排',
+			'classtable.classAdd.scheduleBuilder.dateRules' => '日期规则',
+			'classtable.classAdd.scheduleBuilder.timeRules' => '时间规则',
+			'classtable.classAdd.scheduleBuilder.editRules' => '修改',
+			'classtable.classAdd.scheduleBuilder.emptySelection' => '尚未选择',
+			'classtable.classAdd.scheduleBuilder.selectDates' => '选择日期',
+			'classtable.classAdd.scheduleBuilder.multiDateTip' => '可多选上课日期。',
+			'classtable.classAdd.scheduleBuilder.selectTimes' => '选择时间段',
+			'classtable.classAdd.scheduleBuilder.presets' => '预设选择',
+			'classtable.classAdd.scheduleBuilder.custom' => '自定义',
+			'classtable.classAdd.scheduleBuilder.addTimeRange' => '添加时间段',
+			'classtable.classAdd.scheduleBuilder.timeRangeTitle' => ({required Object index}) => '第 ${index} 个时间段',
+			'classtable.classAdd.scheduleBuilder.startTime' => '开始时间',
+			'classtable.classAdd.scheduleBuilder.endTime' => '结束时间',
+			'classtable.classAdd.scheduleBuilder.timeRule' => '时间必须在 08:30-21:25 之间',
+			'classtable.classAdd.scheduleBuilder.timeOrderRule' => '结束时间必须晚于开始时间',
+			'classtable.classAdd.scheduleBuilder.generateAndAdd' => '生成并添加',
+			'classtable.classAdd.scheduleBuilder.confirmAddTitle' => '确认添加课程时间？',
+			'classtable.classAdd.scheduleBuilder.confirmAddMessage' => ({required Object date_count, required Object time_count, required Object range_count}) => '${date_count} 个日期 x ${time_count} 个时间段，共生成 ${range_count} 条课程安排。',
+			'classtable.classAdd.scheduleBuilder.overlapTitle' => '时间冲突，无法添加',
+			'classtable.classAdd.scheduleBuilder.overlapMessage' => ({required Object count}) => '有 ${count} 条新增时间段与其他时间段重叠，请修改日期或时间规则后重试。',
+			'classtable.classAdd.scheduleBuilder.overlapRange' => ({required Object date, required Object range}) => '${date}：${range}',
 			'classtable.courseDetailCard.classNumberString' => ({required Object number}) => '${number} 班',
 			'classtable.courseDetailCard.unknownTeacher' => '老师未定',
 			'classtable.courseDetailCard.unknownPlace' => '地点未定',
@@ -5607,6 +5675,8 @@ extension on Translations {
 			'homepage.noticeCard.openUrl' => '访问该链接',
 			'homepage.noticeCard.noticePageTitle' => '通知列表',
 			'homepage.classTableCard.title' => '课程表',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.today' => ({required Object remain}) => '今日还有 ${remain} 个日程',
 			'homepage.classTableCard.todayFinished' => '今日安排完成',
 			'homepage.classTableCard.tomorrow' => ({required Object remain}) => '明日有 ${remain} 个安排',
@@ -5624,8 +5694,6 @@ extension on Translations {
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加载失败',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暂无日程',
 			'homepage.classTableCard.updatingInfoText' => '正在更新',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.classTableCard.allLoadingInfoText' => '全部加载中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加载中',
 			'homepage.classTableCard.partialErrorInfoText' => '部分数据加载失败',
@@ -6121,6 +6189,8 @@ extension on Translations {
 			'setting.logoutDialog.content' => '确定退出登录？你的所有数据将会被彻底删除！',
 			'setting.logoutDialog.loggingOut' => '正在退出登录',
 			'setting.needCloseDialog.title' => '请关闭应用',
+			_ => null,
+		} ?? switch (path) {
 			'setting.needCloseDialog.content' => '因为技术限制，用户需要自行关闭窗口，然后重新打开应用。',
 			'setting.changeColorDialog.title' => '颜色设置',
 			'setting.changeColorDialog.kDefault' => '默认颜色',
@@ -6138,8 +6208,6 @@ extension on Translations {
 			'setting.changeSwiftDialog.invalidNumber' => '请输入有效的整数',
 			'setting.changeElectricityTitle' => '修改电费帐号',
 			'setting.changeElectricityAccount.title' => '修改电费帐号',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.campus' => '校区',
 			'setting.changeElectricityAccount.northCampus' => '北校区',
 			'setting.changeElectricityAccount.southCampus' => '南校区',
