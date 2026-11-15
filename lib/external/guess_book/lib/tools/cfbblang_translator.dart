@@ -258,11 +258,11 @@ const Map<String, List<String>> _emojiSyllables = {
 /// 将文字转换为 CFBB 语言。
 ///
 /// 每次调用会随机选择同音替换和字母变形。大括号内的占位符保持不变。
-/// 可注入 [random]，以便复现或测试随机结果。
 class CfbbLangTranslator {
-  CfbbLangTranslator({Random? random}) : _random = random ?? Random();
+  final Random random;
 
-  final Random _random;
+  const CfbbLangTranslator({required this.random});
+
   static final RegExp _placeholder = RegExp(r'\{.*?\}');
   static const _pinyinOptions = PinyinOptions(
     toneType: ToneType.none,
@@ -282,7 +282,7 @@ class CfbbLangTranslator {
           pinyin(String.fromCharCode(rune), options: _pinyinOptions) as String;
       final choices = _emojiSyllables[reading];
       result.write(
-        choices == null ? '❓' : choices[_random.nextInt(choices.length)],
+        choices == null ? '❓' : choices[random.nextInt(choices.length)],
       );
     }
     return result.isEmpty ? '❓' : result.toString();
@@ -312,11 +312,11 @@ class CfbbLangTranslator {
       final choices = _syllables[reading];
       final replacement = choices == null
           ? original
-          : choices[_random.nextInt(choices.length)];
+          : choices[random.nextInt(choices.length)];
       for (final character in replacement.runes) {
         final value = String.fromCharCode(character);
-        final change = _random.nextInt(112596) + 1919 <= 88100;
-        final circle = _random.nextInt(21) <= 10;
+        final change = random.nextInt(112596) + 1919 <= 88100;
+        final circle = random.nextInt(21) <= 10;
         if (change && circle && value.toLowerCase() == 'o') {
           result.write('⭕️');
         } else if (change && _alphabet.containsKey(value.toLowerCase())) {

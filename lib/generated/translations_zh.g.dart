@@ -1111,6 +1111,9 @@ class Translations$homepage$zh {
 	/// zh: '放松一下'
 	String get relax => '放松一下';
 
+	/// zh: '整天学习不会玩，聪明孩子也会傻'
+	String get relaxMessage => '整天学习不会玩，聪明孩子也会傻';
+
 	/// zh: '猪图鉴赏'
 	String get dashboard => '猪图鉴赏';
 
@@ -5584,6 +5587,7 @@ extension on Translations {
 			'homepage.ruisi' => '睿思论坛',
 			'homepage.club' => '社团推荐',
 			'homepage.relax' => '放松一下',
+			'homepage.relaxMessage' => '整天学习不会玩，聪明孩子也会傻',
 			'homepage.dashboard' => '猪图鉴赏',
 			'homepage.planet' => '博客星球',
 			'homepage.setting' => '设置',
@@ -5623,9 +5627,9 @@ extension on Translations {
 			'homepage.classTableCard.scheduleFetchingInfoText' => '正在加载日程',
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加载失败',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暂无日程',
-			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			'homepage.classTableCard.allLoadingInfoText' => '全部加载中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加载中',
 			'homepage.classTableCard.partialErrorInfoText' => '部分数据加载失败',
@@ -6137,9 +6141,9 @@ extension on Translations {
 			'setting.changeSwiftDialog.inputHint' => '请在此输入数字',
 			'setting.changeSwiftDialog.invalidNumber' => '请输入有效的整数',
 			'setting.changeElectricityTitle' => '修改电费帐号',
-			'setting.changeElectricityAccount.title' => '修改电费帐号',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.title' => '修改电费帐号',
 			'setting.changeElectricityAccount.campus' => '校区',
 			'setting.changeElectricityAccount.northCampus' => '北校区',
 			'setting.changeElectricityAccount.southCampus' => '南校区',
