@@ -1,49 +1,56 @@
+// Copyright 2026 xichen778
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/generated/translations.g.dart';
-import 'package:watermeter/repository/campus_notice.dart';
-import 'package:watermeter/repository/notice_channels.dart';
+import 'package:watermeter/page/public_widget/public_widget.dart';
+
+import 'campus_notice_search.dart';
+import 'notice_channels.dart';
 
 class CampusNoticePage extends StatefulWidget {
-  const CampusNoticePage({super.key});
+  const CampusNoticePage({super.key, required this.dio});
+
+  final Dio dio;
 
   @override
   State<CampusNoticePage> createState() => _CampusNoticePageState();
 }
 
 class _CampusNoticePageState extends State<CampusNoticePage> {
-  final _search = CampusNoticeSearch();
   final _input = TextEditingController();
   CancelToken? _token;
   final _byUrl = <Uri, CampusNotice>{};
   final _failed = <String>{};
   int _checked = 0;
+  String? _lastKeyword;
 
   @override
   void dispose() {
     _token?.cancel();
-    _search.close();
     _input.dispose();
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    final keyword = _input.text.trim();
-    if (keyword.isEmpty) return;
+  Future<void> _submit({String? keyword}) async {
+    final query = (keyword ?? _input.text).trim();
+    if (query.isEmpty) return;
+    if (keyword != null) _input.text = query;
     FocusScope.of(context).unfocus();
     _token?.cancel();
     final token = CancelToken();
     setState(() {
       _token = token;
+      _lastKeyword = query;
       _checked = 0;
       _byUrl.clear();
       _failed.clear();
     });
-    await _search.search(
-      keyword,
+    await CampusNoticeSearch(client: widget.dio).search(
+      query,
       token,
       onChannel: (hits, failed) {
         if (!mounted || token != _token) return;
@@ -93,7 +100,7 @@ class _CampusNoticePageState extends State<CampusNoticePage> {
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.search),
                         tooltip: t.noticeSearch,
-                        onPressed: _submit,
+                        onPressed: () => _submit(),
                       ),
                     ),
                   ),
@@ -112,34 +119,44 @@ class _CampusNoticePageState extends State<CampusNoticePage> {
                   ),
                 ],
               ),
-            if (_token != null && !running && notices.isEmpty)
+            if (_token != null &&
+                !running &&
+                notices.isEmpty &&
+                _failed.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(t.noticeEmpty),
               ),
             Expanded(
-              child: ListView.builder(
-                itemCount: notices.length,
-                itemBuilder: (context, i) {
-                  final n = notices[i];
-                  final day = n.date.toIso8601String().substring(0, 10);
-                  return ListTile(
-                    title: Text(n.title),
-                    subtitle: Text('${n.source} · $day'),
-                    onTap: () async {
-                      if (!await launchUrl(
-                            n.url,
-                            mode: LaunchMode.externalApplication,
-                          ) &&
-                          context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(t.noticeOpenError)),
+              child:
+                  _token != null &&
+                      !running &&
+                      notices.isEmpty &&
+                      _failed.isNotEmpty
+                  ? ReloadWidget(function: () => _submit(keyword: _lastKeyword))
+                  : ListView.builder(
+                      itemCount: notices.length,
+                      itemBuilder: (context, i) {
+                        final n = notices[i];
+                        return ListTile(
+                          title: Text(n.title),
+                          subtitle: Text(
+                            '${n.source} · ${n.date.toIso8601String().substring(0, 10)}',
+                          ),
+                          onTap: () async {
+                            bool result = await launchUrl(
+                              n.url,
+                              mode: LaunchMode.externalApplication,
+                            );
+                            if (!result && context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(t.noticeOpenError)),
+                              );
+                            }
+                          },
                         );
-                      }
-                    },
-                  );
-                },
-              ),
+                      },
+                    ),
             ),
           ],
         ),

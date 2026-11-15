@@ -5,11 +5,12 @@
 import 'package:material_ui/material_ui.dart';
 
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:watermeter/external/campus_notice/campus_notice.dart';
 import 'package:watermeter/model/toolbox_addresses.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/toolbox/campus_notice_page.dart';
 import 'package:watermeter/page/toolbox/webview_list_tile.dart';
 import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/repository/network_client.dart';
 
 class ToolBoxPage extends StatefulWidget {
   const ToolBoxPage({super.key});
@@ -29,7 +30,9 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
             leading: const Icon(Icons.search),
             title: Text(context.t.toolbox.noticeSearch),
             subtitle: Text(context.t.toolbox.noticeDescription),
-            onTap: () => context.push<void>(const CampusNoticePage()),
+            onTap: () => context.push<void>(
+              CampusNoticePage(dio: NetworkClients.otherDio),
+            ),
           ),
           ...[
             WebViewAddresses(

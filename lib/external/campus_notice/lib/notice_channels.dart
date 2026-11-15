@@ -1,3 +1,4 @@
+// Copyright 2026 xichen778
 // SPDX-License-Identifier: MPL-2.0
 
 class NoticeChannel {
@@ -9,27 +10,32 @@ class NoticeChannel {
 
 const noticeChannels = [
   NoticeChannel(
-    '西电主页',
+    '西电主页 - 学校通知',
     'https://notice.xidian.edu.cn/2016lanmuye.jsp?urltype=tree.TreeTempUrl&wbtreeid=1227',
     '.lanmu-list-k li',
   ),
   NoticeChannel(
-    '西电主页',
+    '西电主页 - 信息公告',
     'https://notice.xidian.edu.cn/2016lanmuye.jsp?urltype=tree.TreeTempUrl&wbtreeid=1235',
     '.lanmu-list-k li',
   ),
   NoticeChannel(
-    '就业信息网',
+    '就业信息网 - 通知公告',
     'https://job.xidian.edu.cn/news/index/tag/tzgg',
     'ul.newsList',
   ),
+  // NoticeChannel(
+  //   '就业信息网 - 招聘公告',
+  //   'https://job.xidian.edu.cn/campus',
+  //   'ul.infoList',
+  // ),
   NoticeChannel(
-    '信息网络中心',
+    '信息网络中心 - 中心动态',
     'https://xxzx.xidian.edu.cn/zxdt/xwgg.htm',
     '.list03 li',
   ),
   NoticeChannel(
-    '信息网络中心',
+    '信息网络中心 - 网络安全',
     'https://xxzx.xidian.edu.cn/wlaq/xwgg.htm',
     '.list03 li',
   ),
@@ -43,7 +49,11 @@ const noticeChannels = [
     'https://xdjszx.xidian.edu.cn/html/news/',
     '.childinfo li.listtitle',
   ),
-  NoticeChannel('数学建模竞赛', 'https://stsy.xidian.edu.cn/tzgg.htm', 'td.gk3 a.c5'),
+  NoticeChannel(
+    '数学与统计实验中心',
+    'https://stsy.xidian.edu.cn/tzgg.htm',
+    'td.gk3 a.c5',
+  ),
   NoticeChannel(
     '电子设计竞赛',
     'https://edc.xidian.edu.cn/html/notices/',
@@ -66,30 +76,30 @@ const noticeChannels = [
     '.list_box_news li',
   ),
   NoticeChannel(
-    '研究生院',
+    '研究生院 - 通知公告',
     'https://gr.xidian.edu.cn/tzgg1.htm',
     '.main-right-list li',
   ),
   NoticeChannel(
-    '研究生院',
+    '研究生院 - 硕士研究生招生',
     'https://gr.xidian.edu.cn/yjsy/yjszs.htm',
     '.main-right-list li',
   ),
   NoticeChannel('通信工程学院', 'https://ste.xidian.edu.cn/tzgg.htm', 'a.d-block'),
   NoticeChannel('电子工程学院', 'https://see.xidian.edu.cn/tzgg.htm', '.part2L li'),
   NoticeChannel(
-    '计算机科学与技术学院',
-    'https://cs.xidian.edu.cn/tzgg.htm', // 学院通知公告
+    '计算机科学与技术学院 - 通知公告',
+    'https://cs.xidian.edu.cn/tzgg.htm',
     '.n_wenzhang li',
   ),
   NoticeChannel(
-    '计算机科学与技术学院',
-    'https://cs.xidian.edu.cn/bkjy/jxtz.htm', // 本科教育：教学通知
+    '计算机科学与技术学院 - 本科教学通知',
+    'https://cs.xidian.edu.cn/bkjy/jxtz.htm',
     '.n_wenzhang li',
   ),
   NoticeChannel(
-    '计算机科学与技术学院',
-    'https://cs.xidian.edu.cn/yjsjy/yjstz.htm', // 研究生教育：研究生通知
+    '计算机科学与技术学院 - 研究生通知',
+    'https://cs.xidian.edu.cn/yjsjy/yjstz.htm',
     '.n_wenzhang li',
   ),
   NoticeChannel(
@@ -144,23 +154,23 @@ const noticeChannels = [
     '.text-list li',
   ),
   NoticeChannel(
-    '网络与信息安全学院',
+    '网络与信息安全学院 - 通知公告',
     'https://ce.xidian.edu.cn/sy/tzgg.htm',
     '.list2 li',
   ),
   NoticeChannel(
-    '网络与信息安全学院',
+    '网络与信息安全学院 - 本科教学通知',
     'https://ce.xidian.edu.cn/sy/bkjy/jxtz.htm',
     '.list2 li',
   ),
   NoticeChannel(
-    '人工智能学院',
+    '人工智能学院 - 通知公告',
     'https://sai.xidian.edu.cn/tzgg.htm',
-    '.n_right ul.list li',
+    '.n_list_text li',
   ),
   NoticeChannel(
-    '人工智能学院',
-    'https://sai.xidian.edu.cn/sy/bkspy.htm',
+    '人工智能学院 - 本科生培养',
+    'https://sai.xidian.edu.cn/bkspy.htm',
     '.n_list_text li',
   ),
   NoticeChannel(

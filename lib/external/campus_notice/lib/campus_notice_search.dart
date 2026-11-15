@@ -1,3 +1,4 @@
+// Copyright 2026 xichen778
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:convert';
@@ -7,7 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html;
 import 'package:pool/pool.dart';
-import 'package:watermeter/repository/notice_channels.dart';
+import 'notice_channels.dart';
 
 typedef CampusNotice = ({String title, DateTime date, Uri url, String source});
 typedef ListedNotice = ({String title, DateTime? date, Uri url});
@@ -132,20 +133,22 @@ Document _document(String body, Uri url) {
 class CampusNoticeSearch {
   final Dio _dio;
   final List<NoticeChannel> channels;
-  CampusNoticeSearch({Dio? client, this.channels = noticeChannels})
-    : _dio =
-          client ??
-          Dio(
-            BaseOptions(
-              connectTimeout: const Duration(seconds: 8),
-              receiveTimeout: const Duration(seconds: 12),
-              responseType: ResponseType.plain,
-            ),
-          );
-  void close() => _dio.close(force: true);
+  CampusNoticeSearch({required Dio client, this.channels = noticeChannels})
+    : _dio = client;
 
   Future<String> _read(Uri uri, CancelToken token) async {
-    final body = (await _dio.getUri<String>(uri, cancelToken: token)).data;
+    final body = (await _dio.getUri<String>(
+      uri,
+      cancelToken: token,
+      options: Options(
+        connectTimeout: const Duration(seconds: 8),
+        receiveTimeout: const Duration(seconds: 12),
+        responseType: ResponseType.plain,
+        followRedirects: true,
+        validateStatus: (status) =>
+            status != null && status >= 200 && status < 300,
+      ),
+    )).data;
     if (body == null) throw const FormatException('Missing notice page');
     return body;
   }
