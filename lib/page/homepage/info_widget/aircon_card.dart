@@ -6,7 +6,7 @@ import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
-import 'package:watermeter/page/energy/aircon_remote_page.dart';
+import 'package:watermeter/page/aircon/aircon_remote_page.dart';
 import 'package:watermeter/page/homepage/main_page_card.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 

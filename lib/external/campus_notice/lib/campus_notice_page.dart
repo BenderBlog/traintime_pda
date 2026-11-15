@@ -3,7 +3,6 @@
 
 import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:styled_widget/styled_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';

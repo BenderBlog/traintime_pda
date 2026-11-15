@@ -62,42 +62,6 @@ class AirconController {
     return parsed;
   }
 
-  /*
-  void _syncEnergyHistory(FetchResult<AirconEnergyInfo> info) {
-    if (info.isCache) return;
-
-    final newHistoryInfo = List<ElectricityHistoryInfo>.from(
-      energyHistoryInfoList,
-    );
-    final historyInfo = ElectricityHistoryInfo(
-      fetchDay: info.data.stateTime,
-      remain: info.data.electricAmount.toString(),
-    );
-
-    if (newHistoryInfo.isNotEmpty) {
-      final last = newHistoryInfo.last;
-      if (last.fetchDay.isAtSameDayAs(info.data.stateTime)) {
-        if (last.remain == historyInfo.remain) return;
-
-        newHistoryInfo[newHistoryInfo.length - 1] = historyInfo;
-        AirconSession.saveEnergyHistory(newHistoryInfo);
-        energyHistoryInfoList
-          ..clear()
-          ..addAll(newHistoryInfo);
-        return;
-      }
-    }
-
-    if (newHistoryInfo.length > 14) {
-      newHistoryInfo.removeAt(0);
-    }
-    newHistoryInfo.add(historyInfo);
-    AirconSession.saveEnergyHistory(newHistoryInfo);
-    energyHistoryInfoList
-      ..clear()
-      ..addAll(newHistoryInfo);
-  }
-  */
   Future<void> refreshEnergyInfo() async {
     final imei = imeiSignal.value;
     if (imei.isEmpty || _isEnergyReloading) return;
@@ -148,6 +112,156 @@ class AirconController {
       if (imeiSignal.value.isNotEmpty && imei != imeiSignal.value) {
         Future.microtask(refreshDeviceState);
       }
+    }
+  }
+
+  /// 构造电源指令；关机时同时关闭清洁和辅助电热。
+  AirconRemoteCommand powerCommand(AirconState state, bool value) =>
+      AirconRemoteCommand(
+        parameters: value
+            ? {"switchStatus": 1}
+            : {
+                "switchStatus": 0,
+                "indoorClean": 0,
+                "outdoorClean": 0,
+                "electricHeating": 0,
+              },
+        optimisticState: state.copyWith(
+          isOn: value,
+          electricHeating: value ? state.electricHeating : false,
+        ),
+        matches: (state) => state.isOn == value,
+      );
+
+  /// 构造目标温度指令；超出设备范围时拒绝下发。
+  AirconRemoteCommand temperatureCommand(AirconState state, int value) {
+    if (value < minTemperature || value > maxTemperature) {
+      throw RangeError.range(
+        value,
+        minTemperature,
+        maxTemperature,
+        'temperature',
+      );
+    }
+    return AirconRemoteCommand(
+      parameters: {"tempSet": value},
+      optimisticState: state.copyWith(targetTemperature: value),
+      matches: (state) => state.targetTemperature == value,
+    );
+  }
+
+  /// 构造模式切换指令，并按设备规则重置温度、风速和其他功能。
+  AirconRemoteCommand? modeCommand(AirconState state, AirconMode mode) {
+    if (mode == state.mode) return null;
+    final temperature = switch (mode) {
+      AirconMode.heat => 23,
+      AirconMode.cool => 26,
+      _ => 25,
+    };
+    final windSpeed = mode == AirconMode.fan
+        ? AirconWindSpeed.medium
+        : AirconWindSpeed.auto;
+    return AirconRemoteCommand(
+      parameters: {
+        "runMode": mode.value.toString(),
+        "indoorClean": 0,
+        "outdoorClean": 0,
+        "strongMode": 0,
+        "electricHeating": 0,
+        "tempView": temperature,
+        "tempSet": temperature,
+        "windSpeed": windSpeed.value,
+      },
+      optimisticState: state.copyWith(
+        mode: mode,
+        targetTemperature: temperature,
+        windSpeed: windSpeed,
+        strongMode: false,
+        electricHeating: false,
+      ),
+      matches: (state) =>
+          state.mode == mode &&
+          state.targetTemperature == temperature &&
+          state.windSpeed == windSpeed &&
+          !state.strongMode &&
+          !state.electricHeating,
+    );
+  }
+
+  /// 构造风速指令；改变风速时退出强力模式。
+  AirconRemoteCommand? windSpeedCommand(
+    AirconState state,
+    AirconWindSpeed speed,
+  ) {
+    if (speed == state.windSpeed && !state.strongMode) return null;
+    return AirconRemoteCommand(
+      parameters: {"windSpeed": speed.value.toString(), "strongMode": 0},
+      optimisticState: state.copyWith(windSpeed: speed, strongMode: false),
+      matches: (state) => state.windSpeed == speed && !state.strongMode,
+    );
+  }
+
+  /// 构造上下扫风指令。
+  AirconRemoteCommand verticalSwingCommand(AirconState state, bool value) =>
+      AirconRemoteCommand(
+        parameters: {"verticalSwing": value ? 1 : 0},
+        optimisticState: state.copyWith(verticalSwing: value),
+        matches: (state) => state.verticalSwing == value,
+      );
+
+  /// 构造强力模式指令；启用时同时切换为自动风速。
+  AirconRemoteCommand strongModeCommand(AirconState state, bool value) =>
+      AirconRemoteCommand(
+        parameters: {
+          "strongMode": value ? 1 : 0,
+          if (value) "windSpeed": AirconWindSpeed.auto.value,
+        },
+        optimisticState: state.copyWith(
+          strongMode: value,
+          windSpeed: value ? AirconWindSpeed.auto : state.windSpeed,
+        ),
+        matches: (state) =>
+            state.strongMode == value &&
+            (!value || state.windSpeed == AirconWindSpeed.auto),
+      );
+
+  /// 构造辅助电热指令。
+  AirconRemoteCommand electricHeatingCommand(AirconState state, bool value) =>
+      AirconRemoteCommand(
+        parameters: {"electricHeating": value ? 1 : 0},
+        optimisticState: state.copyWith(electricHeating: value),
+        matches: (state) => state.electricHeating == value,
+      );
+
+  /// 下发指令并轮询确认；页面离开或设备变化时不再处理过期结果。
+  Future<AirconState?> sendRemoteCommand({
+    required String imei,
+    required AirconRemoteCommand command,
+    required bool Function() isCurrent,
+  }) async {
+    var sent = false;
+    try {
+      await session.sendCommand(imei: imei, command: command.parameters);
+      sent = true;
+      Object? pollError;
+      for (var attempt = 0; attempt < 12; attempt++) {
+        if (attempt > 0) {
+          await Future<void>.delayed(const Duration(milliseconds: 300));
+        }
+        if (!isCurrent() || imei != imeiSignal.value) return null;
+        try {
+          final state = await session.getDeviceState(imei);
+          if (!isCurrent() || imei != imeiSignal.value) return null;
+          if (state.imei == imei && command.matches(state)) return state;
+        } catch (error) {
+          pollError = error;
+        }
+      }
+      if (!isCurrent() || imei != imeiSignal.value) return null;
+      throw pollError ??
+          const AirconResponseException("device state unconfirmed");
+    } catch (error) {
+      throw AirconCommandException(error, sent: sent);
     }
   }
 
