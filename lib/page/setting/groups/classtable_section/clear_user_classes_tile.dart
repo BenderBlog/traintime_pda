@@ -1,9 +1,10 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 
@@ -14,7 +15,7 @@ class ClearUserClassesTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(MingCuteIcons.mgc_delete_2_line),
-      title: Text(FlutterI18n.translate(context, "setting.clear_user_class")),
+      title: Text(context.t.setting.clearUserClass),
       trailing: const Icon(Icons.navigate_next),
       onTap: () => showDialog<void>(
         context: context,
@@ -30,12 +31,8 @@ class _ClearUserClassesDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        FlutterI18n.translate(context, "setting.clear_user_class_title"),
-      ),
-      content: Text(
-        FlutterI18n.translate(context, "setting.clear_user_class_content"),
-      ),
+      title: Text(context.t.setting.clearUserClassTitle),
+      content: Text(context.t.setting.clearUserClassContent),
       actions: [
         TextButton(
           style: TextButton.styleFrom(
@@ -43,7 +40,7 @@ class _ClearUserClassesDialog extends StatelessWidget {
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
           ),
           onPressed: () => Navigator.pop(context),
-          child: Text(FlutterI18n.translate(context, "cancel")),
+          child: Text(context.t.common.cancel),
         ),
         TextButton(
           onPressed: () async {
@@ -51,14 +48,11 @@ class _ClearUserClassesDialog extends StatelessWidget {
             if (!context.mounted) return;
             showToast(
               context: context,
-              msg: FlutterI18n.translate(
-                context,
-                "setting.clear_user_class_clear",
-              ),
+              msg: context.t.setting.clearUserClassClear,
             );
             Navigator.pop(context);
           },
-          child: Text(FlutterI18n.translate(context, "confirm")),
+          child: Text(context.t.common.confirm),
         ),
       ],
     );

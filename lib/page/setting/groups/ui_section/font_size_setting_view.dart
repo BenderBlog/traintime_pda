@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/theme_controller.dart';
@@ -19,10 +19,7 @@ class FontSizeSettingView extends StatelessWidget {
         final fontScale = ThemeController.i.fontScaleSignal.value;
         return SettingSliderTile(
           leading: Icons.text_fields,
-          title: FlutterI18n.translate(
-            context,
-            'setting.font_size_page.size_title',
-          ),
+          title: context.t.setting.fontSizePage.sizeTitle,
           formatValue: (value) => "${(value * 100).round()}%",
           value: fontScale,
           min: minFontScale,
@@ -36,7 +33,7 @@ class FontSizeSettingView extends StatelessWidget {
             ThemeController.i.updateTheme();
           },
           preview: Text(
-            FlutterI18n.translate(context, 'setting.editor.text_preview'),
+            context.t.setting.editor.textPreview,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
         );

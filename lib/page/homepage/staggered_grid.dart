@@ -32,7 +32,7 @@ class StaggeredGrid extends StatelessWidget {
         final totalWidth = constraints.maxWidth;
         final colWidth =
             (totalWidth - crossAxisSpacing * (crossAxisCount - 1)) /
-                crossAxisCount;
+            crossAxisCount;
 
         final cells = builder(colWidth);
 
@@ -57,7 +57,8 @@ class StaggeredGrid extends StatelessWidget {
                 Positioned(
                   left: positions[i].col * (colWidth + crossAxisSpacing),
                   top: positions[i].row * (rowHeight + mainAxisSpacing),
-                  width: positions[i].colSpan * colWidth +
+                  width:
+                      positions[i].colSpan * colWidth +
                       (positions[i].colSpan - 1) * crossAxisSpacing,
                   height: rowHeight,
                   child: cells[i].child,

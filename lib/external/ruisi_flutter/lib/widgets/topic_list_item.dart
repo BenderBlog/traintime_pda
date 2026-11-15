@@ -1,9 +1,9 @@
 // Copyright 2026 BenderBlog Rodriguez and Contributors.
 // SPDX-License-Identifier: BSD-3-Clause
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 
 import '../constants/urls.dart';
 import '../models/topic.dart';
@@ -40,10 +40,7 @@ class TopicListItem extends StatelessWidget {
             if (topic.isStick)
               _TopicInfoWidget(
                 needErrorColor: true,
-                text: FlutterI18n.translate(
-                  context,
-                  'ruisi.topic_list_item.sticky',
-                ),
+                text: context.t.ruisi.topicListItem.sticky,
               ),
 
             if (topic.categoryName != null && topic.categoryName!.isNotEmpty)

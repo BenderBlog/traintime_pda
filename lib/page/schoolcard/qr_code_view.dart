@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/controller/school_card_controller.dart';
 
 class QRCodeView extends StatefulWidget {
@@ -21,7 +21,7 @@ class _QRCodeViewState extends State<QRCodeView> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(FlutterI18n.translate(context, "school_card_window.qr_code")),
+      title: Text(context.t.schoolCardWindow.qrCode),
       content: FutureBuilder<Uint8List>(
         future: qrCode,
         builder: (context, snapshot) {
@@ -41,15 +41,7 @@ class _QRCodeViewState extends State<QRCodeView> {
                     : snapshot.hasError
                     ? SizedBox(
                         width: 200,
-                        child: Text(
-                          FlutterI18n.translate(
-                            context,
-                            "school_card_window.qr_code",
-                            translationParams: {
-                              "info": snapshot.error.toString(),
-                            },
-                          ),
-                        ),
+                        child: Text(context.t.schoolCardWindow.qrCode),
                       )
                     : Image.memory(snapshot.data!, width: 200, height: 200),
               ),
@@ -64,9 +56,7 @@ class _QRCodeViewState extends State<QRCodeView> {
               qrCode = SchoolCardController.i.session.getQRCode();
             });
           },
-          child: Text(
-            FlutterI18n.translate(context, "school_card_window.reload"),
-          ),
+          child: Text(context.t.schoolCardWindow.reload),
         ),
       ],
     );

@@ -4,8 +4,8 @@
 
 // Library borrow card.
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:watermeter/controller/library_controller.dart';
 import 'package:watermeter/page/library/book_cover.dart';
@@ -53,7 +53,7 @@ class BorrowInfoCard extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text: FlutterI18n.translate(context, "library.borrow_str"),
+                text: context.t.library.borrowStr,
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -87,7 +87,7 @@ class BorrowInfoCard extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text: FlutterI18n.translate(context, "library.due_date"),
+                text: context.t.library.dueDate,
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -122,11 +122,8 @@ class BorrowInfoCard extends StatelessWidget {
                 ),
                 TextSpan(
                   text: isOverdue
-                      ? FlutterI18n.translate(context, "library.after_due_date")
-                      : FlutterI18n.translate(
-                          context,
-                          "library.before_due_date",
-                        ),
+                      ? context.t.library.afterDueDate
+                      : context.t.library.beforeDueDate,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -140,9 +137,7 @@ class BorrowInfoCard extends StatelessWidget {
             onPressed: () {
               if (!isOverdue) {
                 ProgressDialog pd = ProgressDialog(context: context);
-                pd.show(
-                  msg: FlutterI18n.translate(context, "library.renewing"),
-                );
+                pd.show(msg: context.t.library.renewing);
                 LibraryController.i.session.renew(toUse).then((value) {
                   if (context.mounted) {
                     pd.close();
@@ -153,11 +148,8 @@ class BorrowInfoCard extends StatelessWidget {
             },
             child: Text(
               isOverdue
-                  ? FlutterI18n.translate(
-                      context,
-                      "library.cannot_be_renewable",
-                    )
-                  : FlutterI18n.translate(context, "library.can_be_renewable"),
+                  ? context.t.library.cannotBeRenewable
+                  : context.t.library.canBeRenewable,
             ),
           );
           return [text, button].toColumn(

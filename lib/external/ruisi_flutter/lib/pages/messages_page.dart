@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 import '../controller/ruisi_controller.dart';
 import 'topic_detail_page.dart';
@@ -54,12 +54,12 @@ class _MessagesPageState extends State<MessagesPage>
 
       return Scaffold(
         appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, 'ruisi.messages.title')),
+          title: Text(context.t.ruisi.messages.title),
           bottom: TabBar(
             controller: _tabCtrl,
             tabs: [
-              Tab(text: FlutterI18n.translate(context, 'ruisi.common.reply')),
-              Tab(text: FlutterI18n.translate(context, 'ruisi.messages.tab_at')),
+              Tab(text: context.t.ruisi.common.reply),
+              Tab(text: context.t.ruisi.messages.tabAt),
             ],
           ),
         ),
@@ -69,10 +69,10 @@ class _MessagesPageState extends State<MessagesPage>
                 controller: _tabCtrl,
                 children: [
                   c.replyNotifications.value.isEmpty
-                      ? Center(child: Text(FlutterI18n.translate(context, 'ruisi.messages.no_reply')))
+                      ? Center(child: Text(context.t.ruisi.messages.noReply))
                       : _buildReplyList(c),
                   c.atNotifications.value.isEmpty
-                      ? Center(child: Text(FlutterI18n.translate(context, 'ruisi.messages.no_at')))
+                      ? Center(child: Text(context.t.ruisi.messages.noAt))
                       : _buildAtList(c),
                 ],
               ),

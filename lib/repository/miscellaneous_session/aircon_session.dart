@@ -5,12 +5,21 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/aircon_energy.dart';
 import 'package:watermeter/model/aircon_state.dart';
 import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/network_client.dart';
+
+enum AirconCacheHint implements CacheHint {
+  queryFailed;
+
+  @override
+  String resolve(Translations tr) => tr.electricity.airconError;
+}
 
 class AirconSession {
   static const host = "gxkt.juhaolian.cn";
@@ -184,7 +193,7 @@ class AirconSession {
         return FetchResult.cache(
           fetchTime: cache.fetchTime,
           data: cache.data,
-          hintKey: e.toString(),
+          cacheHint: AirconCacheHint.queryFailed,
         );
       }
       rethrow;

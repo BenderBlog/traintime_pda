@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
@@ -64,29 +64,20 @@ class CompletedClassStyleSettings extends StatelessWidget {
 
     return SectionSettingScaffold(
       icon: Icons.check_circle_outline,
-      title: FlutterI18n.translate(
-        context,
-        "setting.class_table_style_page.completed_section",
-      ),
+      title: context.t.setting.classTableStylePage.completedSection,
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
             secondary: const Icon(Icons.check_circle_outline),
             title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.completed_style_enabled",
-              ),
+              context.t.setting.classTableStylePage.completedStyleEnabled,
             ),
             value: completedEnabled,
             onChanged: _onCompletedStyleEnabledChanged,
           ),
           SettingSliderTile(
             leading: Icons.palette_outlined,
-            title: FlutterI18n.translate(
-              context,
-              'setting.editor.fill_saturation',
-            ),
+            title: context.t.setting.editor.fillSaturation,
             formatValue: _formatPercent,
             value: completedSaturation,
             min: 0.1,
@@ -97,7 +88,7 @@ class CompletedClassStyleSettings extends StatelessWidget {
           ),
           SettingSliderTile(
             leading: Icons.brightness_6_outlined,
-            title: FlutterI18n.translate(context, 'setting.editor.brightness'),
+            title: context.t.setting.editor.brightness,
             formatValue: _formatPercent,
             value: completedBrightness,
             min: 0.5,
@@ -108,10 +99,7 @@ class CompletedClassStyleSettings extends StatelessWidget {
           ),
           SettingSliderTile(
             leading: Icons.format_color_text,
-            title: FlutterI18n.translate(
-              context,
-              'setting.editor.text_saturation',
-            ),
+            title: context.t.setting.editor.textSaturation,
             formatValue: _formatPercent,
             value: completedTextSaturation,
             min: 0.1,
@@ -124,10 +112,7 @@ class CompletedClassStyleSettings extends StatelessWidget {
           ),
           SettingSliderTile(
             leading: Icons.border_outer,
-            title: FlutterI18n.translate(
-              context,
-              'setting.editor.border_opacity',
-            ),
+            title: context.t.setting.editor.borderOpacity,
             formatValue: _formatPercent,
             value: completedBorder,
             min: 0.1,
@@ -138,10 +123,7 @@ class CompletedClassStyleSettings extends StatelessWidget {
           ),
           SettingSliderTile(
             leading: Icons.opacity,
-            title: FlutterI18n.translate(
-              context,
-              'setting.editor.fill_opacity',
-            ),
+            title: context.t.setting.editor.fillOpacity,
             formatValue: _formatPercent,
             value: completedInner,
             min: 0.1,

@@ -1,7 +1,7 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:watermeter/page/public_widget/setting/setting_choice_control.dart';
 import 'package:watermeter/page/public_widget/setting/setting_edit_sheet.dart';
 import 'package:watermeter/controller/theme_controller.dart';
@@ -28,28 +28,21 @@ class _LocalizationSettingViewState extends State<LocalizationSettingView> {
 
     return ListTile(
       leading: const Icon(Icons.translate),
-      title: Text(
-        FlutterI18n.translate(context, "setting.localization_dialog.title"),
-      ),
-      subtitle: Text(
-        FlutterI18n.translate(context, selectedLocalization.toShow),
-      ),
+      title: Text(context.t.setting.localizationDialog.title),
+      subtitle: Text(selectedLocalization.displayName(context.t)),
       trailing: const Icon(Icons.navigate_next),
       onTap: () async {
         final selected = await showSettingSheet<Localization>(
           context: context,
           builder: (sheetContext) => SettingSheet(
-            title: FlutterI18n.translate(
-              sheetContext,
-              'setting.localization_dialog.title',
-            ),
+            title: sheetContext.t.setting.localizationDialog.title,
             child: SettingRadioChoices<Localization>(
               value: selectedLocalization,
               options: Localization.values
                   .map(
                     (item) => SettingChoiceOption<Localization>(
                       value: item,
-                      label: FlutterI18n.translate(sheetContext, item.toShow),
+                      label: item.displayName(sheetContext.t),
                     ),
                   )
                   .toList(),
@@ -58,12 +51,8 @@ class _LocalizationSettingViewState extends State<LocalizationSettingView> {
           ),
         );
         if (selected == null) return;
-        await preference.setString(
-          preference.Preference.localization,
-          selected.string,
-        );
+        await ThemeController.i.setLocale(selected);
         if (!mounted) return;
-        ThemeController.i.updateTheme();
         setState(() {});
       },
     );

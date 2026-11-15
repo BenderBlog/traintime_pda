@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
@@ -31,7 +31,7 @@ class GlassStyleSettings extends StatelessWidget {
   SettingSliderTile _sigmaTile(
     BuildContext context, {
     required IconData leading,
-    required String titleKey,
+    required String title,
     required double value,
     required ValueChanged<double> onSigmaChanged,
   }) {
@@ -40,7 +40,7 @@ class GlassStyleSettings extends StatelessWidget {
 
     return SettingSliderTile(
       leading: leading,
-      title: FlutterI18n.translate(context, titleKey),
+      title: title,
       formatValue: (sigma) => sigma.round().toString(),
       value: value,
       min: GlassStyleConfig.minSigma,
@@ -55,25 +55,14 @@ class GlassStyleSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionSettingScaffold(
       icon: Icons.blur_on,
-      title: FlutterI18n.translate(
-        context,
-        "setting.class_table_style_page.frosted_section",
-      ),
+      title: context.t.setting.classTableStylePage.frostedSection,
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
             secondary: const Icon(Icons.blur_circular),
-            title: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.frosted_enabled",
-              ),
-            ),
+            title: Text(context.t.setting.classTableStylePage.frostedEnabled),
             subtitle: Text(
-              FlutterI18n.translate(
-                context,
-                "setting.class_table_style_page.frosted_enabled_hint",
-              ),
+              context.t.setting.classTableStylePage.frostedEnabledHint,
             ),
             value: GlassStyleConfig.enabled,
             onChanged: _onEnabledChanged,
@@ -81,7 +70,7 @@ class GlassStyleSettings extends StatelessWidget {
           _sigmaTile(
             context,
             leading: Icons.square_outlined,
-            titleKey: "setting.class_table_style_page.frosted_card_sigma",
+            title: context.t.setting.classTableStylePage.frostedCardSigma,
             value: GlassStyleConfig.cardSigma,
             onSigmaChanged: (value) {
               GlassStyleConfig.cardSigma = value;
@@ -91,7 +80,7 @@ class GlassStyleSettings extends StatelessWidget {
           _sigmaTile(
             context,
             leading: Icons.schedule,
-            titleKey: "setting.class_table_style_page.frosted_time_line_sigma",
+            title: context.t.setting.classTableStylePage.frostedTimeLineSigma,
             value: GlassStyleConfig.timeLineSigma,
             onSigmaChanged: (value) {
               GlassStyleConfig.timeLineSigma = value;
@@ -101,7 +90,7 @@ class GlassStyleSettings extends StatelessWidget {
           _sigmaTile(
             context,
             leading: Icons.calendar_today_outlined,
-            titleKey: "setting.class_table_style_page.frosted_date_row_sigma",
+            title: context.t.setting.classTableStylePage.frostedDateRowSigma,
             value: GlassStyleConfig.dateRowSigma,
             onSigmaChanged: (value) {
               GlassStyleConfig.dateRowSigma = value;
@@ -111,7 +100,7 @@ class GlassStyleSettings extends StatelessWidget {
           _sigmaTile(
             context,
             leading: Icons.view_week_outlined,
-            titleKey: "setting.class_table_style_page.frosted_week_bar_sigma",
+            title: context.t.setting.classTableStylePage.frostedWeekBarSigma,
             value: GlassStyleConfig.weekBarSigma,
             onSigmaChanged: (value) {
               GlassStyleConfig.weekBarSigma = value;
@@ -121,7 +110,7 @@ class GlassStyleSettings extends StatelessWidget {
           _sigmaTile(
             context,
             leading: Icons.campaign_outlined,
-            titleKey: "setting.class_table_style_page.frosted_banner_sigma",
+            title: context.t.setting.classTableStylePage.frostedBannerSigma,
             value: GlassStyleConfig.bannerSigma,
             onSigmaChanged: (value) {
               GlassStyleConfig.bannerSigma = value;
@@ -131,7 +120,7 @@ class GlassStyleSettings extends StatelessWidget {
           _sigmaTile(
             context,
             leading: Icons.web_asset_outlined,
-            titleKey: "setting.class_table_style_page.frosted_app_bar_sigma",
+            title: context.t.setting.classTableStylePage.frostedAppBarSigma,
             value: GlassStyleConfig.appBarSigma,
             onSigmaChanged: (value) {
               GlassStyleConfig.appBarSigma = value;

@@ -6,7 +6,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_time_column_layout.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
@@ -132,12 +132,9 @@ class ClassTableTimeLine extends StatelessWidget {
       if (indexOfChar == -1 || indexOfChar == -2) {
         cell = Center(
           child: Text(
-            FlutterI18n.translate(
-              context,
-              indexOfChar == -1
-                  ? "classtable.noon_break"
-                  : "classtable.supper_break",
-            ),
+            indexOfChar == -1
+                ? context.t.classtable.noonBreak
+                : context.t.classtable.supperBreak,
             style: layout.breakStyle,
             textAlign: TextAlign.center,
           ),

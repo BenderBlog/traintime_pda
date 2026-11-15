@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
@@ -175,11 +175,7 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
     return Row(
       children: [
         Text(
-          FlutterI18n.translate(
-            context,
-            "classtable.month",
-            translationParams: {"month": firstDay.month.toString()},
-          ),
+          context.t.classtable.month(month: firstDay.month.toString()),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,

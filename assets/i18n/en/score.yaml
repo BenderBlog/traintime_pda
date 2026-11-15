@@ -1,0 +1,55 @@
+cache_message: Cached score information is displayed
+summary: 'Selected subjects {chosen}  Total credits {credit}
+
+  Average {avg} GPA {gpa}'
+all_passed: All subjects have passed
+cache_hint_password_wrong: IDS password is incorrect or expired.
+cache_hint_login_failed: Failed to log in to the score service.
+cache_hint_network_failed: Network request failed.
+cache_hint_unknown_error: Failed to fetch the latest score info. Check logs for details.
+fetching_hint: Fetching the latest score info.
+all_semester: All semesters
+chosen_semester: '{chosen}'
+all_type: All types
+chosen_type: '{type}'
+none: None
+score_choice:
+  title: Transcript
+  search_hint: Search for score records
+  empty_list: No courses from this semester is selected to be calculated
+  sum_dialog_title: Summary
+  sum_dialog_content: 'Overall GPA of all subjects：{gpa_all}
+
+    Overall average：{avg_all}
+
+    Total credits：{credit_all}
+
+    Unpassed subjects：{unpassed}
+
+    Public selective：{not_core_type}
+
+    The data provided by this program is for reference only, and the developer is
+    not responsible for its accuracy'
+score_compose_card:
+  no_detail: No detailed information provided
+  fetching: Fetching...
+  credit: Credits
+  gpa: GPA
+  score: Score
+score_info_card:
+  title: Score Details
+  original_course: Initial course
+  failed: '[Failed]'
+  credit: Credits {credit}
+  gpa: GPA {gpa}
+  score: Score {score}
+score_page:
+  title: Score Query
+  search_hint: Search for score records
+  no_record: No relevant information found
+  select_all: Select all
+  select_nothing: Clear
+  reset_select: Reset
+  summary: Summary
+  CET-4: College English Test Band 4
+  CET-6: College English Test Band 6

@@ -19,6 +19,15 @@ import 'package:watermeter/repository/ids_session/ids_auth_protocol.dart';
 import 'package:watermeter/repository/ids_session/ids_fingerprint.dart';
 import 'package:watermeter/repository/ids_session/ids_reauth_client.dart';
 
+enum LoginProcessStep {
+  readyPage,
+  getEncrypt,
+  readyLogin,
+  slider,
+  secondFactor,
+  afterProcess,
+}
+
 enum IDSLoginState {
   none,
   requesting,
@@ -163,7 +172,7 @@ class IDSSession {
     required String password,
     required Future<void> Function(String) sliderCaptcha,
     bool forceReLogin = false,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
     String? target,
     IDSReAuthHandler? reAuthHandler,
   }) => _idsLock.synchronized(
@@ -183,13 +192,13 @@ class IDSSession {
     required String password,
     required Future<void> Function(String) sliderCaptcha,
     bool forceReLogin = false,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
     String? target,
     IDSReAuthHandler? reAuthHandler,
   }) async {
     /// Get the login webpage.
     if (onResponse != null) {
-      onResponse(10, "login_process.ready_page");
+      onResponse(10, LoginProcessStep.readyPage);
       log.info(
         "[IDSSession][login] "
         "Ready to get the login webpage.",
@@ -219,13 +228,38 @@ class IDSSession {
       );
     }
 
+    final passwordForm = parse(
+      initialResponse.data?.toString() ?? '',
+    ).getElementById("pwdFromId");
+    if (passwordForm == null || passwordForm.localName != "form") {
+      throw const IDSProtocolException("统一认证页面缺少密码登录表单");
+    }
+    final inputs = passwordForm.querySelectorAll('input[type="hidden"]');
+    final fields = <String, String>{};
+    for (final fieldName in ["pwdEncryptSalt", ..._header]) {
+      final matches = inputs
+          .where(
+            (input) =>
+                input.id == fieldName || input.attributes["name"] == fieldName,
+          )
+          .toList();
+      if (matches.isEmpty) {
+        throw IDSProtocolException("密码登录表单缺少字段：$fieldName");
+      }
+      if (matches.length > 1) {
+        throw IDSProtocolException("密码登录表单存在重复字段：$fieldName");
+      }
+      final value = matches.single.attributes["value"];
+      if (value == null || (fieldName != "lt" && value.trim().isEmpty)) {
+        throw IDSProtocolException("密码登录表单字段值无效：$fieldName");
+      }
+      fields[fieldName] = value;
+    }
+    final salt = fields.remove("pwdEncryptSalt")!;
+    if (![16, 24, 32].contains(utf8.encode(salt).length)) {
+      throw const IDSProtocolException("密码登录表单的 pwdEncryptSalt 长度无效");
+    }
     await _registerBrowserFingerprint();
-    final response = initialResponse.data?.toString() ?? '';
-
-    /// Start getting data from webpage.
-    var page = parse(response);
-    var form = page.getElementsByTagName("input")
-      ..removeWhere((element) => element.attributes["type"] != "hidden");
 
     /// Check whether it need CAPTCHA or not:-P
     /// Used in two captcha.
@@ -239,35 +273,25 @@ class IDSSession {
 
     /// Get AES encrypt key. There must be.
     if (onResponse != null) {
-      onResponse(30, "login_process.get_encrypt");
+      onResponse(30, LoginProcessStep.getEncrypt);
     }
-    String keys = form
-        .firstWhere((element) => element.id == "pwdEncryptSalt")
-        .attributes["value"]!;
 
     /// Prepare for login.
     if (onResponse != null) {
-      onResponse(40, "login_process.ready_login");
+      onResponse(40, LoginProcessStep.readyLogin);
     }
     Map<String, dynamic> head = {
       'username': username,
-      'password': aesEncrypt(password, keys),
+      'password': aesEncrypt(password, salt),
       'rememberMe': 'true',
       'cllt': 'userNameLogin',
       'dllt': 'generalLogin',
       '_eventId': 'submit',
+      ...fields,
     };
 
-    for (var i in _header) {
-      head[i] = form
-          .firstWhere(
-            (element) => element.attributes["name"] == i || element.id == i,
-          )
-          .attributes["value"]!;
-    }
-
     if (onResponse != null) {
-      onResponse(45, "login_process.slider");
+      onResponse(45, LoginProcessStep.slider);
     }
 
     await dioNoOfflineCheck.get(
@@ -283,7 +307,7 @@ class IDSSession {
 
     /// Post login request.
     if (onResponse != null) {
-      onResponse(50, "login_process.ready_login");
+      onResponse(50, LoginProcessStep.readyLogin);
     }
     try {
       var data = await dioNoOfflineCheck.post(
@@ -387,7 +411,7 @@ class IDSSession {
     required String? target,
     required String username,
     required IDSReAuthHandler? reAuthHandler,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
   }) async {
     final location = response.headers.value(HttpHeaders.locationHeader);
     if (location == null) {
@@ -401,7 +425,7 @@ class IDSSession {
       reAuthHandler: reAuthHandler,
       onResponse: onResponse,
     );
-    onResponse?.call(80, 'login_process.after_process');
+    onResponse?.call(80, LoginProcessStep.afterProcess);
     return resolved.toString();
   }
 
@@ -410,7 +434,7 @@ class IDSSession {
     String? service,
     String? username,
     IDSReAuthHandler? reAuthHandler,
-    void Function(int, String)? onResponse,
+    void Function(int, LoginProcessStep)? onResponse,
   }) {
     if (!isIDSReAuthLocation(uri.toString())) return Future.value(uri);
     return _reAuthLock.synchronized(() async {
@@ -423,7 +447,7 @@ class IDSSession {
       }
 
       try {
-        onResponse?.call(55, 'login_process.second_factor');
+        onResponse?.call(55, LoginProcessStep.secondFactor);
         final resumedUri = await handler(
           IDSReAuthClient(
             dio: dioNoOfflineCheck,
@@ -491,7 +515,10 @@ class IDSSession {
       if (redirectCount > maxAuthRedirects) {
         throw const LoginFailedException(msg: '统一认证跳转次数超过 30 次');
       }
-      currentUri = nextUri;
+      currentUri = nextUri.replace(
+        scheme: 'https',
+        // port: uri.port == 80 ? null : uri.port,
+      );
     }
   }
 

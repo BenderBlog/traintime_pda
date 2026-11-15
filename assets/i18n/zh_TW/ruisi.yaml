@@ -1,0 +1,145 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+common:
+  refresh: 刷新
+  confirm: 確定
+  cancel: 取消
+  retry: 重試
+  no_topics: 暫無帖子
+  no_content: 暫無內容
+  reply: 回覆
+  favorite: 收藏
+  not_implemented: 未實現
+  login: 登錄
+  logout: 退出登錄
+  logged_out: 已退出登錄
+  submit: 提交
+about:
+  title: 關於
+  app_name: 睿思
+  subtitle: 西安電子科技大學校園論壇客戶端
+  version: 版本
+  version_number: 2.0.0 (隨 XDYou 1.6.0 分發)
+  source_code: 源代碼
+  bug_report: 問題反饋
+  bug_report_subtitle: 在 GitHub 上提交 issue
+  privacy_policy: 隱私政策
+  license: 本應用基於 BSD-3-Clause 許可證開源 基於 Ruisi-iOS 和 Ruisi-Android 在 AI 輔助下重寫
+  privacy_policy_content: '本應用僅在西安電子科技大學校園網內運行，訪問睿思論壇 (rs.xidian.edu.cn) 的數據。
+
+
+    本應用不會收集、存儲或傳輸任何用戶的個人信息到第三方服務器。
+
+
+    用戶的登錄憑據僅保存在本地設備中，用於與睿思論壇服務器進行身份驗證。
+
+
+    本應用使用 Cookie 與睿思論壇服務器進行通信，所有數據交互均直接在用戶的設備與睿思論壇服務器之間進行。
+
+
+    如有任何疑問，請通過 GitHub 提交 issue 聯繫開發者。'
+home:
+  title: 睿思論壇
+  new_post: 發帖
+  forum_list: 論壇板塊
+  tab_hot: 熱帖
+  tab_new_reply: 最新回覆
+  tab_new_post: 最新發表
+  tab_my: 我的
+  tab_trade: 二手交易
+  tab_water: 灌水
+  tab_lost_found: 失物招領
+  tab_employment: 就業
+  tab_photography: 攝影
+  please_login: 請先登錄
+  my_profile: 我的資料
+  my_posts: 我的帖子
+  my_favorites: 我的收藏
+  message_center: 消息中心
+  daily_checkin: 每日簽到
+  settings: 設置
+  about: 關於
+  search: 搜索
+login:
+  title: 登錄睿思
+  username: 用戶名
+  username_hint: 請輸入用戶名
+  password: 密碼
+  password_hint: 請輸入密碼
+  captcha: 驗證碼
+  captcha_hint: 請輸入驗證碼
+  back: 返回
+  reset_login_state: 重置登錄狀態
+  reset_confirm_title: 確認重置
+  reset_confirm_content: 確定要重置登錄狀態嗎？這將清除所有登錄信息。
+  reset_success: 登錄狀態已重置
+  view_logs: 查看日誌
+post:
+  title: 發帖
+  publish: 發佈
+  select_forum: 選擇板塊
+  select_forum_hint: 請選擇板塊
+  subject: 標題
+  subject_hint: 請輸入標題
+  content: 內容
+  content_hint: 請輸入內容
+  success: 發帖成功
+  failure: 發帖失敗
+  smiley: 表情
+topic_detail:
+  title: 帖子詳情
+  reply_too_short: 回覆內容不能少於 13 個字符
+  reply_success: 回覆成功
+  reply_failure: 回覆失敗
+  favorite_success: 收藏成功
+  favorite_failure: 收藏失敗
+  no_data: 無數據
+  reply_hint: 寫回復...
+  vote:
+    single_select: 單選
+    multi_select: 多選，最多 {count} 項
+    title_prefix: 投票
+    count: 共 {count} 人參與
+    open: 點此投票
+    sheet_title: 投票
+    max_selection: 最多隻能選擇 {count} 項
+    not_selected: 你還沒有選擇
+    success: 投票成功
+    failure: 投票失敗
+    param_error: 投票失敗：參數錯誤
+    already_voted: 您已經投過票，謝謝您的參與
+    expired: 該投票已過期或關閉
+    ended: 投票已經結束
+topic_list_item:
+  sticky: 置頂
+forum_list:
+  title: 論壇板塊
+  empty: 睿思論壇版塊分組為空
+favorites:
+  title: 我的收藏
+  empty: 暫無收藏
+messages:
+  title: 消息
+  tab_at: '@我'
+  no_reply: 暫無回覆通知
+  no_at: 暫無@通知
+search:
+  hint: 搜索帖子...
+  input_hint: 輸入關鍵詞搜索
+  no_results: 無搜索結果
+settings:
+  title: 設置
+  section_proxy: 代理
+  proxy_enable: 啟用代理
+  proxy_disabled: 未啟用
+  proxy_address: 代理地址
+  section_debug: 調試
+  view_logs: 查看日誌
+  proxy_dialog_title: 代理設置
+  proxy_host: 主機地址
+  proxy_host_hint: 例如 127.0.0.1
+  proxy_port: 端口
+  proxy_port_hint: 例如 7890
+user:
+  title: 我的
+  tab_profile: 資料
+  unknown: 未知用戶

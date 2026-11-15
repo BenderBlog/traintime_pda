@@ -5,13 +5,14 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
+
 import 'package:watermeter/controller/classtable_controller.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
+import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/pick_file.dart';
@@ -52,10 +53,7 @@ class _ClassTableBackgroundSettingsState
       selectedFile = await pickFile(type: FileType.image);
     } on MissingStoragePermissionException {
       if (mounted) {
-        showToast(
-          context: context,
-          msg: FlutterI18n.translate(context, "setting.no_permission"),
-        );
+        showToast(context: context, msg: context.t.setting.noPermission);
       }
       return;
     }
@@ -114,10 +112,7 @@ class _ClassTableBackgroundSettingsState
     if (!mounted) return;
 
     if (!saved) {
-      showToast(
-        context: context,
-        msg: FlutterI18n.translate(context, "setting.failure_setting"),
-      );
+      showToast(context: context, msg: context.t.setting.failureSetting);
       return;
     }
 
@@ -125,10 +120,7 @@ class _ClassTableBackgroundSettingsState
     await preference.setBool(preference.Preference.decorated, true);
     if (!mounted) return;
     widget.onChanged();
-    showToast(
-      context: context,
-      msg: FlutterI18n.translate(context, "setting.successful_setting"),
-    );
+    showToast(context: context, msg: context.t.setting.successfulSetting);
   }
 
   @override
@@ -137,21 +129,18 @@ class _ClassTableBackgroundSettingsState
         _hasBackground && preference.getBool(preference.Preference.decorated);
     return SectionSettingScaffold(
       icon: Icons.wallpaper,
-      title: FlutterI18n.translate(
-        context,
-        "setting.class_table_background_section",
-      ),
+      title: context.t.setting.classTableBackgroundSection,
       items: SettingSegmentedList(
         items: [
           SwitchListTile(
             secondary: const Icon(MingCuteIcons.mgc_pic_line),
-            title: Text(FlutterI18n.translate(context, "setting.background")),
+            title: Text(context.t.setting.background),
             value: isBackgroundOn,
             onChanged: (value) async {
               if (value && !_hasBackground) {
                 showToast(
                   context: context,
-                  msg: FlutterI18n.translate(context, "setting.no_background"),
+                  msg: context.t.setting.noBackground,
                 );
                 return;
               }
@@ -161,12 +150,9 @@ class _ClassTableBackgroundSettingsState
           ),
           SettingSliderTile(
             leading: Icons.blur_on_sharp,
-            title: FlutterI18n.translate(
-              context,
-              'setting.editor.background_blur',
-            ),
+            title: context.t.setting.editor.backgroundBlur,
             formatValue: (value) => value <= 0
-                ? FlutterI18n.translate(context, 'setting.background_blur_off')
+                ? context.t.setting.backgroundBlurOff
                 : value.round().toString(),
             value: _backgroundBlur,
             min: 0,
@@ -192,9 +178,7 @@ class _ClassTableBackgroundSettingsState
           ),
           ListTile(
             leading: const Icon(Icons.photo_album_outlined),
-            title: Text(
-              FlutterI18n.translate(context, "setting.choose_background"),
-            ),
+            title: Text(context.t.setting.chooseBackground),
             trailing: const Icon(Icons.navigate_next),
             onTap: _chooseBackground,
           ),

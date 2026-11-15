@@ -2,8 +2,9 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/energy_controller.dart';
@@ -31,12 +32,12 @@ class ElectricityWindow extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(FlutterI18n.translate(context, "electricity.title")),
+            title: Text(context.t.electricity.title),
             actions: [
               IconButton(
                 onPressed: isLoading ? null : controller.refreshElectricityInfo,
                 icon: const Icon(Icons.refresh),
-                tooltip: FlutterI18n.translate(context, "electricity.update"),
+                tooltip: context.t.electricity.update,
               ),
             ],
           ),
@@ -45,7 +46,7 @@ class ElectricityWindow extends StatelessWidget {
               if (displayInfo != null && isLoading) LinearProgressIndicator(),
               if (displayInfo != null && hasError)
                 Text(
-                      FlutterI18n.translate(context, "electricity.fetch_error"),
+                      context.t.electricity.fetchError,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.onError,
@@ -57,13 +58,10 @@ class ElectricityWindow extends StatelessWidget {
                     .backgroundColor(Theme.of(context).colorScheme.error),
               if (isFromCache && fetchTime != null)
                 CacheAlerter(
-                  dataType: FlutterI18n.translate(context, "electricity.title"),
-                  hint: FlutterI18n.translate(
-                    context,
-                    cacheHintKey == null || cacheHintKey == "local_cache_hint"
-                        ? "cache_reason_default"
-                        : cacheHintKey,
-                  ),
+                  dataType: context.t.electricity.title,
+                  hint:
+                      cacheHintKey?.resolve(context.t) ??
+                      context.t.common.cacheReasonDefault,
                   placeOfCache: PlaceOfCache.device,
                   fetchTime: fetchTime,
                 ),
@@ -139,7 +137,7 @@ class ElectricityWindow extends StatelessWidget {
     bool hasError = false,
   }) {
     final message = Text(
-      FlutterI18n.translate(context, messageKey),
+      context.t.resolveKey(messageKey),
       style: TextStyle(
         color: hasError
             ? Theme.of(context).colorScheme.error
@@ -151,7 +149,7 @@ class ElectricityWindow extends StatelessWidget {
 
     return InfoCard(
       iconData: icon,
-      title: FlutterI18n.translate(context, titleKey),
+      title: context.t.resolveKey(titleKey),
       children: [
         if (isLoading)
           Row(

@@ -1,0 +1,14 @@
+---
+title: 空闲教室
+date: 日期 {date}
+building: 教学楼 {building}
+search_hint: 教室名称或者教室代码
+classroom: 教室
+empty: 空闲
+occupied: 占用
+now_ongoing: 现在 · 第 {period} 节 {start}-{end}
+now_upcoming: 即将 · 第 {period} 节 {start}-{end}
+now_free: 空闲 {free}/{total} 间
+only_free_now: 只看现在空闲
+no_free_now: 现在没有空闲教室
+classes_over: 今天的课已经结束了

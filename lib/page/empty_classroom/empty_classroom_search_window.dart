@@ -2,9 +2,11 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:intl/intl.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -268,13 +270,12 @@ class _EmptyClassroomSearchWindowState
       return const SizedBox.shrink();
     }
     final label = period == null
-        ? FlutterI18n.translate(context, "empty_classroom.classes_over")
-        : FlutterI18n.translate(
-            context,
+        ? context.t.emptyClassroom.classesOver
+        : context.t.resolveKey(
             isNowOngoing
                 ? "empty_classroom.now_ongoing"
                 : "empty_classroom.now_upcoming",
-            translationParams: {
+            params: {
               "period": "$period",
               "start": timeList[(period - 1) * 2],
               "end": timeList[(period - 1) * 2 + 1],
@@ -309,13 +310,9 @@ class _EmptyClassroomSearchWindowState
                 ),
                 if (period != null)
                   Text(
-                    FlutterI18n.translate(
-                      context,
-                      "empty_classroom.now_free",
-                      translationParams: {
-                        "free": "$free",
-                        "total": "${fetchedData.length}",
-                      },
+                    context.t.emptyClassroom.nowFree(
+                      free: "$free",
+                      total: "${fetchedData.length}",
                     ),
                     style: TextStyle(
                       fontSize: 11,
@@ -327,9 +324,7 @@ class _EmptyClassroomSearchWindowState
           ),
           if (period != null)
             FilterChip(
-              label: Text(
-                FlutterI18n.translate(context, "empty_classroom.only_free_now"),
-              ),
+              label: Text(context.t.emptyClassroom.onlyFreeNow),
               selected: onlyFreeNow,
               onSelected: (value) => setState(() => onlyFreeNow = value),
             ),
@@ -367,10 +362,7 @@ class _EmptyClassroomSearchWindowState
                   autofocus: false,
                   style: const TextStyle(fontSize: 14),
                   decoration: InputDecoration(
-                    hintText: FlutterI18n.translate(
-                      context,
-                      "empty_classroom.search_hint",
-                    ),
+                    hintText: context.t.emptyClassroom.searchHint,
                     isDense: false,
                     contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
                     prefixIcon: const Icon(Icons.search),
@@ -407,12 +399,8 @@ class _EmptyClassroomSearchWindowState
                             });
                           },
                           child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "empty_classroom.date",
-                              translationParams: {
-                                "date": formatter.format(time),
-                              },
+                            context.t.emptyClassroom.date(
+                              date: formatter.format(time),
                             ),
                           ),
                         ).padding(right: 8),
@@ -424,10 +412,8 @@ class _EmptyClassroomSearchWindowState
                             chooseBuilding();
                           },
                           child: Text(
-                            FlutterI18n.translate(
-                              context,
-                              "empty_classroom.building",
-                              translationParams: {"building": chosen.name},
+                            context.t.emptyClassroom.building(
+                              building: chosen.name,
                             ),
                           ),
                         ),
@@ -439,19 +425,12 @@ class _EmptyClassroomSearchWindowState
                   [
                     getIcon(true),
                     const SizedBox(width: 4.0),
-                    Text(
-                      FlutterI18n.translate(
-                        context,
-                        "empty_classroom.occupied",
-                      ),
-                    ),
+                    Text(context.t.emptyClassroom.occupied),
                   ].toRow().padding(right: 8.0),
                   [
                     getIcon(false),
                     const SizedBox(width: 4.0),
-                    Text(
-                      FlutterI18n.translate(context, "empty_classroom.empty"),
-                    ),
+                    Text(context.t.emptyClassroom.empty),
                   ].toRow(),
                 ].toRow(mainAxisAlignment: MainAxisAlignment.center),
                 if (state == SessionState.fetched && isToday) nowSummary(),
@@ -468,11 +447,7 @@ class _EmptyClassroomSearchWindowState
               }),
             ).expanded()
           else if (data.isEmpty && onlyFreeNow)
-            Center(
-              child: Text(
-                FlutterI18n.translate(context, "empty_classroom.no_free_now"),
-              ),
-            ).expanded()
+            Center(child: Text(context.t.emptyClassroom.noFreeNow)).expanded()
           else
             ListView.separated(
               itemCount: data.length,

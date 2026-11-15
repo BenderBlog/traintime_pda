@@ -1,17 +1,18 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:watermeter/page/public_widget/context_extension.dart';
-import 'package:watermeter/page/setting/password_setting_sheet.dart';
-import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
+
 import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/controller/aircon_controller.dart';
+import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/setting/aircon_imei_page.dart';
-
+import 'package:watermeter/page/setting/password_setting_sheet.dart';
+import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
 class AccountSection extends StatefulWidget {
@@ -22,8 +23,7 @@ class AccountSection extends StatefulWidget {
 }
 
 class _AccountSectionState extends State<AccountSection> {
-  String _passwordStatus(preference.Preference key) => FlutterI18n.translate(
-    context,
+  String _passwordStatus(preference.Preference key) => context.t.resolveKey(
     preference.getString(key).isEmpty
         ? 'setting.editor.password_not_set'
         : 'setting.editor.password_set',
@@ -43,22 +43,14 @@ class _AccountSectionState extends State<AccountSection> {
     return Column(
       children: [
         SectionSettingScaffold(
-          title: FlutterI18n.translate(
-            context,
-            "setting.general_account_settings",
-          ),
+          title: context.t.setting.generalAccountSettings,
           items: SettingSegmentedList(
             items: [
               ListTile(
                 leading: const Icon(MingCuteIcons.mgc_wifi_line),
-                title: Text(
-                  FlutterI18n.translate(
-                    context,
-                    "setting.schoolnet_password_setting",
-                  ),
-                ),
+                title: Text(context.t.setting.schoolnetPasswordSetting),
                 subtitle: Text(
-                  '${_passwordStatus(preference.Preference.schoolNetQueryPassword)} · ${FlutterI18n.translate(context, "setting.schoolnet_password_description")}',
+                  '${_passwordStatus(preference.Preference.schoolNetQueryPassword)} · ${context.t.setting.schoolnetPasswordDescription}',
                 ),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
@@ -69,23 +61,14 @@ class _AccountSectionState extends State<AccountSection> {
                 },
               ),
               ListTile(
-                title: Text(
-                  FlutterI18n.translate(context, "setting.aircon_imei_title"),
-                ),
+                title: Text(context.t.setting.airconImeiTitle),
                 subtitle: SignalBuilder(
                   builder: (context) {
                     final imei = AirconController.i.imeiSignal.value;
                     return Text(
                       imei.isEmpty
-                          ? FlutterI18n.translate(
-                              context,
-                              "setting.aircon_imei_not_set",
-                            )
-                          : FlutterI18n.translate(
-                              context,
-                              "setting.aircon_imei_current",
-                              translationParams: {"imei": imei},
-                            ),
+                          ? context.t.setting.airconImeiNotSet
+                          : context.t.setting.airconImeiCurrent(imei: imei),
                     );
                   },
                 ),
@@ -100,20 +83,12 @@ class _AccountSectionState extends State<AccountSection> {
         ),
         if (!preference.getBool(preference.Preference.role))
           SectionSettingScaffold(
-            title: FlutterI18n.translate(
-              context,
-              "setting.undergraduate_system_accounts",
-            ),
+            title: context.t.setting.undergraduateSystemAccounts,
             items: SettingSegmentedList(
               items: [
                 ListTile(
                   leading: const Icon(MingCuteIcons.mgc_run_line),
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.sport_password_setting",
-                    ),
-                  ),
+                  title: Text(context.t.setting.sportPasswordSetting),
                   subtitle: Text(
                     _passwordStatus(preference.Preference.sportPassword),
                   ),
@@ -127,12 +102,7 @@ class _AccountSectionState extends State<AccountSection> {
                 ),
                 ListTile(
                   leading: const Icon(MingCuteIcons.mgc_flask_line),
-                  title: Text(
-                    FlutterI18n.translate(
-                      context,
-                      "setting.experiment_password_setting",
-                    ),
-                  ),
+                  title: Text(context.t.setting.experimentPasswordSetting),
                   subtitle: Text(
                     _passwordStatus(preference.Preference.experimentPassword),
                   ),

@@ -2,8 +2,8 @@
 // Copyright 2025 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 class WeekSelector extends StatefulWidget {
@@ -58,12 +58,7 @@ class _WeekSelectorState extends State<WeekSelector> {
                   Row(
                     children: [
                       Icon(Icons.calendar_month, color: widget.color, size: 16),
-                      Text(
-                            FlutterI18n.translate(
-                              context,
-                              "classtable.class_add.input_week_hint",
-                            ),
-                          )
+                      Text(context.t.classtable.classAdd.inputWeekHint)
                           .textStyle(TextStyle(color: widget.color))
                           .padding(left: 4),
                     ],

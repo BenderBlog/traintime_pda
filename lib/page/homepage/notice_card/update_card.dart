@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/controller/update_notice_controller.dart';
@@ -18,11 +18,11 @@ class UpdateCard extends StatelessWidget {
       builder: (context) {
         final state = UpdateNoticeController.i.updateMessageStateSignal.value;
         if (state.isLoading || state.isRefreshing) {
-          return Text(FlutterI18n.translate(context, "setting.fetching_update"))
+          return Text(context.t.setting.fetchingUpdate)
               .paddingDirectional(horizontal: 16, vertical: 14)
               .withHomeCardStyle(context);
         } else if (state.hasError) {
-          return Text(FlutterI18n.translate(context, "setting.fetch_failed"))
+          return Text(context.t.setting.fetchFailed)
               .paddingDirectional(horizontal: 16, vertical: 14)
               .withHomeCardStyle(context);
         } else {
@@ -32,14 +32,14 @@ class UpdateCard extends StatelessWidget {
               .value) {
             case null:
               return Text(
-                    FlutterI18n.translate(context, "setting.current_testing"),
+                    context.t.setting.currentTesting,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )
                   .paddingDirectional(horizontal: 16, vertical: 14)
                   .withHomeCardStyle(context, type: HomeCardType.warning);
             case true:
               return Text(
-                    FlutterI18n.translate(context, "setting.new_version"),
+                    context.t.setting.newVersion,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )
                   .paddingDirectional(horizontal: 16, vertical: 14)

@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
@@ -39,7 +39,7 @@ class ElectricityReadyView extends StatelessWidget {
               child:
                   [
                     Text(
-                          FlutterI18n.translate(context, "electricity.info"),
+                          context.t.electricity.info,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.orange[800],

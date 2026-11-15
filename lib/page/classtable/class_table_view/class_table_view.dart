@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
@@ -152,10 +152,7 @@ class _ClassTableViewState extends State<ClassTableView>
               SizedBox(height: blockheight(8)),
               Image.asset("assets/art/pda_classtable_empty.webp", scale: 2),
               const SizedBox(height: 20),
-              ...FlutterI18n.translate(
-                context,
-                "classtable.no_class",
-              ).split("\n").map((e) => Text(e)),
+              ...context.t.classtable.noClass.split("\n").map((e) => Text(e)),
             ],
           ),
         ).padding(left: widget.timeColumnWidth),

@@ -9,21 +9,6 @@ part 'class_attendance.g.dart';
 
 enum AttendanceStatus { unknown, eligible, warning, ineligible }
 
-extension I18nString on AttendanceStatus {
-  String get i18nString {
-    switch (this) {
-      case AttendanceStatus.unknown:
-        return "class_attendance.course_state.unknown";
-      case AttendanceStatus.eligible:
-        return "class_attendance.course_state.eligible";
-      case AttendanceStatus.warning:
-        return "class_attendance.course_state.warning";
-      case AttendanceStatus.ineligible:
-        return "class_attendance.course_state.ineligible";
-    }
-  }
-}
-
 class ClassAttendance {
   // 有无预警
   final bool isWarning;
@@ -98,6 +83,22 @@ class ClassAttendance {
   }
 }
 
+enum SignInType { qrCode, gesture, position, unknown, customName }
+
+enum SignStatus {
+  absenceNotParticipating,
+  signed,
+  signedByTeacher,
+  personalLeave2,
+  absence,
+  sickLeave,
+  personalLeave,
+  later,
+  leaveEarly,
+  signExpiredy,
+  publicLeave,
+}
+
 @JsonSerializable(explicitToJson: true)
 class ClassAttendanceDetail {
   final String? submittime;
@@ -131,50 +132,31 @@ class ClassAttendanceDetail {
     required this.status,
   });
 
-  String get signStatus {
-    switch (userStatus) {
-      case 0:
-        return "class_attendance.sign_status.absenceNotParticipating";
-      case 1:
-        return "class_attendance.sign_status.signed";
-      case 2:
-        return "class_attendance.sign_status.signedByTeacher";
-      case 4:
-        return "class_attendance.sign_status.personalLeave2";
-      case 5:
-        return "class_attendance.sign_status.absence";
-      case 7:
-        return "class_attendance.sign_status.sickLeave";
-      case 8:
-        return "class_attendance.sign_status.personalLeave";
-      case 9:
-        return "class_attendance.sign_status.late";
-      case 10:
-        return "class_attendance.sign_status.leaveEarly";
-      case 11:
-        return "class_attendance.sign_status.signExpiredy";
-      case 12:
-        return "class_attendance.sign_status.publicLeave";
-      default:
-        return "class_attendance.sign_status.absenceNotParticipating";
-    }
+  SignInType get signType {
+    if (name != null) return SignInType.customName;
+    return switch (otherId) {
+      2 => SignInType.qrCode,
+      3 => SignInType.gesture,
+      4 => SignInType.position,
+      _ => SignInType.unknown,
+    };
   }
 
-  String get signName {
-    if (name != null) {
-      return name!;
-    } else {
-      switch (otherId) {
-        case 2:
-          return "class_attendance.sign_type.qr_code";
-        case 3:
-          return "class_attendance.sign_type.gesture";
-        case 4:
-          return "class_attendance.sign_type.position";
-        default:
-          return "class_attendance.sign_type.default";
-      }
-    }
+  SignStatus get signStatusType {
+    return switch (userStatus) {
+      0 => SignStatus.absenceNotParticipating,
+      1 => SignStatus.signed,
+      2 => SignStatus.signedByTeacher,
+      4 => SignStatus.personalLeave2,
+      5 => SignStatus.absence,
+      7 => SignStatus.sickLeave,
+      8 => SignStatus.personalLeave,
+      9 => SignStatus.later,
+      10 => SignStatus.leaveEarly,
+      11 => SignStatus.signExpiredy,
+      12 => SignStatus.publicLeave,
+      _ => SignStatus.absenceNotParticipating,
+    };
   }
 
   factory ClassAttendanceDetail.fromJson(Map<String, dynamic> json) =>

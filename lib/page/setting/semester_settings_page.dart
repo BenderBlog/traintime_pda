@@ -9,7 +9,8 @@ import 'package:watermeter/page/public_widget/setting/setting_control_tile.dart'
 import 'package:watermeter/page/public_widget/setting/setting_dropdown_button.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/repository/preference.dart' as pref;
-import 'package:flutter_i18n/flutter_i18n.dart' as i18n;
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/logger.dart' as log;
 
 class SemesterSettingsPage extends StatefulWidget {
@@ -97,13 +98,9 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
     } catch (e, s) {
       log.log.handle(e, s);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              i18n.FlutterI18n.translate(context, 'error_detected'),
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.t.common.errorDetected)));
       }
     } finally {
       if (mounted) {
@@ -130,13 +127,9 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
     } catch (e, s) {
       log.log.handle(e, s);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              i18n.FlutterI18n.translate(context, 'error_detected'),
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.t.common.errorDetected)));
       }
     } finally {
       if (mounted) setState(() => _isApplying = false);
@@ -149,7 +142,7 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
       canPop: !_busy,
       child: Scaffold(
         appBar: AppBar(
-          title: i18n.I18nText('classtable.semester_switcher.choose_semester'),
+          title: Text(context.t.classtable.semesterSwitcher.chooseSemester),
         ),
         body: Center(
           child: ConstrainedBox(
@@ -163,10 +156,7 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
               ),
               children: [
                 Text(
-                  i18n.FlutterI18n.translate(
-                    context,
-                    'classtable.semester_switcher.only_future_hint',
-                  ),
+                  context.t.classtable.semesterSwitcher.onlyFutureHint,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -178,19 +168,13 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
                       padding: const EdgeInsets.all(16),
                       child: SettingDropdownButton<int>(
                         value: selectedYear,
-                        label: i18n.FlutterI18n.translate(
-                          context,
-                          'setting.editor.year',
-                        ),
+                        label: context.t.setting.editor.year,
                         entries: years
                             .map(
                               (year) => DropdownMenuEntry<int>(
                                 value: year,
-                                label: i18n.FlutterI18n.translate(
-                                  context,
-                                  'classtable.semester_switcher.year',
-                                  translationParams: {'year': '$year'},
-                                ),
+                                label: context.t.classtable.semesterSwitcher
+                                    .year(year: '$year'),
                               ),
                             )
                             .toList(),
@@ -204,10 +188,7 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
                       ),
                     ),
                     SettingControlTile(
-                      title: i18n.FlutterI18n.translate(
-                        context,
-                        'setting.editor.semester',
-                      ),
+                      title: context.t.setting.editor.semester,
                       child: AbsorbPointer(
                         absorbing: _busy,
                         child: SettingChoiceControl<int>(
@@ -215,17 +196,19 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
                           options: [
                             SettingChoiceOption(
                               value: 1,
-                              label: i18n.FlutterI18n.translate(
-                                context,
-                                'classtable.semester_switcher.first_academic_year',
-                              ),
+                              label: context
+                                  .t
+                                  .classtable
+                                  .semesterSwitcher
+                                  .firstAcademicYear,
                             ),
                             SettingChoiceOption(
                               value: 2,
-                              label: i18n.FlutterI18n.translate(
-                                context,
-                                'classtable.semester_switcher.second_academic_year',
-                              ),
+                              label: context
+                                  .t
+                                  .classtable
+                                  .semesterSwitcher
+                                  .secondAcademicYear,
                             ),
                           ],
                           onChanged: (semester) {
@@ -249,8 +232,7 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
                         )
                       : const Icon(Icons.cloud_download_outlined),
                   label: Text(
-                    i18n.FlutterI18n.translate(
-                      context,
+                    context.t.resolveKey(
                       _isFetching
                           ? 'classtable.semester_switcher.fetching_remote_semester'
                           : 'classtable.semester_switcher.fetch_remote_semester',
@@ -266,12 +248,7 @@ class _SemesterSettingsPageState extends State<SemesterSettingsPage> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(
-                          i18n.FlutterI18n.translate(
-                            context,
-                            'setting.editor.apply',
-                          ),
-                        ),
+                      : Text(context.t.setting.editor.apply),
                 ),
               ],
             ),

@@ -1,10 +1,9 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
-
 import 'dart:math' as math;
-
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:watermeter/repository/translation_key.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/classtable/classtable_constant.dart';
 
@@ -75,7 +74,7 @@ class ClassTableTimeColumnLayout {
     // Break labels may wrap in some languages and occupy three blocks.
     for (final key in ['classtable.noon_break', 'classtable.supper_break']) {
       final size = measure(
-        FlutterI18n.translate(context, key),
+        context.t.resolveKey(key),
         breakStyle,
         maxWidth: width,
       );

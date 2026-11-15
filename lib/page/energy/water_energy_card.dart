@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
@@ -18,15 +18,11 @@ class WaterEnergyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InfoCard(
       iconData: Icons.water_drop,
-      title: FlutterI18n.translate(
-        context,
-        "electricity.weter_metid_title",
-        translationParams: {"code": metID},
-      ),
+      title: context.t.electricity.weterMetidTitle(code: metID),
       children: [
         if (usages.isEmpty)
           Text(
-            FlutterI18n.translate(context, "electricity.water_empty"),
+            context.t.electricity.waterEmpty,
             style: TextStyle(color: Theme.of(context).colorScheme.outline),
           ).padding(vertical: 8, horizontal: 12)
         else
@@ -46,31 +42,22 @@ class WaterEnergyCard extends StatelessWidget {
     return [
       [
             Text(
-              FlutterI18n.translate(
-                context,
-                "electricity.water_usage_fetch_date",
-              ),
+              context.t.electricity.waterUsageFetchDate,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 4),
             Text(
-              FlutterI18n.translate(context, "electricity.water_usage"),
+              context.t.electricity.waterUsage,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 3),
             Text(
-              FlutterI18n.translate(
-                context,
-                "electricity.water_usage_read_now",
-              ),
+              context.t.electricity.waterUsageReadNow,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 3),
             Text(
-              FlutterI18n.translate(
-                context,
-                "electricity.water_usage_read_before",
-              ),
+              context.t.electricity.waterUsageReadBefore,
               style: headerStyle,
               textAlign: TextAlign.center,
             ).expanded(flex: 3),

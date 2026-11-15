@@ -1,8 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
@@ -26,26 +26,19 @@ class ElectricityEnergyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InfoCard(
       iconData: Icons.electric_meter,
-      title: FlutterI18n.translate(
-        context,
-        "electricity.power_metid_title",
-        translationParams: {"code": metID},
-      ),
+      title: context.t.electricity.powerMetidTitle(code: metID),
       children: [
         InfoItem(
           icon: Icons.cached,
-          label: FlutterI18n.translate(context, "electricity.cache_notice"),
+          label: context.t.electricity.cacheNotice,
           value: DateFormat("yyyy-MM-dd").format(meterInfo.fetchDay),
         ),
         InfoItem(
           icon: Icons.electric_meter,
-          label: FlutterI18n.translate(context, "electricity.remain_power"),
+          label: context.t.electricity.remainPower,
           value: "${meterInfo.remain} kWh",
         ),
-        InfoItem(
-          icon: Icons.history,
-          label: FlutterI18n.translate(context, "electricity.history"),
-        ),
+        InfoItem(icon: Icons.history, label: context.t.electricity.history),
         LayoutBuilder(
               builder: (context, constraints) => ElectricityUsageGraph(
                 graphHeight: 240,
@@ -61,7 +54,7 @@ class ElectricityEnergyCard extends StatelessWidget {
             .padding(horizontal: 12),
         InfoItem(
           icon: Icons.bar_chart,
-          label: FlutterI18n.translate(context, "electricity.daily_usage"),
+          label: context.t.electricity.dailyUsage,
         ),
         LayoutBuilder(
               builder: (context, constraints) => ElectricityAverageUsageGraph(

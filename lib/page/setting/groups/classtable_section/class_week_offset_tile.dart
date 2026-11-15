@@ -1,9 +1,10 @@
 // Copyright 2026 Traintime PDA authors.
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/setting/numeric_setting_sheet.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -24,14 +25,10 @@ class _ClassWeekOffsetTileState extends State<ClassWeekOffsetTile> {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(MingCuteIcons.mgc_calendar_week_line),
-      title: Text(FlutterI18n.translate(context, "setting.class_swift")),
+      title: Text(context.t.setting.classSwift),
       subtitle: Text(
-        FlutterI18n.translate(
-          context,
-          "setting.class_swift_description",
-          translationParams: {
-            "swift": preference.getInt(preference.Preference.swift).toString(),
-          },
+        context.t.setting.classSwiftDescription(
+          swift: preference.getInt(preference.Preference.swift).toString(),
         ),
       ),
       trailing: const Icon(Icons.navigate_next),

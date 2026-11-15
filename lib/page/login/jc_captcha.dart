@@ -7,9 +7,10 @@
 import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/repository/ids_session/slider_captcha_client.dart';
 
 Future<bool> solveSliderCaptchaManually(
@@ -312,9 +313,7 @@ class _CaptchaWidgetState extends State<CaptchaWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(FlutterI18n.translate(context, "login.slider_title")),
-      ),
+      appBar: AppBar(title: Text(context.t.login.sliderTitle)),
       body: FutureBuilder<SliderCaptchaClientProvider>(
         future: _providerFuture,
         builder: (context, snapshot) {

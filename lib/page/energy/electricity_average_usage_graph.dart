@@ -6,10 +6,11 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
+
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/xidian_ids/energy.dart';
 import 'package:watermeter/repository/logger.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 class _GraphMetrics {
   static const double tooltipFontSize = 9;
@@ -147,7 +148,7 @@ class _ElectricityAverageUsageGraphState
       log.info("[ElectricityAverageUsageGraph] Not enough data, quit!");
 
       return Text(
-        FlutterI18n.translate(context, "electricity.not_enough_data"),
+        context.t.electricity.notEnoughData,
         textAlign: TextAlign.center,
 
         style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),

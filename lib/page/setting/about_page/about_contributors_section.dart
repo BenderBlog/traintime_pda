@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'package:watermeter/model/about_page.dart';
+import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 
 class AboutContributorsSection extends StatefulWidget {
@@ -25,7 +26,7 @@ class _AboutContributorsSectionState extends State<AboutContributorsSection> {
     final colors = Theme.of(context).colorScheme;
 
     return SectionSettingScaffold(
-      title: FlutterI18n.translate(context, 'setting.about_page.contributors'),
+      title: context.t.setting.aboutPage.contributors,
       icon: Icons.favorite_border_rounded,
       items: M3EExpandableSegmentedItem(
         index: 0,
@@ -40,12 +41,8 @@ class _AboutContributorsSectionState extends State<AboutContributorsSection> {
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.people_outline_rounded),
           title: Text(
-            FlutterI18n.translate(
-              context,
-              'setting.acknowledgement',
-              translationParams: {
-                'developers': getDevelopers.length.toString(),
-              },
+            context.t.setting.acknowledgement(
+              developers: getDevelopers.length.toString(),
             ),
           ),
         ),
@@ -69,9 +66,7 @@ class _AboutContributorsSectionState extends State<AboutContributorsSection> {
               ),
             ),
             title: Text(developer.name),
-            subtitle: Text(
-              FlutterI18n.translate(context, developer.descriptionI18nKey),
-            ),
+            subtitle: Text(developer.description(context.t)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 20),
           );
         },
