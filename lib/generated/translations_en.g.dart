@@ -101,6 +101,7 @@ class _Translations$classtable$en extends Translations$classtable$zh {
 
 	// Translations
 	@override late final _Translations$classtable$partnerClasstable$en partnerClasstable = _Translations$classtable$partnerClasstable$en._(_root);
+	@override late final _Translations$classtable$weekBar$en weekBar = _Translations$classtable$weekBar$en._(_root);
 	@override String get pageTitle => 'Schedule';
 	@override String partnerPageTitle({required Object partner_name}) => '${partner_name}\'s Schedule';
 	@override late final _Translations$classtable$popupMenu$en popupMenu = _Translations$classtable$popupMenu$en._(_root);
@@ -1155,6 +1156,17 @@ class _Translations$classtable$partnerClasstable$en extends Translations$classta
 	@override late final _Translations$classtable$partnerClasstable$saveDialog$en saveDialog = _Translations$classtable$partnerClasstable$saveDialog$en._(_root);
 	@override late final _Translations$classtable$partnerClasstable$deleteDialog$en deleteDialog = _Translations$classtable$partnerClasstable$deleteDialog$en._(_root);
 	@override late final _Translations$classtable$partnerClasstable$nameDialog$en nameDialog = _Translations$classtable$partnerClasstable$nameDialog$en._(_root);
+}
+
+// Path: classtable.weekBar
+class _Translations$classtable$weekBar$en extends Translations$classtable$weekBar$zh {
+	_Translations$classtable$weekBar$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get pin => 'Pin the week bar';
+	@override String get unpin => 'Collapse the week bar';
 }
 
 // Path: classtable.popupMenu
@@ -2353,6 +2365,15 @@ class _Translations$setting$classTableStylePage$en extends Translations$setting$
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
+	@override String get frostedSection => 'Frosted backgrounds';
+	@override String get frostedEnabled => 'Enable frosted backgrounds';
+	@override String get frostedEnabledHint => 'When off, the controls keep their translucent tint and drop the blur';
+	@override String get frostedCardSigma => 'Course card blur';
+	@override String get frostedTimeLineSigma => 'Time line blur';
+	@override String get frostedDateRowSigma => 'Date row blur';
+	@override String get frostedWeekBarSigma => 'Week bar blur';
+	@override String get frostedBannerSigma => 'Status banner blur';
+	@override String get frostedAppBarSigma => 'Navigation bar blur';
 	@override String get currentTimeSettingsTitle => 'Time indicator settings';
 	@override String get classColorSettingsTitle => 'Class schedule style settings';
 	@override String get currentTimeSection => 'Time indicator settings';
@@ -2547,6 +2568,8 @@ extension on TranslationsEn {
 			'classtable.partnerClasstable.nameDialog.cancel' => 'There\'s nobody other than my sweetie',
 			'classtable.partnerClasstable.nameDialog.accept' => 'Submit',
 			'classtable.partnerClasstable.nameDialog.blankInput' => 'Input is blank!',
+			'classtable.weekBar.pin' => 'Pin the week bar',
+			'classtable.weekBar.unpin' => 'Collapse the week bar',
 			'classtable.pageTitle' => 'Schedule',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}\'s Schedule',
 			'classtable.popupMenu.notArranged' => 'View unarranged classes',
@@ -2993,11 +3016,11 @@ extension on TranslationsEn {
 			'homepage.classTableCard.noArrangementInfoText' => 'No schedule at the moment',
 			'homepage.classTableCard.scheduleFetchingMessage' => 'Schedule is loading, please check again soon',
 			'homepage.classTableCard.scheduleErrorMessage' => 'Failed to load schedule, please try again later',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.scheduleFetchingInfoText' => 'Loading schedule',
 			'homepage.classTableCard.scheduleErrorInfoText' => 'Failed to load schedule',
 			'homepage.classTableCard.scheduleNoneInfoText' => 'No schedule available',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.classTableCard.updatingInfoText' => 'Updating',
 			'homepage.classTableCard.allLoadingInfoText' => 'All sources loading',
 			'homepage.classTableCard.partialLoadingInfoText' => 'Partially loading',
@@ -3507,11 +3530,11 @@ extension on TranslationsEn {
 			'setting.changeBrightnessDialog.dayMode' => 'Light',
 			'setting.changeBrightnessDialog.nightMode' => 'Dark',
 			'setting.changeSwiftDialog.title' => 'Class schedule offset setting',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeSwiftDialog.inputHint' => 'Please input number here',
 			'setting.changeSwiftDialog.invalidNumber' => 'Please enter a valid whole number',
 			'setting.changeElectricityTitle' => 'Modify electricity account',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.title' => 'Modify electricity account',
 			'setting.changeElectricityAccount.campus' => 'Campus',
 			'setting.changeElectricityAccount.northCampus' => 'Northern Campus',
@@ -3686,6 +3709,15 @@ extension on TranslationsEn {
 			'setting.backgroundBlurOff' => 'Off',
 			'setting.classTableStyleSetting' => 'Class schedule display & style',
 			'setting.classTableStyleDescription' => 'Time indicator and course card style',
+			'setting.classTableStylePage.frostedSection' => 'Frosted backgrounds',
+			'setting.classTableStylePage.frostedEnabled' => 'Enable frosted backgrounds',
+			'setting.classTableStylePage.frostedEnabledHint' => 'When off, the controls keep their translucent tint and drop the blur',
+			'setting.classTableStylePage.frostedCardSigma' => 'Course card blur',
+			'setting.classTableStylePage.frostedTimeLineSigma' => 'Time line blur',
+			'setting.classTableStylePage.frostedDateRowSigma' => 'Date row blur',
+			'setting.classTableStylePage.frostedWeekBarSigma' => 'Week bar blur',
+			'setting.classTableStylePage.frostedBannerSigma' => 'Status banner blur',
+			'setting.classTableStylePage.frostedAppBarSigma' => 'Navigation bar blur',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => 'Time indicator settings',
 			'setting.classTableStylePage.classColorSettingsTitle' => 'Class schedule style settings',
 			'setting.classTableStylePage.currentTimeSection' => 'Time indicator settings',

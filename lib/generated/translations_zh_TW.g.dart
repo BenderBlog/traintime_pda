@@ -101,6 +101,7 @@ class _Translations$classtable$zh_TW extends Translations$classtable$zh {
 
 	// Translations
 	@override late final _Translations$classtable$partnerClasstable$zh_TW partnerClasstable = _Translations$classtable$partnerClasstable$zh_TW._(_root);
+	@override late final _Translations$classtable$weekBar$zh_TW weekBar = _Translations$classtable$weekBar$zh_TW._(_root);
 	@override String get pageTitle => '日程表';
 	@override String partnerPageTitle({required Object partner_name}) => '${partner_name}的日程表';
 	@override late final _Translations$classtable$popupMenu$zh_TW popupMenu = _Translations$classtable$popupMenu$zh_TW._(_root);
@@ -1155,6 +1156,17 @@ class _Translations$classtable$partnerClasstable$zh_TW extends Translations$clas
 	@override late final _Translations$classtable$partnerClasstable$saveDialog$zh_TW saveDialog = _Translations$classtable$partnerClasstable$saveDialog$zh_TW._(_root);
 	@override late final _Translations$classtable$partnerClasstable$deleteDialog$zh_TW deleteDialog = _Translations$classtable$partnerClasstable$deleteDialog$zh_TW._(_root);
 	@override late final _Translations$classtable$partnerClasstable$nameDialog$zh_TW nameDialog = _Translations$classtable$partnerClasstable$nameDialog$zh_TW._(_root);
+}
+
+// Path: classtable.weekBar
+class _Translations$classtable$weekBar$zh_TW extends Translations$classtable$weekBar$zh {
+	_Translations$classtable$weekBar$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get pin => '固定週次欄';
+	@override String get unpin => '收起週次欄';
 }
 
 // Path: classtable.popupMenu
@@ -2353,6 +2365,15 @@ class _Translations$setting$classTableStylePage$zh_TW extends Translations$setti
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
+	@override String get frostedSection => '毛玻璃背景';
+	@override String get frostedEnabled => '啟用毛玻璃背景';
+	@override String get frostedEnabledHint => '關閉後各控件只保留半透明底色，可省電、更流暢';
+	@override String get frostedCardSigma => '課程卡片模糊';
+	@override String get frostedTimeLineSigma => '時間軸模糊';
+	@override String get frostedDateRowSigma => '日期欄模糊';
+	@override String get frostedWeekBarSigma => '週次欄模糊';
+	@override String get frostedBannerSigma => '狀態橫幅模糊';
+	@override String get frostedAppBarSigma => '導航欄模糊';
 	@override String get currentTimeSettingsTitle => '時間指示設置';
 	@override String get classColorSettingsTitle => '課表樣式設置';
 	@override String get currentTimeSection => '時間指示設置';
@@ -2547,6 +2568,8 @@ extension on TranslationsZhTw {
 			'classtable.partnerClasstable.nameDialog.cancel' => '我就這一個甜心',
 			'classtable.partnerClasstable.nameDialog.accept' => '提交',
 			'classtable.partnerClasstable.nameDialog.blankInput' => '輸入空白!',
+			'classtable.weekBar.pin' => '固定週次欄',
+			'classtable.weekBar.unpin' => '收起週次欄',
 			'classtable.pageTitle' => '日程表',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}的日程表',
 			'classtable.popupMenu.notArranged' => '查看未安排課程信息',
@@ -2993,11 +3016,11 @@ extension on TranslationsZhTw {
 			'homepage.classTableCard.noArrangementInfoText' => '暫無日程',
 			'homepage.classTableCard.scheduleFetchingMessage' => '日程正在加載，請稍後查看',
 			'homepage.classTableCard.scheduleErrorMessage' => '日程加載失敗，請稍後重試',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.scheduleFetchingInfoText' => '正在加載日程',
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加載失敗',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暫無日程',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			'homepage.classTableCard.allLoadingInfoText' => '全部加載中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加載中',
@@ -3507,11 +3530,11 @@ extension on TranslationsZhTw {
 			'setting.changeBrightnessDialog.dayMode' => '淺色',
 			'setting.changeBrightnessDialog.nightMode' => '深色',
 			'setting.changeSwiftDialog.title' => '課程偏移設置',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeSwiftDialog.inputHint' => '請在此輸入數字',
 			'setting.changeSwiftDialog.invalidNumber' => '請輸入有效的整數',
 			'setting.changeElectricityTitle' => '修改電費帳號',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.title' => '修改電費帳號',
 			'setting.changeElectricityAccount.campus' => '校區',
 			'setting.changeElectricityAccount.northCampus' => '北校區',
@@ -3686,6 +3709,15 @@ extension on TranslationsZhTw {
 			'setting.backgroundBlurOff' => '關閉',
 			'setting.classTableStyleSetting' => '課表顯示與樣式',
 			'setting.classTableStyleDescription' => '時間指示和課程卡片樣式',
+			'setting.classTableStylePage.frostedSection' => '毛玻璃背景',
+			'setting.classTableStylePage.frostedEnabled' => '啟用毛玻璃背景',
+			'setting.classTableStylePage.frostedEnabledHint' => '關閉後各控件只保留半透明底色，可省電、更流暢',
+			'setting.classTableStylePage.frostedCardSigma' => '課程卡片模糊',
+			'setting.classTableStylePage.frostedTimeLineSigma' => '時間軸模糊',
+			'setting.classTableStylePage.frostedDateRowSigma' => '日期欄模糊',
+			'setting.classTableStylePage.frostedWeekBarSigma' => '週次欄模糊',
+			'setting.classTableStylePage.frostedBannerSigma' => '狀態橫幅模糊',
+			'setting.classTableStylePage.frostedAppBarSigma' => '導航欄模糊',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => '時間指示設置',
 			'setting.classTableStylePage.classColorSettingsTitle' => '課表樣式設置',
 			'setting.classTableStylePage.currentTimeSection' => '時間指示設置',

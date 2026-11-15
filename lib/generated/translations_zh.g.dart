@@ -114,6 +114,7 @@ class Translations$classtable$zh {
 
 	// Translations
 	late final Translations$classtable$partnerClasstable$zh partnerClasstable = Translations$classtable$partnerClasstable$zh.internal(_root);
+	late final Translations$classtable$weekBar$zh weekBar = Translations$classtable$weekBar$zh.internal(_root);
 
 	/// zh: '日程表'
 	String get pageTitle => '日程表';
@@ -2491,6 +2492,21 @@ class Translations$classtable$partnerClasstable$zh {
 	late final Translations$classtable$partnerClasstable$saveDialog$zh saveDialog = Translations$classtable$partnerClasstable$saveDialog$zh.internal(_root);
 	late final Translations$classtable$partnerClasstable$deleteDialog$zh deleteDialog = Translations$classtable$partnerClasstable$deleteDialog$zh.internal(_root);
 	late final Translations$classtable$partnerClasstable$nameDialog$zh nameDialog = Translations$classtable$partnerClasstable$nameDialog$zh.internal(_root);
+}
+
+// Path: classtable.weekBar
+class Translations$classtable$weekBar$zh {
+	Translations$classtable$weekBar$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '固定周次栏'
+	String get pin => '固定周次栏';
+
+	/// zh: '收起周次栏'
+	String get unpin => '收起周次栏';
 }
 
 // Path: classtable.popupMenu
@@ -4896,6 +4912,33 @@ class Translations$setting$classTableStylePage$zh {
 
 	// Translations
 
+	/// zh: '毛玻璃背景'
+	String get frostedSection => '毛玻璃背景';
+
+	/// zh: '启用毛玻璃背景'
+	String get frostedEnabled => '启用毛玻璃背景';
+
+	/// zh: '关闭后各控件只保留半透明底色，可省电、更流畅'
+	String get frostedEnabledHint => '关闭后各控件只保留半透明底色，可省电、更流畅';
+
+	/// zh: '课程卡片模糊'
+	String get frostedCardSigma => '课程卡片模糊';
+
+	/// zh: '时间轴模糊'
+	String get frostedTimeLineSigma => '时间轴模糊';
+
+	/// zh: '日期栏模糊'
+	String get frostedDateRowSigma => '日期栏模糊';
+
+	/// zh: '周次栏模糊'
+	String get frostedWeekBarSigma => '周次栏模糊';
+
+	/// zh: '状态横幅模糊'
+	String get frostedBannerSigma => '状态横幅模糊';
+
+	/// zh: '导航栏模糊'
+	String get frostedAppBarSigma => '导航栏模糊';
+
 	/// zh: '时间指示设置'
 	String get currentTimeSettingsTitle => '时间指示设置';
 
@@ -5203,6 +5246,8 @@ extension on Translations {
 			'classtable.partnerClasstable.nameDialog.cancel' => '我就这一个甜心',
 			'classtable.partnerClasstable.nameDialog.accept' => '提交',
 			'classtable.partnerClasstable.nameDialog.blankInput' => '输入空白!',
+			'classtable.weekBar.pin' => '固定周次栏',
+			'classtable.weekBar.unpin' => '收起周次栏',
 			'classtable.pageTitle' => '日程表',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}的日程表',
 			'classtable.popupMenu.notArranged' => '查看未安排课程信息',
@@ -5649,11 +5694,11 @@ extension on Translations {
 			'homepage.classTableCard.noArrangementInfoText' => '暂无日程',
 			'homepage.classTableCard.scheduleFetchingMessage' => '日程正在加载，请稍后查看',
 			'homepage.classTableCard.scheduleErrorMessage' => '日程加载失败，请稍后重试',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.scheduleFetchingInfoText' => '正在加载日程',
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加载失败',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暂无日程',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			'homepage.classTableCard.allLoadingInfoText' => '全部加载中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加载中',
@@ -6163,11 +6208,11 @@ extension on Translations {
 			'setting.changeBrightnessDialog.dayMode' => '浅色',
 			'setting.changeBrightnessDialog.nightMode' => '深色',
 			'setting.changeSwiftDialog.title' => '课程偏移设置',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeSwiftDialog.inputHint' => '请在此输入数字',
 			'setting.changeSwiftDialog.invalidNumber' => '请输入有效的整数',
 			'setting.changeElectricityTitle' => '修改电费帐号',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.title' => '修改电费帐号',
 			'setting.changeElectricityAccount.campus' => '校区',
 			'setting.changeElectricityAccount.northCampus' => '北校区',
@@ -6342,6 +6387,15 @@ extension on Translations {
 			'setting.backgroundBlurOff' => '关闭',
 			'setting.classTableStyleSetting' => '课表显示与样式',
 			'setting.classTableStyleDescription' => '时间指示和课程卡片样式',
+			'setting.classTableStylePage.frostedSection' => '毛玻璃背景',
+			'setting.classTableStylePage.frostedEnabled' => '启用毛玻璃背景',
+			'setting.classTableStylePage.frostedEnabledHint' => '关闭后各控件只保留半透明底色，可省电、更流畅',
+			'setting.classTableStylePage.frostedCardSigma' => '课程卡片模糊',
+			'setting.classTableStylePage.frostedTimeLineSigma' => '时间轴模糊',
+			'setting.classTableStylePage.frostedDateRowSigma' => '日期栏模糊',
+			'setting.classTableStylePage.frostedWeekBarSigma' => '周次栏模糊',
+			'setting.classTableStylePage.frostedBannerSigma' => '状态横幅模糊',
+			'setting.classTableStylePage.frostedAppBarSigma' => '导航栏模糊',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => '时间指示设置',
 			'setting.classTableStylePage.classColorSettingsTitle' => '课表样式设置',
 			'setting.classTableStylePage.currentTimeSection' => '时间指示设置',

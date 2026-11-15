@@ -23,6 +23,9 @@ partner_classtable:
     cancel: There's nobody other than my sweetie
     accept: Submit
     blank_input: Input is blank!
+week_bar:
+  pin: Pin the week bar
+  unpin: Collapse the week bar
 page_title: Schedule
 partner_page_title: '{partner_name}''s Schedule'
 popup_menu:

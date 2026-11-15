@@ -377,6 +377,15 @@ background_blur_off: 'Off'
 class_table_style_setting: Class schedule display & style
 class_table_style_description: Time indicator and course card style
 class_table_style_page:
+  frosted_section: Frosted backgrounds
+  frosted_enabled: Enable frosted backgrounds
+  frosted_enabled_hint: When off, the controls keep their translucent tint and drop the blur
+  frosted_card_sigma: Course card blur
+  frosted_time_line_sigma: Time line blur
+  frosted_date_row_sigma: Date row blur
+  frosted_week_bar_sigma: Week bar blur
+  frosted_banner_sigma: Status banner blur
+  frosted_app_bar_sigma: Navigation bar blur
   current_time_settings_title: Time indicator settings
   class_color_settings_title: Class schedule style settings
   current_time_section: Time indicator settings

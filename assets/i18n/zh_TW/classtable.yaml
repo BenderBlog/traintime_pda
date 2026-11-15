@@ -22,6 +22,9 @@ partner_classtable:
     cancel: 我就這一個甜心
     accept: 提交
     blank_input: 輸入空白!
+week_bar:
+  pin: 固定週次欄
+  unpin: 收起週次欄
 page_title: 日程表
 partner_page_title: '{partner_name}的日程表'
 popup_menu:

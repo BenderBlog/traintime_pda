@@ -346,6 +346,15 @@ background_blur_off: 关闭
 class_table_style_setting: 课表显示与样式
 class_table_style_description: 时间指示和课程卡片样式
 class_table_style_page:
+  frosted_section: 毛玻璃背景
+  frosted_enabled: 启用毛玻璃背景
+  frosted_enabled_hint: 关闭后各控件只保留半透明底色，可省电、更流畅
+  frosted_card_sigma: 课程卡片模糊
+  frosted_time_line_sigma: 时间轴模糊
+  frosted_date_row_sigma: 日期栏模糊
+  frosted_week_bar_sigma: 周次栏模糊
+  frosted_banner_sigma: 状态横幅模糊
+  frosted_app_bar_sigma: 导航栏模糊
   current_time_settings_title: 时间指示设置
   class_color_settings_title: 课表样式设置
   current_time_section: 时间指示设置

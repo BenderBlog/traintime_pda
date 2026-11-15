@@ -16,12 +16,18 @@ class CompletedClassStyleConfig {
   static double completedBrightnessFactor = 0.75;
   static double completedTextSaturationFactor = 0.75;
   static double completedBorderAlpha = 0.75;
-  static double completedInnerAlpha = 0.75;
+
+  /// Left translucent enough that the blurred wallpaper behind the table reads through the card,
+  /// which is what makes a card look like frosted glass. Adjustable in the class colour settings.
+  static double completedInnerAlpha = 0.62;
 
   /// Active-card baseline appearance.
   static double activeBrightnessFactor = 1.0;
   static double activeBorderAlpha = 1.0;
-  static double activeInnerAlpha = 0.9;
+
+  /// Translucent, like the completed card, so the frosted wallpaper shows through. Text stays
+  /// readable because what is behind it is a blur rather than the raw wallpaper.
+  static double activeInnerAlpha = 0.78;
 
   static void loadFromPreference() {
     if (preference.contains(preference.Preference.classStyleCompletedEnabled)) {
