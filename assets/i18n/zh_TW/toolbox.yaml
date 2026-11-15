@@ -16,3 +16,10 @@ physics: 物理計算
 physics_description: 希望操作順利
 discover: 睿思導航
 discover_description: 補充其他功能
+notice_search: 通知查詢
+notice_description: 不要錯過通知
+notice_hint: 搜尋關鍵詞（近30天的通知標題）
+notice_placeholder: 如:轉專業
+notice_incomplete: 部分來源未查完
+notice_empty: 已查欄目中沒有符合的通知
+notice_open_error: 無法開啟原文連結

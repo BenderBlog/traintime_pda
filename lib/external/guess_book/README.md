@@ -1,8 +1,3 @@
-<!--
- Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
- SPDX-License-Identifier: MPL-2.0
--->
-
 # guess_book
 
 猜书名游戏，根据一堆emoji来猜书名。

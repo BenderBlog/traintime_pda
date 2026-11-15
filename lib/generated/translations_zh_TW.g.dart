@@ -521,6 +521,7 @@ class _Translations$homepage$zh_TW extends Translations$homepage$zh {
 	@override String get ruisi => '睿思論壇';
 	@override String get club => '社團推薦';
 	@override String get relax => '放鬆一下';
+	@override String get relaxMessage => '整天學習不會玩，聰明孩子也會傻';
 	@override String get dashboard => '豬圖鑑賞';
 	@override String get planet => '博客星球';
 	@override String get setting => '設置';
@@ -985,6 +986,13 @@ class _Translations$toolbox$zh_TW extends Translations$toolbox$zh {
 	@override String get physicsDescription => '希望操作順利';
 	@override String get discover => '睿思導航';
 	@override String get discoverDescription => '補充其他功能';
+	@override String get noticeSearch => '通知查詢';
+	@override String get noticeDescription => '不要錯過通知';
+	@override String get noticeHint => '搜尋關鍵詞（近30天的通知標題）';
+	@override String get noticePlaceholder => '如:轉專業';
+	@override String get noticeIncomplete => '部分來源未查完';
+	@override String get noticeEmpty => '已查欄目中沒有符合的通知';
+	@override String get noticeOpenError => '無法開啟原文連結';
 }
 
 // Path: weekday
@@ -2948,6 +2956,7 @@ extension on TranslationsZhTw {
 			'homepage.ruisi' => '睿思論壇',
 			'homepage.club' => '社團推薦',
 			'homepage.relax' => '放鬆一下',
+			'homepage.relaxMessage' => '整天學習不會玩，聰明孩子也會傻',
 			'homepage.dashboard' => '豬圖鑑賞',
 			'homepage.planet' => '博客星球',
 			'homepage.setting' => '設置',
@@ -3749,6 +3758,13 @@ extension on TranslationsZhTw {
 			'toolbox.physicsDescription' => '希望操作順利',
 			'toolbox.discover' => '睿思導航',
 			'toolbox.discoverDescription' => '補充其他功能',
+			'toolbox.noticeSearch' => '通知查詢',
+			'toolbox.noticeDescription' => '不要錯過通知',
+			'toolbox.noticeHint' => '搜尋關鍵詞（近30天的通知標題）',
+			'toolbox.noticePlaceholder' => '如:轉專業',
+			'toolbox.noticeIncomplete' => '部分來源未查完',
+			'toolbox.noticeEmpty' => '已查欄目中沒有符合的通知',
+			'toolbox.noticeOpenError' => '無法開啟原文連結',
 			'weekday.monday' => '週一',
 			'weekday.tuesday' => '週二',
 			'weekday.wednesday' => '週三',

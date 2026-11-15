@@ -522,6 +522,7 @@ class _Translations$homepage$en extends Translations$homepage$zh {
 	@override String get club => 'Club';
 	@override String get planet => 'Blog';
 	@override String get relax => 'Take a break';
+	@override String get relaxMessage => 'All work and no play makes Jack a dull boy.';
 	@override String get dashboard => 'Pighub';
 	@override String get setting => 'Settings';
 	@override late final _Translations$homepage$inputPartnerData$en inputPartnerData = _Translations$homepage$inputPartnerData$en._(_root);
@@ -985,6 +986,13 @@ class _Translations$toolbox$en extends Translations$toolbox$zh {
 	@override String get physicsDescription => 'Hope the operation goes smoothly';
 	@override String get discover => 'Ruisi Navigation';
 	@override String get discoverDescription => 'Lots other functions';
+	@override String get noticeSearch => 'Notice search';
+	@override String get noticeDescription => 'Don\'t miss any notices';
+	@override String get noticeHint => 'Search keywords (notice titles from the last 30 days)';
+	@override String get noticePlaceholder => 'e.g. changing majors';
+	@override String get noticeIncomplete => 'Some sources could not be fully searched';
+	@override String get noticeEmpty => 'No matches in the lists checked';
+	@override String get noticeOpenError => 'Could not open the original notice';
 }
 
 // Path: weekday
@@ -2949,6 +2957,7 @@ extension on TranslationsEn {
 			'homepage.club' => 'Club',
 			'homepage.planet' => 'Blog',
 			'homepage.relax' => 'Take a break',
+			'homepage.relaxMessage' => 'All work and no play makes Jack a dull boy.',
 			'homepage.dashboard' => 'Pighub',
 			'homepage.setting' => 'Settings',
 			'homepage.inputPartnerData.routeNotExist' => 'Import path does not exist:P',
@@ -3749,6 +3758,13 @@ extension on TranslationsEn {
 			'toolbox.physicsDescription' => 'Hope the operation goes smoothly',
 			'toolbox.discover' => 'Ruisi Navigation',
 			'toolbox.discoverDescription' => 'Lots other functions',
+			'toolbox.noticeSearch' => 'Notice search',
+			'toolbox.noticeDescription' => 'Don\'t miss any notices',
+			'toolbox.noticeHint' => 'Search keywords (notice titles from the last 30 days)',
+			'toolbox.noticePlaceholder' => 'e.g. changing majors',
+			'toolbox.noticeIncomplete' => 'Some sources could not be fully searched',
+			'toolbox.noticeEmpty' => 'No matches in the lists checked',
+			'toolbox.noticeOpenError' => 'Could not open the original notice',
 			'weekday.monday' => 'Mon.',
 			'weekday.tuesday' => 'Tue.',
 			'weekday.wednesday' => 'Wed.',
