@@ -303,6 +303,7 @@ class _Translations$electricity$zh_TW extends Translations$electricity$zh {
 	@override String get airconTitle => '空調用電';
 	@override String get airconImei => '空調 IMEI';
 	@override String get airconAmount => '平臺用電量';
+	@override String get airconIndoor => '室內溫度';
 	@override String get airconUpdateTime => '更新時間';
 	@override String get airconWaiting => '等待獲取空調用電信息';
 	@override String get airconError => '空調用電獲取失敗';
@@ -2798,6 +2799,7 @@ extension on TranslationsZhTw {
 			'electricity.airconTitle' => '空調用電',
 			'electricity.airconImei' => '空調 IMEI',
 			'electricity.airconAmount' => '平臺用電量',
+			'electricity.airconIndoor' => '室內溫度',
 			'electricity.airconUpdateTime' => '更新時間',
 			'electricity.airconWaiting' => '等待獲取空調用電信息',
 			'electricity.airconError' => '空調用電獲取失敗',

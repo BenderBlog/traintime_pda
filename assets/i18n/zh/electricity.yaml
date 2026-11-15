@@ -33,6 +33,7 @@ not_school_network: 非校园网访问
 aircon_title: 空调用电
 aircon_imei: 空调 IMEI
 aircon_amount: 平台用电量
+aircon_indoor: 室内温度
 aircon_update_time: 更新时间
 aircon_waiting: 等待获取空调用电信息
 aircon_error: 空调用电获取失败

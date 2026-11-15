@@ -587,6 +587,9 @@ class Translations$electricity$zh {
 	/// zh: '平台用电量'
 	String get airconAmount => '平台用电量';
 
+	/// zh: '室内温度'
+	String get airconIndoor => '室内温度';
+
 	/// zh: '更新时间'
 	String get airconUpdateTime => '更新时间';
 
@@ -5452,6 +5455,7 @@ extension on Translations {
 			'electricity.airconTitle' => '空调用电',
 			'electricity.airconImei' => '空调 IMEI',
 			'electricity.airconAmount' => '平台用电量',
+			'electricity.airconIndoor' => '室内温度',
 			'electricity.airconUpdateTime' => '更新时间',
 			'electricity.airconWaiting' => '等待获取空调用电信息',
 			'electricity.airconError' => '空调用电获取失败',

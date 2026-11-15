@@ -303,6 +303,7 @@ class _Translations$electricity$en extends Translations$electricity$zh {
 	@override String get airconTitle => 'Aircon Electricity';
 	@override String get airconImei => 'Aircon IMEI';
 	@override String get airconAmount => 'Platform usage';
+	@override String get airconIndoor => 'Indoor temperature';
 	@override String get airconUpdateTime => 'Updated at';
 	@override String get airconWaiting => 'Waiting to fetch aircon electricity data';
 	@override String get airconError => 'Failed to fetch aircon electricity data';
@@ -2798,6 +2799,7 @@ extension on TranslationsEn {
 			'electricity.airconTitle' => 'Aircon Electricity',
 			'electricity.airconImei' => 'Aircon IMEI',
 			'electricity.airconAmount' => 'Platform usage',
+			'electricity.airconIndoor' => 'Indoor temperature',
 			'electricity.airconUpdateTime' => 'Updated at',
 			'electricity.airconWaiting' => 'Waiting to fetch aircon electricity data',
 			'electricity.airconError' => 'Failed to fetch aircon electricity data',
