@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -20,7 +19,8 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
-import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
+import 'package:watermeter/page/classtable/class_page/classtable_error_button.dart';
+import 'package:watermeter/page/classtable/class_page/classtable_status_hint.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
@@ -270,74 +270,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             );
           },
         ),
-      ),
-    );
-  }
-
-  Future<void> _showLoadErrorDialog() async {
-    final state = ClassTableState.of(context)!.controllers;
-    final errorWithoutCacheSources = state.errorWithoutCacheSources;
-    final errorWithCacheSources = state.errorWithCacheSources;
-
-    String sourceLabel(ClassTableStatusSource source) =>
-        context.t.resolveKey(switch (source) {
-          ClassTableStatusSource.classTable =>
-            "classtable.status_source.class_table",
-          ClassTableStatusSource.exam => "classtable.status_source.exam",
-          ClassTableStatusSource.physicsExperiment =>
-            "classtable.status_source.physics_experiment",
-          ClassTableStatusSource.otherExperiment =>
-            "classtable.status_source.other_experiment",
-        });
-
-    CacheHint? sourceHintKey(ClassTableStatusSource source) => switch (source) {
-      ClassTableStatusSource.classTable => state.classTableCacheHintKey,
-      ClassTableStatusSource.exam => state.examCacheHintKey,
-      ClassTableStatusSource.physicsExperiment =>
-        state.physicsExperimentCacheHintKey,
-      ClassTableStatusSource.otherExperiment =>
-        state.otherExperimentCacheHintKey,
-    };
-
-    final content = <String>[
-      if (errorWithoutCacheSources.isNotEmpty)
-        context.t.classtable.statusBanner.errorSummary(
-          sources: errorWithoutCacheSources.map(sourceLabel).join("、"),
-        ),
-      ...errorWithoutCacheSources.map((source) {
-        final hintKey = sourceHintKey(source);
-        final detail = hintKey != null
-            ? hintKey.resolve(context.t)
-            : context.t.common.networkError;
-        return "${sourceLabel(source)}: $detail";
-      }),
-      if (errorWithoutCacheSources.isNotEmpty &&
-          errorWithCacheSources.isNotEmpty)
-        "",
-      if (errorWithCacheSources.isNotEmpty)
-        context.t.classtable.statusBanner.cache(
-          sources: errorWithCacheSources.map(sourceLabel).join("、"),
-        ),
-      ...errorWithCacheSources.map((source) {
-        final hintKey = sourceHintKey(source);
-        final detail = hintKey != null
-            ? hintKey.resolve(context.t)
-            : context.t.common.networkError;
-        return "${sourceLabel(source)}: $detail";
-      }),
-    ].join("\n");
-
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.t.classtable.errorDialogTitle),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(context.t.common.confirm),
-          ),
-        ],
       ),
     );
   }
@@ -668,21 +600,14 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   @override
   Widget build(BuildContext context) {
     final state = ClassTableState.of(context)!.controllers;
-    final hasError =
-        state.errorWithoutCacheSources.isNotEmpty ||
-        state.errorWithCacheSources.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t.classtable.pageTitle),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
-          if (hasError)
-            IconButton(
-              onPressed: _showLoadErrorDialog,
-              icon: const Icon(Icons.error_outline),
-              tooltip: context.t.classtable.errorDialogTitle,
-            ),
+          ClassTableStatusHint(loadingSources: state.loadingSources),
+          const ClassTableErrorButton(),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
@@ -959,10 +884,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                         : topRowHeightSmall,
                   ),
                   child: _topView(),
-                ),
-                ClassTableInlineBanner(
-                  loadingSources: state.loadingSources,
-                  cacheSources: state.cacheSources,
                 ),
                 _sheet(context).expanded(),
               ],
