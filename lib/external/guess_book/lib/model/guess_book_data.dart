@@ -1,7 +1,7 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
-/// 数据来源：亚托利文学社社长寄意寒星同志或者图书馆管理协会哪位从小红书购买的
+/// 数据来源：亚托利文学社社长寄意寒星同志从小红书购买的
 const Map<String, String> guessBookData = {
   "月亮与六便士": "🌛💡🆚6️⃣🪙",
   "活着": "🔥🐝",

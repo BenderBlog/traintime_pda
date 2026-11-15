@@ -521,6 +521,7 @@ class _Translations$homepage$en extends Translations$homepage$zh {
 	@override String get club => 'Club';
 	@override String get planet => 'Blog';
 	@override String get relax => 'Take a break';
+	@override String get relaxMessage => 'All work and no play makes Jack a dull boy.';
 	@override String get dashboard => 'Pighub';
 	@override String get setting => 'Settings';
 	@override late final _Translations$homepage$inputPartnerData$en inputPartnerData = _Translations$homepage$inputPartnerData$en._(_root);
@@ -2954,6 +2955,7 @@ extension on TranslationsEn {
 			'homepage.club' => 'Club',
 			'homepage.planet' => 'Blog',
 			'homepage.relax' => 'Take a break',
+			'homepage.relaxMessage' => 'All work and no play makes Jack a dull boy.',
 			'homepage.dashboard' => 'Pighub',
 			'homepage.setting' => 'Settings',
 			'homepage.inputPartnerData.routeNotExist' => 'Import path does not exist:P',
@@ -2992,9 +2994,9 @@ extension on TranslationsEn {
 			'homepage.classTableCard.scheduleFetchingInfoText' => 'Loading schedule',
 			'homepage.classTableCard.scheduleErrorInfoText' => 'Failed to load schedule',
 			'homepage.classTableCard.scheduleNoneInfoText' => 'No schedule available',
-			'homepage.classTableCard.updatingInfoText' => 'Updating',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.classTableCard.updatingInfoText' => 'Updating',
 			'homepage.classTableCard.allLoadingInfoText' => 'All sources loading',
 			'homepage.classTableCard.partialLoadingInfoText' => 'Partially loading',
 			'homepage.classTableCard.partialErrorInfoText' => 'Some data failed to load',
@@ -3506,9 +3508,9 @@ extension on TranslationsEn {
 			'setting.changeSwiftDialog.inputHint' => 'Please input number here',
 			'setting.changeSwiftDialog.invalidNumber' => 'Please enter a valid whole number',
 			'setting.changeElectricityTitle' => 'Modify electricity account',
-			'setting.changeElectricityAccount.title' => 'Modify electricity account',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.title' => 'Modify electricity account',
 			'setting.changeElectricityAccount.campus' => 'Campus',
 			'setting.changeElectricityAccount.northCampus' => 'Northern Campus',
 			'setting.changeElectricityAccount.southCampus' => 'Southern Campus',

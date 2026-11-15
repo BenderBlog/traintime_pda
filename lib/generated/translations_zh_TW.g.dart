@@ -520,6 +520,7 @@ class _Translations$homepage$zh_TW extends Translations$homepage$zh {
 	@override String get ruisi => '睿思論壇';
 	@override String get club => '社團推薦';
 	@override String get relax => '放鬆一下';
+	@override String get relaxMessage => '整天學習不會玩，聰明孩子也會傻';
 	@override String get dashboard => '豬圖鑑賞';
 	@override String get planet => '博客星球';
 	@override String get setting => '設置';
@@ -2953,6 +2954,7 @@ extension on TranslationsZhTw {
 			'homepage.ruisi' => '睿思論壇',
 			'homepage.club' => '社團推薦',
 			'homepage.relax' => '放鬆一下',
+			'homepage.relaxMessage' => '整天學習不會玩，聰明孩子也會傻',
 			'homepage.dashboard' => '豬圖鑑賞',
 			'homepage.planet' => '博客星球',
 			'homepage.setting' => '設置',
@@ -2992,9 +2994,9 @@ extension on TranslationsZhTw {
 			'homepage.classTableCard.scheduleFetchingInfoText' => '正在加載日程',
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加載失敗',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暫無日程',
-			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			_ => null,
 		} ?? switch (path) {
+			'homepage.classTableCard.updatingInfoText' => '正在更新',
 			'homepage.classTableCard.allLoadingInfoText' => '全部加載中',
 			'homepage.classTableCard.partialLoadingInfoText' => '部分加載中',
 			'homepage.classTableCard.partialErrorInfoText' => '部分數據加載失敗',
@@ -3506,9 +3508,9 @@ extension on TranslationsZhTw {
 			'setting.changeSwiftDialog.inputHint' => '請在此輸入數字',
 			'setting.changeSwiftDialog.invalidNumber' => '請輸入有效的整數',
 			'setting.changeElectricityTitle' => '修改電費帳號',
-			'setting.changeElectricityAccount.title' => '修改電費帳號',
 			_ => null,
 		} ?? switch (path) {
+			'setting.changeElectricityAccount.title' => '修改電費帳號',
 			'setting.changeElectricityAccount.campus' => '校區',
 			'setting.changeElectricityAccount.northCampus' => '北校區',
 			'setting.changeElectricityAccount.southCampus' => '南校區',
