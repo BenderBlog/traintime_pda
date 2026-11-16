@@ -109,6 +109,9 @@ const double narrowClassCardWidth = 46.0;
 /// The width below which a class card uses the smallest text it has.
 const double tinyClassCardWidth = 32.0;
 
+/// Inset between a class card's outer bounds and its painted content.
+const double classCardContentInset = 1.0;
+
 /// The height the blocks are scaled against by default, keeping card heights consistent
 /// and independent of whether the week bar is docked or collapsed.
 const double classTableHeightReference = 560.0;

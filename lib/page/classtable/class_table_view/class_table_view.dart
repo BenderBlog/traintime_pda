@@ -9,6 +9,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
+import 'package:watermeter/page/classtable/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_state.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 
@@ -83,7 +84,9 @@ class _ClassTableViewState extends State<ClassTableView>
       0.0,
       data.stop - data.start,
     );
-    return blockheight(completedBlocks);
+    final visibleProgress =
+        blockheight(completedBlocks) - classCardContentInset;
+    return visibleProgress > 0 ? visibleProgress : 0;
   }
 
   Positioned? _currentDayColumnBox() => CurrentTimeIndicator.buildDayColumnBox(
@@ -134,7 +137,7 @@ class _ClassTableViewState extends State<ClassTableView>
               completedHeight: completedHeight,
 
               /// Known here already, so the card does not have to measure itself.
-              height: cardHeight - 2,
+              height: cardHeight - 2 * classCardContentInset,
               width: blockwidth,
             ),
           ),

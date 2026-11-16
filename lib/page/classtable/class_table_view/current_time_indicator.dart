@@ -157,18 +157,14 @@ class CurrentTimeIndicator {
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
     final labelHeight = CurrentTimeIndicatorConfig.labelHeight;
     final lineThickness = CurrentTimeIndicatorConfig.lineThickness;
-    final double halfHeight = hasLabel
-        ? (labelHeight / 2)
-        : (lineThickness / 2);
-
-    final double lineTop = blockHeight(
+    final double indicatorHeight = hasLabel ? labelHeight : lineThickness;
+    final double lineCenter = blockHeight(
       _transferIndex(now),
     ).clamp(0.0, blockHeight(61));
 
-    final indicatorTop = lineTop - halfHeight;
-    final indicatorHeight = hasLabel ? labelHeight : lineThickness;
+    final indicatorTop = lineCenter - indicatorHeight / 2;
     final labelTop = 0.0;
-    final lineTopOffset = (indicatorHeight - lineThickness) / 2;
+    final lineTopOffset = indicatorHeight / 2 - lineThickness / 2;
 
     final colorScheme = Theme.of(context).colorScheme;
     final color = colorScheme.primary;

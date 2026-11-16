@@ -91,7 +91,7 @@ class ClassCard extends StatelessWidget {
 
     const borderRadius = BorderRadius.all(Radius.circular(8));
     return Padding(
-      padding: const EdgeInsets.all(1),
+      padding: const EdgeInsets.all(classCardContentInset),
       child: ClipRRect(
         borderRadius: borderRadius,
         child: Stack(
