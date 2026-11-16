@@ -154,43 +154,17 @@ class CurrentTimeIndicator {
       return null;
     }
 
-    final int timeInMin = now.hour * 60 + now.minute;
-    int parseMinute(String hhmm) {
-      final parts = hhmm.split(':');
-      return int.parse(parts[0]) * 60 + int.parse(parts[1]);
-    }
-
-    final firstStart = timeList.isNotEmpty ? parseMinute(timeList.first) : 0;
-    final endMinute = timeList.isNotEmpty
-        ? parseMinute(timeList.last)
-        : 24 * 60;
-
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
     final labelHeight = CurrentTimeIndicatorConfig.labelHeight;
     final lineThickness = CurrentTimeIndicatorConfig.lineThickness;
-
-    // Minimum lineTop ensures the time capsule is not cut off at the start (starts at y >= 1.0)
-    final double minLineTop = hasLabel
-        ? (labelHeight / 2 + 1.0)
-        : (lineThickness / 2 + 1.0);
-
-    // Maximum lineTop positions the time capsule below period 11 text ("21:25") so it does not block the text
-    final double maxLineTop =
-        blockHeight(61) +
-        (hasLabel ? (labelHeight / 2 + 3.0) : (lineThickness / 2 + 3.0));
-
-    double lineTop = blockHeight(_transferIndex(now));
-    if (timeInMin < firstStart) {
-      lineTop = minLineTop;
-    } else if (timeInMin >= endMinute) {
-      lineTop = maxLineTop;
-    } else {
-      lineTop = lineTop.clamp(minLineTop, maxLineTop);
-    }
-
     final double halfHeight = hasLabel
         ? (labelHeight / 2)
         : (lineThickness / 2);
+
+    final double lineTop = blockHeight(
+      _transferIndex(now),
+    ).clamp(0.0, blockHeight(61));
+
     final indicatorTop = lineTop - halfHeight;
     final indicatorHeight = hasLabel ? labelHeight : lineThickness;
     final labelTop = 0.0;
@@ -347,15 +321,15 @@ class CurrentTimeIndicator {
 
   /// The box behind today's column.
   ///
-  /// It spans the full height of the grid, like the time line's panel, so the two bands end level
-  /// with each other, including over the blank room the table keeps after its last period for the
-  /// bottom of the display.
+  /// It spans the 61 period blocks, so its bottom edge aligns with the time-line panel rather than
+  /// continuing into the table's end clearance.
   static Positioned? buildDayColumnBox({
     required BuildContext context,
     required DateTime now,
     required DateTime weekStart,
     required double leftRow,
     required double blockWidth,
+    required double height,
   }) {
     if (!CurrentTimeIndicatorConfig.showTodayColumnHighlight) {
       return null;
@@ -379,7 +353,7 @@ class CurrentTimeIndicator {
     return Positioned(
       left: leftRow + blockWidth * dayOffset,
       top: 0,
-      bottom: 0,
+      height: height,
       width: blockWidth,
       child: IgnorePointer(
         child: DecoratedBox(

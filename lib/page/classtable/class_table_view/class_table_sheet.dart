@@ -139,14 +139,8 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
         /// display itself needs, which is what keeps the last time and the current time indicator
         /// clear of the navigation bar and of the screen's own rounded corners.
         ///
-        /// [classTableTimeLineTopGap] leads instead: the grid starts one strip lower than the sheet,
-        /// so that before the first class the current time indicator has somewhere to be other than
-        /// on top of the 8:30 label.
         final double gridHeight =
-            classTableTimeLineTopGap +
-            61 * blockUnit +
-            classTableSheetEndGap +
-            widget.bottomClearance;
+            61 * blockUnit + classTableSheetEndGap + widget.bottomClearance;
 
         final Widget content = Stack(
           fit: StackFit.expand,
@@ -175,6 +169,8 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                     SizedBox(
                       height: gridHeight,
                       child: Stack(
+                        // The top-aligned indicator can overflow; the date row remains above it.
+                        clipBehavior: Clip.none,
                         children: [
                           /// The classes, below everything else, so a card sliding in from the
                           /// next week passes behind the time line rather than over it.
@@ -437,7 +433,9 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
             opacity: 1.0,
           );
           if (indicator == null) return const SizedBox.shrink();
-          return IgnorePointer(child: Stack(children: [indicator]));
+          return IgnorePointer(
+            child: Stack(clipBehavior: Clip.none, children: [indicator]),
+          );
         },
       );
     }
@@ -484,7 +482,9 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return IgnorePointer(child: Stack(children: [indicator]));
+        return IgnorePointer(
+          child: Stack(clipBehavior: Clip.none, children: [indicator]),
+        );
       },
     );
   }
@@ -506,11 +506,8 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
       leftRow: timeColumnWidth,
       blockWidth: (maxWidth - timeColumnWidth) / 7,
 
-      /// Block 0 sits [classTableTimeLineTopGap] below the top of the grid, exactly like the class
-      /// cards do. Before the first class the indicator still uses its own minimum instead, so it
-      /// waits in that strip rather than on the 8:30 label.
-      blockHeight: (double count) =>
-          classTableTimeLineTopGap + count * blockUnit,
+      /// The first period starts at the top of the grid, matching the class cards and time labels.
+      blockHeight: (double count) => count * blockUnit,
       opacity: opacity,
     );
   }

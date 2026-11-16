@@ -66,7 +66,7 @@ class ClassTableTimeLine extends StatelessWidget {
         Positioned(
           left: timeLineInset,
           top: 0,
-          bottom: 0,
+          height: 61 * blockUnit,
           width: _panelWidth,
           child: DecoratedBox(
             /// The shadow is painted outside the clip so it is not blurred away with the backdrop.
@@ -94,13 +94,11 @@ class ClassTableTimeLine extends StatelessWidget {
           ),
         ),
 
-        /// The labels keep the grid's full height, so each row stays aligned with its blocks. They
-        /// start below [classTableTimeLineTopGap] while the panel above them does not, which is how
-        /// the time line reads as extended upwards: the strip is part of the panel and carries the
-        /// current time indicator before the first class, but no period label.
+        /// The labels keep the grid's full height, so each row stays aligned with its blocks. The
+        /// panel follows the 61-block period area without a spacer above the first period.
         Positioned(
           left: 0,
-          top: classTableTimeLineTopGap,
+          top: 0,
           width: timeColumnWidth,
           child: Column(children: _labels(context)),
         ),
