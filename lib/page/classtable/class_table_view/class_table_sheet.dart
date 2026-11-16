@@ -391,7 +391,7 @@ class _ClassTableScrollBehavior extends MaterialScrollBehavior {
 /// Hidden while the week page moves or rests on another week. It appears only once the current
 /// week page has settled.
 class _CurrentTimeIndicatorLayer extends StatelessWidget {
-  static const Duration _fadeDuration = Duration(milliseconds: 250);
+  static const Duration _fadeDuration = Duration(milliseconds: 100);
 
   const _CurrentTimeIndicatorLayer({
     required this.pageControl,
