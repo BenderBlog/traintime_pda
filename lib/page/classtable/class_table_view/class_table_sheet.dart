@@ -388,11 +388,11 @@ class _ClassTableScrollBehavior extends MaterialScrollBehavior {
 /// The current-time indicator layer: combines the time buoy on the timeline with the horizontal line
 /// as a single connected whole, visible only on the current week.
 ///
-/// Correlates fade-in and fade-out animations directly with horizontal swiping progress:
-/// - Fades out quickly in place as swiping starts away from the current week.
-/// - Stays invisible while swiping and on other weeks.
-/// - Fades in smoothly in place as the swipe brings the current week back into view and settles.
+/// Hidden while the week page moves or rests on another week. It appears only once the current
+/// week page has settled.
 class _CurrentTimeIndicatorLayer extends StatelessWidget {
+  static const Duration _fadeDuration = Duration(milliseconds: 250);
+
   const _CurrentTimeIndicatorLayer({
     required this.pageControl,
     required this.singleIndex,
@@ -407,35 +407,25 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
   final double blockUnit;
   final double maxWidth;
 
-  /// Fraction of a page swipe over which the indicator fades out/in.
-  /// Beyond this distance, the indicator is completely invisible (opacity 0).
-  static const double _fadeThreshold = 0.25;
-
   @override
   Widget build(BuildContext context) {
     final ClassTableState? state = ClassTableState.of(context);
     if (state == null) return const SizedBox.shrink();
 
     final ClassTableWidgetState controllers = state.controllers;
-    final int currentWeek = controllers.currentWeek;
 
     if (pageControl == null) {
-      if (singleIndex != currentWeek) {
-        return const SizedBox.shrink();
-      }
       return ListenableBuilder(
         listenable: controllers.timeTickNotifier,
         builder: (context, _) {
+          final int currentWeek = controllers.currentWeek;
           final indicator = _buildIndicator(
             context: context,
             controllers: controllers,
             currentWeek: currentWeek,
-            opacity: 1.0,
           );
           if (indicator == null) return const SizedBox.shrink();
-          return IgnorePointer(
-            child: Stack(clipBehavior: Clip.none, children: [indicator]),
-          );
+          return _fadeIndicator(indicator, visible: singleIndex == currentWeek);
         },
       );
     }
@@ -443,49 +433,43 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
     final PageController pages = pageControl!;
 
     return AnimatedBuilder(
-      animation: Listenable.merge([pages, controllers.timeTickNotifier]),
+      animation: Listenable.merge([
+        pages,
+        controllers.timeTickNotifier,
+        if (pages.hasClients) pages.position.isScrollingNotifier,
+      ]),
       builder: (context, _) {
-        final double page;
-        if (pages.hasClients && pages.position.hasPixels) {
-          page =
-              pages.page ??
-              (maxWidth > 0
-                  ? pages.position.pixels / maxWidth
-                  : singleIndex.toDouble());
-        } else {
-          page = singleIndex.toDouble();
-        }
-
-        final double dist = (page - currentWeek).abs();
-        if (dist >= _fadeThreshold) {
-          return const SizedBox.shrink();
-        }
-
-        // Correlate fade directly with swipe progress:
-        // As dist increases from 0, opacity quickly drops to 0.
-        // As dist decreases to 0, opacity smoothly fades in to 1.
-        final double t = (1.0 - (dist / _fadeThreshold)).clamp(0.0, 1.0);
-        final double opacity = Curves.easeIn.transform(t);
-
-        if (opacity <= 0.0) {
-          return const SizedBox.shrink();
-        }
+        final int currentWeek = controllers.currentWeek;
+        final double? page = pages.hasClients && pages.position.hasPixels
+            ? pages.page
+            : null;
+        final bool isCurrentWeekSettled =
+            page != null &&
+            !pages.position.isScrollingNotifier.value &&
+            (page - currentWeek).abs() <= 0.001;
 
         final Positioned? indicator = _buildIndicator(
           context: context,
           controllers: controllers,
           currentWeek: currentWeek,
-          opacity: opacity,
         );
 
         if (indicator == null) {
           return const SizedBox.shrink();
         }
 
-        return IgnorePointer(
-          child: Stack(clipBehavior: Clip.none, children: [indicator]),
-        );
+        return _fadeIndicator(indicator, visible: isCurrentWeekSettled);
       },
+    );
+  }
+
+  Widget _fadeIndicator(Positioned indicator, {required bool visible}) {
+    return AnimatedOpacity(
+      opacity: visible ? 1 : 0,
+      duration: _fadeDuration,
+      child: IgnorePointer(
+        child: Stack(clipBehavior: Clip.none, children: [indicator]),
+      ),
     );
   }
 
@@ -493,7 +477,6 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
     required BuildContext context,
     required ClassTableWidgetState controllers,
     required int currentWeek,
-    required double opacity,
   }) {
     final DateTime weekStart = controllers.startDay
         .add(Duration(days: 7 * controllers.offset))
@@ -508,7 +491,6 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
 
       /// The first period starts at the top of the grid, matching the class cards and time labels.
       blockHeight: (double count) => count * blockUnit,
-      opacity: opacity,
     );
   }
 }
