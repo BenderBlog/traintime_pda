@@ -84,7 +84,9 @@ class _ClassTableViewState extends State<ClassTableView>
       0.0,
       data.stop - data.start,
     );
-    return blockheight(completedBlocks);
+    final visibleProgress =
+        blockheight(completedBlocks) - classCardContentInset;
+    return visibleProgress > 0 ? visibleProgress : 0;
   }
 
   Positioned? _currentDayColumnBox() => CurrentTimeIndicator.buildDayColumnBox(
@@ -93,6 +95,7 @@ class _ClassTableViewState extends State<ClassTableView>
     weekStart: _visibleWeekStart,
     leftRow: widget.timeColumnWidth,
     blockWidth: blockwidth,
+    height: blockheight(61),
   );
 
   /// The height of the class card.
@@ -118,9 +121,8 @@ class _ClassTableViewState extends State<ClassTableView>
         /// Generate the row.
         final double cardHeight = blockheight(i.stop - i.start);
 
-        /// Block 0 is a strip below the top of the grid, shared with the time line's labels, so the
-        /// cards, the labels and the indicator all agree on where a period starts.
-        final double cardTop = classTableTimeLineTopGap + blockheight(i.start);
+        /// Cards and time labels share the top of the grid as the first period's start.
+        final double cardTop = blockheight(i.start);
         final double cardLeft =
             widget.timeColumnWidth + blockwidth * (index - 1);
         final completedHeight = _completedHeight(i, index);
@@ -135,7 +137,7 @@ class _ClassTableViewState extends State<ClassTableView>
               completedHeight: completedHeight,
 
               /// Known here already, so the card does not have to measure itself.
-              height: cardHeight - 2,
+              height: cardHeight - 2 * classCardContentInset,
               width: blockwidth,
             ),
           ),

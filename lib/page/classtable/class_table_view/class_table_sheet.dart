@@ -70,12 +70,21 @@ class ClassTableSheet extends StatefulWidget {
 class _ClassTableSheetState extends State<ClassTableSheet> {
   final ScrollController _verticalControl = ScrollController();
 
-  /// The floating date row, measured so the sheet can reserve exactly its height at the top.
+  /// The floating date row, measured so the sheet can reserve its height and indicator clearance.
   ///
   /// Measuring beats a constant because the row grows with the system font scale, and the
   /// reservation is what keeps the grid aligned under the row at rest.
   final GlobalKey _dateRowKey = GlobalKey();
   double _dateRowHeight = 0;
+
+  double get _timeIndicatorTopClearance {
+    if (!CurrentTimeIndicatorConfig.enabled) return 0;
+    final double indicatorHeight = CurrentTimeIndicatorConfig.showTimeLabel
+        ? CurrentTimeIndicatorConfig.labelHeight
+        : CurrentTimeIndicatorConfig.lineThickness;
+    final double clearance = indicatorHeight / 2 - 3;
+    return clearance > 0 ? clearance : 0;
+  }
 
   @override
   void dispose() {
@@ -120,6 +129,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
       builder: (context, constraints) {
         final double available =
             widget.heightReference ?? classTableHeightReference;
+        final double timeIndicatorTopClearance = _timeIndicatorTopClearance;
 
         /// Measured once and handed down, so the time line, the grid and the floating indicators
         /// cannot drift apart: the column is as wide as its widest label needs, and a block is never
@@ -139,14 +149,8 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
         /// display itself needs, which is what keeps the last time and the current time indicator
         /// clear of the navigation bar and of the screen's own rounded corners.
         ///
-        /// [classTableTimeLineTopGap] leads instead: the grid starts one strip lower than the sheet,
-        /// so that before the first class the current time indicator has somewhere to be other than
-        /// on top of the 8:30 label.
         final double gridHeight =
-            classTableTimeLineTopGap +
-            61 * blockUnit +
-            classTableSheetEndGap +
-            widget.bottomClearance;
+            61 * blockUnit + classTableSheetEndGap + widget.bottomClearance;
 
         final Widget content = Stack(
           fit: StackFit.expand,
@@ -169,12 +173,16 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                               : null),
                 child: Column(
                   children: [
-                    /// Room reserved for the floating date row.
-                    SizedBox(height: _dateRowHeight),
+                    /// Room for the floating date row and the top of the time-indicator capsule.
+                    SizedBox(
+                      height: _dateRowHeight + timeIndicatorTopClearance,
+                    ),
 
                     SizedBox(
                       height: gridHeight,
                       child: Stack(
+                        // The top-aligned indicator can overflow; the date row remains above it.
+                        clipBehavior: Clip.none,
                         children: [
                           /// The classes, below everything else, so a card sliding in from the
                           /// next week passes behind the time line rather than over it.
@@ -234,7 +242,10 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
           /// Nothing scrolls in here, so the sheet takes its full height and the page around it does
           /// the scrolling. Confining it to the box it was given is what used to hide the last
           /// periods of the settings preview.
-          return SizedBox(height: _dateRowHeight + gridHeight, child: content);
+          return SizedBox(
+            height: _dateRowHeight + timeIndicatorTopClearance + gridHeight,
+            child: content,
+          );
         }
 
         return content;
@@ -392,11 +403,11 @@ class _ClassTableScrollBehavior extends MaterialScrollBehavior {
 /// The current-time indicator layer: combines the time buoy on the timeline with the horizontal line
 /// as a single connected whole, visible only on the current week.
 ///
-/// Correlates fade-in and fade-out animations directly with horizontal swiping progress:
-/// - Fades out quickly in place as swiping starts away from the current week.
-/// - Stays invisible while swiping and on other weeks.
-/// - Fades in smoothly in place as the swipe brings the current week back into view and settles.
+/// Hidden while the week page moves or rests on another week. It appears only once the current
+/// week page has settled.
 class _CurrentTimeIndicatorLayer extends StatelessWidget {
+  static const Duration _fadeDuration = Duration(milliseconds: 100);
+
   const _CurrentTimeIndicatorLayer({
     required this.pageControl,
     required this.singleIndex,
@@ -411,33 +422,25 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
   final double blockUnit;
   final double maxWidth;
 
-  /// Fraction of a page swipe over which the indicator fades out/in.
-  /// Beyond this distance, the indicator is completely invisible (opacity 0).
-  static const double _fadeThreshold = 0.25;
-
   @override
   Widget build(BuildContext context) {
     final ClassTableState? state = ClassTableState.of(context);
     if (state == null) return const SizedBox.shrink();
 
     final ClassTableWidgetState controllers = state.controllers;
-    final int currentWeek = controllers.currentWeek;
 
     if (pageControl == null) {
-      if (singleIndex != currentWeek) {
-        return const SizedBox.shrink();
-      }
       return ListenableBuilder(
         listenable: controllers.timeTickNotifier,
         builder: (context, _) {
+          final int currentWeek = controllers.currentWeek;
           final indicator = _buildIndicator(
             context: context,
             controllers: controllers,
             currentWeek: currentWeek,
-            opacity: 1.0,
           );
           if (indicator == null) return const SizedBox.shrink();
-          return IgnorePointer(child: Stack(children: [indicator]));
+          return _fadeIndicator(indicator, visible: singleIndex == currentWeek);
         },
       );
     }
@@ -445,47 +448,43 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
     final PageController pages = pageControl!;
 
     return AnimatedBuilder(
-      animation: Listenable.merge([pages, controllers.timeTickNotifier]),
+      animation: Listenable.merge([
+        pages,
+        controllers.timeTickNotifier,
+        if (pages.hasClients) pages.position.isScrollingNotifier,
+      ]),
       builder: (context, _) {
-        final double page;
-        if (pages.hasClients && pages.position.hasPixels) {
-          page =
-              pages.page ??
-              (maxWidth > 0
-                  ? pages.position.pixels / maxWidth
-                  : singleIndex.toDouble());
-        } else {
-          page = singleIndex.toDouble();
-        }
-
-        final double dist = (page - currentWeek).abs();
-        if (dist >= _fadeThreshold) {
-          return const SizedBox.shrink();
-        }
-
-        // Correlate fade directly with swipe progress:
-        // As dist increases from 0, opacity quickly drops to 0.
-        // As dist decreases to 0, opacity smoothly fades in to 1.
-        final double t = (1.0 - (dist / _fadeThreshold)).clamp(0.0, 1.0);
-        final double opacity = Curves.easeIn.transform(t);
-
-        if (opacity <= 0.0) {
-          return const SizedBox.shrink();
-        }
+        final int currentWeek = controllers.currentWeek;
+        final double? page = pages.hasClients && pages.position.hasPixels
+            ? pages.page
+            : null;
+        final bool isCurrentWeekSettled =
+            page != null &&
+            !pages.position.isScrollingNotifier.value &&
+            (page - currentWeek).abs() <= 0.001;
 
         final Positioned? indicator = _buildIndicator(
           context: context,
           controllers: controllers,
           currentWeek: currentWeek,
-          opacity: opacity,
         );
 
         if (indicator == null) {
           return const SizedBox.shrink();
         }
 
-        return IgnorePointer(child: Stack(children: [indicator]));
+        return _fadeIndicator(indicator, visible: isCurrentWeekSettled);
       },
+    );
+  }
+
+  Widget _fadeIndicator(Positioned indicator, {required bool visible}) {
+    return AnimatedOpacity(
+      opacity: visible ? 1 : 0,
+      duration: _fadeDuration,
+      child: IgnorePointer(
+        child: Stack(clipBehavior: Clip.none, children: [indicator]),
+      ),
     );
   }
 
@@ -493,7 +492,6 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
     required BuildContext context,
     required ClassTableWidgetState controllers,
     required int currentWeek,
-    required double opacity,
   }) {
     final DateTime weekStart = controllers.startDay
         .add(Duration(days: 7 * controllers.offset))
@@ -506,12 +504,8 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
       leftRow: timeColumnWidth,
       blockWidth: (maxWidth - timeColumnWidth) / 7,
 
-      /// Block 0 sits [classTableTimeLineTopGap] below the top of the grid, exactly like the class
-      /// cards do. Before the first class the indicator still uses its own minimum instead, so it
-      /// waits in that strip rather than on the 8:30 label.
-      blockHeight: (double count) =>
-          classTableTimeLineTopGap + count * blockUnit,
-      opacity: opacity,
+      /// The first period starts at the top of the grid, matching the class cards and time labels.
+      blockHeight: (double count) => count * blockUnit,
     );
   }
 }
