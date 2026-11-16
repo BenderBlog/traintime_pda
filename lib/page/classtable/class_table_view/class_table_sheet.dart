@@ -70,12 +70,21 @@ class ClassTableSheet extends StatefulWidget {
 class _ClassTableSheetState extends State<ClassTableSheet> {
   final ScrollController _verticalControl = ScrollController();
 
-  /// The floating date row, measured so the sheet can reserve exactly its height at the top.
+  /// The floating date row, measured so the sheet can reserve its height and indicator clearance.
   ///
   /// Measuring beats a constant because the row grows with the system font scale, and the
   /// reservation is what keeps the grid aligned under the row at rest.
   final GlobalKey _dateRowKey = GlobalKey();
   double _dateRowHeight = 0;
+
+  double get _timeIndicatorTopClearance {
+    if (!CurrentTimeIndicatorConfig.enabled) return 0;
+    final double indicatorHeight = CurrentTimeIndicatorConfig.showTimeLabel
+        ? CurrentTimeIndicatorConfig.labelHeight
+        : CurrentTimeIndicatorConfig.lineThickness;
+    final double clearance = indicatorHeight / 2 - 3;
+    return clearance > 0 ? clearance : 0;
+  }
 
   @override
   void dispose() {
@@ -120,6 +129,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
       builder: (context, constraints) {
         final double available =
             widget.heightReference ?? classTableHeightReference;
+        final double timeIndicatorTopClearance = _timeIndicatorTopClearance;
 
         /// Measured once and handed down, so the time line, the grid and the floating indicators
         /// cannot drift apart: the column is as wide as its widest label needs, and a block is never
@@ -163,8 +173,10 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                               : null),
                 child: Column(
                   children: [
-                    /// Room reserved for the floating date row.
-                    SizedBox(height: _dateRowHeight),
+                    /// Room for the floating date row and the top of the time-indicator capsule.
+                    SizedBox(
+                      height: _dateRowHeight + timeIndicatorTopClearance,
+                    ),
 
                     SizedBox(
                       height: gridHeight,
@@ -230,7 +242,10 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
           /// Nothing scrolls in here, so the sheet takes its full height and the page around it does
           /// the scrolling. Confining it to the box it was given is what used to hide the last
           /// periods of the settings preview.
-          return SizedBox(height: _dateRowHeight + gridHeight, child: content);
+          return SizedBox(
+            height: _dateRowHeight + timeIndicatorTopClearance + gridHeight,
+            child: content,
+          );
         }
 
         return content;
