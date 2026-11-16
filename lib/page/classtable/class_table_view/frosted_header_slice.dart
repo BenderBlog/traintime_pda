@@ -8,7 +8,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 
 /// A frosted glass header slice whose bottom edge smoothly dissolves into the content area below.
 ///
@@ -57,7 +57,8 @@ class FrostedHeaderSlice extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final bool hasImage = imageFile != null && imageFile!.existsSync();
+    /// The state hands this over only when the file is really there, so no stat is needed here.
+    final bool hasImage = imageFile != null;
 
     return RepaintBoundary(
       child: LayoutBuilder(
@@ -140,10 +141,8 @@ class FrostedHeaderSlice extends StatelessWidget {
                   0.0,
                   bounds.height - effectiveFeather,
                 );
-                final double solidFraction = (solidHeight / bounds.height).clamp(
-                  0.0,
-                  1.0,
-                );
+                final double solidFraction = (solidHeight / bounds.height)
+                    .clamp(0.0, 1.0);
 
                 return LinearGradient(
                   begin: Alignment.topCenter,

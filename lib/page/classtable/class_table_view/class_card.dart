@@ -10,13 +10,13 @@ import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
-import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/page/classtable/model/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
-import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
+import 'package:watermeter/page/classtable/model/style_config/glass_style_config.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/classtable_scope.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
@@ -53,7 +53,7 @@ class ClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final classTableState = ClassTableState.of(context)!.controllers;
+    final classTableState = ClasstableScope.of(context);
     final activeStyle = CompletedClassStyle.resolve(
       palette: color,
       isCompleted: false,
@@ -62,7 +62,6 @@ class ClassCard extends StatelessWidget {
       palette: color,
       isCompleted: true,
     );
-    final isInteractive = classTableState.isClassCardInteractive(detail);
     final bool isPhoneDevice = isPhone(context);
 
     final splitHeight = completedHeight.clamp(0.0, height);
@@ -134,91 +133,88 @@ class ClassCard extends StatelessWidget {
               ),
             GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: isInteractive
-                  ? () async {
-                      final controller = ClassTableState.of(
-                        context,
-                      )!.controllers;
+              onTap: () async {
+                final controller = ClasstableScope.read(context);
 
-                      /// The way to show the class info of the period.
-                      /// The last one indicate whether to delete this stuff.
-                      final action = await BothSideSheet.show(
-                        title: context.t.classtable.classCard.title,
-                        child: ArrangementDetail(
-                          information: List.generate(data.length, (index) {
-                            if (data.elementAt(index) is Subject ||
-                                data.elementAt(index) is ExperimentData) {
-                              return data.elementAt(index);
-                            } else if (data.elementAt(index)
-                                is (
-                                  CustomClass,
-                                  CustomClassTimeRange,
-                                  MaterialColor,
-                                )) {
-                              return data.elementAt(index);
-                            } else if (data.elementAt(index)
-                                is (CustomClass, CustomClassTimeRange)) {
-                              return data.elementAt(index);
-                            } else if (data.elementAt(index)
-                                is TimeArrangement) {
-                              final TimeArrangement arrangement = data
-                                  .elementAt(index);
-                              return (
-                                classTableState.getClassDetail(
-                                  classTableState.timeArrangement.indexOf(
-                                    arrangement,
-                                  ),
-                                ),
-                                arrangement,
-                              );
-                            } else {
-                              return data.elementAt(index);
-                            }
-                          }),
-                          currentWeek: classTableState.currentWeek,
-                        ),
-                        context: context,
-                      );
-                      if (!context.mounted || action == null) return;
-
-                      if (action is (String, String?, String)) {
-                        final int customIndex = controller.customClasses
-                            .indexWhere((custom) => custom.id == action.$1);
-                        if (customIndex < 0) return;
-
-                        if (action.$3 == 'delete_all') {
-                          await controller.deleteCustomClassById(action.$1);
-                        } else if (action.$3 == 'delete_one') {
-                          final String? timeRangeId = action.$2;
-                          if (timeRangeId == null) return;
-                          await controller.deleteCustomClassTimeRange(
-                            customClassId: action.$1,
-                            timeRangeId: timeRangeId,
-                          );
-                        } else if (action.$3 == 'edit') {
-                          final CustomClass customClass =
-                              controller.customClasses[customIndex];
-                          await Navigator.of(context)
-                              .push(
-                                MaterialPageRoute(
-                                  builder: (context) => ClassAddWindow(
-                                    customToChange: customClass,
-                                    semesterLength: controller.semesterLength,
-                                  ),
-                                ),
-                              )
-                              .then((value) async {
-                                if (value is CustomClass) {
-                                  await controller.editCustomClassById(
-                                    action.$1,
-                                    value,
-                                  );
-                                }
-                              });
-                        }
+                /// The way to show the class info of the period.
+                /// The last one indicate whether to delete this stuff.
+                final action = await BothSideSheet.show(
+                  title: context.t.classtable.classCard.title,
+                  child: ArrangementDetail(
+                    information: List.generate(data.length, (index) {
+                      if (data.elementAt(index) is Subject ||
+                          data.elementAt(index) is ExperimentData) {
+                        return data.elementAt(index);
+                      } else if (data.elementAt(index)
+                          is (
+                            CustomClass,
+                            CustomClassTimeRange,
+                            MaterialColor,
+                          )) {
+                        return data.elementAt(index);
+                      } else if (data.elementAt(index)
+                          is (CustomClass, CustomClassTimeRange)) {
+                        return data.elementAt(index);
+                      } else if (data.elementAt(index) is TimeArrangement) {
+                        final TimeArrangement arrangement = data.elementAt(
+                          index,
+                        );
+                        return (
+                          classTableState.getClassDetail(
+                            classTableState.timeArrangement.indexOf(
+                              arrangement,
+                            ),
+                          ),
+                          arrangement,
+                        );
+                      } else {
+                        return data.elementAt(index);
                       }
-                    }
-                  : null,
+                    }),
+                    currentWeek: classTableState.currentWeek,
+                  ),
+                  context: context,
+                );
+                if (!context.mounted || action == null) return;
+
+                if (action is (String, String?, String)) {
+                  final int customIndex = controller.customClasses.indexWhere(
+                    (custom) => custom.id == action.$1,
+                  );
+                  if (customIndex < 0) return;
+
+                  if (action.$3 == 'delete_all') {
+                    await controller.deleteCustomClassById(action.$1);
+                  } else if (action.$3 == 'delete_one') {
+                    final String? timeRangeId = action.$2;
+                    if (timeRangeId == null) return;
+                    await controller.deleteCustomClassTimeRange(
+                      customClassId: action.$1,
+                      timeRangeId: timeRangeId,
+                    );
+                  } else if (action.$3 == 'edit') {
+                    final CustomClass customClass =
+                        controller.customClasses[customIndex];
+                    await Navigator.of(context)
+                        .push(
+                          MaterialPageRoute(
+                            builder: (context) => ClassAddWindow(
+                              state: controller,
+                              customToChange: customClass,
+                            ),
+                          ),
+                        )
+                        .then((value) async {
+                          if (value is CustomClass) {
+                            await controller.editCustomClassById(
+                              action.$1,
+                              value,
+                            );
+                          }
+                        });
+                  }
+                }
+              },
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: isPhoneDevice ? 2 : 4,

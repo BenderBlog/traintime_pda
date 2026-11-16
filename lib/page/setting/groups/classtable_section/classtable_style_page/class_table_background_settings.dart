@@ -9,14 +9,14 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 
 import 'package:watermeter/controller/classtable_controller.dart';
 import 'package:watermeter/generated/translations.g.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/style_config/class_table_background_style_config.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/repository/network_client.dart';
 import 'package:watermeter/repository/pick_file.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class ClassTableBackgroundSettings extends StatefulWidget {
   const ClassTableBackgroundSettings({
@@ -37,15 +37,12 @@ class _ClassTableBackgroundSettingsState
     extends State<ClassTableBackgroundSettings> {
   static const _imageExtensions = {'.jpg', '.jpeg', '.heic', '.heif', '.png'};
 
-  double _backgroundBlur = preference.getDouble(
-    preference.Preference.classTableBackgroundBlur,
-  );
+  double _backgroundBlur = ClassTableBackgroundStyleConfig.blur;
 
-  bool get _hasBackground =>
-      preference.getBool(preference.Preference.decoration) &&
-      File(
-        "${supportPath.path}/${ClassTableController.decorationName}",
-      ).existsSync();
+  bool get _hasBackground => ClassTableBackgroundStyleConfig.hasImage(
+    directory: supportPath,
+    fileName: ClassTableController.decorationName,
+  );
 
   Future<void> _chooseBackground() async {
     PlatformFile? selectedFile;
@@ -116,8 +113,8 @@ class _ClassTableBackgroundSettingsState
       return;
     }
 
-    await preference.setBool(preference.Preference.decoration, true);
-    await preference.setBool(preference.Preference.decorated, true);
+    await ClassTableBackgroundStyleConfig.setImageAvailable(true);
+    await ClassTableBackgroundStyleConfig.setDecorated(true);
     if (!mounted) return;
     widget.onChanged();
     showToast(context: context, msg: context.t.setting.successfulSetting);
@@ -126,7 +123,7 @@ class _ClassTableBackgroundSettingsState
   @override
   Widget build(BuildContext context) {
     bool isBackgroundOn =
-        _hasBackground && preference.getBool(preference.Preference.decorated);
+        _hasBackground && ClassTableBackgroundStyleConfig.decorated;
     return SectionSettingScaffold(
       icon: Icons.wallpaper,
       title: context.t.setting.classTableBackgroundSection,
@@ -144,7 +141,7 @@ class _ClassTableBackgroundSettingsState
                 );
                 return;
               }
-              await preference.setBool(preference.Preference.decorated, value);
+              await ClassTableBackgroundStyleConfig.setDecorated(value);
               if (mounted) widget.onChanged();
             },
           ),
@@ -166,10 +163,7 @@ class _ClassTableBackgroundSettingsState
                 : null,
             onChangeEnd: isBackgroundOn
                 ? (value) async {
-                    await preference.setDouble(
-                      preference.Preference.classTableBackgroundBlur,
-                      value,
-                    );
+                    await ClassTableBackgroundStyleConfig.setBlur(value);
                     if (!mounted) return;
                     _backgroundBlur = value;
                     widget.onChanged();

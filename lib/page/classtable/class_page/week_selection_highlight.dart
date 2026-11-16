@@ -5,7 +5,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 
 /// The highlight behind the week button on show.
 ///

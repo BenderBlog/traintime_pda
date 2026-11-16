@@ -9,8 +9,9 @@ import 'package:watermeter/page/classtable/class_table_view/class_table_time_lin
 import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
 import 'package:watermeter/page/classtable/class_table_view/classtable_date_row.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_widget_state.dart';
+import 'package:watermeter/page/classtable/classtable_scope.dart';
 
 /// The class table sheet.
 ///
@@ -78,11 +79,10 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
   double _dateRowHeight = 0;
 
   double get _timeIndicatorTopClearance {
-    if (!CurrentTimeIndicatorConfig.enabled) return 0;
-    final double indicatorHeight = CurrentTimeIndicatorConfig.showTimeLabel
-        ? CurrentTimeIndicatorConfig.labelHeight
-        : CurrentTimeIndicatorConfig.lineThickness;
-    final double clearance = indicatorHeight / 2 - 3;
+    /// Reserve for the largest indicator (with its mini clock label) in either mode. Keeping this
+    /// independent of the indicator switches prevents toggling either the line or its label from
+    /// changing the scrollable table's height or shifting the time axis.
+    final double clearance = CurrentTimeIndicatorConfig.labelHeight / 2 - 3;
     return clearance > 0 ? clearance : 0;
   }
 
@@ -111,7 +111,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
   }
 
   DateTime _firstDayOfWeek(int index) {
-    final state = ClassTableState.of(context)!.controllers;
+    final state = ClasstableScope.of(context);
     return state.startDay
         .add(Duration(days: 7 * state.offset))
         .add(Duration(days: 7 * index));
@@ -186,7 +186,11 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                         children: [
                           /// The classes, below everything else, so a card sliding in from the
                           /// next week passes behind the time line rather than over it.
-                          _pages(timeColumnWidth, blockUnit),
+                          _pages(
+                            timeColumnWidth,
+                            blockUnit,
+                            constraints.maxWidth,
+                          ),
 
                           /// Laid out once for the whole table, so it does not page with the weeks.
                           ClassTableTimeLine(
@@ -233,6 +237,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                 /// once the week has already changed.
                 pageControl: widget.pageControl,
                 semesterLength: widget.semesterLength,
+                maxWidth: constraints.maxWidth,
               ),
             ),
           ],
@@ -253,13 +258,14 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
     );
   }
 
-  Widget _pages(double timeColumnWidth, double blockUnit) {
+  Widget _pages(double timeColumnWidth, double blockUnit, double maxWidth) {
     final PageController? control = widget.pageControl;
     if (control == null) {
       return ClassTableView(
         index: widget.singleIndex,
         timeColumnWidth: timeColumnWidth,
         blockUnit: blockUnit,
+        maxWidth: maxWidth,
       );
     }
     return PageView.builder(
@@ -271,6 +277,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
         index: index,
         timeColumnWidth: timeColumnWidth,
         blockUnit: blockUnit,
+        maxWidth: maxWidth,
       ),
     );
   }
@@ -424,14 +431,11 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ClassTableState? state = ClassTableState.of(context);
-    if (state == null) return const SizedBox.shrink();
-
-    final ClassTableWidgetState controllers = state.controllers;
+    final ClasstableWidgetState controllers = ClasstableScope.of(context);
 
     if (pageControl == null) {
       return ListenableBuilder(
-        listenable: controllers.timeTickNotifier,
+        listenable: controllers.now,
         builder: (context, _) {
           final int currentWeek = controllers.currentWeek;
           final indicator = _buildIndicator(
@@ -450,7 +454,7 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
     return AnimatedBuilder(
       animation: Listenable.merge([
         pages,
-        controllers.timeTickNotifier,
+        controllers.now,
         if (pages.hasClients) pages.position.isScrollingNotifier,
       ]),
       builder: (context, _) {
@@ -490,7 +494,7 @@ class _CurrentTimeIndicatorLayer extends StatelessWidget {
 
   Positioned? _buildIndicator({
     required BuildContext context,
-    required ClassTableWidgetState controllers,
+    required ClasstableWidgetState controllers,
     required int currentWeek,
   }) {
     final DateTime weekStart = controllers.startDay

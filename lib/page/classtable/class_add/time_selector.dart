@@ -6,7 +6,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class TimeSelector extends StatefulWidget {

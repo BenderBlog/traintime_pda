@@ -6,7 +6,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
+import 'package:watermeter/page/classtable/model/style_config/glass_style_config.dart';
 
 /// Tells every [GlassBlur] below it whether it may blur at all.
 ///

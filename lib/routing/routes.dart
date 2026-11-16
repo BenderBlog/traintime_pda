@@ -40,10 +40,7 @@ class Routes {
       classAttendance => const ClassAttendanceView(),
       score => const ScoreWindow(),
       exam => const ExamInfoWindow(),
-      classTable => LayoutBuilder(
-        builder: (context, constraints) =>
-            ClassTableWindow(constraints: constraints),
-      ),
+      classTable => const ClasstableWindow(),
       about => const AboutPage(),
       sport => const SportWindow(),
       networkCard => const NetworkCardWindow(),

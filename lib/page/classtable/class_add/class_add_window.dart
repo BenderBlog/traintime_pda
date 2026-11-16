@@ -3,9 +3,8 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
+import 'package:watermeter/page/classtable/model/classtable_widget_state.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -13,21 +12,16 @@ import 'package:watermeter/page/classtable/class_add/date_selector_free.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class ClassAddWindow extends StatefulWidget {
+  final ClasstableWidgetState state;
   final CustomClass? customToChange;
-  final int semesterLength;
-  const ClassAddWindow({
-    super.key,
-    this.customToChange,
-    required this.semesterLength,
-  });
+
+  const ClassAddWindow({super.key, required this.state, this.customToChange});
 
   @override
   State<ClassAddWindow> createState() => _ClassAddWindowState();
 }
 
 class _ClassAddWindowState extends State<ClassAddWindow> {
-  late final CustomClassController customClassController;
-
   late List<DateTimeRange> chosenDates;
   late TextEditingController classNameController;
   late TextEditingController teacherNameController;
@@ -39,17 +33,9 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
   Color get color => Theme.of(context).colorScheme.primary;
   Color get deleteColor => Theme.of(context).colorScheme.error;
 
-  DateTime get semesterStartDate {
-    final String termStartDay =
-        ClassTableController.i.classTableComputedSignal.value.termStartDay;
-    return DateTime.tryParse(termStartDay) ??
-        DateUtils.dateOnly(DateTime.now());
-  }
-
   @override
   void initState() {
     super.initState();
-    customClassController = CustomClassController.i;
     if (widget.customToChange != null) {
       final cc = widget.customToChange!;
       classNameController = TextEditingController(text: cc.name);
@@ -98,9 +84,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
               range.id,
       };
       final customClass = CustomClass(
-        id:
-            widget.customToChange?.id ??
-            customClassController.generateCustomClassId(),
+        id: widget.customToChange?.id ?? widget.state.newCustomClassId(),
         name: classNameController.text,
         teacher: teacherNameController.text.isNotEmpty
             ? teacherNameController.text
@@ -112,9 +96,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
           final String key =
               '${e.start.microsecondsSinceEpoch}-${e.end.microsecondsSinceEpoch}';
           return CustomClassTimeRange(
-            id:
-                existingRangeIds[key] ??
-                customClassController.generateTimeRangeId(),
+            id: existingRangeIds[key] ?? widget.state.newTimeRangeId(),
             startTime: e.start,
             endTime: e.end,
           );
@@ -204,8 +186,8 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
               ).padding(vertical: 8),
               DateSelectorFree(
                 initialDates: chosenDates,
-                semesterStartDay: semesterStartDate,
-                semesterLength: widget.semesterLength,
+                semesterStartDay: widget.state.startDay,
+                semesterLength: widget.state.semesterLength,
                 onChanged: (dates) {
                   chosenDates = dates;
                 },

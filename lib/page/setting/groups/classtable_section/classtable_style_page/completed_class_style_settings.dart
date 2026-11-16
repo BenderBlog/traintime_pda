@@ -4,7 +4,7 @@
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
-import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
+import 'package:watermeter/page/classtable/model/style_config/class_card_style_config.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 
@@ -16,51 +16,49 @@ class CompletedClassStyleSettings extends StatelessWidget {
   String _formatPercent(double value) => "${(value * 100).round()}%";
 
   Future<void> _onCompletedStyleEnabledChanged(bool value) async {
-    CompletedClassStyleConfig.completedEnabled = value;
+    ClassCardStyleConfig.completedEnabled = value;
     onChanged();
-    await CompletedClassStyleConfig.saveToPreference();
+    await ClassCardStyleConfig.saveToPreference();
   }
 
   void _onCompletedSaturationChanged(double value) {
-    CompletedClassStyleConfig.completedSaturationFactor = value;
+    ClassCardStyleConfig.completedSaturationFactor = value;
     onChanged();
   }
 
   void _onCompletedBrightnessChanged(double value) {
-    CompletedClassStyleConfig.completedBrightnessFactor = value;
+    ClassCardStyleConfig.completedBrightnessFactor = value;
     onChanged();
   }
 
   void _onCompletedTextSaturationChanged(double value) {
-    CompletedClassStyleConfig.completedTextSaturationFactor = value;
+    ClassCardStyleConfig.completedTextSaturationFactor = value;
     onChanged();
   }
 
   void _onCompletedBorderChanged(double value) {
-    CompletedClassStyleConfig.completedBorderAlpha = value;
+    ClassCardStyleConfig.completedBorderAlpha = value;
     onChanged();
   }
 
   void _onCompletedInnerChanged(double value) {
-    CompletedClassStyleConfig.completedInnerAlpha = value;
+    ClassCardStyleConfig.completedInnerAlpha = value;
     onChanged();
   }
 
   Future<void> _saveClassStyleSettings(double _) async {
-    await CompletedClassStyleConfig.saveToPreference();
+    await ClassCardStyleConfig.saveToPreference();
   }
 
   @override
   Widget build(BuildContext context) {
-    final completedEnabled = CompletedClassStyleConfig.completedEnabled;
-    final completedSaturation =
-        CompletedClassStyleConfig.completedSaturationFactor;
-    final completedBrightness =
-        CompletedClassStyleConfig.completedBrightnessFactor;
+    final completedEnabled = ClassCardStyleConfig.completedEnabled;
+    final completedSaturation = ClassCardStyleConfig.completedSaturationFactor;
+    final completedBrightness = ClassCardStyleConfig.completedBrightnessFactor;
     final completedTextSaturation =
-        CompletedClassStyleConfig.completedTextSaturationFactor;
-    final completedBorder = CompletedClassStyleConfig.completedBorderAlpha;
-    final completedInner = CompletedClassStyleConfig.completedInnerAlpha;
+        ClassCardStyleConfig.completedTextSaturationFactor;
+    final completedBorder = ClassCardStyleConfig.completedBorderAlpha;
+    final completedInner = ClassCardStyleConfig.completedInnerAlpha;
 
     return SectionSettingScaffold(
       icon: Icons.check_circle_outline,

@@ -21,19 +21,16 @@ import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_error_button.dart';
 import 'package:watermeter/page/classtable/class_page/classtable_status_hint.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.dart';
-import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
-import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
 import 'package:watermeter/page/classtable/class_table_view/frosted_header_slice.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
-import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/model/style_config/glass_style_config.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_widget_state.dart';
+import 'package:watermeter/page/classtable/classtable_scope.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
 import 'package:watermeter/page/classtable/class_page/week_selection_highlight.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/network_client.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class ContentClassTablePage extends StatefulWidget {
   const ContentClassTablePage({super.key});
@@ -66,7 +63,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// it can be dragged freely, instead of snapping from one week button to the next.
   late ScrollController rowControl;
 
-  /// Set while [ClassTableWidgetState.chosenWeek] changes because the table itself was dragged.
+  /// Set while [ClasstableWidgetState.chosenWeek] changes because the table itself was dragged.
   ///
   /// Such a change waits until the page settles, so the week row does not rebuild during the drag.
   bool _chosenWeekFromTable = false;
@@ -88,23 +85,20 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// without the bar being rebuilt on the last frame of a swipe.
   final ValueNotifier<int> _chosenWeek = ValueNotifier<int>(0);
 
-  late ClassTableWidgetState classTableState;
-  bool _isListening = false;
-  bool _didLoadVisualSettings = false;
+  late ClasstableWidgetState classTableState;
+  bool _isBound = false;
 
   /// Whether the week bar is tucked into the app bar.
   ///
   /// Pinned is the default, so the stored flag is the opposite of it and an unset preference reads
   /// back as `false`.
-  bool _weekBarCollapsed = preference.getBool(
-    preference.Preference.classTableWeekBarCollapsed,
-  );
+  late bool _weekBarCollapsed;
 
   /// Whether the collapsed bar is currently opened over the table. Only meaningful while collapsed.
   bool _weekBarExpanded = false;
 
   /// Whether the collapsed floating bar is fully off-stage to stop rendering and layout completely.
-  late bool _weekBarOffstage = _weekBarCollapsed;
+  late bool _weekBarOffstage;
 
   /// The height the week bar takes, either in the page or floating.
   double get _weekBarHeight => MediaQuery.sizeOf(context).height >= 500
@@ -194,16 +188,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     }
   }
 
-  /// Rebuilds the page when signal-driven data changes: loading states and class data refreshes.
-  /// Minute ticks are deliberately not here, they go to [ClassTableWidgetState.timeTickNotifier].
-  /// Kept separate from [_switchPage] so that a data change does not trigger a page animation or
-  /// lock the week row.
-  void _onDataChanged() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   void _switchPage() {
     if (!mounted) {
       return;
@@ -287,7 +271,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   @override
   void dispose() {
-    classTableState.removeListener(_onDataChanged);
     classTableState.weekNavigationNotifier.removeListener(_switchPage);
     pageControl.removeListener(_syncWeekRowToTable);
     _chosenWeek.dispose();
@@ -298,20 +281,10 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
 
   @override
   void didChangeDependencies() {
-    if (!_didLoadVisualSettings) {
-      CurrentTimeIndicatorConfig.loadFromPreference();
-      CompletedClassStyleConfig.loadFromPreference();
-      GlassStyleConfig.loadFromPreference();
-      _didLoadVisualSettings = true;
-    }
-
-    if (!_isListening) {
-      classTableState = ClassTableState.of(context)!.controllers;
-
-      /// Data changes (loading states, class data refreshes) rebuild the page to update the status
-      /// banners and other data-dependent UI. Minute ticks are not among them: they only tick
-      /// [ClassTableWidgetState.timeTickNotifier], so just the current week redraws.
-      classTableState.addListener(_onDataChanged);
+    if (!_isBound) {
+      classTableState = ClasstableScope.read(context);
+      _weekBarCollapsed = classTableState.weekBarCollapsed;
+      _weekBarOffstage = _weekBarCollapsed;
 
       /// Week navigation (tap or swipe) is handled separately so the class card pages — which do
       /// not depend on the chosen week at all — are not rebuilt mid-gesture.
@@ -332,41 +305,19 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       /// rides the page's own animation curve instead of jumping once the page has arrived.
       pageControl.addListener(_syncWeekRowToTable);
 
-      _isListening = true;
+      _isBound = true;
     }
 
-    /// Let controllers listen to the currentWeek's change.
     /// Init the background.
-    File image = File("${supportPath.path}/${classTableState.decorationName}");
-    final bool decorated =
-        preference.getBool(preference.Preference.decorated) &&
-        image.existsSync();
     super.didChangeDependencies();
     precacheImage(
       const AssetImage("assets/art/pda_classtable_empty.webp"),
       context,
     );
-    if (decorated) {
+    final image = classTableState.decorationImage;
+    if (image != null) {
       precacheImage(FileImage(image), context);
     }
-  }
-
-  /// The user-defined background image file, or null if custom decoration is disabled or missing.
-  File? get _decorationImageFile {
-    final bool isDecorated = preference.getBool(
-      preference.Preference.decorated,
-    );
-    if (!isDecorated) return null;
-    final File image = File(
-      "${supportPath.path}/${classTableState.decorationName}",
-    );
-    return image.existsSync() ? image : null;
-  }
-
-  String? get _decorationImageRevision {
-    final file = _decorationImageFile;
-    if (file == null) return null;
-    return "${file.lengthSync()}:${file.lastModifiedSync().microsecondsSinceEpoch}";
   }
 
   /// The user defined background image, confined to the timetable area below the fixed header.
@@ -376,7 +327,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// top edge ([tableTop]), leaving character portraits and artwork fully unobstructed in the
   /// content area.
   Widget _backgroundLayer(BuildContext context, double appBarHeight) {
-    final File? image = _decorationImageFile;
+    final image = classTableState.decorationImage;
     if (image == null) {
       return const Positioned.fill(
         key: ValueKey('class_table_background_layer_empty'),
@@ -390,12 +341,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
         .round()
         .clamp(1, 2560)
         .toInt();
-    final imageRevision = _decorationImageRevision ?? '0';
+    final imageRevision = classTableState.decorationImageRevision ?? '0';
 
-    final double blur = preference
-        .getDouble(preference.Preference.classTableBackgroundBlur)
-        .clamp(0.0, maxClassTableBackgroundBlur)
-        .toDouble();
+    final double blur = classTableState.backgroundBlur;
 
     Widget layer = Image.file(
       image,
@@ -631,10 +579,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// The mode is a preference, so it is remembered.
   void _toggleWeekBarPinned() {
     final bool collapsed = !_weekBarCollapsed;
-    preference.setBool(
-      preference.Preference.classTableWeekBarCollapsed,
-      collapsed,
-    );
+    classTableState.setWeekBarCollapsed(collapsed);
     setState(() {
       _weekBarCollapsed = collapsed;
       _weekBarExpanded = false;
@@ -689,332 +634,9 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
-  String _formatPercent(double value) => "${(value * 100).round()}%";
-
-  // ignore: unused_element
-  Future<void> _showCurrentTimeSettingsDialog() async {
-    var enabled = CurrentTimeIndicatorConfig.enabled;
-    var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
-    var showTodayColumnHighlight =
-        CurrentTimeIndicatorConfig.showTodayColumnHighlight;
-
-    final shouldApply =
-        await showDialog<bool>(
-          context: context,
-          builder: (context) => StatefulBuilder(
-            builder: (context, setDialogState) => AlertDialog(
-              title: Text(
-                context.t.setting.classTableStylePage.currentTimeSettingsTitle,
-              ),
-              content: SizedBox(
-                width: 420,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .showCurrentTimeIndicator,
-                        ),
-                        value: enabled,
-                        onChanged: (value) =>
-                            setDialogState(() => enabled = value),
-                      ),
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .showCurrentTimeLabel,
-                        ),
-                        value: showTimeLabel,
-                        onChanged: enabled
-                            ? (value) =>
-                                  setDialogState(() => showTimeLabel = value)
-                            : null,
-                      ),
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .showTodayColumnHighlight,
-                        ),
-                        value: showTodayColumnHighlight,
-                        onChanged: (value) => setDialogState(
-                          () => showTodayColumnHighlight = value,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(context.t.common.cancel),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(context.t.common.confirm),
-                ),
-              ],
-            ),
-          ),
-        ) ??
-        false;
-
-    if (!shouldApply || !mounted) {
-      return;
-    }
-
-    CurrentTimeIndicatorConfig.enabled = enabled;
-    CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
-    CurrentTimeIndicatorConfig.showTodayColumnHighlight =
-        showTodayColumnHighlight;
-    await CurrentTimeIndicatorConfig.saveToPreference();
-    setState(() {});
-  }
-
-  // ignore: unused_element
-  Future<void> _showClassColorSettingsDialog() async {
-    var completedEnabled = CompletedClassStyleConfig.completedEnabled;
-    var activeBrightnessFactor = CompletedClassStyleConfig
-        .activeBrightnessFactor
-        .clamp(0.5, 1.0)
-        .toDouble();
-    var activeBorderAlpha = CompletedClassStyleConfig.activeBorderAlpha;
-    var activeInnerAlpha = CompletedClassStyleConfig.activeInnerAlpha;
-    var completedSaturationFactor =
-        CompletedClassStyleConfig.completedSaturationFactor;
-    var completedBrightnessFactor = CompletedClassStyleConfig
-        .completedBrightnessFactor
-        .clamp(0.5, 1.0)
-        .toDouble();
-    var completedTextSaturationFactor =
-        CompletedClassStyleConfig.completedTextSaturationFactor;
-    var completedBorderAlpha = CompletedClassStyleConfig.completedBorderAlpha;
-    var completedInnerAlpha = CompletedClassStyleConfig.completedInnerAlpha;
-
-    final shouldApply =
-        await showDialog<bool>(
-          context: context,
-          builder: (context) => StatefulBuilder(
-            builder: (context, setDialogState) => AlertDialog(
-              title: Text(
-                context.t.setting.classTableStylePage.classColorSettingsTitle,
-              ),
-              content: SizedBox(
-                width: 420,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .completedStyleEnabled,
-                        ),
-                        value: completedEnabled,
-                        onChanged: (value) =>
-                            setDialogState(() => completedEnabled = value),
-                      ),
-                      const Divider(height: 24),
-                      Text(
-                        context.t.setting.classTableStylePage.unfinishedSection,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      Text(
-                        context.t.setting.classTableStylePage
-                            .activeBrightnessFactor(
-                              value: _formatPercent(activeBrightnessFactor),
-                            ),
-                      ),
-                      Slider(
-                        value: activeBrightnessFactor,
-                        min: 0.5,
-                        max: 1.0,
-                        divisions: 10,
-                        onChanged: (value) => setDialogState(
-                          () => activeBrightnessFactor = value,
-                        ),
-                      ),
-                      Text(
-                        context.t.setting.classTableStylePage.activeBorderAlpha(
-                          value: _formatPercent(activeBorderAlpha),
-                        ),
-                      ),
-                      Slider(
-                        value: activeBorderAlpha,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 18,
-                        onChanged: (value) =>
-                            setDialogState(() => activeBorderAlpha = value),
-                      ),
-                      Text(
-                        context.t.setting.classTableStylePage.activeInnerAlpha(
-                          value: _formatPercent(activeInnerAlpha),
-                        ),
-                      ),
-                      Slider(
-                        value: activeInnerAlpha,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 18,
-                        onChanged: (value) =>
-                            setDialogState(() => activeInnerAlpha = value),
-                      ),
-                      if (completedEnabled) ...[
-                        const Divider(height: 24),
-                        Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .completedSection,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedSaturationFactor(
-                                value: _formatPercent(
-                                  completedSaturationFactor,
-                                ),
-                              ),
-                        ),
-                        Slider(
-                          value: completedSaturationFactor,
-                          min: 0.1,
-                          max: 1.0,
-                          divisions: 18,
-                          onChanged: (value) => setDialogState(
-                            () => completedSaturationFactor = value,
-                          ),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedBrightnessFactor(
-                                value: _formatPercent(
-                                  completedBrightnessFactor,
-                                ),
-                              ),
-                        ),
-                        Slider(
-                          value: completedBrightnessFactor,
-                          min: 0.5,
-                          max: 1.0,
-                          divisions: 10,
-                          onChanged: (value) => setDialogState(
-                            () => completedBrightnessFactor = value,
-                          ),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedTextSaturationFactor(
-                                value: _formatPercent(
-                                  completedTextSaturationFactor,
-                                ),
-                              ),
-                        ),
-                        Slider(
-                          value: completedTextSaturationFactor,
-                          min: 0.1,
-                          max: 1.0,
-                          divisions: 18,
-                          onChanged: (value) => setDialogState(
-                            () => completedTextSaturationFactor = value,
-                          ),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedBorderAlpha(
-                                value: _formatPercent(completedBorderAlpha),
-                              ),
-                        ),
-                        Slider(
-                          value: completedBorderAlpha,
-                          min: 0.1,
-                          max: 1.0,
-                          divisions: 18,
-                          onChanged: (value) => setDialogState(
-                            () => completedBorderAlpha = value,
-                          ),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedInnerAlpha(
-                                value: _formatPercent(completedInnerAlpha),
-                              ),
-                        ),
-                        Slider(
-                          value: completedInnerAlpha,
-                          min: 0.1,
-                          max: 1.0,
-                          divisions: 18,
-                          onChanged: (value) =>
-                              setDialogState(() => completedInnerAlpha = value),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(context.t.common.cancel),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(context.t.common.confirm),
-                ),
-              ],
-            ),
-          ),
-        ) ??
-        false;
-
-    if (!shouldApply || !mounted) {
-      return;
-    }
-
-    CompletedClassStyleConfig.completedEnabled = completedEnabled;
-    CompletedClassStyleConfig.activeBrightnessFactor = activeBrightnessFactor
-        .clamp(0.5, 1.0)
-        .toDouble();
-    CompletedClassStyleConfig.activeBorderAlpha = activeBorderAlpha;
-    CompletedClassStyleConfig.activeInnerAlpha = activeInnerAlpha;
-    CompletedClassStyleConfig.completedSaturationFactor =
-        completedSaturationFactor;
-    CompletedClassStyleConfig.completedBrightnessFactor =
-        completedBrightnessFactor.clamp(0.5, 1.0).toDouble();
-    CompletedClassStyleConfig.completedTextSaturationFactor =
-        completedTextSaturationFactor;
-    CompletedClassStyleConfig.completedBorderAlpha = completedBorderAlpha;
-    CompletedClassStyleConfig.completedInnerAlpha = completedInnerAlpha;
-    await CompletedClassStyleConfig.saveToPreference();
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    final state = ClassTableState.of(context)!.controllers;
+    final state = ClasstableScope.of(context);
 
     final double statusBarHeight = MediaQuery.paddingOf(context).top;
     final double appBarHeight = statusBarHeight + kToolbarHeight;
@@ -1077,9 +699,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             onSelected: (String action) async {
               switch (action) {
                 case 'A':
-                  var notArranged = ClassTableState.of(
-                    context,
-                  )!.controllers.notArranged;
+                  var notArranged = ClasstableScope.read(context).notArranged;
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (BuildContext context) {
@@ -1089,9 +709,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   );
                   break;
                 case 'B':
-                  var classChange = ClassTableState.of(
-                    context,
-                  )!.controllers.classChange;
+                  var classChange = ClasstableScope.read(context).classChange;
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (BuildContext context) {
@@ -1101,21 +719,16 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   );
                   break;
                 case 'C':
-                  int semesterLength = ClassTableState.of(
-                    context,
-                  )!.controllers.semesterLength;
                   dynamic data = await Navigator.of(context).push<dynamic>(
                     MaterialPageRoute(
                       builder: (BuildContext context) {
-                        return ClassAddWindow(semesterLength: semesterLength);
+                        return ClassAddWindow(state: classTableState);
                       },
                     ),
                   );
                   if (context.mounted && data != null) {
                     if (data is CustomClass) {
-                      await ClassTableState.of(
-                        context,
-                      )!.controllers.addCustomClass(data);
+                      await ClasstableScope.read(context).addCustomClass(data);
                     }
                   }
                   break;
@@ -1284,16 +897,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       ) ??
                       false;
                   if (context.mounted && isAccepted) {
-                    await classTableState.updateClasstable(context).then((
-                      data,
-                    ) {
-                      if (context.mounted) {
-                        showToast(
-                          context: context,
-                          msg: context.t.classtable.refreshClasstable.success,
-                        );
-                      }
-                    });
+                    await classTableState.updateClasstable();
+                    if (context.mounted) {
+                      showToast(
+                        context: context,
+                        msg: context.t.classtable.refreshClasstable.success,
+                      );
+                    }
                   }
                   break;
               }

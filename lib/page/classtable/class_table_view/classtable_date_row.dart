@@ -7,9 +7,8 @@ import 'package:flutter/rendering.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
-import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/model/style_config/glass_style_config.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 
 /// The date row of the class table: the month and the seven day headers.
 ///
@@ -21,6 +20,7 @@ class ClassTableDateRow extends StatefulWidget {
     required this.index,
     required this.firstDayOfWeek,
     required this.timeColumnWidth,
+    required this.maxWidth,
     this.pageControl,
     this.semesterLength = 1,
   });
@@ -33,6 +33,9 @@ class ClassTableDateRow extends StatefulWidget {
 
   /// The width of the time column, so the month cell stays aligned with the labels underneath.
   final double timeColumnWidth;
+
+  /// The width the row has to share between the month cell and the seven day headers.
+  final double maxWidth;
 
   /// The week pages. When set, the headers slide with them.
   final PageController? pageControl;
@@ -130,18 +133,12 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
   }
 
   /// The headers, one week wide each, sliding with the pages when there are pages to follow.
-  Widget _headers(BuildContext context) {
-    final double? stateWidth = ClassTableState.of(
-      context,
-    )?.constraints.maxWidth;
-    if (stateWidth != null && stateWidth > 0) {
-      return _buildHeadersWithWidth(context, stateWidth);
-    }
-    return LayoutBuilder(
-      builder: (context, constraints) =>
-          _buildHeadersWithWidth(context, constraints.maxWidth),
-    );
-  }
+  Widget _headers(BuildContext context) => widget.maxWidth.isFinite
+      ? _buildHeadersWithWidth(context, widget.maxWidth)
+      : LayoutBuilder(
+          builder: (context, constraints) =>
+              _buildHeadersWithWidth(context, constraints.maxWidth),
+        );
 
   Widget _buildHeadersWithWidth(BuildContext context, double maxWidth) {
     if (widget.pageControl == null) {

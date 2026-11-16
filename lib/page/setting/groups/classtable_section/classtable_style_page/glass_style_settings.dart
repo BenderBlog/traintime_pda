@@ -3,7 +3,7 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/generated/translations.g.dart';
-import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
+import 'package:watermeter/page/classtable/model/style_config/glass_style_config.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';

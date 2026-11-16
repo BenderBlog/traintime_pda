@@ -5,10 +5,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:material_ui/material_ui.dart';
 
-import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/page/classtable/model/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/classtable_scope.dart';
+import 'package:watermeter/page/classtable/model/classtable_widget_state.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 /// This is the button of the toprow
@@ -21,7 +22,7 @@ class WeekChoiceView extends StatefulWidget {
 }
 
 class _WeekChoiceViewState extends State<WeekChoiceView> {
-  late ClassTableWidgetState controller;
+  late ClasstableWidgetState controller;
   // 缓存 AutoSizeGroup，避免每次 build 创建新实例
   final AutoSizeGroup _autoSizeGroup = AutoSizeGroup();
   static const double _occupiedOpacity = 1.0;
@@ -72,7 +73,7 @@ class _WeekChoiceViewState extends State<WeekChoiceView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    controller = ClassTableState.of(context)!.controllers;
+    controller = ClasstableScope.read(context);
   }
 
   /// The dot of the overview, [isOccupied] is used to identify the opacity of the dot.

@@ -29,6 +29,7 @@ import 'package:watermeter/repository/notification/notification_registrar.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
+import 'package:watermeter/page/classtable/model/style_config/style_config_preference_functions.dart';
 import 'package:watermeter/themes/font_setting.dart';
 
 void main() async {
@@ -56,6 +57,19 @@ void main() async {
   }
   preference.prefs = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(),
+  );
+
+  preference.Preference resolveStylePreference(StyleConfigPreferenceKey key) =>
+      preference.Preference.values.firstWhere((item) => item.name == key.name);
+
+  StyleConfigPreferenceFunctions.install(
+    getBool: (key) => preference.getBool(resolveStylePreference(key)),
+    getDouble: (key) => preference.getDouble(resolveStylePreference(key)),
+    setBool: (key, value) =>
+        preference.setBool(resolveStylePreference(key), value),
+    setDouble: (key, value) =>
+        preference.setDouble(resolveStylePreference(key), value),
+    contains: (key) => preference.contains(resolveStylePreference(key)),
   );
 
   // Load package info.

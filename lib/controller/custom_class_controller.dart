@@ -6,20 +6,11 @@ import 'dart:async';
 
 import 'package:signals/signals.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
+import 'package:watermeter/model/pda_service/custom_class_occurrence.dart';
 import 'package:watermeter/repository/custom_class_service.dart';
 import 'package:watermeter/repository/logger.dart';
 
 enum CustomClassState { fetching, fetched, error, none }
-
-class CustomClassOccurrence {
-  final CustomClass customClass;
-  final CustomClassTimeRange timeRange;
-
-  const CustomClassOccurrence({
-    required this.customClass,
-    required this.timeRange,
-  });
-}
 
 class CustomClassController {
   static final CustomClassController i = CustomClassController._();
@@ -44,9 +35,6 @@ class CustomClassController {
   String generateCustomClassId() => _nextId(_customClassIdPrefix);
 
   String generateTimeRangeId() => _nextId(_timeRangeIdPrefix);
-
-  DateTime _dateOnly(DateTime value) =>
-      DateTime(value.year, value.month, value.day);
 
   final errorSignal = signal<String?>(null);
   final stateSignal = signal<CustomClassState>(CustomClassState.none);
@@ -174,30 +162,10 @@ class CustomClassController {
     required int weekIndex,
     required int dayIndex,
     required DateTime semesterStartDay,
-  }) {
-    final List<CustomClassOccurrence> occurrences = [];
-
-    for (final customClass in customClasses) {
-      for (final timeRange in customClass.timeRanges) {
-        final int diffDays = _dateOnly(
-          timeRange.startTime,
-        ).difference(_dateOnly(semesterStartDay)).inDays;
-        if (diffDays < 0) continue;
-
-        final int targetWeek = diffDays ~/ 7;
-        final int targetDay = diffDays % 7 + 1;
-
-        if (targetWeek == weekIndex && targetDay == dayIndex) {
-          occurrences.add(
-            CustomClassOccurrence(
-              customClass: customClass,
-              timeRange: timeRange,
-            ),
-          );
-        }
-      }
-    }
-
-    return occurrences;
-  }
+  }) => customClassOccurrencesForDay(
+    classes: customClasses,
+    weekIndex: weekIndex,
+    dayIndex: dayIndex,
+    semesterStartDay: semesterStartDay,
+  );
 }

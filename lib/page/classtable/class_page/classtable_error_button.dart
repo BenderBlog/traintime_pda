@@ -6,7 +6,8 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/fetch_result.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/classtable_scope.dart';
+import 'package:watermeter/page/classtable/model/classtable_status_source.dart';
 import 'package:watermeter/repository/translation_key.dart';
 
 /// The app bar button which opens the load errors together with the sources
@@ -16,27 +17,27 @@ class ClassTableErrorButton extends StatelessWidget {
   const ClassTableErrorButton({super.key});
 
   Future<void> _showDialog(BuildContext context) async {
-    final state = ClassTableState.of(context)!.controllers;
+    final state = ClasstableScope.read(context);
     final errorWithoutCacheSources = state.errorWithoutCacheSources;
     final errorWithCacheSources = state.errorWithCacheSources;
 
-    String sourceLabel(ClassTableStatusSource source) =>
+    String sourceLabel(ClasstableStatusSource source) =>
         context.t.resolveKey(switch (source) {
-          ClassTableStatusSource.classTable =>
+          ClasstableStatusSource.classTable =>
             "classtable.status_source.class_table",
-          ClassTableStatusSource.exam => "classtable.status_source.exam",
-          ClassTableStatusSource.physicsExperiment =>
+          ClasstableStatusSource.exam => "classtable.status_source.exam",
+          ClasstableStatusSource.physicsExperiment =>
             "classtable.status_source.physics_experiment",
-          ClassTableStatusSource.otherExperiment =>
+          ClasstableStatusSource.otherExperiment =>
             "classtable.status_source.other_experiment",
         });
 
-    CacheHint? sourceHintKey(ClassTableStatusSource source) => switch (source) {
-      ClassTableStatusSource.classTable => state.classTableCacheHintKey,
-      ClassTableStatusSource.exam => state.examCacheHintKey,
-      ClassTableStatusSource.physicsExperiment =>
+    CacheHint? sourceHintKey(ClasstableStatusSource source) => switch (source) {
+      ClasstableStatusSource.classTable => state.classTableCacheHintKey,
+      ClasstableStatusSource.exam => state.examCacheHintKey,
+      ClasstableStatusSource.physicsExperiment =>
         state.physicsExperimentCacheHintKey,
-      ClassTableStatusSource.otherExperiment =>
+      ClasstableStatusSource.otherExperiment =>
         state.otherExperimentCacheHintKey,
     };
 
@@ -85,7 +86,7 @@ class ClassTableErrorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = ClassTableState.of(context)!.controllers;
+    final state = ClasstableScope.of(context);
     final hasError =
         state.errorWithoutCacheSources.isNotEmpty ||
         state.errorWithCacheSources.isNotEmpty;

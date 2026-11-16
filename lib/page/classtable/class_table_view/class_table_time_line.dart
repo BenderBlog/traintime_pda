@@ -10,8 +10,8 @@ import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/page/classtable/class_table_view/class_table_time_column_layout.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
-import 'package:watermeter/page/classtable/class_table_view/glass_style.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/style_config/glass_style_config.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
 
 /// The height of one of the 61 blocks of a day.

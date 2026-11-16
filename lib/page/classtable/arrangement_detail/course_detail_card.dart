@@ -6,7 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 /// A dialog/card shows the class detail / time arrangement.

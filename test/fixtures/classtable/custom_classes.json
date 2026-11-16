@@ -1,0 +1,20 @@
+[
+  {
+    "id": "test-custom-01",
+    "name": "虚构自定义安排",
+    "teacher": "测试老师",
+    "classroom": "测试地点",
+    "time_ranges": [
+      {
+        "id": "test-range-01",
+        "start_time": "2026-11-17T14:00:00",
+        "end_time": "2026-11-17T15:35:00"
+      },
+      {
+        "id": "test-range-02",
+        "start_time": "2026-11-24T14:00:00",
+        "end_time": "2026-11-24T15:35:00"
+      }
+    ]
+  }
+]

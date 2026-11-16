@@ -4,13 +4,13 @@
 
 import 'package:material_ui/material_ui.dart';
 
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/model/classtable_status_source.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 /// A loop beside the error button while a source is being fetched, and nothing
 /// otherwise. Which sources came from the cache is the error dialog's business.
 class ClassTableStatusHint extends StatelessWidget {
-  final List<ClassTableStatusSource> loadingSources;
+  final List<ClasstableStatusSource> loadingSources;
 
   const ClassTableStatusHint({super.key, required this.loadingSources});
 
@@ -22,20 +22,20 @@ class ClassTableStatusHint extends StatelessWidget {
 
   static const double _spinnerStroke = 2.5;
 
-  String _sourceLabel(BuildContext context, ClassTableStatusSource source) =>
+  String _sourceLabel(BuildContext context, ClasstableStatusSource source) =>
       switch (source) {
-        ClassTableStatusSource.classTable =>
+        ClasstableStatusSource.classTable =>
           context.t.classtable.statusSource.classTable,
-        ClassTableStatusSource.exam => context.t.classtable.statusSource.exam,
-        ClassTableStatusSource.physicsExperiment =>
+        ClasstableStatusSource.exam => context.t.classtable.statusSource.exam,
+        ClasstableStatusSource.physicsExperiment =>
           context.t.classtable.statusSource.physicsExperiment,
-        ClassTableStatusSource.otherExperiment =>
+        ClasstableStatusSource.otherExperiment =>
           context.t.classtable.statusSource.otherExperiment,
       };
 
   String _joinSources(
     BuildContext context,
-    List<ClassTableStatusSource> sources,
+    List<ClasstableStatusSource> sources,
   ) => sources.map((source) => _sourceLabel(context, source)).join("; ");
 
   @override

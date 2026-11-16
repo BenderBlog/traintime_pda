@@ -3,65 +3,10 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/time_list.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/style_config/current_time_indicator_style_config.dart';
 
-class CurrentTimeIndicatorConfig {
-  /// Default tuning parameters for the current time indicator.
-  /// Configuration for the current time indicator in the class table view.
-  static bool enabled = true;
-  static bool showTimeLabel = true;
-  static bool showTodayColumnHighlight = true;
-  static double lineAlpha = 0.9;
-  static double lineThickness = 2;
-  static double labelHeight = 13;
-  static double labelFontSize = 7;
-  static double labelBackgroundAlpha = 1.0;
-  static double labelHorizontalPadding = 1;
-  static double labelVerticalPadding = 1;
-  static double labelBorderRadius = 4;
-  static double dayColumnHighlightAlpha = 0.25;
-  static double dayColumnHighlightRadius = 8;
-
-  static void loadFromPreference() {
-    if (preference.contains(
-      preference.Preference.currentTimeIndicatorEnabled,
-    )) {
-      enabled = preference.getBool(
-        preference.Preference.currentTimeIndicatorEnabled,
-      );
-    }
-    if (preference.contains(
-      preference.Preference.currentTimeIndicatorShowTimeLabel,
-    )) {
-      showTimeLabel = preference.getBool(
-        preference.Preference.currentTimeIndicatorShowTimeLabel,
-      );
-    }
-    if (preference.contains(
-      preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
-    )) {
-      showTodayColumnHighlight = preference.getBool(
-        preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
-      );
-    }
-  }
-
-  static Future<void> saveToPreference() async {
-    await preference.setBool(
-      preference.Preference.currentTimeIndicatorEnabled,
-      enabled,
-    );
-    await preference.setBool(
-      preference.Preference.currentTimeIndicatorShowTimeLabel,
-      showTimeLabel,
-    );
-    await preference.setBool(
-      preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
-      showTodayColumnHighlight,
-    );
-  }
-}
+export 'package:watermeter/page/classtable/model/style_config/current_time_indicator_style_config.dart';
 
 class CurrentTimeIndicator {
   static double _transferIndex(DateTime time) {

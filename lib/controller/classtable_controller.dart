@@ -15,12 +15,13 @@ import 'package:watermeter/model/home_arrangement.dart';
 import 'package:watermeter/model/time_list.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_sport/sport_class.dart';
+import 'package:watermeter/page/classtable/model/classtable_file_constants.dart';
 import 'package:watermeter/repository/logger.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/repository/ids_session/classtable_session.dart';
 
 class ClassTableController {
-  static const decorationName = "decoration.jpg";
+  static const decorationName = classTableDecorationFileName;
   static final ClassTableController i = ClassTableController._();
 
   final ClassTableSession session = ClassTableSession();

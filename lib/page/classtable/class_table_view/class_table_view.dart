@@ -7,11 +7,11 @@ import 'package:watermeter/generated/translations.g.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 import 'package:watermeter/page/classtable/class_table_view/class_card.dart';
-import 'package:watermeter/page/classtable/class_table_view/class_organized_data.dart';
+import 'package:watermeter/page/classtable/model/class_organized_data.dart';
 import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_widget_state.dart';
+import 'package:watermeter/page/classtable/classtable_scope.dart';
 
 ///
 /// Classtable blanks below per blocks.
@@ -39,11 +39,15 @@ class ClassTableView extends StatefulWidget {
   /// line and the settings preview all size a block the same way.
   final double blockUnit;
 
+  /// The width the whole grid has to share between the time column and the seven days.
+  final double maxWidth;
+
   const ClassTableView({
     super.key,
     required this.index,
     required this.timeColumnWidth,
     required this.blockUnit,
+    required this.maxWidth,
   });
 
   @override
@@ -52,9 +56,8 @@ class ClassTableView extends StatefulWidget {
 
 class _ClassTableViewState extends State<ClassTableView>
     with AutomaticKeepAliveClientMixin {
-  late ClassTableWidgetState classTableState;
-  late BoxConstraints size;
-  bool _isListening = false;
+  late ClasstableWidgetState classTableState;
+  bool _isBound = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -101,7 +104,7 @@ class _ClassTableViewState extends State<ClassTableView>
   /// The height of the class card.
   double blockheight(double count) => count * widget.blockUnit;
 
-  double get blockwidth => (size.maxWidth - widget.timeColumnWidth) / 7;
+  double get blockwidth => (widget.maxWidth - widget.timeColumnWidth) / 7;
 
   /// The class cards of this week, plus the highlight and the current-time indicator over them.
   List<Widget> _classLayer() {
@@ -145,8 +148,7 @@ class _ClassTableViewState extends State<ClassTableView>
       }
     }
 
-    if (thisRow.isEmpty &&
-        !preference.getBool(preference.Preference.decorated)) {
+    if (thisRow.isEmpty && !classTableState.decorated) {
       thisRow.add(
         Center(
           child: Column(
@@ -164,17 +166,6 @@ class _ClassTableViewState extends State<ClassTableView>
     return thisRow;
   }
 
-  int _lastScheduleVersion = 0;
-
-  /// This function will be triggered when user changed class info.
-  void _reload() {
-    if (!mounted) return;
-    if (_lastScheduleVersion != classTableState.scheduleVersion) {
-      _lastScheduleVersion = classTableState.scheduleVersion;
-      setState(() {});
-    }
-  }
-
   /// Whether this page was the current week at the last tick.
   bool _wasCurrentWeek = false;
 
@@ -182,6 +173,9 @@ class _ClassTableViewState extends State<ClassTableView>
   ///
   /// The page that just stopped being the current week redraws once more as well, or it would keep
   /// last Sunday's day-column highlight after midnight.
+  ///
+  /// Data changes do not come through here any more: the scope this page reads in [build] rebuilds
+  /// it whenever the table's snapshot changes.
   void _onTimeTick() {
     if (!mounted) return;
     final bool isCurrentWeek = widget.index == classTableState.currentWeek;
@@ -191,33 +185,20 @@ class _ClassTableViewState extends State<ClassTableView>
     _wasCurrentWeek = isCurrentWeek;
   }
 
-  void updateSize() => size = ClassTableState.of(context)!.constraints;
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_isListening) {
-      classTableState = ClassTableState.of(context)!.controllers;
-      _lastScheduleVersion = classTableState.scheduleVersion;
-      _wasCurrentWeek = widget.index == classTableState.currentWeek;
-      classTableState.addListener(_reload);
-      classTableState.timeTickNotifier.addListener(_onTimeTick);
-      _isListening = true;
-    }
-    updateSize();
+    if (_isBound) return;
+    classTableState = ClasstableScope.read(context);
+    _wasCurrentWeek = widget.index == classTableState.currentWeek;
+    classTableState.now.addListener(_onTimeTick);
+    _isBound = true;
   }
 
   @override
   void dispose() {
-    classTableState.removeListener(_reload);
-    classTableState.timeTickNotifier.removeListener(_onTimeTick);
+    classTableState.now.removeListener(_onTimeTick);
     super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(covariant ClassTableView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    updateSize();
   }
 
   @override
@@ -227,6 +208,7 @@ class _ClassTableViewState extends State<ClassTableView>
     /// older all-in-one build here, and its one change to it (forcing [ClampingScrollPhysics] on
     /// the settings preview's viewport) is honoured in `ClassTableSheet.verticalPhysics` instead.
     super.build(context);
+    classTableState = ClasstableScope.of(context);
     return Stack(children: _classLayer());
   }
 }
