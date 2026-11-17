@@ -1330,7 +1330,7 @@ class _Translations$classtable$classAdd$zh_TW extends Translations$classtable$cl
 	@override String get inputClassroomHint => '教室位置(選填)';
 	@override String get inputWeekHint => '選擇上課周次';
 	@override String get inputTimeHint => '選擇上課時間';
-	@override String get inputTimeWeekdayHint => '上課周次';
+	@override String get inputTimeWeekdayHint => '上課星期';
 	@override String get inputStartTimeHint => '上課時間';
 	@override String get inputEndTimeHint => '下課時間';
 	@override String wheelChooseHint({required Object index}) => '第 ${index} 節';
@@ -2653,7 +2653,7 @@ extension on TranslationsZhTw {
 			'classtable.classAdd.inputClassroomHint' => '教室位置(選填)',
 			'classtable.classAdd.inputWeekHint' => '選擇上課周次',
 			'classtable.classAdd.inputTimeHint' => '選擇上課時間',
-			'classtable.classAdd.inputTimeWeekdayHint' => '上課周次',
+			'classtable.classAdd.inputTimeWeekdayHint' => '上課星期',
 			'classtable.classAdd.inputStartTimeHint' => '上課時間',
 			'classtable.classAdd.inputEndTimeHint' => '下課時間',
 			'classtable.classAdd.wheelChooseHint' => ({required Object index}) => '第 ${index} 節',

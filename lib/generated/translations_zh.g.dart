@@ -2817,8 +2817,8 @@ class Translations$classtable$classAdd$zh {
 	/// zh: '选择上课时间'
 	String get inputTimeHint => '选择上课时间';
 
-	/// zh: '上课周次'
-	String get inputTimeWeekdayHint => '上课周次';
+	/// zh: '星期'
+	String get inputTimeWeekdayHint => '星期';
 
 	/// zh: '上课时间'
 	String get inputStartTimeHint => '上课时间';
@@ -5331,7 +5331,7 @@ extension on Translations {
 			'classtable.classAdd.inputClassroomHint' => '教室位置(选填)',
 			'classtable.classAdd.inputWeekHint' => '选择上课周次',
 			'classtable.classAdd.inputTimeHint' => '选择上课时间',
-			'classtable.classAdd.inputTimeWeekdayHint' => '上课周次',
+			'classtable.classAdd.inputTimeWeekdayHint' => '星期',
 			'classtable.classAdd.inputStartTimeHint' => '上课时间',
 			'classtable.classAdd.inputEndTimeHint' => '下课时间',
 			'classtable.classAdd.wheelChooseHint' => ({required Object index}) => '第 ${index} 节',

@@ -127,7 +127,7 @@ class_add:
   input_classroom_hint: 教室位置(选填)
   input_week_hint: 选择上课周次
   input_time_hint: 选择上课时间
-  input_time_weekday_hint: 上课周次
+  input_time_weekday_hint: 星期
   input_start_time_hint: 上课时间
   input_end_time_hint: 下课时间
   wheel_choose_hint: 第 {index} 节

@@ -11,6 +11,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/wheel_choser.dart';
 import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 
 class DateSelectorFree extends StatefulWidget {
   final List<DateTimeRange> initialDates;
@@ -507,6 +508,12 @@ class _DateSelectorFree extends State<DateSelectorFree> {
             if (chosenDatesRanges.isNotEmpty)
               ...List.generate(chosenDatesRanges.length, (index) {
                 final d = chosenDatesRanges[index];
+                final weekNumber =
+                    DateUtils.dateOnly(
+                          d.start,
+                        ).difference(_semesterFirstDate).inDays ~/
+                        7 +
+                    1;
                 return Padding(
                   padding: EdgeInsetsGeometry.only(top: 8),
                   child: Material(
@@ -531,13 +538,23 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                             Icon(Icons.schedule, color: widget.color, size: 18),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(
-                                '${DateFormat('yyyy-MM-dd').format(d.start)}  '
-                                '${DateFormat('HH:mm').format(d.start)}-${DateFormat('HH:mm').format(d.end)}',
-                                style: TextStyle(
-                                  color: widget.color,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${DateFormat('yyyy-MM-dd').format(d.start)} · '
+                                    '${getWeekString(context, d.start.weekday - 1)} · '
+                                    '${context.t.classtable.weekTitle(week: '$weekNumber')}',
+                                    style: TextStyle(
+                                      color: widget.color,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${DateFormat('HH:mm').format(d.start)}-${DateFormat('HH:mm').format(d.end)}',
+                                    style: TextStyle(color: widget.color),
+                                  ),
+                                ],
                               ),
                             ),
                             IconButton(
