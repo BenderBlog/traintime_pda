@@ -69,6 +69,9 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
       (index) => index == widget.state.chosenWeek,
     );
     selectedWeekday = DateTime.now().weekday;
+    if (widget.customToChange == null && canUseWeeklySchedule) {
+      scheduleInputMode = _ScheduleInputMode.weekly;
+    }
   }
 
   @override
@@ -269,20 +272,21 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                     spacing: 8,
                     children: [
                       ChoiceChip(
+                        label: Text(context.t.classtable.classAdd.repeatWeekly),
+                        selected:
+                            scheduleInputMode == _ScheduleInputMode.weekly,
+                        onSelected: (_) => setState(
+                          () => scheduleInputMode = _ScheduleInputMode.weekly,
+                        ),
+                      ),
+
+                      ChoiceChip(
                         label: Text(context.t.classtable.classAdd.freeTime),
                         selected:
                             scheduleInputMode == _ScheduleInputMode.exactDates,
                         onSelected: (_) => setState(
                           () =>
                               scheduleInputMode = _ScheduleInputMode.exactDates,
-                        ),
-                      ),
-                      ChoiceChip(
-                        label: Text(context.t.classtable.classAdd.repeatWeekly),
-                        selected:
-                            scheduleInputMode == _ScheduleInputMode.weekly,
-                        onSelected: (_) => setState(
-                          () => scheduleInputMode = _ScheduleInputMode.weekly,
                         ),
                       ),
                     ],
