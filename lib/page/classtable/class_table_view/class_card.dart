@@ -285,7 +285,7 @@ class ClassCard extends StatelessWidget {
       return ArrangementDetailItem(
         type: ArrangementDetailType.exam,
         name: '${entry.subject}${entry.type}',
-        color: colorList[2 % colorList.length],
+        color: detail.color,
         classroom: entry.place,
         seat: entry.seat,
         dateRanges: start != null && end != null
@@ -299,7 +299,7 @@ class ClassCard extends StatelessWidget {
             ? ArrangementDetailType.physicsExperiment
             : ArrangementDetailType.otherExperiment,
         name: entry.name,
-        color: colorList[2 % colorList.length],
+        color: detail.color,
         teacher: entry.teacher,
         classroom: entry.classroom,
         dateRanges: entry.timeRanges
