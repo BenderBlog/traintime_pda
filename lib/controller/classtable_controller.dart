@@ -239,7 +239,7 @@ class ClassTableController {
           name: classDetail.name,
           teacher: arrangement.teacher,
           place: arrangement.classroom,
-          colorIndex: classTableData.classDetail.indexOf(classDetail),
+          colorIndex: arrangement.index,
           startTimeStr: formatter.format(
             DateTime(
               updateTime.year,

@@ -277,7 +277,7 @@ class ClasstableWidgetState with ChangeNotifier {
         events.add(
           ClassOrgainzedData.fromTimeArrangement(
             arrangement,
-            colorList[index % colorList.length],
+            colorList[arrangement.index % colorList.length],
             data.getClassDetail(arrangement).name,
           ),
         );
