@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:watermeter/generated/translations.g.dart';
-import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:material_ui/material_ui.dart';
@@ -47,12 +46,6 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
       return const SizedBox.shrink();
     }
 
-    final viewport = MediaQuery.sizeOf(context);
-    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
-    final cacheWidth = (math.max(viewport.width, viewport.height) * pixelRatio)
-        .round()
-        .clamp(1, 2560)
-        .toInt();
     final blur = (widget.backgroundBlur ?? _state.backgroundBlur)
         .clamp(0.0, maxClassTableBackgroundBlur)
         .toDouble();
@@ -61,7 +54,6 @@ class _ClassTablePreviewState extends State<ClassTablePreview> {
       image,
       key: ValueKey("${image.path}:${_state.decorationImageRevision}"),
       fit: BoxFit.cover,
-      cacheWidth: cacheWidth,
       gaplessPlayback: true,
       opacity: AlwaysStoppedAnimation<double>(
         Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,

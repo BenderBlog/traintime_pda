@@ -335,12 +335,6 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       );
     }
 
-    final viewport = MediaQuery.sizeOf(context);
-    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
-    final cacheWidth = (math.max(viewport.width, viewport.height) * pixelRatio)
-        .round()
-        .clamp(1, 2560)
-        .toInt();
     final imageRevision = classTableState.decorationImageRevision ?? '0';
 
     final double blur = classTableState.backgroundBlur;
@@ -349,8 +343,8 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       image,
       key: ValueKey<String>("${image.path}:$imageRevision"),
       fit: BoxFit.cover,
-      alignment: Alignment.topCenter,
-      cacheWidth: cacheWidth,
+      // TODO: Ask the original author why the wallpaper needs top alignment.
+      // alignment: Alignment.topCenter,
       gaplessPlayback: true,
       errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
       opacity: AlwaysStoppedAnimation<double>(

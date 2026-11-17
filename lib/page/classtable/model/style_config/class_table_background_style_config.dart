@@ -3,11 +3,20 @@
 
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 import 'style_config_preference_functions.dart';
 
 /// Background wallpaper settings and image metadata for the timetable.
 class ClassTableBackgroundStyleConfig {
+  /// Published after a replacement background has been saved so the settings preview and the
+  /// live timetable can both rebuild their image widgets.
+  static final ValueNotifier<int> imageChangeRevision = ValueNotifier<int>(0);
+
+  static void notifyImageChanged() {
+    imageChangeRevision.value++;
+  }
+
   static bool get decorated => StyleConfigPreferenceFunctions.getBool(
     StyleConfigPreferenceKey.decorated,
   );
