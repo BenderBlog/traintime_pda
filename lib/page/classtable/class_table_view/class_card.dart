@@ -9,16 +9,20 @@ import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/model/xidian_ids/classtable.dart';
 import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/model/xidian_ids/experiment.dart';
+import 'package:watermeter/model/time_list.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_list.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/model/class_organized_data.dart';
+import 'package:watermeter/page/classtable/model/classtable_widget_state.dart';
 import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
 import 'package:watermeter/page/classtable/model/style_config/glass_style_config.dart';
-import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail_data.dart';
 import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 import 'package:watermeter/page/classtable/classtable_scope.dart';
 import 'package:watermeter/page/public_widget/both_side_sheet.dart';
 import 'package:watermeter/page/public_widget/public_widget.dart';
+import 'package:watermeter/themes/color_seed.dart';
 
 /// The card in [classSubRow], mentioned in [ClassTableView].
 class ClassCard extends StatelessWidget {
@@ -138,61 +142,46 @@ class ClassCard extends StatelessWidget {
 
                 /// The way to show the class info of the period.
                 /// The last one indicate whether to delete this stuff.
+                final semesterWeekCount = classTableState.semesterLength;
+                final semesterStartDay = classTableState.startDay;
+                final weekStartDates = List.generate(
+                  semesterWeekCount,
+                  (week) => semesterStartDay.add(Duration(days: week * 7)),
+                );
                 final action = await BothSideSheet.show(
                   title: context.t.classtable.classCard.title,
                   child: ArrangementDetail(
-                    information: List.generate(data.length, (index) {
-                      if (data.elementAt(index) is Subject ||
-                          data.elementAt(index) is ExperimentData) {
-                        return data.elementAt(index);
-                      } else if (data.elementAt(index)
-                          is (
-                            CustomClass,
-                            CustomClassTimeRange,
-                            MaterialColor,
-                          )) {
-                        return data.elementAt(index);
-                      } else if (data.elementAt(index)
-                          is (CustomClass, CustomClassTimeRange)) {
-                        return data.elementAt(index);
-                      } else if (data.elementAt(index) is TimeArrangement) {
-                        final TimeArrangement arrangement = data.elementAt(
-                          index,
-                        );
-                        return (
-                          classTableState.getClassDetail(
-                            classTableState.timeArrangement.indexOf(
-                              arrangement,
-                            ),
-                          ),
-                          arrangement,
-                        );
-                      } else {
-                        return data.elementAt(index);
-                      }
-                    }),
-                    currentWeek: classTableState.currentWeek,
+                    data: ArrangementDetailData(
+                      arrangements: data
+                          .map((entry) => _toDetailItem(entry, classTableState))
+                          .toList(),
+                      semesterWeekCount: semesterWeekCount,
+                      weekStartDates: weekStartDates,
+                      currentWeek: classTableState.currentWeek,
+                    ),
                   ),
                   context: context,
                 );
                 if (!context.mounted || action == null) return;
 
-                if (action is (String, String?, String)) {
+                if (action is ArrangementDetailAction) {
                   final int customIndex = controller.customClasses.indexWhere(
-                    (custom) => custom.id == action.$1,
+                    (custom) => custom.id == action.customClassId,
                   );
                   if (customIndex < 0) return;
 
-                  if (action.$3 == 'delete_all') {
-                    await controller.deleteCustomClassById(action.$1);
-                  } else if (action.$3 == 'delete_one') {
-                    final String? timeRangeId = action.$2;
+                  if (action.type == CustomCourseActionType.deleteAll) {
+                    await controller.deleteCustomClassById(
+                      action.customClassId,
+                    );
+                  } else if (action.type == CustomCourseActionType.deleteOne) {
+                    final String? timeRangeId = action.customTimeRangeId;
                     if (timeRangeId == null) return;
                     await controller.deleteCustomClassTimeRange(
-                      customClassId: action.$1,
+                      customClassId: action.customClassId,
                       timeRangeId: timeRangeId,
                     );
-                  } else if (action.$3 == 'edit') {
+                  } else if (action.type == CustomCourseActionType.edit) {
                     final CustomClass customClass =
                         controller.customClasses[customIndex];
                     await Navigator.of(context)
@@ -207,7 +196,7 @@ class ClassCard extends StatelessWidget {
                         .then((value) async {
                           if (value is CustomClass) {
                             await controller.editCustomClassById(
-                              action.$1,
+                              action.customClassId,
                               value,
                             );
                           }
@@ -284,6 +273,122 @@ class ClassCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  ArrangementDetailItem _toDetailItem(
+    dynamic entry,
+    ClasstableWidgetState classTableState,
+  ) {
+    if (entry is Subject) {
+      final start = entry.startTime;
+      final end = entry.stopTime;
+      return ArrangementDetailItem(
+        type: ArrangementDetailType.exam,
+        name: '${entry.subject}${entry.type}',
+        color: colorList[2 % colorList.length],
+        classroom: entry.place,
+        seat: entry.seat,
+        dateRanges: start != null && end != null
+            ? [DateTimeRange(start: start, end: end)]
+            : const [],
+      );
+    }
+    if (entry is ExperimentData) {
+      return ArrangementDetailItem(
+        type: entry.type == ExperimentType.physics
+            ? ArrangementDetailType.physicsExperiment
+            : ArrangementDetailType.otherExperiment,
+        name: entry.name,
+        color: colorList[2 % colorList.length],
+        teacher: entry.teacher,
+        classroom: entry.classroom,
+        dateRanges: entry.timeRanges
+            .map((range) => DateTimeRange(start: range.$1, end: range.$2))
+            .toList(),
+      );
+    }
+    if (entry is (CustomClass, CustomClassTimeRange, MaterialColor)) {
+      final (customClass, selectedRange, customColor) = entry;
+      return ArrangementDetailItem(
+        type: ArrangementDetailType.customCourse,
+        name: customClass.name,
+        color: customColor,
+        teacher: customClass.teacher,
+        classroom: customClass.classroom,
+        dateRanges: customClass.timeRanges
+            .map(
+              (range) =>
+                  DateTimeRange(start: range.startTime, end: range.endTime),
+            )
+            .toList(),
+        selectedDateRange: DateTimeRange(
+          start: selectedRange.startTime,
+          end: selectedRange.endTime,
+        ),
+        customClassId: customClass.id,
+        customTimeRangeId: selectedRange.id,
+      );
+    }
+    if (entry is (CustomClass, CustomClassTimeRange)) {
+      final (customClass, selectedRange) = entry;
+      return ArrangementDetailItem(
+        type: ArrangementDetailType.customCourse,
+        name: customClass.name,
+        color: colorList.first,
+        teacher: customClass.teacher,
+        classroom: customClass.classroom,
+        dateRanges: customClass.timeRanges
+            .map(
+              (range) =>
+                  DateTimeRange(start: range.startTime, end: range.endTime),
+            )
+            .toList(),
+        selectedDateRange: DateTimeRange(
+          start: selectedRange.startTime,
+          end: selectedRange.endTime,
+        ),
+        customClassId: customClass.id,
+        customTimeRangeId: selectedRange.id,
+      );
+    }
+    if (entry is TimeArrangement) {
+      final arrangementIndex = classTableState.timeArrangement.indexOf(entry);
+      final classDetail = classTableState.getClassDetail(
+        classTableState.timeArrangement.indexOf(entry),
+      );
+      final day = classTableState.startDay.add(Duration(days: entry.day - 1));
+      DateTime atPeriodTime(int timeIndex) {
+        final parts = timeList[timeIndex].split(':');
+        return DateTime(
+          day.year,
+          day.month,
+          day.day,
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+        );
+      }
+
+      return ArrangementDetailItem(
+        type: ArrangementDetailType.course,
+        name: classDetail.name,
+        color: colorList[arrangementIndex % colorList.length],
+        teacher: entry.teacher,
+        classroom: entry.classroom,
+        weekList: entry.weekList,
+        weekday: entry.day,
+        startPeriod: entry.start,
+        stopPeriod: entry.stop,
+        code: classDetail.code,
+        number: classDetail.number,
+        dateRanges: [
+          DateTimeRange(
+            start: atPeriodTime((entry.start - 1) * 2),
+            end: atPeriodTime((entry.stop - 1) * 2 + 1),
+          ),
+        ],
+      );
+    }
+    throw ArgumentError.value(entry, 'entry', 'Unsupported arrangement');
   }
 }
 

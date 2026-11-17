@@ -3,31 +3,30 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/time_list.dart';
-import 'package:watermeter/model/xidian_ids/classtable.dart';
+import 'package:intl/intl.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail_data.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/custom_list_tile.dart';
 import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 /// A dialog/card shows the class detail / time arrangement.
 class ClassDetailCard extends StatelessWidget {
-  final ClassDetail classDetail;
-  final TimeArrangement timeArrangement;
-  final MaterialColor infoColor;
+  final ArrangementDetailItem item;
   final int currentWeek;
+  final int semesterWeekCount;
   const ClassDetailCard({
     super.key,
-    required this.classDetail,
-    required this.timeArrangement,
-    required this.infoColor,
+    required this.item,
     required this.currentWeek,
+    required this.semesterWeekCount,
   });
 
   /// A doc shows the week info of the class, whether the class /
   /// time arrangement occurs in this week.
   Widget weekDoc({required int index}) {
     bool isOccupied = true;
-    if (!timeArrangement.weekList[index]) {
+    final infoColor = item.color;
+    if (index >= (item.weekList?.length ?? 0) || !item.weekList![index]) {
       isOccupied = false;
     }
     return ClipOval(
@@ -55,6 +54,7 @@ class ClassDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final infoColor = item.color;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360.0),
       child: Card(
@@ -67,8 +67,8 @@ class ClassDetailCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${classDetail.name}"
-                "${classDetail.code != null && classDetail.number != null ? "\n${classDetail.code} | ${context.t.classtable.courseDetailCard.classNumberString(number: '${classDetail.number}')}" : ""}",
+                "${item.name}"
+                "${item.code != null && item.number != null ? "\n${item.code} | ${context.t.classtable.courseDetailCard.classNumberString(number: '${item.number}')}" : ""}",
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,
@@ -82,7 +82,7 @@ class ClassDetailCard extends StatelessWidget {
                     child: CustomListTile(
                       icon: Icons.person,
                       str:
-                          timeArrangement.teacher ??
+                          item.teacher ??
                           context.t.classtable.courseDetailCard.unknownTeacher,
                       infoColor: infoColor,
                     ),
@@ -91,7 +91,7 @@ class ClassDetailCard extends StatelessWidget {
                     child: CustomListTile(
                       icon: Icons.room,
                       str:
-                          timeArrangement.classroom ??
+                          item.classroom ??
                           context.t.classtable.courseDetailCard.unknownPlace,
                       infoColor: infoColor,
                     ),
@@ -101,9 +101,9 @@ class ClassDetailCard extends StatelessWidget {
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,
                 str:
-                    "${getWeekString(context, timeArrangement.day - 1)}"
-                    "${context.t.classtable.courseDetailCard.classPeriod(start: '${timeArrangement.start}', stop: '${timeArrangement.stop}')} "
-                    "${timeList[(timeArrangement.start - 1) * 2]}-${timeList[(timeArrangement.stop - 1) * 2 + 1]}",
+                    "${getWeekString(context, item.weekday! - 1)}"
+                    "${context.t.classtable.courseDetailCard.classPeriod(start: '${item.startPeriod}', stop: '${item.stopPeriod}')} "
+                    "${DateFormat('HH:mm').format(item.dateRanges.first.start)}-${DateFormat('HH:mm').format(item.dateRanges.first.end)}",
                 infoColor: infoColor,
               ),
 
@@ -117,7 +117,7 @@ class ClassDetailCard extends StatelessWidget {
                   crossAxisSpacing: 4,
                   maxCrossAxisExtent: 30,
                   children: List.generate(
-                    timeArrangement.weekList.length,
+                    semesterWeekCount,
                     (index) => weekDoc(index: index),
                   ),
                 ),
@@ -127,34 +127,5 @@ class ClassDetailCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class CustomListTile extends StatelessWidget {
-  final IconData icon;
-  final String str;
-  final MaterialColor infoColor;
-
-  const CustomListTile({
-    super.key,
-    required this.icon,
-    required this.str,
-    required this.infoColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, color: infoColor.shade900),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            str,
-            style: TextStyle(color: infoColor.shade900, fontSize: 16),
-          ),
-        ),
-      ],
-    ).padding(vertical: 4);
   }
 }

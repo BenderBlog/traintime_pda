@@ -5,21 +5,17 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/xidian_ids/experiment.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/custom_list_tile.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail_data.dart';
 
 /// A dialog/card shows the exam detail.
 class ExperimentDetailCard extends StatelessWidget {
-  final ExperimentData experiment;
-  final MaterialColor infoColor;
-  const ExperimentDetailCard({
-    super.key,
-    required this.experiment,
-    required this.infoColor,
-  });
+  final ArrangementDetailItem item;
+  const ExperimentDetailCard({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
+    final infoColor = item.color;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360.0),
       child: Card(
@@ -32,7 +28,7 @@ class ExperimentDetailCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                experiment.name,
+                item.name,
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,
@@ -43,12 +39,12 @@ class ExperimentDetailCard extends StatelessWidget {
               [
                 CustomListTile(
                   icon: Icons.person,
-                  str: experiment.teacher,
+                  str: item.teacher ?? '',
                   infoColor: infoColor,
                 ).flexible(),
                 CustomListTile(
                   icon: Icons.room,
-                  str: experiment.classroom,
+                  str: item.classroom ?? '',
                   infoColor: infoColor,
                 ).flexible(),
               ].toRow(),
@@ -69,10 +65,10 @@ class ExperimentDetailCard extends StatelessWidget {
                   return CustomListTile(
                     icon: Icons.access_time_filled_outlined,
                     infoColor: infoColor,
-                    str: experiment.timeRanges
+                    str: item.dateRanges
                         .map<String>((timeRange) {
-                          final firstDate = timeRange.$1;
-                          final secondDate = timeRange.$2;
+                          final firstDate = timeRange.start;
+                          final secondDate = timeRange.end;
                           final dateStr = dateFormatter.format(firstDate);
                           final startTimeStr = timeFormatter.format(firstDate);
                           final endTimeStr = timeFormatter.format(secondDate);
