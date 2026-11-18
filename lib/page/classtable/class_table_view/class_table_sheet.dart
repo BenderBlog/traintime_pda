@@ -120,10 +120,15 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double available = widget.enableVerticalScrolling
-            ? constraints.maxHeight
-            : classTableHeightReference;
         final double timeIndicatorTopClearance = _timeIndicatorTopClearance;
+        final double topGap = _dateRowHeight + timeIndicatorTopClearance;
+        final double available = widget.enableVerticalScrolling
+            ? constraints.maxHeight -
+                  topGap -
+                  classTableSheetEndGap -
+                  widget.bottomClearance +
+                  midRowHeight
+            : classTableHeightReference;
 
         /// Measured once and handed down, so the time line, the grid and the floating indicators
         /// cannot drift apart: the column is as wide as its widest label needs, and a block is never
@@ -168,9 +173,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
                 child: Column(
                   children: [
                     /// Room for the floating date row and the top of the time-indicator capsule.
-                    SizedBox(
-                      height: _dateRowHeight + timeIndicatorTopClearance,
-                    ),
+                    SizedBox(height: topGap),
 
                     SizedBox(
                       height: gridHeight,

@@ -120,7 +120,7 @@ const double classTableHeightReference = 560.0;
 ///
 /// 滚到底时最后一节的下课时间会贴到面板底边、被自己的圆角切到，留一点就够它
 /// 躲开；末尾的时间滑块也会停在该避让区域上方以避免遮挡文字。
-const double classTableSheetEndGap = 20.0;
+const double classTableSheetEndGap = 6.0;
 
 /// The largest blur which can be applied to a user defined background image.
 const double maxClassTableBackgroundBlur = 20.0;
