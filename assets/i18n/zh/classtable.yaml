@@ -49,14 +49,14 @@ visual_settings:
   show_today_column_highlight: 强调显示今天的纵列
   unfinished_section: 课程样式
   active_brightness_factor: '亮度: {value}'
-  active_border_alpha: '边框透明度: {value}'
-  active_inner_alpha: '底色透明度: {value}'
+  active_border_alpha: '边框不透明度: {value}'
+  active_inner_alpha: '底色不透明度: {value}'
   completed_section: 已结束课程样式
   completed_saturation_factor: '底色饱和度: {value}'
   completed_brightness_factor: '亮度: {value}'
   completed_text_saturation_factor: '文字饱和度: {value}'
-  completed_border_alpha: '边框透明度: {value}'
-  completed_inner_alpha: '底色透明度: {value}'
+  completed_border_alpha: '边框不透明度: {value}'
+  completed_inner_alpha: '底色不透明度: {value}'
 status_source:
   class_table: 课表
   exam: 考试

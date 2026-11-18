@@ -1206,14 +1206,14 @@ class _Translations$classtable$visualSettings$zh_TW extends Translations$classta
 	@override String get showTodayColumnHighlight => '強調顯示今天的縱列';
 	@override String get unfinishedSection => '課程樣式';
 	@override String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
-	@override String activeBorderAlpha({required Object value}) => '邊框透明度: ${value}';
-	@override String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String activeBorderAlpha({required Object value}) => '邊框不透明度: ${value}';
+	@override String activeInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 	@override String get completedSection => '已結束課程樣式';
 	@override String completedSaturationFactor({required Object value}) => '底色飽和度: ${value}';
 	@override String completedBrightnessFactor({required Object value}) => '亮度: ${value}';
 	@override String completedTextSaturationFactor({required Object value}) => '文字飽和度: ${value}';
-	@override String completedBorderAlpha({required Object value}) => '邊框透明度: ${value}';
-	@override String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String completedBorderAlpha({required Object value}) => '邊框不透明度: ${value}';
+	@override String completedInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 }
 
 // Path: classtable.statusSource
@@ -2301,8 +2301,8 @@ class _Translations$setting$editor$zh_TW extends Translations$setting$editor$zh 
 	@override String get electricityUnit => '度';
 	@override String get textPreview => '課程安排 · TrainTime PDA · 0123456789';
 	@override String get brightness => '亮度';
-	@override String get borderOpacity => '邊框透明度';
-	@override String get fillOpacity => '底色透明度';
+	@override String get borderOpacity => '邊框不透明度';
+	@override String get fillOpacity => '底色不透明度';
 	@override String get fillSaturation => '底色飽和度';
 	@override String get textSaturation => '文字飽和度';
 	@override String get backgroundBlur => '背景模糊程度';
@@ -2383,15 +2383,15 @@ class _Translations$setting$classTableStylePage$zh_TW extends Translations$setti
 	@override String get activeSection => '課程卡片樣式';
 	@override String get unfinishedSection => '課程卡片樣式';
 	@override String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
-	@override String activeBorderAlpha({required Object value}) => '邊框透明度: ${value}';
-	@override String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String activeBorderAlpha({required Object value}) => '邊框不透明度: ${value}';
+	@override String activeInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 	@override String get completedSection => '已結束課程樣式';
 	@override String get completedStyleEnabled => '已結束課程樣式區分';
 	@override String completedSaturationFactor({required Object value}) => '底色飽和度: ${value}';
 	@override String completedBrightnessFactor({required Object value}) => '亮度: ${value}';
 	@override String completedTextSaturationFactor({required Object value}) => '文字飽和度: ${value}';
-	@override String completedBorderAlpha({required Object value}) => '邊框透明度: ${value}';
-	@override String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String completedBorderAlpha({required Object value}) => '邊框不透明度: ${value}';
+	@override String completedInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 }
 
 // Path: xduPlanet.confirmAuditDialog
@@ -2593,14 +2593,14 @@ extension on TranslationsZhTw {
 			'classtable.visualSettings.showTodayColumnHighlight' => '強調顯示今天的縱列',
 			'classtable.visualSettings.unfinishedSection' => '課程樣式',
 			'classtable.visualSettings.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
-			'classtable.visualSettings.activeBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
-			'classtable.visualSettings.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'classtable.visualSettings.activeBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
+			'classtable.visualSettings.activeInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'classtable.visualSettings.completedSection' => '已結束課程樣式',
 			'classtable.visualSettings.completedSaturationFactor' => ({required Object value}) => '底色飽和度: ${value}',
 			'classtable.visualSettings.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
 			'classtable.visualSettings.completedTextSaturationFactor' => ({required Object value}) => '文字飽和度: ${value}',
-			'classtable.visualSettings.completedBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
-			'classtable.visualSettings.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'classtable.visualSettings.completedBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
+			'classtable.visualSettings.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'classtable.statusSource.classTable' => '課表',
 			'classtable.statusSource.exam' => '考試',
 			'classtable.statusSource.physicsExperiment' => '物理實驗',
@@ -3673,8 +3673,8 @@ extension on TranslationsZhTw {
 			'setting.editor.electricityUnit' => '度',
 			'setting.editor.textPreview' => '課程安排 · TrainTime PDA · 0123456789',
 			'setting.editor.brightness' => '亮度',
-			'setting.editor.borderOpacity' => '邊框透明度',
-			'setting.editor.fillOpacity' => '底色透明度',
+			'setting.editor.borderOpacity' => '邊框不透明度',
+			'setting.editor.fillOpacity' => '底色不透明度',
 			'setting.editor.fillSaturation' => '底色飽和度',
 			'setting.editor.textSaturation' => '文字飽和度',
 			'setting.editor.backgroundBlur' => '背景模糊程度',
@@ -3727,15 +3727,15 @@ extension on TranslationsZhTw {
 			'setting.classTableStylePage.activeSection' => '課程卡片樣式',
 			'setting.classTableStylePage.unfinishedSection' => '課程卡片樣式',
 			'setting.classTableStylePage.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
-			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
-			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
+			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'setting.classTableStylePage.completedSection' => '已結束課程樣式',
 			'setting.classTableStylePage.completedStyleEnabled' => '已結束課程樣式區分',
 			'setting.classTableStylePage.completedSaturationFactor' => ({required Object value}) => '底色飽和度: ${value}',
 			'setting.classTableStylePage.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
 			'setting.classTableStylePage.completedTextSaturationFactor' => ({required Object value}) => '文字飽和度: ${value}',
-			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
-			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
+			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'setting.classSwiftExplain' => '正數錯後開學日期 負數提前開學日期',
 			'sponsorship.title' => '歡迎使用 XDYou 的鴻蒙版本',
 			'sponsorship.dialogTitle' => '詳細資訊',

@@ -306,8 +306,8 @@ editor:
   electricity_unit: 度
   text_preview: 課程安排 · TrainTime PDA · 0123456789
   brightness: 亮度
-  border_opacity: 邊框透明度
-  fill_opacity: 底色透明度
+  border_opacity: 邊框不透明度
+  fill_opacity: 底色不透明度
   fill_saturation: 底色飽和度
   text_saturation: 文字飽和度
   background_blur: 背景模糊程度
@@ -364,13 +364,13 @@ class_table_style_page:
   active_section: 課程卡片樣式
   unfinished_section: 課程卡片樣式
   active_brightness_factor: '亮度: {value}'
-  active_border_alpha: '邊框透明度: {value}'
-  active_inner_alpha: '底色透明度: {value}'
+  active_border_alpha: '邊框不透明度: {value}'
+  active_inner_alpha: '底色不透明度: {value}'
   completed_section: 已結束課程樣式
   completed_style_enabled: 已結束課程樣式區分
   completed_saturation_factor: '底色飽和度: {value}'
   completed_brightness_factor: '亮度: {value}'
   completed_text_saturation_factor: '文字飽和度: {value}'
-  completed_border_alpha: '邊框透明度: {value}'
-  completed_inner_alpha: '底色透明度: {value}'
+  completed_border_alpha: '邊框不透明度: {value}'
+  completed_inner_alpha: '底色不透明度: {value}'
 class_swift_explain: 正數錯後開學日期 負數提前開學日期

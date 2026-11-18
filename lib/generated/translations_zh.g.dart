@@ -2589,11 +2589,11 @@ class Translations$classtable$visualSettings$zh {
 	/// zh: '亮度: {value}'
 	String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
 
-	/// zh: '边框透明度: {value}'
-	String activeBorderAlpha({required Object value}) => '边框透明度: ${value}';
+	/// zh: '边框不透明度: {value}'
+	String activeBorderAlpha({required Object value}) => '边框不透明度: ${value}';
 
-	/// zh: '底色透明度: {value}'
-	String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	/// zh: '底色不透明度: {value}'
+	String activeInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 
 	/// zh: '已结束课程样式'
 	String get completedSection => '已结束课程样式';
@@ -2607,11 +2607,11 @@ class Translations$classtable$visualSettings$zh {
 	/// zh: '文字饱和度: {value}'
 	String completedTextSaturationFactor({required Object value}) => '文字饱和度: ${value}';
 
-	/// zh: '边框透明度: {value}'
-	String completedBorderAlpha({required Object value}) => '边框透明度: ${value}';
+	/// zh: '边框不透明度: {value}'
+	String completedBorderAlpha({required Object value}) => '边框不透明度: ${value}';
 
-	/// zh: '底色透明度: {value}'
-	String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	/// zh: '底色不透明度: {value}'
+	String completedInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 }
 
 // Path: classtable.statusSource
@@ -4792,11 +4792,11 @@ class Translations$setting$editor$zh {
 	/// zh: '亮度'
 	String get brightness => '亮度';
 
-	/// zh: '边框透明度'
-	String get borderOpacity => '边框透明度';
+	/// zh: '边框不透明度'
+	String get borderOpacity => '边框不透明度';
 
-	/// zh: '底色透明度'
-	String get fillOpacity => '底色透明度';
+	/// zh: '底色不透明度'
+	String get fillOpacity => '底色不透明度';
 
 	/// zh: '底色饱和度'
 	String get fillSaturation => '底色饱和度';
@@ -4966,11 +4966,11 @@ class Translations$setting$classTableStylePage$zh {
 	/// zh: '亮度: {value}'
 	String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
 
-	/// zh: '边框透明度: {value}'
-	String activeBorderAlpha({required Object value}) => '边框透明度: ${value}';
+	/// zh: '边框不透明度: {value}'
+	String activeBorderAlpha({required Object value}) => '边框不透明度: ${value}';
 
-	/// zh: '底色透明度: {value}'
-	String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	/// zh: '底色不透明度: {value}'
+	String activeInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 
 	/// zh: '已结束课程样式'
 	String get completedSection => '已结束课程样式';
@@ -4987,11 +4987,11 @@ class Translations$setting$classTableStylePage$zh {
 	/// zh: '文字饱和度: {value}'
 	String completedTextSaturationFactor({required Object value}) => '文字饱和度: ${value}';
 
-	/// zh: '边框透明度: {value}'
-	String completedBorderAlpha({required Object value}) => '边框透明度: ${value}';
+	/// zh: '边框不透明度: {value}'
+	String completedBorderAlpha({required Object value}) => '边框不透明度: ${value}';
 
-	/// zh: '底色透明度: {value}'
-	String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	/// zh: '底色不透明度: {value}'
+	String completedInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 }
 
 // Path: xduPlanet.confirmAuditDialog
@@ -5271,14 +5271,14 @@ extension on Translations {
 			'classtable.visualSettings.showTodayColumnHighlight' => '强调显示今天的纵列',
 			'classtable.visualSettings.unfinishedSection' => '课程样式',
 			'classtable.visualSettings.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
-			'classtable.visualSettings.activeBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
-			'classtable.visualSettings.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'classtable.visualSettings.activeBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
+			'classtable.visualSettings.activeInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'classtable.visualSettings.completedSection' => '已结束课程样式',
 			'classtable.visualSettings.completedSaturationFactor' => ({required Object value}) => '底色饱和度: ${value}',
 			'classtable.visualSettings.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
 			'classtable.visualSettings.completedTextSaturationFactor' => ({required Object value}) => '文字饱和度: ${value}',
-			'classtable.visualSettings.completedBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
-			'classtable.visualSettings.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'classtable.visualSettings.completedBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
+			'classtable.visualSettings.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'classtable.statusSource.classTable' => '课表',
 			'classtable.statusSource.exam' => '考试',
 			'classtable.statusSource.physicsExperiment' => '物理实验',
@@ -6351,8 +6351,8 @@ extension on Translations {
 			'setting.editor.electricityUnit' => '度',
 			'setting.editor.textPreview' => '课程安排 · TrainTime PDA · 0123456789',
 			'setting.editor.brightness' => '亮度',
-			'setting.editor.borderOpacity' => '边框透明度',
-			'setting.editor.fillOpacity' => '底色透明度',
+			'setting.editor.borderOpacity' => '边框不透明度',
+			'setting.editor.fillOpacity' => '底色不透明度',
 			'setting.editor.fillSaturation' => '底色饱和度',
 			'setting.editor.textSaturation' => '文字饱和度',
 			'setting.editor.backgroundBlur' => '背景模糊程度',
@@ -6405,15 +6405,15 @@ extension on Translations {
 			'setting.classTableStylePage.activeSection' => '课程卡片样式',
 			'setting.classTableStylePage.unfinishedSection' => '课程卡片样式',
 			'setting.classTableStylePage.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
-			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
-			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
+			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'setting.classTableStylePage.completedSection' => '已结束课程样式',
 			'setting.classTableStylePage.completedStyleEnabled' => '已结束课程样式区分',
 			'setting.classTableStylePage.completedSaturationFactor' => ({required Object value}) => '底色饱和度: ${value}',
 			'setting.classTableStylePage.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
 			'setting.classTableStylePage.completedTextSaturationFactor' => ({required Object value}) => '文字饱和度: ${value}',
-			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
-			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
+			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'setting.classSwiftExplain' => '正数错后开学日期 负数提前开学日期',
 			'sponsorship.title' => '欢迎使用 XDYou 的鸿蒙版本',
 			'sponsorship.dialogTitle' => '详细信息',
