@@ -224,17 +224,27 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
               left: 0,
               right: 0,
               top: 0,
-              child: ClassTableDateRow(
-                key: _dateRowKey,
-                index: widget.singleIndex,
-                firstDayOfWeek: _firstDayOfWeek,
-                timeColumnWidth: timeColumnWidth,
+              child: NotificationListener<SizeChangedLayoutNotification>(
+                onNotification: (_) {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    _measureDateRow,
+                  );
+                  return false;
+                },
+                child: SizeChangedLayoutNotifier(
+                  child: ClassTableDateRow(
+                    key: _dateRowKey,
+                    index: widget.singleIndex,
+                    firstDayOfWeek: _firstDayOfWeek,
+                    timeColumnWidth: timeColumnWidth,
 
-                /// Handed the pages so the headers can slide with them rather than flipping over
-                /// once the week has already changed.
-                pageControl: widget.pageControl,
-                semesterLength: widget.semesterLength,
-                maxWidth: constraints.maxWidth,
+                    /// Handed the pages so the headers can slide with them rather than flipping over
+                    /// once the week has already changed.
+                    pageControl: widget.pageControl,
+                    semesterLength: widget.semesterLength,
+                    maxWidth: constraints.maxWidth,
+                  ),
+                ),
               ),
             ),
           ],

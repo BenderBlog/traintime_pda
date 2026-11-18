@@ -152,9 +152,14 @@ class _ClassTableDateRowState extends State<ClassTableDateRow> {
         animation: pages,
         child: _buildHeadersStrip(context, maxWidth),
         builder: (context, child) {
-          final double offset = pages.hasClients && pages.position.hasPixels
-              ? pages.position.pixels
-              : widget.index * maxWidth;
+          final double page =
+              pages.hasClients &&
+                  pages.position.hasPixels &&
+                  pages.position.hasViewportDimension &&
+                  pages.position.viewportDimension > 0
+              ? pages.position.pixels / pages.position.viewportDimension
+              : widget.index.toDouble();
+          final double offset = page * maxWidth;
           return Transform.translate(offset: Offset(-offset, 0), child: child);
         },
       ),
