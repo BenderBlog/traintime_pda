@@ -28,7 +28,6 @@ class ClassTableSheet extends StatefulWidget {
     this.onPageChanged,
     this.enableVerticalScrolling = true,
     this.verticalPhysics,
-    this.heightReference,
     this.bottomClearance = 0,
   });
 
@@ -48,12 +47,6 @@ class ClassTableSheet extends StatefulWidget {
   /// there the same pull would fight the page and it clamps instead. Null keeps the timetable's
   /// own behaviour.
   final ScrollPhysics? verticalPhysics;
-
-  /// The height the blocks are scaled against, [classTableHeightReference] when null.
-  ///
-  /// A fixed reference rather than the viewport, so the blocks keep their size whether the week bar
-  /// is docked or collapsed, and in the settings preview, which has no viewport of its own.
-  final double? heightReference;
 
   /// The room kept after the last period, for the bottom of the display.
   ///
@@ -127,8 +120,9 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double available =
-            widget.heightReference ?? classTableHeightReference;
+        final double available = widget.enableVerticalScrolling
+            ? constraints.maxHeight
+            : classTableHeightReference;
         final double timeIndicatorTopClearance = _timeIndicatorTopClearance;
 
         /// Measured once and handed down, so the time line, the grid and the floating indicators
