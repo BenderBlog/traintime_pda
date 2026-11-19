@@ -1,366 +1,122 @@
-// Copyright 2023-2025 BenderBlog Rodriguez and contributors
-// Copyright 2025 Traintime PDA authors.
-// SPDX-License-Identifier: MPL-2.0
+import 'package:flutter/material.dart';
 
-// Intro of the watermeter program.
+void main() {
+  runApp(const MyApp());
+}
 
-import 'dart:io';
-import 'dart:ui';
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-import 'package:catcher_2/catcher_2.dart';
-import 'package:chinese_font_library/chinese_font_library.dart';
-import 'package:cupertino_ui/cupertino_ui.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:signals/signals_flutter.dart';
-import 'package:shared_preferences/util/legacy_to_async_migration_util.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:home_widget/home_widget.dart';
-
-import 'package:watermeter/controller/theme_controller.dart';
-import 'package:watermeter/generated/translations.g.dart';
-import 'package:watermeter/repository/logger.dart';
-import 'package:watermeter/repository/ids_session/ids_session.dart';
-import 'package:watermeter/repository/network_client.dart' as repo_general;
-import 'package:watermeter/repository/notification/notification_registrar.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
-import 'package:watermeter/page/homepage/home.dart';
-import 'package:watermeter/page/login/login_window.dart';
-import 'package:watermeter/page/classtable/model/style_config/style_config_preference_functions.dart';
-import 'package:watermeter/themes/font_setting.dart';
-
-void main() async {
-  // Make sure the library is initialized.
-  WidgetsFlutterBinding.ensureInitialized();
-
-  log.info(
-    "Traintime PDA Codebase is written by BenderBlog Rodriguez and contributors",
-  );
-
-  // Load cookiejar and other stuff
-  repo_general.supportPath = await getApplicationSupportDirectory();
-
-  // Load shared preference. Per the migration guide
-  // https://pub.dev/packages/shared_preferences#migrating-from-sharedpreferences-to-sharedpreferencesasyncwithcache
-  const SharedPreferencesOptions sharedPreferencesOptions =
-      SharedPreferencesOptions();
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  if (prefs.getKeys().isNotEmpty) {
-    await migrateLegacySharedPreferencesToSharedPreferencesAsyncIfNecessary(
-      legacySharedPreferencesInstance: prefs,
-      sharedPreferencesAsyncOptions: sharedPreferencesOptions,
-      migrationCompletedKey: 'pdaMigrationCompleted',
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        // This is the theme of your application.
+        //
+        // TRY THIS: Try running your application with "flutter run". You'll see
+        // the application has a purple toolbar. Then, without quitting the app,
+        // try changing the seedColor in the colorScheme below to Colors.green
+        // and then invoke "hot reload" (save your changes or press the "hot
+        // reload" button in a Flutter-supported IDE, or press "r" if you used
+        // the command line to start the app).
+        //
+        // Notice that the counter didn't reset back to zero; the application
+        // state is not lost during the reload. To reset the state, use hot
+        // restart instead.
+        //
+        // This works for code too, not just values: Most code changes can be
+        // tested with just a hot reload.
+        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
-  preference.prefs = await SharedPreferencesWithCache.create(
-    cacheOptions: const SharedPreferencesWithCacheOptions(),
-  );
-
-  preference.Preference resolveStylePreference(StyleConfigPreferenceKey key) =>
-      preference.Preference.values.firstWhere((item) => item.name == key.name);
-
-  StyleConfigPreferenceFunctions.install(
-    getBool: (key) => preference.getBool(resolveStylePreference(key)),
-    getDouble: (key) => preference.getDouble(resolveStylePreference(key)),
-    setBool: (key, value) =>
-        preference.setBool(resolveStylePreference(key), value),
-    setDouble: (key, value) =>
-        preference.setDouble(resolveStylePreference(key), value),
-    contains: (key) => preference.contains(resolveStylePreference(key)),
-  );
-
-  // Load package info.
-  preference.packageInfo = await PackageInfo.fromPlatform();
-
-  // Have user registered?
-  String username = preference.getString(preference.Preference.idsAccount);
-  String password = preference.getString(preference.Preference.idsPassword);
-  bool isFirst = username.isEmpty || password.isEmpty;
-  log.info("isFirstLogin: $isFirst");
-
-  Catcher2(
-    rootWidget: MyApp(isFirst: isFirst),
-    debugConfig: preference.catcherOptions,
-    releaseConfig: preference.catcherOptions,
-    navigatorKey: preference.debuggerKey,
-  );
-
-  // Initialize notification services
-  if (Platform.isAndroid || Platform.isIOS) {
-    try {
-      await NotificationServiceRegistrar().initializeAllServices();
-
-      // Handle app launch from notification
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final services = NotificationServiceRegistrar().getAllServices();
-        await Future.wait(
-          services.map((service) => service.handleAppLaunchFromNotification()),
-        );
-      });
-    } catch (e) {
-      log.error('Failed to initialize notification services', e);
-    }
-  }
 }
 
-class MyApp extends StatefulWidget {
-  final bool isFirst;
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
 
-  const MyApp({super.key, required this.isFirst});
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyAppState extends State<MyApp> {
-  final ThemeController appTheme = ThemeController.i;
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    if (Platform.isIOS) HomeWidget.setAppGroupId(preference.appId);
-    //HomeWidget.registerInteractivityCallback(backgroundCallback);
-
-    if (widget.isFirst) {
-      loginState = IDSLoginState.manual;
-    }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      final screenWidth =
-          PlatformDispatcher.instance.views.first.physicalSize.width /
-          PlatformDispatcher.instance.views.first.devicePixelRatio;
-      log.info("Screen width: $screenWidth.");
-      if (screenWidth < 480) {
-        log.info("Vertical vision mode disabled!");
-        await SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
-        ]);
-      }
+  void _incrementCounter() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _counter++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SignalBuilder(
-      builder: (context) {
-        final color = appTheme.colorSignal.value;
-        final themeMode = appTheme.colorStateSignal.value;
-        final fontScale = appTheme.fontScaleSignal.value;
-        final fontWeight = appTheme.fontWeightSignal.value;
-        final locale = appTheme.localeSignal.value;
-        appTheme.savedLocale.value;
-
-        return TranslationProvider(
-          child: MaterialApp(
-            locale: locale,
-            localizationsDelegates: [...GlobalMaterialLocalizations.delegates],
-            supportedLocales: AppLocaleUtils.supportedLocales,
-            debugShowCheckedModeBanner: false,
-            scrollBehavior: MyCustomScrollBehavior(),
-            navigatorKey: preference.debuggerKey,
-            title: Platform.isIOS || Platform.isMacOS || Platform.isAndroid
-                ? "XDYou"
-                : 'Traintime PDA',
-            theme: FlexThemeData.light(
-              colors: color.first,
-              usedColors: 1,
-              surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
-              blendLevel: 2,
-              tabBarStyle: FlexTabBarStyle.forAppBar,
-              subThemesData: const FlexSubThemesData(
-                interactionEffects: true,
-                tintedDisabledControls: true,
-                blendOnLevel: 8,
-                useM2StyleDividerInM3: true,
-                defaultRadius: 12.0,
-                elevatedButtonSchemeColor: SchemeColor.onPrimaryContainer,
-                elevatedButtonSecondarySchemeColor:
-                    SchemeColor.primaryContainer,
-                outlinedButtonOutlineSchemeColor: SchemeColor.primary,
-                toggleButtonsBorderSchemeColor: SchemeColor.primary,
-                segmentedButtonSchemeColor: SchemeColor.primary,
-                segmentedButtonBorderSchemeColor: SchemeColor.primary,
-                unselectedToggleIsColored: true,
-                sliderValueTinted: true,
-                inputDecoratorSchemeColor: SchemeColor.primary,
-                inputDecoratorIsFilled: true,
-                inputDecoratorContentPadding: EdgeInsetsDirectional.fromSTEB(
-                  12,
-                  16,
-                  12,
-                  12,
-                ),
-                inputDecoratorBackgroundAlpha: 7,
-                inputDecoratorBorderSchemeColor: SchemeColor.primary,
-                inputDecoratorBorderType: FlexInputBorderType.outline,
-                inputDecoratorRadius: 8.0,
-                inputDecoratorUnfocusedBorderIsColored: true,
-                inputDecoratorBorderWidth: 1.0,
-                inputDecoratorFocusedBorderWidth: 2.0,
-                inputDecoratorPrefixIconSchemeColor:
-                    SchemeColor.onPrimaryFixedVariant,
-                inputDecoratorSuffixIconSchemeColor: SchemeColor.primary,
-                fabUseShape: true,
-                fabAlwaysCircular: true,
-                fabSchemeColor: SchemeColor.secondary,
-                popupMenuRadius: 8.0,
-                popupMenuElevation: 3.0,
-                alignedDropdown: true,
-                dialogBackgroundSchemeColor: SchemeColor.secondaryContainer,
-                drawerIndicatorRadius: 12.0,
-                drawerIndicatorSchemeColor: SchemeColor.primary,
-                bottomNavigationBarMutedUnselectedLabel: false,
-                bottomNavigationBarMutedUnselectedIcon: false,
-                menuRadius: 8.0,
-                menuElevation: 3.0,
-                menuBarRadius: 0.0,
-                menuBarElevation: 2.0,
-                menuBarShadowColor: Color(0x00000000),
-                searchBarElevation: 1.0,
-                searchViewElevation: 1.0,
-                searchUseGlobalShape: true,
-                navigationBarSelectedLabelSchemeColor: SchemeColor.primary,
-                navigationBarSelectedIconSchemeColor: SchemeColor.onPrimary,
-                navigationBarIndicatorSchemeColor: SchemeColor.primary,
-                navigationBarIndicatorRadius: 12.0,
-                navigationRailSelectedLabelSchemeColor: SchemeColor.primary,
-                navigationRailSelectedIconSchemeColor: SchemeColor.onPrimary,
-                navigationRailUseIndicator: true,
-                navigationRailIndicatorSchemeColor: SchemeColor.primary,
-                navigationRailIndicatorOpacity: 1.00,
-                navigationRailIndicatorRadius: 12.0,
-                navigationRailBackgroundSchemeColor: SchemeColor.surface,
-                navigationRailLabelType: NavigationRailLabelType.all,
-              ),
-              keyColors: const FlexKeyColors(keepPrimary: true),
-              tones: FlexSchemeVariant.jolly.tones(Brightness.light),
-              visualDensity: FlexColorScheme.comfortablePlatformDensity,
-              cupertinoOverrideTheme: const CupertinoThemeData(
-                applyThemeToAll: true,
-              ),
-            ).applyFontWeight(fontWeightFromSlider(fontWeight)),
-            darkTheme: FlexThemeData.dark(
-              colors: color.last,
-              usedColors: 1,
-              surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
-              blendLevel: 2,
-              tabBarStyle: FlexTabBarStyle.forAppBar,
-              subThemesData: const FlexSubThemesData(
-                interactionEffects: true,
-                tintedDisabledControls: true,
-                blendOnLevel: 10,
-                blendOnColors: true,
-                useM2StyleDividerInM3: true,
-                defaultRadius: 12.0,
-                elevatedButtonSchemeColor: SchemeColor.onPrimaryContainer,
-                elevatedButtonSecondarySchemeColor:
-                    SchemeColor.primaryContainer,
-                outlinedButtonOutlineSchemeColor: SchemeColor.primary,
-                toggleButtonsBorderSchemeColor: SchemeColor.primary,
-                segmentedButtonSchemeColor: SchemeColor.primary,
-                segmentedButtonBorderSchemeColor: SchemeColor.primary,
-                unselectedToggleIsColored: true,
-                sliderValueTinted: true,
-                inputDecoratorSchemeColor: SchemeColor.primary,
-                inputDecoratorIsFilled: true,
-                inputDecoratorContentPadding: EdgeInsetsDirectional.fromSTEB(
-                  12,
-                  16,
-                  12,
-                  12,
-                ),
-                inputDecoratorBackgroundAlpha: 40,
-                inputDecoratorBorderSchemeColor: SchemeColor.primary,
-                inputDecoratorBorderType: FlexInputBorderType.outline,
-                inputDecoratorRadius: 8.0,
-                inputDecoratorUnfocusedBorderIsColored: true,
-                inputDecoratorBorderWidth: 1.0,
-                inputDecoratorFocusedBorderWidth: 2.0,
-                inputDecoratorPrefixIconSchemeColor: SchemeColor.primaryFixed,
-                inputDecoratorSuffixIconSchemeColor: SchemeColor.primary,
-                fabUseShape: true,
-                fabAlwaysCircular: true,
-                fabSchemeColor: SchemeColor.secondary,
-                popupMenuRadius: 8.0,
-                popupMenuElevation: 3.0,
-                alignedDropdown: true,
-                drawerIndicatorRadius: 12.0,
-                drawerIndicatorSchemeColor: SchemeColor.primary,
-                bottomNavigationBarMutedUnselectedLabel: false,
-                bottomNavigationBarMutedUnselectedIcon: false,
-                menuRadius: 8.0,
-                menuElevation: 3.0,
-                menuBarRadius: 0.0,
-                menuBarElevation: 2.0,
-                menuBarShadowColor: Color(0x00000000),
-                searchBarElevation: 1.0,
-                searchViewElevation: 1.0,
-                searchUseGlobalShape: true,
-                navigationBarSelectedLabelSchemeColor: SchemeColor.primary,
-                navigationBarSelectedIconSchemeColor: SchemeColor.onPrimary,
-                navigationBarIndicatorSchemeColor: SchemeColor.primary,
-                navigationBarIndicatorRadius: 12.0,
-                navigationRailSelectedLabelSchemeColor: SchemeColor.primary,
-                navigationRailSelectedIconSchemeColor: SchemeColor.onPrimary,
-                navigationRailUseIndicator: true,
-                navigationRailIndicatorSchemeColor: SchemeColor.primary,
-                navigationRailIndicatorOpacity: 1.00,
-                navigationRailIndicatorRadius: 12.0,
-                navigationRailBackgroundSchemeColor: SchemeColor.surface,
-                navigationRailLabelType: NavigationRailLabelType.all,
-              ),
-              keyColors: const FlexKeyColors(),
-              tones: FlexSchemeVariant.jolly.tones(Brightness.dark),
-              visualDensity: FlexColorScheme.comfortablePlatformDensity,
-              cupertinoOverrideTheme: const CupertinoThemeData(
-                applyThemeToAll: true,
-              ),
-            ).applyFontWeight(fontWeightFromSlider(fontWeight)),
-            themeMode: themeMode,
-            home: DefaultTextStyle.merge(
-              style: const TextStyle(textBaseline: TextBaseline.ideographic),
-              child: widget.isFirst ? const LoginWindow() : const HomePage(),
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
+    return Scaffold(
+      appBar: AppBar(
+        // TRY THIS: Try changing the color here to a specific color (to
+        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+        // change color while the other colors stay the same.
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text(widget.title),
+      ),
+      body: Center(
+        // Center is a layout widget. It takes a single child and positions it
+        // in the middle of the parent.
+        child: Column(
+          // Column is also a layout widget. It takes a list of children and
+          // arranges them vertically. By default, it sizes itself to fit its
+          // children horizontally, and tries to be as tall as its parent.
+          //
+          // Column has various properties to control how it sizes itself and
+          // how it positions its children. Here we use mainAxisAlignment to
+          // center the children vertically; the main axis here is the vertical
+          // axis because Columns are vertical (the cross axis would be
+          // horizontal).
+          //
+          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
+          // action in the IDE, or press "p" in the console), to see the
+          // wireframe for each widget.
+          mainAxisAlignment: .center,
+          children: [
+            const Text('You have pushed the button this many times:'),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-            builder: (context, widget) {
-              Catcher2.addDefaultErrorWidget(
-                showStacktrace: true,
-                title: "Unexpected problem:P",
-                description: "An unexpected behaviour occured!",
-                maxWidthForSmallMode: 150,
-              );
-              if (widget != null) {
-                return MaterialUiCompatibilityBridge(
-                  child: DefaultTextStyle.merge(
-                    style: const TextStyle().useSystemChineseFont(),
-                    child: MediaQuery(
-                      data: MediaQuery.of(
-                        context,
-                      ).copyWith(textScaler: TextScaler.linear(fontScale)),
-                      child: widget,
-                    ),
-                  ),
-                );
-              }
-              throw StateError('widget is null');
-            },
-          ),
-        );
-      },
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
     );
   }
-}
-
-class MyCustomScrollBehavior extends MaterialScrollBehavior {
-  // Override behavior methods and getters like dragDevices
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-    PointerDeviceKind.trackpad,
-  };
 }

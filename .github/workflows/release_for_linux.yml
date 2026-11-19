@@ -41,19 +41,21 @@ jobs:
           .flutter/bin/flutter build linux --release
 
       - name: Package Linux Tarball
-        run: 7z a -r "../../../../../build/app/watermeter-linux-release-amd64.zip" *
+        run: |
+          mkdir -p ../../../../../build/app
+          7z a -r "../../../../../build/app/traintime_pda-linux-release-amd64.zip" *
         working-directory: build/linux/x64/release/bundle
 
       - name: Upload Linux Tarball
         uses: actions/upload-artifact@v4
         with:
-          name: Watermeter_Linux
-          path: build/app/watermeter-linux-release-amd64.zip
+          name: Traintime_PDA_Linux
+          path: build/app/traintime_pda-linux-release-amd64.zip
 
       - name: Release Linux Tarball
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/watermeter-linux-release-amd64.zip
+          files: build/app/traintime_pda-linux-release-amd64.zip
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
@@ -67,19 +69,20 @@ jobs:
 
       - name: Find Appimage Executable
         run: |
-          export dir=$(find ./ -name watermeter-*)
-          cp $dir ./watermeter.Appimage
+          appimage=$(find . -type f -name '*.AppImage' -print -quit)
+          test -n "$appimage"
+          cp "$appimage" ./traintime_pda.AppImage
           
       - name: Upload Appimage
         uses: actions/upload-artifact@v4
         with:
-          name: Watermeter_Appimage
-          path: watermeter.Appimage
+          name: Traintime_PDA_Appimage
+          path: traintime_pda.AppImage
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: watermeter.Appimage
+          files: traintime_pda.AppImage
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}

@@ -17,7 +17,7 @@ targets:
 
 builders:
   score_hashes:
-    import: "tool/generators/score_hashes_generator.dart"
+    import: "tools/generators/score_hashes_generator.dart"
     builder_factories: ["scoreHashesBuilder"]
     build_extensions:
       pubspec.yaml: # 输入：pubspec.yaml（触发器）

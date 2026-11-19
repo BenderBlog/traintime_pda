@@ -4,16 +4,11 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   charset_converter
-  file_selector_windows
-  permission_handler_windows
-  restart_app
   share_plus
   url_launcher_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
-  flutter_local_notifications_windows
-  flutter_zxing
   jni
 )
 
