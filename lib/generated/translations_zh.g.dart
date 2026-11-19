@@ -4609,6 +4609,9 @@ class Translations$setting$aboutPage$zh {
 	/// zh: '开发：修复滑块不对齐问题'
 	String get chitao1234 => '开发：修复滑块不对齐问题';
 
+	/// zh: '开发：课程表美化'
+	String get chiiaya => '开发：课程表美化';
+
 	/// zh: '开发：系统日历最新课表同步'
 	String get copperkoi => '开发：系统日历最新课表同步';
 
@@ -4662,6 +4665,9 @@ class Translations$setting$aboutPage$zh {
 
 	/// zh: '设计：iOS 和 Android 图标 / 支持：冠名 XDYou'
 	String get lsy223622 => '设计：iOS 和 Android 图标 / 支持：冠名 XDYou';
+
+	/// zh: '开发：校园通知查询'
+	String get lumdust => '开发：校园通知查询';
 
 	/// zh: '支持：提供网络服务使用说明文档 / 国际化：优化英语翻译'
 	String get mrbrilliant2046 => '支持：提供网络服务使用说明文档 / 国际化：优化英语翻译';
@@ -6295,6 +6301,7 @@ extension on Translations {
 			'setting.aboutPage.breezeline' => '支持：无价值无意义的产品经理(他自己的描述)',
 			'setting.aboutPage.cafebabe' => '支持：提供彩蛋代码 / 开发：2026版本滑块验证码适配',
 			'setting.aboutPage.chitao1234' => '开发：修复滑块不对齐问题',
+			'setting.aboutPage.chiiaya' => '开发：课程表美化',
 			'setting.aboutPage.copperkoi' => '开发：系统日历最新课表同步',
 			'setting.aboutPage.dimole' => '开发支持：辅助修复滑块问题',
 			'setting.aboutPage.elitewars' => '设计：体育成绩页面',
@@ -6313,6 +6320,7 @@ extension on Translations {
 			'setting.aboutPage.lichtyy' => '设计：配色，空白页面贴图 / 开发：实验系统页面读取代码',
 			'setting.aboutPage.lqsyH' => '支持：推文宣传图片制作',
 			'setting.aboutPage.lsy223622' => '设计：iOS 和 Android 图标 / 支持：冠名 XDYou',
+			'setting.aboutPage.lumdust' => '开发：校园通知查询',
 			'setting.aboutPage.mrbrilliant2046' => '支持：提供网络服务使用说明文档 / 国际化：优化英语翻译',
 			'setting.aboutPage.nancunchild' => '开发：图书馆搜索功能 / 国际化：优化英语翻译',
 			'setting.aboutPage.nkanf' => '开发：课程表时间进度展示（初版方案） / 支持：MacOS 构建支持',

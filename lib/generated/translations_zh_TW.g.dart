@@ -2234,6 +2234,7 @@ class _Translations$setting$aboutPage$zh_TW extends Translations$setting$aboutPa
 	@override String get breezeline => '支持：無價值無意義的產品經理(他自己的描述)';
 	@override String get cafebabe => '支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配';
 	@override String get chitao1234 => '開發：修復滑塊不對齊問題';
+	@override String get chiiaya => '開發：課程表美化';
 	@override String get copperkoi => '開發：系統日曆最新課表同步';
 	@override String get dimole => '開發支持：輔助修復滑塊問題';
 	@override String get elitewars => '設計：體育成績頁面';
@@ -2252,6 +2253,7 @@ class _Translations$setting$aboutPage$zh_TW extends Translations$setting$aboutPa
 	@override String get lichtyy => '設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼';
 	@override String get lqsyH => '支持：推文宣傳圖片製作';
 	@override String get lsy223622 => '設計：iOS 和 Android 圖標 / 支持：冠名 XDYou';
+	@override String get lumdust => '開發：校園通知查詢';
 	@override String get mrbrilliant2046 => '支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯';
 	@override String get nancunchild => '開發：圖書館搜索功能 / 國際化：優化英語翻譯';
 	@override String get nkanf => '開發：課程表時間進度展示（初版方案） / 支持：MacOS 構建支持';
@@ -3615,6 +3617,7 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.breezeline' => '支持：無價值無意義的產品經理(他自己的描述)',
 			'setting.aboutPage.cafebabe' => '支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配',
 			'setting.aboutPage.chitao1234' => '開發：修復滑塊不對齊問題',
+			'setting.aboutPage.chiiaya' => '開發：課程表美化',
 			'setting.aboutPage.copperkoi' => '開發：系統日曆最新課表同步',
 			'setting.aboutPage.dimole' => '開發支持：輔助修復滑塊問題',
 			'setting.aboutPage.elitewars' => '設計：體育成績頁面',
@@ -3633,6 +3636,7 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.lichtyy' => '設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼',
 			'setting.aboutPage.lqsyH' => '支持：推文宣傳圖片製作',
 			'setting.aboutPage.lsy223622' => '設計：iOS 和 Android 圖標 / 支持：冠名 XDYou',
+			'setting.aboutPage.lumdust' => '開發：校園通知查詢',
 			'setting.aboutPage.mrbrilliant2046' => '支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯',
 			'setting.aboutPage.nancunchild' => '開發：圖書館搜索功能 / 國際化：優化英語翻譯',
 			'setting.aboutPage.nkanf' => '開發：課程表時間進度展示（初版方案） / 支持：MacOS 構建支持',

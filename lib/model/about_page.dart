@@ -95,6 +95,12 @@ final List<Developer> getDevelopers = [
     "https://blog.hxzzz.asia/",
   ),
   Developer(
+    "ChiiAya",
+    "https://avatars.githubusercontent.com/u/252313068",
+    (t) => t.setting.aboutPage.chiiaya,
+    "https://github.com/ChiiAya",
+  ),
+  Developer(
     "chitao1234",
     "https://avatars.githubusercontent.com/u/25598632",
     (t) => t.setting.aboutPage.chitao1234,
@@ -226,6 +232,12 @@ final List<Developer> getDevelopers = [
     "https://avatars.githubusercontent.com/u/57913213",
     (t) => t.setting.aboutPage.lsy223622,
     "https://lsy223622.com/",
+  ),
+  Developer(
+    "LumDust",
+    "https://avatars.githubusercontent.com/u/330427153",
+    (t) => t.setting.aboutPage.lumdust,
+    "https://github.com/xichen778",
   ),
   Developer(
     "MrBrilliant2046",

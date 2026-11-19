@@ -2234,6 +2234,7 @@ class _Translations$setting$aboutPage$en extends Translations$setting$aboutPage$
 	@override String get breezeline => 'Support: valueless and meaningless product manager (from his own description)';
 	@override String get cafebabe => 'Support: provide Easter egg code / Development: Development: New Slider \'26';
 	@override String get chitao1234 => 'Development: fix slider misalignment issue';
+	@override String get chiiaya => 'Development: timetable visual improvements';
 	@override String get copperkoi => 'Development: latest time arrangement sync to calendar';
 	@override String get dimole => 'Development support: assist in fixing slider issue';
 	@override String get elitewars => 'Design: sports score page';
@@ -2252,6 +2253,7 @@ class _Translations$setting$aboutPage$en extends Translations$setting$aboutPage$
 	@override String get lichtyy => 'Design: color pattern and blank page picture / Development: HTML reader for the experiment system';
 	@override String get lqsyH => 'Support: Promotion Picture';
 	@override String get lsy223622 => 'Design: iOS and Android icons / Support: titled XDYou';
+	@override String get lumdust => 'Development: campus notice search';
 	@override String get mrbrilliant2046 => 'Support: Provided the school net user guide / Internationalization: English correction';
 	@override String get nancunchild => 'Development: library search function / Internationalization: English correction';
 	@override String get nkanf => 'Development: Class progress indicator (original) / Support: MacOS build support';
@@ -3615,6 +3617,7 @@ extension on TranslationsEn {
 			'setting.aboutPage.breezeline' => 'Support: valueless and meaningless product manager (from his own description)',
 			'setting.aboutPage.cafebabe' => 'Support: provide Easter egg code / Development: Development: New Slider \'26',
 			'setting.aboutPage.chitao1234' => 'Development: fix slider misalignment issue',
+			'setting.aboutPage.chiiaya' => 'Development: timetable visual improvements',
 			'setting.aboutPage.copperkoi' => 'Development: latest time arrangement sync to calendar',
 			'setting.aboutPage.dimole' => 'Development support: assist in fixing slider issue',
 			'setting.aboutPage.elitewars' => 'Design: sports score page',
@@ -3633,6 +3636,7 @@ extension on TranslationsEn {
 			'setting.aboutPage.lichtyy' => 'Design: color pattern and blank page picture / Development: HTML reader for the experiment system',
 			'setting.aboutPage.lqsyH' => 'Support: Promotion Picture',
 			'setting.aboutPage.lsy223622' => 'Design: iOS and Android icons / Support: titled XDYou',
+			'setting.aboutPage.lumdust' => 'Development: campus notice search',
 			'setting.aboutPage.mrbrilliant2046' => 'Support: Provided the school net user guide / Internationalization: English correction',
 			'setting.aboutPage.nancunchild' => 'Development: library search function / Internationalization: English correction',
 			'setting.aboutPage.nkanf' => 'Development: Class progress indicator (original) / Support: MacOS build support',
