@@ -2165,6 +2165,9 @@ class Translations$toolbox$zh {
 	/// zh: '搜索关键词（近30天的通知标题）'
 	String get noticeHint => '搜索关键词（近30天的通知标题）';
 
+	/// zh: '当前可能未连接校园网，部分通知来源需要校园网访问。'
+	String get noticeSchoolNetworkWarning => '当前可能未连接校园网，部分通知来源需要校园网访问。';
+
 	/// zh: '如:转专业'
 	String get noticePlaceholder => '如:转专业';
 
@@ -6471,6 +6474,7 @@ extension on Translations {
 			'toolbox.noticeSearch' => '通知查询',
 			'toolbox.noticeDescription' => '不要错过通知',
 			'toolbox.noticeHint' => '搜索关键词（近30天的通知标题）',
+			'toolbox.noticeSchoolNetworkWarning' => '当前可能未连接校园网，部分通知来源需要校园网访问。',
 			'toolbox.noticePlaceholder' => '如:转专业',
 			'toolbox.noticeIncomplete' => '部分来源未查完',
 			'toolbox.noticeEmpty' => '已查栏目中没有匹配的通知',

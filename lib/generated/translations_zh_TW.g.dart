@@ -990,6 +990,7 @@ class _Translations$toolbox$zh_TW extends Translations$toolbox$zh {
 	@override String get noticeSearch => '通知查詢';
 	@override String get noticeDescription => '不要錯過通知';
 	@override String get noticeHint => '搜尋關鍵詞（近30天的通知標題）';
+	@override String get noticeSchoolNetworkWarning => '目前可能未連接校園網路，部分通知來源需要校園網路才能存取。';
 	@override String get noticePlaceholder => '如:轉專業';
 	@override String get noticeIncomplete => '部分來源未查完';
 	@override String get noticeEmpty => '已查欄目中沒有符合的通知';
@@ -3793,6 +3794,7 @@ extension on TranslationsZhTw {
 			'toolbox.noticeSearch' => '通知查詢',
 			'toolbox.noticeDescription' => '不要錯過通知',
 			'toolbox.noticeHint' => '搜尋關鍵詞（近30天的通知標題）',
+			'toolbox.noticeSchoolNetworkWarning' => '目前可能未連接校園網路，部分通知來源需要校園網路才能存取。',
 			'toolbox.noticePlaceholder' => '如:轉專業',
 			'toolbox.noticeIncomplete' => '部分來源未查完',
 			'toolbox.noticeEmpty' => '已查欄目中沒有符合的通知',

@@ -11,9 +11,14 @@ import 'campus_notice_search.dart';
 import 'notice_channels.dart';
 
 class CampusNoticePage extends StatefulWidget {
-  const CampusNoticePage({super.key, required this.dio});
+  const CampusNoticePage({
+    super.key,
+    required this.dio,
+    required this.isInSchool,
+  });
 
   final Dio dio;
+  final Future<bool> Function() isInSchool;
 
   @override
   State<CampusNoticePage> createState() => _CampusNoticePageState();
@@ -25,7 +30,27 @@ class _CampusNoticePageState extends State<CampusNoticePage> {
   final _byUrl = <Uri, CampusNotice>{};
   final _failed = <String>{};
   int _checked = 0;
+  int _networkCheck = 0;
+  bool? _inSchool;
   String? _lastKeyword;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSchoolNetwork();
+  }
+
+  Future<void> _checkSchoolNetwork() async {
+    final check = ++_networkCheck;
+    bool inSchool;
+    try {
+      inSchool = await widget.isInSchool();
+    } catch (_) {
+      inSchool = false;
+    }
+    if (!mounted || check != _networkCheck) return;
+    setState(() => _inSchool = inSchool);
+  }
 
   @override
   void dispose() {
@@ -37,6 +62,7 @@ class _CampusNoticePageState extends State<CampusNoticePage> {
   Future<void> _submit({String? keyword}) async {
     final query = (keyword ?? _input.text).trim();
     if (query.isEmpty) return;
+    _checkSchoolNetwork();
     if (keyword != null) _input.text = query;
     FocusScope.of(context).unfocus();
     _token?.cancel();
@@ -89,6 +115,15 @@ class _CampusNoticePageState extends State<CampusNoticePage> {
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
+                  if (_inSchool == false) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      t.noticeSchoolNetworkWarning,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   TextField(
                     controller: _input,

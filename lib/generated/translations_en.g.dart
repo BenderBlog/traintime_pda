@@ -990,6 +990,7 @@ class _Translations$toolbox$en extends Translations$toolbox$zh {
 	@override String get noticeSearch => 'Notice search';
 	@override String get noticeDescription => 'Don\'t miss any notices';
 	@override String get noticeHint => 'Search keywords (notice titles from the last 30 days)';
+	@override String get noticeSchoolNetworkWarning => 'You may not be connected to the campus network. Some notice sources require it.';
 	@override String get noticePlaceholder => 'e.g. changing majors';
 	@override String get noticeIncomplete => 'Some sources could not be fully searched';
 	@override String get noticeEmpty => 'No matches in the lists checked';
@@ -3793,6 +3794,7 @@ extension on TranslationsEn {
 			'toolbox.noticeSearch' => 'Notice search',
 			'toolbox.noticeDescription' => 'Don\'t miss any notices',
 			'toolbox.noticeHint' => 'Search keywords (notice titles from the last 30 days)',
+			'toolbox.noticeSchoolNetworkWarning' => 'You may not be connected to the campus network. Some notice sources require it.',
 			'toolbox.noticePlaceholder' => 'e.g. changing majors',
 			'toolbox.noticeIncomplete' => 'Some sources could not be fully searched',
 			'toolbox.noticeEmpty' => 'No matches in the lists checked',

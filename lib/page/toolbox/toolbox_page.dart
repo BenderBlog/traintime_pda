@@ -31,7 +31,10 @@ class _ToolBoxPageState extends State<ToolBoxPage> {
             title: Text(context.t.toolbox.noticeSearch),
             subtitle: Text(context.t.toolbox.noticeDescription),
             onTap: () => context.push<void>(
-              CampusNoticePage(dio: NetworkClients.otherDio),
+              CampusNoticePage(
+                dio: NetworkClients.otherDio,
+                isInSchool: isInSchool,
+              ),
             ),
           ),
           ...[
