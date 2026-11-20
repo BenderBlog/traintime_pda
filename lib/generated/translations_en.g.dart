@@ -2350,6 +2350,7 @@ class _Translations$setting$fontSizePage$en extends Translations$setting$fontSiz
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
+	@override String get iosPreview => 'Apple users: turn off Bold Text in Settings before adjusting the font. You can find it in either location:\nSettings → Display & Brightness → Bold Text\nSettings → Accessibility → Display & Text Size → Bold Text';
 	@override String get sizeTitle => 'Font size';
 	@override String get weightTitle => 'Font weight';
 	@override String get previewTitle => 'Preview';
@@ -3698,6 +3699,7 @@ extension on TranslationsEn {
 			'setting.navigation.notificationsDescription' => 'Course reminders and notifications',
 			'setting.navigation.coreDescription' => 'Logs, cached data and sign out',
 			'setting.fontSizeSetting' => 'Font size & weight',
+			'setting.fontSizePage.iosPreview' => 'Apple users: turn off Bold Text in Settings before adjusting the font. You can find it in either location:\nSettings → Display & Brightness → Bold Text\nSettings → Accessibility → Display & Text Size → Bold Text',
 			'setting.fontSizePage.sizeTitle' => 'Font size',
 			'setting.fontSizePage.weightTitle' => 'Font weight',
 			'setting.fontSizePage.previewTitle' => 'Preview',

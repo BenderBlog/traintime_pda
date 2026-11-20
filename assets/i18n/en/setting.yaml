@@ -362,6 +362,7 @@ navigation:
   core_description: Logs, cached data and sign out
 font_size_setting: Font size & weight
 font_size_page:
+  ios_preview: "Apple users: turn off Bold Text in Settings before adjusting the font. You can find it in either location:\nSettings → Display & Brightness → Bold Text\nSettings → Accessibility → Display & Text Size → Bold Text"
   size_title: Font size
   weight_title: Font weight
   preview_title: Preview

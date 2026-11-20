@@ -2350,6 +2350,7 @@ class _Translations$setting$fontSizePage$zh_TW extends Translations$setting$font
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
+	@override String get iosPreview => '蘋果用戶請先關閉系統設定中的「粗體文字」，再調整字體。可透過以下任一路徑找到該選項：\n設定 → 螢幕顯示與亮度 → 粗體文字\n設定 → 輔助使用 → 顯示與文字大小 → 粗體文字';
 	@override String get sizeTitle => '字體大小';
 	@override String get weightTitle => '字體粗細';
 	@override String get previewTitle => '預覽';
@@ -3698,6 +3699,7 @@ extension on TranslationsZhTw {
 			'setting.navigation.notificationsDescription' => '課前提醒與通知管理',
 			'setting.navigation.coreDescription' => '日誌、快取清理與登出',
 			'setting.fontSizeSetting' => '字體大小與粗細',
+			'setting.fontSizePage.iosPreview' => '蘋果用戶請先關閉系統設定中的「粗體文字」，再調整字體。可透過以下任一路徑找到該選項：\n設定 → 螢幕顯示與亮度 → 粗體文字\n設定 → 輔助使用 → 顯示與文字大小 → 粗體文字',
 			'setting.fontSizePage.sizeTitle' => '字體大小',
 			'setting.fontSizePage.weightTitle' => '字體粗細',
 			'setting.fontSizePage.previewTitle' => '預覽',

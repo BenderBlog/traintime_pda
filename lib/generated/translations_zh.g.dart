@@ -4885,6 +4885,9 @@ class Translations$setting$fontSizePage$zh {
 
 	// Translations
 
+	/// zh: '苹果用户请先关闭系统设置中的“粗体文本”，再调整字体。可通过以下任一路径找到该选项： 设置 → 显示与亮度 → 粗体文本 设置 → 辅助功能 → 显示与文字大小 → 粗体文本'
+	String get iosPreview => '苹果用户请先关闭系统设置中的“粗体文本”，再调整字体。可通过以下任一路径找到该选项：\n设置 → 显示与亮度 → 粗体文本\n设置 → 辅助功能 → 显示与文字大小 → 粗体文本';
+
 	/// zh: '字体大小'
 	String get sizeTitle => '字体大小';
 
@@ -6382,6 +6385,7 @@ extension on Translations {
 			'setting.navigation.notificationsDescription' => '课前提醒与通知管理',
 			'setting.navigation.coreDescription' => '日志、缓存清理与退出登录',
 			'setting.fontSizeSetting' => '字体大小与粗细',
+			'setting.fontSizePage.iosPreview' => '苹果用户请先关闭系统设置中的“粗体文本”，再调整字体。可通过以下任一路径找到该选项：\n设置 → 显示与亮度 → 粗体文本\n设置 → 辅助功能 → 显示与文字大小 → 粗体文本',
 			'setting.fontSizePage.sizeTitle' => '字体大小',
 			'setting.fontSizePage.weightTitle' => '字体粗细',
 			'setting.fontSizePage.previewTitle' => '预览',

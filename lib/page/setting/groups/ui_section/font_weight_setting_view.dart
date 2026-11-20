@@ -1,6 +1,8 @@
 // Copyright 2026 Traintime PDA Authours, originally by BenderBlog Rodriguez.
 // SPDX-License-Identifier: MPL-2.0
 
+import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -37,7 +39,9 @@ class FontWeightSettingView extends StatelessWidget {
             ThemeController.i.updateTheme();
           },
           preview: Text(
-            context.t.setting.editor.textPreview,
+            Platform.isIOS
+                ? context.t.setting.fontSizePage.iosPreview
+                : context.t.setting.editor.textPreview,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
         );

@@ -331,6 +331,7 @@ navigation:
   core_description: 日誌、快取清理與登出
 font_size_setting: 字體大小與粗細
 font_size_page:
+  ios_preview: "蘋果用戶請先關閉系統設定中的「粗體文字」，再調整字體。可透過以下任一路徑找到該選項：\n設定 → 螢幕顯示與亮度 → 粗體文字\n設定 → 輔助使用 → 顯示與文字大小 → 粗體文字"
   size_title: 字體大小
   weight_title: 字體粗細
   preview_title: 預覽
