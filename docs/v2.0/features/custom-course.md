@@ -48,7 +48,7 @@
     - [6.8 清空所有学期上下文及课程](#68-清空所有学期上下文及课程)
     - [6.9 删除课程的一个 entry](#69-删除课程的一个-entry)
   - [七、Presentation](#七presentation)
-    - [7.1 global：当前学期共享日程](#71-global当前学期共享日程)
+    - [7.1 当前学期共享日程](#71-当前学期共享日程)
     - [7.2 pages：完整流程与页面状态](#72-pages完整流程与页面状态)
     - [7.3 widgets：可嵌入的课程界面](#73-widgets可嵌入的课程界面)
   - [八、Integration](#八integration)
@@ -59,121 +59,28 @@
 
 ## 一、背景
 
-现有 `CustomClass` 只保存具体起止时间，无法保留周次和节次规则。JSON 文件读写已由 `CustomClassRepository` 承担，`CustomClassController` 负责内存状态、编辑和查询，同时首页、提醒、日历及原生 Widget 仍分别处理时间段。重构需要保留原始规则、统一日程生成，并替换学期变化时自动清空自定义课程的行为。
+旧版 `CustomClass` 只保存具体起止时间，无法保留周次和节次规则。JSON 文件读写已由 `CustomClassRepository` 承担，`CustomClassController` 负责内存状态、编辑和查询，同时首页、提醒、日历及原生 Widget 仍分别处理时间段。重构需要保留原始规则、统一日程生成，并替换学期变化时自动清空自定义课程的行为。
 
 ## 二、目标
 
 1. 支持「具体日期或周次」与「自由时间或节次」的四种排课组合。
 2. 每门课程关联所属学期的 `IndexContext`，切换学期保留课程，只有用户主动删除课程或其最后一条安排时才移除课程。
 3. 使用 Drift 和 SQLite 保存原始规则，统一生成日程供课表、首页和外部设施使用。
-4. 首期只重构自定义课程。教务课表、考试和实验保留现有模型，按入口逐步迁移，避免新旧数据双写。
+4. 首期只重构自定义课程。教务课表、考试和实验由各自功能负责。
 
 ## 三、整体架构设计
 
 第三章定义依赖方向，第四、五章定义模型与存储契约，第六章定义业务编排，第七、八章定义接入，第九章用于验收。后文引用已有约定时，继承其全部校验和失败语义，使用 `try catch` 错误流传递。
 
-代码放在 `lib/experimental/`，业务依赖通过构造函数传入，不在业务对象中查找全局服务。
+依赖方向遵循[项目架构](../../../.agents/skills/pda-v2-coding-principles/references/architecture.md)。自定义课程位于 `lib/features/custom_course/`。Domain 定义课程规则与日程展开，Repository 声明持久化和历史文件操作接口，Data 实现接口。校历由本功能的 ports 描述所需字段，顶层 Integration 从提供方的公开入口接入。
 
-| 目录 | 职责 | 可依赖 | 不可依赖 |
-| --- | --- | --- | --- |
-| `core/database/` | 共享数据库定义与连接初始化 | Drift、SQLite、文件与路径能力、各功能的 Drift 表声明 | Application、Repository 实现、Presentation、Signals、平台同步逻辑 |
-| `core/id/` | ID 生成 | Dart 标准库 | Features、数据库、Flutter、Signals |
-| `features/custom_course/domain/` | 纯 Dart 模型、规则解析、Repository 和查询接口 | Dart、纯 Dart 值对象 | Application、Data、Presentation、Integration、Drift、Flutter、Signals、IO 实现 |
-| `features/custom_course/application/` | 创建、编辑、删除、查询用例编排 | Domain、ID Generator、本层声明的外部数据接口 | Data / Integration 具体实现、Drift、数据库连接、页面、Signals、平台插件 |
-| `features/custom_course/data/` | Drift 表、Repository 实现和 mapper | Domain、Database、Drift 和可选的远端适配器可依赖 Application 的接口及网络客户端 | Application、Presentation、Integration、页面状态 |
-| `features/custom_course/presentation/` | 页面、编辑草稿和基于 Signals 的响应式状态 | Application、Domain 类型、Flutter、Signals | Data、Drift、数据库连接、文件读写与平台同步实现 |
-| `features/custom_course/integration/` | 读取当前学期日程状态，适配课表、首页、通知、系统日历和原生 Widget | Presentation `global/` 暴露的只读状态、Domain 日程类型、现有展示类型、平台插件及投影文件读写 | Data、Drift、数据库连接、旧 `CustomClassController` |
-
-页面在 Presentation 中调用 Application 用例，并维护加载、结果和错误状态，同时用例只返回业务结果或抛出可处理的错误，不保存界面状态。订阅发生错误时，由 Presentation 的 global 状态记录并暴露错误。用例依赖 Domain 接口，Data 实现接口，同时 Domain 不依赖 Flutter 或数据库。数据库访问、文件读写和平台同步由 Data 和 Integration 负责。
-
-写入路径：
-
-```mermaid
-flowchart LR
-  A[Presentation Signals Store] --> B[Application Use Case]
-  B --> C[Repository Implement]
-  C --> D["Drift (SQLite)"]
-```
-
-数据更新链路：
-
-```mermaid
-flowchart LR
-  A[SQLite changes] --> B[Repository Implement Query Stream]
-  B --> C[Building Occurrence by Mapper]
-  C --> D[Application exposes Stream]
-  D --> E[Presentation global Signals]
-  E --> F[Presentation pages / widgets]
-  E --> G[Integration]
-```
-
-> [!TIP] 关于远端数据
->
-> 推荐在 Domain 定义远端数据对应的领域模型及 Repository 接口。Data 层实现 Repository，负责远端请求和 DTO 到领域模型的映射。Application 调用 Repository 并编排用例。远端请求在数据库事务外完成。首期没有实际使用的远端数据源，因此暂不增加对应接口和适配器。
-
-> [!WARNING] 提醒
->
-> 本文描述的是各层职责完整展开后的参考架构，用于复杂业务下明确依赖方向和维护边界。实际实现应根据功能复杂度裁剪，不要求为每一层创建独立类或文件。
->
-> 例如，原本的设计之中还有额外的一层 DAO 在 Repository 和 Drift 之间的，但是由于这个业务流程的内容很简单，所以 DAO 的功能被合并到 Repository 中了，由 Repository 同时承担 DAO 对 Drift 的业务语义化和 Repository 的事务化和原子化。
-> 
-> 而且当前项目中，只有课程系统、系统日历同步和课程提醒适合参考上面的完整分层，其他的功能都应当裁剪部分层次。裁剪层次是一个设计中就考虑了的，因为功能驱动的 MVVM 架构就是会将每个功能做得很单一，注定不会有非常复杂的大模块。
+Application 编排写入用例，将 Repository 发出的规则交给 Domain 展开，对外公开只读查询与订阅。Presentation 持有编辑草稿与交互状态。Integration 按账号生命周期装配共享读取和各消费方的适配器。
 
 ### 3.1 Core
 
-由于目前的 Core 的功能比较简单，所以就没有单开一章来详细说明。
-
 #### Database
 
-`core/database/` 按数据库划分子目录，一个数据库对应一个目录。当前使用 `core/database/xdyou/`；以后确有第二个数据库时再新增同级目录。该目录只需一个手写文件 `init.dart`，同时声明 Drift 数据库、打开连接、启用外键并确认就绪。`init.g.dart` 由 Drift 生成；暂不创建数据库迁移逻辑，如果有需要，推荐放在同级目录下命名为 `migration.dart`。
-
-以下是数据库的最小模板，路径相对于 `lib/experimental/`。表类由 `features/custom_course/data/` 声明，类名在实现时与实际表定义保持一致即可。
-
-`core/database/xdyou/init.dart`：
-
-```dart
-import 'dart:io';
-
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-
-import '../../../features/custom_course/data/local/tables.dart';
-
-part 'init.g.dart';
-
-@DriftDatabase(tables: [
-  IndexContexts,
-  CustomCourses,
-  CustomCourseScheduleEntries,
-])
-class XDYouDatabase extends _$XDYouDatabase {
-  XDYouDatabase(super.executor);
-
-  @override
-  int get schemaVersion => 1;
-}
-
-Future<XDYouDatabase> initXDYouDatabase() async {
-  final directory = await getApplicationSupportDirectory();
-  final file = File(p.join(directory.path, 'xdyou_database.sqlite'));
-  final db = XDYouDatabase(
-    NativeDatabase.createInBackground(
-      file,
-      // 开启外键约束
-      setup: (rawDb) => rawDb.execute('PRAGMA foreign_keys = ON'),
-    ),
-  );
-  try {
-    await db.customSelect('SELECT 1').get();
-    return db;
-  } catch (_) {
-    await db.close();
-    rethrow;
-  }
-}
-```
+具体 Drift 数据库在顶层 Integration 注册各功能从公开入口提供的表。Integration 打开共享连接，向课程 Data 注入访问自身表所需的查询和事务能力。Data 不导入 Integration，Core 不引用功能表。连接初始化、外键和关闭要求见 5.1。
 
 #### ID
 
@@ -310,20 +217,20 @@ classDiagram
 
 ### 4.3 学期归属
 
-每个学期代码至多保存一条 `IndexContext`，同学期的自定义课程共用它。当前查看学期由 `SemesterController` 决定，`ClassTableData.semesterCode` 用来核对课表数据是否属于该学期。新建和导入课程须指定 `indexContextCode`，普通编辑不改变归属，不支持跨学期移动。
+每个学期代码至多保存一条 `IndexContext`，同学期的自定义课程共用它。从注入的学期来源读取当前选择，校历的学期代码 用来核对课表数据是否属于该学期。新建和导入课程须指定 `indexContextCode`，普通编辑不改变归属，不支持跨学期移动。
 
-启动先打开数据库、检查旧文件是否存在并恢复已选学期，迁移未完成时遵守 6.7 的写入和输出限制。对于手动切换学期，Presentation 取消旧订阅，清空旧学期在当前视图中的日程，丢弃迟到结果。后续加载失败只更新错误状态，不回滚学期选择，也不删除其他学期的课程。
+启动先打开数据库、检查旧文件是否存在并恢复已选学期，迁移未完成时遵守 6.7 的写入和输出限制。对于手动切换学期，Integration 取消旧订阅，清空旧学期在当前视图中的日程，丢弃迟到结果。后续加载失败只更新错误状态，不回滚学期选择，也不删除其他学期的课程。
 
-应用装配处按以下顺序处理所选学期的 context，Presentation 管理订阅及加载状态：
+应用装配处按以下顺序处理所选学期的 context，Integration 管理订阅，Application 公开加载状态：
 
 1. 已有合法 context：立即订阅本地课程并展开 Occurrence，供页面和 Integration 使用。教务课表仍可在后台刷新，同时离线或刷新失败不影响已有日程。
 2. 缺少 context：先检查同学期的课表缓存。缓存可用就创建 context 并开始订阅。否则显示「学期未就绪」，等待正常的课表加载结果，不额外发起一次请求。加载仍不可用时维持未就绪，该学期不能新建自定义课程。
 
-可用的 `ClassTableData` 必须与所选学期代码一致、`termStartDay` 是有效开学日期，且 `semesterLength` 在 2–32 周内。**这里以周数大于 1 作为课表已发布的项目约定**，不另存发布标志。创建 context 时以未经显示周偏移的 `termStartDay` 为 `startDate`，以 `semesterLength` 为 `weekCount`，并保存默认作息。未发布课表返回的默认 1 周不能用于创建 context。
+可用的校历 必须与所选学期代码一致、`termStartDay` 是有效开学日期，且 `semesterLength` 在 2–32 周内。**这里以周数大于 1 作为课表已发布的项目约定**，不另存发布标志。创建 context 时以未经显示周偏移的 `termStartDay` 为 `startDate`，以 `semesterLength` 为 `weekCount`，并保存默认作息。未发布课表返回的默认 1 周不能用于创建 context。
 
 已有 context 只在同学期的**本次网络请求完整成功**后更新，且缓存回退不触发更新。若新的 `semesterLength` 大于已保存的 `weekCount`，增加周数，保留 `startDate`、`timeList` 和课程规则；相等或变小时不改动。这样已有 Occurrence 不变，即使部分日程超出教务课表当前显示的周数，也仍留在完整日程流中。开学日期或作息确需修正时，按 5.1 校验关联课程后单独更新。
 
-新版构建须隔离 `ClassTableController._initEffects()` 对旧自定义课程的 `clearAll()`。现有 Session 只有一份 `ClassTable.json`，读写时须核对学期代码。它目前还会缓存未发布时的默认 1 周结果，新版须拒绝这类旧缓存，也不能让它覆盖可用缓存。只有确认拿到当前学期完整的自定义课程日程后，才用它更新日历和 Widget；如果还在加载或加载失败时，先保留原来的内容。
+校历缓存须匹配学期。未发布的结果不能覆盖可用缓存。只有当前学期的完整日程就绪后才能替换日历和 Widget 的内容。
 
 固定日期须落在所属 context 的 `[startDate, startDate + weekCount * 7 天)` 内。Repository 在保存课程及更新 context 时校验，失败则保留原数据。
 
@@ -333,17 +240,17 @@ classDiagram
 
 #### 文件划分
 
-以下路径相对于 `lib/experimental/`。数据库基础设施放在 `core/`，课程表和数据访问实现放在功能模块内。
+以下路径相对于 `lib/`。数据库在顶层 Integration 装配，课程表和数据访问实现放在功能模块内。
 
 | 文件或位置 | 职责 | 设计边界 |
 | --- | --- | --- |
-| `core/database/xdyou/init.dart` | 定义 `XDYouDatabase`、注册三张业务表及首版 schema 版本；打开 `xdyou_database.sqlite`，在每个连接上启用外键并确认就绪 | 返回共享连接，由启动装配持有和关闭；失败时关闭连接并向上报告；不处理课程规则或旧 JSON 导入 |
-| `features/custom_course/domain/repository.dart` | 声明 `IndexContext` 和 `CustomCourse` 的读取、保存、删除及订阅接口 | 使用领域类型，支持按上下文代码访问课程；不暴露 Drift 行类型或数据库事务 |
+| `integration/database/init.dart` | 定义 `XDYouDatabase`、注册三张业务表及首版 schema 版本；打开 `xdyou_database.sqlite`，在每个连接上启用外键并确认就绪 | 返回共享连接，由启动装配持有和关闭；失败时关闭连接并向上报告；不处理课程规则或旧 JSON 导入 |
+| `features/custom_course/repository/` | 声明 `IndexContext` 和 `CustomCourse` 的读取、保存、删除及订阅接口 | 使用领域类型，支持按上下文代码访问课程；不暴露 Drift 行类型或数据库事务 |
 | `features/custom_course/data/local/tables.dart` | 声明 `index_contexts`、`custom_courses`、`custom_course_schedule_entries` 及约束和索引 | 只定义结构，不执行查询，不依赖数据库连接类 |
 | `features/custom_course/data/mapping/mapper.dart` | 转换数据库记录与领域对象，处理日期、时间段列表、周次位图和规则字段 | 纯转换函数，校验数据库表示的格式与完整性，再构造领域对象；不执行 IO、不决定业务规则 |
 | `features/custom_course/data/local/drift_repository.dart` | 实现 Repository 接口，直接使用 Drift 查询、订阅和事务写入，并调用 mapper | 保证课程与 entries 一起提交，并以数据库当前状态校验关联 context 与业务规则；不生成 occurrence、不管理 Signals 或外部同步 |
-| `features/custom_course/data/legacy_source.dart` | 读取、备份和原子保存旧 JSON，保留原始字段，并调用旧 `CustomClass` 校验可解析的记录 | 不调用旧 Controller 或旧 Repository 的保存方法，不把迁移状态写入 SQLite |
-| 现有应用启动装配位置 | 获取数据库目录，初始化共享连接，创建 Repository 和用例并注入 | 负责生命周期和实例连接，不包含 SQL、字段转换或业务规则 |
+| `features/custom_course/data/legacy_source.dart` | 读取、备份和原子保存旧 JSON，保留原始字段，并按历史文件格式校验记录 | 不调用旧 Controller 或旧 Repository 的保存方法，不把迁移状态写入 SQLite |
+| 顶层 Integration | 获取数据库目录，初始化共享连接，创建 Repository 和用例并注入 | 负责生命周期和实例连接，不包含 SQL、字段转换或业务规则 |
 
 `init.dart` 引用功能模块的表声明以注册 schema。Repository 通过构造函数接收共享数据库连接，不自行创建连接或查找全局实例。
 
@@ -351,7 +258,7 @@ classDiagram
 
 1. 读取：Application 调用 Repository，Repository 通过 Drift 在同一快照中取得课程、entries 及各自的 context，再交给 mapper 重建领域对象。损坏记录或缺失关联时报错，不转换为空课表。
 2. 写入：Application 编排 Repository 操作，Repository 在事务中取得数据库当前状态，执行业务正确性校验，经 mapper 转换后直接使用 Drift 保存。所有写入使用同一个数据库事务。
-3. 订阅：Repository 使用 Drift 监听相关表变化并输出领域数据。Application 将 Repository 的每次发出值转换为完整日程流。Presentation global 状态订阅该 Application 流并持有当前学期的唯一订阅，页面与 Integration 消费同一份只读状态。每次数据库变化都会沿查询流和转换流到达 Presentation，再由 Integration 刷新需要响应式更新的外部输出。
+3. 订阅：Repository 在数据变化后发出课程及 context。Application 调用领域规则重新展开日程，页面与平台输出通过同一份只读快照取得更新。
 
 #### 初始化和生命周期
 
@@ -483,8 +390,8 @@ CREATE TABLE custom_course_schedule_entries (
 
 - `semester_code` 原样使用课表请求采用的学期代码；`start_date` 来自校历 `termStartDay`，不叠加显示周偏移。校历或周数无效时不创建、覆盖上下文。
 - 日期使用 `yyyy-MM-dd`，分钟数从当天 00:00 起算。周次存整数位图，最低位表示第 1 周；mapper 与领域模型的周次集合互转。
-- `timeList` 随所属学期保存在 `index_contexts.time_list`，使用与 `lib/model/time_list.dart` 一致的一维 JSON 数组，即 22 个分钟数，偶数下标为开始、奇数下标为结束。数据库使用 `json_valid`、`json_type` 和 `json_array_length` 校验外层必须是包含 22 项的 JSON 数组。数据库只检查 `time_list` 是包含 22 项的合法 JSON 数组，每项是不是有效时间则由应用读取时检查，mapper 只在读取数据库值时校验每项可解析为整数，随后由 `IndexContext` 构造函数校验每对满足 `0 <= start < end < 1440` 且前一对的结束不晚于后一对的开始。损坏数据报错，不回退到全局默认值。
-- 新建 context 时，将 `lib/model/time_list.dart` 的 22 个默认时刻解析为分钟数，校验后与校历一起保存，之后解析节次只使用该 context 中已保存的 `timeList`。应用更新默认作息不覆盖已有学期，仅影响新建 context。
+- `timeList` 随所属学期保存在 `index_contexts.time_list`，使用一维 JSON 数组，即 22 个分钟数，偶数下标为开始、奇数下标为结束。数据库使用 `json_valid`、`json_type` 和 `json_array_length` 校验外层必须是包含 22 项的 JSON 数组。数据库只检查 `time_list` 是包含 22 项的合法 JSON 数组，每项是不是有效时间则由应用读取时检查，mapper 只在读取数据库值时校验每项可解析为整数，随后由 `IndexContext` 构造函数校验每对满足 `0 <= start < end < 1440` 且前一对的结束不晚于后一对的开始。损坏数据报错，不回退到全局默认值。
+- 新建 context 时，将 注入的默认作息中的 22 个时刻解析为分钟数，校验后与校历一起保存，之后解析节次只使用该 context 中已保存的 `timeList`。应用更新默认作息不覆盖已有学期，仅影响新建 context。
 - ID 由应用生成。entry 使用 `(course_id, id)` 联合主键。课程通过非空外键关联 context，entries 不重复保存上下文代码。
 - 切换规则类型时同时填写新字段并将旧字段置为 `NULL`。更新课程或 context 不使用 `INSERT OR REPLACE`，避免替换父记录影响关联数据。
 - **数据库约束负责基本范围、规则组合、唯一性和外键。领域模型构造时校验自身约束；mapper 校验数据库表示；Repository 负责所属 context 的周数和节次上限等依赖数据库状态的业务正确性校验。**
@@ -953,7 +860,7 @@ queryOccurrences(from, to):
 
 ```text
 watchSemesterScheduleOccurrences(indexContextCode):
-  // Application 返回该流；Presentation global 负责订阅并持有订阅生命周期。
+  // Application 返回该流；共享日程读取服务 负责订阅并持有订阅生命周期。
   return repository.使用学期上下文code订阅课程(indexContextCode)
     .map((context, courses) => {
       occurrences = []
@@ -966,7 +873,7 @@ watchSemesterScheduleOccurrences(indexContextCode):
 
 - 对「单次全量查询」不接收学期上下文条件，每门课程使用自己关联的 context 展开周次和节次规则，日期范围决定最终返回结果。这是一个保留的查询方法，实际的业务中更推荐使用相应式订阅方法，即「学期全量订阅」。
 - 无匹配课程时返回空列表。多个读取操作并非全局一致快照；读取期间发生写入时，下次查询取得新结果。
-- 学期订阅传送该 context 关联课程展开后的全量 Occurrence，供课表、首页及三个 Integration 输出共同使用。订阅取消与加载状态由 Presentation global 管理。
+- 学期订阅传送该 context 关联课程展开后的全量 Occurrence，供课表、首页及三个 Integration 输出共同使用。订阅取消与加载状态由 共享日程读取服务 管理。
 - Widget、首页和其他外部输出不另开数据库订阅，也不订阅日期范围数据；各自从学期全量结果中筛选所需日期。
 - 后续可按需要补充以 `indexContextCode` 与周数为输入的查询入口；本期不定义该接口或实现。
 
@@ -1022,11 +929,11 @@ watchSemesterScheduleOccurrences(indexContextCode):
 | --- | --- | --- |
 | 旧文件读取、备份和保存能力，ID Generator，课程 Repository | `Future<MigrationReport>` | 旧课程全部满足新规则并已导入，旧文件已删除 |
 
-用户在迁移页面主动开始转换。应用启动时只检查 `CustomClassesV2.json` 是否存在。文件存在或检查失败时，普通课程的创建、编辑、删除、清空和平台输出暂不开放。用户仍可切换学期、加载课表并准备 `IndexContext`。新版路径不得初始化旧 `CustomClassController`。
+用户在迁移页面主动开始转换。应用启动时只检查 `CustomClassesV2.json` 是否存在。文件存在或检查失败时，普通课程的创建、编辑、删除、清空和平台输出暂不开放。用户仍可切换学期、加载课表并准备 `IndexContext`。
 
 首次转换前，把旧文件的原始字节备份到 `CustomClassesV2.json.bak`。备份成功后才允许修改旧文件或写数据库。备份只创建一次，迁移页面提供导出入口。后续重试始终读取当前的 `CustomClassesV2.json`，不从备份重新导入。
 
-迁移功能自己读取原始字节并解析 JSON，保留每条课程及时间段的原始字段和顺序。它不调用 `CustomClassRepository.load()`，因为该方法在文件不存在时会创建空文件，而且返回对象后无法再准确修改原始 JSON。对于字段完整的记录，使用现有 `CustomClass.fromJson()` 和 `CustomClassTimeRange` 的校验能力。迁移用例只补充新模型要求的校验，包括学期归属、日期范围和时间精度。迁移读取器只复用旧模型需要的解析与规则，不复制旧 Controller 的状态、保存和 Widget 同步逻辑。
+迁移功能自己读取原始字节并解析 JSON，保留每条课程及时间段的原始字段和顺序。文件不存在时直接结束。读取器按历史格式校验字段。迁移用例只补充新模型要求的校验，包括学期归属、日期范围和时间精度。迁移读取器只复用旧模型需要的解析与规则，不复制旧 Controller 的状态、保存和 Widget 同步逻辑。
 
 `MigrationReport` 列出每条问题记录的位置、可读取的课程名、出错字段和原因。迁移页面为可以识别的课程提供编辑表单。表单可修改名称、教师、教室、日期和时间段，并复用创建课程页面的选择组件。用户也可以在已有学期上下文中选择课程归属，选择结果写入旧文件的 `_migrationContextCode`。无论是自动匹配还是用户选择，保存前都要确认每个时间段都落在该学期的 `[startDate, startDate + weekCount * 7 天)` 范围内。若文件本身不是合法 JSON 数组，或某条记录无法显示为课程表单，页面说明文件级或记录级错误，并提供原文件及备份的导出入口，供用户在应用外修正后重试。
 
@@ -1112,27 +1019,15 @@ execute():
 
 ## 七、Presentation
 
-Presentation 按下表划分响应式状态的归属。页面和组件可读取 global，但不另存一份长期有效的课程列表。
+### 7.1 当前学期共享日程
 
-| 位置 | 职责 | 状态范围 |
-| --- | --- | --- |
-| `pages/` | 自定义课程的完整页面，包含需要的 `Scaffold`、路由入口和操作反馈；通过页面状态对象调用用例 | 当前页面的编辑草稿、提交中状态及错误等；离开页面后释放 |
-| `widgets/` | 可嵌入课表、首页或其他页面的自定义课程组件 | 仅保留组件交互必需的状态，例如选择器当前值、弹窗开关；可直接读取 global 的只读状态 |
-| `global/` | 功能级共享的响应式读取状态，连接 Application 的学期全量订阅 | 当前查看学期代码、完整 `ScheduleOccurrence` 列表，以及订阅的加载、数据和错误状态；不保存编辑草稿 |
+Application 提供当前账号、学期及版本对应的只读快照，区分加载、失败、成功空列表和非空结果。Integration 在账号启动时装配共享订阅，在切换学期时取消旧订阅并丢弃迟到结果。页面首次打开前，外部服务即可取得相同快照。
 
-### 7.1 global：当前学期共享日程
-
-Presentation 的 global 状态接收已经就绪的当前学期 `indexContextCode`，调用 6.2 的 `watchSemesterScheduleOccurrences(indexContextCode)`，订阅 Application 返回的流，将每次发出的完整结果与对应学期代码一起转为只读响应式状态。首次结果到达前是加载状态；收到 `[]` 才表示该学期没有自定义课程；订阅出错时保留明确的错误状态，不把错误转换为空列表。本功能页面与 Integration 共用同一份 Presentation global 状态和订阅；课表、首页及外部服务通过 Integration 接入，不各自重建数据库监听与规则展开。
-
-当前查看学期变化时，Presentation 同时更新 global 状态中的学期代码与加载状态，并取消旧订阅；目标 context 就绪后再订阅新学期。旧结果不得作为新学期数据，旧流的迟到结果也不能覆盖新学期状态。切换仅改变展示来源，不删除其他学期的课程或 context。Presentation 不创建缺失的 context；缺失时按 4.3 准备并显示未就绪状态，不回滚学期选择。该 Presentation global 状态的生命周期覆盖应用运行期间，不随课表页面关闭而销毁；应用释放该状态时取消订阅。
-
-global 提供完整学期日程，Integration 从中按课表所选周次、首页今明日期派生各自的显示内容；这些筛选不需要新增数据库订阅粒度。编辑课程需要原始规则时，使用 6.5 按 `courseId` 查询。global 对外只暴露读取状态，不允许调用方直接修改列表来代替用例写入。
-
-启动装配建立上述 Signals 监听。Occurrence 不持久化，因此每次启动需连接数据库、读取当前学期全部规则、展开并建立状态，再由 Integration 按各消费端的触发方式输出；已有 context 的这条本地路径不等待教务课表刷新。性能优化遵循 [6.2](#62-日程查询与学期全量订阅) 的测量原则；跨数据源聚合确有需要时，再评估将相应 Integration 独立出 feature。
+页面按周或日期筛选展示内容，编辑时通过 6.5 查询原始规则。缺少 context 时显示未就绪状态，准备流程见 4.3。
 
 ### 7.2 pages：完整流程与页面状态
 
-课程编辑页承接 `lib/page/classtable/class_add/class_add_window.dart` 的 `ClassAddWindow` 职责，保留现有表单交互：新建时明确接收目标 `indexContextCode`，编辑时接收 `courseId`，通过 6.5 加载原始课程及其所属学期，再建立页面内的响应式表单草稿。名称、教师、教室和各条安排的输入，以及保存中的状态和错误，仅由该页面持有。保存时由页面状态对象构造领域对象并调用 6.3 或 6.4；领域构造失败和用例抛错由页面捕获并展示，只有成功后才退出。Presentation 不自行判断依赖数据库状态的业务正确性。
+课程编辑页新建时接收目标 `indexContextCode`，编辑时接收 `courseId`，通过 6.5 加载原始课程及其所属学期，再建立页面内的响应式表单草稿。名称、教师、教室和各条安排的输入，以及保存中的状态和错误，仅由该页面持有。保存时由页面状态对象构造领域对象并调用 6.3 或 6.4；领域构造失败和用例抛错由页面捕获并展示，只有成功后才退出。Presentation 不自行判断依赖数据库状态的业务正确性。
 
 整门课程删除、单条 entry 删除分别调用 6.6、6.9，确认和失败反馈由发起操作的页面负责。清空全部学期数据须明确提示影响范围后调用 6.8；清除其他学期时调用 6.1。迁移页面显示旧文件读取、学期匹配或时间转换失败的原因。可识别的课程可以在表单中修正并保存，文件级错误提供原文件和备份导出。页面还提供重试和确认放弃入口。只有旧文件成功删除后才开放普通编辑及手动重建入口。迁移未完成时不把数据库里的课程当成完整日程输出。
 
@@ -1142,39 +1037,23 @@ global 提供完整学期日程，Integration 从中按课表所选周次、首�
 
 课程详情卡、安排列表以及日期、周次、节次和自由时间选择器属于可复用组件。它们接收明确的领域数据、`ScheduleOccurrence` 或必要的 ID；需要操作时调用所属页面提供的回调，独立使用的组件则由自身的局部状态对象调用用例。组件只保留自身交互状态，输入值发生变化时通知持有草稿的页面，不再维护另一份课程真值。
 
-现有课表卡片同时展示教务课、考试、实验和自定义课程，仍属于课表界面；其中的自定义课程详情与编辑入口可以使用本功能的 widgets。首页卡片也保留自己的呈现方式，由第八章的适配逻辑读取 global 日程并按日期筛选。原生 Widget 和系统日历由 Integration 监听 global 状态并适配现有平台输出；通知在现有重排入口通过 Integration 读取一次快照，不订阅 global 变化。这些输出均不依赖 Flutter 页面生命周期。
-
-实现清单：
-
-- `lib/page/classtable/arrangement_detail/custom_class_detail_card.dart` 的 `CustomClassDetailCard` 实现课程详情卡，展示课程信息和全部安排，并保留编辑、删除单条安排、删除整门课程的操作入口。现有 `ArrangementList` 位于 `lib/page/classtable/arrangement_detail/arrangement_list.dart`，负责在混合课程列表中选择这张卡片。
-- 参考 `lib/page/classtable/class_add/date_selector_free.dart` 的 `DateSelectorFree` 实现具体日期与自由时间选择，包括安排的添加、修改和删除。编辑草稿保留 entry ID；历史课程使用所属 context。不得沿用初始化时静默过滤超出当前学期日期的逻辑，非法数据应明确报告。
-- `lib/page/setting/groups/classtable_section/clear_user_classes_tile.dart` 的 `ClearUserClassesTile` 保留设置中的清空入口及确认弹窗，调用 6.8。
+详情卡展示课程和全部安排，提供编辑、删除单条安排和删除整门课程的入口。日期选择器保留草稿中的 entry ID，对非法日期显示错误。设置中的清空操作经确认后调用 6.8。
 
 ## 八、Integration
 
-构建时用 `--dart-define=ENABLE_CUSTOM_COURSE=true` 启用新版，未启用时沿用旧版。应用内不切换。适配代码按消费端放在 `features/custom_course/integration/`，每个入口只读取一次 Presentation `global/` 快照，检查学期和就绪状态，再转换为目标类型。Integration 不另存状态或增加数据库订阅。教务课、考试和实验仍由原有代码提供。
-
-| 消费端 | 适配文件与职责 | 现有代码的接线点 |
-| --- | --- | --- |
-| 课表 | `class_table_adapter.dart`：按日期提供 `ClassOrganizedData` 所需课程 | `ClassTableWidgetState` 的按日组装、刷新和详情入口 |
-| 首页 | `homepage_adapter.dart`：按日期提供 `HomeArrangement` | `HomepageController._getCustomClassOfDay` |
-| 提醒 | `reminder_adapter.dart`：提供本次重排的通知数据 | `CourseReminderService` 的现有重排入口 |
-| 系统日历与 iCalendar | `calendar_adapter.dart`：提供 `CalendarEventDraft` 和快照 | `SystemCalendarSyncService` 的同步与导出入口 |
-| 原生 Widget | `native_widget_adapter.dart`：提供完整学期日程投影 | 投影文件写入及两端刷新入口 |
-
-新版构建的这些入口不得初始化旧 `CustomClassController`。学期切换时也不能调用会清除迁移来源的旧 `clearAll()`。
+跨模块适配位于 `lib/integration/`，按消费方组织。课表与首页分别声明读取所需日期日程的 port。Integration 通过自定义课程的公开入口取得快照并满足消费方契约。提醒在重排时读取一次快照，日历与原生 Widget 订阅就绪结果。这些消费者共享同一账号和学期的日程来源，独立于页面生命周期。
 
 ### 输出就绪、重试与原生协议
 
-- 读取结果带学期代码和数据版本，区分加载、错误、成功空列表和非空列表。迁移或 context 未就绪、数据加载失败时，暂停提醒和日历的替换式输出。`CourseReminderService` 的数据可用性与重排入口，以及 `SystemCalendarSyncService` 的事件、快照和自动同步判断，均使用同一次就绪快照。成功空列表仍须清除旧输出，但不主动触发提醒重排。
+- 读取结果带学期代码和数据版本，区分加载、错误、成功空列表和非空列表。迁移或 context 未就绪、数据加载失败时，暂停提醒和日历的替换式输出。提醒的重排与日历的事件生成、自动同步判断，均使用同一次就绪快照。成功空列表仍须清除旧输出，但不主动触发提醒重排。
 - 日历和原生 Widget 串行写入，排队时合并为最新版，调用平台前核对学期与版本。平台调用期间数据变化，则完成后再写最新版。失败保留待同步状态，在数据变化、应用恢复或手动刷新时重试，仅成功后记录已同步版本。提醒仍沿用原有重排和重试入口。
 - 原生投影改用 `CustomCourses.json`，沿用旧版 `CustomClassesV2.json` 的顶层课程数组格式：课程包含 `id`、`name`、可空的 `teacher/classroom` 和 `time_ranges`，每个时间段包含 `id`、`start_time`、`end_time`。将当前学期展开的每次日程写成时间段，时间沿用旧版可解析的本地 ISO 8601 格式。同目录临时文件原子替换后刷新 Widget，iOS App Group 桥接也要支持替换。
 
 ### 退出账号与数据清理
 
-退出流程 `lib/page/setting/groups/core_section.dart` 扩展为单账号范围的数据清理：用户确认后先写独立标记 `CustomCourseCleanupPending`，关闭写入口和监听，等待在途数据库及平台输出结束。然后用 Repository 清空课程、entries 和 contexts，删除旧文件、备份、新版投影及临时文件，并扩展 `clearWidgetFiles()` 清理 iOS App Group 副本。同步 `loggedIn=false`、刷新 Widget，再清空内存、凭据和偏好。全部成功后移除标记，不删除共享数据库文件或重建 context。
+Integration 协调单账号范围的数据清理：用户确认后先写独立标记 `CustomCourseCleanupPending`，关闭写入口和监听，等待在途数据库及平台输出结束。然后用 Repository 清空课程、entries 和 contexts，删除旧文件、备份、新版投影及临时文件，并清理 iOS App Group 副本。同步 `loggedIn=false`、刷新 Widget，再清空内存、凭据和偏好。全部成功后移除标记，不删除共享数据库文件或重建 context。
 
-失败时保留标记，下次启动先幂等重试清理，再初始化账号数据。两种构建都执行这条清理路径；旧版无需初始化新版业务状态。清理期间禁止旧任务写回上一账号数据。
+失败时保留标记，下次启动先幂等重试清理，再初始化账号数据。清理期间禁止旧任务写回上一账号数据。
 
 ## 九、未实现的功能
 
@@ -1190,7 +1069,7 @@ global 提供完整学期日程，Integration 从中按课表所选周次、首�
 | 不因缓存结果更新已有 context | 自动更新只接受本次完整成功的网络结果；周数只增不减，不自动修改开学日期或作息 |
 | 不迁移时区精度不明或信息有损的旧记录 | 不能确认本地时间含义、或存在跨日、秒级精度等无法无损表示的数据，会进入迁移问题列表，不静默截断或四舍五入 |
 | 不自动推断旧课程的周次规则 | 旧数据迁移为具体日期加自由时间；不猜测它原先是否每周重复 |
-| 不在迁移完成后持续同步新旧数据 | 新版编辑不会回写旧 JSON，旧版后续编辑也不会自动重新导入；更早且不识别来源标记的版本不保证回退连续性 |
+| 不在迁移完成后持续同步新旧数据 | 新版编辑不会回写旧 JSON，旧文件仅用于一次性导入 |
 | 不让教务课程、考试和实验立即切换到新模型 | 首期只重构自定义课程，其他数据源逐步迁移 |
 | 不在首期建立未实际使用的远端数据接口或适配器 | 文档允许未来把远端业务模型放在 Domain，但当前没有真实数据源需求 |
 | 不支持多个账号共享同一份自定义课程库 | 首期按单账号数据范围处理，登出时清除自定义课程数据 |
@@ -1200,7 +1079,7 @@ global 提供完整学期日程，Integration 从中按课表所选周次、首�
 | 不要求每项业务都拆成独立类或文件 | 文档明确允许按复杂度裁剪分层；例如 Repository 直接承担 DAO 与事务职责 |
 | 不为课程编辑加入并发冲突处理 | 首期不做编辑版本检查或并发编辑协调 |
 | 不在重构中顺带改造其他功能 | 实验、考试和教务课表继续使用现有模型及流程；仅在自定义课程接入点适配 |
-| 不允许新版输出在来源不匹配或数据未就绪时回退读取旧 Widget JSON | 旧、新来源按构建写入的标记选择；新投影文件缺失时显示未就绪 |
+| 不允许新版输出在来源不匹配或数据未就绪时回退读取旧 Widget JSON | 只读取当前账号与学期的投影；新投影文件缺失时显示未就绪 |
 
 ## 十、额外要求
 
