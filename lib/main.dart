@@ -11,6 +11,7 @@ import 'package:catcher_2/catcher_2.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -335,13 +336,15 @@ class _MyAppState extends State<MyApp> {
               );
               if (widget != null) {
                 return MaterialUiCompatibilityBridge(
-                  child: DefaultTextStyle.merge(
-                    style: const TextStyle().useSystemChineseFont(),
-                    child: MediaQuery(
-                      data: MediaQuery.of(
-                        context,
-                      ).copyWith(textScaler: TextScaler.linear(fontScale)),
-                      child: widget,
+                  child: flutter_material.ScaffoldMessenger(
+                    child: DefaultTextStyle.merge(
+                      style: const TextStyle().useSystemChineseFont(),
+                      child: MediaQuery(
+                        data: MediaQuery.of(
+                          context,
+                        ).copyWith(textScaler: TextScaler.linear(fontScale)),
+                        child: widget,
+                      ),
                     ),
                   ),
                 );
