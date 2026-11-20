@@ -1,0 +1,29 @@
+有史以来修改记录最多的版本。
+
+1. 课程表界面和架构修改
+    a. 增加课程样式和时间指示器设置 @Lagrange-X
+    b. 适配课表圆角、小窗口及背景模糊 @L1angYun
+    c. 美化课表，增加毛玻璃和折叠周次栏 @ChiiAya
+    d. 重构课表、日程详情和自定义课程 @BenderBlog
+    e. 课表支持查看体育课程地点 @imaginary_17
+2. 空调遥控器
+    a. 空调遥控器本身 @aqqkad
+    b. 空调遥控器界面优化 @L1angYun
+    c. 空调遥控器二维码识别优化 @lhx-666-cool
+3. 重构设置页面
+    a. 设置内容分类 @imoscarz
+    b. 使用 M3E 重新设计 @BenderBlog
+    c. 课程周次偏移界面添加负数按钮 @Dami-wq-k03
+4. 新功能及已有功能优化
+    a. 猜书名游戏 @BenderBlog
+    b. 校园通知查询 @LumDust
+    c. 空闲教室优化 @L1angYun
+    d. 电费页面支持多个电表 @BenderBlog
+    e. 课表显示体育课地点 @clever-max
+5. 修复问题
+    a. 修复考勤信息访问实效 @aqqkad
+    b. 修复体育服务访问失效 @BenderBlog
+    c. 修复校园网流量与在线时长显示错误 @L1angYun
+    d. 修复宿舍热水机访问失效 @A1nair
+    e. 修复研究生桌面小部件无法读取信息 @BenderBlog
+6. 迁移国际化框架 @hazuki-keatsu
