@@ -27,6 +27,7 @@ class ClassTableSheet extends StatefulWidget {
     this.semesterLength = 1,
     this.onPageChanged,
     this.enableVerticalScrolling = true,
+    this.fitFullDay = false,
     this.verticalPhysics,
     this.bottomClearance = 0,
   });
@@ -39,6 +40,9 @@ class ClassTableSheet extends StatefulWidget {
   final int semesterLength;
   final ValueChanged<int>? onPageChanged;
   final bool enableVerticalScrolling;
+
+  /// Fit all periods when there is room for their minimum readable height.
+  final bool fitFullDay;
 
   /// Overrides the physics of the sheet's own vertical scroll.
   ///
@@ -139,6 +143,7 @@ class _ClassTableSheetState extends State<ClassTableSheet> {
         final double blockUnit = classTableBlockUnit(
           context,
           available,
+          fitFullDay: widget.fitFullDay,
           minimumUnit: timeColumnLayout.minimumBlockHeight,
         );
 
