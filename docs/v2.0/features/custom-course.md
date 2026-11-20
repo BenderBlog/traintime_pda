@@ -74,13 +74,13 @@
 
 依赖方向遵循[项目架构](../../../.agents/skills/pda-v2-coding-principles/references/architecture.md)。自定义课程位于 `lib/features/custom_course/`。Domain 定义课程规则与日程展开，Repository 声明持久化和历史文件操作接口，Data 实现接口。校历由本功能的 ports 描述所需字段，顶层 Integration 从提供方的公开入口接入。
 
-Application 编排写入用例，将 Repository 发出的规则交给 Domain 展开，对外公开只读查询与订阅。Presentation 持有编辑草稿与交互状态。Integration 按账号生命周期装配共享读取和各消费方的适配器。
+Application 编排写入用例，将 Repository 发出的规则交给 Domain 展开，对外公开只读查询与订阅。Presentation 持有编辑草稿与交互状态。启动装配按账号生命周期创建共享读取，并向各消费方注入适配器。
 
 ### 3.1 Core
 
 #### Database
 
-具体 Drift 数据库在顶层 Integration 注册各功能从公开入口提供的表。Integration 打开共享连接，向课程 Data 注入访问自身表所需的查询和事务能力。Data 不导入 Integration，Core 不引用功能表。连接初始化、外键和关闭要求见 5.1。
+启动装配从各功能的公开入口注册 Drift 表，打开共享连接，向课程 Data 注入访问自身表所需的查询和事务能力。通用连接能力可以放在 Core；Data 不导入 Integration，Core 不引用功能表。连接初始化、外键和关闭要求见 5.1。
 
 #### ID
 
@@ -219,9 +219,9 @@ classDiagram
 
 每个学期代码至多保存一条 `IndexContext`，同学期的自定义课程共用它。从注入的学期来源读取当前选择，校历的学期代码 用来核对课表数据是否属于该学期。新建和导入课程须指定 `indexContextCode`，普通编辑不改变归属，不支持跨学期移动。
 
-启动先打开数据库、检查旧文件是否存在并恢复已选学期，迁移未完成时遵守 6.7 的写入和输出限制。对于手动切换学期，Integration 取消旧订阅，清空旧学期在当前视图中的日程，丢弃迟到结果。后续加载失败只更新错误状态，不回滚学期选择，也不删除其他学期的课程。
+启动先打开数据库、检查旧文件是否存在并恢复已选学期，迁移未完成时遵守 6.7 的写入和输出限制。对于手动切换学期，共享读取取消旧订阅，清空旧学期在当前视图中的日程，丢弃迟到结果。后续加载失败只更新错误状态，不回滚学期选择，也不删除其他学期的课程。
 
-应用装配处按以下顺序处理所选学期的 context，Integration 管理订阅，Application 公开加载状态：
+启动装配按以下顺序处理所选学期的 context，并管理共享订阅的生命周期；Application 公开加载状态：
 
 1. 已有合法 context：立即订阅本地课程并展开 Occurrence，供页面和 Integration 使用。教务课表仍可在后台刷新，同时离线或刷新失败不影响已有日程。
 2. 缺少 context：先检查同学期的课表缓存。缓存可用就创建 context 并开始订阅。否则显示「学期未就绪」，等待正常的课表加载结果，不额外发起一次请求。加载仍不可用时维持未就绪，该学期不能新建自定义课程。
@@ -240,19 +240,18 @@ classDiagram
 
 #### 文件划分
 
-以下路径相对于 `lib/`。数据库在顶层 Integration 装配，课程表和数据访问实现放在功能模块内。
+以下路径相对于 `lib/`。数据库在启动入口装配，课程表和数据访问实现放在功能模块内。
 
 | 文件或位置 | 职责 | 设计边界 |
 | --- | --- | --- |
-| `integration/database/init.dart` | 定义 `XDYouDatabase`、注册三张业务表及首版 schema 版本；打开 `xdyou_database.sqlite`，在每个连接上启用外键并确认就绪 | 返回共享连接，由启动装配持有和关闭；失败时关闭连接并向上报告；不处理课程规则或旧 JSON 导入 |
+| `main.dart` 的启动装配 | 从功能公开入口注册业务表及首版 schema 版本，打开 `xdyou_database.sqlite`，在每个连接上启用外键并确认就绪 | 持有和关闭共享连接；失败时关闭连接并向上报告；不处理课程规则或旧 JSON 导入 |
 | `features/custom_course/repository/` | 声明 `IndexContext` 和 `CustomCourse` 的读取、保存、删除及订阅接口 | 使用领域类型，支持按上下文代码访问课程；不暴露 Drift 行类型或数据库事务 |
 | `features/custom_course/data/local/tables.dart` | 声明 `index_contexts`、`custom_courses`、`custom_course_schedule_entries` 及约束和索引 | 只定义结构，不执行查询，不依赖数据库连接类 |
 | `features/custom_course/data/mapping/mapper.dart` | 转换数据库记录与领域对象，处理日期、时间段列表、周次位图和规则字段 | 纯转换函数，校验数据库表示的格式与完整性，再构造领域对象；不执行 IO、不决定业务规则 |
 | `features/custom_course/data/local/drift_repository.dart` | 实现 Repository 接口，直接使用 Drift 查询、订阅和事务写入，并调用 mapper | 保证课程与 entries 一起提交，并以数据库当前状态校验关联 context 与业务规则；不生成 occurrence、不管理 Signals 或外部同步 |
 | `features/custom_course/data/legacy_source.dart` | 读取、备份和原子保存旧 JSON，保留原始字段，并按历史文件格式校验记录 | 不调用旧 Controller 或旧 Repository 的保存方法，不把迁移状态写入 SQLite |
-| 顶层 Integration | 获取数据库目录，初始化共享连接，创建 Repository 和用例并注入 | 负责生命周期和实例连接，不包含 SQL、字段转换或业务规则 |
 
-`init.dart` 引用功能模块的表声明以注册 schema。Repository 通过构造函数接收共享数据库连接，不自行创建连接或查找全局实例。
+启动装配通过功能的公开入口取得表声明以注册 schema。Repository 通过构造函数接收共享数据库连接，不自行创建连接或查找全局实例。
 
 #### 调用关系
 
@@ -860,7 +859,7 @@ queryOccurrences(from, to):
 
 ```text
 watchSemesterScheduleOccurrences(indexContextCode):
-  // Application 返回该流；共享日程读取服务 负责订阅并持有订阅生命周期。
+  // Application 返回该流；启动装配负责共享订阅的生命周期。
   return repository.使用学期上下文code订阅课程(indexContextCode)
     .map((context, courses) => {
       occurrences = []
@@ -873,7 +872,7 @@ watchSemesterScheduleOccurrences(indexContextCode):
 
 - 对「单次全量查询」不接收学期上下文条件，每门课程使用自己关联的 context 展开周次和节次规则，日期范围决定最终返回结果。这是一个保留的查询方法，实际的业务中更推荐使用相应式订阅方法，即「学期全量订阅」。
 - 无匹配课程时返回空列表。多个读取操作并非全局一致快照；读取期间发生写入时，下次查询取得新结果。
-- 学期订阅传送该 context 关联课程展开后的全量 Occurrence，供课表、首页及三个 Integration 输出共同使用。订阅取消与加载状态由 共享日程读取服务 管理。
+- 学期订阅传送该 context 关联课程展开后的全量 Occurrence，供课表、首页及各外部输出共同使用。启动装配管理订阅生命周期，Application 公开加载状态。
 - Widget、首页和其他外部输出不另开数据库订阅，也不订阅日期范围数据；各自从学期全量结果中筛选所需日期。
 - 后续可按需要补充以 `indexContextCode` 与周数为输入的查询入口；本期不定义该接口或实现。
 
@@ -1021,7 +1020,7 @@ execute():
 
 ### 7.1 当前学期共享日程
 
-Application 提供当前账号、学期及版本对应的只读快照，区分加载、失败、成功空列表和非空结果。Integration 在账号启动时装配共享订阅，在切换学期时取消旧订阅并丢弃迟到结果。页面首次打开前，外部服务即可取得相同快照。
+Application 提供当前账号、学期及版本对应的只读快照，区分加载、失败、成功空列表和非空结果。启动装配在账号启动时创建共享订阅，在切换学期时取消旧订阅并丢弃迟到结果。页面首次打开前，外部服务即可取得相同快照。
 
 页面按周或日期筛选展示内容，编辑时通过 6.5 查询原始规则。缺少 context 时显示未就绪状态，准备流程见 4.3。
 
@@ -1041,7 +1040,7 @@ Application 提供当前账号、学期及版本对应的只读快照，区分�
 
 ## 八、Integration
 
-跨模块适配位于 `lib/integration/`，按消费方组织。课表与首页分别声明读取所需日期日程的 port。Integration 通过自定义课程的公开入口取得快照并满足消费方契约。提醒在重排时读取一次快照，日历与原生 Widget 订阅就绪结果。这些消费者共享同一账号和学期的日程来源，独立于页面生命周期。
+跨模块适配位于 `lib/integration/`，按消费方组织。课表与首页分别声明读取所需日期日程的 port。Integration 实现这些 port，委派给自定义课程的公开查询，并在语义不同时适配结果；启动装配将实现注入消费方。提醒在重排时读取一次快照，日历与原生 Widget 订阅就绪结果。这些消费者共享同一账号和学期的日程来源，独立于页面生命周期。
 
 ### 输出就绪、重试与原生协议
 
@@ -1051,7 +1050,7 @@ Application 提供当前账号、学期及版本对应的只读快照，区分�
 
 ### 退出账号与数据清理
 
-Integration 协调单账号范围的数据清理：用户确认后先写独立标记 `CustomCourseCleanupPending`，关闭写入口和监听，等待在途数据库及平台输出结束。然后用 Repository 清空课程、entries 和 contexts，删除旧文件、备份、新版投影及临时文件，并清理 iOS App Group 副本。同步 `loggedIn=false`、刷新 Widget，再清空内存、凭据和偏好。全部成功后移除标记，不删除共享数据库文件或重建 context。
+账号退出用例协调单账号范围的数据清理：用户确认后先写独立标记 `CustomCourseCleanupPending`，关闭写入口和监听，等待在途数据库及平台输出结束。然后用 Repository 清空课程、entries 和 contexts，删除旧文件、备份、新版投影及临时文件，并清理 iOS App Group 副本。同步 `loggedIn=false`、刷新 Widget，再清空内存、凭据和偏好。全部成功后移除标记，不删除共享数据库文件或重建 context。
 
 失败时保留标记，下次启动先幂等重试清理，再初始化账号数据。清理期间禁止旧任务写回上一账号数据。
 

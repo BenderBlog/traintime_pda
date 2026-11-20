@@ -6,6 +6,7 @@ XDYou (Traintime PDA, package name `watermeter`) is an open-source campus inform
 
 * Before any engineering task, read and use [pda-v2-coding-principles](.agents/skills/pda-v2-coding-principles/SKILL.md). Its [architecture reference](.agents/skills/pda-v2-coding-principles/references/architecture.md) defines project-wide boundaries.
 * For a code change, use the design documents specified by the Operator. If none are specified or a specified document cannot be found, pause the code change and ask the Operator how to proceed. Continue without document-driven development only after the Operator explicitly agrees.
+* Before start coding, you'd better to take a read about the previous implementation in the main branch. And specify that the goal of refactor is to resolve the problem of code being difficult to maintain and having poor scalability caused by over-coupling.
 
 ## Verification and Reporting
 
