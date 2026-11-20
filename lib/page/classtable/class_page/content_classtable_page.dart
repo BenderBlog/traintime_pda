@@ -951,6 +951,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       pageControl: pageControl,
                       semesterLength: classTableState.semesterLength,
                       onPageChanged: _onPageChanged,
+                      fitFullDay: true,
                       bottomClearance: _sheetBottomClearance(context),
                     ).expanded(),
                   ],
