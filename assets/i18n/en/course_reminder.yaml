@@ -1,4 +1,0 @@
-title: 'Pre-class Reminder: {name}'
-body: Class starts in {time} minutes
-location: 'Location: {location}'
-teacher: 'Teacher: {teacher}'

@@ -22,5 +22,13 @@
   "python-envs.defaultEnvManager": "ms-python.python:conda",
   "python-envs.defaultPackageManager": "ms-python.python:conda",
   "python-envs.pythonProjects": [],
-  "dart.flutterSdkPath": ".fvm/versions/stable"
+  "dart.flutterSdkPath": ".fvm/versions/stable",
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#00aaff",
+    "statusBar.foreground": "#000",
+    "titleBar.activeBackground": "#00aaff",
+    "titleBar.activeForeground": "#000",
+    "titleBar.inactiveBackground": "#00aaff99",
+    "titleBar.inactiveForeground": "#000"
+  }
 }

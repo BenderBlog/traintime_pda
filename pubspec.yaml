@@ -16,7 +16,7 @@ dependencies:
   # Cookie Storage
   dio_cookie_manager: ^3.0.0
   cookie_jar: ^4.0.3
-  path_provider: ^2.0.11
+  path_provider: ^2.1.0
   # Preference
   shared_preferences: ^2.5.3
   # Json
@@ -47,15 +47,19 @@ dependencies:
   # Flutter
   flutter:
     sdk: flutter
+  # Database ORM
+  drift: ^2.35.4
+  drift_flutter: ^0.3.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3
-  build_runner: ^2.6.0
+  build_runner: ^2.16.2
   flutter_lints: ^6.0.0
   json_serializable: ^6.10.0
   slang_build_runner: ^4.18.0
+  drift_dev: ^2.35.3
   # Physical Experiment Hash Generator
   path: ^1.9.1
   build: ^4.0.11
