@@ -13,7 +13,7 @@ class ClassCardStyleConfig {
   static double completedInnerAlpha = 0.62;
   static double activeBrightnessFactor = 1.0;
   static double activeBorderAlpha = 1.0;
-  static double activeInnerAlpha = 0.78;
+  static double activeInnerAlpha = 0.9;
 
   static void loadFromPreference() {
     completedEnabled = _readBool(
