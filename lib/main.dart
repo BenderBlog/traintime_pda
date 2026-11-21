@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/core/interfaces/logger_interface.dart';
+import 'package:watermeter/integration/database/xdyou_database.dart';
 import 'package:watermeter/core/interfaces/language_store_interface.dart';
 import 'package:watermeter/core/interfaces/theme_store_interface.dart';
 import 'package:watermeter/core/logging/talker_app_logger.dart';
@@ -67,29 +68,43 @@ void main() {
 }
 
 Future<void> _startApp(LoggerInterface logger) async {
-  final themePreferences = await SharedPreferenceStore.forOwner('theme');
-  final languagePreferences = await SharedPreferenceStore.forOwner('language');
-  runApp(
-    TranslationProvider(
-      child: MultiProvider(
-        providers: [
-          Provider<LoggerInterface>.value(value: logger),
-          Provider<LanguageStoreInterface>.value(
-            value: PreferenceLanguageStore(languagePreferences),
-            updateShouldNotify: (_, _) => false,
-          ),
-          Provider<ThemeStoreInterface>(
-            create: (context) => PreferenceThemeStore(
-              themePreferences,
-              context.read<LoggerInterface>(),
+  final database = XDYouDatabase();
+  try {
+    await database.customSelect('SELECT 1').get();
+    final themePreferences = await SharedPreferenceStore.forOwner('theme');
+    final languagePreferences = await SharedPreferenceStore.forOwner(
+      'language',
+    );
+    runApp(
+      TranslationProvider(
+        child: MultiProvider(
+          providers: [
+            Provider<XDYouDatabase>(
+              lazy: false,
+              create: (_) => database,
+              dispose: (_, database) => unawaited(database.close()),
             ),
-            dispose: (_, store) => store.dispose(),
-          ),
-        ],
-        child: const MyApp(),
+            Provider<LoggerInterface>.value(value: logger),
+            Provider<LanguageStoreInterface>.value(
+              value: PreferenceLanguageStore(languagePreferences),
+              updateShouldNotify: (_, _) => false,
+            ),
+            Provider<ThemeStoreInterface>(
+              create: (context) => PreferenceThemeStore(
+                themePreferences,
+                context.read<LoggerInterface>(),
+              ),
+              dispose: (_, store) => store.dispose(),
+            ),
+          ],
+          child: const MyApp(),
+        ),
       ),
-    ),
-  );
+    );
+  } catch (_) {
+    await database.close();
+    rethrow;
+  }
 }
 
 class MyApp extends StatelessWidget {
