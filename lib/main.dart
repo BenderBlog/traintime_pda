@@ -1,7 +1,85 @@
-import 'package:flutter/material.dart';
+// Copyright 2026 Hazuki Keatsu
+// SPDX-License-Identifier: MPL-2.0
+
+import 'dart:async';
+
+import 'package:catcher_2/catcher_2.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import 'package:watermeter/core/interfaces/logger_interface.dart';
+import 'package:watermeter/core/interfaces/theme_store_interface.dart';
+import 'package:watermeter/core/logging/talker_app_logger.dart';
+import 'package:watermeter/core/logging/talker_report_handler.dart';
+import 'package:watermeter/core/preferences/shared_preference_store.dart';
+import 'package:watermeter/core/themes/presentation/app_theme.dart';
+import 'package:watermeter/core/themes/data/preference_theme_store.dart';
+import 'package:watermeter/core/themes/presentation/theme_settings_card.dart';
+import 'package:watermeter/generated/translations.g.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Init logger
+  final logger = TalkerAppLogger(TalkerFlutter.init());
+
+  // Init slang
+  LocaleSettings.useDeviceLocaleSync();
+  final t = LocaleSettings.instance.getTranslations(LocaleSettings.currentLocale);
+
+  // Init catcher_2
+  Catcher2.addDefaultErrorWidget(
+    showStacktrace: true,
+    title: t.common.unexpectProblemTitle,
+    description: t.common.unexpectProblemHint,
+    maxWidthForSmallMode: 150,
+  );
+  final options = Catcher2Options(
+    PageReportMode(showStackTrace: true),
+    [
+      EmailManualHandler(
+        ["superbart_chen@qq.com"],
+        emailTitle: "PDA 发生故障",
+        emailHeader: "请作者尽快修复",
+      ),
+      ConsoleHandler(),
+    ],
+    localizationOptions: [
+      LocalizationOptions.buildDefaultChineseOptions(),
+      LocalizationOptions.buildDefaultEnglishOptions(),
+    ],
+    logger: PDACatcher2Logger(logger),
+  );
+
+  Catcher2(
+    runAppFunction: () => unawaited(_startApp(logger)),
+    debugConfig: options,
+    profileConfig: options,
+    releaseConfig: options,
+    enableLogger: false,
+  );
+}
+
+Future<void> _startApp(LoggerInterface logger) async {
+  final themePreferences = await SharedPreferenceStore.forOwner('theme');
+  runApp(
+    TranslationProvider(
+      child: MultiProvider(
+        providers: [
+          Provider<LoggerInterface>.value(value: logger),
+          Provider<ThemeStoreInterface>(
+            create: (context) => PreferenceThemeStore(
+              themePreferences,
+              context.read<LoggerInterface>(),
+            ),
+            dispose: (_, store) => store.dispose(),
+          ),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -10,27 +88,28 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    final themeStore = context.watch<ThemeStoreInterface>();
+    final locale = context.t.$meta.locale.flutterLocale;
+    return SignalBuilder(
+      builder: (context) {
+        final settings = themeStore.settings.value;
+        return MaterialApp(
+          title: 'XDYou',
+          locale: locale,
+          supportedLocales: AppLocaleUtils.supportedLocales,
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          theme: AppTheme.light(settings),
+          darkTheme: AppTheme.dark(settings),
+          themeMode: AppTheme.mode(settings.brightness),
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(settings.fontScale)),
+            child: child!,
+          ),
+          home: const MyHomePage(title: 'XDYou'),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }
@@ -109,6 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            ThemeSettingsCard(),
           ],
         ),
       ),

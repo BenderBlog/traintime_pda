@@ -8,31 +8,45 @@ import 'package:watermeter/core/preferences/shared_preference_store.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('SharedPreferences test', () async {
+  test('free keys cannot collide with owned preference keys', () async {
     SharedPreferences.setMockInitialValues(<String, Object>{'legacy': 'saved'});
-    SharedPreferencesAsyncPlatform.instance = null;
-    await expectLater(SharedPreferenceStore.instance, throwsStateError);
     SharedPreferencesAsyncPlatform.instance =
         InMemorySharedPreferencesAsync.empty();
 
-    final PreferenceStoreInterface first = await SharedPreferenceStore.instance;
-    final PreferenceStoreInterface second = await SharedPreferenceStore.instance;
-    expect(identical(first, second), isTrue);
-    expect(first.getString('legacy'), 'saved');
-    expect(first.getBool('missing'), isNull);
+    final PreferenceStoreInterface free =
+        await SharedPreferenceStore.instance();
+    final PreferenceStoreInterface theme = await SharedPreferenceStore.forOwner(
+      'theme',
+    );
+    expect(await SharedPreferenceStore.instance(), same(free));
+    expect(await SharedPreferenceStore.forOwner('free'), same(free));
+    expect(await SharedPreferenceStore.forOwner('theme'), same(theme));
+    expect(theme, isNot(same(free)));
+    expect(free.getString('legacy'), isNull);
+    expect(free.getBool('missing'), isNull);
 
-    await first.setBool('enabled', true);
-    await first.setInt('count', 3);
-    await first.setDouble('scale', 1.25);
-    await first.setString('label', 'mine');
-    expect(second.getBool('enabled'), isTrue);
-    expect(second.getInt('count'), 3);
-    expect(second.getDouble('scale'), 1.25);
-    expect(second.getString('label'), 'mine');
-    expect(second.contains('enabled'), isTrue);
+    await free.setBool('enabled', true);
+    await free.setInt('palette', 7);
+    await free.setDouble('scale', 1.25);
+    await free.setString('label', 'mine');
+    await theme.setInt('palette', 3);
+    expect(free.getInt('palette'), 7);
+    expect(theme.getInt('palette'), 3);
+    expect(free.getBool('enabled'), isTrue);
+    expect(free.getDouble('scale'), 1.25);
+    expect(free.getString('label'), 'mine');
+    expect(free.contains('enabled'), isTrue);
 
-    await second.remove('enabled');
-    expect(first.getBool('enabled'), isNull);
-    expect(first.contains('enabled'), isFalse);
+    await free.remove('enabled');
+    expect(free.getBool('enabled'), isNull);
+    expect(free.contains('enabled'), isFalse);
+    expect(theme.getBool('enabled'), isNull);
+
+    final raw = await SharedPreferencesWithCache.create(
+      cacheOptions: const SharedPreferencesWithCacheOptions(),
+    );
+    expect(raw.getInt('free.palette'), 7);
+    expect(raw.getInt('theme.palette'), 3);
+    expect(raw.getBool('free.enabled'), isNull);
   });
 }
