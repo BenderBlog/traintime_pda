@@ -42,7 +42,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	// Translations
 	late final Translations$common$zh common = Translations$common$zh.internal(_root);
-	late final Translations$theme$zh theme = Translations$theme$zh.internal(_root);
+	late final Translations$core$zh core = Translations$core$zh.internal(_root);
 }
 
 // Path: common
@@ -66,9 +66,50 @@ class Translations$common$zh {
 	String get unexpectProblemHint => '这里有一个没有被预料的问题发生了！';
 }
 
-// Path: theme
-class Translations$theme$zh {
-	Translations$theme$zh.internal(this._root);
+// Path: core
+class Translations$core$zh {
+	Translations$core$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$core$language$zh language = Translations$core$language$zh.internal(_root);
+	late final Translations$core$theme$zh theme = Translations$core$theme$zh.internal(_root);
+}
+
+// Path: core.language
+class Translations$core$language$zh {
+	Translations$core$language$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '语言'
+	String get title => '语言';
+
+	/// zh: '应用语言'
+	String get selection => '应用语言';
+
+	/// zh: '跟随系统'
+	String get system => '跟随系统';
+
+	/// zh: '简体中文'
+	String get simplifiedChinese => '简体中文';
+
+	/// zh: '繁體中文'
+	String get traditionalChinese => '繁體中文';
+
+	/// zh: 'English'
+	String get english => 'English';
+
+	/// zh: '无法保存语言设置'
+	String get saveFailed => '无法保存语言设置';
+}
+
+// Path: core.theme
+class Translations$core$theme$zh {
+	Translations$core$theme$zh.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -95,14 +136,14 @@ class Translations$theme$zh {
 	/// zh: '字体粗细'
 	String get weightTitle => '字体粗细';
 
-	late final Translations$theme$weight$zh weight = Translations$theme$weight$zh.internal(_root);
-	late final Translations$theme$palette$zh palette = Translations$theme$palette$zh.internal(_root);
-	late final Translations$theme$brightness$zh brightness = Translations$theme$brightness$zh.internal(_root);
+	late final Translations$core$theme$weight$zh weight = Translations$core$theme$weight$zh.internal(_root);
+	late final Translations$core$theme$palette$zh palette = Translations$core$theme$palette$zh.internal(_root);
+	late final Translations$core$theme$brightness$zh brightness = Translations$core$theme$brightness$zh.internal(_root);
 }
 
-// Path: theme.weight
-class Translations$theme$weight$zh {
-	Translations$theme$weight$zh.internal(this._root);
+// Path: core.theme.weight
+class Translations$core$theme$weight$zh {
+	Translations$core$theme$weight$zh.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -124,9 +165,9 @@ class Translations$theme$weight$zh {
 	String get bold => '加粗';
 }
 
-// Path: theme.palette
-class Translations$theme$palette$zh {
-	Translations$theme$palette$zh.internal(this._root);
+// Path: core.theme.palette
+class Translations$core$theme$palette$zh {
+	Translations$core$theme$palette$zh.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -151,9 +192,9 @@ class Translations$theme$palette$zh {
 	String get pink => '樱花粉';
 }
 
-// Path: theme.brightness
-class Translations$theme$brightness$zh {
-	Translations$theme$brightness$zh.internal(this._root);
+// Path: core.theme.brightness
+class Translations$core$theme$brightness$zh {
+	Translations$core$theme$brightness$zh.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -181,27 +222,34 @@ extension on Translations {
 			'common.cancel' => '取消',
 			'common.unexpectProblemTitle' => '一个小问题 :P',
 			'common.unexpectProblemHint' => '这里有一个没有被预料的问题发生了！',
-			'theme.saveFailed' => '无法保存主题设置',
-			'theme.display' => '显示',
-			'theme.languageAndText' => '语言和文字',
-			'theme.colorSetting' => '颜色设置',
-			'theme.brightnessSetting' => '深浅色模式',
-			'theme.sizeTitle' => '字体大小',
-			'theme.weightTitle' => '字体粗细',
-			'theme.weight.thin' => '细',
-			'theme.weight.regular' => '常规',
-			'theme.weight.medium' => '中等',
-			'theme.weight.semibold' => '半粗',
-			'theme.weight.bold' => '加粗',
-			'theme.palette.indigo' => '默认颜色',
-			'theme.palette.blue' => '聪明蓝',
-			'theme.palette.deepPurple' => '基佬紫',
-			'theme.palette.green' => '春风绿',
-			'theme.palette.orange' => '明日香橙',
-			'theme.palette.pink' => '樱花粉',
-			'theme.brightness.system' => '跟随系统',
-			'theme.brightness.light' => '浅色',
-			'theme.brightness.dark' => '深色',
+			'core.language.title' => '语言',
+			'core.language.selection' => '应用语言',
+			'core.language.system' => '跟随系统',
+			'core.language.simplifiedChinese' => '简体中文',
+			'core.language.traditionalChinese' => '繁體中文',
+			'core.language.english' => 'English',
+			'core.language.saveFailed' => '无法保存语言设置',
+			'core.theme.saveFailed' => '无法保存主题设置',
+			'core.theme.display' => '显示',
+			'core.theme.languageAndText' => '语言和文字',
+			'core.theme.colorSetting' => '颜色设置',
+			'core.theme.brightnessSetting' => '深浅色模式',
+			'core.theme.sizeTitle' => '字体大小',
+			'core.theme.weightTitle' => '字体粗细',
+			'core.theme.weight.thin' => '细',
+			'core.theme.weight.regular' => '常规',
+			'core.theme.weight.medium' => '中等',
+			'core.theme.weight.semibold' => '半粗',
+			'core.theme.weight.bold' => '加粗',
+			'core.theme.palette.indigo' => '默认颜色',
+			'core.theme.palette.blue' => '聪明蓝',
+			'core.theme.palette.deepPurple' => '基佬紫',
+			'core.theme.palette.green' => '春风绿',
+			'core.theme.palette.orange' => '明日香橙',
+			'core.theme.palette.pink' => '樱花粉',
+			'core.theme.brightness.system' => '跟随系统',
+			'core.theme.brightness.light' => '浅色',
+			'core.theme.brightness.dark' => '深色',
 			_ => null,
 		};
 	}

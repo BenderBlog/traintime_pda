@@ -4,6 +4,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/main.dart';
+import 'package:watermeter/core/interfaces/language_store_interface.dart';
+import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
 import 'package:watermeter/core/interfaces/preference_store_interface.dart';
 import 'package:watermeter/core/interfaces/logger_interface.dart';
@@ -148,14 +150,18 @@ void main() {
 
   testWidgets('MaterialApp follows theme changes', (tester) async {
     LocaleSettings.setLocaleSync(AppLocale.zh);
+    final languageStore = PreferenceLanguageStore(_MemoryPreferences());
     final ThemeStoreInterface store = PreferenceThemeStore(
       _MemoryPreferences(),
       _RecordingLogger(),
     );
     await tester.pumpWidget(
       TranslationProvider(
-        child: Provider<ThemeStoreInterface>.value(
-          value: store,
+        child: MultiProvider(
+          providers: [
+            Provider<ThemeStoreInterface>.value(value: store),
+            Provider<LanguageStoreInterface>.value(value: languageStore),
+          ],
           child: const MyApp(),
         ),
       ),
@@ -172,6 +178,7 @@ void main() {
     expect(app.themeMode, ThemeMode.dark);
     expect(app.theme!.colorScheme.primary, const Color(0xff4ea34c));
     store.dispose();
+    languageStore.dispose();
   });
 
   testWidgets('theme settings card updates its own store', (tester) async {

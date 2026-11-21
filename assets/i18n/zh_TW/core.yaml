@@ -1,0 +1,34 @@
+# Translated using OpenCC s2twp Dictionary, script by Hancl777 and Hazuki Keatsu
+language:
+  title: 語言
+  selection: 應用語言
+  system: 跟隨系統
+  simplified_chinese: 簡體中文
+  traditional_chinese: 繁體中文
+  english: English
+  save_failed: 無法保存語言設置
+theme:
+  save_failed: 無法保存主題設置
+  display: 顯示
+  language_and_text: 文字
+  color_setting: 顏色設置
+  brightness_setting: 深淺色模式
+  size_title: 字體大小
+  weight_title: 字體粗細
+  weight:
+    thin: 細
+    regular: 常規
+    medium: 中等
+    semibold: 半粗
+    bold: 加粗
+  palette:
+    indigo: 默認顏色
+    blue: 聰明藍
+    deep_purple: 基佬紫
+    green: 春風綠
+    orange: 明日香橙
+    pink: 櫻花粉
+  brightness:
+    system: 跟隨系統
+    light: 淺色
+    dark: 深色

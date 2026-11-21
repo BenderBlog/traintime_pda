@@ -40,7 +40,7 @@ class TranslationsEn extends Translations with BaseTranslations<AppLocale, Trans
 
 	// Translations
 	@override late final _Translations$common$en common = _Translations$common$en._(_root);
-	@override late final _Translations$theme$en theme = _Translations$theme$en._(_root);
+	@override late final _Translations$core$en core = _Translations$core$en._(_root);
 }
 
 // Path: common
@@ -56,9 +56,36 @@ class _Translations$common$en extends Translations$common$zh {
 	@override String get unexpectProblemHint => 'An unexpected behavior occurred!';
 }
 
-// Path: theme
-class _Translations$theme$en extends Translations$theme$zh {
-	_Translations$theme$en._(TranslationsEn root) : this._root = root, super.internal(root);
+// Path: core
+class _Translations$core$en extends Translations$core$zh {
+	_Translations$core$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$core$language$en language = _Translations$core$language$en._(_root);
+	@override late final _Translations$core$theme$en theme = _Translations$core$theme$en._(_root);
+}
+
+// Path: core.language
+class _Translations$core$language$en extends Translations$core$language$zh {
+	_Translations$core$language$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Language';
+	@override String get selection => 'App language';
+	@override String get system => 'Follow system';
+	@override String get simplifiedChinese => '简体中文';
+	@override String get traditionalChinese => '繁體中文';
+	@override String get english => 'English';
+	@override String get saveFailed => 'Unable to save language setting';
+}
+
+// Path: core.theme
+class _Translations$core$theme$en extends Translations$core$theme$zh {
+	_Translations$core$theme$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -70,14 +97,14 @@ class _Translations$theme$en extends Translations$theme$zh {
 	@override String get brightnessSetting => 'Light/Dark mode';
 	@override String get sizeTitle => 'Font size';
 	@override String get weightTitle => 'Font weight';
-	@override late final _Translations$theme$weight$en weight = _Translations$theme$weight$en._(_root);
-	@override late final _Translations$theme$palette$en palette = _Translations$theme$palette$en._(_root);
-	@override late final _Translations$theme$brightness$en brightness = _Translations$theme$brightness$en._(_root);
+	@override late final _Translations$core$theme$weight$en weight = _Translations$core$theme$weight$en._(_root);
+	@override late final _Translations$core$theme$palette$en palette = _Translations$core$theme$palette$en._(_root);
+	@override late final _Translations$core$theme$brightness$en brightness = _Translations$core$theme$brightness$en._(_root);
 }
 
-// Path: theme.weight
-class _Translations$theme$weight$en extends Translations$theme$weight$zh {
-	_Translations$theme$weight$en._(TranslationsEn root) : this._root = root, super.internal(root);
+// Path: core.theme.weight
+class _Translations$core$theme$weight$en extends Translations$core$theme$weight$zh {
+	_Translations$core$theme$weight$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -89,9 +116,9 @@ class _Translations$theme$weight$en extends Translations$theme$weight$zh {
 	@override String get bold => 'Bold';
 }
 
-// Path: theme.palette
-class _Translations$theme$palette$en extends Translations$theme$palette$zh {
-	_Translations$theme$palette$en._(TranslationsEn root) : this._root = root, super.internal(root);
+// Path: core.theme.palette
+class _Translations$core$theme$palette$en extends Translations$core$theme$palette$zh {
+	_Translations$core$theme$palette$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -104,9 +131,9 @@ class _Translations$theme$palette$en extends Translations$theme$palette$zh {
 	@override String get pink => 'Sakura Pink';
 }
 
-// Path: theme.brightness
-class _Translations$theme$brightness$en extends Translations$theme$brightness$zh {
-	_Translations$theme$brightness$en._(TranslationsEn root) : this._root = root, super.internal(root);
+// Path: core.theme.brightness
+class _Translations$core$theme$brightness$en extends Translations$core$theme$brightness$zh {
+	_Translations$core$theme$brightness$en._(TranslationsEn root) : this._root = root, super.internal(root);
 
 	final TranslationsEn _root; // ignore: unused_field
 
@@ -128,27 +155,34 @@ extension on TranslationsEn {
 			'common.cancel' => 'Cancel',
 			'common.unexpectProblemTitle' => 'Unexpected problem :P',
 			'common.unexpectProblemHint' => 'An unexpected behavior occurred!',
-			'theme.saveFailed' => 'Unable to save theme settings',
-			'theme.display' => 'Display',
-			'theme.languageAndText' => 'Language and text',
-			'theme.colorSetting' => 'Color theme',
-			'theme.brightnessSetting' => 'Light/Dark mode',
-			'theme.sizeTitle' => 'Font size',
-			'theme.weightTitle' => 'Font weight',
-			'theme.weight.thin' => 'Thin',
-			'theme.weight.regular' => 'Regular',
-			'theme.weight.medium' => 'Medium',
-			'theme.weight.semibold' => 'Semi bold',
-			'theme.weight.bold' => 'Bold',
-			'theme.palette.indigo' => 'Default',
-			'theme.palette.blue' => 'Sky Blue',
-			'theme.palette.deepPurple' => 'Deep Purple',
-			'theme.palette.green' => 'Spring Green',
-			'theme.palette.orange' => 'Asuka Orange',
-			'theme.palette.pink' => 'Sakura Pink',
-			'theme.brightness.system' => 'Follow system',
-			'theme.brightness.light' => 'Light',
-			'theme.brightness.dark' => 'Dark',
+			'core.language.title' => 'Language',
+			'core.language.selection' => 'App language',
+			'core.language.system' => 'Follow system',
+			'core.language.simplifiedChinese' => '简体中文',
+			'core.language.traditionalChinese' => '繁體中文',
+			'core.language.english' => 'English',
+			'core.language.saveFailed' => 'Unable to save language setting',
+			'core.theme.saveFailed' => 'Unable to save theme settings',
+			'core.theme.display' => 'Display',
+			'core.theme.languageAndText' => 'Language and text',
+			'core.theme.colorSetting' => 'Color theme',
+			'core.theme.brightnessSetting' => 'Light/Dark mode',
+			'core.theme.sizeTitle' => 'Font size',
+			'core.theme.weightTitle' => 'Font weight',
+			'core.theme.weight.thin' => 'Thin',
+			'core.theme.weight.regular' => 'Regular',
+			'core.theme.weight.medium' => 'Medium',
+			'core.theme.weight.semibold' => 'Semi bold',
+			'core.theme.weight.bold' => 'Bold',
+			'core.theme.palette.indigo' => 'Default',
+			'core.theme.palette.blue' => 'Sky Blue',
+			'core.theme.palette.deepPurple' => 'Deep Purple',
+			'core.theme.palette.green' => 'Spring Green',
+			'core.theme.palette.orange' => 'Asuka Orange',
+			'core.theme.palette.pink' => 'Sakura Pink',
+			'core.theme.brightness.system' => 'Follow system',
+			'core.theme.brightness.light' => 'Light',
+			'core.theme.brightness.dark' => 'Dark',
 			_ => null,
 		};
 	}

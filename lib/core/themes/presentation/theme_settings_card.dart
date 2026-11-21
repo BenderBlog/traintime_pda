@@ -32,7 +32,7 @@ class _ThemeSettingsCardState extends State<ThemeSettingsCard> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(context.t.theme.saveFailed)));
+            .showSnackBar(SnackBar(content: Text(context.t.core.theme.saveFailed)));
       }
     }
   }
@@ -43,7 +43,7 @@ class _ThemeSettingsCardState extends State<ThemeSettingsCard> {
     return SignalBuilder(
       builder: (context) {
         final settings = store.settings.value;
-        final strings = context.t.theme;
+        final strings = context.t.core.theme;
         const brightnessIcons = [
           MingCuteIcons.mgc_brightness_line,
           MingCuteIcons.mgc_sun_line,
