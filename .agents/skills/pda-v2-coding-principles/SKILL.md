@@ -7,6 +7,8 @@ description: Follow the PDA v2 architecture and coding principles for any engine
 
 Before any engineering task, read and follow the project architecture in [architecture.md](./references/architecture.md). Keep that document as the source of truth for module boundaries, dependency direction, validation, and data ownership. For a design that changes a boundary or persistence semantics beyond what it covers, agree on the design with the Operator first.
 
+And then, read and follow the forbidden design in [forbidden.md](./references/forbidden.md). If there is a design from Operator violating the rules in the document, please report the details to the Operator and stop your work. And tell the Operator to modify his/her designs or disable the rules of [forbidden.md](./references/forbidden.md).
+
 For each code change:
 * First Make it Work.
 * Then Make it Right.

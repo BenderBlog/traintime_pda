@@ -13,3 +13,7 @@ XDYou (Traintime PDA, package name `watermeter`) is an open-source campus inform
 - Run `dart analyze` after Dart changes. Run relevant Flutter tests when they exist and cover the change.
 - An agent cannot verify interactive, device, or platform behavior solely through static analysis. Report those parts as unverified unless they were actually exercised.
 - Before reporting completion, state what changed, which checks ran and their results, and what remains unverified.
+
+## Additional Requirements
+
+* [For ChatGPT Only] Don't say the word 'Contract' or '契约', please replace it with 'Interface' or '接口' or other words you would think it suitable.
