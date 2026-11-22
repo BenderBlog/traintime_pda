@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:catcher_2/catcher_2.dart';
-import 'package:watermeter/core/interfaces/logger_interface.dart';
+import 'package:watermeter/core/logging/logger_interface.dart';
 
 final class PDACatcher2Logger extends Catcher2Logger {
   PDACatcher2Logger(this._logger);

@@ -1,11 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:watermeter/core/interfaces/language_store_interface.dart';
-import 'package:watermeter/core/widgets/settings/choice_control.dart';
-import 'package:watermeter/core/widgets/settings/control_tile.dart';
-import 'package:watermeter/core/widgets/settings/section_scaffold.dart';
-import 'package:watermeter/core/widgets/settings/segmented_list.dart';
+import 'package:watermeter/core/languages/language_store_interface.dart';
+import 'package:watermeter/core/shared/widgets/settings/choice_control.dart';
+import 'package:watermeter/core/shared/widgets/settings/control_tile.dart';
+import 'package:watermeter/core/shared/widgets/settings/section_scaffold.dart';
+import 'package:watermeter/core/shared/widgets/settings/segmented_list.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class LanguageSettingsCard extends StatelessWidget {

@@ -4,19 +4,19 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/main.dart';
-import 'package:watermeter/core/interfaces/language_store_interface.dart';
+import 'package:watermeter/core/languages/language_store_interface.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
-import 'package:watermeter/core/interfaces/preference_store_interface.dart';
-import 'package:watermeter/core/interfaces/logger_interface.dart';
-import 'package:watermeter/core/interfaces/theme_store_interface.dart';
+import 'package:watermeter/core/preferences/preference_store_interface.dart';
+import 'package:watermeter/core/logging/logger_interface.dart';
+import 'package:watermeter/core/themes/theme_store_interface.dart';
 import 'package:watermeter/core/logging/talker_app_logger.dart';
 import 'package:watermeter/core/themes/data/preference_theme_store.dart';
 import 'package:watermeter/core/themes/presentation/theme_settings_card.dart';
-import 'package:watermeter/core/widgets/settings/choice_control.dart';
-import 'package:watermeter/core/widgets/settings/color_choices.dart';
-import 'package:watermeter/core/widgets/settings/segmented_list.dart';
-import 'package:watermeter/core/widgets/settings/slider_tile.dart';
+import 'package:watermeter/core/shared/widgets/settings/choice_control.dart';
+import 'package:watermeter/core/shared/widgets/settings/color_choices.dart';
+import 'package:watermeter/core/shared/widgets/settings/segmented_list.dart';
+import 'package:watermeter/core/shared/widgets/settings/slider_tile.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 void main() {

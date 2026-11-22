@@ -3,7 +3,7 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:m3e_core/m3e_core.dart';
-import 'package:watermeter/core/widgets/settings/control_tile.dart';
+import 'package:watermeter/core/shared/widgets/settings/control_tile.dart';
 
 class SettingSliderTile extends StatelessWidget {
   const SettingSliderTile({

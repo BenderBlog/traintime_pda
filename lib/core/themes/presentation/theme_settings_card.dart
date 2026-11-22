@@ -5,14 +5,14 @@ import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:watermeter/core/interfaces/theme_store_interface.dart';
+import 'package:watermeter/core/themes/theme_store_interface.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
-import 'package:watermeter/core/widgets/settings/choice_control.dart';
-import 'package:watermeter/core/widgets/settings/color_choices.dart';
-import 'package:watermeter/core/widgets/settings/control_tile.dart';
-import 'package:watermeter/core/widgets/settings/section_scaffold.dart';
-import 'package:watermeter/core/widgets/settings/segmented_list.dart';
-import 'package:watermeter/core/widgets/settings/slider_tile.dart';
+import 'package:watermeter/core/shared/widgets/settings/choice_control.dart';
+import 'package:watermeter/core/shared/widgets/settings/color_choices.dart';
+import 'package:watermeter/core/shared/widgets/settings/control_tile.dart';
+import 'package:watermeter/core/shared/widgets/settings/section_scaffold.dart';
+import 'package:watermeter/core/shared/widgets/settings/segmented_list.dart';
+import 'package:watermeter/core/shared/widgets/settings/slider_tile.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class ThemeSettingsCard extends StatefulWidget {

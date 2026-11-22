@@ -3,9 +3,9 @@
 
 import 'package:signals/signals.dart';
 
-import 'package:watermeter/core/interfaces/logger_interface.dart';
-import 'package:watermeter/core/interfaces/preference_store_interface.dart';
-import 'package:watermeter/core/interfaces/theme_store_interface.dart';
+import 'package:watermeter/core/logging/logger_interface.dart';
+import 'package:watermeter/core/preferences/preference_store_interface.dart';
+import 'package:watermeter/core/themes/theme_store_interface.dart';
 
 final class PreferenceThemeStore implements ThemeStoreInterface {
   PreferenceThemeStore(this._preferences, this._logger)

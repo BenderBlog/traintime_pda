@@ -1,6 +1,6 @@
 import 'package:signals/signals.dart';
-import 'package:watermeter/core/interfaces/language_store_interface.dart';
-import 'package:watermeter/core/interfaces/preference_store_interface.dart';
+import 'package:watermeter/core/languages/language_store_interface.dart';
+import 'package:watermeter/core/preferences/preference_store_interface.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 final class PreferenceLanguageStore implements LanguageStoreInterface {

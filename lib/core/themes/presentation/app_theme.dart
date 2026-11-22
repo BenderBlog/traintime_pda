@@ -3,7 +3,7 @@
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:watermeter/core/interfaces/theme_store_interface.dart';
+import 'package:watermeter/core/themes/theme_store_interface.dart';
 
 final class AppTheme {
   static Color paletteColor(ThemePalette palette) =>

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:watermeter/core/widgets/settings/header.dart';
+import 'package:watermeter/core/shared/widgets/settings/header.dart';
 
 class SectionSettingScaffold extends StatelessWidget {
   final String? title;

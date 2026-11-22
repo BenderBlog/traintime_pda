@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:watermeter/core/interfaces/language_store_interface.dart';
-import 'package:watermeter/core/interfaces/preference_store_interface.dart';
+import 'package:watermeter/core/languages/language_store_interface.dart';
+import 'package:watermeter/core/preferences/preference_store_interface.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/languages/presentation/language_settings_card.dart';
 import 'package:watermeter/generated/translations.g.dart';

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:watermeter/core/interfaces/logger_interface.dart';
+import 'package:watermeter/core/logging/logger_interface.dart';
 
 final class TalkerAppLogger implements LoggerInterface {
   const TalkerAppLogger(this.talker);
