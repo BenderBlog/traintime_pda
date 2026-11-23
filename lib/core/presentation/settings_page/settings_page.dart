@@ -4,13 +4,16 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:watermeter/core/presentation/app_shell/app_shell_page_interface.dart';
+import 'package:watermeter/core/presentation/settings_page/settings_page_section_interface.dart';
 import 'package:watermeter/core/shared/const.dart' show sheetMaxWidth;
+import 'package:watermeter/core/shared/widgets/settings/section_scaffold.dart';
+import 'package:watermeter/core/shared/widgets/settings/segmented_list.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class SettingsPage extends StatelessWidget implements AppShellPageInterface {
   const SettingsPage({super.key, required this.sections});
 
-  final List<Widget> sections;
+  final List<SettingsPageSectionInterface> sections;
 
   @override
   String label(BuildContext context) => context.t.settings.title;
@@ -38,7 +41,14 @@ class SettingsPage extends StatelessWidget implements AppShellPageInterface {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           physics: const ClampingScrollPhysics(),
-          children: sections,
+          children: [
+            for (final sec in sections)
+              SectionSettingScaffold(
+                title: sec.title(),
+                icon: sec.icon(),
+                items: SettingSegmentedList(items: sec.items(context)),
+              ),
+          ],
         ),
       ),
     ),

@@ -154,9 +154,7 @@ class MyApp extends StatelessWidget {
                 ],
                 preferences: gridPreferences,
               ),
-              const SettingsPage(
-                sections: [ThemeSettingsCard(), LanguageSettingsCard()],
-              ),
+              SettingsPage(sections: settingsSections),
             ],
           ),
           debugShowCheckedModeBanner: false,
