@@ -3,3 +3,5 @@ confirm: 確認
 cancel: 取消
 unexpect_problem_title: 一個小問題 :P
 unexpect_problem_hint: 這裡有一個沒有被預料的問題發生了！
+error_detected: Ouch! 發生錯誤啦
+click_to_refresh: 點我刷新

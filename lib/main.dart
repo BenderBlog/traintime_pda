@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'package:catcher_2/catcher_2.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -20,12 +19,12 @@ import 'package:watermeter/core/languages/presentation/language_settings_card.da
 import 'package:watermeter/core/preferences/data/shared_preference_store.dart';
 import 'package:watermeter/core/preferences/preference_store_interface.dart';
 import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
-import 'package:watermeter/core/presentation/app_shell/app_shell_page_interface.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page_card_interface.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
 import 'package:watermeter/core/themes/data/preference_theme_store.dart';
 import 'package:watermeter/core/themes/presentation/theme_settings_card.dart';
+import 'package:watermeter/core/presentation/settings_page/settings_page.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 void main() {
@@ -155,7 +154,9 @@ class MyApp extends StatelessWidget {
                 ],
                 preferences: gridPreferences,
               ),
-              const MyHomePage(title: 'XDYou'),
+              const SettingsPage(
+                sections: [ThemeSettingsCard(), LanguageSettingsCard()],
+              ),
             ],
           ),
           debugShowCheckedModeBanner: false,
@@ -186,69 +187,4 @@ class _PlaceholderGridCard implements GridPageCardInterface {
       Center(child: Text(id)),
     ],
   );
-}
-
-class MyHomePage extends StatefulWidget implements AppShellPageInterface {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  String label(BuildContext context) => context.t.core.theme.display;
-
-  @override
-  Widget icon(BuildContext context) =>
-      const Icon(MingCuteIcons.mgc_user_2_line);
-
-  @override
-  Widget selectedIcon(BuildContext context) =>
-      const Icon(MingCuteIcons.mgc_user_2_fill);
-
-  @override
-  Widget buildPage(BuildContext context) => this;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 12.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: .center,
-            children: [
-              const Text('You have pushed the button this many times:'),
-              Text(
-                '$_counter',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              ThemeSettingsCard(),
-              LanguageSettingsCard(),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
 }

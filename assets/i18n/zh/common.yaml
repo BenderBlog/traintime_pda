@@ -2,3 +2,5 @@ confirm: 确认
 cancel: 取消
 unexpect_problem_title: 一个小问题 :P
 unexpect_problem_hint: 这里有一个没有被预料的问题发生了！
+error_detected: Ouch! 发生错误啦
+click_to_refresh: 点我刷新

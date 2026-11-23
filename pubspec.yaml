@@ -53,6 +53,9 @@ dependencies:
   # Database ORM
   drift: ^2.35.4
   drift_flutter: ^0.3.1
+  url_launcher: ^6.3.3
+  cached_network_image: ^4.0.7
+  styled_widget: ^0.4.1
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +71,8 @@ dev_dependencies:
   path: ^1.9.1
   build: ^4.0.11
   glob: ^2.2.0
+  # Application version generator reads pubspec.yaml
+  yaml: ^3.1.4
 
 flutter_launcher_icons:
   # Android launcher icons are maintained in android/app/src/main/res.
@@ -86,3 +91,6 @@ flutter:
     - assets/icon.png
     - assets/Icon-App-iTunes-Background.png
     - assets/Icon-App-iTunes.png
+    - assets/art/noel_0.jpg
+    - assets/art/noel_1.jpg
+    - assets/art/noel_2.jpg

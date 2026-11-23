@@ -1,3 +1,6 @@
+// Copyright 2026 Hazuki Keatsu
+// SPDX-License-Identifier: MPL-2.0
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -8,6 +11,7 @@ import 'package:watermeter/main.dart';
 import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
+import 'package:watermeter/core/languages/presentation/language_settings_card.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
 import 'package:watermeter/core/preferences/preference_store_interface.dart';
@@ -154,6 +158,7 @@ void main() {
   testWidgets('MaterialApp follows theme changes', (tester) async {
     LocaleSettings.setLocaleSync(AppLocale.zh);
     final languageStore = PreferenceLanguageStore(_MemoryPreferences());
+    await languageStore.setLanguage(AppLanguage.simplifiedChinese);
     final ThemeStoreInterface store = PreferenceThemeStore(
       _MemoryPreferences(),
       _RecordingLogger(),
@@ -183,6 +188,14 @@ void main() {
     expect(find.byIcon(Icons.school_outlined), findsOneWidget);
     expect(find.byIcon(MingCuteIcons.mgc_user_2_fill), findsOneWidget);
     expect(find.byType(ThemeSettingsCard), findsOneWidget);
+    expect(find.text('设置'), findsWidgets);
+    expect(
+      find.text('You have pushed the button this many times:'),
+      findsNothing,
+    );
+    await tester.drag(find.byType(ListView), const Offset(0, -600));
+    await tester.pumpAndSettle();
+    expect(find.byType(LanguageSettingsCard), findsOneWidget);
 
     await store.setPalette(ThemePalette.green);
     await store.setBrightness(ThemeBrightness.dark);

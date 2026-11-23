@@ -19,6 +19,10 @@ targets:
         enabled: true
         generate_for:
           - pubspec.yaml # 当 pubspec.yaml 改变时触发
+      watermeter|application_version:
+        enabled: true
+        generate_for:
+          - pubspec.yaml # 版本号变化时重新生成
 
 builders:
   score_hashes:
@@ -31,3 +35,12 @@ builders:
     build_to: source
     required_inputs: # 声明需要的资源文件
       - assets/experiment_score/scores/**
+
+  application_version:
+    import: "tools/generators/application_version_generator.dart"
+    builder_factories: ["applicationVersionBuilder"]
+    build_extensions:
+      pubspec.yaml: # 输入：pubspec.yaml（触发器）
+        - lib/generated/application_version.g.dart # 输出：版本常量
+    auto_apply: root_package
+    build_to: source

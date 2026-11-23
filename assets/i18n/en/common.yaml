@@ -2,3 +2,5 @@ confirm: Confirm
 cancel: Cancel
 unexpect_problem_title: Unexpected problem :P
 unexpect_problem_hint: An unexpected behavior occurred!
+error_detected: Ouch! An error occurred!
+click_to_refresh: Click to refresh

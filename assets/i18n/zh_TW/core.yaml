@@ -32,7 +32,6 @@ theme:
     system: 跟隨系統
     light: 淺色
     dark: 深色
-
 grid_page:
   label: 校園信息
   title: 校園信息查詢
