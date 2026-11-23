@@ -6,25 +6,29 @@ import 'dart:async';
 import 'package:catcher_2/catcher_2.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:pda_network/pda_network.dart';
+import 'package:pda_repository/pda_repository.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/core/logging/logger_interface.dart';
+import 'package:watermeter/features/settings/presentation/groups/about_section.dart';
+import 'package:watermeter/features/update/update.dart';
 import 'package:watermeter/integration/database/xdyou_database.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
 import 'package:watermeter/core/themes/theme_store_interface.dart';
 import 'package:watermeter/core/logging/talker_app_logger.dart';
 import 'package:watermeter/core/logging/talker_report_handler.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
-import 'package:watermeter/core/languages/presentation/language_settings_card.dart';
 import 'package:watermeter/core/preferences/data/shared_preference_store.dart';
 import 'package:watermeter/core/preferences/preference_store_interface.dart';
 import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page_card_interface.dart';
+import 'package:watermeter/core/presentation/settings_page/settings_page_section_interface.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
 import 'package:watermeter/core/themes/data/preference_theme_store.dart';
-import 'package:watermeter/core/themes/presentation/theme_settings_card.dart';
 import 'package:watermeter/core/presentation/settings_page/settings_page.dart';
+import 'package:watermeter/generated/application_version.g.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 void main() {
@@ -74,6 +78,7 @@ void main() {
 
 Future<void> _startApp(LoggerInterface logger) async {
   final database = XDYouDatabase();
+  final network = DioUpdateRepository();
   try {
     await database.customSelect('SELECT 1').get();
     final themePreferences = await SharedPreferenceStore.forOwner('theme');
@@ -81,6 +86,10 @@ Future<void> _startApp(LoggerInterface logger) async {
       'language',
     );
     final gridPreferences = await SharedPreferenceStore.forOwner('grid_page');
+    final updateFeature = UpdateFeature(
+      network,
+      localVersion: kApplicationVersion,
+    );
     runApp(
       TranslationProvider(
         child: MultiProvider(
@@ -91,6 +100,14 @@ Future<void> _startApp(LoggerInterface logger) async {
               dispose: (_, database) => unawaited(database.close()),
             ),
             Provider<LoggerInterface>.value(value: logger),
+            Provider<UpdateRepository>(
+              lazy: false,
+              create: (_) => network,
+              dispose: (_, _) {
+                updateFeature.dispose();
+                network.close();
+              },
+            ),
             Provider<LanguageStoreInterface>.value(
               value: PreferenceLanguageStore(languagePreferences),
               updateShouldNotify: (_, _) => false,
@@ -103,20 +120,33 @@ Future<void> _startApp(LoggerInterface logger) async {
               dispose: (_, store) => store.dispose(),
             ),
           ],
-          child: MyApp(gridPreferences: gridPreferences),
+          child: MyApp(
+            gridPreferences: gridPreferences,
+            headers: [updateFeature.card],
+            settingsSections: [AboutSection(), updateFeature.section],
+          ),
         ),
       ),
     );
+    unawaited(updateFeature.start());
   } catch (_) {
+    network.close();
     await database.close();
     rethrow;
   }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.gridPreferences});
+  const MyApp({
+    super.key,
+    required this.gridPreferences,
+    required this.headers,
+    required this.settingsSections,
+  });
 
   final PreferenceStoreInterface gridPreferences;
+  final List<GridPageCardInterface> headers;
+  final List<SettingsPageSectionInterface> settingsSections;
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +176,7 @@ class MyApp extends StatelessWidget {
                   selectedIcon: Icon(Icons.school),
                 ),
                 navigationLabel: context.t.core.gridPage.label,
+                headers: headers,
                 cards: const [
                   _PlaceholderGridCard('wide_1', 4),
                   _PlaceholderGridCard('wide_2', 4),

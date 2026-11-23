@@ -10,10 +10,6 @@ dependencies:
   # State Management
   signals: ^7.1.0
   provider: ^6.1.5
-  # Network
-  dio: ^5.0.0
-  synchronized: ^3.1.0+1
-  pool: ^1.5.2
   # Cookie Storage
   dio_cookie_manager: ^3.0.0
   cookie_jar: ^4.0.3
@@ -56,6 +52,11 @@ dependencies:
   url_launcher: ^6.3.3
   cached_network_image: ^4.0.7
   styled_widget: ^0.4.1
+  # Network backend
+  pda_network:
+    path: packages/pda_network
+  pda_repository:
+    path: packages/pda_repository
 
 dev_dependencies:
   flutter_test:
