@@ -26,9 +26,10 @@ import 'package:watermeter/page/public_widget/public_widget.dart';
 double classTableBlockUnit(
   BuildContext context,
   double available, {
+  bool fitFullDay = false,
   double minimumUnit = 0,
 }) => math.max(
-  (available - midRowHeight) / (isPhone(context) ? 48 : 61),
+  (available - midRowHeight) / (isPhone(context) && !fitFullDay ? 48 : 61),
   minimumUnit,
 );
 
