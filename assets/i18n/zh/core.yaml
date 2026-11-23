@@ -32,3 +32,12 @@ theme:
     system: 跟随系统
     light: 浅色
     dark: 深色
+
+grid_page:
+  label: 校园信息
+  title: 校园信息查询
+  edit_mode: 编辑布局
+  edit_done: 完成
+  edit_reset: 恢复默认布局
+  manage_hidden: 管理隐藏卡片
+  hide_empty: 没有隐藏的卡片

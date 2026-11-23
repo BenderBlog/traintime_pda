@@ -97,7 +97,7 @@ void main() {
     expect(tester.getSize(find.byType(PageView)).width, 364);
     final divider = tester.getRect(find.byType(VerticalDivider));
     final drag = await tester.startGesture(
-      Offset(divider.center.dx + 10, divider.center.dy),
+      divider.center,
     );
     await drag.moveBy(const Offset(80, 0));
     await drag.up();

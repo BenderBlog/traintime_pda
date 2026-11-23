@@ -1,9 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/main.dart';
+import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
+import 'package:watermeter/core/shared/layouts/grid_page/grid_page.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
@@ -162,7 +165,7 @@ void main() {
             Provider<ThemeStoreInterface>.value(value: store),
             Provider<LanguageStoreInterface>.value(value: languageStore),
           ],
-          child: const MyApp(),
+          child: MyApp(gridPreferences: _MemoryPreferences()),
         ),
       ),
     );
@@ -170,6 +173,16 @@ void main() {
       tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
       ThemeMode.system,
     );
+    expect(find.byType(AppShell), findsOneWidget);
+    expect(find.byType(GridPage), findsOneWidget);
+    expect(find.byType(Placeholder), findsNWidgets(4));
+    expect(find.text('wide_1'), findsOneWidget);
+    expect(find.byIcon(Icons.school), findsOneWidget);
+    await tester.tap(find.byIcon(MingCuteIcons.mgc_user_2_line));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.school_outlined), findsOneWidget);
+    expect(find.byIcon(MingCuteIcons.mgc_user_2_fill), findsOneWidget);
+    expect(find.byType(ThemeSettingsCard), findsOneWidget);
 
     await store.setPalette(ThemePalette.green);
     await store.setBrightness(ThemeBrightness.dark);
@@ -200,6 +213,8 @@ void main() {
     );
 
     expect(find.byType(SettingSegmentedList), findsNWidgets(2));
+    expect(find.byIcon(MingCuteIcons.mgc_palette_line), findsOneWidget);
+    expect(find.byIcon(MingCuteIcons.mgc_brightness_line), findsWidgets);
     expect(find.byType(SettingColorChoices<ThemePalette>), findsOneWidget);
     expect(find.byType(SettingChoiceControl<ThemeBrightness>), findsOneWidget);
     expect(find.byType(SettingSliderTile), findsNWidgets(2));

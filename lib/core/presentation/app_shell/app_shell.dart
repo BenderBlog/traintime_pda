@@ -64,7 +64,7 @@ class AppShellState extends State<AppShell> {
   /// 
   /// This is the difference from the v1.0 design. The origin dividerHitWidth is 1, 
   /// so that it is very hard to drag the divider in v1.0.
-  static const double _dividerHitWidth = 24;
+  static const double _dividerHitWidth = 12;
 
   final _detailKey = GlobalKey<NavigatorState>();
   final _masterKey = GlobalKey();

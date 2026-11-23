@@ -32,3 +32,12 @@ theme:
     system: Follow system
     light: Light
     dark: Dark
+
+grid_page:
+  label: Info
+  title: School Info Center
+  edit_mode: Edit Layout
+  edit_done: Done
+  edit_reset: Reset Layout
+  manage_hidden: Manage hidden cards
+  hide_empty: No hidden cards

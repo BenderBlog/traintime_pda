@@ -75,6 +75,7 @@ class Translations$core$zh {
 	// Translations
 	late final Translations$core$language$zh language = Translations$core$language$zh.internal(_root);
 	late final Translations$core$theme$zh theme = Translations$core$theme$zh.internal(_root);
+	late final Translations$core$gridPage$zh gridPage = Translations$core$gridPage$zh.internal(_root);
 }
 
 // Path: core.language
@@ -121,8 +122,8 @@ class Translations$core$theme$zh {
 	/// zh: '显示'
 	String get display => '显示';
 
-	/// zh: '语言和文字'
-	String get languageAndText => '语言和文字';
+	/// zh: '文字'
+	String get languageAndText => '文字';
 
 	/// zh: '颜色设置'
 	String get colorSetting => '颜色设置';
@@ -139,6 +140,36 @@ class Translations$core$theme$zh {
 	late final Translations$core$theme$weight$zh weight = Translations$core$theme$weight$zh.internal(_root);
 	late final Translations$core$theme$palette$zh palette = Translations$core$theme$palette$zh.internal(_root);
 	late final Translations$core$theme$brightness$zh brightness = Translations$core$theme$brightness$zh.internal(_root);
+}
+
+// Path: core.gridPage
+class Translations$core$gridPage$zh {
+	Translations$core$gridPage$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '校园信息'
+	String get label => '校园信息';
+
+	/// zh: '校园信息查询'
+	String get title => '校园信息查询';
+
+	/// zh: '编辑布局'
+	String get editMode => '编辑布局';
+
+	/// zh: '完成'
+	String get editDone => '完成';
+
+	/// zh: '恢复默认布局'
+	String get editReset => '恢复默认布局';
+
+	/// zh: '管理隐藏卡片'
+	String get manageHidden => '管理隐藏卡片';
+
+	/// zh: '没有隐藏的卡片'
+	String get hideEmpty => '没有隐藏的卡片';
 }
 
 // Path: core.theme.weight
@@ -231,7 +262,7 @@ extension on Translations {
 			'core.language.saveFailed' => '无法保存语言设置',
 			'core.theme.saveFailed' => '无法保存主题设置',
 			'core.theme.display' => '显示',
-			'core.theme.languageAndText' => '语言和文字',
+			'core.theme.languageAndText' => '文字',
 			'core.theme.colorSetting' => '颜色设置',
 			'core.theme.brightnessSetting' => '深浅色模式',
 			'core.theme.sizeTitle' => '字体大小',
@@ -250,6 +281,13 @@ extension on Translations {
 			'core.theme.brightness.system' => '跟随系统',
 			'core.theme.brightness.light' => '浅色',
 			'core.theme.brightness.dark' => '深色',
+			'core.gridPage.label' => '校园信息',
+			'core.gridPage.title' => '校园信息查询',
+			'core.gridPage.editMode' => '编辑布局',
+			'core.gridPage.editDone' => '完成',
+			'core.gridPage.editReset' => '恢复默认布局',
+			'core.gridPage.manageHidden' => '管理隐藏卡片',
+			'core.gridPage.hideEmpty' => '没有隐藏的卡片',
 			_ => null,
 		};
 	}

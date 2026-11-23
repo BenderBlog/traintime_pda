@@ -32,3 +32,12 @@ theme:
     system: 跟隨系統
     light: 淺色
     dark: 深色
+
+grid_page:
+  label: 校園信息
+  title: 校園信息查詢
+  edit_mode: 編輯佈局
+  edit_done: 完成
+  edit_reset: 恢復默認佈局
+  manage_hidden: 管理隱藏卡片
+  hide_empty: 沒有隱藏的卡片

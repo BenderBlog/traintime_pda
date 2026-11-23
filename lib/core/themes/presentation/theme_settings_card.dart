@@ -56,7 +56,7 @@ class _ThemeSettingsCardState extends State<ThemeSettingsCard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SectionSettingScaffold(
-              icon: Icons.color_lens,
+              icon: MingCuteIcons.mgc_palette_line,
               title: strings.display,
               items: SettingSegmentedList(
                 items: [

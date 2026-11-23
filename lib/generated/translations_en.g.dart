@@ -65,6 +65,7 @@ class _Translations$core$en extends Translations$core$zh {
 	// Translations
 	@override late final _Translations$core$language$en language = _Translations$core$language$en._(_root);
 	@override late final _Translations$core$theme$en theme = _Translations$core$theme$en._(_root);
+	@override late final _Translations$core$gridPage$en gridPage = _Translations$core$gridPage$en._(_root);
 }
 
 // Path: core.language
@@ -92,7 +93,7 @@ class _Translations$core$theme$en extends Translations$core$theme$zh {
 	// Translations
 	@override String get saveFailed => 'Unable to save theme settings';
 	@override String get display => 'Display';
-	@override String get languageAndText => 'Language and text';
+	@override String get languageAndText => 'Text';
 	@override String get colorSetting => 'Color theme';
 	@override String get brightnessSetting => 'Light/Dark mode';
 	@override String get sizeTitle => 'Font size';
@@ -100,6 +101,22 @@ class _Translations$core$theme$en extends Translations$core$theme$zh {
 	@override late final _Translations$core$theme$weight$en weight = _Translations$core$theme$weight$en._(_root);
 	@override late final _Translations$core$theme$palette$en palette = _Translations$core$theme$palette$en._(_root);
 	@override late final _Translations$core$theme$brightness$en brightness = _Translations$core$theme$brightness$en._(_root);
+}
+
+// Path: core.gridPage
+class _Translations$core$gridPage$en extends Translations$core$gridPage$zh {
+	_Translations$core$gridPage$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Info';
+	@override String get title => 'School Info Center';
+	@override String get editMode => 'Edit Layout';
+	@override String get editDone => 'Done';
+	@override String get editReset => 'Reset Layout';
+	@override String get manageHidden => 'Manage hidden cards';
+	@override String get hideEmpty => 'No hidden cards';
 }
 
 // Path: core.theme.weight
@@ -164,7 +181,7 @@ extension on TranslationsEn {
 			'core.language.saveFailed' => 'Unable to save language setting',
 			'core.theme.saveFailed' => 'Unable to save theme settings',
 			'core.theme.display' => 'Display',
-			'core.theme.languageAndText' => 'Language and text',
+			'core.theme.languageAndText' => 'Text',
 			'core.theme.colorSetting' => 'Color theme',
 			'core.theme.brightnessSetting' => 'Light/Dark mode',
 			'core.theme.sizeTitle' => 'Font size',
@@ -183,6 +200,13 @@ extension on TranslationsEn {
 			'core.theme.brightness.system' => 'Follow system',
 			'core.theme.brightness.light' => 'Light',
 			'core.theme.brightness.dark' => 'Dark',
+			'core.gridPage.label' => 'Info',
+			'core.gridPage.title' => 'School Info Center',
+			'core.gridPage.editMode' => 'Edit Layout',
+			'core.gridPage.editDone' => 'Done',
+			'core.gridPage.editReset' => 'Reset Layout',
+			'core.gridPage.manageHidden' => 'Manage hidden cards',
+			'core.gridPage.hideEmpty' => 'No hidden cards',
 			_ => null,
 		};
 	}

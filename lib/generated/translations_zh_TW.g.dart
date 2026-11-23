@@ -65,6 +65,7 @@ class _Translations$core$zh_TW extends Translations$core$zh {
 	// Translations
 	@override late final _Translations$core$language$zh_TW language = _Translations$core$language$zh_TW._(_root);
 	@override late final _Translations$core$theme$zh_TW theme = _Translations$core$theme$zh_TW._(_root);
+	@override late final _Translations$core$gridPage$zh_TW gridPage = _Translations$core$gridPage$zh_TW._(_root);
 }
 
 // Path: core.language
@@ -92,7 +93,7 @@ class _Translations$core$theme$zh_TW extends Translations$core$theme$zh {
 	// Translations
 	@override String get saveFailed => '無法保存主題設置';
 	@override String get display => '顯示';
-	@override String get languageAndText => '語言和文字';
+	@override String get languageAndText => '文字';
 	@override String get colorSetting => '顏色設置';
 	@override String get brightnessSetting => '深淺色模式';
 	@override String get sizeTitle => '字體大小';
@@ -100,6 +101,22 @@ class _Translations$core$theme$zh_TW extends Translations$core$theme$zh {
 	@override late final _Translations$core$theme$weight$zh_TW weight = _Translations$core$theme$weight$zh_TW._(_root);
 	@override late final _Translations$core$theme$palette$zh_TW palette = _Translations$core$theme$palette$zh_TW._(_root);
 	@override late final _Translations$core$theme$brightness$zh_TW brightness = _Translations$core$theme$brightness$zh_TW._(_root);
+}
+
+// Path: core.gridPage
+class _Translations$core$gridPage$zh_TW extends Translations$core$gridPage$zh {
+	_Translations$core$gridPage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => '校園信息';
+	@override String get title => '校園信息查詢';
+	@override String get editMode => '編輯佈局';
+	@override String get editDone => '完成';
+	@override String get editReset => '恢復默認佈局';
+	@override String get manageHidden => '管理隱藏卡片';
+	@override String get hideEmpty => '沒有隱藏的卡片';
 }
 
 // Path: core.theme.weight
@@ -164,7 +181,7 @@ extension on TranslationsZhTw {
 			'core.language.saveFailed' => '無法保存語言設置',
 			'core.theme.saveFailed' => '無法保存主題設置',
 			'core.theme.display' => '顯示',
-			'core.theme.languageAndText' => '語言和文字',
+			'core.theme.languageAndText' => '文字',
 			'core.theme.colorSetting' => '顏色設置',
 			'core.theme.brightnessSetting' => '深淺色模式',
 			'core.theme.sizeTitle' => '字體大小',
@@ -183,6 +200,13 @@ extension on TranslationsZhTw {
 			'core.theme.brightness.system' => '跟隨系統',
 			'core.theme.brightness.light' => '淺色',
 			'core.theme.brightness.dark' => '深色',
+			'core.gridPage.label' => '校園信息',
+			'core.gridPage.title' => '校園信息查詢',
+			'core.gridPage.editMode' => '編輯佈局',
+			'core.gridPage.editDone' => '完成',
+			'core.gridPage.editReset' => '恢復默認佈局',
+			'core.gridPage.manageHidden' => '管理隱藏卡片',
+			'core.gridPage.hideEmpty' => '沒有隱藏的卡片',
 			_ => null,
 		};
 	}

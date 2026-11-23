@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:catcher_2/catcher_2.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -17,6 +18,11 @@ import 'package:watermeter/core/logging/talker_report_handler.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/languages/presentation/language_settings_card.dart';
 import 'package:watermeter/core/preferences/data/shared_preference_store.dart';
+import 'package:watermeter/core/preferences/preference_store_interface.dart';
+import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
+import 'package:watermeter/core/presentation/app_shell/app_shell_page_interface.dart';
+import 'package:watermeter/core/shared/layouts/grid_page/grid_page.dart';
+import 'package:watermeter/core/shared/layouts/grid_page/grid_page_card_interface.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
 import 'package:watermeter/core/themes/data/preference_theme_store.dart';
 import 'package:watermeter/core/themes/presentation/theme_settings_card.dart';
@@ -75,6 +81,7 @@ Future<void> _startApp(LoggerInterface logger) async {
     final languagePreferences = await SharedPreferenceStore.forOwner(
       'language',
     );
+    final gridPreferences = await SharedPreferenceStore.forOwner('grid_page');
     runApp(
       TranslationProvider(
         child: MultiProvider(
@@ -97,7 +104,7 @@ Future<void> _startApp(LoggerInterface logger) async {
               dispose: (_, store) => store.dispose(),
             ),
           ],
-          child: const MyApp(),
+          child: MyApp(gridPreferences: gridPreferences),
         ),
       ),
     );
@@ -108,7 +115,9 @@ Future<void> _startApp(LoggerInterface logger) async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.gridPreferences});
+
+  final PreferenceStoreInterface gridPreferences;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +139,25 @@ class MyApp extends StatelessWidget {
                 .copyWith(textScaler: TextScaler.linear(settings.fontScale)),
             child: child!,
           ),
-          home: const MyHomePage(title: 'XDYou'),
+          home: AppShell(
+            pages: [
+              GridPage(
+                icons: const GridPageIcons(
+                  icon: Icon(Icons.school_outlined),
+                  selectedIcon: Icon(Icons.school),
+                ),
+                navigationLabel: context.t.core.gridPage.label,
+                cards: const [
+                  _PlaceholderGridCard('wide_1', 4),
+                  _PlaceholderGridCard('wide_2', 4),
+                  _PlaceholderGridCard('small_1', 1),
+                  _PlaceholderGridCard('small_2', 1),
+                ],
+                preferences: gridPreferences,
+              ),
+              const MyHomePage(title: 'XDYou'),
+            ],
+          ),
           debugShowCheckedModeBanner: false,
         );
       },
@@ -138,10 +165,47 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class _PlaceholderGridCard implements GridPageCardInterface {
+  const _PlaceholderGridCard(this.id, this._flex);
+
+  @override
+  final String id;
+  final int _flex;
+
+  @override
+  int flex() => _flex;
+
+  @override
+  String title(BuildContext context) => id;
+
+  @override
+  Widget buildCard(BuildContext context, bool editMode) => Stack(
+    fit: StackFit.expand,
+    children: [
+      const Placeholder(),
+      Center(child: Text(id)),
+    ],
+  );
+}
+
+class MyHomePage extends StatefulWidget implements AppShellPageInterface {
   const MyHomePage({super.key, required this.title});
 
   final String title;
+
+  @override
+  String label(BuildContext context) => context.t.core.theme.display;
+
+  @override
+  Widget icon(BuildContext context) =>
+      const Icon(MingCuteIcons.mgc_user_2_line);
+
+  @override
+  Widget selectedIcon(BuildContext context) =>
+      const Icon(MingCuteIcons.mgc_user_2_fill);
+
+  @override
+  Widget buildPage(BuildContext context) => this;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
