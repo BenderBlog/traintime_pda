@@ -1,0 +1,7 @@
+name: pda_repository
+description: Pure Dart data interfaces for XDYou backend services.
+version: 0.1.0
+publish_to: "none"
+
+environment:
+  sdk: ^3.13.0
