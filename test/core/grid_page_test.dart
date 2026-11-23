@@ -1,8 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:watermeter/core/preferences/preference_store_interface.dart';
-import 'package:watermeter/core/shared/layouts/grid_page/grid_page.dart';
-import 'package:watermeter/core/shared/layouts/grid_page/grid_page_card_interface.dart';
+import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
+import 'package:watermeter/core/presentation/grid_page/grid_page_card_interface.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 class _Preferences implements PreferenceStoreInterface {

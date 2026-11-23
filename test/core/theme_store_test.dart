@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/main.dart';
 import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
-import 'package:watermeter/core/shared/layouts/grid_page/grid_page.dart';
+import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
