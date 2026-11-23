@@ -1,0 +1,16 @@
+name: pda_network
+description: Network repository implementations for XDYou backend services.
+version: 0.1.0
+publish_to: "none"
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  dio: ^5.0.0
+  pda_repository:
+    path: ../pda_repository
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
