@@ -1,11 +1,12 @@
 // Copyright 2026 Hazuki Keatsu
 // SPDX-License-Identifier: MPL-2.0
 
+import 'package:material_ui/material_ui.dart';
 import 'package:pda_repository/pda_repository.dart';
+import 'package:watermeter/features/update/presentation/update_tile.dart';
 
 import 'application/update_checker.dart';
 import 'presentation/update_card.dart';
-import 'presentation/update_section.dart';
 
 final class UpdateFeature {
   UpdateFeature(UpdateRepository repository, {required String localVersion})
@@ -14,7 +15,7 @@ final class UpdateFeature {
   final UpdateChecker _checker;
 
   UpdateCard get card => UpdateCard(_checker);
-  UpdateSection get section => UpdateSection(_checker);
+  ListTile tile(BuildContext context) => updateTile(context, _checker);
 
   Future<void> start() async => await _checker.check();
 

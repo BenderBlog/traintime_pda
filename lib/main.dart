@@ -5,13 +5,14 @@ import 'dart:async';
 
 import 'package:catcher_2/catcher_2.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:pda_network/pda_network.dart';
 import 'package:pda_repository/pda_repository.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/core/logging/logger_interface.dart';
-import 'package:watermeter/features/settings/presentation/groups/about_section.dart';
+import 'package:watermeter/features/settings/presentation/about_page/about_page.dart';
 import 'package:watermeter/features/update/update.dart';
 import 'package:watermeter/integration/database/xdyou_database.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
@@ -123,7 +124,7 @@ Future<void> _startApp(LoggerInterface logger) async {
           child: MyApp(
             gridPreferences: gridPreferences,
             headers: [updateFeature.card],
-            settingsSections: [AboutSection(), updateFeature.section],
+            settingsSections: [_AboutSection(updateFeature.tile)],
           ),
         ),
       ),
@@ -216,4 +217,32 @@ class _PlaceholderGridCard implements GridPageCardInterface {
       Center(child: Text(id)),
     ],
   );
+}
+
+class _AboutSection implements SettingsPageSectionInterface {
+  const _AboutSection(this.updateTile);
+
+  final SettingsPageSectionEntry Function(BuildContext) updateTile;
+
+  @override
+  IconData? icon() => null;
+
+  @override
+  List<SettingsPageSectionEntry> items(BuildContext context) => <ListTile>[
+    ListTile(
+      leading: const Icon(MingCuteIcons.mgc_information_line),
+      title: Text(context.t.settings.aboutThisProgram),
+      subtitle: Text(
+        context.t.settings.version(
+          version: "$kApplicationVersion + $kApplicationBuildNumber",
+        ),
+      ),
+      trailing: const Icon(Icons.navigate_next),
+      onTap: () => AppShell.of(context).pushDetail(AboutPage()),
+    ),
+    updateTile(context),
+  ];
+
+  @override
+  String? title() => null;
 }

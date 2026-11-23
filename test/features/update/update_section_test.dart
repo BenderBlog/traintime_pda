@@ -6,7 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pda_repository/pda_repository.dart';
 import 'package:watermeter/features/update/application/update_checker.dart';
 import 'package:watermeter/features/update/presentation/update_card.dart';
-import 'package:watermeter/features/update/presentation/update_section.dart';
+import 'package:watermeter/features/update/presentation/update_tile.dart';
 import 'package:watermeter/features/update/update.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -24,7 +24,7 @@ void main() {
               builder: (context) => ListView(
                 children: [
                   feature.card.buildCard(context, false),
-                  ...feature.section.items(context),
+                  feature.tile(context),
                 ],
               ),
             ),
@@ -53,7 +53,7 @@ void main() {
               builder: (context) => ListView(
                 children: [
                   UpdateCard(checker).buildCard(context, false),
-                  ...UpdateSection(checker).items(context),
+                  updateTile(context, checker),
                 ],
               ),
             ),
@@ -79,7 +79,7 @@ void main() {
           home: Scaffold(
             body: Builder(
               builder: (context) =>
-                  ListView(children: UpdateSection(checker).items(context)),
+                  ListView(children: [updateTile(context, checker)]),
             ),
           ),
         ),

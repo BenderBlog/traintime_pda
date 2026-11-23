@@ -178,7 +178,7 @@ void main() {
           child: MyApp(
             gridPreferences: _MemoryPreferences(),
             headers: [updateFeature.card],
-            settingsSections: [updateFeature.section],
+            settingsSections: const [],
           ),
         ),
       ),
