@@ -51,21 +51,90 @@ class _Card implements GridPageCardInterface {
   Widget buildCard(BuildContext context, bool editMode) => Text(id);
 }
 
+class _ModeCard extends _Card {
+  _ModeCard(super.id, super._flex);
+
+  @override
+  Widget buildCard(BuildContext context, bool editMode) =>
+      Text(editMode ? 'editing $id' : id);
+}
+
 Widget _app(Widget home) => TranslationProvider(child: MaterialApp(home: home));
 
-GridPage _page(List<GridPageCardInterface> cards, _Preferences preferences) =>
-    GridPage(
-      icons: const GridPageIcons(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home),
-      ),
-      navigationLabel: 'Info',
-      cards: cards,
-      preferences: preferences,
-    );
+GridPage _page(
+  List<GridPageCardInterface> cards,
+  _Preferences preferences, {
+  List<GridPageCardInterface> headers = const [],
+}) => GridPage(
+  icons: const GridPageIcons(
+    icon: Icon(Icons.home_outlined),
+    selectedIcon: Icon(Icons.home),
+  ),
+  navigationLabel: 'Info',
+  cards: cards,
+  headers: headers,
+  preferences: preferences,
+);
 
 void main() {
   setUp(() => LocaleSettings.setLocaleSync(AppLocale.en));
+  testWidgets('headers stay full width, stack by flex, and cannot be edited', (
+    tester,
+  ) async {
+    final preferences = _Preferences();
+    preferences.values['hidden'] = '["header"]';
+    preferences.values['order'] = '["card","header"]';
+    await tester.pumpWidget(
+      _app(
+        _page(
+          [_Card('card', 1)],
+          preferences,
+          headers: [_ModeCard('header', 1), _ModeCard('tall', 2)],
+        ),
+      ),
+    );
+
+    final header = find.byKey(const ValueKey('header'));
+    final tall = find.byKey(const ValueKey('tall'));
+    final card = find.byKey(const ValueKey('card'));
+    expect(
+      tester.getSize(header).width,
+      tester.getSize(find.byType(ListView).first).width - 16,
+    );
+    expect(
+      tester.getSize(header).height,
+      lessThan(tester.getSize(card).height),
+    );
+    expect(tester.getSize(tall).height, 2 * tester.getSize(header).height);
+    expect(tester.getTopLeft(tall).dy, tester.getBottomLeft(header).dy);
+    expect(tester.getTopLeft(card).dy, tester.getBottomLeft(tall).dy);
+
+    await tester.tap(find.byTooltip('Edit Layout'));
+    await tester.pump();
+    expect(find.text('header'), findsOneWidget);
+    expect(find.text('tall'), findsOneWidget);
+    expect(find.text('editing header'), findsNothing);
+    expect(
+      find.ancestor(
+        of: header,
+        matching: find.byType(LongPressDraggable<String>),
+      ),
+      findsNothing,
+    );
+    expect(find.byTooltip('header'), findsNothing);
+  });
+
+  test('rejects invalid header flex and duplicate IDs across sections', () {
+    final preferences = _Preferences();
+    expect(
+      () => _page([], preferences, headers: [_Card('header', 0)]),
+      throwsArgumentError,
+    );
+    expect(
+      () => _page([_Card('same', 1)], preferences, headers: [_Card('same', 1)]),
+      throwsArgumentError,
+    );
+  });
   testWidgets('page text follows the translation context', (tester) async {
     final original = LocaleSettings.currentLocale;
     addTearDown(() => LocaleSettings.setLocaleSync(original));
@@ -178,7 +247,9 @@ void main() {
     expect(preferences.getString('order'), '["c","a","b"]');
   });
 
-  testWidgets('dragging a card forward moves it past the target', (tester) async {
+  testWidgets('dragging a card forward moves it past the target', (
+    tester,
+  ) async {
     final preferences = _Preferences();
     await tester.pumpWidget(
       _app(_page([_Card('a', 1), _Card('b', 1), _Card('c', 1)], preferences)),

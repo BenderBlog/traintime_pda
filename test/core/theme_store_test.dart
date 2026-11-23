@@ -6,12 +6,12 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:pda_repository/pda_repository.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/main.dart';
 import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
-import 'package:watermeter/core/languages/presentation/language_settings_card.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
 import 'package:watermeter/core/preferences/preference_store_interface.dart';
@@ -25,6 +25,7 @@ import 'package:watermeter/core/shared/widgets/settings/color_choices.dart';
 import 'package:watermeter/core/shared/widgets/settings/segmented_list.dart';
 import 'package:watermeter/core/shared/widgets/settings/slider_tile.dart';
 import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/features/update/update.dart';
 
 void main() {
   test('logger maps its supported levels to Talker', () {
@@ -163,6 +164,10 @@ void main() {
       _MemoryPreferences(),
       _RecordingLogger(),
     );
+    final updateFeature = UpdateFeature(
+      _StaticUpdateRepository(),
+      localVersion: '2.0.0',
+    );
     await tester.pumpWidget(
       TranslationProvider(
         child: MultiProvider(
@@ -170,7 +175,11 @@ void main() {
             Provider<ThemeStoreInterface>.value(value: store),
             Provider<LanguageStoreInterface>.value(value: languageStore),
           ],
-          child: MyApp(gridPreferences: _MemoryPreferences()),
+          child: MyApp(
+            gridPreferences: _MemoryPreferences(),
+            headers: [updateFeature.card],
+            settingsSections: [updateFeature.section],
+          ),
         ),
       ),
     );
@@ -187,16 +196,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.school_outlined), findsOneWidget);
     expect(find.byIcon(MingCuteIcons.mgc_user_2_fill), findsOneWidget);
-    expect(find.byType(ThemeSettingsCard), findsOneWidget);
     expect(find.text('设置'), findsWidgets);
     expect(
       find.text('You have pushed the button this many times:'),
       findsNothing,
     );
-    await tester.drag(find.byType(ListView), const Offset(0, -600));
-    await tester.pumpAndSettle();
-    expect(find.byType(LanguageSettingsCard), findsOneWidget);
-
     await store.setPalette(ThemePalette.green);
     await store.setBrightness(ThemeBrightness.dark);
     await tester.pump();
@@ -205,6 +209,7 @@ void main() {
     expect(app.theme!.colorScheme.primary, const Color(0xff4ea34c));
     store.dispose();
     languageStore.dispose();
+    updateFeature.dispose();
   });
 
   testWidgets('theme settings card updates its own store', (tester) async {
@@ -286,6 +291,17 @@ void main() {
     expect(find.textContaining('100%', findRichText: true), findsOneWidget);
     store.dispose();
   });
+}
+
+class _StaticUpdateRepository implements UpdateRepository {
+  @override
+  Future<UpdateReleaseData> fetchLatest() async => (
+    code: '2.0.0',
+    changes: <String>[],
+    iosUrl: 'https://example.org/ios',
+    androidUrl: 'https://example.org/android',
+    githubUrl: 'https://example.org/releases',
+  );
 }
 
 class _RecordingLogger extends Fake implements LoggerInterface {

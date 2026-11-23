@@ -28,6 +28,8 @@ class GridPageIcons {
   const GridPageIcons({required this.icon, required this.selectedIcon});
 }
 
+const double headerFlexBaseHeight = 48.0;
+
 /// Shared home grid. Card content and persistent storage are injected.
 class GridPage extends StatefulWidget implements AppShellPageInterface {
   GridPage({
@@ -35,11 +37,13 @@ class GridPage extends StatefulWidget implements AppShellPageInterface {
     required this.icons,
     required this.navigationLabel,
     required List<GridPageCardInterface> cards,
+    List<GridPageCardInterface> headers = const [],
     required this.preferences,
   }) : // The unmodifiable List makes the dynamic modification of cards unavailable
-       cards = List.unmodifiable(cards) {
+       cards = List.unmodifiable(cards),
+       headers = List.unmodifiable(headers) {
     final ids = <String>{};
-    for (final card in this.cards) {
+    for (final card in [...this.headers, ...this.cards]) {
       if (card.id.isEmpty || !ids.add(card.id)) {
         throw ArgumentError.value(
           card.id,
@@ -52,6 +56,7 @@ class GridPage extends StatefulWidget implements AppShellPageInterface {
   }
 
   final List<GridPageCardInterface> cards;
+  final List<GridPageCardInterface> headers;
   final GridPageIcons icons;
   final String navigationLabel;
   final PreferenceStoreInterface preferences;
@@ -259,6 +264,13 @@ class _GridPageState extends State<GridPage>
       body: ListView(
         padding: const EdgeInsets.all(8),
         children: [
+          for (final header in widget.headers)
+            SizedBox(
+              key: ValueKey(header.id),
+              width: double.infinity,
+              height: headerFlexBaseHeight * header.flex(),
+              child: header.buildCard(context, false),
+            ),
           _Grid(
             cards: visible,
             editing: _editing,

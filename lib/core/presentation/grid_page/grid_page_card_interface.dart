@@ -7,7 +7,7 @@ abstract interface class GridPageCardInterface {
   /// The stable mark of the card used for sorting, hiding state and persistence.
   String get id;
 
-  /// Get the flex ratio of the card
+  /// Grid cards span this many columns; headers use it as a vertical height multiplier.
   int flex();
 
   /// Used in hidden card list to display to user. Context is used to generate translation.
