@@ -8,7 +8,7 @@ import 'package:watermeter/features/settings/presentation/about_page/about_page.
 import 'package:watermeter/generated/application_version.g.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
-ListTile aboutTile(BuildContext context) {
+ListTile aboutTile(BuildContext context, PackageApplicationInfo appInfo) {
   return ListTile(
     leading: const Icon(MingCuteIcons.mgc_information_line),
     title: Text(context.t.settings.aboutThisProgram),
@@ -18,6 +18,6 @@ ListTile aboutTile(BuildContext context) {
       ),
     ),
     trailing: const Icon(Icons.navigate_next),
-    onTap: () => AppShell.of(context).pushDetail(AboutPage()),
+    onTap: () => AppShell.of(context).pushDetail(AboutPage(appInfo: appInfo,)),
   );
 }

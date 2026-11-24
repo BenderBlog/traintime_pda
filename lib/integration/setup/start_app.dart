@@ -54,9 +54,6 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
               dispose: (_, database) => unawaited(database.close()),
             ),
             Provider<LoggerInterface>.value(value: logger),
-            Provider<PackageApplicationInfo>(
-              create: (_) => PackageApplicationInfo(),
-            ),
             Provider<Talker>.value(value: talker),
             Provider<UpdateRepository>(
               lazy: false,
@@ -82,7 +79,10 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
             gridPreferences: gridPreferences,
             headers: [updateFeature.card],
             settingsSections: [
-              AboutSection(updateFeature: updateFeature),
+              AboutSection(
+                updateFeature: updateFeature,
+                appInfo: PackageApplicationInfo(),
+              ),
               CoreSection(talker: talker),
             ],
           ),

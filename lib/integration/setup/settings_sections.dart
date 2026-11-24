@@ -7,18 +7,20 @@ import 'package:watermeter/core/presentation/settings_page/settings_page_section
 import 'package:watermeter/features/settings/presentation/tiles/about_tile.dart';
 import 'package:watermeter/features/settings/presentation/tiles/talker_tile.dart';
 import 'package:watermeter/features/update/update.dart';
+import 'package:watermeter/generated/application_version.g.dart';
 
 class AboutSection implements SettingsPageSectionInterface {
-  const AboutSection({required this.updateFeature});
+  const AboutSection({required this.updateFeature, required this.appInfo});
 
   final UpdateFeature updateFeature;
+  final PackageApplicationInfo appInfo;
 
   @override
   IconData? icon() => null;
 
   @override
   List<SettingsPageSectionEntry> items(BuildContext context) => <ListTile>[
-    aboutTile(context),
+    aboutTile(context, appInfo),
     updateFeature.tile(context),
   ];
 

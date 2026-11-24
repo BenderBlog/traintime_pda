@@ -24,7 +24,9 @@ import 'film_component.dart';
 import '../category_page.dart';
 
 class AboutPage extends StatefulWidget {
-  const AboutPage({super.key});
+  const AboutPage({super.key, required this.appInfo});
+
+  final PackageApplicationInfo appInfo;
 
   @override
   State<AboutPage> createState() => _AboutPageState();
