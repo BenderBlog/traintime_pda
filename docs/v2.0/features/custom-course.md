@@ -80,7 +80,7 @@ Application 编排写入用例，将 Repository 发出的规则交给 Domain 展
 
 #### Database
 
-启动装配从各功能的公开入口注册 Drift 表，打开共享连接，向课程 Data 注入访问自身表所需的查询和事务能力。通用连接能力可以放在 Core；Data 不导入 Integration，Core 不引用功能表。连接初始化、外键和关闭要求见 5.1。
+`integration/database/` 从各功能的公开入口组合 Drift 表。`integration/setup/` 打开共享连接，向课程 Data 注入访问自身表所需的查询和事务能力，并管理连接生命周期。通用连接能力可以放在 Core；Data 不导入 Integration，Core 不引用功能表。连接初始化、外键和关闭要求见 5.1。
 
 #### ID
 
@@ -240,18 +240,19 @@ classDiagram
 
 #### 文件划分
 
-以下路径相对于 `lib/`。数据库在启动入口装配，课程表和数据访问实现放在功能模块内。
+以下路径相对于 `lib/`。共享数据库由 `integration/database/` 组合，连接由 `integration/setup/` 创建并管理。课程表和数据访问实现放在功能模块内。
 
 | 文件或位置 | 职责 | 设计边界 |
 | --- | --- | --- |
-| `main.dart` 的启动装配 | 从功能公开入口注册业务表及首版 schema 版本，打开 `xdyou_database.sqlite`，在每个连接上启用外键并确认就绪 | 持有和关闭共享连接；失败时关闭连接并向上报告；不处理课程规则或旧 JSON 导入 |
+| `integration/database/` | 从功能公开入口注册业务表及首版 schema 版本，提供共享数据库实现 | 组合 schema 和连接实现；不处理功能专属查询或写入规则 |
+| `integration/setup/` | 打开 `xdyou_database.sqlite`，在每个连接上启用外键并确认就绪 | 注入、持有和关闭共享连接；失败时关闭连接并向上报告；不处理课程规则或旧 JSON 导入 |
 | `features/custom_course/repository/` | 声明 `IndexContext` 和 `CustomCourse` 的读取、保存、删除及订阅接口 | 使用领域类型，支持按上下文代码访问课程；不暴露 Drift 行类型或数据库事务 |
 | `features/custom_course/data/local/tables.dart` | 声明 `index_contexts`、`custom_courses`、`custom_course_schedule_entries` 及约束和索引 | 只定义结构，不执行查询，不依赖数据库连接类 |
 | `features/custom_course/data/mapping/mapper.dart` | 转换数据库记录与领域对象，处理日期、时间段列表、周次位图和规则字段 | 纯转换函数，校验数据库表示的格式与完整性，再构造领域对象；不执行 IO、不决定业务规则 |
 | `features/custom_course/data/local/drift_repository.dart` | 实现 Repository 接口，直接使用 Drift 查询、订阅和事务写入，并调用 mapper | 保证课程与 entries 一起提交，并以数据库当前状态校验关联 context 与业务规则；不生成 occurrence、不管理 Signals 或外部同步 |
 | `features/custom_course/data/legacy_source.dart` | 读取、备份和原子保存旧 JSON，保留原始字段，并按历史文件格式校验记录 | 不调用旧 Controller 或旧 Repository 的保存方法，不把迁移状态写入 SQLite |
 
-启动装配通过功能的公开入口取得表声明以注册 schema。Repository 通过构造函数接收共享数据库连接，不自行创建连接或查找全局实例。
+`integration/database/` 通过功能的公开入口取得表声明以注册 schema。Repository 通过构造函数接收共享数据库连接，不自行创建连接或查找全局实例。
 
 #### 调用关系
 
@@ -1040,7 +1041,7 @@ Application 提供当前账号、学期及版本对应的只读快照，区分�
 
 ## 八、Integration
 
-跨模块适配位于 `lib/integration/`，按消费方组织。课表与首页分别声明读取所需日期日程的 port。Integration 实现这些 port，委派给自定义课程的公开查询，并在语义不同时适配结果；启动装配将实现注入消费方。提醒在重排时读取一次快照，日历与原生 Widget 订阅就绪结果。这些消费者共享同一账号和学期的日程来源，独立于页面生命周期。
+跨模块适配位于 `lib/integration/dispatcher/`，按消费方组织。课表与首页分别声明读取所需日期日程的 port。`integration/dispatcher/` 实现这些 port，委派给自定义课程的公开查询，并在语义不同时适配结果；`integration/setup/` 将实现注入消费方。提醒在重排时读取一次快照，日历与原生 Widget 订阅就绪结果。这些消费者共享同一账号和学期的日程来源，独立于页面生命周期。
 
 ### 输出就绪、重试与原生协议
 

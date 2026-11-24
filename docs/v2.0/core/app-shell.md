@@ -14,7 +14,7 @@
 
 本次重构在宽屏和窄屏都沿用旧版的底部导航栏。主从详情区域，即 [Master-Detail View](https://blogs.windows.com/windowsdeveloper/2017/05/01/master-master-detail-pattern/) 仍按可用宽度切换布局。
 
-启动装配创建页面实现并传给 `AppShell`，此步骤是 `main.dart` 直接依赖各个 feature，是特权设计。功能模块可以在自己的 presentation 层实现 `AppShellPage`，也可以向共享页面（即 `GridPage`，这是一个由 `core/widgets/layouts/grid_page.dart` 实现的一个 `AppShellPageInterface`，在 `main.dart` 中调用装配，并直接从各个 feature 中获取 widget，在 `main.dart` 范围内的特权结构）提供组件；功能模块只依赖 `core` 的页面接口和组件，不直接依赖其他功能模块。跨功能数据仍通过消费方 port、`integration/` 和启动装配接线。
+`integration/setup/` 从各功能的公开入口取得页面和组件，组装后传给 `AppShell`。启动装配可依赖多个功能，这是它的特权。功能模块可以在自己的 presentation 层实现 `AppShellPage`，也可以向共享页面 `GridPage` 提供组件。功能模块只依赖 `core` 的页面接口和组件，不直接依赖其他功能模块。跨功能数据由消费方声明 port，`integration/dispatcher/` 实现委派，再由 `integration/setup/` 注入。
 
 ## 主从详情导航
 
@@ -41,4 +41,4 @@
 - `AppShell` 决定页面顺序、切换行为和详情区域的布局，不计算网格尺寸或者持久化。
 - `core/shared/layouts/` 实现通用布局，不读取 feature 模块的数据。
 - 各功能的 presentation 层创建卡片或其他页面内容，使用共享组件时只从 `core` 导入。
-- 启动装配汇集页面与组件，注入它们需要的依赖，再创建 `AppShell`。
+- `integration/setup/` 汇集页面与组件，注入它们需要的依赖，再创建 `AppShell`。

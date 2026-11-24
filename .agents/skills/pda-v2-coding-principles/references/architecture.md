@@ -29,8 +29,11 @@ lib/
       application/      # 用例与业务编排
       data/             # repository 接口的实现
       presentation/     # 提供页面、组件和界面交互状态
-  integration/          # 实现消费方接口，委派给提供方或平台能力
-  main.dart             # 启动装配与应用生命周期
+  integration/
+    dispatcher/         # 实现消费方接口，委派给其他功能
+    database/           # 组合共享数据库结构与连接实现
+    setup/              # 启动装配与应用生命周期
+  main.dart             # 应用入口
 ```
 
 目录只说明职责，**不要求每个功能都有全部层次**。`core` 可以按需设置 `domain/`、`interfaces/` 和 `presentation/`，例如公共值对象、接口与接收页面参数的 `AppShell`。这些代码不引用 feature；具体页面由启动装配传入。共享设施若需要功能配置，由启动装配注册。
@@ -47,7 +50,7 @@ lib/
 
 确定归属时，先找出规则由谁定义，再确定实例的生命周期和消费者所需的接口。某项业务数据即使被首页、提醒和原生 Widget 共用，仍由其功能模块维护。消费者不能因为复用范围广就把它移入 `core`。**`core` 不导入功能模块，也不包含功能专属模型或规则。**
 
-`integration/` 和启动装配负责接线，不取得业务数据的所有权。跨功能需求由消费方声明 port，`integration/` 委派给提供方；启动装配创建对象、注入依赖并管理生命周期。双方使用同一公共接口时，启动装配可以直接接线。
+`integration/dispatcher/` 实现消费方声明的跨功能 port，委派给提供方。`integration/database/` 组合共享数据库结构与连接实现，不接管功能专属的表、映射和读写规则。`integration/setup/` 创建对象、注入依赖、组装页面并管理应用或账号生命周期。三者都不取得业务数据的所有权。双方使用同一公共接口时，启动装配可以直接接线。`main.dart` 保留应用入口，将启动装配交给 `integration/setup/`。
 
 `Presentation` 使用 `provider` 按接口取得启动装配或功能入口注册的依赖，避免在 Widget 构造参数中逐层传递。状态仍由所属模块持有，使用 signal 的状态由 signal 驱动响应式更新。
 
@@ -62,14 +65,16 @@ lib/
 | `application` | 本功能的 `domain`、`repository`、`ports`，按需依赖 `core` | 编排用例，依赖接口获取外部能力 | Dart 语言原生类型 |
 | `data` | 本功能的 `repository`、`domain`，按需依赖 `core` | 实现持久化和网络接口；网络实现可单独成包 | 数据库、网络等外部库 |
 | `presentation` | 本功能的 `application`，按需依赖本功能的 `domain` 和 `core` | 管理界面状态，共享业务数据由所属功能提供，页面不各存一份真值 | Flutter、状态管理库 |
-| `integration` | `core`、提供方的公开入口及消费方的 `ports` | 实现消费方的跨模块接口，委派给提供方；语义不同时在接口实现中适配 | 实现接口所需的外部能力或平台插件 |
-| 启动装配 | `core`、`integration` 及各功能的公开入口 | 创建对象、注册共享设施、接线、注入并管理应用或账号生命周期 | 必要的外部实现或平台插件 |
+| `integration/dispatcher` | `core`、提供方的公开入口及消费方的 `ports` | 实现消费方的跨模块接口，委派给提供方；语义不同时在接口实现中适配 | 不为外部包单设转发层 |
+| `integration/database` | `core` 及各功能公开的表声明 | 组合共享数据库结构与连接实现；不包含功能专属读写规则 | 数据库库及连接设施 |
+| `integration/setup` | `core`、`integration/dispatcher`、`integration/database` 及各功能的公开入口 | 创建对象、注册共享设施、接线、组装页面、注入并管理应用或账号生命周期 | 必要的外部实现或平台插件 |
+| `main.dart` | `integration/setup` 及入口所需设施 | 初始化 Flutter 和应用级错误处理，并启动应用 | 入口所需的平台或框架能力 |
 
-功能模块之间禁止直接 import 或 export，包括对方的公开入口。消费方在自己的 ports 声明所需能力；顶层 `integration/` 实现该接口，并通过提供方的公开入口委派。启动装配将接口实现注入消费方；双方已使用同一公共接口时直接接线。接口实现按消费端组织在顶层 `integration/` 下。
+功能模块之间禁止直接 import 或 export，包括对方的公开入口。消费方在自己的 ports 声明所需能力；`integration/dispatcher/` 实现该接口，并通过提供方的公开入口委派。`integration/setup/` 将接口实现注入消费方；双方已使用同一公共接口时直接接线。接口实现按消费端组织在 `integration/dispatcher/` 下。
 
-表中“按需依赖 core”对 domain、repository、ports 和 application 仅指纯 Dart 公共接口和值对象；presentation 还可使用 core 的公共界面和只读响应式状态接口。数据库连接、文件和网络客户端等设施使用独立入口，供 data、integration 或启动装配按职责使用。导入检查应覆盖 import 和 export，例如 application 经公共入口间接取得数据库连接也算越界。
+表中“按需依赖 core”对 domain、repository、ports 和 application 仅指纯 Dart 公共接口和值对象；presentation 还可使用 core 的公共界面和只读响应式状态接口。仅由一个功能使用的外部包可在所属层直接使用；共享连接等设施由启动装配创建，通过独立入口供 data 或 integration 使用。导入检查应覆盖 import 和 export，例如 application 经公共入口间接取得数据库连接也算越界。
 
-平台插件通过所属功能的 `data` 或 `integration` 接入，不进入领域规则。
+外部包按职责接入：界面组件由 presentation 使用，网络、存储和功能专属平台插件由所属功能的 data 使用，应用级插件由 setup 管理。需要跨功能能力时才使用消费方 port 和 `integration/dispatcher/`。domain、repository、ports 和 application 不直接依赖平台插件。
 
 ## 4. 分层分粒度数据校验
 
