@@ -3,11 +3,14 @@
 
 import 'dart:async';
 
+import 'package:catcher_2/catcher_2.dart';
+import 'package:flutter/material.dart' as legacy;
 import 'package:material_ui/material_ui.dart';
 import 'package:pda_network/pda_network.dart';
 import 'package:pda_repository/pda_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/core/languages/data/preference_language_store.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
 import 'package:watermeter/core/logging/logger_interface.dart';
@@ -25,9 +28,9 @@ import 'package:watermeter/features/update/update.dart';
 import 'package:watermeter/generated/application_version.g.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/integration/database/xdyou_database.dart';
-import 'package:watermeter/integration/setup/action_section.dart';
+import 'package:watermeter/integration/setup/settings_sections.dart';
 
-Future<void> startApp(LoggerInterface logger) async {
+Future<void> startApp(LoggerInterface logger, Talker talker) async {
   final database = XDYouDatabase();
   final network = DioUpdateRepository();
   try {
@@ -51,6 +54,7 @@ Future<void> startApp(LoggerInterface logger) async {
               dispose: (_, database) => unawaited(database.close()),
             ),
             Provider<LoggerInterface>.value(value: logger),
+            Provider<Talker>.value(value: talker),
             Provider<UpdateRepository>(
               lazy: false,
               create: (_) => network,
@@ -74,13 +78,17 @@ Future<void> startApp(LoggerInterface logger) async {
           child: MyApp(
             gridPreferences: gridPreferences,
             headers: [updateFeature.card],
-            settingsSections: [AboutSection(updateFeature.tile)],
+            settingsSections: [
+              AboutSection(updateFeature: updateFeature),
+              CoreSection(talker: talker),
+            ],
           ),
         ),
       ),
     );
     unawaited(updateFeature.start());
-  } catch (_) {
+  } catch (e, stack) {
+    logger.error("[startApp] Fail to start app", e, stack);
     network.close();
     await database.close();
     rethrow;
@@ -108,16 +116,24 @@ class MyApp extends StatelessWidget {
         final settings = themeStore.settings.value;
         return MaterialApp(
           title: 'XDYou',
+          // Catcher2 uses the root navigator to present error reports.
+          navigatorKey: Catcher2.navigatorKey,
           locale: locale,
           supportedLocales: AppLocaleUtils.supportedLocales,
           localizationsDelegates: GlobalMaterialLocalizations.delegates,
           theme: AppTheme.light(settings),
           darkTheme: AppTheme.dark(settings),
           themeMode: AppTheme.mode(settings.brightness),
-          builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(context)
-                .copyWith(textScaler: TextScaler.linear(settings.fontScale)),
-            child: child!,
+          // Talker's routes need the legacy Material theme and localizations.
+          builder: (context, child) => MaterialUiCompatibilityBridge(
+            child: legacy.ScaffoldMessenger(
+              child: MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: TextScaler.linear(settings.fontScale)),
+                child: child!,
+              ),
+            ),
           ),
           home: AppShell(
             pages: [

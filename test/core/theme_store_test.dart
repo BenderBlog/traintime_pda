@@ -1,8 +1,10 @@
 // Copyright 2026 Traintime PDA authors, originally by Hazuki Keatsu
 // SPDX-License-Identifier: MPL-2.0
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:catcher_2/catcher_2.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart' as legacy;
+import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +28,7 @@ import 'package:watermeter/core/shared/widgets/settings/segmented_list.dart';
 import 'package:watermeter/core/shared/widgets/settings/slider_tile.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/features/update/update.dart';
+import 'package:watermeter/integration/setup/settings_sections.dart';
 
 void main() {
   test('logger maps its supported levels to Talker', () {
@@ -183,6 +186,7 @@ void main() {
         ),
       ),
     );
+    expect(Catcher2.navigatorKey.currentState?.overlay, isNotNull);
     expect(
       tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
       ThemeMode.system,
@@ -210,6 +214,73 @@ void main() {
     store.dispose();
     languageStore.dispose();
     updateFeature.dispose();
+  });
+
+  testWidgets('Talker routes inherit legacy Material localizations', (
+    tester,
+  ) async {
+    LocaleSettings.setLocaleSync(AppLocale.en);
+    final languageStore = PreferenceLanguageStore(_MemoryPreferences());
+    final ThemeStoreInterface store = PreferenceThemeStore(
+      _MemoryPreferences(),
+      _RecordingLogger(),
+    );
+    final talker = Talker(logger: TalkerLogger(output: (_) {}));
+    talker.info('copy target');
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MultiProvider(
+          providers: [
+            Provider<ThemeStoreInterface>.value(value: store),
+            Provider<LanguageStoreInterface>.value(value: languageStore),
+            Provider<Talker>.value(value: talker),
+          ],
+          child: MyApp(
+            gridPreferences: _MemoryPreferences(),
+            headers: const [],
+            settingsSections: [CoreSection(talker: talker)],
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(MingCuteIcons.mgc_user_2_line));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('View network interceptor and logs'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TalkerScreen), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.copy).first);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Log item is copied in clipboard'), findsOneWidget);
+    await store.setPalette(ThemePalette.green);
+    await store.setBrightness(ThemeBrightness.dark);
+    await tester.pumpAndSettle();
+    final talkerTheme = tester
+        .widget<TalkerScreen>(find.byType(TalkerScreen))
+        .theme;
+    final appColors = AppTheme.dark(store.settings.value).colorScheme;
+    expect(
+      Theme.of(tester.element(find.byType(TalkerScreen))).colorScheme.surface,
+      appColors.surface,
+    );
+    expect(
+      legacy.Theme.of(tester.element(find.byType(TalkerScreen)))
+          .colorScheme
+          .surface,
+      appColors.surface,
+    );
+    expect(talkerTheme.backgroundColor, appColors.surface);
+    expect(talkerTheme.textColor, appColors.onSurface);
+    expect(talkerTheme.logColors, TalkerScreenTheme().logColors);
+
+    await tester.tap(find.byIcon(Icons.monitor_heart_outlined));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Talker Monitor'), findsOneWidget);
+
+    store.dispose();
+    languageStore.dispose();
   });
 
   testWidgets('theme settings card updates its own store', (tester) async {

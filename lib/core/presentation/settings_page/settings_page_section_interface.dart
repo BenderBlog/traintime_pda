@@ -6,7 +6,7 @@ import 'package:material_ui/material_ui.dart';
 abstract interface class SettingsPageSectionInterface {
   /// The title for section, nullable.
   String? title();
-  
+
   /// The icon for section, nullable.
   IconData? icon();
 

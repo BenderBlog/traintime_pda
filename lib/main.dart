@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/core/logging/talker_app_logger.dart';
 import 'package:watermeter/core/logging/talker_report_handler.dart';
+import 'package:watermeter/core/presentation/crush_page/pda_page_report_mode.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/integration/setup/start_app.dart';
 
@@ -15,7 +16,10 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Init logger
-  final logger = TalkerAppLogger(TalkerFlutter.init());
+  final talker = TalkerFlutter.init(
+    logger: TalkerLogger(output: (message) => debugPrint(message)),
+  );
+  final logger = TalkerAppLogger(talker);
 
   // Init slang
   LocaleSettings.useDeviceLocaleSync();
@@ -31,15 +35,8 @@ void main() {
     maxWidthForSmallMode: 150,
   );
   final options = Catcher2Options(
-    PageReportMode(showStackTrace: true),
-    [
-      EmailManualHandler(
-        ["superbart_chen@qq.com"],
-        emailTitle: "PDA 发生故障",
-        emailHeader: "请作者尽快修复",
-      ),
-      ConsoleHandler(),
-    ],
+    PdaPageReportMode(showStackTrace: true),
+    [ConsoleHandler()],
     localizationOptions: [
       LocalizationOptions.buildDefaultChineseOptions(),
       LocalizationOptions.buildDefaultEnglishOptions(),
@@ -47,8 +44,10 @@ void main() {
     logger: PDACatcher2Logger(logger),
   );
 
+  logger.info("[main] All the inits before startApp are accomplished.");
+
   Catcher2(
-    runAppFunction: () => unawaited(startApp(logger)),
+    runAppFunction: () => unawaited(startApp(logger, talker)),
     debugConfig: options,
     profileConfig: options,
     releaseConfig: options,

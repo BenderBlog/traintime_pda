@@ -1,0 +1,44 @@
+// Copyright 2026 Traintime PDA authors, originally by Hazuki Keatsu
+// SPDX-License-Identifier: MPL-2.0
+
+import 'package:material_ui/material_ui.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import 'package:watermeter/core/presentation/settings_page/settings_page_section_interface.dart';
+import 'package:watermeter/features/settings/presentation/tiles/about_tile.dart';
+import 'package:watermeter/features/settings/presentation/tiles/talker_tile.dart';
+import 'package:watermeter/features/update/update.dart';
+
+class AboutSection implements SettingsPageSectionInterface {
+  const AboutSection({required this.updateFeature});
+
+  final UpdateFeature updateFeature;
+
+  @override
+  IconData? icon() => null;
+
+  @override
+  List<SettingsPageSectionEntry> items(BuildContext context) => <ListTile>[
+    aboutTile(context),
+    updateFeature.tile(context),
+  ];
+
+  @override
+  String? title() => null;
+}
+
+class CoreSection implements SettingsPageSectionInterface {
+  const CoreSection({required this.talker});
+
+  final Talker talker;
+
+  @override
+  IconData? icon() => null;
+
+  @override
+  List<SettingsPageSectionEntry> items(BuildContext context) => <ListTile>[
+    talkerTile(context, talker),
+  ];
+
+  @override
+  String? title() => null;
+}
