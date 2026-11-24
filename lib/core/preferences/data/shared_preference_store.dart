@@ -9,7 +9,7 @@ import 'package:watermeter/core/preferences/preference_store_interface.dart';
 /// Keys are stored as `<namespace>.<key>`.
 /// [instance] uses the `free.` namespace.
 /// [forOwner] returns the same store for each namespace.
-/// 
+///
 /// All the instances with the same namespace are the singleton instance.
 final class SharedPreferenceStore implements PreferenceStoreInterface {
   SharedPreferenceStore._(this._preferences, this._prefix);

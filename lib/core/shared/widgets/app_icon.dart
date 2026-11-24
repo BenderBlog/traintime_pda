@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 
 class AppIconWidget extends StatelessWidget {

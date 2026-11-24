@@ -138,9 +138,8 @@ class FilmFrame extends StatelessWidget {
           image,
           if (text != null)
             Container(
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.6),
+              color: Theme.of(context).colorScheme.primary
+                  .withValues(alpha: 0.6),
               width: double.infinity,
               child: Padding(
                 padding: EdgeInsets.all(

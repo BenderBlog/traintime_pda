@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 /// @docImport '../preferences/shared_preference_store.dart';
-/// 
+///
 /// The interface for Preference Foundation
-/// 
+///
 /// All the outer module should use this rather than the implementation, [SharedPreferenceStore].
 abstract interface class PreferenceStoreInterface {
   String? getString(String key);

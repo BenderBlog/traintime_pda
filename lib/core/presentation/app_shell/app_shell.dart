@@ -53,7 +53,7 @@ class AppShell extends StatefulWidget {
 
 class AppShellState extends State<AppShell> {
   /// The main area and detail area both need to 364 logic pixels to display.
-  /// 
+  ///
   /// So when the screen width is more than 729 pixels (364 * 2 + 1), the detail area would appear.
   static const double _minPaneWidth = 364;
 
@@ -61,8 +61,8 @@ class AppShellState extends State<AppShell> {
   static const double _dividerWidth = 1;
 
   /// The hit width of the divider.
-  /// 
-  /// This is the difference from the v1.0 design. The origin dividerHitWidth is 1, 
+  ///
+  /// This is the difference from the v1.0 design. The origin dividerHitWidth is 1,
   /// so that it is very hard to drag the divider in v1.0.
   static const double _dividerHitWidth = 12;
 

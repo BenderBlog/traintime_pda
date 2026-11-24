@@ -90,6 +90,7 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
       ),
     );
     unawaited(updateFeature.start());
+    logger.info('[startApp] App was started');
   } catch (e, stack) {
     logger.error("[startApp] Fail to start app", e, stack);
     network.close();

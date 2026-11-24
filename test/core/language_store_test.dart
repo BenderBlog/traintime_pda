@@ -60,7 +60,10 @@ void main() {
     expect(find.textContaining('应用语言', findRichText: true), findsOneWidget);
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('App language', findRichText: true), findsOneWidget);
+    expect(
+      find.textContaining('App language', findRichText: true),
+      findsOneWidget,
+    );
     expect(preferences.value, 'english');
     store.dispose();
   });

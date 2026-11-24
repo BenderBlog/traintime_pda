@@ -31,8 +31,9 @@ class _ThemeSettingsCardState extends State<ThemeSettingsCard> {
       await change();
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(context.t.core.theme.saveFailed)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.t.core.theme.saveFailed)),
+        );
       }
     }
   }

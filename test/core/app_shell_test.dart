@@ -72,14 +72,18 @@ void main() {
     expect(find.text('saved'), findsOneWidget);
   });
 
-  testWidgets('narrow detail animates over the master and back', (tester) async {
+  testWidgets('narrow detail animates over the master and back', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(400, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     final key = GlobalKey<AppShellState>();
     await tester.pumpWidget(
-      MaterialApp(home: AppShell(key: key, pages: const [_Page('A')])),
+      MaterialApp(
+        home: AppShell(key: key, pages: const [_Page('A')]),
+      ),
     );
 
     key.currentState!.pushDetail(const Text('Detail'));
@@ -125,9 +129,7 @@ void main() {
     expect(find.text('Nested'), findsOneWidget);
     expect(tester.getSize(find.byType(PageView)).width, 364);
     final divider = tester.getRect(find.byType(VerticalDivider));
-    final drag = await tester.startGesture(
-      divider.center,
-    );
+    final drag = await tester.startGesture(divider.center);
     await drag.moveBy(const Offset(80, 0));
     await drag.up();
     await tester.pumpAndSettle();

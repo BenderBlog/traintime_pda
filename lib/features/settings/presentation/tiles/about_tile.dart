@@ -10,14 +10,14 @@ import 'package:watermeter/generated/translations.g.dart';
 
 ListTile aboutTile(BuildContext context) {
   return ListTile(
-      leading: const Icon(MingCuteIcons.mgc_information_line),
-      title: Text(context.t.settings.aboutThisProgram),
-      subtitle: Text(
-        context.t.settings.version(
-          version: PackageApplicationInfo.versionWithBuildNumber,
-        ),
+    leading: const Icon(MingCuteIcons.mgc_information_line),
+    title: Text(context.t.settings.aboutThisProgram),
+    subtitle: Text(
+      context.t.settings.version(
+        version: PackageApplicationInfo.versionWithBuildNumber,
       ),
-      trailing: const Icon(Icons.navigate_next),
-      onTap: () => AppShell.of(context).pushDetail(AboutPage()),
-    );
+    ),
+    trailing: const Icon(Icons.navigate_next),
+    onTap: () => AppShell.of(context).pushDetail(AboutPage()),
+  );
 }

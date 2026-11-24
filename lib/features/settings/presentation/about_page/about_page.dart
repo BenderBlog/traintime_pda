@@ -43,7 +43,8 @@ class _AboutPageState extends State<AboutPage> {
         Platform.isIOS || Platform.isMacOS || Platform.isAndroid
         ? 'XDYou'
         : 'Traintime PDA';
-    final applicationVersionText = PackageApplicationInfo.versionWithBuildNumber;
+    final applicationVersionText =
+        PackageApplicationInfo.versionWithBuildNumber;
     final isAndroid =
         !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
     return SettingsCategoryPage(
@@ -91,11 +92,14 @@ class _AboutPageState extends State<AboutPage> {
                     title: Text(context.t.settings.aboutPage.beian),
                     subtitle: const SelectableText('陕ICP备2024026116号-1A'),
                   ),
-                  if (PackageApplicationInfo.buildDateTime != null) ListTile(
-                    leading: const Icon(Icons.build_outlined),
-                        title: Text(context.t.settings.aboutPage.buildTime),
-                        subtitle: Text(PackageApplicationInfo.buildDateTime!.toIso8601String()),
-                  ),
+                  if (PackageApplicationInfo.buildDateTime != null)
+                    ListTile(
+                      leading: const Icon(Icons.build_outlined),
+                      title: Text(context.t.settings.aboutPage.buildTime),
+                      subtitle: Text(
+                        PackageApplicationInfo.buildDateTime!.toIso8601String(),
+                      ),
+                    ),
                   if (isAndroid)
                     FutureBuilder<String?>(
                       future: context

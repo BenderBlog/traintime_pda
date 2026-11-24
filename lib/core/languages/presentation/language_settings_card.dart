@@ -54,9 +54,7 @@ class LanguageSettingsCard extends StatelessWidget {
                     } catch (_) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(strings.saveFailed),
-                          ),
+                          SnackBar(content: Text(strings.saveFailed)),
                         );
                       }
                     }
