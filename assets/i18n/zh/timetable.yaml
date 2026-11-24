@@ -1,0 +1,12 @@
+title: 课程表
+unavailable: 课程数据源尚未接入
+loading: 正在加载课程表
+error: 部分课程数据加载失败
+cache: 正在显示已保存的课程数据
+empty: 本学期暂无安排
+week: '第 {number} 周'
+refresh: 刷新课程表
+today: 今天
+tomorrow: 明天
+no_more_today: 今天没有更多安排
+none_tomorrow: 明天没有安排

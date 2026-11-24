@@ -1,0 +1,12 @@
+title: Schedule
+unavailable: Schedule data sources are not connected yet
+loading: Loading schedule
+error: Some schedule data could not be loaded
+cache: Showing saved schedule data
+empty: No arrangements this semester
+week: 'Week {number}'
+refresh: Refresh schedule
+today: Today
+tomorrow: Tomorrow
+no_more_today: No more arrangements today
+none_tomorrow: No arrangements tomorrow

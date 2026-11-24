@@ -1,0 +1,12 @@
+title: 課程表
+unavailable: 課程資料來源尚未接入
+loading: 正在載入課程表
+error: 部分課程資料載入失敗
+cache: 正在顯示已儲存的課程資料
+empty: 本學期暫無安排
+week: '第 {number} 週'
+refresh: 重新整理課程表
+today: 今天
+tomorrow: 明天
+no_more_today: 今天沒有更多安排
+none_tomorrow: 明天沒有安排
