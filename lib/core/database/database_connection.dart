@@ -1,4 +1,4 @@
-// Copyright 2026 Hazuki Keatsu
+// Copyright 2026 Traintime PDA authors, originally by Hazuki Keatsu
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:drift/drift.dart';

@@ -1,3 +1,6 @@
+// Copyright 2026 Traintime PDA authors, originally by Hazuki Keatsu
+// SPDX-License-Identifier: MPL-2.0
+
 import 'package:signals/signals.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
 import 'package:watermeter/core/preferences/preference_store_interface.dart';

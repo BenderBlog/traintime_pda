@@ -1,3 +1,6 @@
+// Copyright 2026 Traintime PDA authors, originally by Hazuki Keatsu
+// SPDX-License-Identifier: MPL-2.0
+
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
