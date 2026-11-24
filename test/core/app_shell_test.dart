@@ -72,6 +72,32 @@ void main() {
     expect(find.text('saved'), findsOneWidget);
   });
 
+  testWidgets('narrow detail animates over the master and back', (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final key = GlobalKey<AppShellState>();
+    await tester.pumpWidget(
+      MaterialApp(home: AppShell(key: key, pages: const [_Page('A')])),
+    );
+
+    key.currentState!.pushDetail(const Text('Detail'));
+    await tester.pump();
+    expect(find.text('A content'), findsOneWidget);
+    expect(find.text('Detail'), findsOneWidget);
+
+    await tester.pumpAndSettle();
+    key.currentState!.popDetail();
+    await tester.pump();
+    expect(find.text('A content'), findsOneWidget);
+    expect(find.text('Detail'), findsOneWidget);
+
+    await tester.pumpAndSettle();
+    expect(find.text('A content'), findsOneWidget);
+    expect(find.text('Detail'), findsNothing);
+  });
+
   testWidgets('detail survives a width change and can pop', (tester) async {
     tester.view.physicalSize = const Size(400, 800);
     tester.view.devicePixelRatio = 1;

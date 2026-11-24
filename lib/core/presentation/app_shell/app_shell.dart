@@ -151,7 +151,7 @@ class AppShellState extends State<AppShell> {
             ),
     );
 
-    final detail = NavigatorPopHandler(
+    Widget detailNavigator(Widget root) => NavigatorPopHandler(
       enabled: _detailDepth > 0,
       onPopWithResult: (result) async =>
           await _detailKey.currentState?.maybePop(result),
@@ -159,31 +159,20 @@ class AppShellState extends State<AppShell> {
         child: Navigator(
           key: _detailKey,
           observers: [_detailObserver],
-          onGenerateRoute: (settings) {
-            if (settings.name != Navigator.defaultRouteName) {
-              throw ArgumentError.value(
-                settings.name,
-                'route',
-                'Unknown detail route',
-              );
-            }
-            return MaterialPageRoute<void>(
-              settings: settings,
-              builder: (_) => Scaffold(
-                body: Center(
-                  child: Opacity(
-                    opacity: 0.25,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 300),
-                      child: Image.asset(
-                        'assets/Icon-App-iTunes-Background.png',
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+          pages: [MaterialPage<void>(child: root)],
+          onDidRemovePage: (_) {},
+        ),
+      ),
+    );
+
+    final placeholder = Scaffold(
+      body: Center(
+        child: Opacity(
+          opacity: 0.25,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 300),
+            child: Image.asset('assets/Icon-App-iTunes-Background.png'),
+          ),
         ),
       ),
     );
@@ -201,7 +190,7 @@ class AppShellState extends State<AppShell> {
                 children: [
                   SizedBox(width: width, child: master),
                   const VerticalDivider(width: _dividerWidth),
-                  Expanded(child: detail),
+                  Expanded(child: detailNavigator(placeholder)),
                 ],
               ),
               Positioned(
@@ -222,12 +211,7 @@ class AppShellState extends State<AppShell> {
             ],
           );
         }
-        return Stack(
-          children: [
-            Offstage(offstage: _detailDepth > 0, child: master),
-            Offstage(offstage: _detailDepth == 0, child: detail),
-          ],
-        );
+        return detailNavigator(master);
       },
     );
   }
