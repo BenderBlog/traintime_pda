@@ -5,32 +5,11 @@ import 'dart:async';
 
 import 'package:catcher_2/catcher_2.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:pda_network/pda_network.dart';
-import 'package:pda_repository/pda_repository.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:watermeter/core/logging/logger_interface.dart';
-import 'package:watermeter/features/settings/presentation/about_page/about_page.dart';
-import 'package:watermeter/features/update/update.dart';
-import 'package:watermeter/integration/database/xdyou_database.dart';
-import 'package:watermeter/core/languages/language_store_interface.dart';
-import 'package:watermeter/core/themes/theme_store_interface.dart';
 import 'package:watermeter/core/logging/talker_app_logger.dart';
 import 'package:watermeter/core/logging/talker_report_handler.dart';
-import 'package:watermeter/core/languages/data/preference_language_store.dart';
-import 'package:watermeter/core/preferences/data/shared_preference_store.dart';
-import 'package:watermeter/core/preferences/preference_store_interface.dart';
-import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
-import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
-import 'package:watermeter/core/presentation/grid_page/grid_page_card_interface.dart';
-import 'package:watermeter/core/presentation/settings_page/settings_page_section_interface.dart';
-import 'package:watermeter/core/themes/presentation/app_theme.dart';
-import 'package:watermeter/core/themes/data/preference_theme_store.dart';
-import 'package:watermeter/core/presentation/settings_page/settings_page.dart';
-import 'package:watermeter/generated/application_version.g.dart';
 import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/integration/setup/start_app.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,180 +48,10 @@ void main() {
   );
 
   Catcher2(
-    runAppFunction: () => unawaited(_startApp(logger)),
+    runAppFunction: () => unawaited(startApp(logger)),
     debugConfig: options,
     profileConfig: options,
     releaseConfig: options,
     enableLogger: false,
   );
-}
-
-Future<void> _startApp(LoggerInterface logger) async {
-  final database = XDYouDatabase();
-  final network = DioUpdateRepository();
-  try {
-    await database.customSelect('SELECT 1').get();
-    final themePreferences = await SharedPreferenceStore.forOwner('theme');
-    final languagePreferences = await SharedPreferenceStore.forOwner(
-      'language',
-    );
-    final gridPreferences = await SharedPreferenceStore.forOwner('grid_page');
-    final updateFeature = UpdateFeature(
-      network,
-      localVersion: kApplicationVersion,
-    );
-    runApp(
-      TranslationProvider(
-        child: MultiProvider(
-          providers: [
-            Provider<XDYouDatabase>(
-              lazy: false,
-              create: (_) => database,
-              dispose: (_, database) => unawaited(database.close()),
-            ),
-            Provider<LoggerInterface>.value(value: logger),
-            Provider<UpdateRepository>(
-              lazy: false,
-              create: (_) => network,
-              dispose: (_, _) {
-                updateFeature.dispose();
-                network.close();
-              },
-            ),
-            Provider<LanguageStoreInterface>.value(
-              value: PreferenceLanguageStore(languagePreferences),
-              updateShouldNotify: (_, _) => false,
-            ),
-            Provider<ThemeStoreInterface>(
-              create: (context) => PreferenceThemeStore(
-                themePreferences,
-                context.read<LoggerInterface>(),
-              ),
-              dispose: (_, store) => store.dispose(),
-            ),
-          ],
-          child: MyApp(
-            gridPreferences: gridPreferences,
-            headers: [updateFeature.card],
-            settingsSections: [_AboutSection(updateFeature.tile)],
-          ),
-        ),
-      ),
-    );
-    unawaited(updateFeature.start());
-  } catch (_) {
-    network.close();
-    await database.close();
-    rethrow;
-  }
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-    required this.gridPreferences,
-    required this.headers,
-    required this.settingsSections,
-  });
-
-  final PreferenceStoreInterface gridPreferences;
-  final List<GridPageCardInterface> headers;
-  final List<SettingsPageSectionInterface> settingsSections;
-
-  @override
-  Widget build(BuildContext context) {
-    final themeStore = context.watch<ThemeStoreInterface>();
-    final locale = context.t.$meta.locale.flutterLocale;
-    return SignalBuilder(
-      builder: (context) {
-        final settings = themeStore.settings.value;
-        return MaterialApp(
-          title: 'XDYou',
-          locale: locale,
-          supportedLocales: AppLocaleUtils.supportedLocales,
-          localizationsDelegates: GlobalMaterialLocalizations.delegates,
-          theme: AppTheme.light(settings),
-          darkTheme: AppTheme.dark(settings),
-          themeMode: AppTheme.mode(settings.brightness),
-          builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(context)
-                .copyWith(textScaler: TextScaler.linear(settings.fontScale)),
-            child: child!,
-          ),
-          home: AppShell(
-            pages: [
-              GridPage(
-                icons: const GridPageIcons(
-                  icon: Icon(Icons.school_outlined),
-                  selectedIcon: Icon(Icons.school),
-                ),
-                navigationLabel: context.t.core.gridPage.label,
-                headers: headers,
-                cards: const [
-                  _PlaceholderGridCard('wide_1', 4),
-                  _PlaceholderGridCard('wide_2', 4),
-                  _PlaceholderGridCard('small_1', 1),
-                  _PlaceholderGridCard('small_2', 1),
-                ],
-                preferences: gridPreferences,
-              ),
-              SettingsPage(sections: settingsSections),
-            ],
-          ),
-          debugShowCheckedModeBanner: false,
-        );
-      },
-    );
-  }
-}
-
-class _PlaceholderGridCard implements GridPageCardInterface {
-  const _PlaceholderGridCard(this.id, this._flex);
-
-  @override
-  final String id;
-  final int _flex;
-
-  @override
-  int flex() => _flex;
-
-  @override
-  String title(BuildContext context) => id;
-
-  @override
-  Widget buildCard(BuildContext context, bool editMode) => Stack(
-    fit: StackFit.expand,
-    children: [
-      const Placeholder(),
-      Center(child: Text(id)),
-    ],
-  );
-}
-
-class _AboutSection implements SettingsPageSectionInterface {
-  const _AboutSection(this.updateTile);
-
-  final SettingsPageSectionEntry Function(BuildContext) updateTile;
-
-  @override
-  IconData? icon() => null;
-
-  @override
-  List<SettingsPageSectionEntry> items(BuildContext context) => <ListTile>[
-    ListTile(
-      leading: const Icon(MingCuteIcons.mgc_information_line),
-      title: Text(context.t.settings.aboutThisProgram),
-      subtitle: Text(
-        context.t.settings.version(
-          version: "$kApplicationVersion + $kApplicationBuildNumber",
-        ),
-      ),
-      trailing: const Icon(Icons.navigate_next),
-      onTap: () => AppShell.of(context).pushDetail(AboutPage()),
-    ),
-    updateTile(context),
-  ];
-
-  @override
-  String? title() => null;
 }

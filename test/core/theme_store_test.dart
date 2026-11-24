@@ -8,7 +8,7 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:pda_repository/pda_repository.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:watermeter/main.dart';
+import 'package:watermeter/integration/setup/start_app.dart';
 import 'package:watermeter/core/presentation/app_shell/app_shell.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
 import 'package:watermeter/core/languages/language_store_interface.dart';
