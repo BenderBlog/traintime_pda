@@ -14,7 +14,7 @@ ListTile aboutTile(BuildContext context) {
       title: Text(context.t.settings.aboutThisProgram),
       subtitle: Text(
         context.t.settings.version(
-          version: "$kApplicationVersion + $kApplicationBuildNumber",
+          version: PackageApplicationInfo.versionWithBuildNumber,
         ),
       ),
       trailing: const Icon(Icons.navigate_next),

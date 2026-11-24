@@ -291,6 +291,7 @@ about_page:
   contributors: 贡献者与致谢
   licenses: 开源许可
   extras: 更多
+  build_time: 构建时间
   dami: 开发：修复 iOS 课程偏移负数输入及输入校验
   l1angyun: 开发：空闲教室实时显示、课表背景模糊、课表布局与屏幕圆角适配；修复校园网数据展示
   littlestejan: 开发：校园网验证码刷新及验证码输入对话框优化

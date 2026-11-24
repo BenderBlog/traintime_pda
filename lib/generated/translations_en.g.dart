@@ -536,6 +536,7 @@ class _Translations$settings$aboutPage$en extends Translations$settings$aboutPag
 	@override String get contributors => 'Contributors & acknowledgements';
 	@override String get licenses => 'Open source licenses';
 	@override String get extras => 'More';
+	@override String get buildTime => 'Build time';
 	@override String get dami => 'Development: Fix negative course offset input and input validation on iOS';
 	@override String get l1angyun => 'Development: Live availability of classrooms, timetable background blur, timetable layout and screen corner adaptation; fix campus network data display';
 	@override String get littlestejan => 'Development: Campus network captcha refresh and captcha input dialog improvements';
@@ -1005,6 +1006,7 @@ extension on TranslationsEn {
 			'settings.aboutPage.contributors' => 'Contributors & acknowledgements',
 			'settings.aboutPage.licenses' => 'Open source licenses',
 			'settings.aboutPage.extras' => 'More',
+			'settings.aboutPage.buildTime' => 'Build time',
 			'settings.aboutPage.dami' => 'Development: Fix negative course offset input and input validation on iOS',
 			'settings.aboutPage.l1angyun' => 'Development: Live availability of classrooms, timetable background blur, timetable layout and screen corner adaptation; fix campus network data display',
 			'settings.aboutPage.littlestejan' => 'Development: Campus network captcha refresh and captcha input dialog improvements',

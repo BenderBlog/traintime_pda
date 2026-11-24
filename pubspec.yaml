@@ -14,6 +14,10 @@ dependencies:
   dio_cookie_manager: ^3.0.0
   cookie_jar: ^4.0.3
   path_provider: ^2.1.0
+  # path_provider_android 2.3.1 still passes JNI signatures to class lookup.
+  # jni 1.2.0 removed the compatibility handling for those signatures.
+  jni: 1.1.1
+  jni_flutter: 1.0.4+1
   # Preference
   shared_preferences: ^2.5.3
   # Json
@@ -32,6 +36,7 @@ dependencies:
   slang_flutter: ^4.18.0
   # Software info
   device_info_plus: ^13.1.0
+  package_info_plus: ^10.2.2
   # Widgets
   calendar_date_picker2: ^3.0.0
   material_ui: ^1.3.0

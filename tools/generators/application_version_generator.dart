@@ -21,9 +21,7 @@ class _ApplicationVersionBuilder implements Builder {
 
   /// Semantic version with an optional prerelease suffix, without the build
   /// number.
-  static final _semanticVersion = RegExp(
-    r'^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$',
-  );
+  static final _semanticVersion = RegExp(r'^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$');
 
   @override
   Map<String, List<String>> get buildExtensions => const {
@@ -42,10 +40,12 @@ class _ApplicationVersionBuilder implements Builder {
         'tools/generators/application_version_generator.dart.',
       )
       ..writeln()
+      ..writeln("import 'package:package_info_plus/package_info_plus.dart';")
+      ..writeln()
       ..writeln(
         '/// Semantic version from `pubspec.yaml`, without the build number.',
       )
-      ..writeln("const String kApplicationVersion = '$version';")
+      ..writeln("const String _kApplicationVersion = '$version';")
       ..writeln()
       ..writeln(
         '/// Build number from `pubspec.yaml`, or `null` when it is omitted.',
@@ -56,7 +56,38 @@ class _ApplicationVersionBuilder implements Builder {
         '// ignore: unnecessary_nullable_for_final_variable_declarations',
       );
     }
-    buffer.writeln('const int? kApplicationBuildNumber = $buildNumber;');
+    buffer.writeln('const int? _kApplicationBuildNumber = $buildNumber;');
+    buffer
+      ..writeln()
+      ..writeln(
+        '/// The build time of the package. Must be specify by --dart-define.',
+      )
+      ..writeln(
+        "const String _buildTimeRaw = String.fromEnvironment('BUILD_TIME');",
+      )
+      ..writeln(
+        'DateTime? get _buildTime => _buildTimeRaw.isEmpty ? null : DateTime.tryParse(_buildTimeRaw);',
+      )
+      ..writeln();
+    buffer.writeln("""
+final class PackageApplicationInfo {
+  late final Future<String?> androidBuildSignature = _loadSignature();
+
+  Future<String?> _loadSignature() async {
+    final signature = (await PackageInfo.fromPlatform()).buildSignature;
+    return signature.isEmpty ? null : signature;
+  }
+
+  static int? get applicationBuildNumber => _kApplicationBuildNumber;
+
+  static String get applicationVersion => _kApplicationVersion;
+
+  static DateTime? get buildDateTime => _buildTime;
+
+  static String get versionWithBuildNumber =>
+      "\$applicationVersion\${applicationBuildNumber == null ? '' : ' + \$applicationBuildNumber'}";
+}
+""");
 
     await buildStep.writeAsString(
       AssetId(buildStep.inputId.package, _outputPath),
@@ -91,9 +122,7 @@ class _ApplicationVersionBuilder implements Builder {
   (String, int?) _parseVersion(String raw) {
     final plus = raw.indexOf('+');
     final version = plus < 0 ? raw : raw.substring(0, plus);
-    final buildNumber = plus < 0
-        ? null
-        : int.tryParse(raw.substring(plus + 1));
+    final buildNumber = plus < 0 ? null : int.tryParse(raw.substring(plus + 1));
 
     if (!_semanticVersion.hasMatch(version)) {
       throw FormatException(

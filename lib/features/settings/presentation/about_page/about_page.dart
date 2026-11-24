@@ -6,6 +6,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:m3e_core/m3e_core.dart';
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:watermeter/core/logging/logger_interface.dart';
@@ -41,8 +43,9 @@ class _AboutPageState extends State<AboutPage> {
         Platform.isIOS || Platform.isMacOS || Platform.isAndroid
         ? 'XDYou'
         : 'Traintime PDA';
-    final applicationVersionText =
-        '$kApplicationVersion + $kApplicationBuildNumber';
+    final applicationVersionText = PackageApplicationInfo.versionWithBuildNumber;
+    final isAndroid =
+        !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
     return SettingsCategoryPage(
       title: t.settings.aboutPage.title,
       child: Padding(
@@ -88,8 +91,34 @@ class _AboutPageState extends State<AboutPage> {
                     title: Text(context.t.settings.aboutPage.beian),
                     subtitle: const SelectableText('陕ICP备2024026116号-1A'),
                   ),
-                  // TODO(about): Android 构建签名需要平台数据源，
-                  // 无法从 pubspec.yaml 生成，等 ApplicationInfo 接口接入后恢复。
+                  if (PackageApplicationInfo.buildDateTime != null) ListTile(
+                    leading: const Icon(Icons.build_outlined),
+                        title: Text(context.t.settings.aboutPage.buildTime),
+                        subtitle: Text(PackageApplicationInfo.buildDateTime!.toIso8601String()),
+                  ),
+                  if (isAndroid)
+                    FutureBuilder<String?>(
+                      future: context
+                          .read<PackageApplicationInfo>()
+                          .androidBuildSignature,
+                      builder: (context, snapshot) => ListTile(
+                        leading: const Icon(Icons.fingerprint_rounded),
+                        title: Text(context.t.settings.aboutPage.signAndroid),
+                        subtitle: snapshot.hasError
+                            ? Text(context.t.common.errorDetected)
+                            : snapshot.connectionState != ConnectionState.done
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : snapshot.data == null
+                            ? const Text('—')
+                            : SelectableText(snapshot.data!),
+                      ),
+                    ),
                 ],
               ),
             ),

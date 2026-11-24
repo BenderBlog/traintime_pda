@@ -42,7 +42,7 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
     final gridPreferences = await SharedPreferenceStore.forOwner('grid_page');
     final updateFeature = UpdateFeature(
       network,
-      localVersion: kApplicationVersion,
+      localVersion: PackageApplicationInfo.applicationVersion,
     );
     runApp(
       TranslationProvider(
@@ -54,6 +54,9 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
               dispose: (_, database) => unawaited(database.close()),
             ),
             Provider<LoggerInterface>.value(value: logger),
+            Provider<PackageApplicationInfo>(
+              create: (_) => PackageApplicationInfo(),
+            ),
             Provider<Talker>.value(value: talker),
             Provider<UpdateRepository>(
               lazy: false,

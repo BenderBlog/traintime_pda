@@ -320,6 +320,7 @@ about_page:
   contributors: Contributors & acknowledgements
   licenses: Open source licenses
   extras: More
+  build_time: Build time
   dami: 'Development: Fix negative course offset input and input validation on iOS'
   l1angyun: 'Development: Live availability of classrooms, timetable background blur,
     timetable layout and screen corner adaptation; fix campus network data display'

@@ -1148,6 +1148,9 @@ class Translations$settings$aboutPage$zh {
 	/// zh: '更多'
 	String get extras => '更多';
 
+	/// zh: '构建时间'
+	String get buildTime => '构建时间';
+
 	/// zh: '开发：修复 iOS 课程偏移负数输入及输入校验'
 	String get dami => '开发：修复 iOS 课程偏移负数输入及输入校验';
 
@@ -1782,6 +1785,7 @@ extension on Translations {
 			'settings.aboutPage.contributors' => '贡献者与致谢',
 			'settings.aboutPage.licenses' => '开源许可',
 			'settings.aboutPage.extras' => '更多',
+			'settings.aboutPage.buildTime' => '构建时间',
 			'settings.aboutPage.dami' => '开发：修复 iOS 课程偏移负数输入及输入校验',
 			'settings.aboutPage.l1angyun' => '开发：空闲教室实时显示、课表背景模糊、课表布局与屏幕圆角适配；修复校园网数据展示',
 			'settings.aboutPage.littlestejan' => '开发：校园网验证码刷新及验证码输入对话框优化',

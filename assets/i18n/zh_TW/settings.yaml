@@ -305,6 +305,7 @@ about_page:
   contributors: 貢獻者與致謝
   licenses: 開源許可
   extras: 更多
+  build_time: 構建時間
   dami: 開發：修復 iOS 課程偏移負數輸入及輸入校驗
   l1angyun: 開發：空閒教室實時顯示、課表背景模糊、課表佈局與屏幕圓角適配；修復校園網數據展示
   littlestejan: 開發：校園網驗證碼刷新及驗證碼輸入對話框優化

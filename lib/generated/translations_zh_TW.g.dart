@@ -536,6 +536,7 @@ class _Translations$settings$aboutPage$zh_TW extends Translations$settings$about
 	@override String get contributors => '貢獻者與致謝';
 	@override String get licenses => '開源許可';
 	@override String get extras => '更多';
+	@override String get buildTime => '構建時間';
 	@override String get dami => '開發：修復 iOS 課程偏移負數輸入及輸入校驗';
 	@override String get l1angyun => '開發：空閒教室實時顯示、課表背景模糊、課表佈局與屏幕圓角適配；修復校園網數據展示';
 	@override String get littlestejan => '開發：校園網驗證碼刷新及驗證碼輸入對話框優化';
@@ -1005,6 +1006,7 @@ extension on TranslationsZhTw {
 			'settings.aboutPage.contributors' => '貢獻者與致謝',
 			'settings.aboutPage.licenses' => '開源許可',
 			'settings.aboutPage.extras' => '更多',
+			'settings.aboutPage.buildTime' => '構建時間',
 			'settings.aboutPage.dami' => '開發：修復 iOS 課程偏移負數輸入及輸入校驗',
 			'settings.aboutPage.l1angyun' => '開發：空閒教室實時顯示、課表背景模糊、課表佈局與屏幕圓角適配；修復校園網數據展示',
 			'settings.aboutPage.littlestejan' => '開發：校園網驗證碼刷新及驗證碼輸入對話框優化',
