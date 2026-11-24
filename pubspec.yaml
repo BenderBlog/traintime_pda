@@ -20,6 +20,7 @@ dependencies:
   jni_flutter: 1.0.4+1
   # Preference
   shared_preferences: ^2.5.3
+  flutter_secure_storage: ^11.2.0
   # Json
   json_annotation: ^4.9.0
   # Html Process

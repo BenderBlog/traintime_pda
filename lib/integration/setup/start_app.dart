@@ -21,6 +21,8 @@ import 'package:watermeter/core/presentation/grid_page/grid_page.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page_card_interface.dart';
 import 'package:watermeter/core/presentation/settings_page/settings_page.dart';
 import 'package:watermeter/core/presentation/settings_page/settings_page_section_interface.dart';
+import 'package:watermeter/core/secure_storage/data/platform_secure_store.dart';
+import 'package:watermeter/core/secure_storage/secure_store_interface.dart';
 import 'package:watermeter/core/themes/data/preference_theme_store.dart';
 import 'package:watermeter/core/themes/presentation/app_theme.dart';
 import 'package:watermeter/core/themes/theme_store_interface.dart';
@@ -44,6 +46,7 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
       network,
       localVersion: PackageApplicationInfo.applicationVersion,
     );
+    final secureStorage = PlatformSecureStore();
     runApp(
       TranslationProvider(
         child: MultiProvider(
@@ -74,6 +77,7 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
               ),
               dispose: (_, store) => store.dispose(),
             ),
+            Provider<SecureStoreInterface>.value(value: secureStorage),
           ],
           child: MyApp(
             gridPreferences: gridPreferences,
