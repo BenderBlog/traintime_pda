@@ -8,6 +8,7 @@ XDYou (Traintime PDA, package name `watermeter`) is an open-source campus inform
 * For a code change, use the design documents specified by the Operator. If none are specified or a specified document cannot be found, pause the code change and ask the Operator how to proceed. Continue without document-driven development only after the Operator explicitly agrees.
 * Before start coding, you'd better to take a read about the previous implementation in the main branch. And specify that the goal of refactor is to resolve the problem of code being difficult to maintain and having poor scalability caused by over-coupling.
 * Before start to implement the exact feature, please observe the implementation in the main branch and write the characterization tests / behavior tests first.
+* Don't write any migration code in v2.0. Treat this branch as a new implementation without remaining code.
 
 ## Verification and Reporting
 
