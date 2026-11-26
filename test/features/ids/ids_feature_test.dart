@@ -13,10 +13,10 @@ import 'package:watermeter/core/secure_storage/secure_store_interface.dart';
 import 'package:watermeter/features/ids/ids.case.dart';
 import 'package:watermeter/features/ids/ids_credentials.model.dart';
 import 'package:watermeter/features/ids/ids_credentials.store.dart';
-import 'package:watermeter/features/ids/widgets/ids_gate.widget.dart';
-import 'package:watermeter/features/ids/widgets/ids_interaction.widget.dart';
-import 'package:watermeter/features/ids/widgets/ids_logout_tile.widget.dart';
-import 'package:watermeter/features/ids/widgets/ids_reauth.widget.dart';
+import 'package:watermeter/features/ids/presentation/ids_gate.widget.dart';
+import 'package:watermeter/features/ids/presentation/ids_interaction.widget.dart';
+import 'package:watermeter/features/ids/presentation/ids_logout_tile.widget.dart';
+import 'package:watermeter/features/ids/presentation/ids_reauth.widget.dart';
 import 'package:watermeter/features/ids/ids_snapshot.model.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -45,7 +45,9 @@ void main() {
           value: talker,
           child: MaterialApp(
             builder: _withMaterialUiLocalizations,
-              home: material_ui.ScaffoldMessenger(child: _loginPage(feature, 'home')),
+            home: material_ui.ScaffoldMessenger(
+              child: _loginPage(feature, 'home'),
+            ),
           ),
         ),
       ),
@@ -72,7 +74,9 @@ void main() {
       TranslationProvider(
         child: MaterialApp(
           builder: _withMaterialUiLocalizations,
-            home: material_ui.ScaffoldMessenger(child: _loginPage(feature, 'home')),
+          home: material_ui.ScaffoldMessenger(
+            child: _loginPage(feature, 'home'),
+          ),
         ),
       ),
     );

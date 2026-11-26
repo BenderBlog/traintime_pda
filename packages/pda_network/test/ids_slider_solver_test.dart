@@ -24,7 +24,10 @@ void main() {
     }
 
     expect(
-      IdsSliderAlgorithms.solveOffset(img.encodePng(puzzle), img.encodePng(piece)),
+      IdsSliderAlgorithms.solveOffset(
+        img.encodePng(puzzle),
+        img.encodePng(piece),
+      ),
       closeTo(25 / 180, 0.000001),
     );
   });

@@ -4,8 +4,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:watermeter/features/update/application/update_checker.dart';
-import 'package:watermeter/features/update/presentation/update_dialog.dart';
+import 'package:watermeter/features/update/update_checker.case.dart';
+import 'package:watermeter/features/update/presentation/update_dialog.widget.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 ListTile updateTile(BuildContext context, UpdateNotices notices) {

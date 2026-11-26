@@ -30,9 +30,11 @@ final class IdsInteractionHost extends StatefulWidget {
 final class _IdsInteractionHostState extends State<IdsInteractionHost> {
   /// The detach method for interaction from IDS feature
   late void Function() _detachInteraction;
+
   /// The the method to cancel subscription from Signals
   void Function()? _unsubscribe;
   bool _askingPassword = false;
+
   /// Keeps verification dialogs in sequence so only one is shown at a time.
   Future<void> _prompt = Future.value();
 

@@ -69,10 +69,10 @@ class PageWidgetState extends State<PdaPageWidget> {
   Widget build(BuildContext context) => PopScope(
     canPop: true,
     onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (didPop) {
-          widget.pageReportMode.onActionRejected(widget.report);
-        }
-      },
+      if (didPop) {
+        widget.pageReportMode.onActionRejected(widget.report);
+      }
+    },
     child: Builder(
       builder: (context) => Catcher2Utils.isCupertinoAppAncestor(context)
           ? _buildCupertinoPage(context)

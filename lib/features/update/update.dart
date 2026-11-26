@@ -3,10 +3,10 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:pda_repository/pda_repository.dart';
-import 'package:watermeter/features/update/presentation/update_tile.dart';
+import 'package:watermeter/features/update/presentation/update_tile.widget.dart';
 
-import 'application/update_checker.dart';
-import 'presentation/update_card.dart';
+import 'update_checker.case.dart';
+import 'presentation/update_card.widget.dart';
 
 final class UpdateFeature {
   UpdateFeature(UpdateRepository repository, {required String localVersion})

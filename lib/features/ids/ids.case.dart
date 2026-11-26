@@ -9,21 +9,21 @@ import 'ids_credentials.store.dart';
 import 'ids_snapshot.model.dart';
 
 /// The use cases of ids.
-/// 
+///
 /// Network interface implementation and Secure store should be injected manually.
-/// Because the feature need to be initialized before app start. 
+/// Because the feature need to be initialized before app start.
 /// So it is impossible for get dependencies from context.
-/// 
+///
 /// ---
-/// 
-/// This implementation is totally different from the one in v1. 
-/// 
+///
+/// This implementation is totally different from the one in v1.
+///
 /// 1. [authorizeService] support parallel process, not serial process.
-/// 2. [signIn] and [authorizeService] are separate operations. 
-///   - First try to authorize with the existing session. 
+/// 2. [signIn] and [authorizeService] are separate operations.
+///   - First try to authorize with the existing session.
 ///   - If the session is invalid, log in to IDS and then re-authorize the target service.
 /// 3. Concurrently restore multiple invalid session
-/// 4. When app is starting, [restore] will read the saved credential. 
+/// 4. When app is starting, [restore] will read the saved credential.
 /// Having get credential does not mean credential is valid.
 /// 5. IDS Tickets will be put into secure storage.
 /// 6. Status will be highly cohesive. The outside only can access to read-only snapshot.
@@ -38,17 +38,21 @@ final class IdsUseCase {
   final Signal<IdsSnapshot> _state = signal(
     const IdsSnapshot(IdsStatus.signedOut),
   );
+
   /// Get the read-only reactive state of ids feature
   ReadonlySignal<IdsSnapshot> get state => _state.readonly();
+
   /// Get the snapshot of the reactive state at the moment
   IdsSnapshot get snapshot => _state.value;
+
   /// Used to record the generation of the operation.
-  /// 
-  /// When signin, signout and restore, the state updating will be stopped 
+  ///
+  /// When signin, signout and restore, the state updating will be stopped
   /// if the previous operation finds the generation having changed.
   int _epoch = 0;
+
   /// Used to represent the version of session.
-  /// 
+  ///
   /// Identifies the current session generation. Changes when signing in,
   /// signing out, or successfully recovering a session, so an authorization
   /// can tell whether another operation has already refreshed its session.
@@ -82,11 +86,11 @@ final class IdsUseCase {
   IdsInteraction? _interaction;
 
   /// @docImport 'package:watermeter/features/ids/widgets/ids_interaction.widget.dart';
-  /// 
-  /// Used for IDS feature registering an interaction for user. 
+  ///
+  /// Used for IDS feature registering an interaction for user.
   /// And the return Function is used to cancel the passed [IdsInteraction].
-  /// 
-  /// It can be treated as the abstract entity of [IdsInteractionHost]. 
+  ///
+  /// It can be treated as the abstract entity of [IdsInteractionHost].
   /// When the auto login fails, IDS feature will try to popup the dialog of slider and 2FA by the [IdsInteraction].
   void Function() attachInteraction(IdsInteraction interaction) {
     _interaction = interaction;
@@ -96,7 +100,7 @@ final class IdsUseCase {
   }
 
   /// Used for restoring the last saved [IdsCredentials] for secure storage and update IDS feature's state.
-  /// 
+  ///
   /// The restored contents only include account information. The restore logic of cookie is in PdaNetwork layer.
   Future<void> restore() async {
     // Record the epoch number for recognizing the outdate operation
@@ -121,8 +125,8 @@ final class IdsUseCase {
     }
   }
 
-  /// `signIn()` can be passed [IdsInteraction] or not. 
-  /// 
+  /// `signIn()` can be passed [IdsInteraction] or not.
+  ///
   /// When the interaction is not null, the 2FA and the slider will be triggered by this.
   Future<void> signIn(
     IdsCredentials credentials, {

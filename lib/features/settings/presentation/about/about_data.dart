@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:watermeter/features/settings/presentation/models/developer.dart';
-import 'package:watermeter/features/settings/presentation/models/link.dart';
 
-const double sheetMaxWidth = 600;
+import 'developer.dart';
+import 'link.dart';
 
 const List<Link> linkData = [
   Link(

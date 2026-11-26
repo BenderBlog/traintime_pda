@@ -10,11 +10,11 @@ import '../ids_snapshot.model.dart';
 import 'ids_login_error.dart';
 
 /// @docImport 'package:watermeter/core/presentation/app_shell/app_shell.dart';
-/// 
+///
 /// The password input dialog.
-/// 
+///
 /// The dialog will be pushed when IDS ticket is rejected and the state of IDS feature is [IdsStatus.credentialsAvailable].
-/// 
+///
 /// Mostly the last Widget in the navigator is [AppShell].
 class IdsPasswordDialog extends StatefulWidget {
   const IdsPasswordDialog({

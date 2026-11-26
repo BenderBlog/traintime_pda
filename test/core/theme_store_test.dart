@@ -31,9 +31,47 @@ import 'package:watermeter/features/update/update.dart';
 import 'package:watermeter/features/ids/ids.dart';
 import 'package:watermeter/core/secure_storage/secure_store_interface.dart';
 import 'package:watermeter/core/presentation/settings_page/settings_page_section_interface.dart';
-import 'package:watermeter/features/settings/presentation/tiles/talker_tile.dart';
+import 'package:watermeter/features/settings/settings.dart';
+import 'package:watermeter/generated/application_version.g.dart';
 
 void main() {
+  testWidgets('about settings opens the application information', (
+    tester,
+  ) async {
+    LocaleSettings.setLocaleSync(AppLocale.en);
+    final store = PreferenceThemeStore(
+      _MemoryPreferences(),
+      _RecordingLogger(),
+    );
+    final appInfo = PackageApplicationInfo();
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MultiProvider(
+          providers: [
+            Provider<ThemeStoreInterface>.value(value: store),
+            Provider<LoggerInterface>.value(value: _RecordingLogger()),
+            Provider<PackageApplicationInfo>.value(value: appInfo),
+          ],
+          child: MyApp(
+            gridPreferences: _MemoryPreferences(),
+            headers: const [],
+            settingsSections: [_AboutTestSection(appInfo)],
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byIcon(MingCuteIcons.mgc_user_2_line));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('About this APP'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(
+      find.text('NOEL - PDA Third Year Anniversary Edition'),
+      findsOneWidget,
+    );
+    store.dispose();
+  });
+
   test('logger maps its supported levels to Talker', () {
     final talker = Talker(logger: TalkerLogger(output: (_) {}));
     final LoggerInterface logger = TalkerAppLogger(talker);
@@ -421,6 +459,19 @@ void main() {
     expect(find.textContaining('100%', findRichText: true), findsOneWidget);
     store.dispose();
   });
+}
+
+final class _AboutTestSection implements SettingsPageSectionInterface {
+  _AboutTestSection(this.appInfo);
+  final PackageApplicationInfo appInfo;
+  @override
+  IconData? icon() => null;
+  @override
+  String? title() => null;
+  @override
+  List<SettingsPageSectionEntry> items(BuildContext context) => [
+    aboutTile(context, appInfo),
+  ];
 }
 
 final class _TalkerSection implements SettingsPageSectionInterface {

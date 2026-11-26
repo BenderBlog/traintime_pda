@@ -36,6 +36,7 @@ class _IdsReauthDialogState extends State<_IdsReauthDialog> {
   late IdsCodeDelivery _delivery;
   String? _notice;
   String? _error;
+
   /// To avoid that user submit the captcha from the previous code type after switching to the other type.
   bool _methodChanged = false;
 

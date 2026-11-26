@@ -5,7 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
-import '../domain/update_release.dart';
+import '../update_release.model.dart';
 
 class UpdateDialog extends StatelessWidget {
   const UpdateDialog({super.key, required this.release});

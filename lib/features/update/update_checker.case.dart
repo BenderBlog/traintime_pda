@@ -6,7 +6,7 @@ import 'dart:math' as math;
 import 'package:pda_repository/pda_repository.dart';
 import 'package:signals/signals.dart';
 
-import '../domain/update_release.dart';
+import 'update_release.model.dart';
 
 enum UpdateStatus { available, current, testing }
 

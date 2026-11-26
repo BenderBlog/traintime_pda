@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pda_repository/pda_repository.dart';
-import 'package:watermeter/features/update/application/update_checker.dart';
+import 'package:watermeter/features/update/update_checker.case.dart';
 
 void main() {
   test('classifies a newer, current, and testing version', () {

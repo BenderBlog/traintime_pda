@@ -18,10 +18,10 @@ import 'package:watermeter/core/shared/widgets/app_icon.dart';
 import 'package:watermeter/core/shared/widgets/settings/section_scaffold.dart';
 import 'package:watermeter/core/shared/widgets/settings/segmented_list.dart';
 
-import 'about_app_header.dart';
-import 'about_contributors_section.dart';
-import 'film_component.dart';
-import '../category_page.dart';
+import 'about_app_header.widget.dart';
+import 'about_contributors_section.widget.dart';
+import 'film_component.widget.dart';
+import '../category_page.widget.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key, required this.appInfo});

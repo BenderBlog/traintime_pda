@@ -6,8 +6,8 @@ import 'package:signals/signals_flutter.dart';
 import 'package:watermeter/core/presentation/grid_page/grid_page_card_interface.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
-import '../application/update_checker.dart';
-import 'update_dialog.dart';
+import '../update_checker.case.dart';
+import 'update_dialog.widget.dart';
 
 class UpdateCard implements GridPageCardInterface {
   const UpdateCard(this._notices);

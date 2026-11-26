@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:watermeter/config/about_page.dart' show sheetMaxWidth;
+import 'package:watermeter/core/shared/const.dart' show sheetMaxWidth;
 
 /// Presentation only: the existing section owns all settings and side effects.
 class SettingsCategoryPage extends StatelessWidget {

@@ -4,9 +4,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:pda_repository/pda_repository.dart';
-import 'package:watermeter/features/update/application/update_checker.dart';
-import 'package:watermeter/features/update/presentation/update_card.dart';
-import 'package:watermeter/features/update/presentation/update_tile.dart';
+import 'package:watermeter/features/update/update_checker.case.dart';
+import 'package:watermeter/features/update/presentation/update_card.widget.dart';
+import 'package:watermeter/features/update/presentation/update_tile.widget.dart';
 import 'package:watermeter/features/update/update.dart';
 import 'package:watermeter/generated/translations.g.dart';
 

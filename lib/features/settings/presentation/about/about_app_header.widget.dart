@@ -5,7 +5,7 @@ import 'package:m3e_core/m3e_core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../config/about_page.dart';
+import 'about_data.dart';
 
 import 'package:watermeter/core/shared/widgets/app_icon.dart';
 import 'package:watermeter/generated/translations.g.dart';

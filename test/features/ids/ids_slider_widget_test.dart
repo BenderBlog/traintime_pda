@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:pda_repository/pda_repository.dart';
-import 'package:watermeter/features/ids/widgets/ids_slider.widget.dart';
+import 'package:watermeter/features/ids/presentation/ids_slider.widget.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
 final _image = base64Decode(

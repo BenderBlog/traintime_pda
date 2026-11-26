@@ -21,6 +21,7 @@ final class IdsHttpSession {
   late PersistCookieJar _cookies;
   int _generation = 0;
   bool _closed = false;
+
   /// Serially clear cookie jar
   Future<void> _clearing = Future.value();
 
@@ -40,9 +41,9 @@ final class IdsHttpSession {
       clearing = _clearing;
       await clearing;
     } while (!identical(clearing, _clearing));
-    
+
     if (_closed) throw StateError('IDS session is closed');
-    
+
     final client = _dioFactory();
     client.interceptors.insert(0, CookieManager(_cookies));
     client.options.followRedirects = false;

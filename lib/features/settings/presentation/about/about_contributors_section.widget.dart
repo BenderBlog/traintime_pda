@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/core/shared/widgets/settings/section_scaffold.dart';
 
-import '../../../../config/about_page.dart';
+import 'about_data.dart';
 
 class AboutContributorsSection extends StatefulWidget {
   const AboutContributorsSection({super.key});

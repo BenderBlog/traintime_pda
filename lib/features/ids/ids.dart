@@ -4,7 +4,7 @@
 export 'ids.case.dart';
 export 'ids_credentials.model.dart';
 export 'ids_credentials.store.dart';
-export 'widgets/ids_gate.widget.dart';
-export 'widgets/ids_interaction.widget.dart';
+export 'presentation/ids_gate.widget.dart';
+export 'presentation/ids_interaction.widget.dart';
 export 'ids_snapshot.model.dart';
-export 'widgets/ids_logout_tile.widget.dart';
+export 'presentation/ids_logout_tile.widget.dart';

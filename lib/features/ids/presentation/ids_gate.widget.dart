@@ -16,6 +16,11 @@ import 'ids_interaction.widget.dart';
 import '../ids_snapshot.model.dart';
 import 'ids_login_error.dart';
 
+/// The login page.
+///
+/// TODO: The login stage dialog is not implemented.
+/// To implement this, you need to add a interface in pda_repository.
+/// The reason that I do not wanna implement is just lazy. :p
 final class IdsGate extends StatefulWidget {
   const IdsGate({
     super.key,
@@ -176,7 +181,7 @@ final class _IdsGateState extends State<IdsGate> {
                 ),
               ],
             ),
-          ),  
+          ),
           SizedBox(height: wide ? 8 : 16),
           Wrap(
             alignment: WrapAlignment.center,
