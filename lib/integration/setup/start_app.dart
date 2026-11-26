@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:catcher_2/catcher_2.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart' as legacy;
 import 'package:material_ui/material_ui.dart';
 import 'package:pda_network/pda_network.dart';
@@ -32,10 +33,19 @@ import 'package:watermeter/generated/application_version.g.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/integration/database/xdyou_database.dart';
 import 'package:watermeter/integration/setup/settings_sections.dart';
+import 'package:watermeter/integration/setup/network_logging.dart';
 
 Future<void> startApp(LoggerInterface logger, Talker talker) async {
   final database = XDYouDatabase();
-  final network = DioUpdateRepository();
+  final network = DioUpdateRepository(
+    dio: createLoggedDio(
+      talker,
+      options: BaseOptions(
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+      ),
+    ),
+  );
   IdsRepository? idsNetwork;
   try {
     await database.customSelect('SELECT 1').get();
@@ -56,6 +66,7 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
         write: secureStorage.write,
         delete: secureStorage.delete,
       ),
+      dioFactory: () => createLoggedDio(talker),
     );
     final idsUseCase = IdsUseCase(
       // SecureStorage here is used for accessing to account and password.

@@ -45,6 +45,7 @@ dependencies:
     path: packages/pda_network
   pda_repository:
     path: packages/pda_repository
+  dio: ^5.11.1
 
 dev_dependencies:
   flutter_test:
