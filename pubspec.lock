@@ -137,14 +137,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.5"
-  calendar_date_picker2:
-    dependency: "direct main"
-    description:
-      name: calendar_date_picker2
-      sha256: d6ea697c7fc0eebc64c62ad2ac6232a8c38795010bd8466b687bfebcbbdd872e
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   catcher_2:
     dependency: "direct main"
     description:
@@ -169,14 +161,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
-  charset_converter:
-    dependency: "direct main"
-    description:
-      name: charset_converter
-      sha256: da90e0a5bc3bea06df12615cac23544db4e7f06fb26bec0c7253229fc291e12e
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.1"
   checked_yaml:
     dependency: transitive
     description:
@@ -226,7 +210,7 @@ packages:
     source: hosted
     version: "3.1.2"
   cookie_jar:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: cookie_jar
       sha256: "963da02c1ef64cb5ac20de948c9e5940aa351f1e34a12b1d327c83d85b7e8fff"
@@ -274,7 +258,7 @@ packages:
     source: hosted
     version: "3.1.14"
   device_info_plus:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: device_info_plus
       sha256: ade1c36f8355d6284c98e4a47992ea263887ed3d1acb281e37635dd45f04c4aa
@@ -298,7 +282,7 @@ packages:
     source: hosted
     version: "5.11.1"
   dio_cookie_manager:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: dio_cookie_manager
       sha256: "4ed4669cacb11931517c1158876a2189f19386674b9dab498abcca063dbe4c61"
@@ -338,7 +322,7 @@ packages:
     source: hosted
     version: "0.3.1"
   encrypter_plus:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: encrypter_plus
       sha256: "6f6f3c73e26058af4fd138369a928ccae667e45d254cf6ded6301a2d99551a67"
@@ -526,7 +510,7 @@ packages:
     source: hosted
     version: "10.0.3"
   glob:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: glob
       sha256: "218aeb56050c714f62a3182775320dfa04602b55074873e24e31bbd39bda96fb"
@@ -558,7 +542,7 @@ packages:
     source: hosted
     version: "2.0.2"
   html:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: html
       sha256: "43b67b8f43321ab066817dfac5619596c98bb1b61624e77203bb4351785f9699"
@@ -590,7 +574,7 @@ packages:
     source: hosted
     version: "4.1.2"
   image:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: image
       sha256: bc13f61f0f5cb77936e78ae5dae3800f442718dac5d2bc4654f03c239230ed0c
@@ -614,7 +598,7 @@ packages:
     source: hosted
     version: "1.1.0"
   jni:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: jni
       sha256: d8df6dab6847855512fe44dd9032b0bbe34dda7bf7597e41d30750879779813f
@@ -622,7 +606,7 @@ packages:
     source: hosted
     version: "1.1.1"
   jni_flutter:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: jni_flutter
       sha256: "0dd33d67797560f66e961a6053882d4df54bd345bf063b8fe7ea133f7ad8b191"
@@ -638,21 +622,13 @@ packages:
     source: hosted
     version: "1.0.0"
   json_annotation:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: json_annotation
       sha256: "2a743920d81b7910627f68ee2c9ac1fc0bfee32b9fc3403587d7c6791ca12f80"
       url: "https://pub.dev"
     source: hosted
     version: "4.12.0"
-  json_serializable:
-    dependency: "direct dev"
-    description:
-      name: json_serializable
-      sha256: cc7822761b40be9237bcaae62b755ffe5453ceff96a0001f1f5f2439251c66f1
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.15.2"
   leak_tracker:
     dependency: transitive
     description:
@@ -830,7 +806,7 @@ packages:
     source: hosted
     version: "4.1.0"
   path:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: path
       sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"
@@ -854,7 +830,7 @@ packages:
     source: hosted
     version: "1.1.0"
   path_provider:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: path_provider
       sha256: a7f4874f987173da295a61c181b8ee71dab59b332a486b391babf26a1b884825
@@ -1192,14 +1168,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.3.1"
-  source_helper:
-    dependency: transitive
-    description:
-      name: source_helper
-      sha256: "279126bce72de3f2b7d4756408a4157988cf6bb4815be551bf55851aa00e9984"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0"
   source_span:
     dependency: transitive
     description:
