@@ -86,6 +86,10 @@ class _Translations$ids$zh_TW extends Translations$ids$zh {
 	@override String get reauthenticateMessage => '儲存的密碼已遭拒絕，請輸入目前的密碼繼續。';
 	@override String get login => '登入';
 	@override String get loggingIn => '登入中…';
+	@override String get clearCache => '清除登入快取';
+	@override String get cacheCleared => '登入快取已清除。';
+	@override String get cacheClearFailed => '清除登入快取失敗，請重試。';
+	@override String get viewNetworkActivity => '查看網路互動';
 	@override String get loginFailed => '登入失敗，請檢查帳號、密碼或網路後重試';
 	@override String get credentialsRejected => '帳號或密碼錯誤。';
 	@override String get networkUnavailable => '網路無法使用，請重試。';
@@ -820,6 +824,10 @@ extension on TranslationsZhTw {
 			'ids.reauthenticateMessage' => '儲存的密碼已遭拒絕，請輸入目前的密碼繼續。',
 			'ids.login' => '登入',
 			'ids.loggingIn' => '登入中…',
+			'ids.clearCache' => '清除登入快取',
+			'ids.cacheCleared' => '登入快取已清除。',
+			'ids.cacheClearFailed' => '清除登入快取失敗，請重試。',
+			'ids.viewNetworkActivity' => '查看網路互動',
 			'ids.loginFailed' => '登入失敗，請檢查帳號、密碼或網路後重試',
 			'ids.credentialsRejected' => '帳號或密碼錯誤。',
 			'ids.networkUnavailable' => '網路無法使用，請重試。',

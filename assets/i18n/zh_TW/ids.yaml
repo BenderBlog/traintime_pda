@@ -4,6 +4,10 @@ reauthenticate: 請重新登入
 reauthenticate_message: 儲存的密碼已遭拒絕，請輸入目前的密碼繼續。
 login: 登入
 logging_in: 登入中…
+clear_cache: 清除登入快取
+cache_cleared: 登入快取已清除。
+cache_clear_failed: 清除登入快取失敗，請重試。
+view_network_activity: 查看網路互動
 login_failed: 登入失敗，請檢查帳號、密碼或網路後重試
 credentials_rejected: 帳號或密碼錯誤。
 network_unavailable: 網路無法使用，請重試。

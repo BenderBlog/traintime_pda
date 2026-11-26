@@ -113,6 +113,18 @@ class Translations$ids$zh {
 	/// zh: '登录中…'
 	String get loggingIn => '登录中…';
 
+	/// zh: '清除登录缓存'
+	String get clearCache => '清除登录缓存';
+
+	/// zh: '清理登录缓存成功。'
+	String get cacheCleared => '清理登录缓存成功。';
+
+	/// zh: '清理登录缓存失败，请重试。'
+	String get cacheClearFailed => '清理登录缓存失败，请重试。';
+
+	/// zh: '查看网络交互'
+	String get viewNetworkActivity => '查看网络交互';
+
 	/// zh: '登录失败，请检查账号、密码或网络后重试'
 	String get loginFailed => '登录失败，请检查账号、密码或网络后重试';
 
@@ -1682,6 +1694,10 @@ extension on Translations {
 			'ids.reauthenticateMessage' => '保存的密码已被拒绝，请输入当前密码继续。',
 			'ids.login' => '登录',
 			'ids.loggingIn' => '登录中…',
+			'ids.clearCache' => '清除登录缓存',
+			'ids.cacheCleared' => '清理登录缓存成功。',
+			'ids.cacheClearFailed' => '清理登录缓存失败，请重试。',
+			'ids.viewNetworkActivity' => '查看网络交互',
 			'ids.loginFailed' => '登录失败，请检查账号、密码或网络后重试',
 			'ids.credentialsRejected' => '账号或密码错误。',
 			'ids.networkUnavailable' => '网络不可用，请重试。',

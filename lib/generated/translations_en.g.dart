@@ -86,6 +86,10 @@ class _Translations$ids$en extends Translations$ids$zh {
 	@override String get reauthenticateMessage => 'Your saved password was rejected. Enter your current password to continue.';
 	@override String get login => 'Sign in';
 	@override String get loggingIn => 'Signing in…';
+	@override String get clearCache => 'Clear login cache';
+	@override String get cacheCleared => 'Login cache cleared.';
+	@override String get cacheClearFailed => 'Could not clear login cache. Try again.';
+	@override String get viewNetworkActivity => 'View network activity';
 	@override String get loginFailed => 'Sign-in failed. Check your account, password, or network and try again.';
 	@override String get credentialsRejected => 'Incorrect account or password.';
 	@override String get networkUnavailable => 'Network unavailable. Try again.';
@@ -820,6 +824,10 @@ extension on TranslationsEn {
 			'ids.reauthenticateMessage' => 'Your saved password was rejected. Enter your current password to continue.',
 			'ids.login' => 'Sign in',
 			'ids.loggingIn' => 'Signing in…',
+			'ids.clearCache' => 'Clear login cache',
+			'ids.cacheCleared' => 'Login cache cleared.',
+			'ids.cacheClearFailed' => 'Could not clear login cache. Try again.',
+			'ids.viewNetworkActivity' => 'View network activity',
 			'ids.loginFailed' => 'Sign-in failed. Check your account, password, or network and try again.',
 			'ids.credentialsRejected' => 'Incorrect account or password.',
 			'ids.networkUnavailable' => 'Network unavailable. Try again.',

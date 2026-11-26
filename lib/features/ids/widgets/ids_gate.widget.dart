@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart' as legacy;
 import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/core/shared/widgets/app_icon.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
@@ -31,6 +34,7 @@ final class _IdsGateState extends State<IdsGate> {
   final _username = TextEditingController();
   final _password = TextEditingController();
   bool _working = false;
+  bool _clearing = false;
   bool _passwordHidden = true;
 
   @override
@@ -57,7 +61,7 @@ final class _IdsGateState extends State<IdsGate> {
   }
 
   Future<void> _login() async {
-    if (_working) return;
+    if (_working || _clearing) return;
     final username = _username.text.trim();
     final password = _password.text;
     if (username.isEmpty || password.isEmpty) return;
@@ -69,6 +73,26 @@ final class _IdsGateState extends State<IdsGate> {
       // The feature snapshot carries the user-facing failure.
     } finally {
       if (mounted) setState(() => _working = false);
+    }
+  }
+
+  Future<void> _clearCache() async {
+    if (_working || _clearing) return;
+    setState(() => _clearing = true);
+    try {
+      await widget.feature.clearLoginCache();
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.t.ids.cacheCleared)));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.t.ids.cacheClearFailed)));
+      }
+    } finally {
+      if (mounted) setState(() => _clearing = false);
     }
   }
 
@@ -131,7 +155,7 @@ final class _IdsGateState extends State<IdsGate> {
               minimumSize: const Size(double.infinity, 56),
               maximumSize: const Size(double.infinity, 64),
             ),
-            onPressed: _working ? null : _login,
+            onPressed: _working || _clearing ? null : _login,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -152,6 +176,29 @@ final class _IdsGateState extends State<IdsGate> {
                 ),
               ],
             ),
+          ),  
+          SizedBox(height: wide ? 8 : 16),
+          Wrap(
+            alignment: WrapAlignment.center,
+            children: [
+              TextButton(
+                onPressed: _working || _clearing ? null : _clearCache,
+                child: Text(context.t.ids.clearCache),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  legacy.MaterialPageRoute<void>(
+                    builder: (context) => TalkerScreen(
+                      talker: context.read<Talker>(),
+                      theme: TalkerScreenTheme.fromTheme(
+                        legacy.Theme.of(context),
+                      ),
+                    ),
+                  ),
+                ),
+                child: Text(context.t.ids.viewNetworkActivity),
+              ),
+            ],
           ),
         ],
       ),

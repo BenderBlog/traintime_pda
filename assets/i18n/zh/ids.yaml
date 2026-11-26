@@ -4,6 +4,10 @@ reauthenticate: 请重新登录
 reauthenticate_message: 保存的密码已被拒绝，请输入当前密码继续。
 login: 登录
 logging_in: 登录中…
+clear_cache: 清除登录缓存
+cache_cleared: 清理登录缓存成功。
+cache_clear_failed: 清理登录缓存失败，请重试。
+view_network_activity: 查看网络交互
 login_failed: 登录失败，请检查账号、密码或网络后重试
 credentials_rejected: 账号或密码错误。
 network_unavailable: 网络不可用，请重试。

@@ -4,6 +4,10 @@ reauthenticate: Please sign in again
 reauthenticate_message: Your saved password was rejected. Enter your current password to continue.
 login: Sign in
 logging_in: Signing in…
+clear_cache: Clear login cache
+cache_cleared: Login cache cleared.
+cache_clear_failed: Could not clear login cache. Try again.
+view_network_activity: View network activity
 login_failed: Sign-in failed. Check your account, password, or network and try again.
 credentials_rejected: Incorrect account or password.
 network_unavailable: Network unavailable. Try again.

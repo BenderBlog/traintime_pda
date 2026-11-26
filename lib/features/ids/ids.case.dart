@@ -138,6 +138,8 @@ final class IdsUseCase {
     return _startSignIn(credentials, keepPage: true);
   }
 
+  Future<void> clearLoginCache() => _network.clear();
+
   /// Register and manage the ongoing signin.
   Future<void> _startSignIn(
     IdsCredentials credentials, {

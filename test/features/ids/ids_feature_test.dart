@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pda_repository/pda_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
+import 'package:provider/provider.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/core/secure_storage/secure_store_interface.dart';
 import 'package:watermeter/features/ids/ids.case.dart';
 import 'package:watermeter/features/ids/ids_credentials.model.dart';
@@ -26,6 +28,63 @@ Widget _withMaterialUiLocalizations(BuildContext context, Widget? child) =>
     );
 
 void main() {
+  testWidgets('login can clear its session and open network logs', (
+    tester,
+  ) async {
+    final original = LocaleSettings.currentLocale;
+    addTearDown(() => LocaleSettings.setLocaleSync(original));
+    LocaleSettings.setLocaleSync(AppLocale.en);
+    final network = _Network();
+    final feature = IdsUseCase(_credentialsStore(), network);
+    final talker = Talker(logger: TalkerLogger(output: (_) {}));
+    talker.info('network log example');
+    await feature.restore();
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: Provider<Talker>.value(
+          value: talker,
+          child: MaterialApp(
+            builder: _withMaterialUiLocalizations,
+              home: material_ui.ScaffoldMessenger(child: _loginPage(feature, 'home')),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Clear login cache'));
+    await tester.pumpAndSettle();
+    expect(network.resets, 1);
+    expect(find.text('Login cache cleared.'), findsOneWidget);
+    await tester.tap(find.text('View network activity'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TalkerScreen), findsOneWidget);
+    expect(find.text('network log example'), findsOneWidget);
+    feature.dispose();
+  });
+
+  testWidgets('login reports a failed cache clear', (tester) async {
+    final original = LocaleSettings.currentLocale;
+    addTearDown(() => LocaleSettings.setLocaleSync(original));
+    LocaleSettings.setLocaleSync(AppLocale.en);
+    final network = _Network()..clearError = StateError('failure');
+    final feature = IdsUseCase(_credentialsStore(), network);
+    await feature.restore();
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          builder: _withMaterialUiLocalizations,
+            home: material_ui.ScaffoldMessenger(child: _loginPage(feature, 'home')),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Clear login cache'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Could not clear login cache. Try again.'),
+      findsOneWidget,
+    );
+    feature.dispose();
+  });
+
   testWidgets('verification dialog scrolls above the keyboard', (tester) async {
     await tester.binding.setSurfaceSize(const Size(400, 700));
     addTearDown(() => tester.binding.setSurfaceSize(null));
