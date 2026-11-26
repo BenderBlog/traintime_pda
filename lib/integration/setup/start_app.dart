@@ -57,6 +57,7 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
     final updateFeature = UpdateFeature(
       network,
       localVersion: PackageApplicationInfo.applicationVersion,
+      logger: logger,
     );
     final secureStorage = PlatformSecureStore();
     idsNetwork = IdsRepository(
@@ -67,11 +68,13 @@ Future<void> startApp(LoggerInterface logger, Talker talker) async {
         delete: secureStorage.delete,
       ),
       dioFactory: () => createLoggedDio(talker),
+      onLog: logger.debug,
     );
     final idsUseCase = IdsUseCase(
       // SecureStorage here is used for accessing to account and password.
       SecureIdsCredentialsStore(secureStorage),
       idsNetwork,
+      logger: logger,
     );
     try {
       await idsUseCase.restore();

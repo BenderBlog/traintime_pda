@@ -4,6 +4,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:pda_repository/pda_repository.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import 'package:watermeter/core/logging/talker_app_logger.dart';
 import 'package:watermeter/features/update/update_checker.case.dart';
 import 'package:watermeter/features/update/presentation/update_card.widget.dart';
 import 'package:watermeter/features/update/presentation/update_tile.widget.dart';
@@ -15,7 +17,11 @@ void main() {
     tester,
   ) async {
     LocaleSettings.setLocaleSync(AppLocale.en);
-    final feature = UpdateFeature(_Repository(), localVersion: '1.2.0');
+    final feature = UpdateFeature(
+      _Repository(),
+      localVersion: '1.2.0',
+      logger: _logger(),
+    );
     await tester.pumpWidget(
       TranslationProvider(
         child: MaterialApp(
@@ -44,7 +50,11 @@ void main() {
     tester,
   ) async {
     LocaleSettings.setLocaleSync(AppLocale.en);
-    final checker = UpdateChecker(_Repository(), localVersion: '1.2.0');
+    final checker = UpdateChecker(
+      _Repository(),
+      localVersion: '1.2.0',
+      logger: _logger(),
+    );
     await tester.pumpWidget(
       TranslationProvider(
         child: MaterialApp(
@@ -72,7 +82,11 @@ void main() {
 
   testWidgets('checking updates opens the release details', (tester) async {
     LocaleSettings.setLocaleSync(AppLocale.en);
-    final checker = UpdateChecker(_Repository(), localVersion: '1.2.0');
+    final checker = UpdateChecker(
+      _Repository(),
+      localVersion: '1.2.0',
+      logger: _logger(),
+    );
     await tester.pumpWidget(
       TranslationProvider(
         child: MaterialApp(
@@ -94,6 +108,9 @@ void main() {
     checker.dispose();
   });
 }
+
+TalkerAppLogger _logger() =>
+    TalkerAppLogger(Talker(logger: TalkerLogger(output: (_) {})));
 
 class _Repository implements UpdateRepository {
   @override

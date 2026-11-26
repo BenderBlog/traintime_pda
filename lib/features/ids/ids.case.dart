@@ -3,6 +3,7 @@
 
 import 'package:pda_repository/pda_repository.dart';
 import 'package:signals/signals.dart';
+import 'package:watermeter/core/logging/logger_interface.dart';
 
 import 'ids_credentials.model.dart';
 import 'ids_credentials.store.dart';
@@ -31,10 +32,11 @@ import 'ids_snapshot.model.dart';
 /// On exit, it cleans up network sessions and saved credentials, and coordinates ongoing credential writes.
 /// 8. More typed exception will be returned than the implementation of v1.
 final class IdsUseCase {
-  IdsUseCase(this._store, this._network);
+  IdsUseCase(this._store, this._network, {required this.logger});
 
   final SecureIdsCredentialsStore _store;
   final IdsNetworkRepository _network;
+  final LoggerInterface logger;
   final Signal<IdsSnapshot> _state = signal(
     const IdsSnapshot(IdsStatus.signedOut),
   );
@@ -103,6 +105,7 @@ final class IdsUseCase {
   ///
   /// The restored contents only include account information. The restore logic of cookie is in PdaNetwork layer.
   Future<void> restore() async {
+    logger.info('[IDS] restore started');
     // Record the epoch number for recognizing the outdate operation
     final epoch = ++_epoch;
     // Set state
@@ -110,6 +113,9 @@ final class IdsUseCase {
     try {
       final saved = await _store.read();
       if (epoch != _epoch) return;
+      logger.info(
+        '[IDS] restore finished: ${saved == null ? 'no saved credentials' : 'credentials available'}',
+      );
       _emit(
         saved == null
             ? const IdsSnapshot(IdsStatus.signedOut)
@@ -120,6 +126,7 @@ final class IdsUseCase {
       );
     } catch (error) {
       if (epoch != _epoch) return;
+      logger.error('[IDS] restore failed: ${error.runtimeType}');
       _emit(IdsSnapshot(IdsStatus.error, error: error));
       rethrow;
     }
@@ -142,7 +149,16 @@ final class IdsUseCase {
     return _startSignIn(credentials, keepPage: true);
   }
 
-  Future<void> clearLoginCache() => _network.clear();
+  Future<void> clearLoginCache() async {
+    logger.info('[IDS] clear login cache started');
+    try {
+      await _network.clear();
+      logger.info('[IDS] clear login cache completed');
+    } catch (error) {
+      logger.error('[IDS] clear login cache failed: ${error.runtimeType}');
+      rethrow;
+    }
+  }
 
   /// Register and manage the ongoing signin.
   Future<void> _startSignIn(
@@ -173,6 +189,7 @@ final class IdsUseCase {
     required bool keepPage,
   }) async {
     final epoch = ++_epoch;
+    logger.info('[IDS] ${keepPage ? 're-authentication' : 'sign-in'} started');
     ++_sessionVersion;
     _recovery = null;
     var authenticated = false;
@@ -208,13 +225,18 @@ final class IdsUseCase {
       _pendingWrite = write;
       await write;
       if (epoch != _epoch) return;
+      logger.info('[IDS] sign-in completed');
       _emit(IdsSnapshot(IdsStatus.ready, username: credentials.username));
     } catch (error) {
       if (epoch != _epoch) return;
+      logger.error('[IDS] sign-in failed: ${error.runtimeType}');
       if (authenticated) {
         try {
           await _network.clear();
-        } catch (_) {
+        } catch (cleanupError) {
+          logger.error(
+            '[IDS] sign-in session cleanup failed: ${cleanupError.runtimeType}',
+          );
           // Keep the persistence error as the reported failure.
         }
       }
@@ -241,6 +263,7 @@ final class IdsUseCase {
     IdsInteraction? interaction,
   }) async {
     final epoch = _epoch;
+    logger.info('[IDS] service authorization started');
     final sessionVersion = _sessionVersion;
     final activeInteraction =
         interaction ?? _interaction ?? const IdsInteraction();
@@ -255,6 +278,7 @@ final class IdsUseCase {
         await _network.authorize(service, interaction: activeInteraction);
       } on IdsSessionExpired {
         if (epoch != _epoch) return;
+        logger.warning('[IDS] session expired during service authorization');
         if (sessionVersion == _sessionVersion) {
           final recovery = _recovery ??= _loginSavedCredentials(
             epoch,
@@ -270,11 +294,13 @@ final class IdsUseCase {
         await _network.authorize(service, interaction: activeInteraction);
       }
       if (epoch != _epoch) return;
+      logger.info('[IDS] service authorization completed');
       if (snapshot.status != IdsStatus.ready) {
         _emit(IdsSnapshot(IdsStatus.ready, username: snapshot.username));
       }
-    } catch (_) {
+    } catch (error) {
       if (epoch != _epoch) return;
+      logger.error('[IDS] service authorization failed: ${error.runtimeType}');
       rethrow;
     }
   }
@@ -283,6 +309,7 @@ final class IdsUseCase {
     int epoch,
     IdsInteraction interaction,
   ) async {
+    logger.info('[IDS] saved-session recovery started');
     final credentials = await _store.read();
     if (epoch != _epoch) return;
     if (credentials == null) {
@@ -306,7 +333,10 @@ final class IdsUseCase {
       }
       rethrow;
     }
-    if (epoch == _epoch) ++_sessionVersion;
+    if (epoch == _epoch) {
+      ++_sessionVersion;
+      logger.info('[IDS] saved-session recovery completed');
+    }
   }
 
   Future<void> signOut() {
@@ -324,6 +354,7 @@ final class IdsUseCase {
   }
 
   Future<void> _signOut(int epoch, Future<void>? previous) async {
+    logger.info('[IDS] sign-out started');
     try {
       if (previous != null) {
         try {
@@ -335,8 +366,12 @@ final class IdsUseCase {
         await _pendingWrite;
       } catch (_) {}
       await _store.clear();
-      if (epoch == _epoch) _emit(const IdsSnapshot(IdsStatus.signedOut));
-    } catch (_) {
+      if (epoch == _epoch) {
+        _emit(const IdsSnapshot(IdsStatus.signedOut));
+        logger.info('[IDS] sign-out completed');
+      }
+    } catch (error) {
+      logger.error('[IDS] sign-out failed: ${error.runtimeType}');
       rethrow;
     }
   }

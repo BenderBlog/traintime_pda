@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:provider/provider.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:watermeter/core/logging/talker_app_logger.dart';
 import 'package:watermeter/core/secure_storage/secure_store_interface.dart';
 import 'package:watermeter/features/ids/ids.case.dart';
 import 'package:watermeter/features/ids/ids_credentials.model.dart';
@@ -28,6 +29,52 @@ Widget _withMaterialUiLocalizations(BuildContext context, Widget? child) =>
     );
 
 void main() {
+  test(
+    'IDS activity and failures reach Talker without exposing secrets',
+    () async {
+      final talker = Talker(logger: TalkerLogger(output: (_) {}));
+      final network = _Network();
+      final feature = IdsUseCase(
+        _credentialsStore(),
+        network,
+        logger: TalkerAppLogger(talker),
+      );
+      await feature.restore();
+      await feature.signIn(IdsCredentials('secret-user', 'secret-password'));
+      await feature.signOut();
+      network.error = StateError('secret-error-detail');
+      await expectLater(
+        feature.signIn(IdsCredentials('secret-user', 'secret-password')),
+        throwsStateError,
+      );
+      final messages = talker.history.map((entry) => entry.message).join('\n');
+      expect(messages, contains('restore'));
+      expect(messages, contains('sign-in'));
+      expect(messages, contains('sign-out'));
+      expect(messages, contains('StateError'));
+      expect(messages, isNot(contains('secret')));
+      feature.dispose();
+    },
+  );
+  test('IDS logs session recovery and cache clearing failures', () async {
+    final talker = Talker(logger: TalkerLogger(output: (_) {}));
+    final network = _Network();
+    final store = _credentialsStore();
+    await store.write(IdsCredentials('alice', 'secret'));
+    final feature = IdsUseCase(store, network, logger: TalkerAppLogger(talker));
+    await feature.restore();
+    network.expiredAuthorizations = 1;
+    await feature.authorizeService(Uri.parse('https://ehall.xidian.edu.cn/'));
+    network.clearError = StateError('secret-cookie');
+    await expectLater(feature.clearLoginCache(), throwsStateError);
+    final messages = talker.history.map((entry) => entry.message).join('\n');
+    expect(messages, contains('session expired'));
+    expect(messages, contains('saved-session recovery completed'));
+    expect(messages, contains('clear login cache failed'));
+    expect(messages, isNot(contains('secret')));
+    feature.dispose();
+  });
+
   testWidgets('login can clear its session and open network logs', (
     tester,
   ) async {
@@ -35,7 +82,7 @@ void main() {
     addTearDown(() => LocaleSettings.setLocaleSync(original));
     LocaleSettings.setLocaleSync(AppLocale.en);
     final network = _Network();
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     final talker = Talker(logger: TalkerLogger(output: (_) {}));
     talker.info('network log example');
     await feature.restore();
@@ -68,7 +115,7 @@ void main() {
     addTearDown(() => LocaleSettings.setLocaleSync(original));
     LocaleSettings.setLocaleSync(AppLocale.en);
     final network = _Network()..clearError = StateError('failure');
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
@@ -127,18 +174,21 @@ void main() {
     tester,
   ) async {
     final secure = _MemorySecureStore()..readWait = Completer<void>();
-    final feature = IdsUseCase(SecureIdsCredentialsStore(secure), _Network());
+    final feature = _idsUseCase(SecureIdsCredentialsStore(secure), _Network());
     final restore = feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
-        child: MaterialApp(home: _loginPage(feature, 'home')),
+        child: MaterialApp(
+          builder: _withMaterialUiLocalizations,
+          home: _loginPage(feature, 'home'),
+        ),
       ),
     );
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(material_ui.CircularProgressIndicator), findsOneWidget);
     secure.readWait!.complete();
     await restore;
     await tester.pumpAndSettle();
-    expect(find.byType(TextField), findsNWidgets(2));
+    expect(find.byType(material_ui.TextField), findsNWidgets(2));
     feature.dispose();
   });
 
@@ -147,7 +197,7 @@ void main() {
   ) async {
     await tester.binding.setSurfaceSize(const Size(400, 700));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    final feature = IdsUseCase(_credentialsStore(), _Network());
+    final feature = _idsUseCase(_credentialsStore(), _Network());
     await feature.restore();
 
     Widget page(double keyboardHeight) => TranslationProvider(
@@ -155,7 +205,7 @@ void main() {
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context)
               .copyWith(viewInsets: EdgeInsets.only(bottom: keyboardHeight)),
-          child: child!,
+          child: _withMaterialUiLocalizations(context, child),
         ),
         home: _loginPage(feature, 'home'),
       ),
@@ -171,10 +221,10 @@ void main() {
       tester.getRect(find.byType(SingleChildScrollView)).bottom,
       lessThanOrEqualTo(400),
     );
-    await tester.ensureVisible(find.byType(FilledButton));
+    await tester.ensureVisible(find.byType(material_ui.FilledButton));
     await tester.pumpAndSettle();
     expect(
-      tester.getRect(find.byType(FilledButton)).bottom,
+      tester.getRect(find.byType(material_ui.FilledButton)).bottom,
       lessThanOrEqualTo(400),
     );
     feature.dispose();
@@ -186,11 +236,14 @@ void main() {
     final original = LocaleSettings.currentLocale;
     addTearDown(() => LocaleSettings.setLocaleSync(original));
     LocaleSettings.setLocaleSync(AppLocale.en);
-    final feature = IdsUseCase(_credentialsStore(), _Network());
+    final feature = _idsUseCase(_credentialsStore(), _Network());
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
-        child: MaterialApp(home: _loginPage(feature, 'home')),
+        child: MaterialApp(
+          builder: _withMaterialUiLocalizations,
+          home: _loginPage(feature, 'home'),
+        ),
       ),
     );
 
@@ -213,7 +266,7 @@ void main() {
           const IdsCodeDelivery(null, null, Duration.zero, codeRejected: true),
         );
       };
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
@@ -224,8 +277,8 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byType(TextField).first, 'alice');
-    await tester.enterText(find.byType(TextField).last, 'secret');
+    await tester.enterText(find.byType(material_ui.TextField).first, 'alice');
+    await tester.enterText(find.byType(material_ui.TextField).last, 'secret');
     await tester.tap(find.text('Sign in'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
@@ -248,7 +301,7 @@ void main() {
           const IdsCodeDelivery(null, null, Duration.zero),
         );
       };
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     await tester.pumpWidget(
       TranslationProvider(
         child: MaterialApp(
@@ -300,7 +353,7 @@ void main() {
           ),
         );
       };
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     await tester.pumpWidget(
       TranslationProvider(
         child: MaterialApp(
@@ -346,7 +399,7 @@ void main() {
           ),
         );
       };
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
@@ -391,7 +444,7 @@ void main() {
     await store.write(IdsCredentials('alice', 'secret'));
     final network = _Network()
       ..authorizationError = const IdsServiceUnavailable('offline');
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
@@ -415,7 +468,7 @@ void main() {
   testWidgets('logout failure is shown and can be retried', (tester) async {
     LocaleSettings.setLocaleSync(AppLocale.en);
     final network = _Network()..clearError = StateError('delete failed');
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     await tester.pumpWidget(
       TranslationProvider(
         child: material_ui.MaterialApp(
@@ -446,11 +499,14 @@ void main() {
     final store = _credentialsStore();
     await store.write(IdsCredentials('alice', 'secret'));
     final network = _Network()..clearError = StateError('clear failed');
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
-        child: MaterialApp(home: _loginPage(feature, 'home')),
+        child: MaterialApp(
+          builder: _withMaterialUiLocalizations,
+          home: _loginPage(feature, 'home'),
+        ),
       ),
     );
     expect(find.text('home'), findsOneWidget);
@@ -465,7 +521,7 @@ void main() {
   ) async {
     final store = _credentialsStore();
     await store.write(IdsCredentials('alice', 'secret'));
-    final feature = IdsUseCase(store, _Network());
+    final feature = _idsUseCase(store, _Network());
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
@@ -484,16 +540,19 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
     final pendingLogin = Completer<void>();
     final network = _Network()..onLogin = (_) => pendingLogin.future;
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
-        child: MaterialApp(home: _loginPage(feature, 'home')),
+        child: MaterialApp(
+          builder: _withMaterialUiLocalizations,
+          home: _loginPage(feature, 'home'),
+        ),
       ),
     );
 
-    await tester.enterText(find.byType(TextField).first, 'alice');
-    await tester.enterText(find.byType(TextField).last, 'secret');
+    await tester.enterText(find.byType(material_ui.TextField).first, 'alice');
+    await tester.enterText(find.byType(material_ui.TextField).last, 'secret');
     await tester.tap(find.text('Sign in'));
     await tester.pump();
     await feature.signOut();
@@ -511,15 +570,18 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
     final network = _Network()
       ..error = const IdsCredentialsRejected('secret server details');
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
-        child: MaterialApp(home: _loginPage(feature, 'home')),
+        child: MaterialApp(
+          builder: _withMaterialUiLocalizations,
+          home: _loginPage(feature, 'home'),
+        ),
       ),
     );
-    await tester.enterText(find.byType(TextField).first, 'alice');
-    await tester.enterText(find.byType(TextField).last, 'secret');
+    await tester.enterText(find.byType(material_ui.TextField).first, 'alice');
+    await tester.enterText(find.byType(material_ui.TextField).last, 'secret');
     await tester.tap(find.text('Sign in'));
     await tester.pumpAndSettle();
     expect(find.text('Incorrect account or password.'), findsOneWidget);
@@ -536,17 +598,20 @@ void main() {
   ) async {
     LocaleSettings.setLocaleSync(AppLocale.zh);
     final network = _Network()..error = StateError('secret-token-123');
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
-        child: MaterialApp(home: _loginPage(feature, 'account home')),
+        child: MaterialApp(
+          builder: _withMaterialUiLocalizations,
+          home: _loginPage(feature, 'account home'),
+        ),
       ),
     );
     await tester.pumpAndSettle();
     expect(find.text('学号或工号'), findsOneWidget);
-    await tester.enterText(find.byType(TextField).first, 'alice');
-    await tester.enterText(find.byType(TextField).last, 'secret');
+    await tester.enterText(find.byType(material_ui.TextField).first, 'alice');
+    await tester.enterText(find.byType(material_ui.TextField).last, 'secret');
     await tester.tap(find.text('登录'));
     await tester.pumpAndSettle();
     expect(find.textContaining('secret-token-123'), findsNothing);
@@ -574,7 +639,7 @@ void main() {
     () async {
       final store = _credentialsStore();
       await store.write(IdsCredentials('alice', 'secret'));
-      final feature = IdsUseCase(store, _Network());
+      final feature = _idsUseCase(store, _Network());
 
       await feature.restore();
 
@@ -587,7 +652,7 @@ void main() {
   test('login saves credentials only after the server accepts them', () async {
     final store = _credentialsStore();
     final network = _Network()..error = StateError('password rejected');
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
 
     await expectLater(
       feature.signIn(IdsCredentials('alice', 'secret')),
@@ -609,7 +674,7 @@ void main() {
       final store = _credentialsStore();
       await store.write(IdsCredentials('alice', 'secret'));
       final network = _Network();
-      final feature = IdsUseCase(store, network);
+      final feature = _idsUseCase(store, network);
       await feature.restore();
       network.authorization = Completer<void>();
 
@@ -635,7 +700,7 @@ void main() {
     final network = _Network()
       ..authorization = Completer<void>()
       ..authorizationError = const IdsServiceUnavailable('login failed');
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
     final statuses = <IdsStatus>[];
     final unsubscribe = feature.state.subscribe(
@@ -661,7 +726,7 @@ void main() {
   test(
     'successful service authorization does not notify unchanged session',
     () async {
-      final feature = IdsUseCase(_credentialsStore(), _Network());
+      final feature = _idsUseCase(_credentialsStore(), _Network());
       await feature.signIn(IdsCredentials('alice', 'secret'));
       final statuses = <IdsStatus>[];
       final unsubscribe = feature.state.subscribe(
@@ -679,7 +744,7 @@ void main() {
     final store = SecureIdsCredentialsStore(secure);
     await store.write(IdsCredentials('alice', 'secret'));
     final network = _Network();
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
     final readsAfterRestore = secure.reads;
 
@@ -695,7 +760,7 @@ void main() {
     final store = _credentialsStore();
     await store.write(IdsCredentials('alice', 'secret'));
     final network = _Network()..expiredAuthorizations = 1;
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
 
     await feature.authorizeService(Uri.parse('https://ehall.xidian.edu.cn/'));
@@ -709,7 +774,7 @@ void main() {
   test('sign in waits for an in-flight service authorization', () async {
     final authorization = Completer<void>();
     final network = _Network()..authorization = authorization;
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     final pending = feature.authorizeService(
       Uri.parse('https://ehall.xidian.edu.cn/'),
     );
@@ -734,7 +799,7 @@ void main() {
         }
       };
     final store = _credentialsStore();
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     final first = feature.signIn(IdsCredentials('alice', 'secret'));
     await firstStarted.future;
     final second = feature.signIn(IdsCredentials('bob', 'other'));
@@ -755,7 +820,7 @@ void main() {
         loginStarted.complete();
         await finishLogin.future;
       };
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     final login = feature.signIn(IdsCredentials('alice', 'secret'));
     await loginStarted.future;
     final authorization = feature.authorizeService(
@@ -771,7 +836,7 @@ void main() {
 
   test('service authorization waits for logout cleanup', () async {
     final network = _Network()..clearWait = Completer<void>();
-    final feature = IdsUseCase(_credentialsStore(), network);
+    final feature = _idsUseCase(_credentialsStore(), network);
     final logout = feature.signOut();
     final authorization = feature.authorizeService(
       Uri.parse('https://ehall.xidian.edu.cn/'),
@@ -788,7 +853,7 @@ void main() {
     final store = _credentialsStore();
     await store.write(IdsCredentials('alice', 'secret'));
     final network = _Network()..clearError = StateError('clear failed');
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
     await expectLater(feature.signOut(), throwsStateError);
     await expectLater(
@@ -807,7 +872,7 @@ void main() {
     final store = _credentialsStore();
     await store.write(IdsCredentials('alice', 'secret'));
     final network = _Network()..clearWait = Completer<void>();
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
 
     final logout = feature.signOut();
@@ -825,7 +890,7 @@ void main() {
     final store = _credentialsStore();
     await store.write(IdsCredentials('alice', 'secret'));
     final network = _Network()..expiredAuthorizations = 2;
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
 
     await Future.wait([
@@ -847,11 +912,14 @@ void main() {
       final network = _Network()
         ..expiredAuthorizations = 1
         ..error = const IdsCredentialsRejected('rejected');
-      final feature = IdsUseCase(store, network);
+      final feature = _idsUseCase(store, network);
       await feature.restore();
       await tester.pumpWidget(
         TranslationProvider(
-          child: MaterialApp(home: _loginPage(feature, 'home')),
+          child: MaterialApp(
+            builder: _withMaterialUiLocalizations,
+            home: _loginPage(feature, 'home'),
+          ),
         ),
       );
       final failed = expectLater(
@@ -863,10 +931,14 @@ void main() {
       expect(find.text('home'), findsOneWidget);
       expect(find.text('Please sign in again'), findsOneWidget);
       expect(
-        tester.widget<TextField>(find.byType(TextField).last).autofocus,
+        tester
+            .widget<material_ui.TextField>(
+              find.byType(material_ui.TextField).last,
+            )
+            .autofocus,
         isTrue,
       );
-      await tester.enterText(find.byType(TextField).last, 'wrong');
+      await tester.enterText(find.byType(material_ui.TextField).last, 'wrong');
       await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();
       expect(find.text('Incorrect account or password.'), findsOneWidget);
@@ -881,7 +953,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Sign-in cancelled.'), findsOneWidget);
       network.error = null;
-      await tester.enterText(find.byType(TextField).last, 'new');
+      await tester.enterText(find.byType(material_ui.TextField).last, 'new');
       await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();
       expect(find.text('home'), findsOneWidget);
@@ -903,11 +975,14 @@ void main() {
     final network = _Network()
       ..expiredAuthorizations = 1
       ..error = const IdsCredentialsRejected('rejected');
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
     await tester.pumpWidget(
       TranslationProvider(
-        child: MaterialApp(home: _loginPage(feature, 'home')),
+        child: MaterialApp(
+          builder: _withMaterialUiLocalizations,
+          home: _loginPage(feature, 'home'),
+        ),
       ),
     );
     final failed = expectLater(
@@ -928,7 +1003,7 @@ void main() {
     'reauthentication cannot start without a matching saved account',
     () async {
       final network = _Network();
-      final feature = IdsUseCase(_credentialsStore(), network);
+      final feature = _idsUseCase(_credentialsStore(), network);
       await expectLater(
         feature.reauthenticate(IdsCredentials('alice', 'secret')),
         throwsStateError,
@@ -945,7 +1020,7 @@ void main() {
     final network = _Network()
       ..expiredAuthorizations = 1
       ..error = const IdsCredentialsRejected('password rejected');
-    final feature = IdsUseCase(store, network);
+    final feature = _idsUseCase(store, network);
     await feature.restore();
 
     await expectLater(
@@ -967,7 +1042,7 @@ void main() {
         ..writeError = StateError('disk failure');
       final store = SecureIdsCredentialsStore(secure);
       final network = _Network();
-      final feature = IdsUseCase(store, network);
+      final feature = _idsUseCase(store, network);
 
       await expectLater(
         feature.signIn(IdsCredentials('alice', 'secret')),
@@ -980,6 +1055,15 @@ void main() {
     },
   );
 }
+
+IdsUseCase _idsUseCase(
+  SecureIdsCredentialsStore store,
+  IdsNetworkRepository network,
+) => IdsUseCase(
+  store,
+  network,
+  logger: TalkerAppLogger(Talker(logger: TalkerLogger(output: (_) {}))),
+);
 
 Widget _loginPage(IdsUseCase feature, String homeLabel) => IdsGate(
   feature: feature,

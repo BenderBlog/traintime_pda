@@ -211,6 +211,7 @@ void main() {
     final updateFeature = UpdateFeature(
       _StaticUpdateRepository(),
       localVersion: '2.0.0',
+      logger: TalkerAppLogger(Talker(logger: TalkerLogger(output: (_) {}))),
     );
     await tester.pumpWidget(
       TranslationProvider(
@@ -265,7 +266,11 @@ void main() {
     final themeStore = PreferenceThemeStore(preferences, _RecordingLogger());
     final secure = _TestSecureStore();
     final credentials = SecureIdsCredentialsStore(secure);
-    final signedOut = IdsUseCase(credentials, _TestIdsNetwork());
+    final signedOut = IdsUseCase(
+      credentials,
+      _TestIdsNetwork(),
+      logger: TalkerAppLogger(Talker(logger: TalkerLogger(output: (_) {}))),
+    );
     await signedOut.restore();
 
     await tester.pumpWidget(
@@ -283,15 +288,19 @@ void main() {
     );
     expect(find.byType(IdsGate), findsOneWidget);
     expect(find.byType(AppShell), findsNothing);
-    await tester.enterText(find.byType(legacy.TextField).first, 'alice');
-    await tester.enterText(find.byType(legacy.TextField).last, 'secret');
+    await tester.enterText(find.byType(TextField).first, 'alice');
+    await tester.enterText(find.byType(TextField).last, 'secret');
     await tester.tap(find.text('登录'));
     await tester.pumpAndSettle();
     expect(find.byType(AppShell), findsOneWidget);
-    expect(find.byType(legacy.TextField), findsNothing);
+    expect(find.byType(TextField), findsNothing);
 
     await tester.pumpWidget(const legacy.SizedBox());
-    final signedIn = IdsUseCase(credentials, _TestIdsNetwork());
+    final signedIn = IdsUseCase(
+      credentials,
+      _TestIdsNetwork(),
+      logger: TalkerAppLogger(Talker(logger: TalkerLogger(output: (_) {}))),
+    );
     await signedIn.restore();
     await tester.pumpWidget(
       TranslationProvider(
@@ -307,7 +316,7 @@ void main() {
       ),
     );
     expect(find.byType(AppShell), findsOneWidget);
-    expect(find.byType(legacy.TextField), findsNothing);
+    expect(find.byType(TextField), findsNothing);
     signedOut.dispose();
     signedIn.dispose();
     themeStore.dispose();

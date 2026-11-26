@@ -96,8 +96,16 @@ void main() {
         solveSlider: (_, _, _) async => [(x: 100, y: 0, milliseconds: 10)],
       );
 
-      final first = IdsRepository(sessionStore, dioFactory: server);
+      final events = <String>[];
+      final first = IdsRepository(
+        sessionStore,
+        dioFactory: server,
+        onLog: events.add,
+      );
       await first.login('alice', 'secret', interaction: interaction);
+      expect(events.join('\n'), contains('slider'));
+      expect(events.join('\n'), contains('login'));
+      expect(events.join('\n'), isNot(contains('secret')));
       first.close();
       expect(passwordPosts, 1);
       expect(saved.keys, contains('ids.session.ids.xidian.edu.cn'));

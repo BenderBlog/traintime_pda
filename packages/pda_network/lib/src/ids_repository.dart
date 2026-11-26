@@ -16,13 +16,14 @@ import 'utils/ids_redirects.dart';
 import 'utils/ids_slider_solver.dart';
 
 final class IdsRepository implements IdsNetworkRepository {
-  IdsRepository(IdsSessionStore store, {Dio Function()? dioFactory})
+  IdsRepository(IdsSessionStore store, {Dio Function()? dioFactory, this.onLog})
     : _sessionStore = store,
       session = IdsHttpSession(store, dioFactory: dioFactory);
 
   static final Uri _ids = Uri.parse('https://ids.xidian.edu.cn');
   static const _maxRedirects = 30;
   final IdsSessionStore _sessionStore;
+  final void Function(String)? onLog;
   final IdsHttpSession session;
   Future<Dio>? _client;
   int _generation = 0;
@@ -58,10 +59,12 @@ final class IdsRepository implements IdsNetworkRepository {
     String password,
     IdsInteraction interaction,
   ) async {
+    onLog?.call('[IDS network] clearing session before login');
     await session.clear();
     _check(generation);
     _client = null;
     final loginUri = _ids.replace(path: '/authserver/login');
+    onLog?.call('[IDS network] requesting login page');
     var response = await _request(generation, loginUri);
     if (_redirect(response)) {
       await _follow(generation, response, null, interaction);
@@ -97,6 +100,9 @@ final class IdsRepository implements IdsNetworkRepository {
     if (![16, 24, 32].contains(utf8.encode(salt).length)) {
       throw const FormatException('统一认证加密参数无效');
     }
+    onLog?.call(
+      '[IDS network] login form parsed; preparing device fingerprint',
+    );
     await _request(
       generation,
       _ids.replace(
@@ -108,6 +114,7 @@ final class IdsRepository implements IdsNetworkRepository {
       ),
     );
     await _solveSlider(generation, interaction);
+    onLog?.call('[IDS network] submitting login');
     response = await _request(
       generation,
       loginUri,
@@ -132,6 +139,7 @@ final class IdsRepository implements IdsNetworkRepository {
       }
       response = continued;
     }
+    onLog?.call('[IDS network] following login redirects');
     await _follow(generation, response, null, interaction);
   }
 
@@ -141,6 +149,7 @@ final class IdsRepository implements IdsNetworkRepository {
     IdsInteraction interaction,
   ) async {
     validateIdsService(service);
+    onLog?.call('[IDS network] requesting service authorization');
     final loginUri = _ids.replace(
       path: '/authserver/login',
       queryParameters: {'service': service.toString()},
@@ -190,6 +199,7 @@ final class IdsRepository implements IdsNetworkRepository {
   }
 
   Future<void> _solveSlider(int generation, IdsInteraction interaction) async {
+    onLog?.call('[IDS network] automatic slider verification started');
     late Uint8List background;
     late Uint8List piece;
     for (var attempt = 0; attempt < 6; attempt++) {
@@ -208,12 +218,18 @@ final class IdsRepository implements IdsNetworkRepository {
             IdsSliderAlgorithms.generateTracks(move),
             delay: true,
           )) {
+            onLog?.call(
+              '[IDS network] automatic slider verification succeeded',
+            );
             return;
           }
         }
       }
     }
     final manual = interaction.solveSlider;
+    onLog?.call(
+      '[IDS network] automatic slider verification exhausted; manual verification required',
+    );
     if (manual == null) throw const IdsLoginException('滑块验证码校验失败');
     var retry = false;
     while (true) {
@@ -224,6 +240,7 @@ final class IdsRepository implements IdsNetworkRepository {
           await _verifySlider(generation, piece, [
             for (final p in points) TrackPoint(p.x, p.y, p.milliseconds),
           ])) {
+        onLog?.call('[IDS network] manual slider verification succeeded');
         return;
       }
       (background, piece) = await _loadSlider(generation);
@@ -315,6 +332,7 @@ final class IdsRepository implements IdsNetworkRepository {
       }
       if (next.host == _ids.host &&
           next.path == '/authserver/reAuthCheck/reAuthLoginView.do') {
+        onLog?.call('[IDS network] second-factor verification required');
         response = await _secondFactor(generation, next, service, interaction);
         continue;
       }
@@ -365,6 +383,9 @@ final class IdsRepository implements IdsNetworkRepository {
     IdsCodeType? currentType;
     IdsCodeDelivery? currentDelivery;
     Future<IdsCodeDelivery> sendCode(IdsCodeType type) async {
+      onLog?.call(
+        '[IDS network] requesting second-factor code via ${type.name}',
+      );
       final typeValue = type == IdsCodeType.sms ? '3' : '4';
       final codeName = type == IdsCodeType.sms
           ? 'reAuthDynamicCodeType'
@@ -455,6 +476,7 @@ final class IdsRepository implements IdsNetworkRepository {
       final result = _jsonMap(submitted.data);
       switch (result['code']?.toString()) {
         case 'reAuth_success':
+          onLog?.call('[IDS network] second-factor verification succeeded');
           return _request(
             generation,
             _ids.replace(
