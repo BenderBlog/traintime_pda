@@ -1,5 +1,7 @@
 # 自定义课程数据流程重构方案
 
+> **结构说明：** 本文早于当前[项目架构](../../../.agents/skills/pda-v2-coding-principles/references/architecture.md)的文件组织调整。下文提到的固定分层目录、feature 内的 Repository 接口及 `drift_repository.dart` 路径不再是实现要求。实现时以 `*.model.dart`、`*.case.dart`、`*.store.dart`、`*.widget.dart` 标记主要职责；本地读写由用例或具体 store 负责，网络接口放在 `pda_repository`。下文的课程规则、表结构及事务要求仍有效；第 6.7 节历史数据迁移不适用于 v2 新实现。
+
 ## Table of Contents
 
 - [自定义课程数据流程重构方案](#自定义课程数据流程重构方案)

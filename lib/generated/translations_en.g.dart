@@ -41,7 +41,9 @@ class TranslationsEn extends Translations with BaseTranslations<AppLocale, Trans
 	// Translations
 	@override late final _Translations$common$en common = _Translations$common$en._(_root);
 	@override late final _Translations$core$en core = _Translations$core$en._(_root);
+	@override late final _Translations$ids$en ids = _Translations$ids$en._(_root);
 	@override late final _Translations$settings$en settings = _Translations$settings$en._(_root);
+	@override late final _Translations$timetable$en timetable = _Translations$timetable$en._(_root);
 }
 
 // Path: common
@@ -69,6 +71,42 @@ class _Translations$core$en extends Translations$core$zh {
 	@override late final _Translations$core$language$en language = _Translations$core$language$en._(_root);
 	@override late final _Translations$core$theme$en theme = _Translations$core$theme$en._(_root);
 	@override late final _Translations$core$gridPage$en gridPage = _Translations$core$gridPage$en._(_root);
+}
+
+// Path: ids
+class _Translations$ids$en extends Translations$ids$zh {
+	_Translations$ids$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get username => 'Student or staff ID';
+	@override String get password => 'Password';
+	@override String get reauthenticate => 'Please sign in again';
+	@override String get reauthenticateMessage => 'Your saved password was rejected. Enter your current password to continue.';
+	@override String get login => 'Sign in';
+	@override String get loggingIn => 'Signing in…';
+	@override String get loginFailed => 'Sign-in failed. Check your account, password, or network and try again.';
+	@override String get credentialsRejected => 'Incorrect account or password.';
+	@override String get networkUnavailable => 'Network unavailable. Try again.';
+	@override String get loginCancelled => 'Sign-in cancelled.';
+	@override String get logout => 'Sign out';
+	@override String get sliderTitle => 'Slider verification';
+	@override String get sliderRetry => 'Verification failed. Try the new image.';
+	@override String get mfaMethodTitle => 'Choose a verification method';
+	@override String get smsCode => 'SMS code';
+	@override String get wechatCode => 'WeCom code';
+	@override String get mfaTitle => 'Two-step verification';
+	@override String get codeSent => 'Verification code sent';
+	@override String get codeRequired => 'Enter the verification code';
+	@override String get codeInvalid => 'Incorrect code. Try again.';
+	@override String get trustDevice => 'Trust this device';
+	@override String get submit => 'Submit';
+	@override String get sendCode => 'Send code';
+	@override String resendCountdown({required Object seconds}) => 'Resend in ${seconds} s';
+	@override String get trustDeviceHint => 'Fewer verification prompts next time';
+	@override String get codeSendFailed => 'Could not send the code. Try again.';
+	@override late final _Translations$ids$logoutDialog$en logoutDialog = _Translations$ids$logoutDialog$en._(_root);
 }
 
 // Path: settings
@@ -185,6 +223,27 @@ class _Translations$settings$en extends Translations$settings$zh {
 	@override String get classSwiftExplain => 'Positive number delays the start date, negative number advances the start date';
 }
 
+// Path: timetable
+class _Translations$timetable$en extends Translations$timetable$zh {
+	_Translations$timetable$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Schedule';
+	@override String get unavailable => 'Schedule data sources are not connected yet';
+	@override String get loading => 'Loading schedule';
+	@override String get error => 'Some schedule data could not be loaded';
+	@override String get cache => 'Showing saved schedule data';
+	@override String get empty => 'No arrangements this semester';
+	@override String week({required Object number}) => 'Week ${number}';
+	@override String get refresh => 'Refresh schedule';
+	@override String get today => 'Today';
+	@override String get tomorrow => 'Tomorrow';
+	@override String get noMoreToday => 'No more arrangements today';
+	@override String get noneTomorrow => 'No arrangements tomorrow';
+}
+
 // Path: core.language
 class _Translations$core$language$en extends Translations$core$language$zh {
 	_Translations$core$language$en._(TranslationsEn root) : this._root = root, super.internal(root);
@@ -234,6 +293,18 @@ class _Translations$core$gridPage$en extends Translations$core$gridPage$zh {
 	@override String get editReset => 'Reset Layout';
 	@override String get manageHidden => 'Manage hidden cards';
 	@override String get hideEmpty => 'No hidden cards';
+}
+
+// Path: ids.logoutDialog
+class _Translations$ids$logoutDialog$en extends Translations$ids$logoutDialog$zh {
+	_Translations$ids$logoutDialog$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Logout confirmation';
+	@override String get content => 'Sign out? Saved IDS credentials and session cookies will be removed.';
+	@override String get failed => 'Could not sign out. Please try again.';
 }
 
 // Path: settings.lowElectricityThresholdDialog
@@ -743,6 +814,35 @@ extension on TranslationsEn {
 			'core.gridPage.editReset' => 'Reset Layout',
 			'core.gridPage.manageHidden' => 'Manage hidden cards',
 			'core.gridPage.hideEmpty' => 'No hidden cards',
+			'ids.username' => 'Student or staff ID',
+			'ids.password' => 'Password',
+			'ids.reauthenticate' => 'Please sign in again',
+			'ids.reauthenticateMessage' => 'Your saved password was rejected. Enter your current password to continue.',
+			'ids.login' => 'Sign in',
+			'ids.loggingIn' => 'Signing in…',
+			'ids.loginFailed' => 'Sign-in failed. Check your account, password, or network and try again.',
+			'ids.credentialsRejected' => 'Incorrect account or password.',
+			'ids.networkUnavailable' => 'Network unavailable. Try again.',
+			'ids.loginCancelled' => 'Sign-in cancelled.',
+			'ids.logout' => 'Sign out',
+			'ids.sliderTitle' => 'Slider verification',
+			'ids.sliderRetry' => 'Verification failed. Try the new image.',
+			'ids.mfaMethodTitle' => 'Choose a verification method',
+			'ids.smsCode' => 'SMS code',
+			'ids.wechatCode' => 'WeCom code',
+			'ids.mfaTitle' => 'Two-step verification',
+			'ids.codeSent' => 'Verification code sent',
+			'ids.codeRequired' => 'Enter the verification code',
+			'ids.codeInvalid' => 'Incorrect code. Try again.',
+			'ids.trustDevice' => 'Trust this device',
+			'ids.submit' => 'Submit',
+			'ids.sendCode' => 'Send code',
+			'ids.resendCountdown' => ({required Object seconds}) => 'Resend in ${seconds} s',
+			'ids.trustDeviceHint' => 'Fewer verification prompts next time',
+			'ids.codeSendFailed' => 'Could not send the code. Try again.',
+			'ids.logoutDialog.title' => 'Logout confirmation',
+			'ids.logoutDialog.content' => 'Sign out? Saved IDS credentials and session cookies will be removed.',
+			'ids.logoutDialog.failed' => 'Could not sign out. Please try again.',
 			'settings.title' => 'Settings',
 			'settings.aboutInfo' => 'APP info',
 			'settings.acknowledgement' => ({required Object developers}) => 'Made With Love From ${developers} People',
@@ -1085,6 +1185,18 @@ extension on TranslationsEn {
 			'settings.classTableStylePage.completedBorderAlpha' => ({required Object value}) => 'Border opacity: ${value}',
 			'settings.classTableStylePage.completedInnerAlpha' => ({required Object value}) => 'Fill opacity: ${value}',
 			'settings.classSwiftExplain' => 'Positive number delays the start date, negative number advances the start date',
+			'timetable.title' => 'Schedule',
+			'timetable.unavailable' => 'Schedule data sources are not connected yet',
+			'timetable.loading' => 'Loading schedule',
+			'timetable.error' => 'Some schedule data could not be loaded',
+			'timetable.cache' => 'Showing saved schedule data',
+			'timetable.empty' => 'No arrangements this semester',
+			'timetable.week' => ({required Object number}) => 'Week ${number}',
+			'timetable.refresh' => 'Refresh schedule',
+			'timetable.today' => 'Today',
+			'timetable.tomorrow' => 'Tomorrow',
+			'timetable.noMoreToday' => 'No more arrangements today',
+			'timetable.noneTomorrow' => 'No arrangements tomorrow',
 			_ => null,
 		};
 	}

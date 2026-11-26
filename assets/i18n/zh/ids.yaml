@@ -1,0 +1,30 @@
+username: 学号或工号
+password: 密码
+reauthenticate: 请重新登录
+reauthenticate_message: 保存的密码已被拒绝，请输入当前密码继续。
+login: 登录
+logging_in: 登录中…
+login_failed: 登录失败，请检查账号、密码或网络后重试
+credentials_rejected: 账号或密码错误。
+network_unavailable: 网络不可用，请重试。
+login_cancelled: 已取消登录。
+logout: 退出账号
+slider_title: 滑块验证
+slider_retry: 验证失败，请使用新图片重试。
+mfa_method_title: 选择二次认证方式
+sms_code: 短信验证码
+wechat_code: 企业微信验证码
+mfa_title: 二次认证
+code_sent: 验证码已发送
+code_required: 请输入验证码
+code_invalid: 验证码错误，请重试
+trust_device: 信任此设备
+submit: 提交
+send_code: 发送验证码
+resend_countdown: '{seconds} 秒后重发'
+trust_device_hint: 下次可减少验证
+code_send_failed: 验证码发送失败，请重试
+logout_dialog:
+  title: 确认对话框
+  content: 确定退出登录？保存的统一认证账号密码和会话 Cookie 将被删除。
+  failed: 退出失败，请重试。

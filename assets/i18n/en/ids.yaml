@@ -1,0 +1,30 @@
+username: Student or staff ID
+password: Password
+reauthenticate: Please sign in again
+reauthenticate_message: Your saved password was rejected. Enter your current password to continue.
+login: Sign in
+logging_in: Signing in…
+login_failed: Sign-in failed. Check your account, password, or network and try again.
+credentials_rejected: Incorrect account or password.
+network_unavailable: Network unavailable. Try again.
+login_cancelled: Sign-in cancelled.
+logout: Sign out
+slider_title: Slider verification
+slider_retry: Verification failed. Try the new image.
+mfa_method_title: Choose a verification method
+sms_code: SMS code
+wechat_code: WeCom code
+mfa_title: Two-step verification
+code_sent: Verification code sent
+code_required: Enter the verification code
+code_invalid: Incorrect code. Try again.
+trust_device: Trust this device
+submit: Submit
+send_code: Send code
+resend_countdown: 'Resend in {seconds} s'
+trust_device_hint: Fewer verification prompts next time
+code_send_failed: Could not send the code. Try again.
+logout_dialog:
+  title: Logout confirmation
+  content: Sign out? Saved IDS credentials and session cookies will be removed.
+  failed: Could not sign out. Please try again.

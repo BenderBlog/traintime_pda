@@ -1,0 +1,30 @@
+username: 學號或工號
+password: 密碼
+reauthenticate: 請重新登入
+reauthenticate_message: 儲存的密碼已遭拒絕，請輸入目前的密碼繼續。
+login: 登入
+logging_in: 登入中…
+login_failed: 登入失敗，請檢查帳號、密碼或網路後重試
+credentials_rejected: 帳號或密碼錯誤。
+network_unavailable: 網路無法使用，請重試。
+login_cancelled: 已取消登入。
+logout: 登出帳號
+slider_title: 滑塊驗證
+slider_retry: 驗證失敗，請使用新圖片重試。
+mfa_method_title: 選擇二次認證方式
+sms_code: 簡訊驗證碼
+wechat_code: 企業微信驗證碼
+mfa_title: 二次認證
+code_sent: 驗證碼已傳送
+code_required: 請輸入驗證碼
+code_invalid: 驗證碼錯誤，請重試
+trust_device: 信任此裝置
+submit: 提交
+send_code: 傳送驗證碼
+resend_countdown: '{seconds} 秒後重發'
+trust_device_hint: 下次可減少驗證
+code_send_failed: 驗證碼傳送失敗，請重試
+logout_dialog:
+  title: 確認對話框
+  content: 確定登出？儲存的統一認證帳號密碼和工作階段 Cookie 將被刪除。
+  failed: 登出失敗，請重試。

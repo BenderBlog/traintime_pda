@@ -4,6 +4,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/core/presentation/settings_page/settings_page_section_interface.dart';
+import 'package:watermeter/features/ids/ids.dart';
 import 'package:watermeter/features/settings/presentation/tiles/about_tile.dart';
 import 'package:watermeter/features/settings/presentation/tiles/talker_tile.dart';
 import 'package:watermeter/features/update/update.dart';
@@ -29,9 +30,10 @@ class AboutSection implements SettingsPageSectionInterface {
 }
 
 class CoreSection implements SettingsPageSectionInterface {
-  const CoreSection({required this.talker});
+  const CoreSection({required this.talker, required this.idsUseCase});
 
   final Talker talker;
+  final IdsUseCase idsUseCase;
 
   @override
   IconData? icon() => null;
@@ -39,6 +41,7 @@ class CoreSection implements SettingsPageSectionInterface {
   @override
   List<SettingsPageSectionEntry> items(BuildContext context) => <ListTile>[
     talkerTile(context, talker),
+    idsLogoutTile(context, idsUseCase),
   ];
 
   @override

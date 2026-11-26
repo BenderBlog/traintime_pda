@@ -28,7 +28,10 @@ import 'package:watermeter/core/shared/widgets/settings/segmented_list.dart';
 import 'package:watermeter/core/shared/widgets/settings/slider_tile.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/features/update/update.dart';
-import 'package:watermeter/integration/setup/settings_sections.dart';
+import 'package:watermeter/features/ids/ids.dart';
+import 'package:watermeter/core/secure_storage/secure_store_interface.dart';
+import 'package:watermeter/core/presentation/settings_page/settings_page_section_interface.dart';
+import 'package:watermeter/features/settings/presentation/tiles/talker_tile.dart';
 
 void main() {
   test('logger maps its supported levels to Talker', () {
@@ -216,6 +219,62 @@ void main() {
     updateFeature.dispose();
   });
 
+  testWidgets('MyApp starts on login only when no IDS account is saved', (
+    tester,
+  ) async {
+    LocaleSettings.setLocaleSync(AppLocale.zh);
+    final preferences = _MemoryPreferences();
+    final themeStore = PreferenceThemeStore(preferences, _RecordingLogger());
+    final secure = _TestSecureStore();
+    final credentials = SecureIdsCredentialsStore(secure);
+    final signedOut = IdsUseCase(credentials, _TestIdsNetwork());
+    await signedOut.restore();
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: Provider<ThemeStoreInterface>.value(
+          value: themeStore,
+          child: MyApp(
+            gridPreferences: preferences,
+            headers: const [],
+            settingsSections: const [],
+            idsUseCase: signedOut,
+          ),
+        ),
+      ),
+    );
+    expect(find.byType(IdsGate), findsOneWidget);
+    expect(find.byType(AppShell), findsNothing);
+    await tester.enterText(find.byType(legacy.TextField).first, 'alice');
+    await tester.enterText(find.byType(legacy.TextField).last, 'secret');
+    await tester.tap(find.text('登录'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AppShell), findsOneWidget);
+    expect(find.byType(legacy.TextField), findsNothing);
+
+    await tester.pumpWidget(const legacy.SizedBox());
+    final signedIn = IdsUseCase(credentials, _TestIdsNetwork());
+    await signedIn.restore();
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: Provider<ThemeStoreInterface>.value(
+          value: themeStore,
+          child: MyApp(
+            gridPreferences: preferences,
+            headers: const [],
+            settingsSections: const [],
+            idsUseCase: signedIn,
+          ),
+        ),
+      ),
+    );
+    expect(find.byType(AppShell), findsOneWidget);
+    expect(find.byType(legacy.TextField), findsNothing);
+    signedOut.dispose();
+    signedIn.dispose();
+    themeStore.dispose();
+  });
+
   testWidgets('Talker routes inherit legacy Material localizations', (
     tester,
   ) async {
@@ -238,7 +297,7 @@ void main() {
           child: MyApp(
             gridPreferences: _MemoryPreferences(),
             headers: const [],
-            settingsSections: [CoreSection(talker: talker)],
+            settingsSections: [_TalkerSection(talker)],
           ),
         ),
       ),
@@ -364,6 +423,19 @@ void main() {
   });
 }
 
+final class _TalkerSection implements SettingsPageSectionInterface {
+  const _TalkerSection(this.talker);
+  final Talker talker;
+  @override
+  IconData? icon() => null;
+  @override
+  String? title() => null;
+  @override
+  List<SettingsPageSectionEntry> items(BuildContext context) => [
+    talkerTile(context, talker),
+  ];
+}
+
 class _StaticUpdateRepository implements UpdateRepository {
   @override
   Future<UpdateReleaseData> fetchLatest() async => (
@@ -373,6 +445,37 @@ class _StaticUpdateRepository implements UpdateRepository {
     androidUrl: 'https://example.org/android',
     githubUrl: 'https://example.org/releases',
   );
+}
+
+final class _TestSecureStore implements SecureStoreInterface {
+  final values = <String, String>{};
+
+  @override
+  Future<String?> read(String key) async => values[key];
+
+  @override
+  Future<void> write(String key, String value) async => values[key] = value;
+
+  @override
+  Future<void> delete(String key) async => values.remove(key);
+}
+
+final class _TestIdsNetwork implements IdsNetworkRepository {
+  @override
+  Future<void> login(
+    String username,
+    String password, {
+    IdsInteraction interaction = const IdsInteraction(),
+  }) async {}
+
+  @override
+  Future<void> authorize(
+    Uri service, {
+    IdsInteraction interaction = const IdsInteraction(),
+  }) async {}
+
+  @override
+  Future<void> clear() async {}
 }
 
 class _RecordingLogger extends Fake implements LoggerInterface {

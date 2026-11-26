@@ -8,6 +8,11 @@ environment:
 
 dependencies:
   dio: ^5.0.0
+  dio_cookie_manager: ^3.0.0
+  cookie_jar: ^4.0.3
+  encrypter_plus: ^5.1.0
+  html: ^0.15.4
+  image: ^4.2.0
   pda_repository:
     path: ../pda_repository
 

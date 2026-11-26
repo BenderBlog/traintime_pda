@@ -41,7 +41,9 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	// Translations
 	@override late final _Translations$common$zh_TW common = _Translations$common$zh_TW._(_root);
 	@override late final _Translations$core$zh_TW core = _Translations$core$zh_TW._(_root);
+	@override late final _Translations$ids$zh_TW ids = _Translations$ids$zh_TW._(_root);
 	@override late final _Translations$settings$zh_TW settings = _Translations$settings$zh_TW._(_root);
+	@override late final _Translations$timetable$zh_TW timetable = _Translations$timetable$zh_TW._(_root);
 }
 
 // Path: common
@@ -69,6 +71,42 @@ class _Translations$core$zh_TW extends Translations$core$zh {
 	@override late final _Translations$core$language$zh_TW language = _Translations$core$language$zh_TW._(_root);
 	@override late final _Translations$core$theme$zh_TW theme = _Translations$core$theme$zh_TW._(_root);
 	@override late final _Translations$core$gridPage$zh_TW gridPage = _Translations$core$gridPage$zh_TW._(_root);
+}
+
+// Path: ids
+class _Translations$ids$zh_TW extends Translations$ids$zh {
+	_Translations$ids$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get username => '學號或工號';
+	@override String get password => '密碼';
+	@override String get reauthenticate => '請重新登入';
+	@override String get reauthenticateMessage => '儲存的密碼已遭拒絕，請輸入目前的密碼繼續。';
+	@override String get login => '登入';
+	@override String get loggingIn => '登入中…';
+	@override String get loginFailed => '登入失敗，請檢查帳號、密碼或網路後重試';
+	@override String get credentialsRejected => '帳號或密碼錯誤。';
+	@override String get networkUnavailable => '網路無法使用，請重試。';
+	@override String get loginCancelled => '已取消登入。';
+	@override String get logout => '登出帳號';
+	@override String get sliderTitle => '滑塊驗證';
+	@override String get sliderRetry => '驗證失敗，請使用新圖片重試。';
+	@override String get mfaMethodTitle => '選擇二次認證方式';
+	@override String get smsCode => '簡訊驗證碼';
+	@override String get wechatCode => '企業微信驗證碼';
+	@override String get mfaTitle => '二次認證';
+	@override String get codeSent => '驗證碼已傳送';
+	@override String get codeRequired => '請輸入驗證碼';
+	@override String get codeInvalid => '驗證碼錯誤，請重試';
+	@override String get trustDevice => '信任此裝置';
+	@override String get submit => '提交';
+	@override String get sendCode => '傳送驗證碼';
+	@override String resendCountdown({required Object seconds}) => '${seconds} 秒後重發';
+	@override String get trustDeviceHint => '下次可減少驗證';
+	@override String get codeSendFailed => '驗證碼傳送失敗，請重試';
+	@override late final _Translations$ids$logoutDialog$zh_TW logoutDialog = _Translations$ids$logoutDialog$zh_TW._(_root);
 }
 
 // Path: settings
@@ -185,6 +223,27 @@ class _Translations$settings$zh_TW extends Translations$settings$zh {
 	@override String get classSwiftExplain => '正數錯後開學日期 負數提前開學日期';
 }
 
+// Path: timetable
+class _Translations$timetable$zh_TW extends Translations$timetable$zh {
+	_Translations$timetable$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '課程表';
+	@override String get unavailable => '課程資料來源尚未接入';
+	@override String get loading => '正在載入課程表';
+	@override String get error => '部分課程資料載入失敗';
+	@override String get cache => '正在顯示已儲存的課程資料';
+	@override String get empty => '本學期暫無安排';
+	@override String week({required Object number}) => '第 ${number} 週';
+	@override String get refresh => '重新整理課程表';
+	@override String get today => '今天';
+	@override String get tomorrow => '明天';
+	@override String get noMoreToday => '今天沒有更多安排';
+	@override String get noneTomorrow => '明天沒有安排';
+}
+
 // Path: core.language
 class _Translations$core$language$zh_TW extends Translations$core$language$zh {
 	_Translations$core$language$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -234,6 +293,18 @@ class _Translations$core$gridPage$zh_TW extends Translations$core$gridPage$zh {
 	@override String get editReset => '恢復默認佈局';
 	@override String get manageHidden => '管理隱藏卡片';
 	@override String get hideEmpty => '沒有隱藏的卡片';
+}
+
+// Path: ids.logoutDialog
+class _Translations$ids$logoutDialog$zh_TW extends Translations$ids$logoutDialog$zh {
+	_Translations$ids$logoutDialog$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '確認對話框';
+	@override String get content => '確定登出？儲存的統一認證帳號密碼和工作階段 Cookie 將被刪除。';
+	@override String get failed => '登出失敗，請重試。';
 }
 
 // Path: settings.lowElectricityThresholdDialog
@@ -743,6 +814,35 @@ extension on TranslationsZhTw {
 			'core.gridPage.editReset' => '恢復默認佈局',
 			'core.gridPage.manageHidden' => '管理隱藏卡片',
 			'core.gridPage.hideEmpty' => '沒有隱藏的卡片',
+			'ids.username' => '學號或工號',
+			'ids.password' => '密碼',
+			'ids.reauthenticate' => '請重新登入',
+			'ids.reauthenticateMessage' => '儲存的密碼已遭拒絕，請輸入目前的密碼繼續。',
+			'ids.login' => '登入',
+			'ids.loggingIn' => '登入中…',
+			'ids.loginFailed' => '登入失敗，請檢查帳號、密碼或網路後重試',
+			'ids.credentialsRejected' => '帳號或密碼錯誤。',
+			'ids.networkUnavailable' => '網路無法使用，請重試。',
+			'ids.loginCancelled' => '已取消登入。',
+			'ids.logout' => '登出帳號',
+			'ids.sliderTitle' => '滑塊驗證',
+			'ids.sliderRetry' => '驗證失敗，請使用新圖片重試。',
+			'ids.mfaMethodTitle' => '選擇二次認證方式',
+			'ids.smsCode' => '簡訊驗證碼',
+			'ids.wechatCode' => '企業微信驗證碼',
+			'ids.mfaTitle' => '二次認證',
+			'ids.codeSent' => '驗證碼已傳送',
+			'ids.codeRequired' => '請輸入驗證碼',
+			'ids.codeInvalid' => '驗證碼錯誤，請重試',
+			'ids.trustDevice' => '信任此裝置',
+			'ids.submit' => '提交',
+			'ids.sendCode' => '傳送驗證碼',
+			'ids.resendCountdown' => ({required Object seconds}) => '${seconds} 秒後重發',
+			'ids.trustDeviceHint' => '下次可減少驗證',
+			'ids.codeSendFailed' => '驗證碼傳送失敗，請重試',
+			'ids.logoutDialog.title' => '確認對話框',
+			'ids.logoutDialog.content' => '確定登出？儲存的統一認證帳號密碼和工作階段 Cookie 將被刪除。',
+			'ids.logoutDialog.failed' => '登出失敗，請重試。',
 			'settings.title' => '設置',
 			'settings.aboutInfo' => '程序信息',
 			'settings.acknowledgement' => ({required Object developers}) => 'Made With Love From ${developers} People',
@@ -1085,6 +1185,18 @@ extension on TranslationsZhTw {
 			'settings.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
 			'settings.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'settings.classSwiftExplain' => '正數錯後開學日期 負數提前開學日期',
+			'timetable.title' => '課程表',
+			'timetable.unavailable' => '課程資料來源尚未接入',
+			'timetable.loading' => '正在載入課程表',
+			'timetable.error' => '部分課程資料載入失敗',
+			'timetable.cache' => '正在顯示已儲存的課程資料',
+			'timetable.empty' => '本學期暫無安排',
+			'timetable.week' => ({required Object number}) => '第 ${number} 週',
+			'timetable.refresh' => '重新整理課程表',
+			'timetable.today' => '今天',
+			'timetable.tomorrow' => '明天',
+			'timetable.noMoreToday' => '今天沒有更多安排',
+			'timetable.noneTomorrow' => '明天沒有安排',
 			_ => null,
 		};
 	}

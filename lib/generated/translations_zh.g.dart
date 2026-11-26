@@ -43,7 +43,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	// Translations
 	late final Translations$common$zh common = Translations$common$zh.internal(_root);
 	late final Translations$core$zh core = Translations$core$zh.internal(_root);
+	late final Translations$ids$zh ids = Translations$ids$zh.internal(_root);
 	late final Translations$settings$zh settings = Translations$settings$zh.internal(_root);
+	late final Translations$timetable$zh timetable = Translations$timetable$zh.internal(_root);
 }
 
 // Path: common
@@ -83,6 +85,95 @@ class Translations$core$zh {
 	late final Translations$core$language$zh language = Translations$core$language$zh.internal(_root);
 	late final Translations$core$theme$zh theme = Translations$core$theme$zh.internal(_root);
 	late final Translations$core$gridPage$zh gridPage = Translations$core$gridPage$zh.internal(_root);
+}
+
+// Path: ids
+class Translations$ids$zh {
+	Translations$ids$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '学号或工号'
+	String get username => '学号或工号';
+
+	/// zh: '密码'
+	String get password => '密码';
+
+	/// zh: '请重新登录'
+	String get reauthenticate => '请重新登录';
+
+	/// zh: '保存的密码已被拒绝，请输入当前密码继续。'
+	String get reauthenticateMessage => '保存的密码已被拒绝，请输入当前密码继续。';
+
+	/// zh: '登录'
+	String get login => '登录';
+
+	/// zh: '登录中…'
+	String get loggingIn => '登录中…';
+
+	/// zh: '登录失败，请检查账号、密码或网络后重试'
+	String get loginFailed => '登录失败，请检查账号、密码或网络后重试';
+
+	/// zh: '账号或密码错误。'
+	String get credentialsRejected => '账号或密码错误。';
+
+	/// zh: '网络不可用，请重试。'
+	String get networkUnavailable => '网络不可用，请重试。';
+
+	/// zh: '已取消登录。'
+	String get loginCancelled => '已取消登录。';
+
+	/// zh: '退出账号'
+	String get logout => '退出账号';
+
+	/// zh: '滑块验证'
+	String get sliderTitle => '滑块验证';
+
+	/// zh: '验证失败，请使用新图片重试。'
+	String get sliderRetry => '验证失败，请使用新图片重试。';
+
+	/// zh: '选择二次认证方式'
+	String get mfaMethodTitle => '选择二次认证方式';
+
+	/// zh: '短信验证码'
+	String get smsCode => '短信验证码';
+
+	/// zh: '企业微信验证码'
+	String get wechatCode => '企业微信验证码';
+
+	/// zh: '二次认证'
+	String get mfaTitle => '二次认证';
+
+	/// zh: '验证码已发送'
+	String get codeSent => '验证码已发送';
+
+	/// zh: '请输入验证码'
+	String get codeRequired => '请输入验证码';
+
+	/// zh: '验证码错误，请重试'
+	String get codeInvalid => '验证码错误，请重试';
+
+	/// zh: '信任此设备'
+	String get trustDevice => '信任此设备';
+
+	/// zh: '提交'
+	String get submit => '提交';
+
+	/// zh: '发送验证码'
+	String get sendCode => '发送验证码';
+
+	/// zh: '{seconds} 秒后重发'
+	String resendCountdown({required Object seconds}) => '${seconds} 秒后重发';
+
+	/// zh: '下次可减少验证'
+	String get trustDeviceHint => '下次可减少验证';
+
+	/// zh: '验证码发送失败，请重试'
+	String get codeSendFailed => '验证码发送失败，请重试';
+
+	late final Translations$ids$logoutDialog$zh logoutDialog = Translations$ids$logoutDialog$zh.internal(_root);
 }
 
 // Path: settings
@@ -383,6 +474,51 @@ class Translations$settings$zh {
 	String get classSwiftExplain => '正数错后开学日期 负数提前开学日期';
 }
 
+// Path: timetable
+class Translations$timetable$zh {
+	Translations$timetable$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '课程表'
+	String get title => '课程表';
+
+	/// zh: '课程数据源尚未接入'
+	String get unavailable => '课程数据源尚未接入';
+
+	/// zh: '正在加载课程表'
+	String get loading => '正在加载课程表';
+
+	/// zh: '部分课程数据加载失败'
+	String get error => '部分课程数据加载失败';
+
+	/// zh: '正在显示已保存的课程数据'
+	String get cache => '正在显示已保存的课程数据';
+
+	/// zh: '本学期暂无安排'
+	String get empty => '本学期暂无安排';
+
+	/// zh: '第 {number} 周'
+	String week({required Object number}) => '第 ${number} 周';
+
+	/// zh: '刷新课程表'
+	String get refresh => '刷新课程表';
+
+	/// zh: '今天'
+	String get today => '今天';
+
+	/// zh: '明天'
+	String get tomorrow => '明天';
+
+	/// zh: '今天没有更多安排'
+	String get noMoreToday => '今天没有更多安排';
+
+	/// zh: '明天没有安排'
+	String get noneTomorrow => '明天没有安排';
+}
+
 // Path: core.language
 class Translations$core$language$zh {
 	Translations$core$language$zh.internal(this._root);
@@ -475,6 +611,24 @@ class Translations$core$gridPage$zh {
 
 	/// zh: '没有隐藏的卡片'
 	String get hideEmpty => '没有隐藏的卡片';
+}
+
+// Path: ids.logoutDialog
+class Translations$ids$logoutDialog$zh {
+	Translations$ids$logoutDialog$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '确认对话框'
+	String get title => '确认对话框';
+
+	/// zh: '确定退出登录？保存的统一认证账号密码和会话 Cookie 将被删除。'
+	String get content => '确定退出登录？保存的统一认证账号密码和会话 Cookie 将被删除。';
+
+	/// zh: '退出失败，请重试。'
+	String get failed => '退出失败，请重试。';
 }
 
 // Path: settings.lowElectricityThresholdDialog
@@ -1522,6 +1676,35 @@ extension on Translations {
 			'core.gridPage.editReset' => '恢复默认布局',
 			'core.gridPage.manageHidden' => '管理隐藏卡片',
 			'core.gridPage.hideEmpty' => '没有隐藏的卡片',
+			'ids.username' => '学号或工号',
+			'ids.password' => '密码',
+			'ids.reauthenticate' => '请重新登录',
+			'ids.reauthenticateMessage' => '保存的密码已被拒绝，请输入当前密码继续。',
+			'ids.login' => '登录',
+			'ids.loggingIn' => '登录中…',
+			'ids.loginFailed' => '登录失败，请检查账号、密码或网络后重试',
+			'ids.credentialsRejected' => '账号或密码错误。',
+			'ids.networkUnavailable' => '网络不可用，请重试。',
+			'ids.loginCancelled' => '已取消登录。',
+			'ids.logout' => '退出账号',
+			'ids.sliderTitle' => '滑块验证',
+			'ids.sliderRetry' => '验证失败，请使用新图片重试。',
+			'ids.mfaMethodTitle' => '选择二次认证方式',
+			'ids.smsCode' => '短信验证码',
+			'ids.wechatCode' => '企业微信验证码',
+			'ids.mfaTitle' => '二次认证',
+			'ids.codeSent' => '验证码已发送',
+			'ids.codeRequired' => '请输入验证码',
+			'ids.codeInvalid' => '验证码错误，请重试',
+			'ids.trustDevice' => '信任此设备',
+			'ids.submit' => '提交',
+			'ids.sendCode' => '发送验证码',
+			'ids.resendCountdown' => ({required Object seconds}) => '${seconds} 秒后重发',
+			'ids.trustDeviceHint' => '下次可减少验证',
+			'ids.codeSendFailed' => '验证码发送失败，请重试',
+			'ids.logoutDialog.title' => '确认对话框',
+			'ids.logoutDialog.content' => '确定退出登录？保存的统一认证账号密码和会话 Cookie 将被删除。',
+			'ids.logoutDialog.failed' => '退出失败，请重试。',
 			'settings.title' => '设置',
 			'settings.aboutInfo' => '程序信息',
 			'settings.acknowledgement' => ({required Object developers}) => 'Made With Love From ${developers} People',
@@ -1864,6 +2047,18 @@ extension on Translations {
 			'settings.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
 			'settings.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'settings.classSwiftExplain' => '正数错后开学日期 负数提前开学日期',
+			'timetable.title' => '课程表',
+			'timetable.unavailable' => '课程数据源尚未接入',
+			'timetable.loading' => '正在加载课程表',
+			'timetable.error' => '部分课程数据加载失败',
+			'timetable.cache' => '正在显示已保存的课程数据',
+			'timetable.empty' => '本学期暂无安排',
+			'timetable.week' => ({required Object number}) => '第 ${number} 周',
+			'timetable.refresh' => '刷新课程表',
+			'timetable.today' => '今天',
+			'timetable.tomorrow' => '明天',
+			'timetable.noMoreToday' => '今天没有更多安排',
+			'timetable.noneTomorrow' => '明天没有安排',
 			_ => null,
 		};
 	}
