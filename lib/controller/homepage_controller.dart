@@ -161,7 +161,9 @@ class HomepageController {
   List<HomeArrangement> _getCustomClassOfDay(DateTime day) {
     final formatter = DateFormat(HomeArrangement.format);
     final result = <HomeArrangement>[];
-    for (final cc in CustomClassController.i.customClassesSignal.value) {
+    final customClasses = CustomClassController.i.customClassesSignal.value;
+    for (var index = 0; index < customClasses.length; index++) {
+      final cc = customClasses[index];
       for (final tr in cc.timeRanges) {
         if (tr.startTime.year == day.year &&
             tr.startTime.month == day.month &&
@@ -171,6 +173,7 @@ class HomepageController {
               name: cc.name,
               teacher: cc.teacher,
               place: cc.classroom,
+              colorIndex: index,
               startTimeStr: formatter.format(tr.startTime),
               endTimeStr: formatter.format(tr.endTime),
             ),

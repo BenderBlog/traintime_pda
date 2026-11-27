@@ -1,0 +1,17 @@
+title: Emoji 猜書名
+entry_description: 看表情，猜猜是哪本書
+empty: 題庫暫時為空
+question: 這些表情說的是哪本書？
+instruction: 從下面的選項中選出答案
+correct: 答對了！
+answer: 正確答案：{answer}
+next: 下一題
+reveal: 查看答案
+choice_mode: 選擇題
+input_mode: 輸入題
+input_instruction: 輸入你猜的書名
+input_label: 書名
+submit: 提交答案
+original_clue: 原題
+random_clue: 隨機表情
+random_clue_fallback: 這道題無法完整生成隨機表情，已使用原題。

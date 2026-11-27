@@ -11,7 +11,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:watermeter/external/ruisi_flutter/ruisi_flutter.dart';
-import 'package:watermeter/page/pig/pig_page.dart';
+import 'package:watermeter/page/entertainment/entertainment_page.dart';
 import 'package:watermeter/page/public_widget/split_page_placeholder.dart';
 import 'package:watermeter/page/toolbox/toolbox_page.dart';
 import 'package:watermeter/repository/logger.dart';
@@ -291,9 +291,9 @@ class _HomePageMasterState extends State<HomePageMaster>
       ),
       PageInformation(
         index: 3,
-        name: context.t.homepage.dashboard,
-        icon: MingCuteIcons.mgc_pig_line,
-        iconChoice: MingCuteIcons.mgc_pig_fill,
+        name: context.t.homepage.relax,
+        icon: Icons.games_outlined,
+        iconChoice: Icons.games,
       ),
       PageInformation(
         index: 4,
@@ -321,7 +321,7 @@ class _HomePageMasterState extends State<HomePageMaster>
             talker: TalkerFlutter.init(),
           ),
           const ToolBoxPage(),
-          const PigPage(),
+          const EntertainmentPage(),
           const SettingWindow(),
         ],
         onPageChanged: (int index) {

@@ -1,0 +1,29 @@
+The release with the most changelogs in the project's history.
+
+1. Timetable Interface and Architecture
+   a. Added course style and time indicator settings @Lagrange-X
+   b. Adapted the timetable for rounded screens, small windows, and background blur @L1angYun
+   c. Improved the timetable with frosted glass and a collapsible week selector @ChiiAya
+   d. Refactored the timetable, schedule details, and custom courses @BenderBlog
+   e. Added sports course locations to the timetable @imaginary_17
+2. Air Conditioner Remote
+   a. Added air conditioner remote recognition @aqqkad
+   b. Improved the remote control interface @L1angYun
+   c. Improved air conditioner QR code recognition @lhx-666-cool
+3. Settings Page Redesign
+   a. Organized settings into categories @imoscarz
+   b. Redesigned the interface with M3E @BenderBlog
+   c. Added a negative value button to the course week offset settings @Dami-wq-k03
+4. New Features and Improvements
+   a. Added a book-guessing game @BenderBlog
+   b. Added campus notice search @LumDust
+   c. Improved the vacant classroom feature @L1angYun
+   d. Added support for multiple electricity meters @BenderBlog
+   e. Added sports course locations to the timetable @clever-max
+5. Bug Fixes
+   a. Fixed access to attendance information @aqqkad
+   b. Fixed access to the sports service @BenderBlog
+   c. Fixed campus network traffic and online time display @L1angYun
+   d. Fixed access to dormitory hot water dispensers @A1nair
+   e. Fixed the postgraduate home screen widget failing to load information @BenderBlog
+6. Migrated the internationalization framework @hazuki-keatsu

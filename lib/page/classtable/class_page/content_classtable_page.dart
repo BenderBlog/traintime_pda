@@ -3,34 +3,34 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:watermeter/repository/translation_key.dart';
-import 'package:watermeter/model/fetch_result.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
-import 'dart:ui' show BlurStyle, ImageFilter, MaskFilter;
+import 'dart:ui' show ImageFilter;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-
 import 'package:intl/intl.dart';
 
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
 import 'package:watermeter/page/classtable/class_add/class_add_window.dart';
 import 'package:watermeter/page/classtable/class_page/class_change_list.dart';
-import 'package:watermeter/page/classtable/class_page/classtable_inline_banner.dart';
-import 'package:watermeter/page/classtable/class_table_view/class_table_view.dart';
-import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
-import 'package:watermeter/page/classtable/class_table_view/current_time_indicator.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/class_page/classtable_error_button.dart';
+import 'package:watermeter/page/classtable/class_page/classtable_status_hint.dart';
+import 'package:watermeter/page/classtable/class_table_view/class_table_sheet.dart';
+import 'package:watermeter/page/classtable/class_table_view/frosted_header_slice.dart';
+import 'package:watermeter/page/classtable/class_table_view/glass_blur.dart';
+import 'package:watermeter/page/classtable/model/style_config/glass_style_config.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_widget_state.dart';
+import 'package:watermeter/page/classtable/classtable_scope.dart';
 import 'package:watermeter/page/classtable/class_page/not_arranged_class_list.dart';
 import 'package:watermeter/page/classtable/class_page/week_choice_view.dart';
+import 'package:watermeter/page/classtable/class_page/week_selection_highlight.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/repository/network_client.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
 
 class ContentClassTablePage extends StatefulWidget {
   const ContentClassTablePage({super.key});
@@ -47,158 +47,312 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   /// When locked, choiceWeek cannot be changed.
   bool isTopRowLocked = false;
 
+  /// The backdrop this page's frosted controls share.
+  ///
+  /// Held here rather than left to [BackdropGroup]'s own default: that default mints a fresh
+  /// [BackdropKey] every time the widget is built, so every rebuild of this page would re-key the
+  /// group, and re-keying it marks every grouped filter as needing a repaint.
+  final BackdropKey _backdropKey = BackdropKey();
+
   /// Classtable pageView controller.
   late PageController pageControl;
 
   /// Week choice row controller.
-  late PageController rowControl;
+  ///
+  /// A plain scroll controller rather than a page controller: the week row scrolls continuously so
+  /// it can be dragged freely, instead of snapping from one week button to the next.
+  late ScrollController rowControl;
 
-  late ClassTableWidgetState classTableState;
-  bool _isListening = false;
-  bool _didLoadVisualSettings = false;
+  /// Set while [ClasstableWidgetState.chosenWeek] changes because the table itself was dragged.
+  ///
+  /// Such a change waits until the page settles, so the week row does not rebuild during the drag.
+  bool _chosenWeekFromTable = false;
+
+  /// Set while the week row's highlight is waiting for the pages to come to rest before it redraws.
+  ///
+  /// A week change redraws the week row and every week page with it, which is easily a frame's worth
+  /// of work. Doing that in the middle of a drag is what made the table itself stutter, so it waits
+  /// until the pages are still, where the very same work costs nothing anyone can see.
+  bool _weekRowRefreshPending = false;
+
+  /// Whether a frame callback is already watching for the pages to stop.
+  bool _settleWatchScheduled = false;
+
+  /// The page offset the watch last saw, which is how it tells "still moving" from "stopped".
+  double _lastPagePixels = 0;
+
+  /// The week on show. Published as a listenable so the week bar's highlight can follow it
+  /// without the bar being rebuilt on the last frame of a swipe.
+  final ValueNotifier<int> _chosenWeek = ValueNotifier<int>(0);
+
+  late ClasstableWidgetState classTableState;
+  bool _isBound = false;
+
+  /// Whether the week bar is tucked into the app bar.
+  ///
+  /// Pinned is the default, so the stored flag is the opposite of it and an unset preference reads
+  /// back as `false`.
+  late bool _weekBarCollapsed;
+
+  /// Whether the collapsed bar is currently opened over the table. Only meaningful while collapsed.
+  bool _weekBarExpanded = false;
+
+  /// Whether the collapsed floating bar is fully off-stage to stop rendering and layout completely.
+  late bool _weekBarOffstage;
+
+  /// The height the week bar takes, either in the page or floating.
+  double get _weekBarHeight => MediaQuery.sizeOf(context).height >= 500
+      ? topRowHeightBig
+      : topRowHeightSmall;
+
+  /// Rebuilds and repositions the week row once the pages have stopped moving.
+  void _watchPageSettle(double pixels) {
+    _lastPagePixels = pixels;
+    if (_settleWatchScheduled) {
+      return;
+    }
+    _settleWatchScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback(_onSettleWatchFrame);
+  }
+
+  void _onSettleWatchFrame(Duration _) {
+    _settleWatchScheduled = false;
+    if (!mounted || !_weekRowRefreshPending) {
+      return;
+    }
+    if (pageControl.hasClients) {
+      final double pixels = pageControl.position.pixels;
+      if ((pixels - _lastPagePixels).abs() > 0.01) {
+        /// Still moving: look again on the next frame.
+        _watchPageSettle(pixels);
+        return;
+      }
+    }
+    _weekRowRefreshPending = false;
+    final double? offset = _weekRowOffset(
+      classTableState.chosenWeek.toDouble(),
+    );
+    if (offset != null) {
+      rowControl.jumpTo(offset);
+    }
+  }
+
+  /// The week row offset that shows the week [weeks] weeks into the semester.
+  ///
+  /// Null while the row cannot be measured yet.
+  double? _weekRowOffset(double weeks) {
+    if (!rowControl.hasClients) {
+      return null;
+    }
+    final ScrollPosition rowPosition = rowControl.position;
+    if (!rowPosition.hasContentDimensions) {
+      return null;
+    }
+    return (weeks * weekChoiceItemExtent)
+        .clamp(rowPosition.minScrollExtent, rowPosition.maxScrollExtent)
+        .toDouble();
+  }
+
+  /// Keeps the week row on the same week as the table while the table moves.
+  ///
+  /// One table page is one week and one row item is one week, so the row's offset is the page's
+  /// progress in weeks times [weekChoiceItemExtent]. Following the page frame by frame is what gives
+  /// the row its easing: it rides the page's own animation curve when the week is picked elsewhere,
+  /// and it stays under the finger when the table itself is dragged.
+  void _syncWeekRowToTable() {
+    /// While the page is running a week change picked elsewhere, the row is left where it is so the
+    /// highlight can visibly slide from the old week to the new one. Only the table's own drag moves
+    /// the row along. Also skip when the week bar is collapsed and hidden.
+    if (isTopRowLocked || !_weekBarVisible) {
+      return;
+    }
+    if (!pageControl.hasClients) {
+      return;
+    }
+    final ScrollPosition pagePosition = pageControl.position;
+    if (!pagePosition.hasViewportDimension ||
+        pagePosition.viewportDimension <= 0) {
+      return;
+    }
+    final double? offset = _weekRowOffset(
+      pagePosition.pixels / pagePosition.viewportDimension,
+    );
+    if (offset != null) {
+      final bool needsJump =
+          !rowControl.hasClients ||
+          !rowControl.position.hasPixels ||
+          (rowControl.offset - offset).abs() > 0.01;
+      if (needsJump) {
+        rowControl.jumpTo(offset);
+      }
+    }
+  }
 
   void _switchPage() {
     if (!mounted) {
       return;
     }
-    setState(() => isTopRowLocked = true);
-    Future.wait([
-      rowControl.animateToPage(
-        classTableState.chosenWeek,
-        curve: Curves.easeInOut,
-        duration: const Duration(milliseconds: changePageTime),
-      ),
-      pageControl.animateToPage(
-        classTableState.chosenWeek,
-        curve: Curves.easeInOutCubic,
-        duration: const Duration(milliseconds: changePageTime),
-      ),
-    ]).then((value) {
-      if (mounted) {
-        isTopRowLocked = false;
+
+    /// First thing, whatever else happens: the highlight follows this directly.
+    _chosenWeek.value = classTableState.chosenWeek;
+
+    /// A week picked by dragging the table is already moving on screen. Defer the week row update
+    /// until the page settles so the drag does not rebuild the overview buttons on every page tick.
+    if (_chosenWeekFromTable) {
+      _weekRowRefreshPending = true;
+      if (!_settleWatchScheduled &&
+          pageControl.hasClients &&
+          pageControl.position.hasPixels) {
+        _watchPageSettle(pageControl.position.pixels);
       }
-    });
+      return;
+    }
+
+    setState(() => isTopRowLocked = true);
+
+    /// The highlight slides to the chosen week on its own, so the row is only nudged when that week
+    /// would otherwise be off screen. Watching the page scroll is paused for the duration (see
+    /// [_syncWeekRowToTable]), which is what lets the highlight be seen moving.
+    _revealWeekRow(classTableState.chosenWeek);
+
+    /// The page is animated independently; the row ends up on the same week either way.
+    pageControl
+        .animateToPage(
+          classTableState.chosenWeek,
+          curve: Curves.easeInOutCubic,
+          duration: const Duration(milliseconds: changePageTime),
+        )
+        .then((value) {
+          if (!mounted) {
+            return;
+          }
+
+          /// The row can be scrolled on its own, so make sure the chosen week is at least in view
+          /// once the page has landed. When it already is, this does nothing.
+          _revealWeekRow(classTableState.chosenWeek);
+          isTopRowLocked = false;
+        });
+  }
+
+  /// Brings [week]'s button into view, if it is not there already.
+  ///
+  /// Deliberately not an alignment: when the week is already on screen the row is left exactly where
+  /// it is, so picking a neighbouring week slides the highlight across rather than dragging the whole
+  /// row along with it. The row only moves when the new week would otherwise be off screen.
+  void _revealWeekRow(int week) {
+    if (!rowControl.hasClients) {
+      return;
+    }
+    final ScrollPosition rowPosition = rowControl.position;
+    if (!rowPosition.hasContentDimensions) {
+      return;
+    }
+    const double edgePadding = 12.0;
+    final double left = week * weekChoiceItemExtent;
+    final double right = left + weekChoiceItemExtent;
+    final double offset = rowControl.offset;
+    double? target;
+    if (left - edgePadding < offset) {
+      target = left - edgePadding;
+    } else if (right + edgePadding > offset + rowPosition.viewportDimension) {
+      target = right + edgePadding - rowPosition.viewportDimension;
+    }
+    if (target == null) {
+      return;
+    }
+    rowControl.animateTo(
+      target
+          .clamp(rowPosition.minScrollExtent, rowPosition.maxScrollExtent)
+          .toDouble(),
+      curve: Curves.easeInOutCubic,
+      duration: const Duration(milliseconds: changePageTime),
+    );
   }
 
   @override
   void dispose() {
-    classTableState.removeListener(_switchPage);
+    classTableState.weekNavigationNotifier.removeListener(_switchPage);
+    pageControl.removeListener(_syncWeekRowToTable);
+    _chosenWeek.dispose();
+    pageControl.dispose();
+    rowControl.dispose();
     super.dispose();
   }
 
   @override
   void didChangeDependencies() {
-    if (!_didLoadVisualSettings) {
-      CurrentTimeIndicatorConfig.loadFromPreference();
-      CompletedClassStyleConfig.loadFromPreference();
-      _didLoadVisualSettings = true;
+    if (!_isBound) {
+      classTableState = ClasstableScope.read(context);
+      _weekBarCollapsed = classTableState.weekBarCollapsed;
+      _weekBarOffstage = _weekBarCollapsed;
+
+      /// Week navigation (tap or swipe) is handled separately so the class card pages — which do
+      /// not depend on the chosen week at all — are not rebuilt mid-gesture.
+      classTableState.weekNavigationNotifier.addListener(_switchPage);
+
+      /// Created once: rebuilding them on every dependency change would reset the row's scroll
+      /// position and leak the previous controllers.
+      pageControl = PageController(
+        initialPage: classTableState.chosenWeek,
+        keepPage: true,
+      );
+      rowControl = ScrollController(
+        initialScrollOffset: classTableState.chosenWeek * weekChoiceItemExtent,
+      );
+      _chosenWeek.value = classTableState.chosenWeek;
+
+      /// The table drives the week row while it moves, which is what gives the row its easing: it
+      /// rides the page's own animation curve instead of jumping once the page has arrived.
+      pageControl.addListener(_syncWeekRowToTable);
+
+      _isBound = true;
     }
 
-    if (!_isListening) {
-      classTableState = ClassTableState.of(context)!.controllers;
-      classTableState.addListener(_switchPage);
-      _isListening = true;
-    }
-
-    pageControl = PageController(
-      initialPage: classTableState.chosenWeek,
-      keepPage: true,
-    );
-
-    /// (weekButtonWidth + 2 * weekButtonHorizontalPadding)
-    /// is the width of the week choose button.
-    rowControl = PageController(
-      initialPage: classTableState.chosenWeek,
-      viewportFraction:
-          (weekButtonWidth + 2 * weekButtonHorizontalPadding) /
-          ClassTableState.of(context)!.constraints.minWidth,
-      keepPage: true,
-    );
-
+    /// Init the background.
     super.didChangeDependencies();
+    precacheImage(
+      const AssetImage("assets/art/pda_classtable_empty.webp"),
+      context,
+    );
+    final image = classTableState.decorationImage;
+    if (image != null) {
+      precacheImage(FileImage(image), context);
+    }
   }
 
-  /// Padding which keeps the classtable sheet away from the edges of the
-  /// display.
+  /// The user defined background image, confined to the timetable area below the fixed header.
   ///
-  /// The sheet is scrollable down to its very last row, and the bottom of the
-  /// screen is where the system navigation bar and the rounded corners of the
-  /// display are. Both are honoured here, so the last block of the day (the
-  /// time of the 11th class) stays readable.
-  EdgeInsets _sheetSafeInsets(BuildContext context) {
-    /// `padding` already has the top inset of the app bar taken out, while
-    /// `viewPadding` keeps the real size of the system bars. The bottom one
-    /// has to come from `viewPadding`, otherwise the sheet would crawl under
-    /// the navigation bar whenever the keyboard is around.
-    final padding = MediaQuery.paddingOf(context);
-    final viewPadding = MediaQuery.viewPaddingOf(context);
-
-    /// The sheet does not reach the edges of the display, so the corner of the
-    /// screen only reaches in about half of its radius where the sheet starts.
-    /// Keeping the whole radius free left a lot of empty room on devices with
-    /// round corners, so only half of it is kept, within sane limits.
-    ///
-    /// The radii come from [MediaQuery.displayCornerRadiiOf], which the platform
-    /// fills in on Android 12 and later and leaves null everywhere else. Reading
-    /// them there also means this page is rebuilt whenever they change, so the
-    /// window does not have to be watched by hand.
-    final corners = MediaQuery.displayCornerRadiiOf(context);
-    final cornerRadius = math.max(
-      corners?.bottomLeft.y ?? 0,
-      corners?.bottomRight.y ?? 0,
-    );
-    final cornerInset = math.min(
-      math.max(cornerRadius / 2, classTableMinimumBottomInset),
-      classTableMaximumBottomInset,
-    );
-    return EdgeInsets.fromLTRB(
-      padding.left + classTableSheetMargin,
-      padding.top + classTableSheetMargin,
-      padding.right + classTableSheetMargin,
-      math.max(viewPadding.bottom, cornerInset) + classTableSheetMargin,
-    );
-  }
-
-  /// The user defined background image, blurred as configured.
-  Widget _backgroundLayer(BuildContext context) {
-    if (!preference.getBool(preference.Preference.decorated)) {
-      return const SizedBox.shrink();
+  /// The fixed header area above extracts and blurs the very top edge of the wallpaper to create
+  /// an ambient frosted background. The actual, sharp wallpaper begins right at the timetable's
+  /// top edge ([tableTop]), leaving character portraits and artwork fully unobstructed in the
+  /// content area.
+  Widget _backgroundLayer(BuildContext context, double appBarHeight) {
+    final image = classTableState.decorationImage;
+    if (image == null) {
+      return const Positioned.fill(
+        key: ValueKey('class_table_background_layer_empty'),
+        child: SizedBox.shrink(),
+      );
     }
 
-    final image = File("${supportPath.path}/${classTableState.decorationName}");
-    if (!image.existsSync()) {
-      return const SizedBox.shrink();
-    }
+    final imageRevision = classTableState.decorationImageRevision ?? '0';
 
-    final viewport = MediaQuery.sizeOf(context);
-    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
-    final cacheWidth = (math.max(viewport.width, viewport.height) * pixelRatio)
-        .round()
-        .clamp(1, 2560)
-        .toInt();
-    final imageRevision =
-        "${image.lengthSync()}:${image.lastModifiedSync().microsecondsSinceEpoch}";
-
-    final blur = preference
-        .getDouble(preference.Preference.classTableBackgroundBlur)
-        .clamp(0.0, maxClassTableBackgroundBlur)
-        .toDouble();
+    final double blur = classTableState.backgroundBlur;
 
     Widget layer = Image.file(
       image,
-      key: ValueKey("${image.path}:$imageRevision"),
+      key: ValueKey<String>("${image.path}:$imageRevision"),
       fit: BoxFit.cover,
-      cacheWidth: cacheWidth,
+      // TODO: Ask the original author why the wallpaper needs top alignment.
+      // alignment: Alignment.topCenter,
       gaplessPlayback: true,
+      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
       opacity: AlwaysStoppedAnimation<double>(
         Theme.of(context).brightness == Brightness.dark ? 0.4 : 1.0,
       ),
     );
 
     if (blur > 0) {
-      /// Blurring pulls in the pixels outside of the image, which would leave
-      /// the edges translucent. The image is scaled up a little to make sure
-      /// the whole background stays covered.
       layer = ClipRect(
         child: Transform.scale(
           scale: 1 + blur / 50,
@@ -214,7 +368,95 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
       );
     }
 
-    return Positioned.fill(child: layer);
+    final double tableTop =
+        appBarHeight + (_weekBarCollapsed ? 0 : _weekBarHeight);
+
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          /// 1. The sharp wallpaper, confined to the timetable area below the fixed header.
+          AnimatedPositioned(
+            key: const ValueKey('class_table_background_layer'),
+            left: 0,
+            right: 0,
+            top: tableTop,
+            bottom: 0,
+            duration: weekBarDockDuration,
+            curve: Curves.easeOutCubic,
+            child: ClipRect(child: layer),
+          ),
+
+          /// 2. The ambient top-edge stretch & blur, feathering 30dp into the timetable wallpaper.
+          /// Strictly kept at the bottom-most background layer behind all UI controls and banners.
+          AnimatedPositioned(
+            key: const ValueKey('class_table_header_ambient_blur'),
+            left: 0,
+            right: 0,
+            top: 0,
+            height: tableTop + frostedHeaderFeatherHeight,
+            duration: weekBarDockDuration,
+            curve: Curves.easeOutCubic,
+            child: IgnorePointer(
+              child: FrostedHeaderSlice(
+                headerHeight: tableTop,
+                featherHeight: frostedHeaderFeatherHeight,
+                sigma: GlassStyleConfig.appBarSigma,
+                tintColor: Theme.of(context).colorScheme.surfaceContainerHigh
+                    .withValues(alpha: weekBarSurfaceAlpha),
+                imageFile: image,
+                imageRevision: imageRevision,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The room the class table keeps after its last period, for the bottom of the display.
+  ///
+  /// The sheet scrolls down to its very last row, and the bottom of the screen is where the system
+  /// navigation bar and the rounded corners of the display are. Neither becomes a margin around the
+  /// table — it stays borderless and reaches the edges — so the room is handed to the sheet and
+  /// spent as a blank stretch at the end of the time line.
+  ///
+  /// Sizing it is a question of how far the corner reaches *inwards* at the height of the lowest
+  /// thing the table draws down there: the current time capsule and the time labels of the last
+  /// period, which sit along the left edge [timeLineInset] in from the screen. A corner of radius
+  /// `r` only cuts away what is farther out than `r - sqrt(r² - (r - inset)²)` above the bottom at
+  /// that inset, so that height is exactly the room needed — no more, which is why the whole radius
+  /// is not used. The system bar may ask for more on its own, and the sheet already keeps
+  /// [classTableSheetEndGap] of it.
+  double _sheetBottomClearance(BuildContext context) {
+    /// `viewPadding` keeps the real size of the system bars, while `padding` gives up the bottom one
+    /// as soon as the keyboard is around — and the table still must not crawl under the navigation
+    /// bar in that case.
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+
+    /// The radii come from [MediaQuery.displayCornerRadiiOf], which the platform fills in on
+    /// Android 12 and later and leaves null everywhere else. Reading them there also means this page
+    /// is rebuilt whenever they change, so the window does not have to be watched by hand.
+    final corners = MediaQuery.displayCornerRadiiOf(context);
+    final double radius = math.max(
+      corners?.bottomLeft.y ?? 0,
+      corners?.bottomRight.y ?? 0,
+    );
+
+    /// Where the curve passes the inset of that content: at the corner's own radius the curve has
+    /// already left that inset behind, so nothing is cut away there.
+    final double cornerReach = radius <= timeLineInset
+        ? 0
+        : radius -
+              math.sqrt(
+                radius * radius -
+                    (radius - timeLineInset) * (radius - timeLineInset),
+              );
+
+    return math.max(
+      0,
+      math.max(viewPadding.bottom, cornerReach) - classTableSheetEndGap,
+    );
   }
 
   /// A row shows a series of buttons about the classtable's index.
@@ -224,465 +466,202 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
   ///
   /// When user click on the button, the pageview will show the class table of the
   /// week the button suggested.
-  Widget _topView() {
-    return SizedBox(
-      /// Related to the overview of the week.
-      height: MediaQuery.sizeOf(context).height >= 500
-          ? topRowHeightBig
-          : topRowHeightSmall,
-
-      child: Container(
-        padding: const EdgeInsets.only(top: 2, bottom: 4),
-        color: Theme.of(context).colorScheme.surface,
-        child: PageView.builder(
-          padEnds: false,
-          controller: rowControl,
-          physics: const ClampingScrollPhysics(),
-          scrollDirection: Axis.horizontal,
-          itemCount: classTableState.semesterLength,
-          itemBuilder: (BuildContext context, int index) {
-            return Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: weekButtonHorizontalPadding,
-              ),
-              child: SizedBox(
-                width: weekButtonWidth,
-                child: Card(
-                  color: Theme.of(context).highlightColor.withValues(
-                    alpha: classTableState.chosenWeek == index ? 0.3 : 0.0,
-                  ),
-                  elevation: 0.0,
-                  child: InkWell(
-                    /// The following themes are the same as the Material 3 Card Radius.
-                    borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-                    onTap: () {
-                      if (isTopRowLocked == false) {
-                        classTableState.chosenWeek = index;
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: WeekChoiceView(index: index),
-                    ),
-                  ),
+  Widget _weekRow() {
+    return ClipRect(
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          overscroll: false,
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
+        ),
+        child: Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            /// The highlight sits behind the buttons, sliding from week to week.
+            Positioned.fill(
+              child: IgnorePointer(
+                child: WeekSelectionHighlight(
+                  week: _chosenWeek,
+                  rowControl: rowControl,
                 ),
               ),
-            );
-          },
+            ),
+            ListView.builder(
+              controller: rowControl,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              itemExtent: weekChoiceItemExtent,
+              itemCount: classTableState.semesterLength,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: weekButtonHorizontalPadding,
+                  ),
+                  child: Card(
+                    /// Transparent: the highlight is the box behind the row, not a tint per button.
+                    color: Colors.transparent,
+                    elevation: 0.0,
+                    child: InkWell(
+                      /// The following themes are the same as the Material 3 Card Radius.
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(weekChoiceCardRadius),
+                      ),
+                      onTap: () {
+                        if (isTopRowLocked == false) {
+                          classTableState.chosenWeek = index;
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: WeekChoiceView(index: index),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Future<void> _showLoadErrorDialog() async {
-    final state = ClassTableState.of(context)!.controllers;
-    final errorWithoutCacheSources = state.errorWithoutCacheSources;
-    final errorWithCacheSources = state.errorWithCacheSources;
+  /// Whether the bar is showing at all.
+  ///
+  /// Pinned means always; collapsed means only while the user has it open.
+  bool get _weekBarVisible => !_weekBarCollapsed || _weekBarExpanded;
 
-    String sourceLabel(ClassTableStatusSource source) =>
-        context.t.resolveKey(switch (source) {
-          ClassTableStatusSource.classTable =>
-            "classtable.status_source.class_table",
-          ClassTableStatusSource.exam => "classtable.status_source.exam",
-          ClassTableStatusSource.physicsExperiment =>
-            "classtable.status_source.physics_experiment",
-          ClassTableStatusSource.otherExperiment =>
-            "classtable.status_source.other_experiment",
-        });
+  /// Whether the bar floats over the table rather than sitting in the page.
+  ///
+  /// This is what the two modes animate between: floating is inset, rounded and shadowed, docked is
+  /// flush with the app bar and takes its own strip.
+  bool get _weekBarFloating => _weekBarCollapsed;
 
-    CacheHint? sourceHintKey(ClassTableStatusSource source) => switch (source) {
-      ClassTableStatusSource.classTable => state.classTableCacheHintKey,
-      ClassTableStatusSource.exam => state.examCacheHintKey,
-      ClassTableStatusSource.physicsExperiment =>
-        state.physicsExperimentCacheHintKey,
-      ClassTableStatusSource.otherExperiment =>
-        state.otherExperimentCacheHintKey,
-    };
-
-    final content = <String>[
-      if (errorWithoutCacheSources.isNotEmpty)
-        context.t.classtable.statusBanner.errorSummary(
-          sources: errorWithoutCacheSources.map(sourceLabel).join("、"),
-        ),
-      ...errorWithoutCacheSources.map((source) {
-        final hintKey = sourceHintKey(source);
-        final detail = hintKey != null
-            ? hintKey.resolve(context.t)
-            : context.t.common.networkError;
-        return "${sourceLabel(source)}: $detail";
-      }),
-      if (errorWithoutCacheSources.isNotEmpty &&
-          errorWithCacheSources.isNotEmpty)
-        "",
-      if (errorWithCacheSources.isNotEmpty)
-        context.t.classtable.statusBanner.cache(
-          sources: errorWithCacheSources.map(sourceLabel).join("、"),
-        ),
-      ...errorWithCacheSources.map((source) {
-        final hintKey = sourceHintKey(source);
-        final detail = hintKey != null
-            ? hintKey.resolve(context.t)
-            : context.t.common.networkError;
-        return "${sourceLabel(source)}: $detail";
-      }),
-    ].join("\n");
-
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.t.classtable.errorDialogTitle),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(context.t.common.confirm),
-          ),
+  /// The scrolling week buttons with the pin toggle at the end.
+  ///
+  /// One widget for both modes, so the two can animate into each other instead of being swapped.
+  Widget _weekBarContents() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 4),
+      child: Row(
+        children: [
+          Expanded(child: _weekRow()),
+          _pinToggle(),
         ],
       ),
     );
   }
 
-  String _formatPercent(double value) => "${(value * 100).round()}%";
-
-  // ignore: unused_element
-  Future<void> _showCurrentTimeSettingsDialog() async {
-    var enabled = CurrentTimeIndicatorConfig.enabled;
-    var showTimeLabel = CurrentTimeIndicatorConfig.showTimeLabel;
-    var showTodayColumnHighlight =
-        CurrentTimeIndicatorConfig.showTodayColumnHighlight;
-
-    final shouldApply =
-        await showDialog<bool>(
-          context: context,
-          builder: (context) => StatefulBuilder(
-            builder: (context, setDialogState) => AlertDialog(
-              title: Text(
-                context.t.setting.classTableStylePage.currentTimeSettingsTitle,
-              ),
-              content: SizedBox(
-                width: 420,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .showCurrentTimeIndicator,
-                        ),
-                        value: enabled,
-                        onChanged: (value) =>
-                            setDialogState(() => enabled = value),
-                      ),
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .showCurrentTimeLabel,
-                        ),
-                        value: showTimeLabel,
-                        onChanged: enabled
-                            ? (value) =>
-                                  setDialogState(() => showTimeLabel = value)
-                            : null,
-                      ),
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .showTodayColumnHighlight,
-                        ),
-                        value: showTodayColumnHighlight,
-                        onChanged: (value) => setDialogState(
-                          () => showTodayColumnHighlight = value,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(context.t.common.cancel),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(context.t.common.confirm),
-                ),
-              ],
-            ),
-          ),
-        ) ??
-        false;
-
-    if (!shouldApply || !mounted) {
-      return;
-    }
-
-    CurrentTimeIndicatorConfig.enabled = enabled;
-    CurrentTimeIndicatorConfig.showTimeLabel = showTimeLabel;
-    CurrentTimeIndicatorConfig.showTodayColumnHighlight =
-        showTodayColumnHighlight;
-    await CurrentTimeIndicatorConfig.saveToPreference();
-    setState(() {});
+  /// Pins the bar, or tucks it back into the app bar.
+  Widget _pinToggle() {
+    return IconButton(
+      onPressed: _toggleWeekBarPinned,
+      icon: Icon(
+        _weekBarCollapsed ? Icons.push_pin_outlined : Icons.push_pin,
+        size: 18,
+      ),
+      tooltip: (_weekBarCollapsed
+          ? context.t.classtable.weekBar.pin
+          : context.t.classtable.weekBar.unpin),
+    );
   }
 
-  // ignore: unused_element
-  Future<void> _showClassColorSettingsDialog() async {
-    var completedEnabled = CompletedClassStyleConfig.completedEnabled;
-    var activeBrightnessFactor = CompletedClassStyleConfig
-        .activeBrightnessFactor
-        .clamp(0.5, 1.0)
-        .toDouble();
-    var activeBorderAlpha = CompletedClassStyleConfig.activeBorderAlpha;
-    var activeInnerAlpha = CompletedClassStyleConfig.activeInnerAlpha;
-    var completedSaturationFactor =
-        CompletedClassStyleConfig.completedSaturationFactor;
-    var completedBrightnessFactor = CompletedClassStyleConfig
-        .completedBrightnessFactor
-        .clamp(0.5, 1.0)
-        .toDouble();
-    var completedTextSaturationFactor =
-        CompletedClassStyleConfig.completedTextSaturationFactor;
-    var completedBorderAlpha = CompletedClassStyleConfig.completedBorderAlpha;
-    var completedInnerAlpha = CompletedClassStyleConfig.completedInnerAlpha;
+  /// The mode is a preference, so it is remembered.
+  void _toggleWeekBarPinned() {
+    final bool collapsed = !_weekBarCollapsed;
+    classTableState.setWeekBarCollapsed(collapsed);
+    setState(() {
+      _weekBarCollapsed = collapsed;
+      _weekBarExpanded = false;
+      if (!collapsed) {
+        _weekBarOffstage = false;
+      }
+    });
+  }
 
-    final shouldApply =
-        await showDialog<bool>(
-          context: context,
-          builder: (context) => StatefulBuilder(
-            builder: (context, setDialogState) => AlertDialog(
-              title: Text(
-                context.t.setting.classTableStylePage.classColorSettingsTitle,
-              ),
-              content: SizedBox(
-                width: 420,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .completedStyleEnabled,
-                        ),
-                        value: completedEnabled,
-                        onChanged: (value) =>
-                            setDialogState(() => completedEnabled = value),
-                      ),
-                      const Divider(height: 24),
-                      Text(
-                        context.t.setting.classTableStylePage.unfinishedSection,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      Text(
-                        context.t.setting.classTableStylePage
-                            .activeBrightnessFactor(
-                              value: _formatPercent(activeBrightnessFactor),
-                            ),
-                      ),
-                      Slider(
-                        value: activeBrightnessFactor,
-                        min: 0.5,
-                        max: 1.0,
-                        divisions: 10,
-                        onChanged: (value) => setDialogState(
-                          () => activeBrightnessFactor = value,
-                        ),
-                      ),
-                      Text(
-                        context.t.setting.classTableStylePage.activeBorderAlpha(
-                          value: _formatPercent(activeBorderAlpha),
-                        ),
-                      ),
-                      Slider(
-                        value: activeBorderAlpha,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 18,
-                        onChanged: (value) =>
-                            setDialogState(() => activeBorderAlpha = value),
-                      ),
-                      Text(
-                        context.t.setting.classTableStylePage.activeInnerAlpha(
-                          value: _formatPercent(activeInnerAlpha),
-                        ),
-                      ),
-                      Slider(
-                        value: activeInnerAlpha,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 18,
-                        onChanged: (value) =>
-                            setDialogState(() => activeInnerAlpha = value),
-                      ),
-                      if (completedEnabled) ...[
-                        const Divider(height: 24),
-                        Text(
-                          context
-                              .t
-                              .setting
-                              .classTableStylePage
-                              .completedSection,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedSaturationFactor(
-                                value: _formatPercent(
-                                  completedSaturationFactor,
-                                ),
-                              ),
-                        ),
-                        Slider(
-                          value: completedSaturationFactor,
-                          min: 0.1,
-                          max: 1.0,
-                          divisions: 18,
-                          onChanged: (value) => setDialogState(
-                            () => completedSaturationFactor = value,
-                          ),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedBrightnessFactor(
-                                value: _formatPercent(
-                                  completedBrightnessFactor,
-                                ),
-                              ),
-                        ),
-                        Slider(
-                          value: completedBrightnessFactor,
-                          min: 0.5,
-                          max: 1.0,
-                          divisions: 10,
-                          onChanged: (value) => setDialogState(
-                            () => completedBrightnessFactor = value,
-                          ),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedTextSaturationFactor(
-                                value: _formatPercent(
-                                  completedTextSaturationFactor,
-                                ),
-                              ),
-                        ),
-                        Slider(
-                          value: completedTextSaturationFactor,
-                          min: 0.1,
-                          max: 1.0,
-                          divisions: 18,
-                          onChanged: (value) => setDialogState(
-                            () => completedTextSaturationFactor = value,
-                          ),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedBorderAlpha(
-                                value: _formatPercent(completedBorderAlpha),
-                              ),
-                        ),
-                        Slider(
-                          value: completedBorderAlpha,
-                          min: 0.1,
-                          max: 1.0,
-                          divisions: 18,
-                          onChanged: (value) => setDialogState(
-                            () => completedBorderAlpha = value,
-                          ),
-                        ),
-                        Text(
-                          context.t.setting.classTableStylePage
-                              .completedInnerAlpha(
-                                value: _formatPercent(completedInnerAlpha),
-                              ),
-                        ),
-                        Slider(
-                          value: completedInnerAlpha,
-                          min: 0.1,
-                          max: 1.0,
-                          divisions: 18,
-                          onChanged: (value) =>
-                              setDialogState(() => completedInnerAlpha = value),
-                        ),
-                      ],
-                    ],
+  /// What the collapsed bar reduces to in the app bar: the week number, as a rounded chip.
+  Widget _weekChip() {
+    return ValueListenableBuilder<int>(
+      key: const ValueKey('week_chip'),
+      valueListenable: _chosenWeek,
+      builder: (context, chosenWeek, _) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Material(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh
+                  .withValues(alpha: timeLineSurfaceAlpha),
+              borderRadius: BorderRadius.circular(timeLineRadius),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(timeLineRadius),
+                onTap: () {
+                  setState(() {
+                    if (!_weekBarExpanded) {
+                      _weekBarOffstage = false;
+                    }
+                    _weekBarExpanded = !_weekBarExpanded;
+                  });
+                },
+                child: Container(
+                  height: 32,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    context.t.classtable.weekTitle(
+                      week: (chosenWeek + 1).toString(),
+                    ),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(context.t.common.cancel),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(context.t.common.confirm),
-                ),
-              ],
             ),
           ),
-        ) ??
-        false;
-
-    if (!shouldApply || !mounted) {
-      return;
-    }
-
-    CompletedClassStyleConfig.completedEnabled = completedEnabled;
-    CompletedClassStyleConfig.activeBrightnessFactor = activeBrightnessFactor
-        .clamp(0.5, 1.0)
-        .toDouble();
-    CompletedClassStyleConfig.activeBorderAlpha = activeBorderAlpha;
-    CompletedClassStyleConfig.activeInnerAlpha = activeInnerAlpha;
-    CompletedClassStyleConfig.completedSaturationFactor =
-        completedSaturationFactor;
-    CompletedClassStyleConfig.completedBrightnessFactor =
-        completedBrightnessFactor.clamp(0.5, 1.0).toDouble();
-    CompletedClassStyleConfig.completedTextSaturationFactor =
-        completedTextSaturationFactor;
-    CompletedClassStyleConfig.completedBorderAlpha = completedBorderAlpha;
-    CompletedClassStyleConfig.completedInnerAlpha = completedInnerAlpha;
-    await CompletedClassStyleConfig.saveToPreference();
-    setState(() {});
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ClassTableState.of(context)!.controllers;
-    final hasError =
-        state.errorWithoutCacheSources.isNotEmpty ||
-        state.errorWithCacheSources.isNotEmpty;
+    final state = ClasstableScope.of(context);
+
+    final double statusBarHeight = MediaQuery.paddingOf(context).top;
+    final double appBarHeight = statusBarHeight + kToolbarHeight;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(context.t.classtable.pageTitle),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
         actions: [
-          if (hasError)
-            IconButton(
-              onPressed: _showLoadErrorDialog,
-              icon: const Icon(Icons.error_outline),
-              tooltip: context.t.classtable.errorDialogTitle,
+          ClassTableStatusHint(loadingSources: state.loadingSources),
+          const ClassTableErrorButton(),
+
+          /// While collapsed, the week number is all that is left of the bar.
+          AnimatedSwitcher(
+            duration: weekBarPopDuration,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SizeTransition(
+                sizeFactor: animation,
+                axis: Axis.horizontal,
+                child: Center(child: child),
+              ),
             ),
+            child: _weekBarCollapsed
+                ? _weekChip()
+                : const SizedBox.shrink(key: ValueKey('week_chip_empty')),
+          ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
@@ -714,9 +693,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
             onSelected: (String action) async {
               switch (action) {
                 case 'A':
-                  var notArranged = ClassTableState.of(
-                    context,
-                  )!.controllers.notArranged;
+                  var notArranged = ClasstableScope.read(context).notArranged;
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (BuildContext context) {
@@ -726,9 +703,7 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   );
                   break;
                 case 'B':
-                  var classChange = ClassTableState.of(
-                    context,
-                  )!.controllers.classChange;
+                  var classChange = ClasstableScope.read(context).classChange;
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (BuildContext context) {
@@ -738,21 +713,16 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                   );
                   break;
                 case 'C':
-                  int semesterLength = ClassTableState.of(
-                    context,
-                  )!.controllers.semesterLength;
                   dynamic data = await Navigator.of(context).push<dynamic>(
                     MaterialPageRoute(
                       builder: (BuildContext context) {
-                        return ClassAddWindow(semesterLength: semesterLength);
+                        return ClassAddWindow(state: classTableState);
                       },
                     ),
                   );
                   if (context.mounted && data != null) {
                     if (data is CustomClass) {
-                      await ClassTableState.of(
-                        context,
-                      )!.controllers.addCustomClass(data);
+                      await ClasstableScope.read(context).addCustomClass(data);
                     }
                   }
                   break;
@@ -921,16 +891,13 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
                       ) ??
                       false;
                   if (context.mounted && isAccepted) {
-                    await classTableState.updateClasstable(context).then((
-                      data,
-                    ) {
-                      if (context.mounted) {
-                        showToast(
-                          context: context,
-                          msg: context.t.classtable.refreshClasstable.success,
-                        );
-                      }
-                    });
+                    await classTableState.updateClasstable();
+                    if (context.mounted) {
+                      showToast(
+                        context: context,
+                        msg: context.t.classtable.refreshClasstable.success,
+                      );
+                    }
                   }
                   break;
               }
@@ -938,92 +905,194 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
           ),
         ],
       ),
-      body: Builder(
-        /// The safe area has to be measured below the app bar: the insets of
-        /// the context above the scaffold still contain the status bar the app
-        /// bar has already taken care of.
-        builder: (context) => Stack(
-          fit: StackFit.expand,
-          children: [
-            /// The background image is drawn behind everything, so the
-            /// decorated area still reaches the edges of the screen while the
-            /// sheet below respects the safe area.
-            _backgroundLayer(context),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                PreferredSize(
-                  preferredSize: Size.fromHeight(
-                    MediaQuery.sizeOf(context).height >= 500
-                        ? topRowHeightBig
-                        : topRowHeightSmall,
-                  ),
-                  child: _topView(),
-                ),
-                ClassTableInlineBanner(
-                  loadingSources: state.loadingSources,
-                  cacheSources: state.cacheSources,
-                ),
-                _sheet(context).expanded(),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// The sheet of the classtable: it is kept inside the safe area of the
-  /// display and gets rounded corners of its own, since it does not reach the
-  /// edges of the screen any more.
-  ///
-  /// A shadow drawn only outside of it, plus a hairline around it, lift it off
-  /// the screen, so the table reads as one card floating over the picture and
-  /// the room kept below it reads as the margin of that card instead of a gap.
-  ///
-  /// The picture itself is left alone: a colour laid over it would hide the
-  /// background image, and blurring it here would only repeat what the
-  /// background blur already does.
-  Widget _sheet(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final borderRadius = BorderRadius.circular(classTableSheetRadius);
-    return Padding(
-      padding: _sheetSafeInsets(context),
-      child: Stack(
-        /// 阴影要画到面板外面去，所以这一层不能裁。
-        clipBehavior: Clip.none,
+      body: Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.hardEdge,
         children: [
-          /// 阴影单独一层，而且**只画面板外侧**：面板本身是透明的，
-          /// 用普通的 BoxShadow 会在面板内部透出来一圈黑。
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _SheetShadowPainter(
-                radius: classTableSheetRadius,
-                sigma: classTableSheetShadowSigma,
-                color: scheme.shadow.withValues(alpha: 0.5),
+          /// The wallpaper, confined to the timetable area below the fixed header.
+          _backgroundLayer(context, appBarHeight),
+
+          /// The page. While the bar floats it starts at the top and the bar covers it; once the bar
+          /// is pinned it slides down to leave the bar a strip of its own.
+          AnimatedPositioned(
+            left: 0,
+            right: 0,
+            top: appBarHeight + (_weekBarCollapsed ? 0 : _weekBarHeight),
+            bottom: 0,
+            duration: weekBarDockDuration,
+            curve: Curves.easeOutCubic,
+            child: NotificationListener<ScrollNotification>(
+              /// Dragging the table puts the floating bar away, so it does not sit on top of a
+              /// table the user is trying to reach.
+              ///
+              /// Only a drag counts. Picking a week from the bar itself pages the table over an
+              /// animation, and that is not a reason to close the bar the user is working in: it
+              /// stays out until they put it away themselves.
+              onNotification: (ScrollNotification notification) {
+                final bool dragStarted =
+                    notification is ScrollStartNotification &&
+                    notification.dragDetails != null;
+                if (dragStarted && _weekBarCollapsed && _weekBarExpanded) {
+                  setState(() => _weekBarExpanded = false);
+                }
+                return false;
+              },
+
+              /// Controls that opt into grouping share one blur of the backdrop: the status banner
+              /// and the class cards. Panels with their own independent blur (such as the date row
+              /// and time line) maintain their own blur caches.
+              child: BackdropGroup(
+                backdropKey: _backdropKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ClassTableSheet(
+                      singleIndex: classTableState.chosenWeek,
+                      pageControl: pageControl,
+                      semesterLength: classTableState.semesterLength,
+                      onPageChanged: _onPageChanged,
+                      bottomClearance: _sheetBottomClearance(context),
+                    ).expanded(),
+                  ],
+                ),
               ),
             ),
           ),
+
+          /// Tapping anywhere else puts the floating bar away.
+          ///
+          /// Kept mounted even while closed and merely ignored, because a conditionally present
+          /// sibling shifts the bar along the Stack's children list: Flutter would then treat the bar
+          /// as a brand new element and the implicit animations below would jump straight to their
+          /// new values instead of running.
+          ///
+          /// `translucent`, not `opaque`: opaque would swallow the drag as well as the tap and leave
+          /// the table unscrollable while the bar is open. Being hit first still lets this layer win
+          /// the tap, so a tap on a class card does not open it.
           Positioned.fill(
-            child: DecoratedBox(
-              /// 紧贴着边缘描一圈极细的线：花壁纸上只靠阴影，边角是"站不住"的。
-              position: DecorationPosition.foreground,
-              decoration: BoxDecoration(
-                borderRadius: borderRadius,
-                border: Border.all(
-                  color: scheme.outlineVariant.withValues(alpha: 0.6),
-                  width: 0.8,
+            child: IgnorePointer(
+              ignoring: !(_weekBarCollapsed && _weekBarExpanded),
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => setState(() => _weekBarExpanded = false),
+              ),
+            ),
+          ),
+
+          /// The unified frosted header glass behind the navigation bar and docked week bar.
+          ///
+          /// Sized strictly to the docked header height so that cards scrolling up pass underneath it,
+          /// while remaining completely clear of the content and banners below. Ambient edge blur
+          /// feathering is handled separately at the bottom-most background layer.
+          ///
+          /// When the week bar is floating or tucked away, this layer seamlessly sizes to [appBarHeight],
+          /// continuing to provide the frosted backdrop for the navigation bar alone, while the
+          /// floating week bar carries its own independent floating frosted capsule below.
+          AnimatedPositioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            height: appBarHeight + (!_weekBarCollapsed ? _weekBarHeight : 0),
+            duration: weekBarDockDuration,
+            curve: Curves.easeOutCubic,
+            child: IgnorePointer(
+              child: GlassBlur(
+                sigma: GlassStyleConfig.appBarSigma,
+                child: ColoredBox(
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh
+                      .withValues(alpha: weekBarSurfaceAlpha),
                 ),
               ),
-              child: ClipRRect(
-                borderRadius: borderRadius,
-                child: LayoutBuilder(
-                  /// The table measures itself against the room which is really
-                  /// left for it, instead of the whole window.
-                  builder: (context, constraints) => ClassTableState(
-                    constraints: constraints,
-                    controllers: classTableState,
-                    child: _classTablePage(),
+            ),
+          ),
+
+          /// The bar itself, one element for both modes.
+          ///
+          /// Collapsed it is inset, rounded and shadowed so it reads as floating over the table;
+          /// pinned it grows to the full width, squares off and drops its shadow as it docks. The
+          /// page above follows a slightly longer curve, so the bar visibly settles first and the
+          /// table then takes its place.
+          AnimatedPositioned(
+            left: _weekBarFloating ? timeLineInset : 0,
+            right: _weekBarFloating ? timeLineInset : 0,
+            top: appBarHeight + (_weekBarFloating ? timeLineInset : 0),
+            height: _weekBarHeight,
+            duration: weekBarPopDuration,
+            curve: _weekBarVisible
+                ? Curves.easeOutCubic
+                : Curves.easeInOutCubic,
+            child: Offstage(
+              offstage: _weekBarOffstage,
+              child: IgnorePointer(
+                ignoring: !_weekBarVisible,
+                child: ClipRect(
+                  clipper: const _WeekBarTopClipper(),
+                  child: AnimatedSlide(
+                    offset: _weekBarVisible
+                        ? Offset.zero
+                        : const Offset(0, -1.35),
+                    duration: weekBarPopDuration,
+                    curve: _weekBarVisible
+                        ? Curves.easeOutCubic
+                        : Curves.easeInOutCubic,
+                    onEnd: () {
+                      if (!_weekBarVisible && mounted) {
+                        setState(() => _weekBarOffstage = true);
+                      }
+                    },
+                    child: AnimatedContainer(
+                      duration: weekBarPopDuration,
+                      curve: _weekBarVisible
+                          ? Curves.easeOutCubic
+                          : Curves.easeInOutCubic,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          _weekBarFloating ? timeLineRadius : 0,
+                        ),
+                        boxShadow: _weekBarFloating
+                            ? [
+                                BoxShadow(
+                                  color: Colors.black.withValues(
+                                    alpha: timeLineShadowAlpha,
+                                  ),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Stack(
+                        children: [
+                          if (_weekBarFloating)
+                            Positioned.fill(
+                              child: GlassBlur(
+                                borderRadius: BorderRadius.circular(
+                                  timeLineRadius,
+                                ),
+                                sigma: GlassStyleConfig.weekBarSigma,
+                                child: ColoredBox(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHigh
+                                      .withValues(alpha: weekBarSurfaceAlpha),
+                                ),
+                              ),
+                            ),
+
+                          /// Taps on the bar's own body keep it open: putting it away is for taps
+                          /// outside it. Translucent rather than opaque, so a drag that starts on
+                          /// the bar still reaches the table underneath.
+                          Positioned.fill(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {},
+                            ),
+                          ),
+                          _weekBarContents(),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -1034,71 +1103,40 @@ class _ContentClassTablePageState extends State<ContentClassTablePage> {
     );
   }
 
-  /// The [_classTablePage] is controlled by [pageControl].
-  Widget _classTablePage() => PageView.builder(
-    scrollDirection: Axis.horizontal,
-    controller: pageControl,
-    onPageChanged: (value) {
-      /// When [pageControl.animateTo] triggered,
-      /// page view will try to refresh the [chosenWeek] everytime the page
-      /// view changed into a new page. Because animateTo will load every page
-      /// it passed.
-      ///
-      /// So that's the [isTopRowLocked] is used for. When week choice row is
-      /// locked, it will not refresh the [chosenWeek]. And when [chosenWeek]
-      /// is equal to the current page, unlock the [isTopRowLocked].
-      if (isTopRowLocked == false) {
+  /// Keeps [classTableState.chosenWeek] in step with the week pages.
+  void _onPageChanged(int value) {
+    /// When [pageControl.animateTo] triggered,
+    /// page view will try to refresh the [chosenWeek] everytime the page
+    /// view changed into a new page. Because animateTo will load every page
+    /// it passed.
+    ///
+    /// So that's the [isTopRowLocked] is used for. When week choice row is
+    /// locked, it will not refresh the [chosenWeek]. And when [chosenWeek]
+    /// is equal to the current page, unlock the [isTopRowLocked].
+    if (isTopRowLocked == false) {
+      /// Flagged so [_switchPage] leaves the table to finish its own gesture instead of animating
+      /// a page the user is still dragging. The row is repositioned after the page settles.
+      _chosenWeekFromTable = true;
+      try {
         classTableState.chosenWeek = value;
+      } finally {
+        _chosenWeekFromTable = false;
       }
-    },
-    itemCount: classTableState.semesterLength,
-    itemBuilder: (context, index) => LayoutBuilder(
-      builder: (context, constraint) =>
-          ClassTableView(constraint: constraint, index: index),
-    ),
-  );
+    }
+  }
 }
 
-/// 画课表面板外侧的一圈阴影。
-///
-/// 面板里面是透的（能看见壁纸），所以不能直接用 `BoxShadow` —— 它的模糊会从
-/// 面板内部透出来，看着就是"里面一圈黑"。这里先把面板那块从画布上挖掉，
-/// 再画模糊的圆角矩形，于是只有外侧那一圈留下来。
-class _SheetShadowPainter extends CustomPainter {
-  const _SheetShadowPainter({
-    required this.radius,
-    required this.sigma,
-    required this.color,
-  });
-
-  final double radius;
-  final double sigma;
-  final Color color;
+/// Clips the week bar strictly at top: 0 to prevent any portion of it or its shadow
+/// from bleeding behind the frosted AppBar during slide animations, while leaving
+/// left, right, and bottom unclipped so its drop shadow remains intact.
+class _WeekBarTopClipper extends CustomClipper<Rect> {
+  const _WeekBarTopClipper();
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final box = Offset.zero & size;
-    final rrect = RRect.fromRectAndRadius(box, Radius.circular(radius));
-
-    canvas.clipPath(
-      Path.combine(
-        PathOperation.difference,
-        Path()..addRect(box.inflate(sigma * 4)),
-        Path()..addRRect(rrect),
-      ),
-      doAntiAlias: true,
-    );
-    canvas.drawRRect(
-      rrect,
-      Paint()
-        ..color = color
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, sigma),
-    );
+  Rect getClip(Size size) {
+    return Rect.fromLTRB(-24, 0, size.width + 24, size.height + 24);
   }
 
   @override
-  bool shouldRepaint(covariant _SheetShadowPainter oldDelegate) =>
-      oldDelegate.radius != radius ||
-      oldDelegate.sigma != sigma ||
-      oldDelegate.color != color;
+  bool shouldReclip(covariant _WeekBarTopClipper oldClipper) => false;
 }

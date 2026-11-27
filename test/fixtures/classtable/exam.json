@@ -1,0 +1,14 @@
+{
+  "subject": [
+    {
+      "subject": "虚构期中考试",
+      "typeStr": "期中考试",
+      "time": "2026-11-18 10:25-12:00",
+      "startTimeStr": "2026-11-18 10:25:00",
+      "endTimeStr": "2026-11-18 12:00:00",
+      "place": "教学楼 T101",
+      "seat": "T-01"
+    }
+  ],
+  "toBeArranged": []
+}

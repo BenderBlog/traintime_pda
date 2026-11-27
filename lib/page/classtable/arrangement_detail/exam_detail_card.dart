@@ -4,21 +4,18 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:watermeter/model/xidian_ids/exam.dart';
 import 'package:watermeter/page/classtable/arrangement_detail/custom_list_tile.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail_data.dart';
+import 'package:intl/intl.dart';
 
 /// A dialog/card shows the exam detail.
 class ExamDetailCard extends StatelessWidget {
-  final Subject subject;
-  final MaterialColor infoColor;
-  const ExamDetailCard({
-    super.key,
-    required this.subject,
-    required this.infoColor,
-  });
+  final ArrangementDetailItem item;
+  const ExamDetailCard({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
+    final infoColor = item.color;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360.0),
       child: Card(
@@ -31,7 +28,7 @@ class ExamDetailCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${subject.subject}${subject.type}",
+                item.name,
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,
@@ -42,19 +39,27 @@ class ExamDetailCard extends StatelessWidget {
               [
                 CustomListTile(
                   icon: Icons.room,
-                  str: subject.place,
+                  str: item.classroom ?? '',
                   infoColor: infoColor,
                 ).flexible(),
-                if (subject.seat != null)
+                if (item.seat != null)
                   CustomListTile(
                     icon: Icons.chair,
-                    str: subject.seat.toString(),
+                    str: item.seat!,
                     infoColor: infoColor,
                   ).flexible(),
               ].toRow(),
               CustomListTile(
                 icon: Icons.access_time_filled_outlined,
-                str: subject.time,
+                str: item.dateRanges
+                    .map((range) {
+                      final dateFormatter = DateFormat(
+                        'y/M/d EEEE',
+                        Localizations.localeOf(context).toLanguageTag(),
+                      );
+                      return '${dateFormatter.format(range.start)} ${DateFormat('HH:mm').format(range.start)}-${DateFormat('HH:mm').format(range.end)}';
+                    })
+                    .join('\n'),
                 infoColor: infoColor,
               ),
             ],

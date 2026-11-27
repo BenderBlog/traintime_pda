@@ -4,30 +4,24 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
-import 'package:watermeter/model/pda_service/custom_class.dart';
-import 'package:watermeter/page/classtable/arrangement_detail/course_detail_card.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/arrangement_detail_data.dart';
 import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/page/classtable/arrangement_detail/custom_list_tile.dart';
 
 class CustomClassDetailCard extends StatelessWidget {
-  final CustomClass customClass;
-  final CustomClassTimeRange timeRange;
-  final MaterialColor infoColor;
+  final ArrangementDetailItem item;
 
-  const CustomClassDetailCard({
-    super.key,
-    required this.customClass,
-    required this.timeRange,
-    required this.infoColor,
-  });
+  const CustomClassDetailCard({super.key, required this.item});
 
-  String _dateText(CustomClassTimeRange range) =>
-      DateFormat('yyyy-MM-dd').format(range.startTime);
+  String _dateText(DateTimeRange range) =>
+      DateFormat('yyyy-MM-dd').format(range.start);
 
-  String _timeText(CustomClassTimeRange range) =>
-      '${DateFormat('HH:mm').format(range.startTime)}-${DateFormat('HH:mm').format(range.endTime)}';
+  String _timeText(DateTimeRange range) =>
+      '${DateFormat('HH:mm').format(range.start)}-${DateFormat('HH:mm').format(range.end)}';
 
   @override
   Widget build(BuildContext context) {
+    final infoColor = item.color;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360.0),
       child: Card(
@@ -40,7 +34,7 @@ class CustomClassDetailCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                customClass.name,
+                item.name,
                 style: TextStyle(
                   color: infoColor.shade900,
                   fontSize: 18,
@@ -51,14 +45,14 @@ class CustomClassDetailCard extends StatelessWidget {
               CustomListTile(
                 icon: Icons.person,
                 str:
-                    customClass.teacher ??
+                    item.teacher ??
                     context.t.classtable.courseDetailCard.unknownTeacher,
                 infoColor: infoColor,
               ),
               CustomListTile(
                 icon: Icons.room,
                 str:
-                    customClass.classroom ??
+                    item.classroom ??
                     context.t.classtable.courseDetailCard.unknownPlace,
                 infoColor: infoColor,
               ),
@@ -75,7 +69,7 @@ class CustomClassDetailCard extends StatelessWidget {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: customClass.timeRanges
+                        children: item.dateRanges
                             .map(
                               (range) => Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -84,7 +78,9 @@ class CustomClassDetailCard extends StatelessWidget {
                                 child: _TimeRangeRow(
                                   dateText: _dateText(range),
                                   timeText: _timeText(range),
-                                  isBold: range.id == timeRange.id,
+                                  isBold:
+                                      range.start ==
+                                      item.selectedDateRange?.start,
                                   infoColor: infoColor,
                                 ),
                               ),
@@ -100,9 +96,13 @@ class CustomClassDetailCard extends StatelessWidget {
                 children: [
                   TextButton(
                     onPressed: () {
-                      Navigator.of(
-                        context,
-                      ).pop((customClass.id, timeRange.id, 'edit'));
+                      Navigator.of(context).pop(
+                        ArrangementDetailAction(
+                          customClassId: item.customClassId!,
+                          customTimeRangeId: item.customTimeRangeId,
+                          type: CustomCourseActionType.edit,
+                        ),
+                      );
                     },
                     child: Text(
                       context.t.classtable.courseDetailCard.edit,
@@ -145,9 +145,13 @@ class CustomClassDetailCard extends StatelessWidget {
                         ),
                       );
                       if (context.mounted && isContinue == true) {
-                        Navigator.of(
-                          context,
-                        ).pop((customClass.id, timeRange.id, 'delete_one'));
+                        Navigator.of(context).pop(
+                          ArrangementDetailAction(
+                            customClassId: item.customClassId!,
+                            customTimeRangeId: item.customTimeRangeId,
+                            type: CustomCourseActionType.deleteOne,
+                          ),
+                        );
                       }
                     },
                     child: Text(
@@ -187,9 +191,12 @@ class CustomClassDetailCard extends StatelessWidget {
                         ),
                       );
                       if (context.mounted && isContinue == true) {
-                        Navigator.of(
-                          context,
-                        ).pop((customClass.id, null, 'delete_all'));
+                        Navigator.of(context).pop(
+                          ArrangementDetailAction(
+                            customClassId: item.customClassId!,
+                            type: CustomCourseActionType.deleteAll,
+                          ),
+                        );
                       }
                     },
                     child: Text(

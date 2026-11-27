@@ -42,7 +42,7 @@ class AboutAppHeader extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'NOEL Edition',
+              'NOEL - PDA Third Year Anniversary Edition',
               textAlign: TextAlign.center,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: colors.onPrimaryContainer,

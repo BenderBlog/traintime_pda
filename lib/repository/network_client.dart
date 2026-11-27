@@ -91,7 +91,7 @@ class NetworkClients {
 
   static Dio get sportDio => _sportDio ??= _createDio(
     cookieJar: sportCookieJar,
-    baseUrl: 'https://tybjxgl.xidian.edu.cn/app/',
+    baseUrl: 'http://tybjxgl.xidian.edu.cn/app/',
     followRedirects: true,
   );
 

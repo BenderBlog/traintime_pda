@@ -1,42 +1,18 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/classtable/class_page/content_classtable_page.dart';
 import 'package:watermeter/page/classtable/class_page/empty_classtable_page.dart';
-import 'package:watermeter/page/classtable/classtable_state.dart';
+import 'package:watermeter/page/classtable/classtable_scope.dart';
 
-class ClassTablePage extends StatefulWidget {
+/// Switches between the table and the "no classes yet" page.
+///
+/// Reading the scope here is what makes the switch happen: the page is rebuilt whenever the table's
+/// snapshot changes, so no listener of its own is needed.
+class ClassTablePage extends StatelessWidget {
   const ClassTablePage({super.key});
 
   @override
-  State<ClassTablePage> createState() => _ClassTablePageState();
-}
-
-class _ClassTablePageState extends State<ClassTablePage> {
-  late ClassTableWidgetState classTableState;
-  bool _isListening = false;
-
-  void _reload() {
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isListening) {
-      classTableState = ClassTableState.of(context)!.controllers;
-      classTableState.addListener(_reload);
-      _isListening = true;
-    }
-  }
-
-  @override
-  void dispose() {
-    classTableState.removeListener(_reload);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return classTableState.haveClass
+    return ClasstableScope.of(context).haveClass
         ? const ContentClassTablePage()
         : const EmptyClassTablePage();
   }

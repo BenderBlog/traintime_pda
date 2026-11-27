@@ -55,6 +55,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$exam$zh exam = Translations$exam$zh.internal(_root);
 	late final Translations$experiment$zh experiment = Translations$experiment$zh.internal(_root);
 	late final Translations$experimentController$zh experimentController = Translations$experimentController$zh.internal(_root);
+	late final Translations$guessBook$zh guessBook = Translations$guessBook$zh.internal(_root);
 	late final Translations$homepage$zh homepage = Translations$homepage$zh.internal(_root);
 	late final Translations$library$zh library = Translations$library$zh.internal(_root);
 	late final Translations$libraryCard$zh libraryCard = Translations$libraryCard$zh.internal(_root);
@@ -114,9 +115,10 @@ class Translations$classtable$zh {
 
 	// Translations
 	late final Translations$classtable$partnerClasstable$zh partnerClasstable = Translations$classtable$partnerClasstable$zh.internal(_root);
+	late final Translations$classtable$weekBar$zh weekBar = Translations$classtable$weekBar$zh.internal(_root);
 
-	/// zh: '我的日程表'
-	String get pageTitle => '我的日程表';
+	/// zh: '日程表'
+	String get pageTitle => '日程表';
 
 	/// zh: '{partner_name}的日程表'
 	String partnerPageTitle({required Object partner_name}) => '${partner_name}的日程表';
@@ -611,6 +613,9 @@ class Translations$electricity$zh {
 	/// zh: '平台用电量'
 	String get airconAmount => '平台用电量';
 
+	/// zh: '室内温度'
+	String get airconIndoor => '室内温度';
+
 	/// zh: '更新时间'
 	String get airconUpdateTime => '更新时间';
 
@@ -1004,6 +1009,66 @@ class Translations$experimentController$zh {
 	String get loginFailed => '登录失败';
 }
 
+// Path: guessBook
+class Translations$guessBook$zh {
+	Translations$guessBook$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: 'Emoji 猜书名'
+	String get title => 'Emoji 猜书名';
+
+	/// zh: '看表情，猜猜是哪本书'
+	String get entryDescription => '看表情，猜猜是哪本书';
+
+	/// zh: '题库暂时为空'
+	String get empty => '题库暂时为空';
+
+	/// zh: '这些表情说的是哪本书？'
+	String get question => '这些表情说的是哪本书？';
+
+	/// zh: '从下面的选项中选出答案'
+	String get instruction => '从下面的选项中选出答案';
+
+	/// zh: '答对了！'
+	String get correct => '答对了！';
+
+	/// zh: '正确答案：{answer}'
+	String answer({required Object answer}) => '正确答案：${answer}';
+
+	/// zh: '下一题'
+	String get next => '下一题';
+
+	/// zh: '查看答案'
+	String get reveal => '查看答案';
+
+	/// zh: '选择题'
+	String get choiceMode => '选择题';
+
+	/// zh: '输入题'
+	String get inputMode => '输入题';
+
+	/// zh: '输入你猜的书名'
+	String get inputInstruction => '输入你猜的书名';
+
+	/// zh: '书名'
+	String get inputLabel => '书名';
+
+	/// zh: '提交答案'
+	String get submit => '提交答案';
+
+	/// zh: '原题'
+	String get originalClue => '原题';
+
+	/// zh: '随机表情'
+	String get randomClue => '随机表情';
+
+	/// zh: '这道题无法完整生成随机表情，已使用原题。'
+	String get randomClueFallback => '这道题无法完整生成随机表情，已使用原题。';
+}
+
 // Path: homepage
 class Translations$homepage$zh {
 	Translations$homepage$zh.internal(this._root);
@@ -1071,6 +1136,12 @@ class Translations$homepage$zh {
 
 	/// zh: '社团推荐'
 	String get club => '社团推荐';
+
+	/// zh: '放松一下'
+	String get relax => '放松一下';
+
+	/// zh: '整天学习不会玩，聪明孩子也会傻'
+	String get relaxMessage => '整天学习不会玩，聪明孩子也会傻';
 
 	/// zh: '猪图鉴赏'
 	String get dashboard => '猪图鉴赏';
@@ -1766,6 +1837,15 @@ class Translations$setting$zh {
 	/// zh: '当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI'
 	String get airconCameraUnavailable => '当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI';
 
+	/// zh: '轻点画面可以对焦；空调离得远、放大后仍然模糊时，请用系统相机拍照识别'
+	String get airconScanHint => '轻点画面可以对焦；空调离得远、放大后仍然模糊时，请用系统相机拍照识别';
+
+	/// zh: '用系统相机拍照识别'
+	String get airconTakePhoto => '用系统相机拍照识别';
+
+	/// zh: '无法打开相机：{error}'
+	String airconCameraError({required Object error}) => '无法打开相机：${error}';
+
 	/// zh: '通知设置'
 	String get notificationSetting => '通知设置';
 
@@ -2100,6 +2180,30 @@ class Translations$toolbox$zh {
 
 	/// zh: '补充其他功能'
 	String get discoverDescription => '补充其他功能';
+
+	/// zh: '通知查询'
+	String get noticeSearch => '通知查询';
+
+	/// zh: '不要错过通知'
+	String get noticeDescription => '不要错过通知';
+
+	/// zh: '搜索关键词（近30天的通知标题）'
+	String get noticeHint => '搜索关键词（近30天的通知标题）';
+
+	/// zh: '当前可能未连接校园网，部分通知来源需要校园网访问。'
+	String get noticeSchoolNetworkWarning => '当前可能未连接校园网，部分通知来源需要校园网访问。';
+
+	/// zh: '如:转专业'
+	String get noticePlaceholder => '如:转专业';
+
+	/// zh: '部分来源未查完'
+	String get noticeIncomplete => '部分来源未查完';
+
+	/// zh: '已查栏目中没有匹配的通知'
+	String get noticeEmpty => '已查栏目中没有匹配的通知';
+
+	/// zh: '无法打开原文链接'
+	String get noticeOpenError => '无法打开原文链接';
 }
 
 // Path: weekday
@@ -2418,6 +2522,21 @@ class Translations$classtable$partnerClasstable$zh {
 	late final Translations$classtable$partnerClasstable$nameDialog$zh nameDialog = Translations$classtable$partnerClasstable$nameDialog$zh.internal(_root);
 }
 
+// Path: classtable.weekBar
+class Translations$classtable$weekBar$zh {
+	Translations$classtable$weekBar$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '固定周次栏'
+	String get pin => '固定周次栏';
+
+	/// zh: '收起周次栏'
+	String get unpin => '收起周次栏';
+}
+
 // Path: classtable.popupMenu
 class Translations$classtable$popupMenu$zh {
 	Translations$classtable$popupMenu$zh.internal(this._root);
@@ -2498,11 +2617,11 @@ class Translations$classtable$visualSettings$zh {
 	/// zh: '亮度: {value}'
 	String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
 
-	/// zh: '边框透明度: {value}'
-	String activeBorderAlpha({required Object value}) => '边框透明度: ${value}';
+	/// zh: '边框不透明度: {value}'
+	String activeBorderAlpha({required Object value}) => '边框不透明度: ${value}';
 
-	/// zh: '底色透明度: {value}'
-	String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	/// zh: '底色不透明度: {value}'
+	String activeInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 
 	/// zh: '已结束课程样式'
 	String get completedSection => '已结束课程样式';
@@ -2516,11 +2635,11 @@ class Translations$classtable$visualSettings$zh {
 	/// zh: '文字饱和度: {value}'
 	String completedTextSaturationFactor({required Object value}) => '文字饱和度: ${value}';
 
-	/// zh: '边框透明度: {value}'
-	String completedBorderAlpha({required Object value}) => '边框透明度: ${value}';
+	/// zh: '边框不透明度: {value}'
+	String completedBorderAlpha({required Object value}) => '边框不透明度: ${value}';
 
-	/// zh: '底色透明度: {value}'
-	String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	/// zh: '底色不透明度: {value}'
+	String completedInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 }
 
 // Path: classtable.statusSource
@@ -2555,8 +2674,8 @@ class Translations$classtable$statusBanner$zh {
 	/// zh: '正在更新：{sources}'
 	String loading({required Object sources}) => '正在更新：${sources}';
 
-	/// zh: '当前使用缓存：{sources}'
-	String cache({required Object sources}) => '当前使用缓存：${sources}';
+	/// zh: '读取缓存：{sources}'
+	String cache({required Object sources}) => '读取缓存：${sources}';
 
 	/// zh: '以下信息加载失败：{sources}'
 	String errorSummary({required Object sources}) => '以下信息加载失败：${sources}';
@@ -2726,8 +2845,8 @@ class Translations$classtable$classAdd$zh {
 	/// zh: '选择上课时间'
 	String get inputTimeHint => '选择上课时间';
 
-	/// zh: '上课周次'
-	String get inputTimeWeekdayHint => '上课周次';
+	/// zh: '星期'
+	String get inputTimeWeekdayHint => '星期';
 
 	/// zh: '上课时间'
 	String get inputStartTimeHint => '上课时间';
@@ -4533,6 +4652,9 @@ class Translations$setting$aboutPage$zh {
 	/// zh: '开发：修复滑块不对齐问题'
 	String get chitao1234 => '开发：修复滑块不对齐问题';
 
+	/// zh: '开发：课程表美化'
+	String get chiiaya => '开发：课程表美化';
+
 	/// zh: '开发：系统日历最新课表同步'
 	String get copperkoi => '开发：系统日历最新课表同步';
 
@@ -4586,6 +4708,9 @@ class Translations$setting$aboutPage$zh {
 
 	/// zh: '设计：iOS 和 Android 图标 / 支持：冠名 XDYou'
 	String get lsy223622 => '设计：iOS 和 Android 图标 / 支持：冠名 XDYou';
+
+	/// zh: '开发：校园通知查询'
+	String get lumdust => '开发：校园通知查询';
 
 	/// zh: '支持：提供网络服务使用说明文档 / 国际化：优化英语翻译'
 	String get mrbrilliant2046 => '支持：提供网络服务使用说明文档 / 国际化：优化英语翻译';
@@ -4719,11 +4844,11 @@ class Translations$setting$editor$zh {
 	/// zh: '亮度'
 	String get brightness => '亮度';
 
-	/// zh: '边框透明度'
-	String get borderOpacity => '边框透明度';
+	/// zh: '边框不透明度'
+	String get borderOpacity => '边框不透明度';
 
-	/// zh: '底色透明度'
-	String get fillOpacity => '底色透明度';
+	/// zh: '底色不透明度'
+	String get fillOpacity => '底色不透明度';
 
 	/// zh: '底色饱和度'
 	String get fillSaturation => '底色饱和度';
@@ -4803,6 +4928,9 @@ class Translations$setting$fontSizePage$zh {
 
 	// Translations
 
+	/// zh: '苹果用户请先关闭系统设置中的“粗体文本”，再调整字体。可通过以下任一路径找到该选项： 设置 → 显示与亮度 → 粗体文本 设置 → 辅助功能 → 显示与文字大小 → 粗体文本'
+	String get iosPreview => '苹果用户请先关闭系统设置中的“粗体文本”，再调整字体。可通过以下任一路径找到该选项：\n设置 → 显示与亮度 → 粗体文本\n设置 → 辅助功能 → 显示与文字大小 → 粗体文本';
+
 	/// zh: '字体大小'
 	String get sizeTitle => '字体大小';
 
@@ -4839,6 +4967,33 @@ class Translations$setting$classTableStylePage$zh {
 
 	// Translations
 
+	/// zh: '毛玻璃背景'
+	String get frostedSection => '毛玻璃背景';
+
+	/// zh: '启用毛玻璃背景'
+	String get frostedEnabled => '启用毛玻璃背景';
+
+	/// zh: '关闭后各控件只保留半透明底色，可省电、更流畅'
+	String get frostedEnabledHint => '关闭后各控件只保留半透明底色，可省电、更流畅';
+
+	/// zh: '课程卡片模糊'
+	String get frostedCardSigma => '课程卡片模糊';
+
+	/// zh: '时间轴模糊'
+	String get frostedTimeLineSigma => '时间轴模糊';
+
+	/// zh: '日期栏模糊'
+	String get frostedDateRowSigma => '日期栏模糊';
+
+	/// zh: '周次栏模糊'
+	String get frostedWeekBarSigma => '周次栏模糊';
+
+	/// zh: '状态横幅模糊'
+	String get frostedBannerSigma => '状态横幅模糊';
+
+	/// zh: '导航栏模糊'
+	String get frostedAppBarSigma => '导航栏模糊';
+
 	/// zh: '时间指示设置'
 	String get currentTimeSettingsTitle => '时间指示设置';
 
@@ -4866,11 +5021,11 @@ class Translations$setting$classTableStylePage$zh {
 	/// zh: '亮度: {value}'
 	String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
 
-	/// zh: '边框透明度: {value}'
-	String activeBorderAlpha({required Object value}) => '边框透明度: ${value}';
+	/// zh: '边框不透明度: {value}'
+	String activeBorderAlpha({required Object value}) => '边框不透明度: ${value}';
 
-	/// zh: '底色透明度: {value}'
-	String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	/// zh: '底色不透明度: {value}'
+	String activeInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 
 	/// zh: '已结束课程样式'
 	String get completedSection => '已结束课程样式';
@@ -4887,11 +5042,11 @@ class Translations$setting$classTableStylePage$zh {
 	/// zh: '文字饱和度: {value}'
 	String completedTextSaturationFactor({required Object value}) => '文字饱和度: ${value}';
 
-	/// zh: '边框透明度: {value}'
-	String completedBorderAlpha({required Object value}) => '边框透明度: ${value}';
+	/// zh: '边框不透明度: {value}'
+	String completedBorderAlpha({required Object value}) => '边框不透明度: ${value}';
 
-	/// zh: '底色透明度: {value}'
-	String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	/// zh: '底色不透明度: {value}'
+	String completedInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 }
 
 // Path: xduPlanet.confirmAuditDialog
@@ -5146,7 +5301,9 @@ extension on Translations {
 			'classtable.partnerClasstable.nameDialog.cancel' => '我就这一个甜心',
 			'classtable.partnerClasstable.nameDialog.accept' => '提交',
 			'classtable.partnerClasstable.nameDialog.blankInput' => '输入空白!',
-			'classtable.pageTitle' => '我的日程表',
+			'classtable.weekBar.pin' => '固定周次栏',
+			'classtable.weekBar.unpin' => '收起周次栏',
+			'classtable.pageTitle' => '日程表',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}的日程表',
 			'classtable.popupMenu.notArranged' => '查看未安排课程信息',
 			'classtable.popupMenu.classChanged' => '查看课程安排调整信息',
@@ -5169,21 +5326,21 @@ extension on Translations {
 			'classtable.visualSettings.showTodayColumnHighlight' => '强调显示今天的纵列',
 			'classtable.visualSettings.unfinishedSection' => '课程样式',
 			'classtable.visualSettings.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
-			'classtable.visualSettings.activeBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
-			'classtable.visualSettings.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'classtable.visualSettings.activeBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
+			'classtable.visualSettings.activeInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'classtable.visualSettings.completedSection' => '已结束课程样式',
 			'classtable.visualSettings.completedSaturationFactor' => ({required Object value}) => '底色饱和度: ${value}',
 			'classtable.visualSettings.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
 			'classtable.visualSettings.completedTextSaturationFactor' => ({required Object value}) => '文字饱和度: ${value}',
-			'classtable.visualSettings.completedBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
-			'classtable.visualSettings.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'classtable.visualSettings.completedBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
+			'classtable.visualSettings.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'classtable.statusSource.classTable' => '课表',
 			'classtable.statusSource.exam' => '考试',
 			'classtable.statusSource.physicsExperiment' => '物理实验',
 			'classtable.statusSource.otherExperiment' => '其他实验',
 			'classtable.errorDialogTitle' => '错误信息概览',
 			'classtable.statusBanner.loading' => ({required Object sources}) => '正在更新：${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => '当前使用缓存：${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => '读取缓存：${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => '以下信息加载失败：${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => '${semester_code} 学期没有课程安排。',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => '${semester_code} 学期没有课程安排，但有考试安排。',
@@ -5229,7 +5386,7 @@ extension on Translations {
 			'classtable.classAdd.inputClassroomHint' => '教室位置(选填)',
 			'classtable.classAdd.inputWeekHint' => '选择上课周次',
 			'classtable.classAdd.inputTimeHint' => '选择上课时间',
-			'classtable.classAdd.inputTimeWeekdayHint' => '上课周次',
+			'classtable.classAdd.inputTimeWeekdayHint' => '星期',
 			'classtable.classAdd.inputStartTimeHint' => '上课时间',
 			'classtable.classAdd.inputEndTimeHint' => '下课时间',
 			'classtable.classAdd.wheelChooseHint' => ({required Object index}) => '第 ${index} 节',
@@ -5403,6 +5560,7 @@ extension on Translations {
 			'electricity.airconTitle' => '空调用电',
 			'electricity.airconImei' => '空调 IMEI',
 			'electricity.airconAmount' => '平台用电量',
+			'electricity.airconIndoor' => '室内温度',
 			'electricity.airconUpdateTime' => '更新时间',
 			'electricity.airconWaiting' => '等待获取空调用电信息',
 			'electricity.airconError' => '空调用电获取失败',
@@ -5521,6 +5679,23 @@ extension on Translations {
 			'experiment.scoreHint3' => '目前识别库数据不全，请您务必核对一下。',
 			'experimentController.noPassword' => '没有物理实验密码，请到设置中进行设置',
 			'experimentController.loginFailed' => '登录失败',
+			'guessBook.title' => 'Emoji 猜书名',
+			'guessBook.entryDescription' => '看表情，猜猜是哪本书',
+			'guessBook.empty' => '题库暂时为空',
+			'guessBook.question' => '这些表情说的是哪本书？',
+			'guessBook.instruction' => '从下面的选项中选出答案',
+			'guessBook.correct' => '答对了！',
+			'guessBook.answer' => ({required Object answer}) => '正确答案：${answer}',
+			'guessBook.next' => '下一题',
+			'guessBook.reveal' => '查看答案',
+			'guessBook.choiceMode' => '选择题',
+			'guessBook.inputMode' => '输入题',
+			'guessBook.inputInstruction' => '输入你猜的书名',
+			'guessBook.inputLabel' => '书名',
+			'guessBook.submit' => '提交答案',
+			'guessBook.originalClue' => '原题',
+			'guessBook.randomClue' => '随机表情',
+			'guessBook.randomClueFallback' => '这道题无法完整生成随机表情，已使用原题。',
 			'homepage.title' => '校园信息查询',
 			'homepage.loading' => '正在加载',
 			'homepage.loaded' => '加载成功',
@@ -5541,6 +5716,8 @@ extension on Translations {
 			'homepage.homepage' => '校园信息',
 			'homepage.ruisi' => '睿思论坛',
 			'homepage.club' => '社团推荐',
+			'homepage.relax' => '放松一下',
+			'homepage.relaxMessage' => '整天学习不会玩，聪明孩子也会傻',
 			'homepage.dashboard' => '猪图鉴赏',
 			'homepage.planet' => '博客星球',
 			'homepage.setting' => '设置',
@@ -5572,6 +5749,8 @@ extension on Translations {
 			'homepage.classTableCard.onHoliday' => '假期中',
 			'homepage.classTableCard.errorMessage' => ({required Object error}) => '遇到错误：${error}',
 			'homepage.classTableCard.fetchingMessage' => '正在获取课表',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.errorInfoText' => '遇到错误',
 			'homepage.classTableCard.fetchingInfoText' => '正在加载',
 			'homepage.classTableCard.noArrangementInfoText' => '暂无日程',
@@ -5594,8 +5773,6 @@ extension on Translations {
 			'homepage.electricityCard.title' => '水电信息',
 			'homepage.electricityCard.currentElectricity' => ({required Object amount}) => '余额 ${amount} 度',
 			'homepage.electricityCard.cacheNotice' => ({required Object date}) => '最后一次读表：${date}',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.title' => '图书借阅',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => '借书 ${count} 本',
 			'homepage.libraryCard.errorOccured' => '获取借书信息发生错误',
@@ -6000,6 +6177,9 @@ extension on Translations {
 			'setting.scanAirconQr' => '扫描空调二维码',
 			'setting.pickAirconQrImage' => '从相册选择二维码图片',
 			'setting.airconCameraUnavailable' => '当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI',
+			'setting.airconScanHint' => '轻点画面可以对焦；空调离得远、放大后仍然模糊时，请用系统相机拍照识别',
+			'setting.airconTakePhoto' => '用系统相机拍照识别',
+			'setting.airconCameraError' => ({required Object error}) => '无法打开相机：${error}',
 			'setting.notificationSetting' => '通知设置',
 			'setting.courseReminderSetting' => '课前通知设置',
 			'setting.courseReminderDescription' => '设置课前提醒通知',
@@ -6083,6 +6263,8 @@ extension on Translations {
 			'setting.needCloseDialog.title' => '请关闭应用',
 			'setting.needCloseDialog.content' => '因为技术限制，用户需要自行关闭窗口，然后重新打开应用。',
 			'setting.changeColorDialog.title' => '颜色设置',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeColorDialog.kDefault' => '默认颜色',
 			'setting.changeColorDialog.blue' => '聪明蓝',
 			'setting.changeColorDialog.deepPurple' => '基佬紫',
@@ -6108,8 +6290,6 @@ extension on Translations {
 			'setting.changeElectricityAccount.successfulFetch' => ({required Object account_number}) => '账号获取成功：${account_number}',
 			'setting.changeElectricityAccount.failedFetch' => ({required Object e}) => '获取失败：${e}',
 			'setting.changeElectricityAccount.accountSaved' => ({required Object account_number}) => '账号已保存：${account_number}',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.unknownCodingPattern' => '该楼号编码规则未知',
 			'setting.changeElectricityAccount.selectBuilding' => '选择楼栋',
 			'setting.changeElectricityAccount.building' => '楼栋',
@@ -6178,6 +6358,7 @@ extension on Translations {
 			'setting.aboutPage.breezeline' => '支持：无价值无意义的产品经理(他自己的描述)',
 			'setting.aboutPage.cafebabe' => '支持：提供彩蛋代码 / 开发：2026版本滑块验证码适配',
 			'setting.aboutPage.chitao1234' => '开发：修复滑块不对齐问题',
+			'setting.aboutPage.chiiaya' => '开发：课程表美化',
 			'setting.aboutPage.copperkoi' => '开发：系统日历最新课表同步',
 			'setting.aboutPage.dimole' => '开发支持：辅助修复滑块问题',
 			'setting.aboutPage.elitewars' => '设计：体育成绩页面',
@@ -6196,6 +6377,7 @@ extension on Translations {
 			'setting.aboutPage.lichtyy' => '设计：配色，空白页面贴图 / 开发：实验系统页面读取代码',
 			'setting.aboutPage.lqsyH' => '支持：推文宣传图片制作',
 			'setting.aboutPage.lsy223622' => '设计：iOS 和 Android 图标 / 支持：冠名 XDYou',
+			'setting.aboutPage.lumdust' => '开发：校园通知查询',
 			'setting.aboutPage.mrbrilliant2046' => '支持：提供网络服务使用说明文档 / 国际化：优化英语翻译',
 			'setting.aboutPage.nancunchild' => '开发：图书馆搜索功能 / 国际化：优化英语翻译',
 			'setting.aboutPage.nkanf' => '开发：课程表时间进度展示（初版方案） / 支持：MacOS 构建支持',
@@ -6237,8 +6419,8 @@ extension on Translations {
 			'setting.editor.electricityUnit' => '度',
 			'setting.editor.textPreview' => '课程安排 · TrainTime PDA · 0123456789',
 			'setting.editor.brightness' => '亮度',
-			'setting.editor.borderOpacity' => '边框透明度',
-			'setting.editor.fillOpacity' => '底色透明度',
+			'setting.editor.borderOpacity' => '边框不透明度',
+			'setting.editor.fillOpacity' => '底色不透明度',
 			'setting.editor.fillSaturation' => '底色饱和度',
 			'setting.editor.textSaturation' => '文字饱和度',
 			'setting.editor.backgroundBlur' => '背景模糊程度',
@@ -6257,6 +6439,7 @@ extension on Translations {
 			'setting.navigation.notificationsDescription' => '课前提醒与通知管理',
 			'setting.navigation.coreDescription' => '日志、缓存清理与退出登录',
 			'setting.fontSizeSetting' => '字体大小与粗细',
+			'setting.fontSizePage.iosPreview' => '苹果用户请先关闭系统设置中的“粗体文本”，再调整字体。可通过以下任一路径找到该选项：\n设置 → 显示与亮度 → 粗体文本\n设置 → 辅助功能 → 显示与文字大小 → 粗体文本',
 			'setting.fontSizePage.sizeTitle' => '字体大小',
 			'setting.fontSizePage.weightTitle' => '字体粗细',
 			'setting.fontSizePage.previewTitle' => '预览',
@@ -6273,6 +6456,15 @@ extension on Translations {
 			'setting.backgroundBlurOff' => '关闭',
 			'setting.classTableStyleSetting' => '课表显示与样式',
 			'setting.classTableStyleDescription' => '时间指示和课程卡片样式',
+			'setting.classTableStylePage.frostedSection' => '毛玻璃背景',
+			'setting.classTableStylePage.frostedEnabled' => '启用毛玻璃背景',
+			'setting.classTableStylePage.frostedEnabledHint' => '关闭后各控件只保留半透明底色，可省电、更流畅',
+			'setting.classTableStylePage.frostedCardSigma' => '课程卡片模糊',
+			'setting.classTableStylePage.frostedTimeLineSigma' => '时间轴模糊',
+			'setting.classTableStylePage.frostedDateRowSigma' => '日期栏模糊',
+			'setting.classTableStylePage.frostedWeekBarSigma' => '周次栏模糊',
+			'setting.classTableStylePage.frostedBannerSigma' => '状态横幅模糊',
+			'setting.classTableStylePage.frostedAppBarSigma' => '导航栏模糊',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => '时间指示设置',
 			'setting.classTableStylePage.classColorSettingsTitle' => '课表样式设置',
 			'setting.classTableStylePage.currentTimeSection' => '时间指示设置',
@@ -6282,15 +6474,15 @@ extension on Translations {
 			'setting.classTableStylePage.activeSection' => '课程卡片样式',
 			'setting.classTableStylePage.unfinishedSection' => '课程卡片样式',
 			'setting.classTableStylePage.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
-			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
-			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
+			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'setting.classTableStylePage.completedSection' => '已结束课程样式',
 			'setting.classTableStylePage.completedStyleEnabled' => '已结束课程样式区分',
 			'setting.classTableStylePage.completedSaturationFactor' => ({required Object value}) => '底色饱和度: ${value}',
 			'setting.classTableStylePage.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
 			'setting.classTableStylePage.completedTextSaturationFactor' => ({required Object value}) => '文字饱和度: ${value}',
-			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '边框透明度: ${value}',
-			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '边框不透明度: ${value}',
+			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'setting.classSwiftExplain' => '正数错后开学日期 负数提前开学日期',
 			'sponsorship.title' => '欢迎使用 XDYou 的鸿蒙版本',
 			'sponsorship.dialogTitle' => '详细信息',
@@ -6345,6 +6537,14 @@ extension on Translations {
 			'toolbox.physicsDescription' => '希望操作顺利',
 			'toolbox.discover' => '睿思导航',
 			'toolbox.discoverDescription' => '补充其他功能',
+			'toolbox.noticeSearch' => '通知查询',
+			'toolbox.noticeDescription' => '不要错过通知',
+			'toolbox.noticeHint' => '搜索关键词（近30天的通知标题）',
+			'toolbox.noticeSchoolNetworkWarning' => '当前可能未连接校园网，部分通知来源需要校园网访问。',
+			'toolbox.noticePlaceholder' => '如:转专业',
+			'toolbox.noticeIncomplete' => '部分来源未查完',
+			'toolbox.noticeEmpty' => '已查栏目中没有匹配的通知',
+			'toolbox.noticeOpenError' => '无法打开原文链接',
 			'weekday.monday' => '周一',
 			'weekday.tuesday' => '周二',
 			'weekday.wednesday' => '周三',

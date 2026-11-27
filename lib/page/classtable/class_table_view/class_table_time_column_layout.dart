@@ -5,7 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/repository/translation_key.dart';
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:watermeter/model/time_list.dart';
-import 'package:watermeter/page/classtable/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 
 /// Measures the time column using the same styles and scaling as its labels.
 class ClassTableTimeColumnLayout {
@@ -69,7 +69,7 @@ class ClassTableTimeColumnLayout {
     // A class occupies five blocks; leave room between its three labels.
     var minimumBlockHeight = math.max(
       minBlockUnitHeight,
-      (timeHeight * 2 + periodHeight + 4) / 5,
+      (timeHeight * 2 + periodHeight + 6) / 5,
     );
     // Break labels may wrap in some languages and occupy three blocks.
     for (final key in ['classtable.noon_break', 'classtable.supper_break']) {

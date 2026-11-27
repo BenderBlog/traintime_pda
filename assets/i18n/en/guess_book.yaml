@@ -1,0 +1,17 @@
+title: Emoji Book Quiz
+entry_description: Guess the book from the emoji
+empty: There are no questions yet.
+question: Which book do these emoji represent?
+instruction: Choose an answer below.
+correct: Correct!
+answer: 'Correct answer: {answer}'
+next: Next question
+reveal: Show answer
+choice_mode: Multiple choice
+input_mode: Type answer
+input_instruction: Enter the book title.
+input_label: Book title
+submit: Submit answer
+original_clue: Original
+random_clue: Random emoji
+random_clue_fallback: This clue could not be fully generated, so the original is shown.

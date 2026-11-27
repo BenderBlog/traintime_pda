@@ -11,6 +11,7 @@ import 'package:catcher_2/catcher_2.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -29,6 +30,7 @@ import 'package:watermeter/repository/notification/notification_registrar.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/page/homepage/home.dart';
 import 'package:watermeter/page/login/login_window.dart';
+import 'package:watermeter/page/classtable/model/style_config/style_config_preference_functions.dart';
 import 'package:watermeter/themes/font_setting.dart';
 
 void main() async {
@@ -56,6 +58,19 @@ void main() async {
   }
   preference.prefs = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(),
+  );
+
+  preference.Preference resolveStylePreference(StyleConfigPreferenceKey key) =>
+      preference.Preference.values.firstWhere((item) => item.name == key.name);
+
+  StyleConfigPreferenceFunctions.install(
+    getBool: (key) => preference.getBool(resolveStylePreference(key)),
+    getDouble: (key) => preference.getDouble(resolveStylePreference(key)),
+    setBool: (key, value) =>
+        preference.setBool(resolveStylePreference(key), value),
+    setDouble: (key, value) =>
+        preference.setDouble(resolveStylePreference(key), value),
+    contains: (key) => preference.contains(resolveStylePreference(key)),
   );
 
   // Load package info.
@@ -321,13 +336,15 @@ class _MyAppState extends State<MyApp> {
               );
               if (widget != null) {
                 return MaterialUiCompatibilityBridge(
-                  child: DefaultTextStyle.merge(
-                    style: const TextStyle().useSystemChineseFont(),
-                    child: MediaQuery(
-                      data: MediaQuery.of(
-                        context,
-                      ).copyWith(textScaler: TextScaler.linear(fontScale)),
-                      child: widget,
+                  child: flutter_material.ScaffoldMessenger(
+                    child: DefaultTextStyle.merge(
+                      style: const TextStyle().useSystemChineseFont(),
+                      child: MediaQuery(
+                        data: MediaQuery.of(
+                          context,
+                        ).copyWith(textScaler: TextScaler.linear(fontScale)),
+                        child: widget,
+                      ),
                     ),
                   ),
                 );

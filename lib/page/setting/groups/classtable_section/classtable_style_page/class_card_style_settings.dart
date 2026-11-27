@@ -4,7 +4,7 @@
 import 'package:watermeter/generated/translations.g.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/page/public_widget/setting/setting_slider_tile.dart';
-import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
+import 'package:watermeter/page/classtable/model/style_config/class_card_style_config.dart';
 import 'package:watermeter/page/public_widget/setting/setting_section_scaffold.dart';
 import 'package:watermeter/page/public_widget/setting/setting_segmented_list.dart';
 
@@ -16,29 +16,29 @@ class ClassCardStyleSettings extends StatelessWidget {
   String _formatPercent(double value) => "${(value * 100).round()}%";
 
   void _onActiveBrightnessChanged(double value) {
-    CompletedClassStyleConfig.activeBrightnessFactor = value;
+    ClassCardStyleConfig.activeBrightnessFactor = value;
     onChanged();
   }
 
   void _onActiveBorderChanged(double value) {
-    CompletedClassStyleConfig.activeBorderAlpha = value;
+    ClassCardStyleConfig.activeBorderAlpha = value;
     onChanged();
   }
 
   void _onActiveInnerChanged(double value) {
-    CompletedClassStyleConfig.activeInnerAlpha = value;
+    ClassCardStyleConfig.activeInnerAlpha = value;
     onChanged();
   }
 
   Future<void> _saveClassStyleSettings(double _) async {
-    await CompletedClassStyleConfig.saveToPreference();
+    await ClassCardStyleConfig.saveToPreference();
   }
 
   @override
   Widget build(BuildContext context) {
-    final activeBrightness = CompletedClassStyleConfig.activeBrightnessFactor;
-    final activeBorder = CompletedClassStyleConfig.activeBorderAlpha;
-    final activeInner = CompletedClassStyleConfig.activeInnerAlpha;
+    final activeBrightness = ClassCardStyleConfig.activeBrightnessFactor;
+    final activeBorder = ClassCardStyleConfig.activeBorderAlpha;
+    final activeInner = ClassCardStyleConfig.activeInnerAlpha;
 
     return SectionSettingScaffold(
       icon: Icons.play_circle_outline,

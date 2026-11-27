@@ -13,6 +13,7 @@ import 'package:watermeter/controller/homepage_controller.dart';
 import 'package:watermeter/routing/routes.dart';
 import 'package:watermeter/page/homepage/home_card_padding.dart';
 import 'package:watermeter/model/home_arrangement.dart';
+import 'package:watermeter/page/classtable/class_table_view/completed_class_style.dart';
 import 'package:watermeter/page/public_widget/context_extension.dart';
 import 'package:watermeter/repository/preference.dart' as preference;
 import 'package:watermeter/themes/color_seed.dart';
@@ -36,6 +37,12 @@ class ClassTableCard extends StatefulWidget {
 }
 
 class _ClassTableCardState extends State<ClassTableCard> {
+  @override
+  void initState() {
+    super.initState();
+    ClassCardStyleConfig.loadFromPreference();
+  }
+
   String _getEmptyInfoText(home.ArrangementState state) {
     switch (state) {
       case home.ArrangementState.fetching:
@@ -242,12 +249,19 @@ class _ClassArrangementListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final index = arrangement.colorIndex ?? colorIndex;
-    final color = colorList[index % colorList.length];
+    final style = CompletedClassStyle.resolve(
+      palette: colorList[index % colorList.length],
+      isCompleted: false,
+    );
+    final color = style.textColor;
+    final backgroundColor = style.innerColor.withValues(
+      alpha: style.innerAlpha,
+    );
     return [
           Container(
             width: 8,
             decoration: BoxDecoration(
-              color: color,
+              color: style.borderColor,
               borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
           ),
@@ -316,7 +330,7 @@ class _ClassArrangementListTile extends StatelessWidget {
         .parent(({required child}) => IntrinsicHeight(child: child))
         .padding(horizontal: 8, vertical: 6)
         .decorated(
-          color: color.withValues(alpha: 0.125),
+          color: backgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
         )
         .padding(vertical: 4);

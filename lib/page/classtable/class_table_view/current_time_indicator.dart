@@ -3,64 +3,10 @@
 
 import 'package:material_ui/material_ui.dart';
 import 'package:watermeter/model/time_list.dart';
-import 'package:watermeter/repository/preference.dart' as preference;
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
+import 'package:watermeter/page/classtable/model/style_config/current_time_indicator_style_config.dart';
 
-class CurrentTimeIndicatorConfig {
-  /// Default tuning parameters for the current time indicator.
-  /// Configuration for the current time indicator in the class table view.
-  static bool enabled = true;
-  static bool showTimeLabel = true;
-  static bool showTodayColumnHighlight = true;
-  static double lineAlpha = 0.9;
-  static double lineThickness = 2;
-  static double labelHeight = 13;
-  static double labelFontSize = 7;
-  static double labelBackgroundAlpha = 1.0;
-  static double labelHorizontalPadding = 1;
-  static double labelVerticalPadding = 1;
-  static double labelBorderRadius = 4;
-  static double dayColumnHighlightAlpha = 0.25;
-  static double dayColumnHighlightRadius = 8;
-
-  static void loadFromPreference() {
-    if (preference.contains(
-      preference.Preference.currentTimeIndicatorEnabled,
-    )) {
-      enabled = preference.getBool(
-        preference.Preference.currentTimeIndicatorEnabled,
-      );
-    }
-    if (preference.contains(
-      preference.Preference.currentTimeIndicatorShowTimeLabel,
-    )) {
-      showTimeLabel = preference.getBool(
-        preference.Preference.currentTimeIndicatorShowTimeLabel,
-      );
-    }
-    if (preference.contains(
-      preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
-    )) {
-      showTodayColumnHighlight = preference.getBool(
-        preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
-      );
-    }
-  }
-
-  static Future<void> saveToPreference() async {
-    await preference.setBool(
-      preference.Preference.currentTimeIndicatorEnabled,
-      enabled,
-    );
-    await preference.setBool(
-      preference.Preference.currentTimeIndicatorShowTimeLabel,
-      showTimeLabel,
-    );
-    await preference.setBool(
-      preference.Preference.currentTimeIndicatorShowTodayColumnHighlight,
-      showTodayColumnHighlight,
-    );
-  }
-}
+export 'package:watermeter/page/classtable/model/style_config/current_time_indicator_style_config.dart';
 
 class CurrentTimeIndicator {
   static double _transferIndex(DateTime time) {
@@ -129,7 +75,8 @@ class CurrentTimeIndicator {
 
   static double transferTimeToBlockIndex(DateTime time) => _transferIndex(time);
 
-  static Positioned? build({
+  /// Everything the indicator needs to place itself this frame.
+  static _IndicatorGeometry? _geometry({
     required BuildContext context,
     required DateTime now,
     required DateTime weekStart,
@@ -152,123 +99,178 @@ class CurrentTimeIndicator {
       return null;
     }
 
-    final lineTop = blockHeight(_transferIndex(now));
-    final colorScheme = Theme.of(context).colorScheme;
-    final color = colorScheme.primary;
-    final labelText =
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     final hasLabel = CurrentTimeIndicatorConfig.showTimeLabel;
     final labelHeight = CurrentTimeIndicatorConfig.labelHeight;
-    final indicatorTop = lineTop - labelHeight;
-    final lineOffset = lineTop - indicatorTop;
-    final lineTopOffset =
-        lineOffset - CurrentTimeIndicatorConfig.lineThickness / 2;
-    final labelTop = lineOffset - CurrentTimeIndicatorConfig.labelHeight / 2;
-    final labelBottom = labelTop + CurrentTimeIndicatorConfig.labelHeight;
-    final lineBottom = lineTopOffset + CurrentTimeIndicatorConfig.lineThickness;
-    final indicatorHeight =
-        (hasLabel
-                ? (labelBottom > lineBottom ? labelBottom : lineBottom)
-                : lineBottom)
-            .clamp(0.0, double.infinity)
-            .toDouble();
-    final labelBackgroundColor = colorScheme.surface.withValues(
-      alpha: CurrentTimeIndicatorConfig.labelBackgroundAlpha,
-    );
-    final connectorColor = color.withValues(
-      alpha: CurrentTimeIndicatorConfig.lineAlpha * 0.35,
-    );
-    final lineColor = color.withValues(
-      alpha: CurrentTimeIndicatorConfig.lineAlpha,
-    );
+    final lineThickness = CurrentTimeIndicatorConfig.lineThickness;
+    final double indicatorHeight = hasLabel ? labelHeight : lineThickness;
+    final double lineCenter = blockHeight(
+      _transferIndex(now),
+    ).clamp(0.0, blockHeight(61));
 
-    return Positioned(
-      left: 0,
-      top: indicatorTop,
-      width: leftRow + blockWidth * (dayOffset + 1),
-      child: IgnorePointer(
-        child: SizedBox(
-          height: indicatorHeight,
-          child: Stack(
-            children: [
-              if (hasLabel)
-                Positioned(
-                  top: labelTop,
-                  left: 0,
-                  width: leftRow,
-                  height: CurrentTimeIndicatorConfig.labelHeight,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: labelBackgroundColor,
-                      border: Border.all(
-                        color: color.withValues(alpha: 0.7),
-                        width: 1.4,
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        CurrentTimeIndicatorConfig.labelBorderRadius,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal:
-                            CurrentTimeIndicatorConfig.labelHorizontalPadding,
-                        vertical:
-                            CurrentTimeIndicatorConfig.labelVerticalPadding,
-                      ),
-                      child: Center(
-                        child: Text(
-                          labelText,
-                          style: TextStyle(
-                            fontSize: CurrentTimeIndicatorConfig.labelFontSize,
-                            color: color,
-                            fontWeight: FontWeight.w700,
-                            height: 1,
-                            shadows: const [
-                              Shadow(
-                                offset: Offset(0, 0),
-                                blurRadius: 2,
-                                color: Colors.black26,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              if (dayOffset > 0)
-                Positioned(
-                  top: lineTopOffset,
-                  left: leftRow,
-                  width: blockWidth * dayOffset,
-                  child: Container(
-                    height: CurrentTimeIndicatorConfig.lineThickness,
-                    color: connectorColor,
-                  ),
-                ),
-              Positioned(
-                top: lineTopOffset,
-                left: leftRow + blockWidth * dayOffset,
-                width: blockWidth,
-                child: Container(
-                  height: CurrentTimeIndicatorConfig.lineThickness,
-                  color: lineColor,
-                ),
-              ),
-            ],
-          ),
-        ),
+    final indicatorTop = lineCenter - indicatorHeight / 2;
+    final labelTop = 0.0;
+    final lineTopOffset = indicatorHeight / 2 - lineThickness / 2;
+
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = colorScheme.primary;
+
+    return _IndicatorGeometry(
+      indicatorTop: indicatorTop,
+      indicatorHeight: indicatorHeight,
+      labelTop: labelTop,
+      lineTopOffset: lineTopOffset,
+      dayOffset: dayOffset,
+      leftRow: leftRow,
+      blockWidth: blockWidth,
+      hasLabel: hasLabel,
+      labelText:
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+      color: color,
+      connectorColor: color.withValues(
+        alpha: CurrentTimeIndicatorConfig.lineAlpha * 0.35,
+      ),
+      lineColor: color.withValues(alpha: CurrentTimeIndicatorConfig.lineAlpha),
+      labelBackgroundColor: colorScheme.surface.withValues(
+        alpha: CurrentTimeIndicatorConfig.labelBackgroundAlpha,
       ),
     );
   }
 
-  static Positioned? buildDayColumnBox({
+  /// The combined current time indicator: the time buoy on the timeline and the horizontal line
+  /// across to today's column, as a single connected whole.
+  ///
+  /// [opacity] fades the whole indicator, which is how the sheet ties it to the swipe progress.
+  static Positioned? build({
     required BuildContext context,
     required DateTime now,
     required DateTime weekStart,
     required double leftRow,
     required double blockWidth,
     required double Function(double) blockHeight,
+    double opacity = 1.0,
+  }) {
+    if (opacity <= 0.0) {
+      return null;
+    }
+    final _IndicatorGeometry? geometry = _geometry(
+      context: context,
+      now: now,
+      weekStart: weekStart,
+      leftRow: leftRow,
+      blockWidth: blockWidth,
+      blockHeight: blockHeight,
+    );
+    if (geometry == null) {
+      return null;
+    }
+
+    final hasLabel = geometry.hasLabel;
+
+    /// The buoy floats inside the time column's floating panel, which is inset from the column's
+    /// own edges, so its width follows the measured column rather than a constant.
+    final double buoyWidth = leftRow - 2 * timeLineInset;
+    final double lineStart = hasLabel ? (timeLineInset + buoyWidth) : leftRow;
+    final double todayColumnStart =
+        geometry.leftRow + geometry.blockWidth * geometry.dayOffset;
+    final double totalWidth =
+        geometry.leftRow + geometry.blockWidth * (geometry.dayOffset + 1);
+
+    Widget content = SizedBox(
+      height: geometry.indicatorHeight,
+      child: Stack(
+        children: [
+          if (hasLabel)
+            Positioned(
+              top: geometry.labelTop,
+              left: timeLineInset,
+              width: buoyWidth,
+              height: CurrentTimeIndicatorConfig.labelHeight,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: geometry.labelBackgroundColor,
+                  border: Border.all(
+                    color: geometry.color.withValues(alpha: 0.7),
+                    width: 1.4,
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    CurrentTimeIndicatorConfig.labelBorderRadius,
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal:
+                        CurrentTimeIndicatorConfig.labelHorizontalPadding,
+                    vertical: CurrentTimeIndicatorConfig.labelVerticalPadding,
+                  ),
+                  child: Center(
+                    child: Text(
+                      geometry.labelText,
+                      style: TextStyle(
+                        fontSize: CurrentTimeIndicatorConfig.labelFontSize,
+                        color: geometry.color,
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                        shadows: const [
+                          Shadow(
+                            offset: Offset(0, 0),
+                            blurRadius: 2,
+                            color: Colors.black26,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if (todayColumnStart > lineStart)
+            Positioned(
+              top: geometry.lineTopOffset,
+              left: lineStart,
+              width: todayColumnStart - lineStart,
+              child: Container(
+                height: CurrentTimeIndicatorConfig.lineThickness,
+                color: geometry.dayOffset == 0
+                    ? geometry.lineColor
+                    : geometry.connectorColor,
+              ),
+            ),
+          Positioned(
+            top: geometry.lineTopOffset,
+            left: todayColumnStart,
+            width: geometry.blockWidth,
+            child: Container(
+              height: CurrentTimeIndicatorConfig.lineThickness,
+              color: geometry.lineColor,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (opacity < 1.0) {
+      content = Opacity(opacity: opacity.clamp(0.0, 1.0), child: content);
+    }
+
+    return Positioned(
+      left: 0,
+      top: geometry.indicatorTop,
+      width: totalWidth,
+      child: IgnorePointer(child: content),
+    );
+  }
+
+  /// The box behind today's column.
+  ///
+  /// It spans the 61 period blocks, so its bottom edge aligns with the time-line panel rather than
+  /// continuing into the table's end clearance.
+  static Positioned? buildDayColumnBox({
+    required BuildContext context,
+    required DateTime now,
+    required DateTime weekStart,
+    required double leftRow,
+    required double blockWidth,
+    required double height,
   }) {
     if (!CurrentTimeIndicatorConfig.showTodayColumnHighlight) {
       return null;
@@ -292,8 +294,8 @@ class CurrentTimeIndicator {
     return Positioned(
       left: leftRow + blockWidth * dayOffset,
       top: 0,
+      height: height,
       width: blockWidth,
-      height: blockHeight(61),
       child: IgnorePointer(
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -306,4 +308,37 @@ class CurrentTimeIndicator {
       ),
     );
   }
+}
+
+/// Where the current-time indicator sits this frame.
+class _IndicatorGeometry {
+  const _IndicatorGeometry({
+    required this.indicatorTop,
+    required this.indicatorHeight,
+    required this.labelTop,
+    required this.lineTopOffset,
+    required this.dayOffset,
+    required this.leftRow,
+    required this.blockWidth,
+    required this.hasLabel,
+    required this.labelText,
+    required this.color,
+    required this.connectorColor,
+    required this.lineColor,
+    required this.labelBackgroundColor,
+  });
+
+  final double indicatorTop;
+  final double indicatorHeight;
+  final double labelTop;
+  final double lineTopOffset;
+  final int dayOffset;
+  final double leftRow;
+  final double blockWidth;
+  final bool hasLabel;
+  final String labelText;
+  final Color color;
+  final Color connectorColor;
+  final Color lineColor;
+  final Color labelBackgroundColor;
 }

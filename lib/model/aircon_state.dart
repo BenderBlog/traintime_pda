@@ -5,6 +5,33 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'aircon_state.g.dart';
 
+const minTemperature = 18;
+const maxTemperature = 32;
+const stateMotionDuration = Duration(milliseconds: 260);
+const pressMotionDuration = Duration(milliseconds: 120);
+
+class AirconRemoteCommand {
+  const AirconRemoteCommand({
+    required this.parameters,
+    required this.optimisticState,
+    required this.matches,
+  });
+
+  final Map<String, dynamic> parameters;
+  final AirconState optimisticState;
+  final bool Function(AirconState state) matches;
+}
+
+class AirconCommandException implements Exception {
+  const AirconCommandException(this.error, {required this.sent});
+
+  final Object error;
+  final bool sent;
+
+  @override
+  String toString() => error.toString();
+}
+
 @JsonEnum(valueField: "value")
 enum AirconMode {
   fan(0, "electricity.aircon_mode_fan"),

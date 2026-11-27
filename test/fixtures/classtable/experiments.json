@@ -1,0 +1,16 @@
+[
+  {
+    "type": "physics",
+    "name": "虚构物理实验",
+    "score": null,
+    "classroom": "实验楼 T201",
+    "timeRanges": [
+      {
+        "$1": "2026-11-19T14:00:00",
+        "$2": "2026-11-19T15:35:00"
+      }
+    ],
+    "teacher": "测试老师",
+    "reference": null
+  }
+]

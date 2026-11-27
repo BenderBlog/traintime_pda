@@ -21,7 +21,10 @@ partner_classtable:
     cancel: 我就这一个甜心
     accept: 提交
     blank_input: 输入空白!
-page_title: 我的日程表
+week_bar:
+  pin: 固定周次栏
+  unpin: 收起周次栏
+page_title: 日程表
 partner_page_title: '{partner_name}的日程表'
 popup_menu:
   not_arranged: 查看未安排课程信息
@@ -46,14 +49,14 @@ visual_settings:
   show_today_column_highlight: 强调显示今天的纵列
   unfinished_section: 课程样式
   active_brightness_factor: '亮度: {value}'
-  active_border_alpha: '边框透明度: {value}'
-  active_inner_alpha: '底色透明度: {value}'
+  active_border_alpha: '边框不透明度: {value}'
+  active_inner_alpha: '底色不透明度: {value}'
   completed_section: 已结束课程样式
   completed_saturation_factor: '底色饱和度: {value}'
   completed_brightness_factor: '亮度: {value}'
   completed_text_saturation_factor: '文字饱和度: {value}'
-  completed_border_alpha: '边框透明度: {value}'
-  completed_inner_alpha: '底色透明度: {value}'
+  completed_border_alpha: '边框不透明度: {value}'
+  completed_inner_alpha: '底色不透明度: {value}'
 status_source:
   class_table: 课表
   exam: 考试
@@ -62,7 +65,7 @@ status_source:
 error_dialog_title: 错误信息概览
 status_banner:
   loading: 正在更新：{sources}
-  cache: 当前使用缓存：{sources}
+  cache: 读取缓存：{sources}
   error_summary: 以下信息加载失败：{sources}
 empty_state:
   no_course: '{semester_code} 学期没有课程安排。'
@@ -124,7 +127,7 @@ class_add:
   input_classroom_hint: 教室位置(选填)
   input_week_hint: 选择上课周次
   input_time_hint: 选择上课时间
-  input_time_weekday_hint: 上课周次
+  input_time_weekday_hint: 星期
   input_start_time_hint: 上课时间
   input_end_time_hint: 下课时间
   wheel_choose_hint: 第 {index} 节

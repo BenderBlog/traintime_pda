@@ -53,6 +53,7 @@ class TranslationsEn extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$exam$en exam = _Translations$exam$en._(_root);
 	@override late final _Translations$experiment$en experiment = _Translations$experiment$en._(_root);
 	@override late final _Translations$experimentController$en experimentController = _Translations$experimentController$en._(_root);
+	@override late final _Translations$guessBook$en guessBook = _Translations$guessBook$en._(_root);
 	@override late final _Translations$homepage$en homepage = _Translations$homepage$en._(_root);
 	@override late final _Translations$library$en library = _Translations$library$en._(_root);
 	@override late final _Translations$libraryCard$en libraryCard = _Translations$libraryCard$en._(_root);
@@ -101,7 +102,8 @@ class _Translations$classtable$en extends Translations$classtable$zh {
 
 	// Translations
 	@override late final _Translations$classtable$partnerClasstable$en partnerClasstable = _Translations$classtable$partnerClasstable$en._(_root);
-	@override String get pageTitle => 'My Schedule';
+	@override late final _Translations$classtable$weekBar$en weekBar = _Translations$classtable$weekBar$en._(_root);
+	@override String get pageTitle => 'Schedule';
 	@override String partnerPageTitle({required Object partner_name}) => '${partner_name}\'s Schedule';
 	@override late final _Translations$classtable$popupMenu$en popupMenu = _Translations$classtable$popupMenu$en._(_root);
 	@override late final _Translations$classtable$visualSettings$en visualSettings = _Translations$classtable$visualSettings$en._(_root);
@@ -317,6 +319,7 @@ class _Translations$electricity$en extends Translations$electricity$zh {
 	@override String get airconTitle => 'Aircon Electricity';
 	@override String get airconImei => 'Aircon IMEI';
 	@override String get airconAmount => 'Platform usage';
+	@override String get airconIndoor => 'Indoor temperature';
 	@override String get airconUpdateTime => 'Updated at';
 	@override String get airconWaiting => 'Waiting to fetch aircon electricity data';
 	@override String get airconError => 'Failed to fetch aircon electricity data';
@@ -480,6 +483,32 @@ class _Translations$experimentController$en extends Translations$experimentContr
 	@override String get loginFailed => 'Login failed';
 }
 
+// Path: guessBook
+class _Translations$guessBook$en extends Translations$guessBook$zh {
+	_Translations$guessBook$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Emoji Book Quiz';
+	@override String get entryDescription => 'Guess the book from the emoji';
+	@override String get empty => 'There are no questions yet.';
+	@override String get question => 'Which book do these emoji represent?';
+	@override String get instruction => 'Choose an answer below.';
+	@override String get correct => 'Correct!';
+	@override String answer({required Object answer}) => 'Correct answer: ${answer}';
+	@override String get next => 'Next question';
+	@override String get reveal => 'Show answer';
+	@override String get choiceMode => 'Multiple choice';
+	@override String get inputMode => 'Type answer';
+	@override String get inputInstruction => 'Enter the book title.';
+	@override String get inputLabel => 'Book title';
+	@override String get submit => 'Submit answer';
+	@override String get originalClue => 'Original';
+	@override String get randomClue => 'Random emoji';
+	@override String get randomClueFallback => 'This clue could not be fully generated, so the original is shown.';
+}
+
 // Path: homepage
 class _Translations$homepage$en extends Translations$homepage$zh {
 	_Translations$homepage$en._(TranslationsEn root) : this._root = root, super.internal(root);
@@ -508,6 +537,8 @@ class _Translations$homepage$en extends Translations$homepage$zh {
 	@override String get ruisi => 'Forum';
 	@override String get club => 'Club';
 	@override String get planet => 'Blog';
+	@override String get relax => 'Take a break';
+	@override String get relaxMessage => 'All work and no play makes Jack a dull boy.';
 	@override String get dashboard => 'Pighub';
 	@override String get setting => 'Settings';
 	@override late final _Translations$homepage$inputPartnerData$en inputPartnerData = _Translations$homepage$inputPartnerData$en._(_root);
@@ -830,6 +861,9 @@ class _Translations$setting$en extends Translations$setting$zh {
 	@override String get scanAirconQr => 'Scan aircon QR code';
 	@override String get pickAirconQrImage => 'Choose QR image';
 	@override String get airconCameraUnavailable => 'Camera scanning is unavailable on this platform. Choose a QR image or enter the IMEI manually.';
+	@override String get airconScanHint => 'Tap to focus. If the aircon is far away and stays blurry when zoomed in, take a photo with the system camera instead.';
+	@override String get airconTakePhoto => 'Take a photo with the system camera';
+	@override String airconCameraError({required Object error}) => 'Unable to open the camera: ${error}';
 	@override String get notificationSetting => 'Notification Settings';
 	@override String get courseReminderSetting => 'Pre-class Reminder Settings';
 	@override String get courseReminderDescription => 'Configure pre-class reminder notifications';
@@ -968,6 +1002,14 @@ class _Translations$toolbox$en extends Translations$toolbox$zh {
 	@override String get physicsDescription => 'Hope the operation goes smoothly';
 	@override String get discover => 'Ruisi Navigation';
 	@override String get discoverDescription => 'Lots other functions';
+	@override String get noticeSearch => 'Notice search';
+	@override String get noticeDescription => 'Don\'t miss any notices';
+	@override String get noticeHint => 'Search keywords (notice titles from the last 30 days)';
+	@override String get noticeSchoolNetworkWarning => 'You may not be connected to the campus network. Some notice sources require it.';
+	@override String get noticePlaceholder => 'e.g. changing majors';
+	@override String get noticeIncomplete => 'Some sources could not be fully searched';
+	@override String get noticeEmpty => 'No matches in the lists checked';
+	@override String get noticeOpenError => 'Could not open the original notice';
 }
 
 // Path: weekday
@@ -977,13 +1019,13 @@ class _Translations$weekday$en extends Translations$weekday$zh {
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
-	@override String get monday => 'Mon.';
-	@override String get tuesday => 'Tue.';
-	@override String get wednesday => 'Wed.';
-	@override String get thursday => 'Thu.';
-	@override String get friday => 'Fri.';
-	@override String get saturday => 'Sat.';
-	@override String get sunday => 'Sun.';
+	@override String get monday => 'Mon';
+	@override String get tuesday => 'Tue';
+	@override String get wednesday => 'Wed';
+	@override String get thursday => 'Thu';
+	@override String get friday => 'Fri';
+	@override String get saturday => 'Sat';
+	@override String get sunday => 'Sun';
 }
 
 // Path: xduPlanet
@@ -1132,6 +1174,17 @@ class _Translations$classtable$partnerClasstable$en extends Translations$classta
 	@override late final _Translations$classtable$partnerClasstable$nameDialog$en nameDialog = _Translations$classtable$partnerClasstable$nameDialog$en._(_root);
 }
 
+// Path: classtable.weekBar
+class _Translations$classtable$weekBar$en extends Translations$classtable$weekBar$zh {
+	_Translations$classtable$weekBar$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get pin => 'Pin the week bar';
+	@override String get unpin => 'Collapse the week bar';
+}
+
 // Path: classtable.popupMenu
 class _Translations$classtable$popupMenu$en extends Translations$classtable$popupMenu$zh {
 	_Translations$classtable$popupMenu$en._(TranslationsEn root) : this._root = root, super.internal(root);
@@ -1200,7 +1253,7 @@ class _Translations$classtable$statusBanner$en extends Translations$classtable$s
 
 	// Translations
 	@override String loading({required Object sources}) => 'Updating: ${sources}';
-	@override String cache({required Object sources}) => 'Using cached data: ${sources}';
+	@override String cache({required Object sources}) => 'Reading from cache: ${sources}';
 	@override String errorSummary({required Object sources}) => 'Failed to load: ${sources}';
 }
 
@@ -2202,6 +2255,7 @@ class _Translations$setting$aboutPage$en extends Translations$setting$aboutPage$
 	@override String get breezeline => 'Support: valueless and meaningless product manager (from his own description)';
 	@override String get cafebabe => 'Support: provide Easter egg code / Development: Development: New Slider \'26';
 	@override String get chitao1234 => 'Development: fix slider misalignment issue';
+	@override String get chiiaya => 'Development: timetable visual improvements';
 	@override String get copperkoi => 'Development: latest time arrangement sync to calendar';
 	@override String get dimole => 'Development support: assist in fixing slider issue';
 	@override String get elitewars => 'Design: sports score page';
@@ -2220,6 +2274,7 @@ class _Translations$setting$aboutPage$en extends Translations$setting$aboutPage$
 	@override String get lichtyy => 'Design: color pattern and blank page picture / Development: HTML reader for the experiment system';
 	@override String get lqsyH => 'Support: Promotion Picture';
 	@override String get lsy223622 => 'Design: iOS and Android icons / Support: titled XDYou';
+	@override String get lumdust => 'Development: campus notice search';
 	@override String get mrbrilliant2046 => 'Support: Provided the school net user guide / Internationalization: English correction';
 	@override String get nancunchild => 'Development: library search function / Internationalization: English correction';
 	@override String get nkanf => 'Development: Class progress indicator (original) / Support: MacOS build support';
@@ -2316,6 +2371,7 @@ class _Translations$setting$fontSizePage$en extends Translations$setting$fontSiz
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
+	@override String get iosPreview => 'Apple users: turn off Bold Text in Settings before adjusting the font. You can find it in either location:\nSettings → Display & Brightness → Bold Text\nSettings → Accessibility → Display & Text Size → Bold Text';
 	@override String get sizeTitle => 'Font size';
 	@override String get weightTitle => 'Font weight';
 	@override String get previewTitle => 'Preview';
@@ -2334,6 +2390,15 @@ class _Translations$setting$classTableStylePage$en extends Translations$setting$
 	final TranslationsEn _root; // ignore: unused_field
 
 	// Translations
+	@override String get frostedSection => 'Frosted backgrounds';
+	@override String get frostedEnabled => 'Enable frosted backgrounds';
+	@override String get frostedEnabledHint => 'When off, the controls keep their translucent tint and drop the blur';
+	@override String get frostedCardSigma => 'Course card blur';
+	@override String get frostedTimeLineSigma => 'Time line blur';
+	@override String get frostedDateRowSigma => 'Date row blur';
+	@override String get frostedWeekBarSigma => 'Week bar blur';
+	@override String get frostedBannerSigma => 'Status banner blur';
+	@override String get frostedAppBarSigma => 'Navigation bar blur';
 	@override String get currentTimeSettingsTitle => 'Time indicator settings';
 	@override String get classColorSettingsTitle => 'Class schedule style settings';
 	@override String get currentTimeSection => 'Time indicator settings';
@@ -2528,7 +2593,9 @@ extension on TranslationsEn {
 			'classtable.partnerClasstable.nameDialog.cancel' => 'There\'s nobody other than my sweetie',
 			'classtable.partnerClasstable.nameDialog.accept' => 'Submit',
 			'classtable.partnerClasstable.nameDialog.blankInput' => 'Input is blank!',
-			'classtable.pageTitle' => 'My Schedule',
+			'classtable.weekBar.pin' => 'Pin the week bar',
+			'classtable.weekBar.unpin' => 'Collapse the week bar',
+			'classtable.pageTitle' => 'Schedule',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}\'s Schedule',
 			'classtable.popupMenu.notArranged' => 'View unarranged classes',
 			'classtable.popupMenu.classChanged' => 'View schedule changes',
@@ -2565,7 +2632,7 @@ extension on TranslationsEn {
 			'classtable.statusSource.otherExperiment' => 'Other Experiments',
 			'classtable.errorDialogTitle' => 'Error Info',
 			'classtable.statusBanner.loading' => ({required Object sources}) => 'Updating: ${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => 'Using cached data: ${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => 'Reading from cache: ${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => 'Failed to load: ${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => 'No classes are arranged for semester ${semester_code}.',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => 'No classes are arranged for semester ${semester_code}, but exam arrangements are available.',
@@ -2785,6 +2852,7 @@ extension on TranslationsEn {
 			'electricity.airconTitle' => 'Aircon Electricity',
 			'electricity.airconImei' => 'Aircon IMEI',
 			'electricity.airconAmount' => 'Platform usage',
+			'electricity.airconIndoor' => 'Indoor temperature',
 			'electricity.airconUpdateTime' => 'Updated at',
 			'electricity.airconWaiting' => 'Waiting to fetch aircon electricity data',
 			'electricity.airconError' => 'Failed to fetch aircon electricity data',
@@ -2903,6 +2971,23 @@ extension on TranslationsEn {
 			'experiment.scoreHint3' => 'Due to the lack of data for recognization, it is necessary to check twice.',
 			'experimentController.noPassword' => 'Experiment password is not set, please set up one in the setting',
 			'experimentController.loginFailed' => 'Login failed',
+			'guessBook.title' => 'Emoji Book Quiz',
+			'guessBook.entryDescription' => 'Guess the book from the emoji',
+			'guessBook.empty' => 'There are no questions yet.',
+			'guessBook.question' => 'Which book do these emoji represent?',
+			'guessBook.instruction' => 'Choose an answer below.',
+			'guessBook.correct' => 'Correct!',
+			'guessBook.answer' => ({required Object answer}) => 'Correct answer: ${answer}',
+			'guessBook.next' => 'Next question',
+			'guessBook.reveal' => 'Show answer',
+			'guessBook.choiceMode' => 'Multiple choice',
+			'guessBook.inputMode' => 'Type answer',
+			'guessBook.inputInstruction' => 'Enter the book title.',
+			'guessBook.inputLabel' => 'Book title',
+			'guessBook.submit' => 'Submit answer',
+			'guessBook.originalClue' => 'Original',
+			'guessBook.randomClue' => 'Random emoji',
+			'guessBook.randomClueFallback' => 'This clue could not be fully generated, so the original is shown.',
 			'homepage.title' => 'School Info Center',
 			'homepage.loading' => 'Loading',
 			'homepage.loaded' => 'Message updated',
@@ -2924,6 +3009,8 @@ extension on TranslationsEn {
 			'homepage.ruisi' => 'Forum',
 			'homepage.club' => 'Club',
 			'homepage.planet' => 'Blog',
+			'homepage.relax' => 'Take a break',
+			'homepage.relaxMessage' => 'All work and no play makes Jack a dull boy.',
 			'homepage.dashboard' => 'Pighub',
 			'homepage.setting' => 'Settings',
 			'homepage.inputPartnerData.routeNotExist' => 'Import path does not exist:P',
@@ -2954,6 +3041,8 @@ extension on TranslationsEn {
 			'homepage.classTableCard.onHoliday' => 'On vacation',
 			'homepage.classTableCard.errorMessage' => ({required Object error}) => 'An error occurred: ${error}',
 			'homepage.classTableCard.fetchingMessage' => 'Fetching class schedule',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.errorInfoText' => 'An error occurred',
 			'homepage.classTableCard.fetchingInfoText' => 'Loading',
 			'homepage.classTableCard.noArrangementInfoText' => 'No schedule at the moment',
@@ -2976,8 +3065,6 @@ extension on TranslationsEn {
 			'homepage.electricityCard.title' => 'Electricity and Hydroenergy Information',
 			'homepage.electricityCard.currentElectricity' => ({required Object amount}) => '${amount} kWh remains',
 			'homepage.electricityCard.cacheNotice' => ({required Object date}) => 'Last fetch date: ${date}',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.title' => 'Library Info',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => 'Borrowing ${count} book(s)',
 			'homepage.libraryCard.errorOccured' => 'Error occurred while retrieving borrowing information',
@@ -3382,6 +3469,9 @@ extension on TranslationsEn {
 			'setting.scanAirconQr' => 'Scan aircon QR code',
 			'setting.pickAirconQrImage' => 'Choose QR image',
 			'setting.airconCameraUnavailable' => 'Camera scanning is unavailable on this platform. Choose a QR image or enter the IMEI manually.',
+			'setting.airconScanHint' => 'Tap to focus. If the aircon is far away and stays blurry when zoomed in, take a photo with the system camera instead.',
+			'setting.airconTakePhoto' => 'Take a photo with the system camera',
+			'setting.airconCameraError' => ({required Object error}) => 'Unable to open the camera: ${error}',
 			'setting.notificationSetting' => 'Notification Settings',
 			'setting.courseReminderSetting' => 'Pre-class Reminder Settings',
 			'setting.courseReminderDescription' => 'Configure pre-class reminder notifications',
@@ -3465,6 +3555,8 @@ extension on TranslationsEn {
 			'setting.needCloseDialog.title' => 'Crashed',
 			'setting.needCloseDialog.content' => 'Due to technical limitations, you need to close the window manually and then reopen the app.',
 			'setting.changeColorDialog.title' => 'Color setting',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeColorDialog.kDefault' => 'Default',
 			'setting.changeColorDialog.blue' => 'Sky Blue',
 			'setting.changeColorDialog.deepPurple' => 'Deep Purple',
@@ -3490,8 +3582,6 @@ extension on TranslationsEn {
 			'setting.changeElectricityAccount.successfulFetch' => ({required Object account_number}) => 'Successful fetching account: ${account_number}',
 			'setting.changeElectricityAccount.failedFetch' => ({required Object e}) => 'Failed to fetch: ${e}',
 			'setting.changeElectricityAccount.accountSaved' => ({required Object account_number}) => 'Account saved：${account_number}',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.unknownCodingPattern' => 'Unknown coding pattern',
 			'setting.changeElectricityAccount.selectBuilding' => 'Select Building',
 			'setting.changeElectricityAccount.building' => 'Building',
@@ -3560,6 +3650,7 @@ extension on TranslationsEn {
 			'setting.aboutPage.breezeline' => 'Support: valueless and meaningless product manager (from his own description)',
 			'setting.aboutPage.cafebabe' => 'Support: provide Easter egg code / Development: Development: New Slider \'26',
 			'setting.aboutPage.chitao1234' => 'Development: fix slider misalignment issue',
+			'setting.aboutPage.chiiaya' => 'Development: timetable visual improvements',
 			'setting.aboutPage.copperkoi' => 'Development: latest time arrangement sync to calendar',
 			'setting.aboutPage.dimole' => 'Development support: assist in fixing slider issue',
 			'setting.aboutPage.elitewars' => 'Design: sports score page',
@@ -3578,6 +3669,7 @@ extension on TranslationsEn {
 			'setting.aboutPage.lichtyy' => 'Design: color pattern and blank page picture / Development: HTML reader for the experiment system',
 			'setting.aboutPage.lqsyH' => 'Support: Promotion Picture',
 			'setting.aboutPage.lsy223622' => 'Design: iOS and Android icons / Support: titled XDYou',
+			'setting.aboutPage.lumdust' => 'Development: campus notice search',
 			'setting.aboutPage.mrbrilliant2046' => 'Support: Provided the school net user guide / Internationalization: English correction',
 			'setting.aboutPage.nancunchild' => 'Development: library search function / Internationalization: English correction',
 			'setting.aboutPage.nkanf' => 'Development: Class progress indicator (original) / Support: MacOS build support',
@@ -3639,6 +3731,7 @@ extension on TranslationsEn {
 			'setting.navigation.notificationsDescription' => 'Course reminders and notifications',
 			'setting.navigation.coreDescription' => 'Logs, cached data and sign out',
 			'setting.fontSizeSetting' => 'Font size & weight',
+			'setting.fontSizePage.iosPreview' => 'Apple users: turn off Bold Text in Settings before adjusting the font. You can find it in either location:\nSettings → Display & Brightness → Bold Text\nSettings → Accessibility → Display & Text Size → Bold Text',
 			'setting.fontSizePage.sizeTitle' => 'Font size',
 			'setting.fontSizePage.weightTitle' => 'Font weight',
 			'setting.fontSizePage.previewTitle' => 'Preview',
@@ -3655,6 +3748,15 @@ extension on TranslationsEn {
 			'setting.backgroundBlurOff' => 'Off',
 			'setting.classTableStyleSetting' => 'Class schedule display & style',
 			'setting.classTableStyleDescription' => 'Time indicator and course card style',
+			'setting.classTableStylePage.frostedSection' => 'Frosted backgrounds',
+			'setting.classTableStylePage.frostedEnabled' => 'Enable frosted backgrounds',
+			'setting.classTableStylePage.frostedEnabledHint' => 'When off, the controls keep their translucent tint and drop the blur',
+			'setting.classTableStylePage.frostedCardSigma' => 'Course card blur',
+			'setting.classTableStylePage.frostedTimeLineSigma' => 'Time line blur',
+			'setting.classTableStylePage.frostedDateRowSigma' => 'Date row blur',
+			'setting.classTableStylePage.frostedWeekBarSigma' => 'Week bar blur',
+			'setting.classTableStylePage.frostedBannerSigma' => 'Status banner blur',
+			'setting.classTableStylePage.frostedAppBarSigma' => 'Navigation bar blur',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => 'Time indicator settings',
 			'setting.classTableStylePage.classColorSettingsTitle' => 'Class schedule style settings',
 			'setting.classTableStylePage.currentTimeSection' => 'Time indicator settings',
@@ -3727,13 +3829,21 @@ extension on TranslationsEn {
 			'toolbox.physicsDescription' => 'Hope the operation goes smoothly',
 			'toolbox.discover' => 'Ruisi Navigation',
 			'toolbox.discoverDescription' => 'Lots other functions',
-			'weekday.monday' => 'Mon.',
-			'weekday.tuesday' => 'Tue.',
-			'weekday.wednesday' => 'Wed.',
-			'weekday.thursday' => 'Thu.',
-			'weekday.friday' => 'Fri.',
-			'weekday.saturday' => 'Sat.',
-			'weekday.sunday' => 'Sun.',
+			'toolbox.noticeSearch' => 'Notice search',
+			'toolbox.noticeDescription' => 'Don\'t miss any notices',
+			'toolbox.noticeHint' => 'Search keywords (notice titles from the last 30 days)',
+			'toolbox.noticeSchoolNetworkWarning' => 'You may not be connected to the campus network. Some notice sources require it.',
+			'toolbox.noticePlaceholder' => 'e.g. changing majors',
+			'toolbox.noticeIncomplete' => 'Some sources could not be fully searched',
+			'toolbox.noticeEmpty' => 'No matches in the lists checked',
+			'toolbox.noticeOpenError' => 'Could not open the original notice',
+			'weekday.monday' => 'Mon',
+			'weekday.tuesday' => 'Tue',
+			'weekday.wednesday' => 'Wed',
+			'weekday.thursday' => 'Thu',
+			'weekday.friday' => 'Fri',
+			'weekday.saturday' => 'Sat',
+			'weekday.sunday' => 'Sun',
 			'xduPlanet.all' => 'All',
 			'xduPlanet.loading' => 'Loading, please wait <(=ω=)>',
 			'xduPlanet.unknownAuthor' => 'Unknown author',

@@ -44,6 +44,9 @@ aircon_imei_clear: 清除
 scan_aircon_qr: 扫描空调二维码
 pick_aircon_qr_image: 从相册选择二维码图片
 aircon_camera_unavailable: 当前平台不支持相机扫码，请选择二维码图片或手动输入 IMEI
+aircon_scan_hint: "轻点画面可以对焦；空调离得远、放大后仍然模糊时，请用系统相机拍照识别"
+aircon_take_photo: "用系统相机拍照识别"
+aircon_camera_error: "无法打开相机：{error}"
 notification_setting: 通知设置
 course_reminder_setting: 课前通知设置
 course_reminder_description: 设置课前提醒通知
@@ -243,6 +246,7 @@ about_page:
   breezeline: 支持：无价值无意义的产品经理(他自己的描述)
   cafebabe: 支持：提供彩蛋代码 / 开发：2026版本滑块验证码适配
   chitao1234: 开发：修复滑块不对齐问题
+  chiiaya: 开发：课程表美化
   copperkoi: 开发：系统日历最新课表同步
   dimole: 开发支持：辅助修复滑块问题
   elitewars: 设计：体育成绩页面
@@ -261,6 +265,7 @@ about_page:
   lichtyy: 设计：配色，空白页面贴图 / 开发：实验系统页面读取代码
   lqsy-h: 支持：推文宣传图片制作
   lsy223622: 设计：iOS 和 Android 图标 / 支持：冠名 XDYou
+  lumdust: 开发：校园通知查询
   mrbrilliant2046: 支持：提供网络服务使用说明文档 / 国际化：优化英语翻译
   nancunchild: 开发：图书馆搜索功能 / 国际化：优化英语翻译
   nkanf: 开发：课程表时间进度展示（初版方案） / 支持：MacOS 构建支持
@@ -309,8 +314,8 @@ editor:
   electricity_unit: 度
   text_preview: 课程安排 · TrainTime PDA · 0123456789
   brightness: 亮度
-  border_opacity: 边框透明度
-  fill_opacity: 底色透明度
+  border_opacity: 边框不透明度
+  fill_opacity: 底色不透明度
   fill_saturation: 底色饱和度
   text_saturation: 文字饱和度
   background_blur: 背景模糊程度
@@ -332,6 +337,7 @@ navigation:
   core_description: 日志、缓存清理与退出登录
 font_size_setting: 字体大小与粗细
 font_size_page:
+  ios_preview: "苹果用户请先关闭系统设置中的“粗体文本”，再调整字体。可通过以下任一路径找到该选项：\n设置 → 显示与亮度 → 粗体文本\n设置 → 辅助功能 → 显示与文字大小 → 粗体文本"
   size_title: 字体大小
   weight_title: 字体粗细
   preview_title: 预览
@@ -349,6 +355,15 @@ background_blur_off: 关闭
 class_table_style_setting: 课表显示与样式
 class_table_style_description: 时间指示和课程卡片样式
 class_table_style_page:
+  frosted_section: 毛玻璃背景
+  frosted_enabled: 启用毛玻璃背景
+  frosted_enabled_hint: 关闭后各控件只保留半透明底色，可省电、更流畅
+  frosted_card_sigma: 课程卡片模糊
+  frosted_time_line_sigma: 时间轴模糊
+  frosted_date_row_sigma: 日期栏模糊
+  frosted_week_bar_sigma: 周次栏模糊
+  frosted_banner_sigma: 状态横幅模糊
+  frosted_app_bar_sigma: 导航栏模糊
   current_time_settings_title: 时间指示设置
   class_color_settings_title: 课表样式设置
   current_time_section: 时间指示设置
@@ -358,13 +373,13 @@ class_table_style_page:
   active_section: 课程卡片样式
   unfinished_section: 课程卡片样式
   active_brightness_factor: '亮度: {value}'
-  active_border_alpha: '边框透明度: {value}'
-  active_inner_alpha: '底色透明度: {value}'
+  active_border_alpha: '边框不透明度: {value}'
+  active_inner_alpha: '底色不透明度: {value}'
   completed_section: 已结束课程样式
   completed_style_enabled: 已结束课程样式区分
   completed_saturation_factor: '底色饱和度: {value}'
   completed_brightness_factor: '亮度: {value}'
   completed_text_saturation_factor: '文字饱和度: {value}'
-  completed_border_alpha: '边框透明度: {value}'
-  completed_inner_alpha: '底色透明度: {value}'
+  completed_border_alpha: '边框不透明度: {value}'
+  completed_inner_alpha: '底色不透明度: {value}'
 class_swift_explain: 正数错后开学日期 负数提前开学日期

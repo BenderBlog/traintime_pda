@@ -53,6 +53,7 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final _Translations$exam$zh_TW exam = _Translations$exam$zh_TW._(_root);
 	@override late final _Translations$experiment$zh_TW experiment = _Translations$experiment$zh_TW._(_root);
 	@override late final _Translations$experimentController$zh_TW experimentController = _Translations$experimentController$zh_TW._(_root);
+	@override late final _Translations$guessBook$zh_TW guessBook = _Translations$guessBook$zh_TW._(_root);
 	@override late final _Translations$homepage$zh_TW homepage = _Translations$homepage$zh_TW._(_root);
 	@override late final _Translations$library$zh_TW library = _Translations$library$zh_TW._(_root);
 	@override late final _Translations$libraryCard$zh_TW libraryCard = _Translations$libraryCard$zh_TW._(_root);
@@ -101,7 +102,8 @@ class _Translations$classtable$zh_TW extends Translations$classtable$zh {
 
 	// Translations
 	@override late final _Translations$classtable$partnerClasstable$zh_TW partnerClasstable = _Translations$classtable$partnerClasstable$zh_TW._(_root);
-	@override String get pageTitle => '我的日程表';
+	@override late final _Translations$classtable$weekBar$zh_TW weekBar = _Translations$classtable$weekBar$zh_TW._(_root);
+	@override String get pageTitle => '日程表';
 	@override String partnerPageTitle({required Object partner_name}) => '${partner_name}的日程表';
 	@override late final _Translations$classtable$popupMenu$zh_TW popupMenu = _Translations$classtable$popupMenu$zh_TW._(_root);
 	@override late final _Translations$classtable$visualSettings$zh_TW visualSettings = _Translations$classtable$visualSettings$zh_TW._(_root);
@@ -317,6 +319,7 @@ class _Translations$electricity$zh_TW extends Translations$electricity$zh {
 	@override String get airconTitle => '空調用電';
 	@override String get airconImei => '空調 IMEI';
 	@override String get airconAmount => '平臺用電量';
+	@override String get airconIndoor => '室內溫度';
 	@override String get airconUpdateTime => '更新時間';
 	@override String get airconWaiting => '等待獲取空調用電信息';
 	@override String get airconError => '空調用電獲取失敗';
@@ -480,6 +483,32 @@ class _Translations$experimentController$zh_TW extends Translations$experimentCo
 	@override String get loginFailed => '登錄失敗';
 }
 
+// Path: guessBook
+class _Translations$guessBook$zh_TW extends Translations$guessBook$zh {
+	_Translations$guessBook$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Emoji 猜書名';
+	@override String get entryDescription => '看表情，猜猜是哪本書';
+	@override String get empty => '題庫暫時為空';
+	@override String get question => '這些表情說的是哪本書？';
+	@override String get instruction => '從下面的選項中選出答案';
+	@override String get correct => '答對了！';
+	@override String answer({required Object answer}) => '正確答案：${answer}';
+	@override String get next => '下一題';
+	@override String get reveal => '查看答案';
+	@override String get choiceMode => '選擇題';
+	@override String get inputMode => '輸入題';
+	@override String get inputInstruction => '輸入你猜的書名';
+	@override String get inputLabel => '書名';
+	@override String get submit => '提交答案';
+	@override String get originalClue => '原題';
+	@override String get randomClue => '隨機表情';
+	@override String get randomClueFallback => '這道題無法完整生成隨機表情，已使用原題。';
+}
+
 // Path: homepage
 class _Translations$homepage$zh_TW extends Translations$homepage$zh {
 	_Translations$homepage$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -507,6 +536,8 @@ class _Translations$homepage$zh_TW extends Translations$homepage$zh {
 	@override String get homepage => '校園信息';
 	@override String get ruisi => '睿思論壇';
 	@override String get club => '社團推薦';
+	@override String get relax => '放鬆一下';
+	@override String get relaxMessage => '整天學習不會玩，聰明孩子也會傻';
 	@override String get dashboard => '豬圖鑑賞';
 	@override String get planet => '博客星球';
 	@override String get setting => '設置';
@@ -830,6 +861,9 @@ class _Translations$setting$zh_TW extends Translations$setting$zh {
 	@override String get scanAirconQr => '掃描空調二維碼';
 	@override String get pickAirconQrImage => '從相冊選擇二維碼圖片';
 	@override String get airconCameraUnavailable => '當前平臺不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI';
+	@override String get airconScanHint => '輕點畫面可以對焦；空調離得遠、放大後仍然模糊時，請用系統相機拍照識別';
+	@override String get airconTakePhoto => '用系統相機拍照識別';
+	@override String airconCameraError({required Object error}) => '無法打開相機：${error}';
 	@override String get notificationSetting => '通知設置';
 	@override String get courseReminderSetting => '課前通知設置';
 	@override String get courseReminderDescription => '設置課前提醒通知';
@@ -968,6 +1002,14 @@ class _Translations$toolbox$zh_TW extends Translations$toolbox$zh {
 	@override String get physicsDescription => '希望操作順利';
 	@override String get discover => '睿思導航';
 	@override String get discoverDescription => '補充其他功能';
+	@override String get noticeSearch => '通知查詢';
+	@override String get noticeDescription => '不要錯過通知';
+	@override String get noticeHint => '搜尋關鍵詞（近30天的通知標題）';
+	@override String get noticeSchoolNetworkWarning => '目前可能未連接校園網路，部分通知來源需要校園網路才能存取。';
+	@override String get noticePlaceholder => '如:轉專業';
+	@override String get noticeIncomplete => '部分來源未查完';
+	@override String get noticeEmpty => '已查欄目中沒有符合的通知';
+	@override String get noticeOpenError => '無法開啟原文連結';
 }
 
 // Path: weekday
@@ -1132,6 +1174,17 @@ class _Translations$classtable$partnerClasstable$zh_TW extends Translations$clas
 	@override late final _Translations$classtable$partnerClasstable$nameDialog$zh_TW nameDialog = _Translations$classtable$partnerClasstable$nameDialog$zh_TW._(_root);
 }
 
+// Path: classtable.weekBar
+class _Translations$classtable$weekBar$zh_TW extends Translations$classtable$weekBar$zh {
+	_Translations$classtable$weekBar$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get pin => '固定週次欄';
+	@override String get unpin => '收起週次欄';
+}
+
 // Path: classtable.popupMenu
 class _Translations$classtable$popupMenu$zh_TW extends Translations$classtable$popupMenu$zh {
 	_Translations$classtable$popupMenu$zh_TW._(TranslationsZhTw root) : this._root = root, super.internal(root);
@@ -1169,14 +1222,14 @@ class _Translations$classtable$visualSettings$zh_TW extends Translations$classta
 	@override String get showTodayColumnHighlight => '強調顯示今天的縱列';
 	@override String get unfinishedSection => '課程樣式';
 	@override String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
-	@override String activeBorderAlpha({required Object value}) => '邊框透明度: ${value}';
-	@override String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String activeBorderAlpha({required Object value}) => '邊框不透明度: ${value}';
+	@override String activeInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 	@override String get completedSection => '已結束課程樣式';
 	@override String completedSaturationFactor({required Object value}) => '底色飽和度: ${value}';
 	@override String completedBrightnessFactor({required Object value}) => '亮度: ${value}';
 	@override String completedTextSaturationFactor({required Object value}) => '文字飽和度: ${value}';
-	@override String completedBorderAlpha({required Object value}) => '邊框透明度: ${value}';
-	@override String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String completedBorderAlpha({required Object value}) => '邊框不透明度: ${value}';
+	@override String completedInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 }
 
 // Path: classtable.statusSource
@@ -1200,7 +1253,7 @@ class _Translations$classtable$statusBanner$zh_TW extends Translations$classtabl
 
 	// Translations
 	@override String loading({required Object sources}) => '正在更新：${sources}';
-	@override String cache({required Object sources}) => '當前使用緩存：${sources}';
+	@override String cache({required Object sources}) => '讀取緩存：${sources}';
 	@override String errorSummary({required Object sources}) => '以下信息加載失敗：${sources}';
 }
 
@@ -1293,7 +1346,7 @@ class _Translations$classtable$classAdd$zh_TW extends Translations$classtable$cl
 	@override String get inputClassroomHint => '教室位置(選填)';
 	@override String get inputWeekHint => '選擇上課周次';
 	@override String get inputTimeHint => '選擇上課時間';
-	@override String get inputTimeWeekdayHint => '上課周次';
+	@override String get inputTimeWeekdayHint => '上課星期';
 	@override String get inputStartTimeHint => '上課時間';
 	@override String get inputEndTimeHint => '下課時間';
 	@override String wheelChooseHint({required Object index}) => '第 ${index} 節';
@@ -2202,6 +2255,7 @@ class _Translations$setting$aboutPage$zh_TW extends Translations$setting$aboutPa
 	@override String get breezeline => '支持：無價值無意義的產品經理(他自己的描述)';
 	@override String get cafebabe => '支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配';
 	@override String get chitao1234 => '開發：修復滑塊不對齊問題';
+	@override String get chiiaya => '開發：課程表美化';
 	@override String get copperkoi => '開發：系統日曆最新課表同步';
 	@override String get dimole => '開發支持：輔助修復滑塊問題';
 	@override String get elitewars => '設計：體育成績頁面';
@@ -2220,6 +2274,7 @@ class _Translations$setting$aboutPage$zh_TW extends Translations$setting$aboutPa
 	@override String get lichtyy => '設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼';
 	@override String get lqsyH => '支持：推文宣傳圖片製作';
 	@override String get lsy223622 => '設計：iOS 和 Android 圖標 / 支持：冠名 XDYou';
+	@override String get lumdust => '開發：校園通知查詢';
 	@override String get mrbrilliant2046 => '支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯';
 	@override String get nancunchild => '開發：圖書館搜索功能 / 國際化：優化英語翻譯';
 	@override String get nkanf => '開發：課程表時間進度展示（初版方案） / 支持：MacOS 構建支持';
@@ -2270,8 +2325,8 @@ class _Translations$setting$editor$zh_TW extends Translations$setting$editor$zh 
 	@override String get electricityUnit => '度';
 	@override String get textPreview => '課程安排 · TrainTime PDA · 0123456789';
 	@override String get brightness => '亮度';
-	@override String get borderOpacity => '邊框透明度';
-	@override String get fillOpacity => '底色透明度';
+	@override String get borderOpacity => '邊框不透明度';
+	@override String get fillOpacity => '底色不透明度';
 	@override String get fillSaturation => '底色飽和度';
 	@override String get textSaturation => '文字飽和度';
 	@override String get backgroundBlur => '背景模糊程度';
@@ -2316,6 +2371,7 @@ class _Translations$setting$fontSizePage$zh_TW extends Translations$setting$font
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
+	@override String get iosPreview => '蘋果用戶請先關閉系統設定中的「粗體文字」，再調整字體。可透過以下任一路徑找到該選項：\n設定 → 螢幕顯示與亮度 → 粗體文字\n設定 → 輔助使用 → 顯示與文字大小 → 粗體文字';
 	@override String get sizeTitle => '字體大小';
 	@override String get weightTitle => '字體粗細';
 	@override String get previewTitle => '預覽';
@@ -2334,6 +2390,15 @@ class _Translations$setting$classTableStylePage$zh_TW extends Translations$setti
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
+	@override String get frostedSection => '毛玻璃背景';
+	@override String get frostedEnabled => '啟用毛玻璃背景';
+	@override String get frostedEnabledHint => '關閉後各控件只保留半透明底色，可省電、更流暢';
+	@override String get frostedCardSigma => '課程卡片模糊';
+	@override String get frostedTimeLineSigma => '時間軸模糊';
+	@override String get frostedDateRowSigma => '日期欄模糊';
+	@override String get frostedWeekBarSigma => '週次欄模糊';
+	@override String get frostedBannerSigma => '狀態橫幅模糊';
+	@override String get frostedAppBarSigma => '導航欄模糊';
 	@override String get currentTimeSettingsTitle => '時間指示設置';
 	@override String get classColorSettingsTitle => '課表樣式設置';
 	@override String get currentTimeSection => '時間指示設置';
@@ -2343,15 +2408,15 @@ class _Translations$setting$classTableStylePage$zh_TW extends Translations$setti
 	@override String get activeSection => '課程卡片樣式';
 	@override String get unfinishedSection => '課程卡片樣式';
 	@override String activeBrightnessFactor({required Object value}) => '亮度: ${value}';
-	@override String activeBorderAlpha({required Object value}) => '邊框透明度: ${value}';
-	@override String activeInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String activeBorderAlpha({required Object value}) => '邊框不透明度: ${value}';
+	@override String activeInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 	@override String get completedSection => '已結束課程樣式';
 	@override String get completedStyleEnabled => '已結束課程樣式區分';
 	@override String completedSaturationFactor({required Object value}) => '底色飽和度: ${value}';
 	@override String completedBrightnessFactor({required Object value}) => '亮度: ${value}';
 	@override String completedTextSaturationFactor({required Object value}) => '文字飽和度: ${value}';
-	@override String completedBorderAlpha({required Object value}) => '邊框透明度: ${value}';
-	@override String completedInnerAlpha({required Object value}) => '底色透明度: ${value}';
+	@override String completedBorderAlpha({required Object value}) => '邊框不透明度: ${value}';
+	@override String completedInnerAlpha({required Object value}) => '底色不透明度: ${value}';
 }
 
 // Path: xduPlanet.confirmAuditDialog
@@ -2528,7 +2593,9 @@ extension on TranslationsZhTw {
 			'classtable.partnerClasstable.nameDialog.cancel' => '我就這一個甜心',
 			'classtable.partnerClasstable.nameDialog.accept' => '提交',
 			'classtable.partnerClasstable.nameDialog.blankInput' => '輸入空白!',
-			'classtable.pageTitle' => '我的日程表',
+			'classtable.weekBar.pin' => '固定週次欄',
+			'classtable.weekBar.unpin' => '收起週次欄',
+			'classtable.pageTitle' => '日程表',
 			'classtable.partnerPageTitle' => ({required Object partner_name}) => '${partner_name}的日程表',
 			'classtable.popupMenu.notArranged' => '查看未安排課程信息',
 			'classtable.popupMenu.classChanged' => '查看課程安排調整信息',
@@ -2551,21 +2618,21 @@ extension on TranslationsZhTw {
 			'classtable.visualSettings.showTodayColumnHighlight' => '強調顯示今天的縱列',
 			'classtable.visualSettings.unfinishedSection' => '課程樣式',
 			'classtable.visualSettings.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
-			'classtable.visualSettings.activeBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
-			'classtable.visualSettings.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'classtable.visualSettings.activeBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
+			'classtable.visualSettings.activeInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'classtable.visualSettings.completedSection' => '已結束課程樣式',
 			'classtable.visualSettings.completedSaturationFactor' => ({required Object value}) => '底色飽和度: ${value}',
 			'classtable.visualSettings.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
 			'classtable.visualSettings.completedTextSaturationFactor' => ({required Object value}) => '文字飽和度: ${value}',
-			'classtable.visualSettings.completedBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
-			'classtable.visualSettings.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'classtable.visualSettings.completedBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
+			'classtable.visualSettings.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'classtable.statusSource.classTable' => '課表',
 			'classtable.statusSource.exam' => '考試',
 			'classtable.statusSource.physicsExperiment' => '物理實驗',
 			'classtable.statusSource.otherExperiment' => '其他實驗',
 			'classtable.errorDialogTitle' => '錯誤信息概覽',
 			'classtable.statusBanner.loading' => ({required Object sources}) => '正在更新：${sources}',
-			'classtable.statusBanner.cache' => ({required Object sources}) => '當前使用緩存：${sources}',
+			'classtable.statusBanner.cache' => ({required Object sources}) => '讀取緩存：${sources}',
 			'classtable.statusBanner.errorSummary' => ({required Object sources}) => '以下信息加載失敗：${sources}',
 			'classtable.emptyState.noCourse' => ({required Object semester_code}) => '${semester_code} 學期沒有課程安排。',
 			'classtable.emptyState.withExam' => ({required Object semester_code}) => '${semester_code} 學期沒有課程安排，但有考試安排。',
@@ -2611,7 +2678,7 @@ extension on TranslationsZhTw {
 			'classtable.classAdd.inputClassroomHint' => '教室位置(選填)',
 			'classtable.classAdd.inputWeekHint' => '選擇上課周次',
 			'classtable.classAdd.inputTimeHint' => '選擇上課時間',
-			'classtable.classAdd.inputTimeWeekdayHint' => '上課周次',
+			'classtable.classAdd.inputTimeWeekdayHint' => '上課星期',
 			'classtable.classAdd.inputStartTimeHint' => '上課時間',
 			'classtable.classAdd.inputEndTimeHint' => '下課時間',
 			'classtable.classAdd.wheelChooseHint' => ({required Object index}) => '第 ${index} 節',
@@ -2785,6 +2852,7 @@ extension on TranslationsZhTw {
 			'electricity.airconTitle' => '空調用電',
 			'electricity.airconImei' => '空調 IMEI',
 			'electricity.airconAmount' => '平臺用電量',
+			'electricity.airconIndoor' => '室內溫度',
 			'electricity.airconUpdateTime' => '更新時間',
 			'electricity.airconWaiting' => '等待獲取空調用電信息',
 			'electricity.airconError' => '空調用電獲取失敗',
@@ -2903,6 +2971,23 @@ extension on TranslationsZhTw {
 			'experiment.scoreHint3' => '目前識別庫數據不全，請您務必核對一下。',
 			'experimentController.noPassword' => '沒有物理實驗密碼，請到設置中進行設置',
 			'experimentController.loginFailed' => '登錄失敗',
+			'guessBook.title' => 'Emoji 猜書名',
+			'guessBook.entryDescription' => '看表情，猜猜是哪本書',
+			'guessBook.empty' => '題庫暫時為空',
+			'guessBook.question' => '這些表情說的是哪本書？',
+			'guessBook.instruction' => '從下面的選項中選出答案',
+			'guessBook.correct' => '答對了！',
+			'guessBook.answer' => ({required Object answer}) => '正確答案：${answer}',
+			'guessBook.next' => '下一題',
+			'guessBook.reveal' => '查看答案',
+			'guessBook.choiceMode' => '選擇題',
+			'guessBook.inputMode' => '輸入題',
+			'guessBook.inputInstruction' => '輸入你猜的書名',
+			'guessBook.inputLabel' => '書名',
+			'guessBook.submit' => '提交答案',
+			'guessBook.originalClue' => '原題',
+			'guessBook.randomClue' => '隨機表情',
+			'guessBook.randomClueFallback' => '這道題無法完整生成隨機表情，已使用原題。',
 			'homepage.title' => '校園信息查詢',
 			'homepage.loading' => '正在加載',
 			'homepage.loaded' => '加載成功',
@@ -2923,6 +3008,8 @@ extension on TranslationsZhTw {
 			'homepage.homepage' => '校園信息',
 			'homepage.ruisi' => '睿思論壇',
 			'homepage.club' => '社團推薦',
+			'homepage.relax' => '放鬆一下',
+			'homepage.relaxMessage' => '整天學習不會玩，聰明孩子也會傻',
 			'homepage.dashboard' => '豬圖鑑賞',
 			'homepage.planet' => '博客星球',
 			'homepage.setting' => '設置',
@@ -2954,6 +3041,8 @@ extension on TranslationsZhTw {
 			'homepage.classTableCard.onHoliday' => '假期中',
 			'homepage.classTableCard.errorMessage' => ({required Object error}) => '遇到錯誤：${error}',
 			'homepage.classTableCard.fetchingMessage' => '正在獲取課表',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.errorInfoText' => '遇到錯誤',
 			'homepage.classTableCard.fetchingInfoText' => '正在加載',
 			'homepage.classTableCard.noArrangementInfoText' => '暫無日程',
@@ -2976,8 +3065,6 @@ extension on TranslationsZhTw {
 			'homepage.electricityCard.title' => '水電信息',
 			'homepage.electricityCard.currentElectricity' => ({required Object amount}) => '餘額 ${amount} 度',
 			'homepage.electricityCard.cacheNotice' => ({required Object date}) => '最後一次讀表：${date}',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.libraryCard.title' => '圖書借閱',
 			'homepage.libraryCard.currentBorrow' => ({required Object count}) => '借書 ${count} 本',
 			'homepage.libraryCard.errorOccured' => '獲取借書信息發生錯誤',
@@ -3382,6 +3469,9 @@ extension on TranslationsZhTw {
 			'setting.scanAirconQr' => '掃描空調二維碼',
 			'setting.pickAirconQrImage' => '從相冊選擇二維碼圖片',
 			'setting.airconCameraUnavailable' => '當前平臺不支持相機掃碼，請選擇二維碼圖片或手動輸入 IMEI',
+			'setting.airconScanHint' => '輕點畫面可以對焦；空調離得遠、放大後仍然模糊時，請用系統相機拍照識別',
+			'setting.airconTakePhoto' => '用系統相機拍照識別',
+			'setting.airconCameraError' => ({required Object error}) => '無法打開相機：${error}',
 			'setting.notificationSetting' => '通知設置',
 			'setting.courseReminderSetting' => '課前通知設置',
 			'setting.courseReminderDescription' => '設置課前提醒通知',
@@ -3465,6 +3555,8 @@ extension on TranslationsZhTw {
 			'setting.needCloseDialog.title' => '請關閉應用',
 			'setting.needCloseDialog.content' => '因為技術限制，用戶需要自行關閉窗口，然後重新打開應用。',
 			'setting.changeColorDialog.title' => '顏色設置',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeColorDialog.kDefault' => '默認顏色',
 			'setting.changeColorDialog.blue' => '聰明藍',
 			'setting.changeColorDialog.deepPurple' => '基佬紫',
@@ -3490,8 +3582,6 @@ extension on TranslationsZhTw {
 			'setting.changeElectricityAccount.successfulFetch' => ({required Object account_number}) => '賬號獲取成功：${account_number}',
 			'setting.changeElectricityAccount.failedFetch' => ({required Object e}) => '獲取失敗：${e}',
 			'setting.changeElectricityAccount.accountSaved' => ({required Object account_number}) => '賬號已保存：${account_number}',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeElectricityAccount.unknownCodingPattern' => '該樓號編碼規則未知',
 			'setting.changeElectricityAccount.selectBuilding' => '選擇樓棟',
 			'setting.changeElectricityAccount.building' => '樓棟',
@@ -3560,6 +3650,7 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.breezeline' => '支持：無價值無意義的產品經理(他自己的描述)',
 			'setting.aboutPage.cafebabe' => '支持：提供彩蛋代碼 / 開發：2026版本滑塊驗證碼適配',
 			'setting.aboutPage.chitao1234' => '開發：修復滑塊不對齊問題',
+			'setting.aboutPage.chiiaya' => '開發：課程表美化',
 			'setting.aboutPage.copperkoi' => '開發：系統日曆最新課表同步',
 			'setting.aboutPage.dimole' => '開發支持：輔助修復滑塊問題',
 			'setting.aboutPage.elitewars' => '設計：體育成績頁面',
@@ -3578,6 +3669,7 @@ extension on TranslationsZhTw {
 			'setting.aboutPage.lichtyy' => '設計：配色，空白頁面貼圖 / 開發：實驗系統頁面讀取代碼',
 			'setting.aboutPage.lqsyH' => '支持：推文宣傳圖片製作',
 			'setting.aboutPage.lsy223622' => '設計：iOS 和 Android 圖標 / 支持：冠名 XDYou',
+			'setting.aboutPage.lumdust' => '開發：校園通知查詢',
 			'setting.aboutPage.mrbrilliant2046' => '支持：提供網絡服務使用說明文檔 / 國際化：優化英語翻譯',
 			'setting.aboutPage.nancunchild' => '開發：圖書館搜索功能 / 國際化：優化英語翻譯',
 			'setting.aboutPage.nkanf' => '開發：課程表時間進度展示（初版方案） / 支持：MacOS 構建支持',
@@ -3619,8 +3711,8 @@ extension on TranslationsZhTw {
 			'setting.editor.electricityUnit' => '度',
 			'setting.editor.textPreview' => '課程安排 · TrainTime PDA · 0123456789',
 			'setting.editor.brightness' => '亮度',
-			'setting.editor.borderOpacity' => '邊框透明度',
-			'setting.editor.fillOpacity' => '底色透明度',
+			'setting.editor.borderOpacity' => '邊框不透明度',
+			'setting.editor.fillOpacity' => '底色不透明度',
 			'setting.editor.fillSaturation' => '底色飽和度',
 			'setting.editor.textSaturation' => '文字飽和度',
 			'setting.editor.backgroundBlur' => '背景模糊程度',
@@ -3639,6 +3731,7 @@ extension on TranslationsZhTw {
 			'setting.navigation.notificationsDescription' => '課前提醒與通知管理',
 			'setting.navigation.coreDescription' => '日誌、快取清理與登出',
 			'setting.fontSizeSetting' => '字體大小與粗細',
+			'setting.fontSizePage.iosPreview' => '蘋果用戶請先關閉系統設定中的「粗體文字」，再調整字體。可透過以下任一路徑找到該選項：\n設定 → 螢幕顯示與亮度 → 粗體文字\n設定 → 輔助使用 → 顯示與文字大小 → 粗體文字',
 			'setting.fontSizePage.sizeTitle' => '字體大小',
 			'setting.fontSizePage.weightTitle' => '字體粗細',
 			'setting.fontSizePage.previewTitle' => '預覽',
@@ -3655,6 +3748,15 @@ extension on TranslationsZhTw {
 			'setting.backgroundBlurOff' => '關閉',
 			'setting.classTableStyleSetting' => '課表顯示與樣式',
 			'setting.classTableStyleDescription' => '時間指示和課程卡片樣式',
+			'setting.classTableStylePage.frostedSection' => '毛玻璃背景',
+			'setting.classTableStylePage.frostedEnabled' => '啟用毛玻璃背景',
+			'setting.classTableStylePage.frostedEnabledHint' => '關閉後各控件只保留半透明底色，可省電、更流暢',
+			'setting.classTableStylePage.frostedCardSigma' => '課程卡片模糊',
+			'setting.classTableStylePage.frostedTimeLineSigma' => '時間軸模糊',
+			'setting.classTableStylePage.frostedDateRowSigma' => '日期欄模糊',
+			'setting.classTableStylePage.frostedWeekBarSigma' => '週次欄模糊',
+			'setting.classTableStylePage.frostedBannerSigma' => '狀態橫幅模糊',
+			'setting.classTableStylePage.frostedAppBarSigma' => '導航欄模糊',
 			'setting.classTableStylePage.currentTimeSettingsTitle' => '時間指示設置',
 			'setting.classTableStylePage.classColorSettingsTitle' => '課表樣式設置',
 			'setting.classTableStylePage.currentTimeSection' => '時間指示設置',
@@ -3664,15 +3766,15 @@ extension on TranslationsZhTw {
 			'setting.classTableStylePage.activeSection' => '課程卡片樣式',
 			'setting.classTableStylePage.unfinishedSection' => '課程卡片樣式',
 			'setting.classTableStylePage.activeBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
-			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
-			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.activeBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
+			'setting.classTableStylePage.activeInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'setting.classTableStylePage.completedSection' => '已結束課程樣式',
 			'setting.classTableStylePage.completedStyleEnabled' => '已結束課程樣式區分',
 			'setting.classTableStylePage.completedSaturationFactor' => ({required Object value}) => '底色飽和度: ${value}',
 			'setting.classTableStylePage.completedBrightnessFactor' => ({required Object value}) => '亮度: ${value}',
 			'setting.classTableStylePage.completedTextSaturationFactor' => ({required Object value}) => '文字飽和度: ${value}',
-			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '邊框透明度: ${value}',
-			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色透明度: ${value}',
+			'setting.classTableStylePage.completedBorderAlpha' => ({required Object value}) => '邊框不透明度: ${value}',
+			'setting.classTableStylePage.completedInnerAlpha' => ({required Object value}) => '底色不透明度: ${value}',
 			'setting.classSwiftExplain' => '正數錯後開學日期 負數提前開學日期',
 			'sponsorship.title' => '歡迎使用 XDYou 的鴻蒙版本',
 			'sponsorship.dialogTitle' => '詳細資訊',
@@ -3727,6 +3829,14 @@ extension on TranslationsZhTw {
 			'toolbox.physicsDescription' => '希望操作順利',
 			'toolbox.discover' => '睿思導航',
 			'toolbox.discoverDescription' => '補充其他功能',
+			'toolbox.noticeSearch' => '通知查詢',
+			'toolbox.noticeDescription' => '不要錯過通知',
+			'toolbox.noticeHint' => '搜尋關鍵詞（近30天的通知標題）',
+			'toolbox.noticeSchoolNetworkWarning' => '目前可能未連接校園網路，部分通知來源需要校園網路才能存取。',
+			'toolbox.noticePlaceholder' => '如:轉專業',
+			'toolbox.noticeIncomplete' => '部分來源未查完',
+			'toolbox.noticeEmpty' => '已查欄目中沒有符合的通知',
+			'toolbox.noticeOpenError' => '無法開啟原文連結',
 			'weekday.monday' => '週一',
 			'weekday.tuesday' => '週二',
 			'weekday.wednesday' => '週三',

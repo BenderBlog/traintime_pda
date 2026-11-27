@@ -3,53 +3,52 @@
 // SPDX-License-Identifier: MPL-2.0 OR Apache-2.0
 
 import 'package:material_ui/material_ui.dart';
-import 'package:watermeter/controller/classtable_controller.dart';
-import 'package:watermeter/controller/custom_class_controller.dart';
 import 'package:watermeter/model/pda_service/custom_class.dart';
+import 'package:watermeter/page/classtable/model/classtable_widget_state.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
 import 'package:watermeter/page/public_widget/safe_scroll_padding.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/classtable/class_add/date_selector_free.dart';
+import 'package:watermeter/page/classtable/class_add/week_selector.dart';
+import 'package:watermeter/page/classtable/class_add/time_selector.dart';
 import 'package:watermeter/generated/translations.g.dart';
 
+enum _ScheduleInputMode { exactDates, weekly }
+
 class ClassAddWindow extends StatefulWidget {
+  final ClasstableWidgetState state;
   final CustomClass? customToChange;
-  final int semesterLength;
-  const ClassAddWindow({
-    super.key,
-    this.customToChange,
-    required this.semesterLength,
-  });
+
+  const ClassAddWindow({super.key, required this.state, this.customToChange});
 
   @override
   State<ClassAddWindow> createState() => _ClassAddWindowState();
 }
 
 class _ClassAddWindowState extends State<ClassAddWindow> {
-  late final CustomClassController customClassController;
-
   late List<DateTimeRange> chosenDates;
   late TextEditingController classNameController;
   late TextEditingController teacherNameController;
   late TextEditingController classRoomController;
+  late List<bool> chosenWeeks;
+  _ScheduleInputMode scheduleInputMode = _ScheduleInputMode.exactDates;
+  late int selectedWeekday;
+  TimeOfDay selectedStartTime = const TimeOfDay(hour: 8, minute: 30);
+  TimeOfDay selectedEndTime = const TimeOfDay(hour: 9, minute: 15);
 
   final double inputFieldVerticalPadding = 4;
   final double horizontalPadding = 10;
 
   Color get color => Theme.of(context).colorScheme.primary;
   Color get deleteColor => Theme.of(context).colorScheme.error;
-
-  DateTime get semesterStartDate {
-    final String termStartDay =
-        ClassTableController.i.classTableComputedSignal.value.termStartDay;
-    return DateTime.tryParse(termStartDay) ??
-        DateUtils.dateOnly(DateTime.now());
-  }
+  bool get canUseWeeklySchedule =>
+      widget.state.haveClass &&
+      widget.state.semesterLength > 0 &&
+      widget.state.startDay.year != 2000;
 
   @override
   void initState() {
     super.initState();
-    customClassController = CustomClassController.i;
     if (widget.customToChange != null) {
       final cc = widget.customToChange!;
       classNameController = TextEditingController(text: cc.name);
@@ -63,6 +62,15 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
       teacherNameController = TextEditingController();
       classRoomController = TextEditingController();
       chosenDates = [];
+    }
+    final semesterWeekCount = widget.state.semesterLength;
+    chosenWeeks = List<bool>.generate(
+      semesterWeekCount,
+      (index) => index == widget.state.chosenWeek,
+    );
+    selectedWeekday = DateTime.now().weekday;
+    if (widget.customToChange == null && canUseWeeklySchedule) {
+      scheduleInputMode = _ScheduleInputMode.weekly;
     }
   }
 
@@ -83,7 +91,35 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
       return;
     }
 
-    if (chosenDates.isEmpty) {
+    if (scheduleInputMode == _ScheduleInputMode.weekly) {
+      final startMinutes =
+          selectedStartTime.hour * 60 + selectedStartTime.minute;
+      final endMinutes = selectedEndTime.hour * 60 + selectedEndTime.minute;
+      if (startMinutes < 8 * 60 + 30 ||
+          startMinutes > 21 * 60 + 25 ||
+          endMinutes < 8 * 60 + 30 ||
+          endMinutes > 21 * 60 + 25) {
+        showToast(
+          context: context,
+          msg: context.t.classtable.classAdd.dateSelectorFree.rule,
+        );
+        return;
+      }
+      if (endMinutes <= startMinutes) {
+        showToast(
+          context: context,
+          msg: context.t.classtable.classAdd.dateSelectorFree.rule2,
+        );
+        return;
+      }
+    }
+
+    final List<DateTimeRange> datesToSave =
+        scheduleInputMode == _ScheduleInputMode.weekly
+        ? _generateWeeklyDates()
+        : chosenDates;
+
+    if (datesToSave.isEmpty) {
       showToast(
         context: context,
         msg: context.t.classtable.classAdd.chooseAtLeastOne,
@@ -98,9 +134,7 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
               range.id,
       };
       final customClass = CustomClass(
-        id:
-            widget.customToChange?.id ??
-            customClassController.generateCustomClassId(),
+        id: widget.customToChange?.id ?? widget.state.newCustomClassId(),
         name: classNameController.text,
         teacher: teacherNameController.text.isNotEmpty
             ? teacherNameController.text
@@ -108,13 +142,11 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
         classroom: classRoomController.text.isNotEmpty
             ? classRoomController.text
             : null,
-        timeRanges: chosenDates.map((e) {
+        timeRanges: datesToSave.map((e) {
           final String key =
               '${e.start.microsecondsSinceEpoch}-${e.end.microsecondsSinceEpoch}';
           return CustomClassTimeRange(
-            id:
-                existingRangeIds[key] ??
-                customClassController.generateTimeRangeId(),
+            id: existingRangeIds[key] ?? widget.state.newTimeRangeId(),
             startTime: e.start,
             endTime: e.end,
           );
@@ -124,6 +156,37 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
     } catch (e) {
       showToast(context: context, msg: e.toString());
     }
+  }
+
+  List<DateTimeRange> _generateWeeklyDates() {
+    final List<DateTimeRange> dates = [];
+    final DateTime semesterStart = widget.state.startDay;
+    for (var week = 0; week < chosenWeeks.length; week++) {
+      if (!chosenWeeks[week]) continue;
+
+      final DateTime day = semesterStart.add(
+        Duration(days: week * 7 + selectedWeekday - 1),
+      );
+      dates.add(
+        DateTimeRange(
+          start: DateTime(
+            day.year,
+            day.month,
+            day.day,
+            selectedStartTime.hour,
+            selectedStartTime.minute,
+          ),
+          end: DateTime(
+            day.year,
+            day.month,
+            day.day,
+            selectedEndTime.hour,
+            selectedEndTime.minute,
+          ),
+        ),
+      );
+    }
+    return dates;
   }
 
   @override
@@ -202,17 +265,63 @@ class _ClassAddWindowState extends State<ClassAddWindow> {
                   ).padding(vertical: inputFieldVerticalPadding),
                 ],
               ).padding(vertical: 8),
-              DateSelectorFree(
-                initialDates: chosenDates,
-                semesterStartDay: semesterStartDate,
-                semesterLength: widget.semesterLength,
-                onChanged: (dates) {
-                  chosenDates = dates;
-                },
-                color: color,
-                deleteColor: deleteColor,
-                enableBorder: true,
-              ),
+              if (canUseWeeklySchedule && widget.customToChange == null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
+                      ChoiceChip(
+                        label: Text(context.t.classtable.classAdd.repeatWeekly),
+                        selected:
+                            scheduleInputMode == _ScheduleInputMode.weekly,
+                        onSelected: (_) => setState(
+                          () => scheduleInputMode = _ScheduleInputMode.weekly,
+                        ),
+                      ),
+
+                      ChoiceChip(
+                        label: Text(context.t.classtable.classAdd.freeTime),
+                        selected:
+                            scheduleInputMode == _ScheduleInputMode.exactDates,
+                        onSelected: (_) => setState(
+                          () =>
+                              scheduleInputMode = _ScheduleInputMode.exactDates,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (scheduleInputMode == _ScheduleInputMode.weekly) ...[
+                WeekSelector(
+                  key: const ValueKey('weekly-class-weeks'),
+                  initialWeeks: chosenWeeks,
+                  onChanged: (weeks) => chosenWeeks = List<bool>.from(weeks),
+                  color: color,
+                ),
+                TimeSelector(
+                  initialWeekday: selectedWeekday,
+                  initialStartTime: selectedStartTime,
+                  initialEndTime: selectedEndTime,
+                  onChanged: (selection) {
+                    selectedWeekday = selection.$1;
+                    selectedStartTime = selection.$2;
+                    selectedEndTime = selection.$3;
+                  },
+                  color: color,
+                ),
+              ] else
+                DateSelectorFree(
+                  initialDates: chosenDates,
+                  semesterStartDay: widget.state.startDay,
+                  semesterLength: widget.state.semesterLength,
+                  onChanged: (dates) {
+                    chosenDates = dates;
+                  },
+                  color: color,
+                  deleteColor: deleteColor,
+                  enableBorder: true,
+                ),
             ],
           ),
         ),

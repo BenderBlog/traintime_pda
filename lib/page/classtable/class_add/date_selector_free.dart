@@ -9,8 +9,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:watermeter/page/public_widget/toast.dart';
-import 'package:watermeter/page/public_widget/wheel_choser.dart';
 import 'package:watermeter/generated/translations.g.dart';
+import 'package:watermeter/page/classtable/model/classtable_constant.dart';
 
 class DateSelectorFree extends StatefulWidget {
   final List<DateTimeRange> initialDates;
@@ -68,17 +68,6 @@ class _DateSelectorFree extends State<DateSelectorFree> {
     return value >= _earliestInMinutes && value <= _latestInMinutes;
   }
 
-  List<int> _allowedMinutes(int hour, {required bool isStart}) {
-    if (hour == 8) {
-      return List<int>.generate(30, (index) => index + 30);
-    }
-    if (hour == 21) {
-      final int maxMinute = isStart ? 24 : 25;
-      return List<int>.generate(maxMinute + 1, (index) => index);
-    }
-    return List<int>.generate(60, (index) => index);
-  }
-
   TimeOfDay _sanitizeTime(TimeOfDay source, {required bool isStart}) {
     int hour = source.hour.clamp(8, 21);
     int minute = source.minute;
@@ -110,221 +99,63 @@ class _DateSelectorFree extends State<DateSelectorFree> {
       end = TimeOfDay(hour: fixedEnd ~/ 60, minute: fixedEnd % 60);
     }
 
-    return await showModalBottomSheet<(TimeOfDay, TimeOfDay)>(
+    FocusScope.of(context).unfocus();
+    final startSelection = await showTimePicker(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext builderContext) {
-        return StatefulBuilder(
-          builder: (context, setModalState) => SizedBox(
-            height: 480,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(builderContext).pop(),
-                        child: Text(
-                          context.t.common.cancel,
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                      Text(
-                        helpText,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (!_isInRange(start) || !_isInRange(end)) {
-                            showToast(
-                              context: context,
-                              msg: context
-                                  .t
-                                  .classtable
-                                  .classAdd
-                                  .dateSelectorFree
-                                  .rule,
-                            );
-                            return;
-                          }
-                          if (_minutesOf(end) <= _minutesOf(start)) {
-                            showToast(
-                              context: context,
-                              msg: context
-                                  .t
-                                  .classtable
-                                  .classAdd
-                                  .dateSelectorFree
-                                  .rule2,
-                            );
-                            return;
-                          }
-                          Navigator.of(builderContext).pop((start, end));
-                        },
-                        child: Text(
-                          context.t.common.confirm,
-                          style: TextStyle(color: widget.color),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                    children: [
-                      _buildTimeEditor(
-                        keyPrefix: 'start',
-                        isStart: true,
-                        title: context
-                            .t
-                            .classtable
-                            .classAdd
-                            .dateSelectorFree
-                            .classStartTime,
-                        color: widget.color,
-                        current: start,
-                        onHourChanged: (hour) {
-                          setModalState(() {
-                            final mins = _allowedMinutes(hour, isStart: true);
-                            int minute = start.minute;
-                            if (!mins.contains(minute)) {
-                              minute = mins.first;
-                            }
-                            start = TimeOfDay(hour: hour, minute: minute);
-                          });
-                        },
-                        onMinuteChanged: (minute) {
-                          setModalState(() {
-                            start = TimeOfDay(hour: start.hour, minute: minute);
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildTimeEditor(
-                        keyPrefix: 'end',
-                        isStart: false,
-                        title: context
-                            .t
-                            .classtable
-                            .classAdd
-                            .dateSelectorFree
-                            .classEndTime,
-                        color: widget.color,
-                        current: end,
-                        onHourChanged: (hour) {
-                          setModalState(() {
-                            final mins = _allowedMinutes(hour, isStart: false);
-                            int minute = end.minute;
-                            if (!mins.contains(minute)) {
-                              minute = mins.first;
-                            }
-                            end = TimeOfDay(hour: hour, minute: minute);
-                          });
-                        },
-                        onMinuteChanged: (minute) {
-                          setModalState(() {
-                            end = TimeOfDay(hour: end.hour, minute: minute);
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTimeEditor({
-    required String keyPrefix,
-    required bool isStart,
-    required String title,
-    required Color color,
-    required TimeOfDay current,
-    required ValueChanged<int> onHourChanged,
-    required ValueChanged<int> onMinuteChanged,
-  }) {
-    final allowedHours = List<int>.generate(14, (index) => index + 8);
-    final allowedMinutes = _allowedMinutes(current.hour, isStart: isStart);
-    final hourPage = allowedHours.indexOf(current.hour);
-    final minutePage = allowedMinutes.indexOf(current.minute);
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: color.withValues(alpha: 0.08),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(color: color, fontWeight: FontWeight.w600),
-          ),
-          SizedBox(
-            height: 140,
-            child: Row(
-              children: [
-                Expanded(
-                  child: WheelChoose<int>(
-                    defaultPage: hourPage < 0 ? 0 : hourPage,
-                    changeBookIdCallBack: onHourChanged,
-                    options: allowedHours
-                        .map(
-                          (hour) => WheelChooseOptions(
-                            data: hour,
-                            hint: hour.toString().padLeft(2, '0'),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-                const Text(
-                  ':',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Expanded(
-                  child: WheelChoose<int>(
-                    key: ValueKey('$keyPrefix-${current.hour}'),
-                    defaultPage: minutePage < 0 ? 0 : minutePage,
-                    changeBookIdCallBack: onMinuteChanged,
-                    options: allowedMinutes
-                        .map(
-                          (minute) => WheelChooseOptions(
-                            data: minute,
-                            hint: minute.toString().padLeft(2, '0'),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      initialTime: start,
+      initialEntryMode: TimePickerEntryMode.input,
+      helpText:
+          '$helpText · ${context.t.classtable.classAdd.dateSelectorFree.classStartTime}',
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
       ),
     );
+    if (!context.mounted || startSelection == null) return null;
+    if (!_isInRange(startSelection)) {
+      showToast(
+        context: context,
+        msg: context.t.classtable.classAdd.dateSelectorFree.rule,
+      );
+      return null;
+    }
+    start = startSelection;
+
+    if (_minutesOf(end) <= _minutesOf(start)) {
+      final int suggestedEnd = (_minutesOf(start) + 60).clamp(
+        _earliestInMinutes + 1,
+        _latestInMinutes,
+      );
+      end = TimeOfDay(hour: suggestedEnd ~/ 60, minute: suggestedEnd % 60);
+    }
+
+    final endSelection = await showTimePicker(
+      context: context,
+      initialTime: end,
+      initialEntryMode: TimePickerEntryMode.input,
+      helpText:
+          '$helpText · ${context.t.classtable.classAdd.dateSelectorFree.classEndTime}',
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (!context.mounted || endSelection == null) return null;
+    if (!_isInRange(endSelection)) {
+      showToast(
+        context: context,
+        msg: context.t.classtable.classAdd.dateSelectorFree.rule,
+      );
+      return null;
+    }
+    if (_minutesOf(endSelection) <= _minutesOf(start)) {
+      showToast(
+        context: context,
+        msg: context.t.classtable.classAdd.dateSelectorFree.rule2,
+      );
+      return null;
+    }
+    return (start, endSelection);
   }
 
   Future<void> _editChosenDate(int index) async {
@@ -506,6 +337,12 @@ class _DateSelectorFree extends State<DateSelectorFree> {
             if (chosenDatesRanges.isNotEmpty)
               ...List.generate(chosenDatesRanges.length, (index) {
                 final d = chosenDatesRanges[index];
+                final weekNumber =
+                    DateUtils.dateOnly(
+                          d.start,
+                        ).difference(_semesterFirstDate).inDays ~/
+                        7 +
+                    1;
                 return Padding(
                   padding: EdgeInsetsGeometry.only(top: 8),
                   child: Material(
@@ -530,13 +367,23 @@ class _DateSelectorFree extends State<DateSelectorFree> {
                             Icon(Icons.schedule, color: widget.color, size: 18),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(
-                                '${DateFormat('yyyy-MM-dd').format(d.start)}  '
-                                '${DateFormat('HH:mm').format(d.start)}-${DateFormat('HH:mm').format(d.end)}',
-                                style: TextStyle(
-                                  color: widget.color,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${DateFormat('yyyy-MM-dd').format(d.start)} · '
+                                    '${getWeekString(context, d.start.weekday - 1)} · '
+                                    '${context.t.classtable.weekTitle(week: '$weekNumber')}',
+                                    style: TextStyle(
+                                      color: widget.color,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${DateFormat('HH:mm').format(d.start)}-${DateFormat('HH:mm').format(d.end)}',
+                                    style: TextStyle(color: widget.color),
+                                  ),
+                                ],
                               ),
                             ),
                             IconButton(
