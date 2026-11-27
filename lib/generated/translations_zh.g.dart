@@ -45,6 +45,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$classtable$zh classtable = Translations$classtable$zh.internal(_root);
 	late final Translations$clubPromotion$zh clubPromotion = Translations$clubPromotion$zh.internal(_root);
 	late final Translations$common$zh common = Translations$common$zh.internal(_root);
+	late final Translations$courseLiveUpdate$zh courseLiveUpdate = Translations$courseLiveUpdate$zh.internal(_root);
 	late final Translations$courseReminder$zh courseReminder = Translations$courseReminder$zh.internal(_root);
 	late final Translations$dormWater$zh dormWater = Translations$dormWater$zh.internal(_root);
 	late final Translations$easterEggRobot$zh easterEggRobot = Translations$easterEggRobot$zh.internal(_root);
@@ -302,6 +303,30 @@ class Translations$common$zh {
 
 	/// zh: '加载错误'
 	String get loadError => '加载错误';
+}
+
+// Path: courseLiveUpdate
+class Translations$courseLiveUpdate$zh {
+	Translations$courseLiveUpdate$zh.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// zh: '第 {start}-{stop} 节'
+	String period({required Object start, required Object stop}) => '第 ${start}-${stop} 节';
+
+	/// zh: '第 {start} 节'
+	String periodSingle({required Object start}) => '第 ${start} 节';
+
+	/// zh: '下一节 {time} · {location}'
+	String nextClass({required Object time, required Object location}) => '下一节 ${time} · ${location}';
+
+	/// zh: '即将开始'
+	String get upcomingStart => '即将开始';
+
+	/// zh: '未知教室'
+	String get noLocation => '未知教室';
 }
 
 // Path: courseReminder
@@ -4183,6 +4208,24 @@ class Translations$setting$notificationPage$zh {
 	/// zh: '分钟'
 	String get minutesUnit => '分钟';
 
+	/// zh: '实时更新（岛）'
+	String get liveUpdateSection => '实时更新（岛）';
+
+	/// zh: '上课时显示在岛上'
+	String get liveUpdateEnabled => '上课时显示在岛上';
+
+	/// zh: '上课期间一直挂在状态栏/岛上，放学自动消失；和提醒是两回事'
+	String get liveUpdateEnabledHint => '上课期间一直挂在状态栏/岛上，放学自动消失；和提醒是两回事';
+
+	/// zh: '提前多久上岛'
+	String get liveUpdateLead => '提前多久上岛';
+
+	/// zh: '只影响岛，不响铃；上面的「提前提醒时间」才是会响的那条'
+	String get liveUpdateLeadHint => '只影响岛，不响铃；上面的「提前提醒时间」才是会响的那条';
+
+	/// zh: '上课时'
+	String get liveUpdateLeadAtClass => '上课时';
+
 	/// zh: '计划通知天数'
 	String get daysToSchedule => '计划通知天数';
 
@@ -5429,6 +5472,11 @@ extension on Translations {
 			'common.easterEggApple' => '=== 带我飞向月亮吧 ===\n歌声演绎：Frank Sintara, 1964\n\n带我飞向月亮吧\n让我和星星共舞嬉戏\n\n我好想知道\n木星和火星上的春天\n是什么颜色的\n\n让你的歌声温暖我的心\n我会一直歌唱下去\n\n我日夜都在想你和牵挂你\n请你真心接受我 我爱你\n\n=== 沉浸在你的爱意中 ===\n吉他演奏：Earl Klugh, 1976\n\n无法忘怀这种感觉，被你的爱包裹的温暖\n不想失去这种感觉，被你的爱抚摸的舒适\n你让我感到好自在，被你的爱托举的坚强\n想一直在你怀中，沉浸在你的爱意中\n我不敢向你说出，我对你的心意和爱\n',
 			'common.easterEggOthers' => '=== 百变小樱魔术卡之小樱卡篇主题曲 ===\n歌声演绎：Maaya Sakamoto, 2000\n（原歌词为日文，按照英语翻译二翻）\n\nI am a dreamer, 有无限的力量\n\n我的世界有梦想、热爱与踌躇\n但有些东西，我依旧无法想象\n我想向着广阔的天空，寻求自己的方向\n\n我要追求自己的梦想\n努力让自己的心愿成真\n虽困难重重也要继续前行\n\n等待奇迹 等待美好\n用心感受这个世界\n最终 一定会出乎意料\n\n=== 沉浸在你的爱意中 ===\n吉他演奏：Earl Klugh, 1976\n\n无法忘怀这种感觉，被你的爱包裹的温暖\n不想失去这种感觉，被你的爱抚摸的舒适\n你让我感到好自在，被你的爱托举的坚强\n想躺在你的怀中，沉浸在你的爱意\n而且，我不敢想你说出，我现在的心意\n',
 			'common.loadError' => '加载错误',
+			'courseLiveUpdate.period' => ({required Object start, required Object stop}) => '第 ${start}-${stop} 节',
+			'courseLiveUpdate.periodSingle' => ({required Object start}) => '第 ${start} 节',
+			'courseLiveUpdate.nextClass' => ({required Object time, required Object location}) => '下一节 ${time} · ${location}',
+			'courseLiveUpdate.upcomingStart' => '即将开始',
+			'courseLiveUpdate.noLocation' => '未知教室',
 			'courseReminder.title' => ({required Object name}) => '课前提醒：${name}',
 			'courseReminder.body' => ({required Object time}) => '${time} 分钟后开始上课',
 			'courseReminder.location' => ({required Object location}) => '地点：${location}',
@@ -5701,13 +5749,13 @@ extension on Translations {
 			'homepage.classTableCard.onHoliday' => '假期中',
 			'homepage.classTableCard.errorMessage' => ({required Object error}) => '遇到错误：${error}',
 			'homepage.classTableCard.fetchingMessage' => '正在获取课表',
+			_ => null,
+		} ?? switch (path) {
 			'homepage.classTableCard.errorInfoText' => '遇到错误',
 			'homepage.classTableCard.fetchingInfoText' => '正在加载',
 			'homepage.classTableCard.noArrangementInfoText' => '暂无日程',
 			'homepage.classTableCard.scheduleFetchingMessage' => '日程正在加载，请稍后查看',
 			'homepage.classTableCard.scheduleErrorMessage' => '日程加载失败，请稍后重试',
-			_ => null,
-		} ?? switch (path) {
 			'homepage.classTableCard.scheduleFetchingInfoText' => '正在加载日程',
 			'homepage.classTableCard.scheduleErrorInfoText' => '日程加载失败',
 			'homepage.classTableCard.scheduleNoneInfoText' => '暂无日程',
@@ -6164,6 +6212,12 @@ extension on Translations {
 			'setting.notificationPage.minutesBefore' => '提前提醒时间',
 			'setting.notificationPage.minutesBeforeHint' => '课前提前提醒的时间设置',
 			'setting.notificationPage.minutesUnit' => '分钟',
+			'setting.notificationPage.liveUpdateSection' => '实时更新（岛）',
+			'setting.notificationPage.liveUpdateEnabled' => '上课时显示在岛上',
+			'setting.notificationPage.liveUpdateEnabledHint' => '上课期间一直挂在状态栏/岛上，放学自动消失；和提醒是两回事',
+			'setting.notificationPage.liveUpdateLead' => '提前多久上岛',
+			'setting.notificationPage.liveUpdateLeadHint' => '只影响岛，不响铃；上面的「提前提醒时间」才是会响的那条',
+			'setting.notificationPage.liveUpdateLeadAtClass' => '上课时',
 			'setting.notificationPage.daysToSchedule' => '计划通知天数',
 			'setting.notificationPage.daysToScheduleHint' => '本程序是提前将课程信息写入计划日程，该设置可调整写入计划日程的天数',
 			'setting.notificationPage.daysUnit' => '天',
@@ -6209,6 +6263,8 @@ extension on Translations {
 			'setting.needCloseDialog.title' => '请关闭应用',
 			'setting.needCloseDialog.content' => '因为技术限制，用户需要自行关闭窗口，然后重新打开应用。',
 			'setting.changeColorDialog.title' => '颜色设置',
+			_ => null,
+		} ?? switch (path) {
 			'setting.changeColorDialog.kDefault' => '默认颜色',
 			'setting.changeColorDialog.blue' => '聪明蓝',
 			'setting.changeColorDialog.deepPurple' => '基佬紫',
@@ -6220,8 +6276,6 @@ extension on Translations {
 			'setting.changeBrightnessDialog.dayMode' => '浅色',
 			'setting.changeBrightnessDialog.nightMode' => '深色',
 			'setting.changeSwiftDialog.title' => '课程偏移设置',
-			_ => null,
-		} ?? switch (path) {
 			'setting.changeSwiftDialog.inputHint' => '请在此输入数字',
 			'setting.changeSwiftDialog.invalidNumber' => '请输入有效的整数',
 			'setting.changeElectricityTitle' => '修改电费帐号',

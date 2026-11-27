@@ -113,5 +113,7 @@
 	<string>Access contacts for event attendee editing.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Access most functions for calendar viewing and editing.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 </dict>
 </plist>
